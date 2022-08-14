@@ -12,7 +12,7 @@ class PunchData {
       this.state);
 }
 
-class ToStore{
+class PunchDataList{
   int allTime = 0;
   int valid = 0;
   List<PunchData> all = [];

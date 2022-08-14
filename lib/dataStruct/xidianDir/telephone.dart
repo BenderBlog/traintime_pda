@@ -38,7 +38,7 @@ class TeleyInformation {
   String? northTeley;
   String? southTeley;
 }
-
+/*
 List<TeleyInformation> emmm = [
   TeleyInformation(title: "WTF"),
   TeleyInformation(
@@ -60,3 +60,4 @@ List<TeleyInformation> emmm = [
       northTeley: "Bart把他们家电话线绞了",
       isNorth: true),
 ];
+*/

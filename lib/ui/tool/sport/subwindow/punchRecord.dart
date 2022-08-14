@@ -23,6 +23,7 @@ class PunchRecordWindow extends StatefulWidget {
 }
 
 class _PunchRecordWindowState extends State<PunchRecordWindow> {
+  bool isValid = false;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -30,27 +31,51 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => _get(),
-            child: FutureBuilder<ToStore>(
+            child: FutureBuilder<PunchDataList>(
               future: _get(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasError) {
-                    return Center(child: Text("坏事: ${snapshot.error} / ${snapshot.data} / ${toUse.userId}"));
+                    return Center(child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
                   } else {
-                    return ListView(
-                      children: [
-                        TitleLine(
-                            child:Container(
-                              padding: const EdgeInsets.all(10),
-                              child: Text(
-                                "总次数：${snapshot.data.allTime}      成功次数：${snapshot.data.valid}",
-                                textScaleFactor: 1.2,
-                              ),
-                            )
+                    return Scaffold(
+                      body: Column(
+                        children: [
+                          TitleLine(
+                              child:Container(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  children:[
+                                    Text(
+                                      "总次数：${snapshot.data.allTime}      成功次数：${snapshot.data.valid}",
+                                      textScaleFactor: 1.2,
+                                    ),
+                                  ],
+                                ),
+                              )
+                          ),
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                for (int i = snapshot.data.all.length - 1; i >=0 ; --i)
+                                  RecordCard(mark: i + 1, toUse: snapshot.data.all[i]),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      floatingActionButton: FloatingActionButton.extended(
+                        onPressed: () {
+                          setState(() {
+                            isValid = !isValid;
+                          });
+                        },
+                        label: Text(
+                          isValid ? "查看所有记录" : "查看成功记录",
+                          textScaleFactor: 1.1,
                         ),
-                        for (int i = snapshot.data.all.length - 1; i >=0 ; --i)
-                          RecordCard(mark: i + 1, toUse: snapshot.data.all[i]),
-                      ],
+                        backgroundColor: Colors.deepPurple,
+                      ),
                     );
                   }
                 } else {
@@ -64,8 +89,8 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
     );
   }
 
-  Future<ToStore> _get() async =>
-      getPunchData();
+  Future<PunchDataList> _get() async =>
+      getPunchData(isValid);
 }
 
 class RecordCard extends StatelessWidget {
@@ -102,18 +127,10 @@ class RecordCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  /*CircleAvatar(
-                      radius: 12.5,
-                      backgroundColor: Colors.deepPurple,
-                      child: Text(
-                          mark.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          )
-                      )
-                  ),*/
-                  Text(mark.toString()),
+                  TagsBoxes(
+                    text: mark.toString(),
+                    backgroundColor: Colors.deepPurple,
+                  ),
                   situation(),
                 ],
               ),
@@ -122,7 +139,7 @@ class RecordCard extends StatelessWidget {
                 children: [
                   const SizedBox(width: 5),
                   Text(
-                    "于 ${toUse.punchDay} ${toUse.punchTime} 在${toUse.machineName}",
+                    "于 ${toUse.punchDay} ${toUse.punchTime} 在 ${toUse.machineName}",
                     textScaleFactor: 1.1,
                   ),
                 ],

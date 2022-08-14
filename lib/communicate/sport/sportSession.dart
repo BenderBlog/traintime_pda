@@ -143,12 +143,11 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8S
     } else {
       throw "获取学期信息失败：${response["returnMsg"]}";
     }
-
   }
 
   
-  Future<ToStore> getPunchData () async {
-    ToStore toReturn = ToStore();
+  Future<PunchDataList> getPunchData (bool isValid) async {
+    PunchDataList toReturn = PunchDataList();
     if (userId == ""){
       await login(username: account, password: password);
     }
@@ -161,11 +160,14 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8S
         'pageIndex': "1"
       },
     );
-    /*if (response["returnCode"] != 200 || response["returnCode"] != "200") {
-      throw "获取失败：${response["returnMsg"]}";
-    }*/
-    print(response);
     for (var i in response["data"]){
+      toReturn.allTime++;
+      if (i["state"].toString().contains("恭喜你本次打卡成功")){
+        toReturn.valid++;
+      }
+      if (isValid && !i["state"].toString().contains("恭喜你本次打卡成功")){
+        continue;
+      }
       toReturn.all.add(PunchData(
           i["machineName"],
           i["weekNum"],
@@ -174,12 +176,11 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8S
           i["state"]
       ));
     }
-    toReturn.allTime = response["total"];
     return toReturn;
   }
 }
 
 var toUse = SportSession();
 
-Future<ToStore> getPunchData() => toUse.getPunchData();
+Future<PunchDataList> getPunchData(bool isValid) => toUse.getPunchData(isValid);
 
