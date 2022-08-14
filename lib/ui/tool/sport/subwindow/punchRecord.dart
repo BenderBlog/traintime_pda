@@ -94,9 +94,10 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
 }
 
 class RecordCard extends StatelessWidget {
-  PunchData toUse;
-  int mark;
-  RecordCard({Key? key, required this.mark, required this.toUse}) : super(key: key);
+
+  final PunchData toUse;
+  final int mark;
+  const RecordCard({Key? key, required this.mark, required this.toUse}) : super(key: key);
 
   TagsBoxes situation () {
     String toShow;

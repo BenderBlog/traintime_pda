@@ -15,9 +15,9 @@ if you want to use.
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:crypto/crypto.dart';
 import 'package:watermeter/dataStruct/sport/punch.dart';
+import 'package:watermeter/dataStruct/sport/score.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:watermeter/communicate/general.dart';
@@ -42,7 +42,15 @@ class SportSession {
   final _baseURL = 'http://xd.5itsn.com/app/';
 
   final rsaKey = """-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8Soh/NzEmry77QDZ2koyr96M5Wx+A9cxwewQMHzi8RoOfb3UcQO4UDQlMUImLuzUnfbk3TTppijSLH+PU88XQxcgYm2JTa546c7JdZSI6dBeXOJH20quuxWyzgLk9jAlt3ytYygPQ7C6o6ZSmjcMgE3xgLaHGvixEVpOjL/pdVLzXhrMqWVAnB/snMjpCqesDVTDe5c6OOmj2q5J8n+tzIXtnvrkxQSDaUp8DWF8meMwyTErmYklMXzKic2rjdYZpHh4x98Fg0Q28sp6i2ZoWiGrJDKW29mntVQQiDNhKDawb4B45zUwIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4l
+aolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8Soh/NzEmry77QDZ
+2koyr96M5Wx+A9cxwewQMHzi8RoOfb3UcQO4UDQlMUImLuz
+Unfbk3TTppijSLH+PU88XQxcgYm2JTa546c7JdZSI6dBeXO
+JH20quuxWyzgLk9jAlt3ytYygPQ7C6o6ZSmjcMgE3xgLaHG
+vixEVpOjL/pdVLzXhrMqWVAnB/snMjpCqesDVTDe5c6OOmj
+2q5J8n+tzIXtnvrkxQSDaUp8DWF8meMwyTErmYklMXzKic2
+rjdYZpHh4x98Fg0Q28sp6i2ZoWiGrJDKW29mntVQQiDNhKD
+awb4B45zUwIDAQAB
 -----END PUBLIC KEY-----""";
 
   final _commonHeader = {
@@ -123,7 +131,7 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8S
         "openid": ""
       },
     );
-    if (response["returnCode"] != "200") {
+    if (response["returnCode"] != "200" && response["returnCode"] != 200) {
       throw "登陆失败：${response["returnMsg"]}";
     } else {
       userId = response["data"]["id"].toString();
@@ -145,7 +153,6 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8S
     }
   }
 
-  
   Future<PunchDataList> getPunchData (bool isValid) async {
     PunchDataList toReturn = PunchDataList();
     if (userId == ""){
@@ -178,9 +185,48 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3Oa5pS/uCPlZfASK8S
     }
     return toReturn;
   }
+
+  Future<SportScore> getSportScore () async {
+    SportScore toReturn = SportScore();
+    if (userId == ""){
+      await login(username: account, password: password);
+    }
+    var response = await require(
+      subWebsite: "measure/getStuTotalScore",
+      body: { "userId": userId },
+    );
+    for (var i in response["data"]){
+      if (i.keys.contains("graduationStatus")) {
+        toReturn.total = i["totalScore"];
+        toReturn.detail = i["gradeType"];
+      } else {
+        SportScoreOfYear toAdd = SportScoreOfYear(
+          year: i["year"],
+          totalScore: i["totalScore"],
+          rank: i["rank"],
+          gradeType: i["gradeType"]
+        );
+        var anotherResponse = await require(
+          subWebsite: "measure/getStuScoreDetail",
+          body: { "meaScoreId": i["meaScoreId"] },
+        );
+        for (var i in anotherResponse["data"]){
+          toAdd.details.add(SportItems(
+              examName: i["examName"],
+              examunit: i["examunit"],
+              actualScore: i["actualScore"] ?? "0",
+              score: i["score"] ?? 0.0,
+              rank: i["rank"] ?? "不及格"
+          ));
+        }
+        toReturn.list.add(toAdd);
+      }
+    }
+    return toReturn;
+  }
 }
 
 var toUse = SportSession();
 
 Future<PunchDataList> getPunchData(bool isValid) => toUse.getPunchData(isValid);
-
+Future<SportScore> getSportScore() => toUse.getSportScore();

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/ui/tool/sport/sportWindow.dart';
 
 class ToolWindow extends StatelessWidget {
-  ToolWindow({Key? key, required this.contextFromPage}) : super(key: key);
-  BuildContext contextFromPage;
+
+  final BuildContext contextFromPage;
+  const ToolWindow({Key? key, required this.contextFromPage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +25,11 @@ class ToolWindow extends StatelessWidget {
         crossAxisCount: 2,
         children: [
           MaterialButton(
-            child: Text("体育查询"),
+            child: const Text("体育查询"),
             onPressed: () {
               Navigator.of(contextFromPage).push(
                 MaterialPageRoute(builder: (context) {
-                  return SportWindow();
+                  return const SportWindow();
                 }),
               );
             },
