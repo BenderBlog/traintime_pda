@@ -11,14 +11,25 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
+import 'package:watermeter/dataStruct/user.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  bool isFirst = false;
+  try {
+    await initUser();
+  } on String {
+    isFirst = true;
+  }
+  print("isFirst = $isFirst");
+  runApp(MyApp(isFirst: isFirst,));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final bool isFirst;
+  const MyApp({Key? key, required this.isFirst}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -28,7 +39,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const HomePage(),
+      home: isFirst ? const LoginWindow() : const HomePage(),
     );
   }
 }

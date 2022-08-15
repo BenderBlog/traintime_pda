@@ -45,11 +45,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-/assets/xidianDirShop.json
-/assets/zhuyuan.json
-/assets/dingxiang.json
-/assets/haitang.json
-/assets/xidianDirCafeteria.json
-/assets/sportPunch_All.json
-/assets/sport_term.json
-/assets/sport_inital.json
+/assets/*

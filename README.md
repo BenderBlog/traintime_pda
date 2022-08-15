@@ -9,7 +9,7 @@ Still in development, and no deadline, may never ends.
 
 Xidian Directory: Functional, but need to add report function.  
 (now pending since data is too old and nobody update it, maybe when I finish the whole).   
-Sport Punch Record / Sport Score: Functional, but I need to write a cache-like things.
+Sport Punch Record / Sport Score: Functional, but I need to write a cache-like things.  
 IDS related: Trouble with the implementation of web code.  
 Classtable Window: Found one on the Internet. When IDS completed.  
 

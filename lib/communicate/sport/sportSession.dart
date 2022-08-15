@@ -20,6 +20,7 @@ import 'package:watermeter/dataStruct/sport/punch.dart';
 import 'package:watermeter/dataStruct/sport/score.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/communicate/general.dart';
 
 // Test only.
@@ -119,9 +120,12 @@ awb4B45zUwIDAQAB
   }
 
   Future<void> login ({
-    required String username,
-    required String password,
+    required String? username,
+    required String? password,
   }) async {
+    if (username == null || password == null){
+      throw "请在设置里面设置体适能密码";
+    }
     this.username = username;
     var response = await require(
       subWebsite: "/h5/login",
@@ -132,7 +136,7 @@ awb4B45zUwIDAQAB
       },
     );
     if (response["returnCode"] != "200" && response["returnCode"] != 200) {
-      throw "登陆失败：${response["returnMsg"]}";
+      throw "登录失败：${response["returnMsg"]}";
     } else {
       userId = response["data"]["id"].toString();
       _commonHeader["token"] = response["data"]["token"];
@@ -156,7 +160,7 @@ awb4B45zUwIDAQAB
   Future<PunchDataList> getPunchData (bool isValid) async {
     PunchDataList toReturn = PunchDataList();
     if (userId == ""){
-      await login(username: account, password: password);
+      await login(username: user["idsAccount"], password: user["sportPassword"]);
     }
     var response = await require(
       subWebsite: "stuPunchRecord/findPager",
@@ -189,7 +193,7 @@ awb4B45zUwIDAQAB
   Future<SportScore> getSportScore () async {
     SportScore toReturn = SportScore();
     if (userId == ""){
-      await login(username: account, password: password);
+      await login(username: user["idsAccount"], password: user["sportPassword"]);
     }
     var response = await require(
       subWebsite: "measure/getStuTotalScore",

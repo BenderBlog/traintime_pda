@@ -18,6 +18,3 @@ class PunchDataList{
   List<PunchData> all = [];
 }
 
-/// Should be identical to the student id.
-String account = "";
-String password = "";

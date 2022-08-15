@@ -39,8 +39,8 @@ class HomePage extends StatelessWidget {
 }
 
 class MyDrawer extends Drawer {
-  MyDrawer({Key? key, required this.contextFromPage}) : super(key: key);
-  BuildContext contextFromPage;
+  const MyDrawer({Key? key, required this.contextFromPage}) : super(key: key);
+  final BuildContext contextFromPage;
 
   @override
   // TODO: implement child
