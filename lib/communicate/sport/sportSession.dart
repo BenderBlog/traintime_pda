@@ -23,9 +23,6 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/communicate/general.dart';
 
-// Test only.
-import 'package:cookie_jar/cookie_jar.dart';
-
 /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
 String rsaEncrypt(String toEnc, String pubKey) {
   dynamic publicKey = RSAKeyParser().parse(pubKey);
@@ -33,8 +30,6 @@ String rsaEncrypt(String toEnc, String pubKey) {
 }
 
 class SportSession {
-
-  CookieJar mooncake = CookieJar();
 
   var username = "";
 
@@ -94,7 +89,7 @@ awb4B45zUwIDAQAB
       baseUrl: _baseURL,
       contentType: Headers.formUrlEncodedContentType,
     ));
-    toReturn.interceptors.add(CookieManager(mooncake));
+    toReturn.interceptors.add(CookieManager(cookieJar));
     return toReturn;
   }
 
@@ -114,7 +109,7 @@ awb4B45zUwIDAQAB
     );
     if (kDebugMode) {
       print(response.data);
-      print(await mooncake.loadForRequest(Uri.parse("http://xd.5itsn.com")));
+      print(await cookieJar.loadForRequest(Uri.parse("http://xd.5itsn.com")));
     }
     return response.data;
   }

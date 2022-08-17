@@ -10,22 +10,36 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/dataStruct/user.dart';
 
+
 void main() async {
+  // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
+  // Loading cookiejar.
+  Directory supportPath = await getApplicationSupportDirectory();
+  cookieJar = PersistCookieJar(storage: FileStorage(supportPath.path));
+  // Have user registered?
   bool isFirst = false;
   try {
     await initUser();
   } on String {
     isFirst = true;
   }
-  print("isFirst = $isFirst");
-  runApp(MyApp(isFirst: isFirst,));
+  if (kDebugMode) {
+    print("isFirst = $isFirst");
+  }
+  runApp(MyApp(isFirst: isFirst));
 }
+
 
 class MyApp extends StatelessWidget {
   final bool isFirst;
