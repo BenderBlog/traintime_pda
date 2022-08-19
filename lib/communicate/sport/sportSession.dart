@@ -89,7 +89,7 @@ awb4B45zUwIDAQAB
       baseUrl: _baseURL,
       contentType: Headers.formUrlEncodedContentType,
     ));
-    toReturn.interceptors.add(CookieManager(cookieJar));
+    toReturn.interceptors.add(CookieManager(SportCookieJar));
     return toReturn;
   }
 
@@ -109,7 +109,7 @@ awb4B45zUwIDAQAB
     );
     if (kDebugMode) {
       print(response.data);
-      print(await cookieJar.loadForRequest(Uri.parse("http://xd.5itsn.com")));
+      print(await SportCookieJar.loadForRequest(Uri.parse("http://xd.5itsn.com")));
     }
     return response.data;
   }

@@ -11,6 +11,7 @@ if you want to use.
 */
 
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,13 +21,16 @@ import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/dataStruct/user.dart';
 
+import 'package:watermeter/communicate/IDS/ids.dart';
+
 
 void main() async {
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
   // Loading cookiejar.
   Directory supportPath = await getApplicationSupportDirectory();
-  cookieJar = PersistCookieJar(storage: FileStorage(supportPath.path));
+  SportCookieJar = PersistCookieJar(storage: FileStorage("${supportPath.path}/sport"));
+  IDSCookieJar = PersistCookieJar(storage: FileStorage("${supportPath.path}/ids"));
   // Have user registered?
   bool isFirst = false;
   try {
@@ -36,6 +40,21 @@ void main() async {
   }
   if (kDebugMode) {
     print("isFirst = $isFirst");
+  }
+  if (!isFirst) {
+    // For test purpose.
+    try {
+      await ids.isLoggedIn();
+    } on String {
+      print("没登录，呜哇");
+      try {
+        await ids.login(username: user["idsAccount"]!, password: user["idsPassword"]!, target: "http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html");
+      } on DioError catch (e) {
+        print(e.response);
+      }
+    } finally {
+      print("希望这样登录了吧");
+    }
   }
   runApp(MyApp(isFirst: isFirst));
 }
