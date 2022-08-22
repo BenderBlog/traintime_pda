@@ -20,8 +20,7 @@ import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/dataStruct/user.dart';
-
-import 'package:watermeter/communicate/IDS/ids.dart';
+import 'package:watermeter/communicate/IDS/ehall.dart';
 
 
 void main() async {
@@ -29,8 +28,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Loading cookiejar.
   Directory supportPath = await getApplicationSupportDirectory();
-  SportCookieJar = PersistCookieJar(storage: FileStorage("${supportPath.path}/sport"));
-  IDSCookieJar = PersistCookieJar(storage: FileStorage("${supportPath.path}/ids"));
+  SportCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
+  IDSCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
+  print(await IDSCookieJar.loadForRequest(Uri.parse("https://ids.xidian.edu.cn/")));
   // Have user registered?
   bool isFirst = false;
   try {
@@ -43,18 +43,8 @@ void main() async {
   }
   if (!isFirst) {
     // For test purpose.
-    try {
-      await ids.isLoggedIn();
-    } on String {
-      print("没登录，呜哇");
-      try {
-        await ids.login(username: user["idsAccount"]!, password: user["idsPassword"]!, target: "http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html");
-      } on DioError catch (e) {
-        print(e.response);
-      }
-    } finally {
-      print("希望这样登录了吧");
-    }
+   await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
+   print(await ses.isLoggedIn());
   }
   runApp(MyApp(isFirst: isFirst));
 }

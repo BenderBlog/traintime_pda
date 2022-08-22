@@ -43,11 +43,11 @@ String aesEncrypt(String toEnc, String key) {
 
 class IDSSession {
 
-  final String _baseURL = "https://ids.xidian.edu.cn/authserver/";
+  // final String _baseURL = "http://ids.xidian.edu.cn/authserver/";
 
   Dio get _dio{
     Dio toReturn = Dio(BaseOptions(
-      baseUrl: _baseURL,
+      // baseUrl: _baseURL,
       contentType: Headers.formUrlEncodedContentType,
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
@@ -55,19 +55,17 @@ class IDSSession {
   }
 
   Future<void> isLoggedIn() async {
-    try{
-      var response = await _dio.get(
-          "index.do",
-          options: Options(
-            followRedirects: false,
-          )
-      );
-    } on DioError catch (e) {
-      print(e);
-      throw "没登陆 IDS";
+    var response = await _dio.post(
+      "http://ids.xidian.edu.cn/authserver/index.do",
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) { return status! < 500; },
+      )
+    );
+    print("登录回复信息：${response.headers}");
+    if (response.statusCode == 302) {
+      throw "没有登录";
     }
-
-
   }
 
   Future<void> login({
@@ -78,15 +76,16 @@ class IDSSession {
   }) async {
     /// Get the login webpage.
     var response = await _dio.get(
-      "login",
+      "http://ids.xidian.edu.cn/authserver/login",
       queryParameters: {'service': target, 'type': 'userNameLogin'},
     ).then((value) => value.data);
     /// Start getting data from webpage.
+    print("登陆前返回：${response.runtimeType}");
     var page = BeautifulSoup(response);
     var form = page.find("form",attrs: {'id': 'pwdFromId'});
     /// Check whether it need CAPTCHA or not:-P
     var checkCAPTCHA = await _dio.get(
-      "checkNeedCaptcha.htl",
+      "http://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
       queryParameters: {'username': username, '_': DateTime.now().millisecondsSinceEpoch.toString()},
     ).then((value) => value.data);
     print(checkCAPTCHA);
@@ -97,6 +96,7 @@ class IDSSession {
     /// Get AES encrypt key.
     String keys = form!.find("input",id: 'pwdEncryptSalt')!.getAttrValue("value")!;
     // print(form);
+    print(keys);
     Map<String,dynamic> head = {
       'username': username,
       'password': aesEncrypt(password, keys),
@@ -104,25 +104,24 @@ class IDSSession {
     };
     // print(head["password"]);
     for (var i in form.findAll("input",attrs: {"type":"hidden"})){
-      if (i["id"] == "pwdEncryptSalt") {
-        continue;
-      }
       head[i["id"]!] = i["value"] ?? "";
       // print(head);
     }
-    try {
-      var check = await _dio.post(
-          "login",
-          queryParameters: {'service': target},
-          data: head,
-          options: Options(
-            followRedirects: true,
-          )
+    var data = await _dio.post(
+      "http://ids.xidian.edu.cn/authserver/login",
+      queryParameters: {'service': target},
+      data: head,
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) { return status! < 500; },
+      )
+    );
+    print(data.headers['location']![0]);
+    if (data.statusCode == 301 || data.statusCode == 302) {
+      var whatever = await _dio.get(
+        data.headers['location']![0],
       );
-    } on DioError catch (e) {
-      print(e.requestOptions.data);
-      print(e.response);
-      rethrow;
+      print(whatever);
     }
   }
 }
