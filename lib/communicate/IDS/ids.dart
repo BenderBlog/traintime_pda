@@ -120,8 +120,12 @@ class IDSSession {
     if (data.statusCode == 301 || data.statusCode == 302) {
       var whatever = await _dio.get(
         data.headers['location']![0],
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) { return status! < 500; },
+        )
       );
-      print(whatever);
+      print(whatever.data);
     }
   }
 }

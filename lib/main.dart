@@ -44,7 +44,8 @@ void main() async {
   if (!isFirst) {
     // For test purpose.
    await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
-   print(await ses.isLoggedIn());
+   print("目前登陆状态: ${await ses.isLoggedIn()}");
+   ses.getStuInformation();
   }
   runApp(MyApp(isFirst: isFirst));
 }
