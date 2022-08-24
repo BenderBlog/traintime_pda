@@ -45,7 +45,8 @@ void main() async {
     // For test purpose.
    await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
    print("目前登陆状态: ${await ses.isLoggedIn()}");
-   ses.getStuInformation();
+   // ses.getScore();
+   ses.getClasstable();
   }
   runApp(MyApp(isFirst: isFirst));
 }

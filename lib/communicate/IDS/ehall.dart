@@ -1,5 +1,5 @@
 /*
-E-hall class.
+E-hall class, which get lots of useful data here.
 Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,7 +8,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
+
+Thanks xidian-script and libxdauth!
 */
+
+import 'dart:ffi';
 
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -18,11 +22,8 @@ import 'package:watermeter/communicate/general.dart';
 
 class EhallSession extends IDSSession {
 
-  //final String _baseURL = "";
-
   Dio get _dio{
     Dio toReturn = Dio(BaseOptions(
-      //baseUrl: _baseURL,
       contentType: Headers.formUrlEncodedContentType,
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
@@ -66,9 +67,12 @@ class EhallSession extends IDSSession {
     ).then((value) => value.headers['location']![0]);
   }
 
-  /// 学生个人信息管理 4585275700341858
-  /// 考试成绩       4768574631264620
-  Future<void> getStuInformation () async {
+  /// 学生个人信息管理  4585275700341858
+
+
+
+  /// 考试成绩        4768574631264620
+  Future<void> getScore () async {
     Map<String,dynamic> querySetting =
       {
         'name': 'SFYX',
@@ -91,6 +95,43 @@ class EhallSession extends IDSSession {
       },
     );
     print(getData);
+  }
+
+  /// 课程表 4770397878132218
+  Future<void> getClasstable () async {
+    var firstPost = await useApp("4770397878132218");
+    print(firstPost);
+    var post = await _dio.get(firstPost);
+    print(post);
+    String semesterCode = await _dio.post(
+      "http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+      options: Options(
+        headers: {'Accept': 'application/json, text/javascript, */*; q=0.01'}
+      )
+    ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
+    print(semesterCode);
+    String termStartDay = await _dio.post(
+      'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+      data: {
+        'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
+        'XQ': semesterCode.split('-')[2]
+      },
+      options: Options(
+        headers: {'Accept': 'application/json, text/javascript, */*; q=0.01'}
+      ),
+    ).then((value)=>value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
+    print(termStartDay);
+    var qResult = await _dio.post(
+      'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
+      data: {'XNXQDM': semesterCode},
+      options: Options(
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Accept': 'application/json, text/javascript, */*; q=0.01'
+        }
+      )
+    ).then((value) => value.data['datas']['xskcb']);
+    print(qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
   }
 
 }

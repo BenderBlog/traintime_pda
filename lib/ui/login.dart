@@ -13,7 +13,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/ui/home.dart';
-import 'package:watermeter/communicate/IDS/ids.dart';
+import 'package:watermeter/communicate/IDS/ehall.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({Key? key}) : super(key: key);
@@ -70,7 +70,7 @@ class _LoginWindowState extends State<LoginWindow> {
                       await addUser("idsPassword", idsPass);
                       /// Temporary this way :-P
                       await addUser("sportPassword", sportPass);
-                      ids.login(username: user["idsAccount"]!, password: user["idsPassword"]!, target: "http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html");
+                      await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) {
                           return const HomePage();
