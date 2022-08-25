@@ -41,11 +41,9 @@ String aesEncrypt(String toEnc, String key) {
 
 class IDSSession {
 
-  // final String _baseURL = "http://ids.xidian.edu.cn/authserver/";
-
-  Dio get _dio{
+  @protected
+  Dio get dio{
     Dio toReturn = Dio(BaseOptions(
-      // baseUrl: _baseURL,
       contentType: Headers.formUrlEncodedContentType,
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
@@ -53,7 +51,7 @@ class IDSSession {
   }
 
   Future<void> isLoggedIn() async {
-    var response = await _dio.post(
+    var response = await dio.post(
       "http://ids.xidian.edu.cn/authserver/index.do",
       options: Options(
         followRedirects: false,
@@ -73,7 +71,7 @@ class IDSSession {
     bool forceReLogin = false
   }) async {
     /// Get the login webpage.
-    var response = await _dio.get(
+    var response = await dio.get(
       "http://ids.xidian.edu.cn/authserver/login",
       queryParameters: {'service': target, 'type': 'userNameLogin'},
     ).then((value) => value.data);
@@ -82,7 +80,7 @@ class IDSSession {
     var page = BeautifulSoup(response);
     var form = page.find("form",attrs: {'id': 'pwdFromId'});
     /// Check whether it need CAPTCHA or not:-P
-    var checkCAPTCHA = await _dio.get(
+    var checkCAPTCHA = await dio.get(
       "http://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
       queryParameters: {'username': username, '_': DateTime.now().millisecondsSinceEpoch.toString()},
     ).then((value) => value.data);
@@ -105,7 +103,7 @@ class IDSSession {
       head[i["id"]!] = i["value"] ?? "";
       // print(head);
     }
-    var data = await _dio.post(
+    var data = await dio.post(
       "http://ids.xidian.edu.cn/authserver/login",
       queryParameters: {'service': target},
       data: head,
@@ -116,7 +114,7 @@ class IDSSession {
     );
     print(data.headers['location']![0]);
     if (data.statusCode == 301 || data.statusCode == 302) {
-      var whatever = await _dio.get(
+      var whatever = await dio.get(
         data.headers['location']![0],
         options: Options(
           followRedirects: false,

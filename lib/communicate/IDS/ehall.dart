@@ -12,28 +12,16 @@ if you want to use.
 Thanks xidian-script and libxdauth!
 */
 
-import 'dart:ffi';
-
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:watermeter/communicate/IDS/ids.dart';
-import 'package:watermeter/communicate/general.dart';
 
 class EhallSession extends IDSSession {
 
-  Dio get _dio{
-    Dio toReturn = Dio(BaseOptions(
-      contentType: Headers.formUrlEncodedContentType,
-    ));
-    toReturn.interceptors.add(CookieManager(IDSCookieJar));
-    return toReturn;
-  }
-
   @override
   Future<bool> isLoggedIn() async {
-    var response = await _dio.get(
+    var response = await dio.get(
       "http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
     print(response.data);
@@ -55,7 +43,7 @@ class EhallSession extends IDSSession {
     }
   }
 
-  Future<String> useApp(String appID) async => await _dio.get(
+  Future<String> useApp(String appID) async => await dio.get(
       "http://ehall.xidian.edu.cn/appShow",
       queryParameters: {'appId': appID},
       options: Options(
@@ -67,10 +55,10 @@ class EhallSession extends IDSSession {
       )
     ).then((value) => value.headers['location']![0]);
 
-  /// 学生个人信息管理  4585275700341858
+  /// 学生个人信息  4585275700341858
   Future<void> getInformation () async {
     var firstPost = await useApp("4585275700341858");
-    var post = await _dio.get(firstPost).then((value)=>value.data);
+    var post = await dio.get(firstPost).then((value)=>value.data);
     /// Get student ID.
     BeautifulSoup getStuID = BeautifulSoup(post);
     String stepForward = getStuID.find("script").toString();
@@ -84,7 +72,7 @@ class EhallSession extends IDSSession {
     ).then((value) => value.data["data"]);
     print("初步信息：\n学号 ${information[0]}\n姓名 ${information[1]}\n学院 ${information[2]}");
     */
-    var detailed = await _dio.post(
+    var detailed = await dio.post(
       "http://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
       data: {"requestParamStr": "\{\"XSBH\":$ID\}"},
     );
@@ -92,7 +80,7 @@ class EhallSession extends IDSSession {
   }
 
 
-  /// 考试成绩        4768574631264620
+  /// 考试成绩 4768574631264620
   Future<void> getScore () async {
     Map<String,dynamic> querySetting =
       {
@@ -102,10 +90,8 @@ class EhallSession extends IDSSession {
         'builder': 'm_value_equal'
       };
     var firstPost = await useApp("4768574631264620");
-    print(firstPost);
-    var post = await _dio.get(firstPost);
-    print(post);
-    var getData = await _dio.post(
+    await dio.get(firstPost);
+    var getData = await dio.post(
       "http://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
       data: {
         "*json": 1,
@@ -121,17 +107,15 @@ class EhallSession extends IDSSession {
   /// 课程表 4770397878132218
   Future<void> getClasstable () async {
     var firstPost = await useApp("4770397878132218");
-    print(firstPost);
-    var post = await _dio.get(firstPost);
-    print(post);
-    String semesterCode = await _dio.post(
+    await dio.get(firstPost);
+    String semesterCode = await dio.post(
       "http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
       options: Options(
         headers: {'Accept': 'application/json, text/javascript, */*; q=0.01'}
       )
     ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
     print(semesterCode);
-    String termStartDay = await _dio.post(
+    String termStartDay = await dio.post(
       'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
       data: {
         'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
@@ -142,7 +126,7 @@ class EhallSession extends IDSSession {
       ),
     ).then((value)=>value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
     print(termStartDay);
-    var qResult = await _dio.post(
+    var qResult = await dio.post(
       'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
       data: {'XNXQDM': semesterCode},
       options: Options(
@@ -155,6 +139,46 @@ class EhallSession extends IDSSession {
     print(qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
   }
 
+  /// 考试安排 4768687067472349
+  Future<void> getExamTime () async {
+    var firstPost = await useApp("4768687067472349");
+    await dio.get(firstPost);
+    /// Get semester information.
+    /*  Hard to use, I would rather do it by myself.
+    var whatever = await dio.post(
+      "http://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
+      data: {"*order": "-PX,-DM"},
+    );
+    int totalSize = whatever.data["datas"]["xnxqcx"]['totalSize'];
+    List<String> semester = [];
+    for (var i in whatever.data["datas"]["xnxqcx"]['rows']) {
+      semester.add(i["DM"]);
+    }
+    print(semester);
+    */
+    int now = DateTime.now().month;
+    String semester = "";
+    if (now == 1) {
+      semester = "${DateTime.now().year-1}-${DateTime.now().year}-1";
+    } else if (now >= 2 && now <= 7) {
+      semester = "${DateTime.now().year-1}-${DateTime.now().year}-2";
+    } else {
+      semester = "${DateTime.now().year}-${DateTime.now().year+1}-1";
+    }
+    print(semester);
+    /// cxyxkwapkwdkc 查询已选课未安排考务的课程
+    /// wdksap 我的考试安排
+    /// cxwapdksrw 查询未安排的考试任务
+    /// If failed, it is more likely that no exam have arranged.
+    var data = await dio.post(
+      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
+      queryParameters: {
+        "XNXQDM":semester,
+        "*order":"-KSRQ,-KSSJMS"
+      },
+    );
+    print(data);
+  }
 }
 
 class NotLoginException implements Exception {}
