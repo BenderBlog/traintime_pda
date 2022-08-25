@@ -14,6 +14,7 @@ Thanks xidian-script and libxdauth!
 
 import 'dart:ffi';
 
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -35,6 +36,7 @@ class EhallSession extends IDSSession {
     var response = await _dio.get(
       "http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
+    print(response.data);
     return response.data["hasLogin"];
   }
 
@@ -53,8 +55,7 @@ class EhallSession extends IDSSession {
     }
   }
 
-  Future<String> useApp(String appID) async {
-    return await _dio.get(
+  Future<String> useApp(String appID) async => await _dio.get(
       "http://ehall.xidian.edu.cn/appShow",
       queryParameters: {'appId': appID},
       options: Options(
@@ -65,10 +66,30 @@ class EhallSession extends IDSSession {
         }
       )
     ).then((value) => value.headers['location']![0]);
-  }
 
   /// 学生个人信息管理  4585275700341858
-
+  Future<void> getInformation () async {
+    var firstPost = await useApp("4585275700341858");
+    var post = await _dio.get(firstPost).then((value)=>value.data);
+    /// Get student ID.
+    BeautifulSoup getStuID = BeautifulSoup(post);
+    String stepForward = getStuID.find("script").toString();
+    int indexOfID = stepForward.indexOf("\"USERID\":\"");
+    String ID = stepForward.substring(indexOfID, indexOfID+22).substring(10,21);
+    /// Get information here.
+    /// Check returnCode, #E000000000000 is successful.
+    /*
+    var information = await _dio.post(
+      "http://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=$ID",
+    ).then((value) => value.data["data"]);
+    print("初步信息：\n学号 ${information[0]}\n姓名 ${information[1]}\n学院 ${information[2]}");
+    */
+    var detailed = await _dio.post(
+      "http://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
+      data: {"requestParamStr": "\{\"XSBH\":$ID\}"},
+    );
+    print(detailed.data["data"]);
+  }
 
 
   /// 考试成绩        4768574631264620

@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
@@ -46,7 +47,8 @@ void main() async {
    await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
    print("目前登陆状态: ${await ses.isLoggedIn()}");
    // ses.getScore();
-   ses.getClasstable();
+   // ses.getClasstable();
+   ses.getInformation();
   }
   runApp(MyApp(isFirst: isFirst));
 }
