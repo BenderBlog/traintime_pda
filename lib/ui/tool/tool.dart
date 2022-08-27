@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:watermeter/ui/tool/score/score.dart';
 import 'package:watermeter/ui/tool/sport/sportWindow.dart';
+
+import '../../communicate/IDS/ehall.dart';
 
 class ToolWindow extends StatelessWidget {
 
@@ -33,7 +36,17 @@ class ToolWindow extends StatelessWidget {
                 }),
               );
             },
-          )
+          ),
+          MaterialButton(
+            child: const Text("成绩查询"),
+            onPressed: () {
+              Navigator.of(contextFromPage).push(
+                MaterialPageRoute(builder: (context) {
+                  return const ScoreWindow();
+                }),
+              );
+            },
+          ),
         ]
       )
     );

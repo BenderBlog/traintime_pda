@@ -36,20 +36,10 @@ void main() async {
   bool isFirst = false;
   try {
     await initUser();
+    print("isLogin");
+    await ses.getScore();
   } on String {
     isFirst = true;
-  }
-  if (kDebugMode) {
-    print("isFirst = $isFirst");
-  }
-  if (!isFirst) {
-    // For test purpose.
-    await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
-    print("目前登陆状态: ${await ses.isLoggedIn()}");
-   // ses.getScore();
-   // ses.getClasstable();
-   // ses.getInformation();
-    ses.getExamTime();
   }
   runApp(MyApp(isFirst: isFirst));
 }

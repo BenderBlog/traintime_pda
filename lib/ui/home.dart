@@ -5,6 +5,7 @@ import 'package:watermeter/ui/setting/setting.dart';
 import 'package:watermeter/ui/tool/tool.dart';
 import 'package:watermeter/ui/weight.dart';
 import 'package:watermeter/ui/xidianDir/xidianDir.dart';
+import 'package:watermeter/dataStruct/user.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -47,14 +48,17 @@ class MyDrawer extends Drawer {
   Widget? get child => Column(
         children: [
           Row(
-            children: const [
+            children: [
               Expanded(
                 child: DrawerHeader(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.yellow,
                   ),
                   child: Center(
-                    child: Text("SuperBart Record Proudly Present WaterMeter"),
+                    child: Text(
+                        "${user["name"]} ${user["subject"]} ${user["execution"]}\n"
+                        "SuperBart Record Proudly Present WaterMeter"
+                    ),
                   ),
                 ),
               ),

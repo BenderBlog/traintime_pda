@@ -10,6 +10,7 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/ui/home.dart';
@@ -71,6 +72,10 @@ class _LoginWindowState extends State<LoginWindow> {
                       /// Temporary this way :-P
                       await addUser("sportPassword", sportPass);
                       await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
+                      if (kDebugMode) {
+                        print("目前登陆状态: ${await ses.isLoggedIn()}");
+                      }
+                      ses.getInformation();
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) {
                           return const HomePage();

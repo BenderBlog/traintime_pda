@@ -12,10 +12,11 @@ if you want to use.
 Thanks xidian-script and libxdauth!
 */
 
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:watermeter/communicate/IDS/ids.dart';
+import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/dataStruct/ids/score.dart';
 
 class EhallSession extends IDSSession {
 
@@ -43,27 +44,25 @@ class EhallSession extends IDSSession {
     }
   }
 
-  Future<String> useApp(String appID) async => await dio.get(
-      "http://ehall.xidian.edu.cn/appShow",
-      queryParameters: {'appId': appID},
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) { return status! < 500; },
-        headers: {
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        }
-      )
-    ).then((value) => value.headers['location']![0]);
+  Future<String> useApp(String appID) async {
+    await loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
+    return await dio.get(
+        "http://ehall.xidian.edu.cn/appShow",
+        queryParameters: {'appId': appID},
+        options: Options(
+            followRedirects: false,
+            validateStatus: (status) { return status! < 500; },
+            headers: {
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            }
+        )
+    ).then((value) {print(value.headers);return value.headers['location']![0];});
+  }
 
   /// 学生个人信息  4585275700341858
   Future<void> getInformation () async {
     var firstPost = await useApp("4585275700341858");
     var post = await dio.get(firstPost).then((value)=>value.data);
-    /// Get student ID.
-    BeautifulSoup getStuID = BeautifulSoup(post);
-    String stepForward = getStuID.find("script").toString();
-    int indexOfID = stepForward.indexOf("\"USERID\":\"");
-    String ID = stepForward.substring(indexOfID, indexOfID+22).substring(10,21);
     /// Get information here.
     /// Check returnCode, #E000000000000 is successful.
     /*
@@ -74,9 +73,14 @@ class EhallSession extends IDSSession {
     */
     var detailed = await dio.post(
       "http://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
-      data: {"requestParamStr": "\{\"XSBH\":$ID\}"},
-    );
-    print(detailed.data["data"]);
+      data: {"requestParamStr": "\{\"XSBH\":${user["idsAccount"]}\}"},
+    ).then((value) => value.data["data"]);
+    await addUser("name",detailed["XM"]);
+    await addUser("sex", detailed["XBDM_DISPLAY"]);
+    await addUser("execution", detailed["BZ5_DISPLAY"]);
+    await addUser("institutes", detailed["DZ_DWDM_DISPLAY"]);
+    await addUser("subject", detailed["ZYDM_DISPLAY"]);
+    await addUser("dorm", detailed["ZSDZ"]);
   }
 
 
@@ -90,6 +94,7 @@ class EhallSession extends IDSSession {
         'builder': 'm_value_equal'
       };
     var firstPost = await useApp("4768574631264620");
+    print(firstPost);
     await dio.get(firstPost);
     var getData = await dio.post(
       "http://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
@@ -102,6 +107,16 @@ class EhallSession extends IDSSession {
       },
     );
     print(getData);
+    for (var i in getData.data['datas']['xscjcx']['rows']){
+      scoreTable.add(Score(
+          name: i["XSKCM"],
+          score: i["ZCJ"],
+          year: i["XNXQDM"],
+          credit: i["XF"],
+          status: i["KCXZDM_DISPLAY"]
+      ));
+    }
+    print(scoreTable.length);
   }
 
   /// 课程表 4770397878132218
@@ -136,7 +151,8 @@ class EhallSession extends IDSSession {
         }
       )
     ).then((value) => value.data['datas']['xskcb']);
-    print(qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
+    /// qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
+
   }
 
   /// 考试安排 4768687067472349
@@ -169,7 +185,7 @@ class EhallSession extends IDSSession {
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程
     /// wdksap 我的考试安排
     /// cxwapdksrw 查询未安排的考试任务
-    /// If failed, it is more likely that no exam have arranged.
+    /// If failed, it is more likely that no exam has arranged.
     var data = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
       queryParameters: {

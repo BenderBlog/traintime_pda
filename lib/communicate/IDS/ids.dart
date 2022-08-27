@@ -112,6 +112,7 @@ class IDSSession {
         validateStatus: (status) { return status! < 500; },
       )
     );
+    print(data);
     print(data.headers['location']![0]);
     if (data.statusCode == 301 || data.statusCode == 302) {
       var whatever = await dio.get(

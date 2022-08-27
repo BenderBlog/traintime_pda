@@ -67,7 +67,6 @@ awb4B45zUwIDAQAB
       toCalculate += "&$i=${params[i]}";
     }
     // sure it is hexString.
-    print(toCalculate.substring(1));
     return md5.convert(utf8.encode(toCalculate.substring(1))).toString();
   }
 
@@ -77,9 +76,6 @@ awb4B45zUwIDAQAB
     Map<String, dynamic> forSign = payload;
     forSign["timestamp"] = toReturn["timestamp"];
     toReturn['sign'] = _getSign(forSign);
-    if (kDebugMode) {
-      print("header: $toReturn");
-    }
     return toReturn;
   }
 
@@ -99,7 +95,6 @@ awb4B45zUwIDAQAB
     bool isForce = false,
   }) async {
     body.addAll(_commonSignParams);
-    print("body: $body");
     var response = await _dio.post(
       subWebsite,
       data: body,
@@ -107,10 +102,6 @@ awb4B45zUwIDAQAB
         headers: _getHead(body),
       )
     );
-    if (kDebugMode) {
-      print(response.data);
-      print(await SportCookieJar.loadForRequest(Uri.parse("http://xd.5itsn.com")));
-    }
     return response.data;
   }
 

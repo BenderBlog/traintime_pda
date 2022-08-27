@@ -49,7 +49,7 @@ class TagsBoxes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.fromLTRB(5,3,5,3),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
@@ -57,6 +57,7 @@ class TagsBoxes extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(color: textColor),
+        textScaleFactor: 0.9,
       ),
     );
   }
