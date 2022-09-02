@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /*
-Intro of the score data from ids.
+Calculate the average score.
 Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,10 +13,7 @@ if you want to use.
 */
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
-import 'package:watermeter/ui/tool/sport/subwindow/punchRecord.dart';
-import 'package:watermeter/ui/tool/sport/subwindow/sportScore.dart';
-
-import '../../weight.dart';
+import 'package:watermeter/ui/weight.dart';
 
 class ScoreWindow extends StatelessWidget {
   const ScoreWindow({Key? key}) : super(key: key);
@@ -52,7 +49,9 @@ class TabForScore extends StatelessWidget {
                     builder: (context) => AlertDialog(
                           title: const Text('关于成绩查询'),
                           content: const Text(
-                            "Copyright 2022 SuperBart. \nMPL 2.0 License.",
+                            "Copyright 2022 SuperBart. \n"
+                            "MPL 2.0 License.\n"
+                            "H.Farnsworth: Please, Fry. I don't know how to teach. I'm a professor! ",
                           ),
                           actions: <Widget>[
                             TextButton(
@@ -84,6 +83,18 @@ class _ScoreTableState extends State<ScoreTable> {
   List<bool> selected =
       List<bool>.generate(scoreTable.length, (int index) => false);
 
+  double evalAvgScore (){
+    double totalScore = 0.0;
+    double totalCredit = 0.0;
+    for (var i = 0; i < selected.length; ++i){
+      if (selected[i] == true){
+        totalScore += scoreTable[i].score * scoreTable[i].credit;
+        totalCredit += scoreTable[i].credit;
+      }
+    }
+    return totalCredit != 0 ? totalScore/totalCredit : 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     print(scoreTable.length);
@@ -91,8 +102,8 @@ class _ScoreTableState extends State<ScoreTable> {
         scrollDirection: Axis.vertical,
           child: DataTable(
             dataRowHeight: 70,
-            columns: const [
-              DataColumn(label: Text('')),
+            columns: [
+              DataColumn(label: Text('目前选中科目计算的均分：${evalAvgScore().toStringAsFixed(2)}')),
             ],
             rows: List<DataRow>.generate(
               scoreTable.length,
@@ -119,6 +130,7 @@ class _ScoreTableState extends State<ScoreTable> {
                 onSelectChanged: (bool? value) {
                   setState(() {
                     selected[index] = value!;
+                    evalAvgScore();
                   });
                 },
               ),

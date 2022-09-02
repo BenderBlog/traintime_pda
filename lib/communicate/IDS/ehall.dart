@@ -12,9 +12,13 @@ if you want to use.
 Thanks xidian-script and libxdauth!
 */
 
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:watermeter/communicate/IDS/ids.dart';
+import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 
@@ -46,7 +50,7 @@ class EhallSession extends IDSSession {
 
   Future<String> useApp(String appID) async {
     await loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
-    return await dio.get(
+    var value = await dio.get(
         "http://ehall.xidian.edu.cn/appShow",
         queryParameters: {'appId': appID},
         options: Options(
@@ -56,20 +60,27 @@ class EhallSession extends IDSSession {
               "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
             }
         )
-    ).then((value) {print(value.headers);return value.headers['location']![0];});
+    );
+    print("登陆完了${value.headers["set-cookie"]}");
+    print(value.headers);
+    await IDSCookieJar.saveFromResponse(Uri.parse("http://ehall.xidian.edu.cn/"),[Cookie.fromSetCookieValue("amp.locale=undefined; path=/")]);
+    if (value.headers["set-cookie"] != null) {
+      await IDSCookieJar.saveFromResponse(Uri.parse("http://ehall.xidian.edu.cn/"),[Cookie.fromSetCookieValue("${value.headers["set-cookie"]!.first}; path=/")]);
+    }
+    return value.headers['location']![0];
   }
 
   /// 学生个人信息  4585275700341858
   Future<void> getInformation () async {
     var firstPost = await useApp("4585275700341858");
-    var post = await dio.get(firstPost).then((value)=>value.data);
+    await dio.get(firstPost).then((value)=>value.data);
     /// Get information here.
     /// Check returnCode, #E000000000000 is successful.
     /*
-    var information = await _dio.post(
-      "http://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=$ID",
+    var information = await dio.post(
+      "http://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=${user["idsAccount"]}",
     ).then((value) => value.data["data"]);
-    print("初步信息：\n学号 ${information[0]}\n姓名 ${information[1]}\n学院 ${information[2]}");
+    print("$information");
     */
     var detailed = await dio.post(
       "http://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
@@ -91,11 +102,10 @@ class EhallSession extends IDSSession {
         'name': 'SFYX',
         'value': '1',
         'linkOpt': 'and',
-        'builder': 'm_value_equal'
+        'builder': 'm_value_equal',
       };
     var firstPost = await useApp("4768574631264620");
-    print(firstPost);
-    await dio.get(firstPost);
+    var whatever  = await dio.get(firstPost);
     var getData = await dio.post(
       "http://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
       data: {
@@ -106,28 +116,49 @@ class EhallSession extends IDSSession {
         'pageNumber': 1,
       },
     );
-    print(getData);
+    print("获取到成绩了");
     for (var i in getData.data['datas']['xscjcx']['rows']){
       scoreTable.add(Score(
           name: i["XSKCM"],
           score: i["ZCJ"],
           year: i["XNXQDM"],
           credit: i["XF"],
-          status: i["KCXZDM_DISPLAY"]
+          status: i["KCXZDM_DISPLAY"],
+          classID: i["JXBID"]
       ));
+      /* Unable to work.
+      if (i["DJCJLXDM"] == "100") {
+        try {
+          var anotherResponse = await dio.post(
+              "http://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkxkgcxlrcj.do",
+              data: {
+                "JXBID": scoreTable.last.classID,
+                'XH': user["idsAccount"],
+                'XNXQDM':scoreTable.last.year,
+                'CKLY': "1",
+              },
+            options: Options(
+              headers: {
+                "DNT": "1",
+                "Referer": firstPost
+              },
+            )
+          );
+          print(anotherResponse.data);
+        } on DioError catch (e) {
+          print("WTF:" + e.toString());
+          break;
+        }
+      }*/
     }
     print(scoreTable.length);
   }
 
   /// 课程表 4770397878132218
   Future<void> getClasstable () async {
-    var firstPost = await useApp("4770397878132218");
-    await dio.get(firstPost);
+    await useApp("4770397878132218");
     String semesterCode = await dio.post(
       "http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-      options: Options(
-        headers: {'Accept': 'application/json, text/javascript, */*; q=0.01'}
-      )
     ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
     print(semesterCode);
     String termStartDay = await dio.post(
@@ -136,22 +167,20 @@ class EhallSession extends IDSSession {
         'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
         'XQ': semesterCode.split('-')[2]
       },
-      options: Options(
-        headers: {'Accept': 'application/json, text/javascript, */*; q=0.01'}
-      ),
     ).then((value)=>value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
     print(termStartDay);
     var qResult = await dio.post(
       'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
       data: {'XNXQDM': semesterCode},
-      options: Options(
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Accept': 'application/json, text/javascript, */*; q=0.01'
-        }
-      )
     ).then((value) => value.data['datas']['xskcb']);
     /// qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
+    print(qResult);
+
+    var notOnTable = await dio.post(
+      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
+      data: {'XNXQDM': semesterCode},
+    ).then((value) => value.data['datas']['cxxsllsywpk']);
+    print(notOnTable);
 
   }
 

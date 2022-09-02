@@ -38,6 +38,9 @@ void main() async {
     await initUser();
     print("isLogin");
     await ses.getScore();
+    //await ses.getExamTime();
+    //await ses.getClasstable();
+    await ses.getInformation();
   } on String {
     isFirst = true;
   }

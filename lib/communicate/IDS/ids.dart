@@ -10,7 +10,10 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:io';
+
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' hide Key;
 import 'dart:convert';
@@ -32,10 +35,10 @@ String aesEncrypt(String toEnc, String key) {
   for (var i = 0; i < paddingLength; ++i) {
     dataToPad.add(paddingLength);
   }
-  String reallyToEnc = utf8.decode(dataToPad);
+  String readyToEnc = utf8.decode(dataToPad);
   /// Start encrypt.
   return Encrypter(crypt)
-      .encrypt(reallyToEnc, iv: IV.fromUtf8('xidianscriptsxdu'))
+      .encrypt(readyToEnc, iv: IV.fromUtf8('xidianscriptsxdu'))
       .base64;
 }
 
@@ -45,8 +48,18 @@ class IDSSession {
   Dio get dio{
     Dio toReturn = Dio(BaseOptions(
       contentType: Headers.formUrlEncodedContentType,
+
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
+    /*(toReturn.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+        //return Platform.isAndroid;
+        return true;
+      };
+      client.findProxy = (uri) {
+        return "PROXY 127.0.0.1:8888";
+      };
+    };*/
     return toReturn;
   }
 
@@ -76,7 +89,7 @@ class IDSSession {
       queryParameters: {'service': target, 'type': 'userNameLogin'},
     ).then((value) => value.data);
     /// Start getting data from webpage.
-    print("登陆前返回：${response.runtimeType}");
+    print("登陆前返回：${response.runtimeType}\n${response}");
     var page = BeautifulSoup(response);
     var form = page.find("form",attrs: {'id': 'pwdFromId'});
     /// Check whether it need CAPTCHA or not:-P
@@ -112,8 +125,7 @@ class IDSSession {
         validateStatus: (status) { return status! < 500; },
       )
     );
-    print(data);
-    print(data.headers['location']![0]);
+    print("data" + data.headers['location']![0]);
     if (data.statusCode == 301 || data.statusCode == 302) {
       var whatever = await dio.get(
         data.headers['location']![0],
@@ -122,7 +134,7 @@ class IDSSession {
           validateStatus: (status) { return status! < 500; },
         )
       );
-      print(whatever.data);
+      print("Whatever" + whatever.data);
     }
   }
 }
