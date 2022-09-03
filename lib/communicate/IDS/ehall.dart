@@ -4,7 +4,7 @@ Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
@@ -27,7 +27,7 @@ class EhallSession extends IDSSession {
   @override
   Future<bool> isLoggedIn() async {
     var response = await dio.get(
-      "http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
+      "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
     //print(response.data);
     return response.data["hasLogin"];
@@ -43,7 +43,7 @@ class EhallSession extends IDSSession {
       await super.login(
         username: username,
         password: password,
-        target: "http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html"
+        target: "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html"
       );
     }
   }
@@ -51,7 +51,7 @@ class EhallSession extends IDSSession {
   Future<String> useApp(String appID) async {
     await loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
     var value = await dio.get(
-        "http://ehall.xidian.edu.cn/appShow",
+        "https://ehall.xidian.edu.cn/appShow",
         queryParameters: {'appId': appID},
         options: Options(
             followRedirects: false,
@@ -63,10 +63,6 @@ class EhallSession extends IDSSession {
     );
     //print("登陆完了${value.headers["set-cookie"]}");
     //print(value.headers);
-    await IDSCookieJar.saveFromResponse(Uri.parse("http://ehall.xidian.edu.cn/"),[Cookie.fromSetCookieValue("amp.locale=undefined; path=/")]);
-    if (value.headers["set-cookie"] != null) {
-      await IDSCookieJar.saveFromResponse(Uri.parse("http://ehall.xidian.edu.cn/"),[Cookie.fromSetCookieValue("${value.headers["set-cookie"]!.first}; path=/")]);
-    }
     return value.headers['location']![0];
   }
 
@@ -78,12 +74,12 @@ class EhallSession extends IDSSession {
     /// Check returnCode, #E000000000000 is successful.
     /*
     var information = await dio.post(
-      "http://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=${user["idsAccount"]}",
+      "https://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=${user["idsAccount"]}",
     ).then((value) => value.data["data"]);
     //print("$information");
     */
     var detailed = await dio.post(
-      "http://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
+      "https://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
       data: {"requestParamStr": "\{\"XSBH\":${user["idsAccount"]}\}"},
     ).then((value) => value.data["data"]);
     await addUser("name",detailed["XM"]);
@@ -108,7 +104,7 @@ class EhallSession extends IDSSession {
     var firstPost = await useApp("4768574631264620");
     var whatever  = await dio.get(firstPost);
     var getData = await dio.post(
-      "http://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
+      "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
       data: {
         "*json": 1,
         "querySetting": json.encode(querySetting),
@@ -127,14 +123,15 @@ class EhallSession extends IDSSession {
           year: i["XNXQDM"],
           credit: i["XF"],
           status: i["KCXZDM_DISPLAY"],
-          classID: i["JXBID"]
+          classID: i["JXBID"],
+          isPassed: i["SFJG"]
       ));
       j++;
       /* Unable to work.
       if (i["DJCJLXDM"] == "100") {
         try {
           var anotherResponse = await dio.post(
-              "http://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkxkgcxlrcj.do",
+              "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkxkgcxlrcj.do",
               data: {
                 "JXBID": scoreTable.last.classID,
                 'XH': user["idsAccount"],
@@ -163,11 +160,11 @@ class EhallSession extends IDSSession {
   Future<void> getClasstable () async {
     await useApp("4770397878132218");
     String semesterCode = await dio.post(
-      "http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
     ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
     //print(semesterCode);
     String termStartDay = await dio.post(
-      'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
       data: {
         'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
         'XQ': semesterCode.split('-')[2]
@@ -175,14 +172,14 @@ class EhallSession extends IDSSession {
     ).then((value)=>value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
     //print(termStartDay);
     var qResult = await dio.post(
-      'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
+      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
       data: {'XNXQDM': semesterCode},
     ).then((value) => value.data['datas']['xskcb']);
     /// qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
     //print(qResult);
 
     var notOnTable = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
+      "httpss://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
       data: {'XNXQDM': semesterCode},
     ).then((value) => value.data['datas']['cxxsllsywpk']);
     //print(notOnTable);
@@ -196,7 +193,7 @@ class EhallSession extends IDSSession {
     /// Get semester information.
     /*  Hard to use, I would rather do it by myself.
     var whatever = await dio.post(
-      "http://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
+      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
       data: {"*order": "-PX,-DM"},
     );
     int totalSize = whatever.data["datas"]["xnxqcx"]['totalSize'];
@@ -221,7 +218,7 @@ class EhallSession extends IDSSession {
     /// cxwapdksrw 查询未安排的考试任务
     /// If failed, it is more likely that no exam has arranged.
     var data = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
+      "httpss://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
       queryParameters: {
         "XNXQDM":semester,
         "*order":"-KSRQ,-KSSJMS"

@@ -40,7 +40,8 @@ void main() async {
     await ses.getScore();
     //await ses.getExamTime();
     //await ses.getClasstable();
-    await ses.getInformation();
+    /// TODO: Debug this!
+    //await ses.getInformation();
   } on String {
     isFirst = true;
   }

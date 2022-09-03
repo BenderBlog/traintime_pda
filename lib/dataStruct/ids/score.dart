@@ -8,6 +8,7 @@ class Score {
   String? classID; // 教学班序列号
   String? scoreStructure; //成绩构成
   String? scoreDetail; //分项成绩
+  String isPassed; //是否及格
   Score({
     required this.mark,
     required this.name,
@@ -15,6 +16,7 @@ class Score {
     required this.year,
     required this.credit,
     required this.status,
+    required this.isPassed,
     this.classID,
     this.scoreStructure,
     this.scoreDetail,
@@ -25,10 +27,16 @@ class ScoreList {
   late List<Score> scoreTable;
   late Set<String> semester;
   late Set<String> statuses;
+  double randomChoice = 0.0;
 
   ScoreList({required this.scoreTable}){
     semester = { for (var i in scoreTable) i.year };
     statuses = { for (var i in scoreTable) i.status };
+    for (var i in scoreTable){
+      if (i.status == "公共任选") {
+        randomChoice += i.credit;
+      }
+    }
   }
 }
 

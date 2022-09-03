@@ -73,9 +73,11 @@ class _LoginWindowState extends State<LoginWindow> {
                       await addUser("sportPassword", sportPass);
                       await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
                       if (kDebugMode) {
-                        //print("目前登陆状态: ${await ses.isLoggedIn()}");
+                        print("目前登陆状态: ${await ses.isLoggedIn()}");
                       }
-                      ses.getInformation();
+                      /// TODO: Debug this!
+                      //ses.getInformation();
+                      ses.getScore();
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) {
                           return const HomePage();

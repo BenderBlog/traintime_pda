@@ -14,6 +14,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 import 'package:watermeter/ui/weight.dart';
+import 'package:watermeter/communicate/IDS/ehall.dart';
 
 
 class ScoreWindow extends StatelessWidget {
@@ -46,23 +47,9 @@ class TabForScore extends StatelessWidget {
               icon: const Icon(Icons.info),
               onPressed: () {
                 showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: const Text('关于成绩查询'),
-                          content: const Text(
-                            "Copyright 2022 SuperBart. \n"
-                            "MPL 2.0 License.\n"
-                            "Please, Fry. I don't know how to teach. I'm a professor! ",
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text("确定"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ));
+                  context: context,
+                  builder: (context) => aboutDialog(context),
+                );
               },
             ),
           ],
@@ -71,6 +58,23 @@ class TabForScore extends StatelessWidget {
       ),
     );
   }
+
+  Widget aboutDialog(context) => AlertDialog(
+    title: const Text('关于成绩查询'),
+    content: const Text(
+      "Copyright 2022 SuperBart. \n"
+          "MPL 2.0 License.\n"
+          "求你了，Fry。我不会教课，我是教授啊。",
+    ),
+    actions: <Widget>[
+      TextButton(
+        child: const Text("确定"),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    ],
+  );
 }
 
 class ScoreTable extends StatefulWidget {
@@ -84,7 +88,7 @@ class _ScoreTableState extends State<ScoreTable> {
 
   bool isSelectMod = false;
 
-  List<bool> selected =
+  List<bool> isSelected =
       List<bool>.generate(scores.scoreTable.length, (int index) => false);
 
   /// Empty means all semester.
@@ -93,11 +97,11 @@ class _ScoreTableState extends State<ScoreTable> {
   /// Empty means all status.
   String chosenStatus = "";
 
-  double _evalAvgScore (){
+  double _evalAvgScore (bool isAll){
     double totalScore = 0.0;
     double totalCredit = 0.0;
-    for (var i = 0; i < selected.length; ++i){
-      if (selected[i] == true){
+    for (var i = 0; i < isSelected.length; ++i){
+      if ((isSelected[i] == true && isAll == false) || isAll == true){
         totalScore += scores.scoreTable[i].score * scores.scoreTable[i].credit;
         totalCredit += scores.scoreTable[i].credit;
       }
@@ -109,7 +113,6 @@ class _ScoreTableState extends State<ScoreTable> {
     /// If I write "whatever = scores.scoreTable", every change I make to "whatever"
     /// applies to scores.scoreTable. Since the reference whatsoever.
     List<Score> whatever = List.from(scores.scoreTable);
-    print(scores.scoreTable.length);
     if (chosenSemester != "") {
       whatever.removeWhere((element)=>element.year!=chosenSemester);
     }
@@ -117,6 +120,22 @@ class _ScoreTableState extends State<ScoreTable> {
       whatever.removeWhere((element)=>element.status!=chosenStatus);
     }
     return whatever;
+  }
+
+  List<String> unpassed () {
+    List<String> unpassed = [];
+    for (var i in scores.scoreTable) {
+      if (i.isPassed != '1' && !unpassed.contains(i.name)) {
+        unpassed.add(i.name);
+      }
+      if (unpassed.contains(i.name) && i.isPassed == "1"){
+        unpassed.remove(i.name);
+      }
+    }
+    if (unpassed.isEmpty){
+      unpassed.add("没有");
+    }
+    return unpassed;
   }
 
   @override
@@ -135,10 +154,11 @@ class _ScoreTableState extends State<ScoreTable> {
                 ),
               ],
             ),
-            child:Row(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(25,10,10,10),
+                  padding: const EdgeInsets.fromLTRB(5,10,10,10),
                   child: DropdownButton(
                     value: chosenSemester,
                     icon: const Icon(
@@ -153,7 +173,7 @@ class _ScoreTableState extends State<ScoreTable> {
                         DropdownMenuItem(value: i, child: Text(i))
                     ],
                     onChanged: (String? value) {
-                      setState(() {chosenSemester = value!; },);
+                      setState(() {chosenSemester = value!;});
                     },
                   ),
                 ),
@@ -178,7 +198,16 @@ class _ScoreTableState extends State<ScoreTable> {
                   ),
                 ),
                 TextButton(
-                  onPressed: (){setState(() { isSelectMod = !isSelectMod; });},
+                  onPressed: () {
+                    setState(() {
+                      isSelectMod = !isSelectMod;
+                      /// Do not remember anything when quit calculating.
+                      if (!isSelectMod) {
+                        for (var i = isSelected.length - 1; i >= 0; --i){
+                          isSelected[i] = false;
+                        }
+                      }
+                    });},
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),
@@ -195,10 +224,16 @@ class _ScoreTableState extends State<ScoreTable> {
               itemBuilder: (builder, index){
                 return Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: ScoreCard(toUse: toShow()[index]),
-                    ),
+                    InkWell(
+                      onTap: () => setState(() {
+                        if (isSelectMod) {
+                          isSelected[toShow()[index].mark] = !isSelected[toShow()[index].mark];
+                        }
+                      }),
+                      child: Container(
+                        decoration: BoxDecoration(color: _getColor(toShow()[index])),
+                        child: ScoreCard(toUse: toShow()[index]),
+                      )),
                     const Divider(height: 10, thickness:5.0),
                   ],
                 );
@@ -224,7 +259,7 @@ class _ScoreTableState extends State<ScoreTable> {
                   child: Row(
                     children:[
                       Text(
-                        "目前选中科目计算的均分",
+                        "目前选中科目计算的均分 ${_evalAvgScore(false).toStringAsFixed(2)}",
                         textScaleFactor: 1.2,
                       ),
                     ],
@@ -236,16 +271,35 @@ class _ScoreTableState extends State<ScoreTable> {
         ],
       ),
       floatingActionButton: _buildDetailsWindow(),
-
-
     );
   }
 
   Widget? _buildDetailsWindow() {
     if (isSelectMod) {
       return FloatingActionButton(
-        onPressed: () => print("may output a window"),
-        child: Icon(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) =>  AlertDialog(
+              title: const Text('小总结'),
+              content: Text(
+               "所有科目计算均分：${_evalAvgScore(true).toStringAsFixed(2)}\n"
+               "未通过科目：${unpassed().join(",")}\n"
+               "公共选修课已经修得学分：${scores.randomChoice} / 8.0\n"
+               "本程序提供的数据仅供参考，开发者对其准确性不负责"
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("确定"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+        child: const Icon(
           Icons.panorama_fisheye,
         ),
       );
@@ -254,46 +308,13 @@ class _ScoreTableState extends State<ScoreTable> {
     }
   }
 
-
-/*return SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-          child: DataTable(
-            dataRowHeight: 70,
-            columns: [
-              DataColumn(label: Text('目前选中科目计算的均分：${evalAvgScore().toStringAsFixed(2)}')),
-            ],
-            rows: List<DataRow>.generate(
-              scoreTable.length,
-              (int index) => DataRow(
-                color: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                  // All rows will have the same selected color.
-                  if (states.contains(MaterialState.selected)) {
-                    return Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withOpacity(0.08);
-                  }
-                  // Even rows will have a grey color.
-                  if (index.isEven) {
-                    return Colors.grey.withOpacity(0.3);
-                  }
-                  return null; // Use default value for other states and odd rows.
-                }),
-                cells: <DataCell>[
-                  DataCell(ScoreCard(toUse: scoreTable[index])),
-                ],
-                selected: selected[index],
-                onSelectChanged: (bool? value) {
-                  setState(() {
-                    selected[index] = value!;
-                    evalAvgScore();
-                  });
-                },
-              ),
-            ),
-          ),
-    );*/
+  Color _getColor(Score data) {
+    if (isSelectMod && isSelected[data.mark]) {
+      return Colors.yellow.shade100;
+    } else {
+      return Colors.white;
+    }
+  }
 }
 
 class ScoreCard extends StatelessWidget {
@@ -304,7 +325,7 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+      padding: const EdgeInsets.all(10),
       child: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
