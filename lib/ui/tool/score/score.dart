@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /*
-Calculate the average score.
+Score window.
 Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,6 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 import 'package:watermeter/ui/weight.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 
 class ScoreWindow extends StatelessWidget {
@@ -82,6 +81,9 @@ class ScoreTable extends StatefulWidget {
 }
 
 class _ScoreTableState extends State<ScoreTable> {
+
+  bool isSelectMod = false;
+
   List<bool> selected =
       List<bool>.generate(scores.scoreTable.length, (int index) => false);
 
@@ -119,63 +121,64 @@ class _ScoreTableState extends State<ScoreTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                spreadRadius: 0.1,
-                color: Colors.black.withOpacity(0.2),
-              ),
-            ],
-          ),
-          child:Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(25,10,10,10),
-                child: DropdownButton(
-                  value: chosenSemester,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                  ),
-                  underline: Container(
-                    height: 2,
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: "", child: Text("所有学期")),
-                    for (var i in scores.semester)
-                      DropdownMenuItem(value: i, child: Text(i))
-                  ],
-                  onChanged: (String? value) {
-                    setState(() {chosenSemester = value!; },);
-                  },
+    return Scaffold(
+      body: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  spreadRadius: 0.1,
+                  color: Colors.black.withOpacity(0.2),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: DropdownButton(
-                  value: chosenStatus,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
+              ],
+            ),
+            child:Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(25,10,10,10),
+                  child: DropdownButton(
+                    value: chosenSemester,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                    ),
+                    underline: Container(
+                      height: 2,
+                    ),
+                    items: [
+                      const DropdownMenuItem(value: "", child: Text("所有学期")),
+                      for (var i in scores.semester)
+                        DropdownMenuItem(value: i, child: Text(i))
+                    ],
+                    onChanged: (String? value) {
+                      setState(() {chosenSemester = value!; },);
+                    },
                   ),
-                  underline: Container(
-                    height: 2,
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: "", child: Text("所有类型")),
-                    for (var i in scores.statuses)
-                      DropdownMenuItem(value: i, child: Text(i))
-                  ],
-                  onChanged: (String? value) {
-                    setState(() { chosenStatus = value!; },);
-                  },
                 ),
-              ),
-              TextButton(
-                  onPressed: () { print("Pending..."); },
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: DropdownButton(
+                    value: chosenStatus,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                    ),
+                    underline: Container(
+                      height: 2,
+                    ),
+                    items: [
+                      const DropdownMenuItem(value: "", child: Text("所有类型")),
+                      for (var i in scores.statuses)
+                        DropdownMenuItem(value: i, child: Text(i))
+                    ],
+                    onChanged: (String? value) {
+                      setState(() { chosenStatus = value!; },);
+                    },
+                  ),
+                ),
+                TextButton(
+                  onPressed: (){setState(() { isSelectMod = !isSelectMod; });},
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),
@@ -184,34 +187,75 @@ class _ScoreTableState extends State<ScoreTable> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemBuilder: (builder, index){
-              return Column(
-                children: [
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (builder, index){
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: ScoreCard(toUse: toShow()[index]),
+                    ),
+                    const Divider(height: 10, thickness:5.0),
+                  ],
+                );
+              },
+              itemCount: toShow().length,
+            ),
+          ),
+          if (isSelectMod) Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  spreadRadius: 0.1,
+                  color: Colors.black.withOpacity(0.2),
+                ),
+              ],
+            ),
+            child:Row(
+              children: [
                   Container(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: ScoreCard(toUse: toShow()[index]),
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    children:[
+                      Text(
+                        "目前选中科目计算的均分",
+                        textScaleFactor: 1.2,
+                      ),
+                    ],
                   ),
-                  const Divider(height: 10, thickness:5.0),
-                ],
-              );
-            },
-            itemCount: toShow().length,
+                )
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+      floatingActionButton: _buildDetailsWindow(),
+
+
     );
+  }
+
+  Widget? _buildDetailsWindow() {
+    if (isSelectMod) {
+      return FloatingActionButton(
+        onPressed: () => print("may output a window"),
+        child: Icon(
+          Icons.panorama_fisheye,
+        ),
+      );
+    } else {
+      return null;
+    }
+  }
 
 
-
-
-
-
-    /*return SingleChildScrollView(
+/*return SingleChildScrollView(
         scrollDirection: Axis.vertical,
           child: DataTable(
             dataRowHeight: 70,
@@ -250,7 +294,6 @@ class _ScoreTableState extends State<ScoreTable> {
             ),
           ),
     );*/
-  }
 }
 
 class ScoreCard extends StatelessWidget {
