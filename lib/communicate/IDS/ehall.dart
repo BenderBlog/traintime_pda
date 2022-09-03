@@ -29,7 +29,7 @@ class EhallSession extends IDSSession {
     var response = await dio.get(
       "http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
-    print(response.data);
+    //print(response.data);
     return response.data["hasLogin"];
   }
 
@@ -39,7 +39,7 @@ class EhallSession extends IDSSession {
     bool forceReLogin = false
   }) async {
     if (await isLoggedIn() == false || forceReLogin == true){
-      print("IsnotLogin");
+      //print("IsnotLogin");
       await super.login(
         username: username,
         password: password,
@@ -61,8 +61,8 @@ class EhallSession extends IDSSession {
             }
         )
     );
-    print("登陆完了${value.headers["set-cookie"]}");
-    print(value.headers);
+    //print("登陆完了${value.headers["set-cookie"]}");
+    //print(value.headers);
     await IDSCookieJar.saveFromResponse(Uri.parse("http://ehall.xidian.edu.cn/"),[Cookie.fromSetCookieValue("amp.locale=undefined; path=/")]);
     if (value.headers["set-cookie"] != null) {
       await IDSCookieJar.saveFromResponse(Uri.parse("http://ehall.xidian.edu.cn/"),[Cookie.fromSetCookieValue("${value.headers["set-cookie"]!.first}; path=/")]);
@@ -80,7 +80,7 @@ class EhallSession extends IDSSession {
     var information = await dio.post(
       "http://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=${user["idsAccount"]}",
     ).then((value) => value.data["data"]);
-    print("$information");
+    //print("$information");
     */
     var detailed = await dio.post(
       "http://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
@@ -97,6 +97,7 @@ class EhallSession extends IDSSession {
 
   /// 考试成绩 4768574631264620
   Future<void> getScore () async {
+    List<Score> scoreTable = [];
     Map<String,dynamic> querySetting =
       {
         'name': 'SFYX',
@@ -116,9 +117,11 @@ class EhallSession extends IDSSession {
         'pageNumber': 1,
       },
     );
-    print("获取到成绩了");
+    //print("获取到成绩了");
+    int j = 0;
     for (var i in getData.data['datas']['xscjcx']['rows']){
       scoreTable.add(Score(
+          mark: j,
           name: i["XSKCM"],
           score: i["ZCJ"],
           year: i["XNXQDM"],
@@ -126,6 +129,7 @@ class EhallSession extends IDSSession {
           status: i["KCXZDM_DISPLAY"],
           classID: i["JXBID"]
       ));
+      j++;
       /* Unable to work.
       if (i["DJCJLXDM"] == "100") {
         try {
@@ -144,14 +148,15 @@ class EhallSession extends IDSSession {
               },
             )
           );
-          print(anotherResponse.data);
+          //print(anotherResponse.data);
         } on DioError catch (e) {
-          print("WTF:" + e.toString());
+          //print("WTF:" + e.toString());
           break;
         }
       }*/
     }
-    print(scoreTable.length);
+    scores = ScoreList(scoreTable: scoreTable);
+    //print(scoreTable.length);
   }
 
   /// 课程表 4770397878132218
@@ -160,7 +165,7 @@ class EhallSession extends IDSSession {
     String semesterCode = await dio.post(
       "http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
     ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    print(semesterCode);
+    //print(semesterCode);
     String termStartDay = await dio.post(
       'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
       data: {
@@ -168,19 +173,19 @@ class EhallSession extends IDSSession {
         'XQ': semesterCode.split('-')[2]
       },
     ).then((value)=>value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    print(termStartDay);
+    //print(termStartDay);
     var qResult = await dio.post(
       'http://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
       data: {'XNXQDM': semesterCode},
     ).then((value) => value.data['datas']['xskcb']);
     /// qResult['extParams']['code'] == 1 ? qResult['rows'] : qResult['extParams']['msg']);
-    print(qResult);
+    //print(qResult);
 
     var notOnTable = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
       data: {'XNXQDM': semesterCode},
     ).then((value) => value.data['datas']['cxxsllsywpk']);
-    print(notOnTable);
+    //print(notOnTable);
 
   }
 
@@ -199,7 +204,7 @@ class EhallSession extends IDSSession {
     for (var i in whatever.data["datas"]["xnxqcx"]['rows']) {
       semester.add(i["DM"]);
     }
-    print(semester);
+    //print(semester);
     */
     int now = DateTime.now().month;
     String semester = "";
@@ -210,7 +215,7 @@ class EhallSession extends IDSSession {
     } else {
       semester = "${DateTime.now().year}-${DateTime.now().year+1}-1";
     }
-    print(semester);
+    //print(semester);
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程
     /// wdksap 我的考试安排
     /// cxwapdksrw 查询未安排的考试任务
@@ -222,7 +227,7 @@ class EhallSession extends IDSSession {
         "*order":"-KSRQ,-KSSJMS"
       },
     );
-    print(data);
+    //print(data);
   }
 }
 

@@ -1,4 +1,5 @@
 class Score {
+  int mark;       // 编号，用于某种计算，从 0 开始
   String name;    // 学科名称
   double score;   // 分数
   String year;    // 学年
@@ -8,6 +9,7 @@ class Score {
   String? scoreStructure; //成绩构成
   String? scoreDetail; //分项成绩
   Score({
+    required this.mark,
     required this.name,
     required this.score,
     required this.year,
@@ -19,9 +21,21 @@ class Score {
   });
 }
 
-List<Score> scoreTable = [];
+class ScoreList {
+  late List<Score> scoreTable;
+  late Set<String> semester;
+  late Set<String> statuses;
 
+  ScoreList({required this.scoreTable}){
+    semester = { for (var i in scoreTable) i.year };
+    statuses = { for (var i in scoreTable) i.status };
+  }
+}
+
+late ScoreList scores;
+/*
 Score xianbei = Score(
+  mark: 0,
   name: "淫梦学",
   score: 81,
   year: "2010-2009-1",
@@ -29,3 +43,4 @@ Score xianbei = Score(
   status: "必修课",
   classID: "1145141919810"
 );
+*/

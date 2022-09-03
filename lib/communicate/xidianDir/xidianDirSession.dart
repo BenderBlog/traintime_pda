@@ -78,10 +78,10 @@ class XidianDirectorySession {
     /// platform limitation of dio_http_cache.
     if (kDebugMode) {
       if (null != response.headers.value(DIO_CACHE_HEADER_KEY_DATA_SOURCE)) {
-          print({"data source": "data come from cache"});
+          //print({"data source": "data come from cache"});
 
       } else {
-        print({"data source": "data come from net"});
+        //print({"data source": "data come from net"});
       }
     }
     /// Default return a Map<String,dynamic>, but I ordered him to get json!
@@ -185,10 +185,10 @@ Future<List<TeleyInformation>> getTelephoneData(bool isForceUpdate) async{
   );
   if (kDebugMode) {
     if (null != response.headers.value(DIO_CACHE_HEADER_KEY_DATA_SOURCE)) {
-      print({"data source": "data come from cache"});
+      //print({"data source": "data come from cache"});
 
     } else {
-      print({"data source": "data come from net"});
+      //print({"data source": "data come from net"});
     }
   }
   for (var i in response.data){

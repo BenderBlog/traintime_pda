@@ -31,12 +31,12 @@ void main() async {
   Directory supportPath = await getApplicationSupportDirectory();
   SportCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
   IDSCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
-  print(await IDSCookieJar.loadForRequest(Uri.parse("https://ids.xidian.edu.cn/")));
+  //print(await IDSCookieJar.loadForRequest(Uri.parse("https://ids.xidian.edu.cn/")));
   // Have user registered?
   bool isFirst = false;
   try {
     await initUser();
-    print("isLogin");
+    //print("isLogin");
     await ses.getScore();
     //await ses.getExamTime();
     //await ses.getClasstable();

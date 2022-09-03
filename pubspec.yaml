@@ -37,6 +37,7 @@ dependencies:
   path_provider: ^2.0.11
   html: ^0.15.0
   beautiful_soup_dart: ^0.3.0
+  multi_select_flutter: ^4.1.2
 
   flutter:
     sdk: flutter

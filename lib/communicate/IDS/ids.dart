@@ -71,7 +71,7 @@ class IDSSession {
         validateStatus: (status) { return status! < 500; },
       )
     );
-    print("登录回复信息：${response.headers}");
+    //print("登录回复信息：${response.headers}");
     if (response.statusCode == 302) {
       throw "没有登录";
     }
@@ -89,7 +89,7 @@ class IDSSession {
       queryParameters: {'service': target, 'type': 'userNameLogin'},
     ).then((value) => value.data);
     /// Start getting data from webpage.
-    print("登陆前返回：${response.runtimeType}\n${response}");
+    //print("登陆前返回：${response.runtimeType}\n${response}");
     var page = BeautifulSoup(response);
     var form = page.find("form",attrs: {'id': 'pwdFromId'});
     /// Check whether it need CAPTCHA or not:-P
@@ -97,7 +97,7 @@ class IDSSession {
       "http://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
       queryParameters: {'username': username, '_': DateTime.now().millisecondsSinceEpoch.toString()},
     ).then((value) => value.data);
-    print(checkCAPTCHA);
+    //print(checkCAPTCHA);
     bool isNeed = checkCAPTCHA.contains("true");
     if (isNeed) {
       throw "Need captcha, but I donno how to write it! Go to e";
@@ -105,7 +105,7 @@ class IDSSession {
     /// Get AES encrypt key.
     String keys = form!.find("input",id: 'pwdEncryptSalt')!.getAttrValue("value")!;
     // print(form);
-    print(keys);
+    //print(keys);
     Map<String,dynamic> head = {
       'username': username,
       'password': aesEncrypt(password, keys),
@@ -125,7 +125,7 @@ class IDSSession {
         validateStatus: (status) { return status! < 500; },
       )
     );
-    print("data" + data.headers['location']![0]);
+    //print("data" + data.headers['location']![0]);
     if (data.statusCode == 301 || data.statusCode == 302) {
       var whatever = await dio.get(
         data.headers['location']![0],
@@ -134,7 +134,7 @@ class IDSSession {
           validateStatus: (status) { return status! < 500; },
         )
       );
-      print("Whatever" + whatever.data);
+      //print("Whatever" + whatever.data);
     }
   }
 }

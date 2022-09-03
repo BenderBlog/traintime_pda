@@ -14,6 +14,8 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 import 'package:watermeter/ui/weight.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+
 
 class ScoreWindow extends StatelessWidget {
   const ScoreWindow({Key? key}) : super(key: key);
@@ -51,7 +53,7 @@ class TabForScore extends StatelessWidget {
                           content: const Text(
                             "Copyright 2022 SuperBart. \n"
                             "MPL 2.0 License.\n"
-                            "H.Farnsworth: Please, Fry. I don't know how to teach. I'm a professor! ",
+                            "Please, Fry. I don't know how to teach. I'm a professor! ",
                           ),
                           actions: <Widget>[
                             TextButton(
@@ -81,24 +83,135 @@ class ScoreTable extends StatefulWidget {
 
 class _ScoreTableState extends State<ScoreTable> {
   List<bool> selected =
-      List<bool>.generate(scoreTable.length, (int index) => false);
+      List<bool>.generate(scores.scoreTable.length, (int index) => false);
 
-  double evalAvgScore (){
+  /// Empty means all semester.
+  String chosenSemester = "";
+
+  /// Empty means all status.
+  String chosenStatus = "";
+
+  double _evalAvgScore (){
     double totalScore = 0.0;
     double totalCredit = 0.0;
     for (var i = 0; i < selected.length; ++i){
       if (selected[i] == true){
-        totalScore += scoreTable[i].score * scoreTable[i].credit;
-        totalCredit += scoreTable[i].credit;
+        totalScore += scores.scoreTable[i].score * scores.scoreTable[i].credit;
+        totalCredit += scores.scoreTable[i].credit;
       }
     }
     return totalCredit != 0 ? totalScore/totalCredit : 0.0;
   }
 
+  List<Score> toShow () {
+    /// If I write "whatever = scores.scoreTable", every change I make to "whatever"
+    /// applies to scores.scoreTable. Since the reference whatsoever.
+    List<Score> whatever = List.from(scores.scoreTable);
+    print(scores.scoreTable.length);
+    if (chosenSemester != "") {
+      whatever.removeWhere((element)=>element.year!=chosenSemester);
+    }
+    if (chosenStatus != ""){
+      whatever.removeWhere((element)=>element.status!=chosenStatus);
+    }
+    return whatever;
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(scoreTable.length);
-    return SingleChildScrollView(
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                spreadRadius: 0.1,
+                color: Colors.black.withOpacity(0.2),
+              ),
+            ],
+          ),
+          child:Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(25,10,10,10),
+                child: DropdownButton(
+                  value: chosenSemester,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                  ),
+                  underline: Container(
+                    height: 2,
+                  ),
+                  items: [
+                    const DropdownMenuItem(value: "", child: Text("所有学期")),
+                    for (var i in scores.semester)
+                      DropdownMenuItem(value: i, child: Text(i))
+                  ],
+                  onChanged: (String? value) {
+                    setState(() {chosenSemester = value!; },);
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: DropdownButton(
+                  value: chosenStatus,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                  ),
+                  underline: Container(
+                    height: 2,
+                  ),
+                  items: [
+                    const DropdownMenuItem(value: "", child: Text("所有类型")),
+                    for (var i in scores.statuses)
+                      DropdownMenuItem(value: i, child: Text(i))
+                  ],
+                  onChanged: (String? value) {
+                    setState(() { chosenStatus = value!; },);
+                  },
+                ),
+              ),
+              TextButton(
+                  onPressed: () { print("Pending..."); },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
+                  child: const Text(
+                    "计算均分",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemBuilder: (builder, index){
+              return Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: ScoreCard(toUse: toShow()[index]),
+                  ),
+                  const Divider(height: 10, thickness:5.0),
+                ],
+              );
+            },
+            itemCount: toShow().length,
+          ),
+        ),
+      ],
+    );
+
+
+
+
+
+
+    /*return SingleChildScrollView(
         scrollDirection: Axis.vertical,
           child: DataTable(
             dataRowHeight: 70,
@@ -136,7 +249,7 @@ class _ScoreTableState extends State<ScoreTable> {
               ),
             ),
           ),
-    );
+    );*/
   }
 }
 
@@ -159,7 +272,7 @@ class ScoreCard extends StatelessWidget {
                 Text(
                   toUse.name,
                   textAlign: TextAlign.left,
-                  textScaleFactor: 0.9,
+                  //textScaleFactor: 0.9,
                 ),
                 Row(
                   children: [
