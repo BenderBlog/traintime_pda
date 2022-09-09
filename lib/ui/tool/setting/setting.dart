@@ -12,8 +12,6 @@ class SettingWindow extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
-            //ScaffoldMessenger.of(context).showSnackBar(
-            //    const SnackBar(content: Text('Should back to the main menu.')));
           },
         ),
       ),

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /*
 Score window.
 Copyright 2022 SuperBart
@@ -14,7 +12,6 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 import 'package:watermeter/ui/weight.dart';
-import 'package:watermeter/communicate/IDS/ehall.dart';
 
 
 class ScoreWindow extends StatelessWidget {
@@ -60,12 +57,8 @@ class TabForScore extends StatelessWidget {
   }
 
   Widget aboutDialog(context) => AlertDialog(
-    title: const Text('关于成绩查询'),
-    content: const Text(
-      "Copyright 2022 SuperBart. \n"
-          "MPL 2.0 License.\n"
-          "求你了，Fry。我不会教课，我是教授啊。",
-    ),
+    title: const Text("Are you agree?"),
+    content: Image.asset("assets/Farnsworth-Score.jpg"),
     actions: <Widget>[
       TextButton(
         child: const Text("确定"),
@@ -110,8 +103,8 @@ class _ScoreTableState extends State<ScoreTable> {
   }
 
   List<Score> toShow () {
-    /// If I write "whatever = scores.scoreTable", every change I make to "whatever"
-    /// applies to scores.scoreTable. Since the reference whatsoever.
+    /// If I write "whatever = scores.scoreTable", every change I made to "whatever"
+    /// also applies to scores.scoreTable. Since reference whatsoever.
     List<Score> whatever = List.from(scores.scoreTable);
     if (chosenSemester != "") {
       whatever.removeWhere((element)=>element.year!=chosenSemester);
@@ -122,20 +115,11 @@ class _ScoreTableState extends State<ScoreTable> {
     return whatever;
   }
 
-  List<String> unpassed () {
-    List<String> unpassed = [];
-    for (var i in scores.scoreTable) {
-      if (i.isPassed != '1' && !unpassed.contains(i.name)) {
-        unpassed.add(i.name);
-      }
-      if (unpassed.contains(i.name) && i.isPassed == "1"){
-        unpassed.remove(i.name);
-      }
+  String unPassed () {
+    if (scores.unPassed.isEmpty){
+      return "没有";
     }
-    if (unpassed.isEmpty){
-      unpassed.add("没有");
-    }
-    return unpassed;
+    return scores.unPassed.join(",");
   }
 
   @override
@@ -150,16 +134,15 @@ class _ScoreTableState extends State<ScoreTable> {
                 BoxShadow(
                   blurRadius: 10,
                   spreadRadius: 0.1,
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withOpacity(0.8),
                 ),
               ],
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(5,10,10,10),
-                  child: DropdownButton(
+                const SizedBox(),
+                DropdownButton(
                     value: chosenSemester,
                     icon: const Icon(
                       Icons.keyboard_arrow_down,
@@ -176,10 +159,7 @@ class _ScoreTableState extends State<ScoreTable> {
                       setState(() {chosenSemester = value!;});
                     },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: DropdownButton(
+                DropdownButton(
                     value: chosenStatus,
                     icon: const Icon(
                       Icons.keyboard_arrow_down,
@@ -196,7 +176,6 @@ class _ScoreTableState extends State<ScoreTable> {
                       setState(() { chosenStatus = value!; },);
                     },
                   ),
-                ),
                 TextButton(
                   onPressed: () {
                     setState(() {
@@ -252,17 +231,13 @@ class _ScoreTableState extends State<ScoreTable> {
                 ),
               ],
             ),
-            child:Row(
+            child: Row(
               children: [
                   Container(
                   padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children:[
-                      Text(
-                        "目前选中科目计算的均分 ${_evalAvgScore(false).toStringAsFixed(2)}",
-                        textScaleFactor: 1.2,
-                      ),
-                    ],
+                  child: Text(
+                    "目前选中科目计算的均分 ${_evalAvgScore(false).toStringAsFixed(2)}",
+                    textScaleFactor: 1.2,
                   ),
                 )
               ],
@@ -284,7 +259,7 @@ class _ScoreTableState extends State<ScoreTable> {
               title: const Text('小总结'),
               content: Text(
                "所有科目计算均分：${_evalAvgScore(true).toStringAsFixed(2)}\n"
-               "未通过科目：${unpassed().join(",")}\n"
+               "未通过科目：${unPassed()}\n"
                "公共选修课已经修得学分：${scores.randomChoice} / 8.0\n"
                "本程序提供的数据仅供参考，开发者对其准确性不负责"
               ),

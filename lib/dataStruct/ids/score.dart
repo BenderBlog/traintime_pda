@@ -27,6 +27,7 @@ class ScoreList {
   late List<Score> scoreTable;
   late Set<String> semester;
   late Set<String> statuses;
+  Set<String> unPassed = {};
   double randomChoice = 0.0;
 
   ScoreList({required this.scoreTable}){
@@ -35,6 +36,19 @@ class ScoreList {
     for (var i in scoreTable){
       if (i.status == "公共任选") {
         randomChoice += i.credit;
+      }
+    }
+    for (var i in scoreTable) {
+      if (i.isPassed != '1') {
+        unPassed.add(i.name);
+      }
+      if (unPassed.contains(i.name) && i.isPassed == "1"){
+        unPassed.remove(i.name);
+        /// Whatever score is, if not passed in the first time, count as 60.
+        /// Please take a note of it.
+        i.score = 60;
+        i.name += "(非初修通过)";
+        unPassed.remove(i.name);
       }
     }
   }

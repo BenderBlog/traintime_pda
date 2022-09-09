@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:watermeter/ui/classtable/classtable.dart';
-import 'package:watermeter/ui/links/links.dart';
-import 'package:watermeter/ui/setting/setting.dart';
-import 'package:watermeter/ui/tool/tool.dart';
-import 'package:watermeter/ui/weight.dart';
+import 'package:watermeter/ui/tool/score/score.dart';
+import 'package:watermeter/ui/tool/sport/sportWindow.dart';
+import 'package:watermeter/ui/tool/setting/setting.dart';
 import 'package:watermeter/ui/xidianDir/xidianDir.dart';
 import 'package:watermeter/dataStruct/user.dart';
 
@@ -16,109 +14,99 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("WaterMeter"),
       ),
-      drawer: MyDrawer(contextFromPage: context),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: const [
-          SizedBox(height: 10),
-          ShadowBox(
-            child: Center(child: Text("课表")),
-          ),
-          SizedBox(height: 40),
-          ShadowBox(
-            child: Center(child: Text("各种信息")),
-          ),
-          SizedBox(height: 40),
-          ShadowBox(
-            child: Center(child: Text("有用的链接")),
-          ),
-          SizedBox(height: 10),
-        ],
-      ),
+      body: ToolWindow(contextFromPage: context),
     );
   }
 }
 
-class MyDrawer extends Drawer {
-  const MyDrawer({Key? key, required this.contextFromPage}) : super(key: key);
+class ToolWindow extends StatelessWidget {
+
   final BuildContext contextFromPage;
+  const ToolWindow({Key? key, required this.contextFromPage}) : super(key: key);
 
   @override
-  // TODO: implement child
-  Widget? get child => Column(
-        children: [
-          Row(
+  Widget build(BuildContext context) {
+    return GridView.count(
+            crossAxisCount: 2,
             children: [
-              Expanded(
-                child: DrawerHeader(
-                  decoration: const BoxDecoration(
-                    color: Colors.yellow,
-                  ),
-                  child: Center(
-                    child: Text(
-                        "${user["name"]} ${user["subject"]} ${user["execution"]}\n"
-                        "SuperBart Record Proudly Present WaterMeter"
-                    ),
-                  ),
+              MaterialButton(
+                color: Colors.cyan,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.run_circle_outlined, size: 96.0,),
+                    SizedBox(height: 10),
+                    Text("体育查询", textScaleFactor: 1.5,),
+                  ],
                 ),
+                onPressed: () {
+                  Navigator.of(contextFromPage).push(
+                    MaterialPageRoute(builder: (context) {
+                      return const SportWindow();
+                    }),
+                  );
+                },
               ),
-            ],
-          ),
-          ListTile(
-            leading: const Icon(Icons.calendar_month),
-            title: const Text("课表"),
-            onTap: () {
-              Navigator.of(contextFromPage).push(
-                MaterialPageRoute(builder: (context) {
-                  return ClassTable();
-                }),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.work),
-            title: const Text("工具箱"),
-            onTap: () {
-              Navigator.of(contextFromPage).push(
-                MaterialPageRoute(builder: (context) {
-                  return ToolWindow(contextFromPage: contextFromPage);
-                }),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.nightlife),
-            title: const Text("生活信息"),
-            onTap: () {
-              Navigator.of(contextFromPage).push(
-                MaterialPageRoute(builder: (context) {
-                  return const XidianDirWindow();
-                }),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.link),
-            title: const Text("有用的链接"),
-            onTap: () {
-              Navigator.of(contextFromPage).push(
-                MaterialPageRoute(builder: (context) {
-                  return const LinksWindow();
-                }),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text("设置"),
-            onTap: () {
-              Navigator.of(contextFromPage).push(
-                MaterialPageRoute(builder: (context) {
-                  return const SettingWindow();
-                }),
-              );
-            },
-          ),
-        ],
-      );
+              MaterialButton(
+                color: Colors.orange,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.score, size: 96.0,),
+                    SizedBox(height: 10),
+                    Text("成绩查询", textScaleFactor: 1.5,),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.of(contextFromPage).push(
+                    MaterialPageRoute(builder: (context) {
+                      return const ScoreWindow();
+                    }),
+                  );
+                },
+              ),
+              MaterialButton(
+                color: Colors.yellowAccent,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.nightlife, size: 96.0,),
+                    SizedBox(height: 10,),
+                    Text("生活信息", textScaleFactor: 1.5,),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.of(contextFromPage).push(
+                    MaterialPageRoute(builder: (context) {
+                      return const XidianDirWindow();
+                    }),
+                  );
+                },
+              ),
+              MaterialButton(
+                color: Colors.green,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.settings, size: 96.0,),
+                    SizedBox(height: 10,),
+                    Text("设置", textScaleFactor: 1.5,),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.of(contextFromPage).push(
+                    MaterialPageRoute(builder: (context) {
+                      return const SettingWindow();
+                    }),
+                  );
+                },
+              ),
+            ]
+    );
+  }
 }
+
