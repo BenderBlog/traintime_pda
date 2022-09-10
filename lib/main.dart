@@ -11,12 +11,10 @@ if you want to use.
 */
 
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
@@ -31,19 +29,17 @@ void main() async {
   Directory supportPath = await getApplicationSupportDirectory();
   SportCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
   IDSCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
-  //print(await IDSCookieJar.loadForRequest(Uri.parse("https://ids.xidian.edu.cn/")));
   // Have user registered?
   bool isFirst = false;
   try {
     await initUser();
-    //print("isLogin");
-    await ses.getScore();
-    //await ses.getExamTime();
-    //await ses.getClasstable();
-    /// TODO: Debug this!
-    //await ses.getInformation();
   } on String {
     isFirst = true;
+  }
+  try {
+    await ses.getScore();
+    await ses.getInformation();
+  } on String {
   }
   runApp(MyApp(isFirst: isFirst));
 }

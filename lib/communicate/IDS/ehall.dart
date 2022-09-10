@@ -12,13 +12,9 @@ if you want to use.
 Thanks xidian-script and libxdauth!
 */
 
-import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:watermeter/communicate/IDS/ids.dart';
-import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 
@@ -29,7 +25,6 @@ class EhallSession extends IDSSession {
     var response = await dio.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
-    //print(response.data);
     return response.data["hasLogin"];
   }
 
@@ -39,7 +34,6 @@ class EhallSession extends IDSSession {
     bool forceReLogin = false
   }) async {
     if (await isLoggedIn() == false || forceReLogin == true){
-      //print("IsnotLogin");
       await super.login(
         username: username,
         password: password,
@@ -51,43 +45,44 @@ class EhallSession extends IDSSession {
   Future<String> useApp(String appID) async {
     await loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
     var value = await dio.get(
-        "https://ehall.xidian.edu.cn/appShow",
-        queryParameters: {'appId': appID},
-        options: Options(
-            followRedirects: false,
-            validateStatus: (status) { return status! < 500; },
-            headers: {
-              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            }
-        )
+      "https://ehall.xidian.edu.cn/appShow",
+      queryParameters: {'appId': appID},
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) { return status! < 500; },
+        headers: {
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        }
+      ),
     );
-    //print("登陆完了${value.headers["set-cookie"]}");
-    //print(value.headers);
     return value.headers['location']![0];
   }
 
-  /// 学生个人信息  4585275700341858
+  /// 学生个人信息  4585275700341858 Unable to use because xgxt.xidian.edu.cn (学工系统)
+  /// 宿舍学生住宿  4618295887225301
   Future<void> getInformation () async {
-    var firstPost = await useApp("4585275700341858");
+    var firstPost = await useApp("4618295887225301");
     await dio.get(firstPost).then((value)=>value.data);
-    /// Get information here.
-    /// Check returnCode, #E000000000000 is successful.
-    /*
-    var information = await dio.post(
-      "https://ehall.xidian.edu.cn/xsfw/sys/swpubapp/userinfo/getConfigUserInfo.do?USERID=${user["idsAccount"]}",
-    ).then((value) => value.data["data"]);
-    //print("$information");
-    */
+    /// Get information here. resultCode==00000 is successful.
     var detailed = await dio.post(
-      "https://ehall.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBatchInfo.do",
-      data: {"requestParamStr": "\{\"XSBH\":${user["idsAccount"]}\}"},
-    ).then((value) => value.data["data"]);
-    await addUser("name",detailed["XM"]);
-    await addUser("sex", detailed["XBDM_DISPLAY"]);
-    await addUser("execution", detailed["BZ5_DISPLAY"]);
-    await addUser("institutes", detailed["DZ_DWDM_DISPLAY"]);
-    await addUser("subject", detailed["ZYDM_DISPLAY"]);
-    await addUser("dorm", detailed["ZSDZ"]);
+      "https://ehall.xidian.edu.cn/xsfw/sys/xszsapp/commoncall/callQuery/xsjbxxcx-MINE-QUERY.do",
+      data: {
+        "requestParams": "{\"XSBH\":\"${user["idsAccount"]}\"}",
+        "actionType": "MINE",
+        "actionName": "xsjbxxcx",
+        "dataModelAction": "QUERY",
+      },
+    ).then((value) => value.data);
+    if (detailed["resultCode"] != "00000") {
+      throw detailed["msg"];
+    } else {
+      await addUser("name",detailed["data"][0]["XM"]);
+      await addUser("sex", detailed["data"][0]["XBDM_DISPLAY"]);
+      await addUser("execution", detailed["data"][0]["DZ_SYDM_DISPLAY"]);
+      await addUser("institutes", detailed["data"][0]["DZ_DWDM_DISPLAY"]);
+      await addUser("subject", detailed["data"][0]["ZYDM_DISPLAY"]);
+      await addUser("dorm", detailed["data"][0]["ZSDZ"]);
+    }
   }
 
 
@@ -102,7 +97,7 @@ class EhallSession extends IDSSession {
         'builder': 'm_value_equal',
       };
     var firstPost = await useApp("4768574631264620");
-    var whatever  = await dio.get(firstPost);
+    await dio.get(firstPost);
     var getData = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
       data: {
@@ -113,7 +108,6 @@ class EhallSession extends IDSSession {
         'pageNumber': 1,
       },
     );
-    //print("获取到成绩了");
     int j = 0;
     for (var i in getData.data['datas']['xscjcx']['rows']){
       scoreTable.add(Score(
@@ -153,7 +147,6 @@ class EhallSession extends IDSSession {
       }*/
     }
     scores = ScoreList(scoreTable: scoreTable);
-    //print(scoreTable.length);
   }
 
   /// 课程表 4770397878132218
@@ -189,6 +182,7 @@ class EhallSession extends IDSSession {
   /// 考试安排 4768687067472349
   Future<void> getExamTime () async {
     var firstPost = await useApp("4768687067472349");
+    print(firstPost);
     await dio.get(firstPost);
     /// Get semester information.
     /*  Hard to use, I would rather do it by myself.
@@ -212,22 +206,18 @@ class EhallSession extends IDSSession {
     } else {
       semester = "${DateTime.now().year}-${DateTime.now().year+1}-1";
     }
-    //print(semester);
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程
     /// wdksap 我的考试安排
     /// cxwapdksrw 查询未安排的考试任务
     /// If failed, it is more likely that no exam has arranged.
     var data = await dio.post(
-      "httpss://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
+      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
       queryParameters: {
         "XNXQDM":semester,
         "*order":"-KSRQ,-KSSJMS"
       },
     );
-    //print(data);
   }
 }
-
-class NotLoginException implements Exception {}
 
 var ses = EhallSession();
