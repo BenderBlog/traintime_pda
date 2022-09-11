@@ -19,7 +19,6 @@ import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/login.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/dataStruct/user.dart';
-import 'package:watermeter/communicate/IDS/ehall.dart';
 
 
 void main() async {
@@ -35,11 +34,6 @@ void main() async {
     await initUser();
   } on String {
     isFirst = true;
-  }
-  try {
-    await ses.getScore();
-    await ses.getInformation();
-  } on String {
   }
   runApp(MyApp(isFirst: isFirst));
 }

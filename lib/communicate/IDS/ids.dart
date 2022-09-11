@@ -48,7 +48,9 @@ class IDSSession {
   Dio get dio{
     Dio toReturn = Dio(BaseOptions(
       contentType: Headers.formUrlEncodedContentType,
-
+      headers: {
+        HttpHeaders.userAgentHeader: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+      },
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
     /*(toReturn.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
@@ -89,7 +91,6 @@ class IDSSession {
       queryParameters: {'service': target, 'type': 'userNameLogin'},
     ).then((value) => value.data);
     /// Start getting data from webpage.
-    //print("登陆前返回：${response.runtimeType}\n${response}");
     var page = BeautifulSoup(response);
     var form = page.find("form",attrs: {'id': 'pwdFromId'});
     /// Check whether it need CAPTCHA or not:-P
@@ -97,24 +98,19 @@ class IDSSession {
       "http://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
       queryParameters: {'username': username, '_': DateTime.now().millisecondsSinceEpoch.toString()},
     ).then((value) => value.data);
-    //print(checkCAPTCHA);
     bool isNeed = checkCAPTCHA.contains("true");
     if (isNeed) {
-      throw "Need captcha, but I donno how to write it! Go to e";
+      throw "需要验证码，请去浏览器登陆";
     }
     /// Get AES encrypt key.
     String keys = form!.find("input",id: 'pwdEncryptSalt')!.getAttrValue("value")!;
-    // print(form);
-    //print(keys);
     Map<String,dynamic> head = {
       'username': username,
       'password': aesEncrypt(password, keys),
       'rememberMe': 'true',
     };
-    // print(head["password"]);
     for (var i in form.findAll("input",attrs: {"type":"hidden"})){
       head[i["id"]!] = i["value"] ?? "";
-      // print(head);
     }
     var data = await dio.post(
       "http://ids.xidian.edu.cn/authserver/login",
@@ -125,16 +121,23 @@ class IDSSession {
         validateStatus: (status) { return status! < 500; },
       )
     );
-    //print("data" + data.headers['location']![0]);
-    if (data.statusCode == 301 || data.statusCode == 302) {
+    print(data.statusCode);
+    if (data.statusCode == 401) {
+      throw "用户名或密码错误";
+    } else if (data.statusCode == 301 || data.statusCode == 302) {
       var whatever = await dio.get(
         data.headers['location']![0],
-        options: Options(
-          followRedirects: false,
-          validateStatus: (status) { return status! < 500; },
-        )
+          options: Options(
+            followRedirects: false,
+            validateStatus: (status) { return status! < 500; },
+          )
       );
-      //print("Whatever" + whatever.data);
+      if (whatever.data.contains("验证码错误")){
+        throw "不知为啥还是说让输验证码";
+      }
+      return;
+    } else {
+      throw "登陆失败了，原因不明";
     }
   }
 }

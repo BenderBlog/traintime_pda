@@ -45,10 +45,8 @@ class TabForSport extends StatelessWidget {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('关于体育查询'),
-                      content: const Text(
-                        "Copyright 2022 SuperBart. \nMPL 2.0 License.",
-                      ),
+                      title: const Text('谁想的让我们上四年体育的'),
+                      content: Image.asset("assets/Why-4-Years-Sport.jpg"),
                       actions: <Widget>[
                         TextButton(
                           child: const Text("确定"),

@@ -24,71 +24,133 @@ class LoginWindow extends StatefulWidget {
 }
 
 class _LoginWindowState extends State<LoginWindow> {
-  String idsName = "";
-  String idsPass = "";
-  String sportPass = "123456";
+  /// Sport Password Text Editing Controller
+  final TextEditingController _sportPasswordController = TextEditingController.fromValue(
+    TextEditingValue(
+      text: "123456",
+      selection: TextSelection.fromPosition(
+        const TextPosition(
+          affinity: TextAffinity.downstream,
+          offset: "123456".length,
+         )
+      ),
+    )
+  );
+  /// The rest of Text Editing Controller
+  final TextEditingController _idsAccountController = TextEditingController();
+  final TextEditingController _idsPasswordController = TextEditingController();
+  /// State observer.
+  final GlobalKey _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("请登录到 WaterMeter"),
       ),
-      body: Column(
-        children: [
-          TextField(
-            autofocus: true,
-            decoration: const InputDecoration(
-                labelText: "学号",
-                prefixIcon: Icon(Icons.person)
+      body: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  TextFormField(
+                    autofocus: true,
+                    controller: _idsAccountController,
+                    decoration: const InputDecoration(labelText: "学号", prefixIcon: Icon(Icons.person)),
+                    validator: (value) => value!.length == 11 ? null : "学号必须11位",
+                  ),
+                  TextFormField(
+                    controller: _idsPasswordController,
+                    decoration: const InputDecoration(labelText: "一站式登录密码", prefixIcon: Icon(Icons.lock)),
+                    obscureText: true,
+                    validator: (value) => value!.isNotEmpty ? null : "请输入密码",
+                  ),
+                  TextFormField(
+                    controller: _sportPasswordController,
+                    decoration: const InputDecoration(labelText: "体适能密码", prefixIcon: Icon(Icons.lock),),
+                    obscureText: true,
+                    validator: (value) => value!.isNotEmpty ? null : "请输入密码",
+                  ),
+                ],
+              ),
             ),
-            onChanged: (String value) => idsName = value,
-          ),
-          TextField(
-            decoration: const InputDecoration(
-                labelText: "一站式登录密码",
-                prefixIcon: Icon(Icons.lock)
+            Padding(
+              padding: const EdgeInsets.only(top: 14.0),
+              child: ElevatedButton(
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("登录"),
+                ),
+                onPressed: () {
+                  if ((_formKey.currentState as FormState).validate()) {
+                    _login();
+                  }
+                },
+              ),
             ),
-            obscureText: true,
-            onChanged: (String value) => idsPass = value,
-          ),
-          TextField(
-            decoration: const InputDecoration(
-                labelText: "体适能，默认 123456，没改的就不要填了",
-                prefixIcon: Icon(Icons.lock)
-            ),
-            obscureText: true,
-            onChanged: (String value) => sportPass = value,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 28.0),
-            child: ElevatedButton(
-                    child: const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text("登录"),
-                    ),
-                    onPressed: () async {
-                      await addUser("idsAccount", idsName);
-                      await addUser("idsPassword", idsPass);
-                      /// Temporary this way :-P
-                      await addUser("sportPassword", sportPass);
-                      await ses.loginEhall(username: user["idsAccount"]!, password: user["idsPassword"]!);
-                      if (kDebugMode) {
-                        print("目前登陆状态: ${await ses.isLoggedIn()}");
-                      }
-                      /// TODO: Debug this!
-                      //ses.getInformation();
-                      ses.getScore();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) {
-                          return const HomePage();
-                        }),
-                      );
+          ],
+        ),
+      ),
+    );
+  }
 
+  Future<void> _sesLogin(BuildContext context, VoidCallback onSuccess, Function(dynamic) onFailure) async {
+    try {
+      await ses.loginEhall(
+        username: _idsAccountController.text,
+        password: _idsPasswordController.text,
+      );
+    } catch (e) {
+      onFailure(e);
+    }
+    if (await ses.isLoggedIn()) {
+      onSuccess.call();
+    } else {
+      onFailure("登录因不明原因失败");
+    }
+  }
+
+  void _login () async {
+    print("准备登录 ${_idsAccountController.text} ${_idsPasswordController.text}");
+    _sesLogin(
+      context,
+      () {
+        if (mounted) {
+          addUser("idsAccount", _idsAccountController.text);
+          addUser("idsPassword", _idsPasswordController.text);
+
+          /// Temporary solution.
+          addUser("sportPassword", _sportPasswordController.text);
+          ses.getInformation();
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false,
+          );
+        }
+      },
+      (e) {
+        showDialog(
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                title: const Text('登录失败'),
+                content: Text("错误信息：$e"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("确定"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
                     },
                   ),
-          ),
-        ],
-      ),
+                ],
+              ),
+        );
+      },
     );
   }
 }

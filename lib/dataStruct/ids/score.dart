@@ -54,7 +54,7 @@ class ScoreList {
   }
 }
 
-late ScoreList scores;
+ScoreList? scores;
 /*
 Score xianbei = Score(
   mark: 0,

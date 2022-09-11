@@ -87,15 +87,19 @@ class EhallSession extends IDSSession {
 
 
   /// 考试成绩 4768574631264620
-  Future<void> getScore () async {
+  Future<void> getScore ({bool focus = false}) async {
+    if (scores != null && focus == false) {
+      return;
+    }
     List<Score> scoreTable = [];
+    /// Get all scores here.
     Map<String,dynamic> querySetting =
-      {
-        'name': 'SFYX',
-        'value': '1',
-        'linkOpt': 'and',
-        'builder': 'm_value_equal',
-      };
+    {
+      'name': 'SFYX',
+      'value': '1',
+      'linkOpt': 'and',
+      'builder': 'm_value_equal',
+    };
     var firstPost = await useApp("4768574631264620");
     await dio.get(firstPost);
     var getData = await dio.post(
@@ -107,18 +111,22 @@ class EhallSession extends IDSSession {
         'pageSize':1000,
         'pageNumber': 1,
       },
-    );
+    ).then((value)=>value.data);
+    /// Hope this check could work.
+    if (getData['datas']['xscjcx']["extParams"]["code"] != 1){
+      throw getData['datas']['xscjcx']["extParams"]["msg"];
+    }
     int j = 0;
-    for (var i in getData.data['datas']['xscjcx']['rows']){
+    for (var i in getData['datas']['xscjcx']['rows']){
       scoreTable.add(Score(
-          mark: j,
-          name: i["XSKCM"],
-          score: i["ZCJ"],
-          year: i["XNXQDM"],
-          credit: i["XF"],
-          status: i["KCXZDM_DISPLAY"],
-          classID: i["JXBID"],
-          isPassed: i["SFJG"]
+        mark: j,
+        name: i["XSKCM"],
+        score: i["ZCJ"],
+        year: i["XNXQDM"],
+        credit: i["XF"],
+        status: i["KCXZDM_DISPLAY"],
+        classID: i["JXBID"],
+        isPassed: i["SFJG"]
       ));
       j++;
       /* Unable to work.
@@ -206,17 +214,21 @@ class EhallSession extends IDSSession {
     } else {
       semester = "${DateTime.now().year}-${DateTime.now().year+1}-1";
     }
-    /// cxyxkwapkwdkc 查询已选课未安排考务的课程
+    /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中？)
     /// wdksap 我的考试安排
     /// cxwapdksrw 查询未安排的考试任务
     /// If failed, it is more likely that no exam has arranged.
     var data = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
       queryParameters: {
-        "XNXQDM":semester,
+        "XNXQDM": semester,
         "*order":"-KSRQ,-KSSJMS"
       },
-    );
+    ).then((value) => value.data["datas"]["wdksap"]);
+    if (data["extParams"]["msg"] != "查询成功"){
+      throw "没有数据，也许没安排考试？";
+    }
+    print(data);
   }
 }
 
