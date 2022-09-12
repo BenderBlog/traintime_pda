@@ -10,9 +10,11 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'package:flutter/foundation.dart';
+// Color card: https://colorhunt.co/palette/be9fe1c9b6e4e1ccecf1f1f6
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/communicate/IDS/ehall.dart';
 
@@ -39,76 +41,156 @@ class _LoginWindowState extends State<LoginWindow> {
   /// The rest of Text Editing Controller
   final TextEditingController _idsAccountController = TextEditingController();
   final TextEditingController _idsPasswordController = TextEditingController();
-  /// State observer.
-  final GlobalKey _formKey = GlobalKey<FormState>();
+  final double widthOfSquare = 30.0;
+  final double roundRadius = 10;
+
+  Widget inputField({
+    required String text,
+    required Icon icon,
+    required TextEditingController controller,
+    bool isPassword = false,
+    bool isAutoFocus = false,
+  }) => Padding(
+          padding: EdgeInsets.symmetric(horizontal: widthOfSquare),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black12),
+              borderRadius: BorderRadius.circular(roundRadius),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: TextField(
+                autofocus: isAutoFocus,
+                controller: controller,
+                obscureText: isPassword,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                  hintText: text,
+                ),
+              ),
+            ),
+          ),
+        );
+
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("请登录到 WaterMeter"),
-      ),
-      body: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  TextFormField(
-                    autofocus: true,
-                    controller: _idsAccountController,
-                    decoration: const InputDecoration(labelText: "学号", prefixIcon: Icon(Icons.person)),
-                    validator: (value) => value!.length == 11 ? null : "学号必须11位",
-                  ),
-                  TextFormField(
-                    controller: _idsPasswordController,
-                    decoration: const InputDecoration(labelText: "一站式登录密码", prefixIcon: Icon(Icons.lock)),
-                    obscureText: true,
-                    validator: (value) => value!.isNotEmpty ? null : "请输入密码",
-                  ),
-                  TextFormField(
-                    controller: _sportPasswordController,
-                    decoration: const InputDecoration(labelText: "体适能密码", prefixIcon: Icon(Icons.lock),),
-                    obscureText: true,
-                    validator: (value) => value!.isNotEmpty ? null : "请输入密码",
-                  ),
-                ],
+      backgroundColor: const Color(0xFFF1F1F6),
+
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          /// Temporary symbol of watermeter.
+          const CircleAvatar(
+            backgroundImage: AssetImage("assets/Login-Background.jpg"),
+            radius: 60.0,
+          ),
+          const SizedBox(height: 15.0),
+          const Text(
+              '请登录 Watermeter',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 26,
+              )
+          ),
+          const SizedBox(height: 40.0),
+          inputField(
+            text: "学号",
+            icon: const Icon(Icons.person),
+            controller: _idsAccountController,
+            isAutoFocus: true,
+          ),
+          const SizedBox(height: 20.0),
+          inputField(
+            text: "一站式登录密码",
+            icon: const Icon(Icons.lock),
+            controller: _idsPasswordController,
+            isPassword: true,
+          ),
+          const SizedBox(height: 20.0),
+          /*inputField(
+            text: "体适能密码",
+            icon: const Icon(Icons.lock),
+            controller: _sportPasswordController,
+            isPassword: true,
+          ),
+          const SizedBox(height: 20.0),*/
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: widthOfSquare),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFA267AC),
+                padding: const EdgeInsets.all(20.0),
+                minimumSize: const Size(double.infinity, 60),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(roundRadius)),
               ),
+              child: const Text(
+                "登录",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0
+                ),
+              ),
+              onPressed: () {
+                if (_idsAccountController.text.length == 11 && _idsPasswordController.text.isNotEmpty) {
+                  _login();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('用户名或密码不符合要求，学号必须 11 位且密码非空'),
+                    ),
+                  );
+                }
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 14.0),
-              child: ElevatedButton(
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("登录"),
+          ),
+          const SizedBox(height: 20.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                child: const Text(
+                  '清除登录缓存',
+                  style: TextStyle(
+                    color: Color(0xFFA267AC),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 onPressed: () {
-                  if ((_formKey.currentState as FormState).validate()) {
-                    _login();
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
+                  IDSCookieJar.deleteAll().then(
+                        (value) => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('清理缓存成功'),
+                      ),
+                    ),
+                  );
+                } ,
+              )
+            ],
+          )
+        ],
       ),
     );
+
   }
 
   Future<void> _sesLogin(BuildContext context, VoidCallback onSuccess, Function(dynamic) onFailure) async {
+    bool hadThrown = false;
     try {
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
       );
     } catch (e) {
+      hadThrown = true;
       onFailure(e);
     }
-    if (await ses.isLoggedIn()) {
+    if (await ses.isLoggedIn() && hadThrown == false) {
       onSuccess.call();
     } else {
       onFailure("登录因不明原因失败");

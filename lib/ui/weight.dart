@@ -15,13 +15,21 @@ import 'package:flutter/material.dart';
 /// Use it as the larger boxes.
 class ShadowBox extends StatelessWidget {
   final Widget child;
+  final double padding;
+  final Color backgroundColor;
 
-  const ShadowBox({Key? key, required this.child}) : super(key: key);
+  const ShadowBox({
+    Key? key,
+    required this.child,
+    this.padding = 10.0,
+    this.backgroundColor = Colors.white,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(10),
+      color: backgroundColor,
+      margin: EdgeInsets.all(padding),
       //color: Colors.deepPurple,
       elevation: 20.0,
       shape: const RoundedRectangleBorder(
