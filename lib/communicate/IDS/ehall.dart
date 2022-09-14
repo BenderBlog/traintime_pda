@@ -58,7 +58,7 @@ class EhallSession extends IDSSession {
     return value.headers['location']![0];
   }
 
-  /// 学生个人信息  4585275700341858 Unable to use because xgxt.xidian.edu.cn (学工系统)
+  /// 学生个人信息  4585275700341858 Unable to use because of xgxt.xidian.edu.cn (学工系统)
   /// 宿舍学生住宿  4618295887225301
   Future<void> getInformation () async {
     var firstPost = await useApp("4618295887225301");
@@ -87,8 +87,12 @@ class EhallSession extends IDSSession {
 
 
   /// 考试成绩 4768574631264620
-  Future<void> getScore ({bool focus = false}) async {
+  Future<void> getScore ({
+    bool focus = false,
+    required void Function(int, String) onResponse,
+  }) async {
     if (scores != null && focus == false) {
+      onResponse(100,"成绩已获取");
       return;
     }
     List<Score> scoreTable = [];
@@ -100,6 +104,7 @@ class EhallSession extends IDSSession {
       'linkOpt': 'and',
       'builder': 'm_value_equal',
     };
+    onResponse(10,"准备获取成绩，正在登录");
     var firstPost = await useApp("4768574631264620");
     await dio.get(firstPost);
     var getData = await dio.post(
@@ -112,6 +117,7 @@ class EhallSession extends IDSSession {
         'pageNumber': 1,
       },
     ).then((value)=>value.data);
+    onResponse(60,"准备获取成绩，正在处理数据");
     /// Hope this check could work.
     if (getData['datas']['xscjcx']["extParams"]["code"] != 1){
       throw getData['datas']['xscjcx']["extParams"]["msg"];
@@ -154,7 +160,9 @@ class EhallSession extends IDSSession {
         }
       }*/
     }
+    print(scoreTable.length);
     scores = ScoreList(scoreTable: scoreTable);
+    onResponse(100,"成绩已获取");
   }
 
   /// 课程表 4770397878132218

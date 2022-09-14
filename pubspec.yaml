@@ -37,7 +37,7 @@ dependencies:
   path_provider: ^2.0.11
   html: ^0.15.0
   beautiful_soup_dart: ^0.3.0
-  flutter_login: ^4.0.0
+  sn_progress_dialog: ^1.0.8
 
   flutter:
     sdk: flutter

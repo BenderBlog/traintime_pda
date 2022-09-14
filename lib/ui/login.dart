@@ -179,7 +179,11 @@ class _LoginWindowState extends State<LoginWindow> {
 
   }
 
-  Future<void> _sesLogin(BuildContext context, VoidCallback onSuccess, Function(dynamic) onFailure) async {
+  Future<void> _sesLogin(
+    BuildContext context,
+    VoidCallback onSuccess,
+    Function(dynamic) onFailure
+  ) async {
     bool hadThrown = false;
     try {
       await ses.loginEhall(

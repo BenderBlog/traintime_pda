@@ -22,6 +22,13 @@ Future<void> initUser() async {
   if (user["idsAccount"] == null || user["idsPassword"] == null || user["sportPassword"] == null){
     throw "有未注册用户，跳转至登录界面";
   }
+  user["name"] = prefs.getString("name");
+  user["sex"] = prefs.getString("sex");
+  user["execution"] = prefs.getString("execution");
+  user["institutes"] = prefs.getString("institutes");
+  user["subject"] = prefs.getString("subject");
+  user["dorm"] = prefs.getString("dorm");
+
 }
 
 Future<void> addUser(String key, String value) async {
