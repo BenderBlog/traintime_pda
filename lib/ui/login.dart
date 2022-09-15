@@ -157,9 +157,6 @@ class _LoginWindowState extends State<LoginWindow> {
         if (mounted) {
           addUser("idsAccount", _idsAccountController.text);
           addUser("idsPassword", _idsPasswordController.text);
-
-          /// Temporary solution.
-          /// addUser("sportPassword", _sportPasswordController.text);
           ses.getInformation();
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const HomePage()),

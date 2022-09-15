@@ -71,108 +71,113 @@ class _ToolWindowState extends State<ToolWindow> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      children: [
-        MaterialButton(
-          color: Colors.cyan,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.run_circle_outlined,
-                size: 96.0,
-              ),
-              SizedBox(height: 10),
-              Text(
-                "体育查询",
-                textScaleFactor: 1.5,
-              ),
-            ],
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        children: [
+          MaterialButton(
+            color: Colors.cyan,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.run_circle_outlined,
+                  size: 96.0,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "体育查询",
+                  textScaleFactor: 1.5,
+                ),
+              ],
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return const SportWindow();
+                }),
+              );
+            },
           ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) {
-                return const SportWindow();
-              }),
-            );
-          },
-        ),
-        MaterialButton(
-          color: Colors.orange,
-          onPressed: _getScore,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.score,
-                size: 96.0,
-              ),
-              SizedBox(height: 10),
-              Text(
-                "成绩查询",
-                textScaleFactor: 1.5,
-              ),
-            ],
+          MaterialButton(
+            color: Colors.orange,
+            onPressed: _getScore,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.score,
+                  size: 96.0,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "成绩查询",
+                  textScaleFactor: 1.5,
+                ),
+              ],
+            ),
           ),
-        ),
-        MaterialButton(
-          color: Colors.yellowAccent,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.nightlife,
-                size: 96.0,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "生活信息",
-                textScaleFactor: 1.5,
-              ),
-            ],
+          MaterialButton(
+            color: Colors.yellowAccent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.nightlife,
+                  size: 96.0,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "生活信息",
+                  textScaleFactor: 1.5,
+                ),
+              ],
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return const XidianDirWindow();
+                }),
+              );
+            },
           ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) {
-                return const XidianDirWindow();
-              }),
-            );
-          },
-        ),
-        MaterialButton(
-          color: Colors.green,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.settings,
-                size: 96.0,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "设置",
-                textScaleFactor: 1.5,
-              ),
-            ],
+          MaterialButton(
+            color: Colors.green,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.settings,
+                  size: 96.0,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "设置",
+                  textScaleFactor: 1.5,
+                ),
+              ],
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return const SettingWindow();
+                }),
+              );
+            },
           ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) {
-                return const SettingWindow();
-              }),
-            );
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

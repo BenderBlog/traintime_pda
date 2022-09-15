@@ -82,17 +82,17 @@ class TitleLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              spreadRadius: 0.1,
-              color: Colors.black.withOpacity(0.2),
-            ),
-          ],
-        ),
-        child: child,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 10,
+            spreadRadius: 0.1,
+            color: Colors.black.withOpacity(0.2),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 }
