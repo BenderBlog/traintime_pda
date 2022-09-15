@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 import 'package:watermeter/ui/weight.dart';

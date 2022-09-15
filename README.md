@@ -20,10 +20,7 @@
 
 本软件大部分代码的授权是[Mozilla Public License Version 2.0](http://mozilla.org/MPL/2.0/)
 
-以下部分代码授权为[AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html):
-* lib/xidianDir/xidianDirSession.dart  
-* lib/dataStruct/xidianDir/*  
-* ui/xidianDir/*  
+本软件修改了由 Aydın Emre Esen 编写的 [sn_progress_dialog](https://github.com/emreesen27/Flutter-Progress-Dialog)，授权是 MIT 协议。代码在 `lib/modified_lib/sprt_sn_progress_dialog` 下面。
 
 请注意以下附加条款：
 1. 如使用本软件，即表示您知晓 (acknowledge) 软件作者反对996等不合理竞争和劳动。他/她还反感官僚化的任何东西，包括无意义的会议，课程等。

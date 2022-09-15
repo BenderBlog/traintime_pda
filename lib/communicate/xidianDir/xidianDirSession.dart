@@ -3,18 +3,9 @@ Get data from Xidian Directory Database.
 
 Copyright (C) 2022 SuperBart
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
@@ -161,55 +152,6 @@ Future<List<WindowInformation>> getCafeteriaData({
         commit: i.comment,
       )
     );
-  }
-  return toReturn;
-}
-
-Future<List<TeleyInformation>> getTelephoneData(bool isForceUpdate) async{
-  List<TeleyInformation> toReturn = [];
-  const addBook = "https://myxdu.moefactory.com/ncov/static/json/";
-  var dio = Dio(BaseOptions(baseUrl: addBook));
-  dio.interceptors.add(
-      DioCacheManager(
-          CacheConfig(
-            baseUrl: "https://myxdu.moefactory.com/ncov/static/json/",
-          )
-      ).interceptor
-  );
-  var response = await dio.get(
-    "data.json",
-    options: buildCacheOptions(
-      const Duration(days: 30),
-      forceRefresh: isForceUpdate,
-    ),
-  );
-  if (kDebugMode) {
-    if (null != response.headers.value(DIO_CACHE_HEADER_KEY_DATA_SOURCE)) {
-      //print({"data source": "data come from cache"});
-
-    } else {
-      //print({"data source": "data come from net"});
-    }
-  }
-  for (var i in response.data){
-    var toAdd = TeleyInformation(title: i['name']);
-    for (var j in i['place']){
-      if (j['campus'] == "北校区") {
-        toAdd.isNorth = true;
-        toAdd.northAddress = j['address'];
-        if(j['tel'].isNotEmpty) {
-          toAdd.northTeley = j['tel'].join(" 或 ");
-        }
-      }
-      if (j['campus'] == "南校区") {
-        toAdd.isSouth = true;
-        toAdd.southAddress = j['address'];
-        if(j['tel'].isNotEmpty) {
-          toAdd.southTeley = j['tel'].join(" 或 ");
-        }
-      }
-    }
-    toReturn.add(toAdd);
   }
   return toReturn;
 }

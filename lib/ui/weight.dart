@@ -12,6 +12,10 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 
+/// Something related to the box.
+const double widthOfSquare = 30.0;
+const double roundRadius = 10;
+
 /// Use it as the larger boxes.
 class ShadowBox extends StatelessWidget {
   final Widget child;
@@ -27,15 +31,13 @@ class ShadowBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: backgroundColor,
+    return Container(
       margin: EdgeInsets.all(padding),
-      //color: Colors.deepPurple,
-      elevation: 20.0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20.0)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black12),
+        borderRadius: BorderRadius.circular(roundRadius),
       ),
-      semanticContainer: false,
       child: child,
     );
   }
@@ -95,3 +97,33 @@ class TitleLine extends StatelessWidget {
   }
 }
 
+/// A input widget.
+Widget inputField({
+  required String text,
+  required Icon icon,
+  required TextEditingController controller,
+  bool isPassword = false,
+  bool isAutoFocus = false,
+}) => Padding(
+  padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
+  child: Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: Colors.black12),
+      borderRadius: BorderRadius.circular(roundRadius),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.only(left: 20),
+      child: TextField(
+        autofocus: isAutoFocus,
+        controller: controller,
+        obscureText: isPassword,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          floatingLabelBehavior: FloatingLabelBehavior.never,
+          hintText: text,
+        ),
+      ),
+    ),
+  ),
+);

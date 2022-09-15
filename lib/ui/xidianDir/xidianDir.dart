@@ -2,18 +2,9 @@
 Intro UI of the Xidian Directory. With the bar.
 Copyright (C) 2022 SuperBart
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
@@ -22,7 +13,6 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/ui/xidianDir/subwindow/comprehensive.dart';
 import 'package:watermeter/ui/xidianDir/subwindow/dininghall.dart';
-import 'package:watermeter/ui/xidianDir/subwindow/telebook.dart';
 
 class XidianDirWindow extends StatelessWidget {
   const XidianDirWindow({Key? key}) : super(key: key);
@@ -39,7 +29,7 @@ class TabForXDDir extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("生活信息"),
@@ -58,7 +48,7 @@ class TabForXDDir extends StatelessWidget {
                     builder: (context) => AlertDialog(
                       title: const Text('关于生活信息'),
                       content: const Text(
-                        "This Flutter frontend, \nCopyright 2022 SuperBart. AGPLv3 License.\n"
+                        "This Flutter frontend, \nCopyright 2022 SuperBart. MPL License.\n"
                         "\nOriginal React/Chakra-UI frontend, \nCopyright 2022 hawa130. All right reserved.\n"
                         "\nData used with permission from \nXidian Directory Development Group.\n"
                         "\nBender have shiny metal ass which should not be bitten.\n",
@@ -74,15 +64,12 @@ class TabForXDDir extends StatelessWidget {
                       ],
                     ));
               },
-
             ),
-
           ],
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.store_mall_directory)),
+              Tab(icon: Icon(Icons.store_mall_directory), ),
               Tab(icon: Icon(Icons.restaurant)),
-              Tab(icon: Icon(Icons.phone)),
             ],
           ),
         ),
@@ -90,7 +77,6 @@ class TabForXDDir extends StatelessWidget {
           children: [
             ComprehensiveWindow(),
             DiningHallWindow(),
-            TeleBookWindow(),
           ],
         ),
       ),

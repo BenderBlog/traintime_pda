@@ -13,7 +13,6 @@ if you want to use.
 /* This file is a mess with orders! I need to some sort of cache support. */
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:watermeter/dataStruct/sport/punch.dart';

@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/home.dart';
+import 'package:watermeter/ui/weight.dart';
 import 'package:watermeter/communicate/IDS/ehall.dart';
 
 class LoginWindow extends StatefulWidget {
@@ -26,54 +27,9 @@ class LoginWindow extends StatefulWidget {
 }
 
 class _LoginWindowState extends State<LoginWindow> {
-  /// Sport Password Text Editing Controller
-  final TextEditingController _sportPasswordController = TextEditingController.fromValue(
-    TextEditingValue(
-      text: "123456",
-      selection: TextSelection.fromPosition(
-        const TextPosition(
-          affinity: TextAffinity.downstream,
-          offset: "123456".length,
-         )
-      ),
-    )
-  );
   /// The rest of Text Editing Controller
   final TextEditingController _idsAccountController = TextEditingController();
   final TextEditingController _idsPasswordController = TextEditingController();
-  final double widthOfSquare = 30.0;
-  final double roundRadius = 10;
-
-  Widget inputField({
-    required String text,
-    required Icon icon,
-    required TextEditingController controller,
-    bool isPassword = false,
-    bool isAutoFocus = false,
-  }) => Padding(
-          padding: EdgeInsets.symmetric(horizontal: widthOfSquare),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black12),
-              borderRadius: BorderRadius.circular(roundRadius),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: TextField(
-                autofocus: isAutoFocus,
-                controller: controller,
-                obscureText: isPassword,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                  hintText: text,
-                ),
-              ),
-            ),
-          ),
-        );
-
 
   @override
   Widget build(BuildContext context) {
@@ -112,13 +68,6 @@ class _LoginWindowState extends State<LoginWindow> {
             isPassword: true,
           ),
           const SizedBox(height: 20.0),
-          /*inputField(
-            text: "体适能密码",
-            icon: const Icon(Icons.lock),
-            controller: _sportPasswordController,
-            isPassword: true,
-          ),
-          const SizedBox(height: 20.0),*/
           Padding(
             padding: EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: ElevatedButton(
@@ -163,7 +112,7 @@ class _LoginWindowState extends State<LoginWindow> {
                 ),
                 onPressed: () {
                   IDSCookieJar.deleteAll().then(
-                        (value) => ScaffoldMessenger.of(context).showSnackBar(
+                    (value) => ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('清理缓存成功'),
                       ),
@@ -176,7 +125,6 @@ class _LoginWindowState extends State<LoginWindow> {
         ],
       ),
     );
-
   }
 
   Future<void> _sesLogin(
@@ -211,7 +159,7 @@ class _LoginWindowState extends State<LoginWindow> {
           addUser("idsPassword", _idsPasswordController.text);
 
           /// Temporary solution.
-          addUser("sportPassword", _sportPasswordController.text);
+          /// addUser("sportPassword", _sportPasswordController.text);
           ses.getInformation();
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const HomePage()),
