@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/ui/tool/score/score.dart';
 import 'package:watermeter/ui/tool/sport/sportWindow.dart';
 import 'package:watermeter/ui/tool/setting/setting.dart';
@@ -33,8 +33,6 @@ class _ToolWindowState extends State<ToolWindow> {
 
   void _getScore() async {
     bool isGood = true;
-    /// Initially for display errors.
-    String error = "如果你看到这个，说明出现错误了:-P";
     ProgressDialog pd = ProgressDialog(context: context);
     /// I need to find a button whatever to close this window.
     pd.show(
@@ -42,7 +40,10 @@ class _ToolWindowState extends State<ToolWindow> {
       max: 100,
       hideValue: true,
       completed: Completed(
-        completedMsg: error,
+        completedMsg: "成绩已经获得",
+        closedDelay: 2500,
+      ),
+      error: ErrorSignal(
         closedDelay: 2500,
       ),
     );
@@ -52,8 +53,7 @@ class _ToolWindowState extends State<ToolWindow> {
       );
     } catch (e) {
       isGood = false;
-      error = e.toString();
-      pd.update(value: 100, msg: e.toString());
+      pd.update(value: -1, msg: e.toString());
     }
     print(isGood);
     if (!mounted) return;
@@ -67,10 +67,6 @@ class _ToolWindowState extends State<ToolWindow> {
         ),
       );
     }
-
-
-
-
   }
 
   @override
