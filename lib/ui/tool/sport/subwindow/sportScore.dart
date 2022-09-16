@@ -88,17 +88,31 @@ class ScoreCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Row(
-                  children: [
-                    Text("${toUse.year} ${toUse.gradeType}"),
-                    situation(toUse.rank),
-                  ],
-                ),
-                Text(toUse.totalScore),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15,0,20,0),
+              child: Row(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "${toUse.year} ${toUse.gradeType}",
+                        textScaleFactor: 1.2,
+                      ),
+                      const SizedBox(width: 10),
+                      situation(toUse.rank,),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    toUse.totalScore,
+                    textScaleFactor: 1.2,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: double.parse(toUse.totalScore) >= 50 ? Colors.green : Colors.orange,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const Divider(height: 15),
             DecoratedBox(
@@ -113,16 +127,27 @@ class ScoreCard extends StatelessWidget {
                     for (var i in toUse.details)
                       TableRow(
                         children: [
-                          Text(i.examName, textAlign:TextAlign.center,),
-                          Text("${i.actualScore} ${unitToShow(i.examunit)}", textAlign:TextAlign.end,),
-                          Text("${i.score} 分", textAlign:TextAlign.end,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [const SizedBox(width: 12), situation(i.rank),],
-                          )
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                            child: Text(i.examName, textAlign:TextAlign.center,),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                            child: Text("${i.actualScore} ${unitToShow(i.examunit)}", textAlign:TextAlign.end,),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                            child: Text("${i.score} 分", textAlign:TextAlign.end,),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center ,
+                              children: [const SizedBox(width: 12), situation(i.rank),],
+                            )
+                          ),
                         ],
                       ),
-
                   ],
                 ),
               ),

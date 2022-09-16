@@ -1,8 +1,19 @@
+/*
+Setting window.
+Copyright 2022 SuperBart
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
+if you want to use.
+*/
+
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:watermeter/dataStruct/user.dart';
-import 'package:watermeter/ui/weight.dart';
 
 class SettingWindow extends StatelessWidget {
   const SettingWindow({Key? key}) : super(key: key);
@@ -45,6 +56,16 @@ class _SettingDetailsState extends State<SettingDetails> {
     return SettingsList(
       sections: [
         SettingsSection(
+          title: const SizedBox(),
+          tiles: <SettingsTile>[
+            SettingsTile.navigation(
+              leading: const Icon(Icons.person),
+              title: const Text('用户信息'),
+              value: Text("${user["name"]} ${user["execution"]}\n${user["institutes"]} ${user["subject"]}")
+            ),
+          ],
+        ),
+        SettingsSection(
           title: const Text('体育查询设置'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
@@ -52,8 +73,8 @@ class _SettingDetailsState extends State<SettingDetails> {
               title: const Text('体适能密码'),
               onPressed: (content) {
                 showDialog(
-                    context: context,
-                    builder: (context) => const SportPasswordDialog(),
+                  context: context,
+                  builder: (context) => const SportPasswordDialog(),
                 );
               }
             ),
@@ -112,7 +133,6 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
       )
   );
 
-  /// If other things happens, it should be a array.
   bool _couldView = true;
 
   @override

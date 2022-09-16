@@ -78,7 +78,7 @@ class EhallSession extends IDSSession {
     } else {
       await addUser("name",detailed["data"][0]["XM"]);
       await addUser("sex", detailed["data"][0]["XBDM_DISPLAY"]);
-      await addUser("execution", detailed["data"][0]["DZ_SYDM_DISPLAY"]);
+      await addUser("execution", detailed["data"][0]["DZ_SYDM_DISPLAY"].toString().replaceAll(".", ""));
       await addUser("institutes", detailed["data"][0]["DZ_DWDM_DISPLAY"]);
       await addUser("subject", detailed["data"][0]["ZYDM_DISPLAY"]);
       await addUser("dorm", detailed["data"][0]["ZSDZ"]);

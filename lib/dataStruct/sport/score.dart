@@ -32,3 +32,5 @@ class SportScore {
   String detail = "";
   List<SportScoreOfYear> list = [];
 }
+
+var sportScore = SportScore();

@@ -36,23 +36,23 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasError) {
-                    return Center(child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
+                    return Center(child: Text("坏事: ${snapshot.error}"));
                   } else {
                     return Scaffold(
                       body: Column(
                         children: [
                           TitleLine(
-                              child:Container(
-                                padding: const EdgeInsets.all(10),
-                                child: Row(
-                                  children:[
-                                    Text(
-                                      "总次数：${snapshot.data.allTime}      成功次数：${snapshot.data.valid}",
-                                      textScaleFactor: 1.2,
-                                    ),
-                                  ],
-                                ),
-                              )
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                children:[
+                                  Text(
+                                    "总次数：${snapshot.data.allTime}      成功次数：${snapshot.data.valid}",
+                                    textScaleFactor: 1.2,
+                                  ),
+                                ],
+                              ),
+                            )
                           ),
                           Expanded(
                             child: ListView(
@@ -79,7 +79,26 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
                     );
                   }
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return Column(
+                    children: [
+                      TitleLine(
+                        child:Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            children: const[
+                              Text(
+                                "正在获取信息...",
+                                textScaleFactor: 1.2,
+                              ),
+                            ],
+                          ),
+                        )
+                      ),
+                      const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ],
+                  );
                 }
               },
             ),

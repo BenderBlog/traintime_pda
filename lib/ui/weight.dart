@@ -1,5 +1,5 @@
 /*
-Useful weight to simplify watermeter program.
+Useful weights to simplify watermeter program.
 Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public

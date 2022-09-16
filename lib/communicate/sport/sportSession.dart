@@ -107,9 +107,15 @@ awb4B45zUwIDAQAB
   Future<void> login ({
     required String? username,
     required String? password,
+    void Function(int, String)? onResponse,
   }) async {
     if (username == null || password == null){
       throw "请在设置里面设置体适能密码";
+    }
+    if (userId == ""){
+      if (onResponse != null) {
+        onResponse(100,"登录成功");
+      }
     }
     this.username = username;
     var response = await require(
@@ -125,6 +131,9 @@ awb4B45zUwIDAQAB
     } else {
       userId = response["data"]["id"].toString();
       _commonHeader["token"] = response["data"]["token"];
+      if (onResponse != null) {
+        onResponse(100,"登录成功");
+      }
     }
   }
 
@@ -142,6 +151,7 @@ awb4B45zUwIDAQAB
     }
   }
 
+  /// Dynamic data.
   Future<PunchDataList> getPunchData (bool isValid) async {
     PunchDataList toReturn = PunchDataList();
     if (userId == ""){
@@ -175,7 +185,8 @@ awb4B45zUwIDAQAB
     return toReturn;
   }
 
-  Future<SportScore> getSportScore () async {
+  /// "Static" Data.
+  Future<void> getSportScore () async {
     SportScore toReturn = SportScore();
     if (userId == ""){
       await login(username: user["idsAccount"], password: user["sportPassword"]);
@@ -211,11 +222,18 @@ awb4B45zUwIDAQAB
         toReturn.list.add(toAdd);
       }
     }
-    return toReturn;
+    sportScore = toReturn;
   }
 }
 
 var toUse = SportSession();
 
 Future<PunchDataList> getPunchData(bool isValid) => toUse.getPunchData(isValid);
-Future<SportScore> getSportScore() => toUse.getSportScore();
+Future<SportScore> getSportScore() async {
+  if (sportScore.detail == "") {
+    await toUse.getSportScore();
+  }
+  return Future.delayed(const Duration(microseconds: 10), ()=>sportScore);
+}
+Future<void> sportLogin(void Function(int, String)? whatever) =>
+    toUse.login(username: user["idsAccount"], password: user["sportPassword"], onResponse: whatever);
