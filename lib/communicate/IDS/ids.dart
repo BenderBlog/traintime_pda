@@ -13,7 +13,6 @@ if you want to use.
 import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' hide Key;
 import 'dart:convert';
@@ -83,9 +82,13 @@ class IDSSession {
     required String username,
     required String password,
     required String target,
-    bool forceReLogin = false
+    bool forceReLogin = false,
+    void Function(int,String)? onResponse,
   }) async {
     /// Get the login webpage.
+    if (onResponse != null) {
+      onResponse(10, "准备获取登录网页");
+    }
     var response = await dio.get(
       "http://ids.xidian.edu.cn/authserver/login",
       queryParameters: {'service': target, 'type': 'userNameLogin'},
@@ -94,6 +97,9 @@ class IDSSession {
     var page = BeautifulSoup(response);
     var form = page.find("form",attrs: {'id': 'pwdFromId'});
     /// Check whether it need CAPTCHA or not:-P
+    if (onResponse != null) {
+      onResponse(20, "查询是否需要验证码");
+    }
     var checkCAPTCHA = await dio.get(
       "http://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
       queryParameters: {'username': username, '_': DateTime.now().millisecondsSinceEpoch.toString()},
@@ -103,7 +109,14 @@ class IDSSession {
       throw "需要验证码，请去浏览器登陆";
     }
     /// Get AES encrypt key.
+    if (onResponse != null) {
+      onResponse(30, "获取密码加密密钥");
+    }
     String keys = form!.find("input",id: 'pwdEncryptSalt')!.getAttrValue("value")!;
+    /// Prepare for login.
+    if (onResponse != null) {
+      onResponse(40, "准备登录");
+    }
     Map<String,dynamic> head = {
       'username': username,
       'password': aesEncrypt(password, keys),
@@ -111,6 +124,10 @@ class IDSSession {
     };
     for (var i in form.findAll("input",attrs: {"type":"hidden"})){
       head[i["id"]!] = i["value"] ?? "";
+    }
+    /// Post login request.
+    if (onResponse != null) {
+      onResponse(50, "准备登录");
     }
     var data = await dio.post(
       "http://ids.xidian.edu.cn/authserver/login",
@@ -125,6 +142,10 @@ class IDSSession {
     if (data.statusCode == 401) {
       throw "用户名或密码错误";
     } else if (data.statusCode == 301 || data.statusCode == 302) {
+      /// Post login progress.
+      if (onResponse != null) {
+        onResponse(80, "登录后处理");
+      }
       var whatever = await dio.get(
         data.headers['location']![0],
           options: Options(

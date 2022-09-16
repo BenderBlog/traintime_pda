@@ -13,6 +13,7 @@ if you want to use.
 // Color card: https://colorhunt.co/palette/be9fe1c9b6e4e1ccecf1f1f6
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/ui/home.dart';
@@ -31,12 +32,52 @@ class _LoginWindowState extends State<LoginWindow> {
   final TextEditingController _idsAccountController = TextEditingController();
   final TextEditingController _idsPasswordController = TextEditingController();
 
+
+
+  void _login () async {
+    bool isGood = true;
+    ProgressDialog pd = ProgressDialog(context: context);
+    pd.show(
+      msg: '正在登录学校一站式',
+      max: 100,
+      hideValue: true,
+      completed: Completed(
+        completedMsg: "登录成功",
+        closedDelay: 2500,
+      ),
+      error: ErrorSignal(
+        closedDelay: 2500,
+      ),
+    );
+    try {
+      await ses.loginEhall(
+        username: _idsAccountController.text,
+        password: _idsPasswordController.text,
+        onResponse: (int number, String status) => pd.update(msg: status, value: number),
+      );
+    } catch (e) {
+      isGood = false;
+      pd.update(value: -1, msg: e.toString());
+    }
+    if (!mounted) return;
+    if (isGood == true) {
+      addUser("idsAccount", _idsAccountController.text);
+      addUser("idsPassword", _idsPasswordController.text);
+      ses.getInformation();
+      if (pd.isOpen()) {
+        pd.close();
+      }
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomePage()),
+            (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: const Color(0xFFF1F1F6),
-
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -69,7 +110,7 @@ class _LoginWindowState extends State<LoginWindow> {
           ),
           const SizedBox(height: 20.0),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: widthOfSquare),
+            padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFA267AC),
@@ -124,64 +165,6 @@ class _LoginWindowState extends State<LoginWindow> {
           )
         ],
       ),
-    );
-  }
-
-  Future<void> _sesLogin(
-    BuildContext context,
-    VoidCallback onSuccess,
-    Function(dynamic) onFailure
-  ) async {
-    bool hadThrown = false;
-    try {
-      await ses.loginEhall(
-        username: _idsAccountController.text,
-        password: _idsPasswordController.text,
-      );
-    } catch (e) {
-      hadThrown = true;
-      onFailure(e);
-    }
-    if (await ses.isLoggedIn() && hadThrown == false) {
-      onSuccess.call();
-    } else {
-      onFailure("登录因不明原因失败");
-    }
-  }
-
-  void _login () async {
-    print("准备登录 ${_idsAccountController.text} ${_idsPasswordController.text}");
-    _sesLogin(
-      context,
-      () {
-        if (mounted) {
-          addUser("idsAccount", _idsAccountController.text);
-          addUser("idsPassword", _idsPasswordController.text);
-          ses.getInformation();
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false,
-          );
-        }
-      },
-      (e) {
-        showDialog(
-          context: context,
-          builder: (context) =>
-              AlertDialog(
-                title: const Text('登录失败'),
-                content: Text("错误信息：$e"),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text("确定"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-        );
-      },
     );
   }
 }

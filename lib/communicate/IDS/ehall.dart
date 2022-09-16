@@ -31,13 +31,15 @@ class EhallSession extends IDSSession {
   Future<void> loginEhall({
     required String username,
     required String password,
-    bool forceReLogin = false
+    bool forceReLogin = false,
+    void Function(int,String)? onResponse,
   }) async {
     if (await isLoggedIn() == false || forceReLogin == true){
       await super.login(
         username: username,
         password: password,
-        target: "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html"
+        target: "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+        onResponse: onResponse,
       );
     }
   }
@@ -78,7 +80,7 @@ class EhallSession extends IDSSession {
     } else {
       await addUser("name",detailed["data"][0]["XM"]);
       await addUser("sex", detailed["data"][0]["XBDM_DISPLAY"]);
-      await addUser("execution", detailed["data"][0]["DZ_SYDM_DISPLAY"].toString().replaceAll(".", ""));
+      await addUser("execution", detailed["data"][0]["DZ_SYDM_DISPLAY"].toString().replaceAll("·", ""));
       await addUser("institutes", detailed["data"][0]["DZ_DWDM_DISPLAY"]);
       await addUser("subject", detailed["data"][0]["ZYDM_DISPLAY"]);
       await addUser("dorm", detailed["data"][0]["ZSDZ"]);
