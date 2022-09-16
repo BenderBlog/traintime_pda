@@ -170,7 +170,6 @@ class EhallSession extends IDSSession {
         }
       }*/
     }
-    print(scoreTable.length);
     scores = ScoreList(scoreTable: scoreTable);
     onResponse(100, "成绩已获取");
   }

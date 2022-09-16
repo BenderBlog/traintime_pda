@@ -56,6 +56,7 @@ class _SettingDetailsState extends State<SettingDetails> {
     return SettingsList(
       sections: [
         SettingsSection(
+          title: const Text('用户相关'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
                 leading: const Icon(Icons.person),

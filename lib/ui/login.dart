@@ -32,6 +32,9 @@ class _LoginWindowState extends State<LoginWindow> {
   final TextEditingController _idsAccountController = TextEditingController();
   final TextEditingController _idsPasswordController = TextEditingController();
 
+  /// Can I see the password?
+  bool _couldNotView = true;
+
   void _login() async {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
@@ -62,14 +65,16 @@ class _LoginWindowState extends State<LoginWindow> {
     if (isGood == true) {
       addUser("idsAccount", _idsAccountController.text);
       addUser("idsPassword", _idsPasswordController.text);
-      ses.getInformation();
-      if (pd.isOpen()) {
-        pd.close();
+      await ses.getInformation();
+      if (mounted) {
+        if (pd.isOpen()) {
+          pd.close();
+        }
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false,
+        );
       }
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomePage()),
-        (route) => false,
-      );
     }
   }
 
@@ -99,11 +104,34 @@ class _LoginWindowState extends State<LoginWindow> {
             isAutoFocus: true,
           ),
           const SizedBox(height: 20.0),
-          inputField(
-            text: "一站式登录密码",
-            icon: const Icon(Icons.lock),
-            controller: _idsPasswordController,
-            isPassword: true,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(roundRadius),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: TextField(
+                  controller: _idsPasswordController,
+                  obscureText: _couldNotView,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    hintText: "一站式登录密码",
+                    suffixIcon: IconButton(
+                        icon: Icon(_couldNotView ? Icons.visibility : Icons.visibility_off),
+                        onPressed: () {
+                          setState(() {
+                            _couldNotView = !_couldNotView;
+                          });
+                        }),
+                  ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 20.0),
           Padding(
