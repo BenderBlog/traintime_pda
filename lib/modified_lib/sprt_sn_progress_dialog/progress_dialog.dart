@@ -22,7 +22,6 @@ SOFTWARE.
 
 /// Modified version of sn_progress_dialog https://github.com/emreesen27/Flutter-Progress-Dialog
 /// I am not sure whether it needs a pull_request.
-
 import 'package:flutter/material.dart';
 import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/completed.dart';
 import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/error.dart';
@@ -112,7 +111,6 @@ class ProgressDialog {
   // If an assignment is not made, the dialog closes without showing anything.
   Completed? completed;
 
-
   /// [error] Widgets that will be displayed when the process received an error.
   // If an assignment is not made, the dialog closes without showing anything.
   ErrorSignal? error;
@@ -166,14 +164,20 @@ class ProgressDialog {
                 if (completed == null) {
                   close();
                 } else {
-                  Future.delayed(Duration(milliseconds: completed.closedDelay), () => close(),);
+                  Future.delayed(
+                    Duration(milliseconds: completed.closedDelay),
+                    () => close(),
+                  );
                 }
               }
               if (value == -1) {
                 if (error == null) {
                   close();
                 } else {
-                  Future.delayed(Duration(milliseconds: error.closedDelay), () => close(),);
+                  Future.delayed(
+                    Duration(milliseconds: error.closedDelay),
+                    () => close(),
+                  );
                 }
               }
               return Column(
@@ -187,33 +191,31 @@ class ProgressDialog {
                           Icons.error,
                           color: Colors.blue,
                         ),
-
                       if (value == max && completed != null)
                         const Icon(
                           size: 40.0,
                           Icons.check_circle,
                           color: Colors.blue,
                         ),
-
                       if (value != -1 && value != max)
                         SizedBox(
                           width: 35.0,
                           height: 35.0,
                           child: progressType == ProgressType.normal
                               ? _normalProgress(
-                              bgColor: progressBgColor,
-                              valueColor: progressValueColor,
-                              )
-                              : value == 0
-                                ? _normalProgress(
                                   bgColor: progressBgColor,
                                   valueColor: progressValueColor,
                                 )
-                                : _valueProgress(
-                                  valueColor: progressValueColor,
-                                  bgColor: progressBgColor,
-                                  value: (value / max) * 100,
-                                ),
+                              : value == 0
+                                  ? _normalProgress(
+                                      bgColor: progressBgColor,
+                                      valueColor: progressValueColor,
+                                    )
+                                  : _valueProgress(
+                                      valueColor: progressValueColor,
+                                      bgColor: progressBgColor,
+                                      value: (value / max) * 100,
+                                    ),
                         ),
                       Expanded(
                         child: Padding(

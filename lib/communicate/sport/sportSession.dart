@@ -10,17 +10,18 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 /* This file is a mess with orders! I need to some sort of cache support. */
 
 import 'package:dio/dio.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:encrypt/encrypt.dart';
+import 'package:watermeter/communicate/general.dart';
 import 'package:watermeter/dataStruct/sport/punch.dart';
 import 'package:watermeter/dataStruct/sport/score.dart';
-import 'package:encrypt/encrypt.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:watermeter/dataStruct/user.dart';
-import 'package:watermeter/communicate/general.dart';
 
 /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
 String rsaEncrypt(String toEnc, String pubKey) {
@@ -29,7 +30,6 @@ String rsaEncrypt(String toEnc, String pubKey) {
 }
 
 class SportSession {
-
   var username = "";
 
   var userId = '';
@@ -79,7 +79,7 @@ awb4B45zUwIDAQAB
   }
 
   /// Maybe I wrote how to store the data is better.
-  Dio get _dio{
+  Dio get _dio {
     Dio toReturn = Dio(BaseOptions(
       baseUrl: _baseURL,
       contentType: Headers.formUrlEncodedContentType,
@@ -88,33 +88,32 @@ awb4B45zUwIDAQAB
     return toReturn;
   }
 
-  Future<Map<String,dynamic>> require({
+  Future<Map<String, dynamic>> require({
     required String subWebsite,
-    required Map<String,dynamic> body,
+    required Map<String, dynamic> body,
     bool isForce = false,
   }) async {
     body.addAll(_commonSignParams);
-    var response = await _dio.post(
-      subWebsite,
-      data: body,
-      options: Options(
-        headers: _getHead(body),
-      )
-    );
+    var response = await _dio.post(subWebsite,
+        data: body,
+        options: Options(
+          headers: _getHead(body),
+        ));
     return response.data;
   }
 
-  Future<void> login ({
+  Future<void> login({
     required String? username,
     required String? password,
     void Function(int, String)? onResponse,
   }) async {
-    if (username == null || password == null){
+    if (username == null || password == null) {
       throw "请在设置里面设置体适能密码";
     }
-    if (userId == ""){
+    print("userId: $userId");
+    if (userId != "") {
       if (onResponse != null) {
-        onResponse(100,"登录成功");
+        onResponse(100, "登录成功");
       }
     }
     this.username = username;
@@ -122,7 +121,7 @@ awb4B45zUwIDAQAB
       subWebsite: "/h5/login",
       body: {
         "uname": username,
-        "pwd": rsaEncrypt(password,rsaKey),
+        "pwd": rsaEncrypt(password, rsaKey),
         "openid": ""
       },
     );
@@ -132,19 +131,17 @@ awb4B45zUwIDAQAB
       userId = response["data"]["id"].toString();
       _commonHeader["token"] = response["data"]["token"];
       if (onResponse != null) {
-        onResponse(100,"登录成功");
+        onResponse(100, "登录成功");
       }
     }
   }
 
-  Future<String> getTermID () async {
-    var response = await require(
-        subWebsite: "/stuTermPunchRecord/findList",
-        body: {
-          'userId': userId,
-        }
-    );
-    if (response["returnCode"] == "200"){
+  Future<String> getTermID() async {
+    var response =
+        await require(subWebsite: "/stuTermPunchRecord/findList", body: {
+      'userId': userId,
+    });
+    if (response["returnCode"] == "200") {
       return response["data"][0]["sysTermId"].toString();
     } else {
       throw "获取学期信息失败：${response["returnMsg"]}";
@@ -152,10 +149,11 @@ awb4B45zUwIDAQAB
   }
 
   /// Dynamic data.
-  Future<PunchDataList> getPunchData (bool isValid) async {
+  Future<PunchDataList> getPunchData(bool isValid) async {
     PunchDataList toReturn = PunchDataList();
-    if (userId == ""){
-      await login(username: user["idsAccount"], password: user["sportPassword"]);
+    if (userId == "") {
+      await login(
+          username: user["idsAccount"], password: user["sportPassword"]);
     }
     var response = await require(
       subWebsite: "stuPunchRecord/findPager",
@@ -166,58 +164,52 @@ awb4B45zUwIDAQAB
         'pageIndex': "1"
       },
     );
-    for (var i in response["data"]){
+    for (var i in response["data"]) {
       toReturn.allTime++;
-      if (i["state"].toString().contains("恭喜你本次打卡成功")){
+      if (i["state"].toString().contains("恭喜你本次打卡成功")) {
         toReturn.valid++;
       }
-      if (isValid && !i["state"].toString().contains("恭喜你本次打卡成功")){
+      if (isValid && !i["state"].toString().contains("恭喜你本次打卡成功")) {
         continue;
       }
-      toReturn.all.add(PunchData(
-          i["machineName"],
-          i["weekNum"],
-          i["punchDay"],
-          i["punchTime"],
-          i["state"]
-      ));
+      toReturn.all.add(PunchData(i["machineName"], i["weekNum"], i["punchDay"],
+          i["punchTime"], i["state"]));
     }
     return toReturn;
   }
 
   /// "Static" Data.
-  Future<void> getSportScore () async {
+  Future<void> getSportScore() async {
     SportScore toReturn = SportScore();
-    if (userId == ""){
-      await login(username: user["idsAccount"], password: user["sportPassword"]);
+    if (userId == "") {
+      await login(
+          username: user["idsAccount"], password: user["sportPassword"]);
     }
     var response = await require(
       subWebsite: "measure/getStuTotalScore",
-      body: { "userId": userId },
+      body: {"userId": userId},
     );
-    for (var i in response["data"]){
+    for (var i in response["data"]) {
       if (i.keys.contains("graduationStatus")) {
         toReturn.total = i["totalScore"];
         toReturn.detail = i["gradeType"];
       } else {
         SportScoreOfYear toAdd = SportScoreOfYear(
-          year: i["year"],
-          totalScore: i["totalScore"],
-          rank: i["rank"],
-          gradeType: i["gradeType"]
-        );
+            year: i["year"],
+            totalScore: i["totalScore"],
+            rank: i["rank"],
+            gradeType: i["gradeType"]);
         var anotherResponse = await require(
           subWebsite: "measure/getStuScoreDetail",
-          body: { "meaScoreId": i["meaScoreId"] },
+          body: {"meaScoreId": i["meaScoreId"]},
         );
-        for (var i in anotherResponse["data"]){
+        for (var i in anotherResponse["data"]) {
           toAdd.details.add(SportItems(
               examName: i["examName"],
               examunit: i["examunit"],
               actualScore: i["actualScore"] ?? "0",
               score: i["score"] ?? 0.0,
-              rank: i["rank"] ?? "不及格"
-          ));
+              rank: i["rank"] ?? "不及格"));
         }
         toReturn.list.add(toAdd);
       }
@@ -229,11 +221,15 @@ awb4B45zUwIDAQAB
 var toUse = SportSession();
 
 Future<PunchDataList> getPunchData(bool isValid) => toUse.getPunchData(isValid);
+
 Future<SportScore> getSportScore() async {
   if (sportScore.detail == "") {
     await toUse.getSportScore();
   }
-  return Future.delayed(const Duration(microseconds: 10), ()=>sportScore);
+  return Future.delayed(const Duration(microseconds: 10), () => sportScore);
 }
-Future<void> sportLogin(void Function(int, String)? whatever) =>
-    toUse.login(username: user["idsAccount"], password: user["sportPassword"], onResponse: whatever);
+
+Future<void> sportLogin(void Function(int, String)? whatever) => toUse.login(
+    username: user["idsAccount"],
+    password: user["sportPassword"],
+    onResponse: whatever);

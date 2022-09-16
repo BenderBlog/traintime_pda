@@ -4,17 +4,13 @@ class PunchData {
   String punchDay;
   String punchTime;
   String state;
-  PunchData(
-      this.machineName,
-      this.weekNum,
-      this.punchDay,
-      this.punchTime,
+
+  PunchData(this.machineName, this.weekNum, this.punchDay, this.punchTime,
       this.state);
 }
 
-class PunchDataList{
+class PunchDataList {
   int allTime = 0;
   int valid = 0;
   List<PunchData> all = [];
 }
-

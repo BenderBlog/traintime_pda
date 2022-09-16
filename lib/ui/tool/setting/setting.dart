@@ -10,9 +10,9 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:watermeter/dataStruct/user.dart';
 
 class SettingWindow extends StatelessWidget {
@@ -34,19 +34,19 @@ class SettingWindow extends StatelessWidget {
       body: const SettingDetails(),
     );
   }
-  
 }
 
 class SettingDetails extends StatefulWidget {
   const SettingDetails({Key? key}) : super(key: key);
+
   @override
   State<SettingDetails> createState() => _SettingDetailsState();
 }
 
 class _SettingDetailsState extends State<SettingDetails> {
-
   /// Play easter egg sound effect.
   final player = AudioPlayer();
+
   void _playEffect(String soundRoute) async {
     await player.play(AssetSource(soundRoute));
   }
@@ -56,33 +56,35 @@ class _SettingDetailsState extends State<SettingDetails> {
     return SettingsList(
       sections: [
         SettingsSection(
-          title: const SizedBox(),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-              leading: const Icon(Icons.person),
-              title: const Text('用户信息'),
-              value: Text("${user["name"]} ${user["execution"]}\n${user["institutes"]} ${user["subject"]}")
-            ),
+                leading: const Icon(Icons.person),
+                title: const Text('用户信息'),
+                value: Text(
+                    "${user["name"]} ${user["execution"]}\n${user["institutes"]} ${user["subject"]}")),
           ],
         ),
         SettingsSection(
           title: const Text('体育查询设置'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-              leading: const Icon(Icons.run_circle_outlined),
-              title: const Text('体适能密码'),
-              onPressed: (content) {
-                showDialog(
-                  context: context,
-                  builder: (context) => const SportPasswordDialog(),
-                );
-              }
-            ),
+                leading: const Icon(Icons.run_circle_outlined),
+                title: const Text('体适能密码'),
+                onPressed: (content) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const SportPasswordDialog(),
+                  );
+                }),
           ],
         ),
         SettingsSection(
           title: const Text('关于本软件'),
           tiles: <SettingsTile>[
+            SettingsTile.navigation(
+              title: const Text('Watermeter'),
+              value: const Text("version Pre-Alpha 0.0.1, MPL v2.0"),
+            ),
             SettingsTile.navigation(
               title: const Text('Main Developer'),
               value: const Text("BenderBlog"),
@@ -95,7 +97,8 @@ class _SettingDetailsState extends State<SettingDetails> {
             ),
             SettingsTile.navigation(
               title: const Text('Backend'),
-              value: const Text("Xidian-script by Xidian Open Source Community"),
+              value:
+                  const Text("Xidian-script by Xidian Open Source Community"),
               onPressed: (context) => _playEffect("HellProtecting.wav"),
             ),
             SettingsTile.navigation(
@@ -103,7 +106,6 @@ class _SettingDetailsState extends State<SettingDetails> {
               value: const Text("hawa130"),
               onPressed: (context) => _playEffect("HellProtection.wav"),
             ),
-
           ],
         ),
       ],
@@ -119,19 +121,15 @@ class SportPasswordDialog extends StatefulWidget {
 }
 
 class _SportPasswordDialogState extends State<SportPasswordDialog> {
-
   /// Sport Password Text Editing Controller
-  final TextEditingController _sportPasswordController = TextEditingController.fromValue(
-      TextEditingValue(
-        text: user["sportPassword"] == null ? "" : user["sportPassword"]!,
-        selection: TextSelection.fromPosition(
-            TextPosition(
-              affinity: TextAffinity.downstream,
-              offset: user["sportPassword"] == null ? 0 : user["sportPassword"]!.length,
-            )
-        ),
-      )
-  );
+  final TextEditingController _sportPasswordController =
+      TextEditingController.fromValue(TextEditingValue(
+    text: user["sportPassword"] == null ? "" : user["sportPassword"]!,
+    selection: TextSelection.fromPosition(TextPosition(
+      affinity: TextAffinity.downstream,
+      offset: user["sportPassword"] == null ? 0 : user["sportPassword"]!.length,
+    )),
+  ));
 
   bool _couldView = true;
 
@@ -147,7 +145,10 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
           suffixIcon: IconButton(
               icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
-                setState(() { _couldView = !_couldView; print(_couldView); });
+                setState(() {
+                  _couldView = !_couldView;
+                  print(_couldView);
+                });
               }),
         ),
       ),
@@ -175,7 +176,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
           ),
         ),
       ],
-      actionsPadding: const EdgeInsets.fromLTRB(24,0,12,24),
+      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 12, 24),
     );
   }
 }

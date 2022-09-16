@@ -8,15 +8,17 @@ import 'package:watermeter/dataStruct/xidianDir/cafeteria_window_item_entity.dar
 import 'package:watermeter/dataStruct/xidianDir/shop_information_entity.dart';
 
 JsonConvert jsonConvert = JsonConvert();
+
 typedef JsonConvertFunction<T> = T Function(Map<String, dynamic> json);
 
 class JsonConvert {
-	static final Map<String, JsonConvertFunction> _convertFuncMap = {
-		(CafeteriaWindowItemEntity).toString(): CafeteriaWindowItemEntity.fromJson,
-		(CafeteriaWindowItemResults).toString(): CafeteriaWindowItemResults.fromJson,
-		(ShopInformationEntity).toString(): ShopInformationEntity.fromJson,
-		(ShopInformationResults).toString(): ShopInformationResults.fromJson,
-	};
+  static final Map<String, JsonConvertFunction> _convertFuncMap = {
+    (CafeteriaWindowItemEntity).toString(): CafeteriaWindowItemEntity.fromJson,
+    (CafeteriaWindowItemResults).toString():
+        CafeteriaWindowItemResults.fromJson,
+    (ShopInformationEntity).toString(): ShopInformationEntity.fromJson,
+    (ShopInformationResults).toString(): ShopInformationResults.fromJson,
+  };
 
   T? convert<T>(dynamic value) {
     if (value == null) {
@@ -89,31 +91,44 @@ class JsonConvert {
     }
   }
 
-	//list is returned by type
-	static M? _getListChildType<M>(List<Map<String, dynamic>> data) {
-		if(<CafeteriaWindowItemEntity>[] is M){
-			return data.map<CafeteriaWindowItemEntity>((Map<String, dynamic> e) => CafeteriaWindowItemEntity.fromJson(e)).toList() as M;
-		}
-		if(<CafeteriaWindowItemResults>[] is M){
-			return data.map<CafeteriaWindowItemResults>((Map<String, dynamic> e) => CafeteriaWindowItemResults.fromJson(e)).toList() as M;
-		}
-		if(<ShopInformationEntity>[] is M){
-			return data.map<ShopInformationEntity>((Map<String, dynamic> e) => ShopInformationEntity.fromJson(e)).toList() as M;
-		}
-		if(<ShopInformationResults>[] is M){
-			return data.map<ShopInformationResults>((Map<String, dynamic> e) => ShopInformationResults.fromJson(e)).toList() as M;
-		}
+  //list is returned by type
+  static M? _getListChildType<M>(List<Map<String, dynamic>> data) {
+    if (<CafeteriaWindowItemEntity>[] is M) {
+      return data
+          .map<CafeteriaWindowItemEntity>(
+              (Map<String, dynamic> e) => CafeteriaWindowItemEntity.fromJson(e))
+          .toList() as M;
+    }
+    if (<CafeteriaWindowItemResults>[] is M) {
+      return data
+          .map<CafeteriaWindowItemResults>((Map<String, dynamic> e) =>
+              CafeteriaWindowItemResults.fromJson(e))
+          .toList() as M;
+    }
+    if (<ShopInformationEntity>[] is M) {
+      return data
+          .map<ShopInformationEntity>(
+              (Map<String, dynamic> e) => ShopInformationEntity.fromJson(e))
+          .toList() as M;
+    }
+    if (<ShopInformationResults>[] is M) {
+      return data
+          .map<ShopInformationResults>(
+              (Map<String, dynamic> e) => ShopInformationResults.fromJson(e))
+          .toList() as M;
+    }
 
-		debugPrint("${M.toString()} not found");
-	
-		return null;
-}
+    debugPrint("${M.toString()} not found");
 
-	static M? fromJsonAsT<M>(dynamic json) {
-		if (json is List) {
-			return _getListChildType<M>(json.map((e) => e as Map<String, dynamic>).toList());
-		} else {
-			return jsonConvert.asT<M>(json);
-		}
-	}
+    return null;
+  }
+
+  static M? fromJsonAsT<M>(dynamic json) {
+    if (json is List) {
+      return _getListChildType<M>(
+          json.map((e) => e as Map<String, dynamic>).toList());
+    } else {
+      return jsonConvert.asT<M>(json);
+    }
+  }
 }

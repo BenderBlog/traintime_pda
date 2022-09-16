@@ -1,10 +1,10 @@
 class Score {
-  int mark;       // 编号，用于某种计算，从 0 开始
-  String name;    // 学科名称
-  double score;   // 分数
-  String year;    // 学年
-  double credit;  // 学分
-  String status;  // 修读状态
+  int mark; // 编号，用于某种计算，从 0 开始
+  String name; // 学科名称
+  double score; // 分数
+  String year; // 学年
+  double credit; // 学分
+  String status; // 修读状态
   String? classID; // 教学班序列号
   String? scoreStructure; //成绩构成
   String? scoreDetail; //分项成绩
@@ -30,10 +30,10 @@ class ScoreList {
   Set<String> unPassed = {};
   double randomChoice = 0.0;
 
-  ScoreList({required this.scoreTable}){
-    semester = { for (var i in scoreTable) i.year };
-    statuses = { for (var i in scoreTable) i.status };
-    for (var i in scoreTable){
+  ScoreList({required this.scoreTable}) {
+    semester = {for (var i in scoreTable) i.year};
+    statuses = {for (var i in scoreTable) i.status};
+    for (var i in scoreTable) {
       if (i.status == "公共任选") {
         randomChoice += i.credit;
       }
@@ -42,8 +42,9 @@ class ScoreList {
       if (i.isPassed != '1') {
         unPassed.add(i.name);
       }
-      if (unPassed.contains(i.name) && i.isPassed == "1"){
+      if (unPassed.contains(i.name) && i.isPassed == "1") {
         unPassed.remove(i.name);
+
         /// Whatever score is, if not passed in the first time, count as 60.
         /// Please take a note of it.
         i.score = 60;

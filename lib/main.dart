@@ -11,23 +11,25 @@ if you want to use.
 */
 
 import 'dart:io';
+
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:watermeter/communicate/general.dart';
-import 'package:watermeter/ui/login.dart';
-import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/dataStruct/user.dart';
-
+import 'package:watermeter/ui/home.dart';
+import 'package:watermeter/ui/login.dart';
 
 void main() async {
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
   // Loading cookiejar.
   Directory supportPath = await getApplicationSupportDirectory();
-  SportCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
-  IDSCookieJar = PersistCookieJar(ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
+  SportCookieJar = PersistCookieJar(
+      ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
+  IDSCookieJar = PersistCookieJar(
+      ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
   // Have user registered?
   bool isFirst = false;
   try {
@@ -38,9 +40,9 @@ void main() async {
   runApp(MyApp(isFirst: isFirst));
 }
 
-
 class MyApp extends StatelessWidget {
   final bool isFirst;
+
   const MyApp({Key? key, required this.isFirst}) : super(key: key);
 
   // This widget is the root of your application.

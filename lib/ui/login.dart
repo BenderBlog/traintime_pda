@@ -13,12 +13,12 @@ if you want to use.
 // Color card: https://colorhunt.co/palette/be9fe1c9b6e4e1ccecf1f1f6
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
-import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/communicate/IDS/ehall.dart';
 import 'package:watermeter/communicate/general.dart';
+import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/ui/weight.dart';
-import 'package:watermeter/communicate/IDS/ehall.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({Key? key}) : super(key: key);
@@ -32,9 +32,7 @@ class _LoginWindowState extends State<LoginWindow> {
   final TextEditingController _idsAccountController = TextEditingController();
   final TextEditingController _idsPasswordController = TextEditingController();
 
-
-
-  void _login () async {
+  void _login() async {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
@@ -53,7 +51,8 @@ class _LoginWindowState extends State<LoginWindow> {
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, String status) => pd.update(msg: status, value: number),
+        onResponse: (int number, String status) =>
+            pd.update(msg: status, value: number),
       );
     } catch (e) {
       isGood = false;
@@ -69,7 +68,7 @@ class _LoginWindowState extends State<LoginWindow> {
       }
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomePage()),
-            (route) => false,
+        (route) => false,
       );
     }
   }
@@ -87,13 +86,11 @@ class _LoginWindowState extends State<LoginWindow> {
             radius: 60.0,
           ),
           const SizedBox(height: 15.0),
-          const Text(
-              '请登录 Watermeter',
+          const Text('请登录 Watermeter',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 26,
-              )
-          ),
+              )),
           const SizedBox(height: 40.0),
           inputField(
             text: "学号",
@@ -116,18 +113,19 @@ class _LoginWindowState extends State<LoginWindow> {
                 backgroundColor: const Color(0xFFA267AC),
                 padding: const EdgeInsets.all(20.0),
                 minimumSize: const Size(double.infinity, 60),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(roundRadius)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(roundRadius)),
               ),
               child: const Text(
                 "登录",
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16.0
-                ),
+                    fontSize: 16.0),
               ),
               onPressed: () {
-                if (_idsAccountController.text.length == 11 && _idsPasswordController.text.isNotEmpty) {
+                if (_idsAccountController.text.length == 11 &&
+                    _idsPasswordController.text.isNotEmpty) {
                   _login();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -159,7 +157,7 @@ class _LoginWindowState extends State<LoginWindow> {
                       ),
                     ),
                   );
-                } ,
+                },
               )
             ],
           )

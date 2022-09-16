@@ -22,7 +22,6 @@ SOFTWARE.
 
 /// Modified version of sn_progress_dialog https://github.com/emreesen27/Flutter-Progress-Dialog
 /// I am not sure whether it needs a pull_request.
-
 import 'package:flutter/material.dart';
 
 /// Not to be confused with Error class in the Dart Core Library.

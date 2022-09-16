@@ -49,17 +49,17 @@ class TagsBoxes extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
 
-  const TagsBoxes({
-    Key? key,
-    required this.text,
-    this.backgroundColor = Colors.blue,
-    this.textColor = Colors.white
-  }) : super(key: key);
+  const TagsBoxes(
+      {Key? key,
+      required this.text,
+      this.backgroundColor = Colors.blue,
+      this.textColor = Colors.white})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(5,3,5,3),
+      padding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
@@ -104,26 +104,27 @@ Widget inputField({
   required TextEditingController controller,
   bool isPassword = false,
   bool isAutoFocus = false,
-}) => Padding(
-  padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
-  child: Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border.all(color: Colors.black12),
-      borderRadius: BorderRadius.circular(roundRadius),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.only(left: 20),
-      child: TextField(
-        autofocus: isAutoFocus,
-        controller: controller,
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          floatingLabelBehavior: FloatingLabelBehavior.never,
-          hintText: text,
+}) =>
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black12),
+          borderRadius: BorderRadius.circular(roundRadius),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: TextField(
+            autofocus: isAutoFocus,
+            controller: controller,
+            obscureText: isPassword,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              floatingLabelBehavior: FloatingLabelBehavior.never,
+              hintText: text,
+            ),
+          ),
         ),
       ),
-    ),
-  ),
-);
+    );

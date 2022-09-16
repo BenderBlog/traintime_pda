@@ -12,13 +12,13 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/communicate/sport/sportSession.dart';
-import 'package:watermeter/ui/weight.dart';
 import 'package:watermeter/dataStruct/sport/score.dart';
+import 'package:watermeter/ui/weight.dart';
 
-TagsBoxes situation (String rank) => TagsBoxes(
-  text: rank,
-  backgroundColor: rank.contains("不") ? Colors.red : Colors.green,
-);
+TagsBoxes situation(String rank) => TagsBoxes(
+      text: rank,
+      backgroundColor: rank.contains("不") ? Colors.red : Colors.green,
+    );
 
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({Key? key}) : super(key: key);
@@ -37,26 +37,27 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
-              return Center(child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
+              return Center(
+                  child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
             } else {
               return ListView(
-                  children: [
-                    ShadowBox(
+                children: [
+                  ShadowBox(
                       child: Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text("目前四年总分 ${snapshot.data.total}"),
-                            Text("${snapshot.data.detail.substring(0,snapshot.data.detail.indexOf("\\"))}"),
-                          ],
-                        ),
-                      )
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("目前四年总分 ${snapshot.data.total}"),
+                        Text(
+                            "${snapshot.data.detail.substring(0, snapshot.data.detail.indexOf("\\"))}"),
+                      ],
                     ),
-                    for (int i = snapshot.data.list.length - 1; i >= 0 ; --i)
-                      ScoreCard(toUse: snapshot.data.list[i]),
-                  ],
-                );
+                  )),
+                  for (int i = snapshot.data.list.length - 1; i >= 0; --i)
+                    ScoreCard(toUse: snapshot.data.list[i]),
+                ],
+              );
             }
           } else {
             return const Center(child: CircularProgressIndicator());
@@ -71,11 +72,12 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
 
 class ScoreCard extends StatelessWidget {
   final SportScoreOfYear toUse;
+
   const ScoreCard({Key? key, required this.toUse}) : super(key: key);
 
-  String unitToShow (String eval){
-    if (eval.contains(".")){
-      return eval.substring(0,eval.indexOf("."));
+  String unitToShow(String eval) {
+    if (eval.contains(".")) {
+      return eval.substring(0, eval.indexOf("."));
     } else {
       return eval;
     }
@@ -89,7 +91,7 @@ class ScoreCard extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(15,0,20,0),
+              padding: const EdgeInsets.fromLTRB(15, 0, 20, 0),
               child: Row(
                 children: [
                   Row(
@@ -99,7 +101,9 @@ class ScoreCard extends StatelessWidget {
                         textScaleFactor: 1.2,
                       ),
                       const SizedBox(width: 10),
-                      situation(toUse.rank,),
+                      situation(
+                        toUse.rank,
+                      ),
                     ],
                   ),
                   const Spacer(),
@@ -108,7 +112,9 @@ class ScoreCard extends StatelessWidget {
                     textScaleFactor: 1.2,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: double.parse(toUse.totalScore) >= 50 ? Colors.green : Colors.orange,
+                      color: double.parse(toUse.totalScore) >= 50
+                          ? Colors.green
+                          : Colors.orange,
                     ),
                   ),
                 ],
@@ -129,23 +135,34 @@ class ScoreCard extends StatelessWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Text(i.examName, textAlign:TextAlign.center,),
+                            child: Text(
+                              i.examName,
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Text("${i.actualScore} ${unitToShow(i.examunit)}", textAlign:TextAlign.end,),
+                            child: Text(
+                              "${i.actualScore} ${unitToShow(i.examunit)}",
+                              textAlign: TextAlign.end,
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Text("${i.score} 分", textAlign:TextAlign.end,),
+                            child: Text(
+                              "${i.score} 分",
+                              textAlign: TextAlign.end,
+                            ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center ,
-                              children: [const SizedBox(width: 12), situation(i.rank),],
-                            )
-                          ),
+                              padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(width: 12),
+                                  situation(i.rank),
+                                ],
+                              )),
                         ],
                       ),
                   ],

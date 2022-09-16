@@ -46,29 +46,31 @@ class TabForXDDir extends StatelessWidget {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('关于生活信息'),
-                      content: const Text(
-                        "This Flutter frontend, \nCopyright 2022 SuperBart. MPL License.\n"
-                        "\nOriginal React/Chakra-UI frontend, \nCopyright 2022 hawa130. All right reserved.\n"
-                        "\nData used with permission from \nXidian Directory Development Group.\n"
-                        "\nBender have shiny metal ass which should not be bitten.\n",
-                        textScaleFactor: 0.89,
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text("确定"),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ));
+                          title: const Text('关于生活信息'),
+                          content: const Text(
+                            "This Flutter frontend, \nCopyright 2022 SuperBart. MPL License.\n"
+                            "\nOriginal React/Chakra-UI frontend, \nCopyright 2022 hawa130. All right reserved.\n"
+                            "\nData used with permission from \nXidian Directory Development Group.\n"
+                            "\nBender have shiny metal ass which should not be bitten.\n",
+                            textScaleFactor: 0.89,
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("确定"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ));
               },
             ),
           ],
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.store_mall_directory), ),
+              Tab(
+                icon: Icon(Icons.store_mall_directory),
+              ),
               Tab(icon: Icon(Icons.restaurant)),
             ],
           ),

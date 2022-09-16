@@ -4,13 +4,13 @@ class SportItems {
   String actualScore;
   double score;
   String rank = "不合格";
-  SportItems({
-    required this.examName,
-    required this.examunit,
-    required this.actualScore,
-    required this.score,
-    required this.rank
-  });
+
+  SportItems(
+      {required this.examName,
+      required this.examunit,
+      required this.actualScore,
+      required this.score,
+      required this.rank});
 }
 
 class SportScoreOfYear {
@@ -19,12 +19,12 @@ class SportScoreOfYear {
   String rank;
   String gradeType;
   List<SportItems> details = [];
-  SportScoreOfYear({
-    required this.year,
-    required this.totalScore,
-    required this.rank,
-    required this.gradeType
-  });
+
+  SportScoreOfYear(
+      {required this.year,
+      required this.totalScore,
+      required this.rank,
+      required this.gradeType});
 }
 
 class SportScore {

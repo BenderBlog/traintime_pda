@@ -11,15 +11,14 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
-import 'package:watermeter/ui/tool/score/score.dart';
-import 'package:watermeter/ui/tool/sport/sportWindow.dart';
-import 'package:watermeter/ui/tool/setting/setting.dart';
-import 'package:watermeter/ui/xidianDir/xidianDir.dart';
-import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/communicate/IDS/ehall.dart';
 import 'package:watermeter/communicate/sport/sportSession.dart';
-
+import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
+import 'package:watermeter/ui/tool/score/score.dart';
+import 'package:watermeter/ui/tool/setting/setting.dart';
+import 'package:watermeter/ui/tool/sport/sportWindow.dart';
+import 'package:watermeter/ui/xidianDir/xidianDir.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -54,12 +53,10 @@ class ToolWindow extends StatefulWidget {
   State<ToolWindow> createState() => _ToolWindowState();
 }
 
-
 class _ToolWindowState extends State<ToolWindow> {
-
   void _sportLogin() async {
     bool isGood = true;
-    if (user["sportPassword"] == "" || user["sportPassword"] == null){
+    if (user["sportPassword"] == "" || user["sportPassword"] == null) {
       await showDialog(
         context: context,
         builder: (context) => const SportPasswordDialog(),
@@ -72,7 +69,6 @@ class _ToolWindowState extends State<ToolWindow> {
       hideValue: true,
       completed: Completed(
         completedMsg: "登录成功",
-        closedDelay: 2500,
       ),
       error: ErrorSignal(
         closedDelay: 2500,
@@ -92,9 +88,9 @@ class _ToolWindowState extends State<ToolWindow> {
         pd.close();
       }
       Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) {return const SportWindow();}
-        ),
+        MaterialPageRoute(builder: (context) {
+          return const SportWindow();
+        }),
       );
     }
   }
@@ -116,7 +112,8 @@ class _ToolWindowState extends State<ToolWindow> {
     );
     try {
       await ses.getScore(
-        onResponse: (int number, String status) => pd.update(msg: status, value: number),
+        onResponse: (int number, String status) =>
+            pd.update(msg: status, value: number),
       );
     } catch (e) {
       isGood = false;
@@ -128,11 +125,9 @@ class _ToolWindowState extends State<ToolWindow> {
         pd.close();
       }
       Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) {
-            return const ScoreWindow();
-          }
-        ),
+        MaterialPageRoute(builder: (context) {
+          return const ScoreWindow();
+        }),
       );
     }
   }
@@ -216,4 +211,3 @@ class _ToolWindowState extends State<ToolWindow> {
     );
   }
 }
-

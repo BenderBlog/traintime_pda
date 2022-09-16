@@ -19,21 +19,22 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:convert';
+
 import 'package:watermeter/generated/json/base/json_field.dart';
 import 'package:watermeter/generated/json/cafeteria_window_item_entity.g.dart';
-import 'dart:convert';
 
 // Modified to simplify searching.
 const categories = ['竹园一楼', '竹园二楼', '海棠一楼', '海棠二楼', '丁香'];
 
 @JsonSerializable()
 class CafeteriaWindowItemEntity {
+  late List<CafeteriaWindowItemResults> results;
 
-	late List<CafeteriaWindowItemResults> results;
-  
   CafeteriaWindowItemEntity();
 
-  factory CafeteriaWindowItemEntity.fromJson(Map<String, dynamic> json) => $CafeteriaWindowItemEntityFromJson(json);
+  factory CafeteriaWindowItemEntity.fromJson(Map<String, dynamic> json) =>
+      $CafeteriaWindowItemEntityFromJson(json);
 
   Map<String, dynamic> toJson() => $CafeteriaWindowItemEntityToJson(this);
 
@@ -45,23 +46,23 @@ class CafeteriaWindowItemEntity {
 
 @JsonSerializable()
 class CafeteriaWindowItemResults {
+  late DateTime updatedAt;
+  late String place;
+  int? number;
+  String unit = "份";
+  String name = "录数据的看不清";
+  late String objectId;
+  late DateTime createdAt;
+  late String window;
+  bool status = true;
+  late List<int> price;
+  String? comment;
+  String? shopComment;
 
-	late DateTime updatedAt;
-	late String place;
-	int? number;
-	String unit = "份";
-	String name = "录数据的看不清";
-	late String objectId;
-	late DateTime createdAt;
-	late String window;
-	bool status = true;
-	late List<int> price;
-	String? comment;
-	String? shopComment;
-  
   CafeteriaWindowItemResults();
 
-  factory CafeteriaWindowItemResults.fromJson(Map<String, dynamic> json) => $CafeteriaWindowItemResultsFromJson(json);
+  factory CafeteriaWindowItemResults.fromJson(Map<String, dynamic> json) =>
+      $CafeteriaWindowItemResultsFromJson(json);
 
   Map<String, dynamic> toJson() => $CafeteriaWindowItemResultsToJson(this);
 
@@ -88,8 +89,8 @@ class WindowInformation {
   });
 
   bool state() {
-    for (var i in items){
-      if (i.status == true){
+    for (var i in items) {
+      if (i.status == true) {
         return true;
       }
     }
@@ -99,7 +100,7 @@ class WindowInformation {
   void addItems(WindowItemsGroup toAdd) => items.add(toAdd);
 }
 
-class WindowItemsGroup{
+class WindowItemsGroup {
   String name;
   List<int> price;
   String unit;
