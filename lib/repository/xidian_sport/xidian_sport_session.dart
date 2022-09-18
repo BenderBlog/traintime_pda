@@ -18,7 +18,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:watermeter/communicate/general.dart';
+import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/dataStruct/sport/punch.dart';
 import 'package:watermeter/dataStruct/sport/score.dart';
 import 'package:watermeter/dataStruct/user.dart';

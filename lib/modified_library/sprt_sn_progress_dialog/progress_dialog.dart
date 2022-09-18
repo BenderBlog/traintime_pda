@@ -23,8 +23,8 @@ SOFTWARE.
 /// Modified version of sn_progress_dialog https://github.com/emreesen27/Flutter-Progress-Dialog
 /// I am not sure whether it needs a pull_request.
 import 'package:flutter/material.dart';
-import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/completed.dart';
-import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/error.dart';
+import 'package:watermeter/modified_library/sprt_sn_progress_dialog/completed.dart';
+import 'package:watermeter/modified_library/sprt_sn_progress_dialog/error.dart';
 
 enum ValuePosition { center, right }
 

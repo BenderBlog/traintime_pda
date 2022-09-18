@@ -13,10 +13,10 @@ if you want to use.
 // Color card: https://colorhunt.co/palette/be9fe1c9b6e4e1ccecf1f1f6
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/communicate/IDS/ehall.dart';
-import 'package:watermeter/communicate/general.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/dataStruct/user.dart';
-import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
+import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/ui/weight.dart';
 

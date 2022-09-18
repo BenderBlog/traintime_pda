@@ -16,7 +16,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:watermeter/communicate/general.dart';
+import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/dataStruct/user.dart';
 import 'package:watermeter/ui/home.dart';
 import 'package:watermeter/ui/login.dart';

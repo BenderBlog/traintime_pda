@@ -11,10 +11,10 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/communicate/IDS/ehall.dart';
-import 'package:watermeter/communicate/sport/sportSession.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/dataStruct/user.dart';
-import 'package:watermeter/modified_lib/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
+import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/ui/tool/score/score.dart';
 import 'package:watermeter/ui/tool/setting/setting.dart';
 import 'package:watermeter/ui/tool/sport/sportWindow.dart';

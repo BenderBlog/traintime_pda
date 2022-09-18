@@ -15,7 +15,7 @@ Thanks xidian-script and libxdauth!
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:watermeter/communicate/IDS/ids.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/dataStruct/ids/score.dart';
 import 'package:watermeter/dataStruct/user.dart';
 

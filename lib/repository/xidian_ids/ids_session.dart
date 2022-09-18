@@ -18,7 +18,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' hide Key;
-import 'package:watermeter/communicate/general.dart';
+import 'package:watermeter/repository/general.dart';
 
 /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
 /// Padding part is copied from libxduauth's idea.
