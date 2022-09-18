@@ -17,8 +17,8 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/foundation.dart';
-import 'package:watermeter/dataStruct/xidianDir/cafeteria_window_item_entity.dart';
-import 'package:watermeter/dataStruct/xidianDir/shop_information_entity.dart';
+import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
+import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
 
 class XidianDirectorySession {
   final String _apiKey = 'ya0UhH6yzo8nKmWyrHfkLEyb';

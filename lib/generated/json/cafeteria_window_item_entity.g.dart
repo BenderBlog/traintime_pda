@@ -1,4 +1,4 @@
-import 'package:watermeter/dataStruct/xidianDir/cafeteria_window_item_entity.dart';
+import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
 import 'package:watermeter/generated/json/base/json_convert_content.dart';
 
 CafeteriaWindowItemEntity $CafeteriaWindowItemEntityFromJson(

@@ -12,8 +12,8 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
-import 'package:watermeter/dataStruct/xidianDir/shop_information_entity.dart';
-import 'package:watermeter/ui/weight.dart';
+import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
+import 'package:watermeter/page/weight.dart';
 
 class ComprehensiveWindow extends StatefulWidget {
   const ComprehensiveWindow({Key? key}) : super(key: key);

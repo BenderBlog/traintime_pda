@@ -11,8 +11,8 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/dataStruct/ids/score.dart';
-import 'package:watermeter/ui/weight.dart';
+import 'package:watermeter/model/xidian_ids/score.dart';
+import 'package:watermeter/page/weight.dart';
 
 class ScoreWindow extends StatelessWidget {
   const ScoreWindow({Key? key}) : super(key: key);
@@ -127,21 +127,10 @@ class _ScoreTableState extends State<ScoreTable> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 10,
-                  spreadRadius: 0.1,
-                  color: Colors.black.withOpacity(0.8),
-                ),
-              ],
-            ),
+          TitleLine(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const SizedBox(),
                 DropdownButton(
                   value: chosenSemester,
                   icon: const Icon(
@@ -186,7 +175,6 @@ class _ScoreTableState extends State<ScoreTable> {
                   onPressed: () {
                     setState(() {
                       isSelectMod = !isSelectMod;
-
                       /// Do not remember anything when quit calculating.
                       if (!isSelectMod) {
                         for (var i = isSelected.length - 1; i >= 0; --i) {
@@ -223,7 +211,7 @@ class _ScoreTableState extends State<ScoreTable> {
                               BoxDecoration(color: _getColor(toShow()[index])),
                           child: ScoreCard(toUse: toShow()[index]),
                         )),
-                    const Divider(height: 10, thickness: 5.0),
+
                   ],
                 );
               },
@@ -231,17 +219,7 @@ class _ScoreTableState extends State<ScoreTable> {
             ),
           ),
           if (isSelectMod)
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    spreadRadius: 0.1,
-                    color: Colors.black.withOpacity(0.2),
-                  ),
-                ],
-              ),
+            TitleLine(
               child: Row(
                 children: [
                   Container(

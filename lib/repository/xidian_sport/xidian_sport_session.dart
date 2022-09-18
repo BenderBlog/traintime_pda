@@ -19,9 +19,9 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:watermeter/repository/general.dart';
-import 'package:watermeter/dataStruct/sport/punch.dart';
-import 'package:watermeter/dataStruct/sport/score.dart';
-import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/model/xidian_sport/punch.dart';
+import 'package:watermeter/model/xidian_sport/score.dart';
+import 'package:watermeter/model/user.dart';
 
 /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
 String rsaEncrypt(String toEnc, String pubKey) {

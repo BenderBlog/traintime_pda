@@ -15,10 +15,10 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/general.dart';
-import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
-import 'package:watermeter/ui/home.dart';
-import 'package:watermeter/ui/weight.dart';
+import 'package:watermeter/page/home.dart';
+import 'package:watermeter/page/weight.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({Key? key}) : super(key: key);

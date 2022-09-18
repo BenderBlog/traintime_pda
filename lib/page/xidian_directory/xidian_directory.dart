@@ -1,6 +1,6 @@
 /*
-Intro of the sport data.
-Copyright 2022 SuperBart
+Intro UI of the Xidian Directory. With the bar.
+Copyright (C) 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,21 +9,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
-import 'package:flutter/material.dart';
-import 'package:watermeter/ui/tool/sport/subwindow/punchRecord.dart';
-import 'package:watermeter/ui/tool/sport/subwindow/sportScore.dart';
 
-class SportWindow extends StatelessWidget {
-  const SportWindow({Key? key}) : super(key: key);
+import 'package:flutter/material.dart';
+import 'package:watermeter/page/xidian_directory/subwindow/comprehensive.dart';
+import 'package:watermeter/page/xidian_directory/subwindow/dininghall.dart';
+
+class XidianDirWindow extends StatelessWidget {
+  const XidianDirWindow({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const TabForSport();
+    return const TabForXDDir();
   }
 }
 
-class TabForSport extends StatelessWidget {
-  const TabForSport({Key? key}) : super(key: key);
+class TabForXDDir extends StatelessWidget {
+  const TabForXDDir({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class TabForSport extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("体育查询"),
+          title: const Text("生活信息"),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -45,8 +46,14 @@ class TabForSport extends StatelessWidget {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                          title: const Text('谁想的让我们上四年体育的'),
-                          content: Image.asset("assets/Why-4-Years-Sport.jpg"),
+                          title: const Text('关于生活信息'),
+                          content: const Text(
+                            "This Flutter frontend, \nCopyright 2022 SuperBart. MPL License.\n"
+                            "\nOriginal React/Chakra-UI frontend, \nCopyright 2022 hawa130. All right reserved.\n"
+                            "\nData used with permission from \nXidian Directory Development Group.\n"
+                            "\nBender have shiny metal ass which should not be bitten.\n",
+                            textScaleFactor: 0.89,
+                          ),
                           actions: <Widget>[
                             TextButton(
                               child: const Text("确定"),
@@ -61,15 +68,17 @@ class TabForSport extends StatelessWidget {
           ],
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.edit)),
-              Tab(icon: Icon(Icons.run_circle)),
+              Tab(
+                icon: Icon(Icons.store_mall_directory),
+              ),
+              Tab(icon: Icon(Icons.restaurant)),
             ],
           ),
         ),
         body: const TabBarView(
           children: [
-            PunchRecordWindow(),
-            SportScoreWindow(),
+            ComprehensiveWindow(),
+            DiningHallWindow(),
           ],
         ),
       ),

@@ -13,7 +13,7 @@ if you want to use.
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/model/user.dart';
 
 class SettingWindow extends StatelessWidget {
   const SettingWindow({Key? key}) : super(key: key);

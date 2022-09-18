@@ -92,7 +92,10 @@ class TitleLine extends StatelessWidget {
           ),
         ],
       ),
-      child: child,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: child,
+      ),
     );
   }
 }

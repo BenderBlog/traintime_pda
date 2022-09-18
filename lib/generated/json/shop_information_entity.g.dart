@@ -1,4 +1,4 @@
-import 'package:watermeter/dataStruct/xidianDir/shop_information_entity.dart';
+import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
 import 'package:watermeter/generated/json/base/json_convert_content.dart';
 
 ShopInformationEntity $ShopInformationEntityFromJson(

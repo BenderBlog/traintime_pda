@@ -16,8 +16,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/dataStruct/ids/score.dart';
-import 'package:watermeter/dataStruct/user.dart';
+import 'package:watermeter/model/xidian_ids/score.dart';
+import 'package:watermeter/model/user.dart';
 
 class EhallSession extends IDSSession {
   @override

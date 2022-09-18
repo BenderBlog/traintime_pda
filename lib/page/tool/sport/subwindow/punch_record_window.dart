@@ -12,8 +12,8 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
-import 'package:watermeter/dataStruct/sport/punch.dart';
-import 'package:watermeter/ui/weight.dart';
+import 'package:watermeter/model/xidian_sport/punch.dart';
+import 'package:watermeter/page/weight.dart';
 
 class PunchRecordWindow extends StatefulWidget {
   const PunchRecordWindow({Key? key}) : super(key: key);
