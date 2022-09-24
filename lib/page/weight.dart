@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 const double widthOfSquare = 30.0;
 const double roundRadius = 10;
 
-/// Use it as the larger boxes.
+/// Use it as a larger box.
 class ShadowBox extends StatelessWidget {
   final Widget child;
   final double padding;
@@ -73,7 +73,7 @@ class TagsBoxes extends StatelessWidget {
   }
 }
 
-/// Use it at the top of each page
+/// Use it at the top of each page.
 class TitleLine extends StatelessWidget {
   final Widget child;
 
@@ -100,7 +100,7 @@ class TitleLine extends StatelessWidget {
   }
 }
 
-/// A input widget.
+/// An input widget.
 Widget inputField({
   required String text,
   required Icon icon,

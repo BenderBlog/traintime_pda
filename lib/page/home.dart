@@ -15,6 +15,7 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
+import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/tool/score/score.dart';
 import 'package:watermeter/page/tool/setting/setting.dart';
 import 'package:watermeter/page/tool/sport/sport_window.dart';
@@ -141,6 +142,29 @@ class _ToolWindowState extends State<ToolWindow> {
         mainAxisSpacing: 20,
         crossAxisSpacing: 20,
         children: [
+          MaterialButton(
+            color: Colors.greenAccent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.calendar_month_sharp,
+                  size: 96.0,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "课程表",
+                  textScaleFactor: 1.5,
+                ),
+              ],
+            ),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return const ClassTable();
+              }),
+            ),
+          ),
           MaterialButton(
             color: Colors.cyan,
             child: Column(
