@@ -133,6 +133,46 @@ class _ToolWindowState extends State<ToolWindow> {
     }
   }
 
+  void _getClassTable() async {
+    bool isGood = true;
+    ProgressDialog pd = ProgressDialog(context: context);
+    pd.show(
+      msg: '正在获取成绩',
+      max: 100,
+      hideValue: true,
+      completed: Completed(
+        completedMsg: "成绩已经获得",
+        closedDelay: 2500,
+      ),
+      error: ErrorSignal(
+        closedDelay: 2500,
+      ),
+    );
+    try {
+      await ses.getClasstable(
+        onResponse: (int number, String status) =>
+            pd.update(msg: status, value: number),
+      );
+    } on Exception catch (e) {
+      isGood = false;
+      print(e);
+      pd.update(value: -1, msg: e.toString());
+    }
+    if (!mounted) return;
+    if (isGood == true) {
+      if (pd.isOpen()) {
+        pd.close();
+      }
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) {
+          return const ClassTable();
+        }),
+      );
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -159,11 +199,7 @@ class _ToolWindowState extends State<ToolWindow> {
                 ),
               ],
             ),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) {
-                return const ClassTable();
-              }),
-            ),
+            onPressed: () => _getClassTable(),
           ),
           MaterialButton(
             color: Colors.cyan,

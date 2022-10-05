@@ -25,8 +25,6 @@ class ClassTable extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
-            //ScaffoldMessenger.of(context).showSnackBar(
-            //    const SnackBar(content: Text('Should back to the main menu.')));
           },
         ),
       ),
@@ -256,7 +254,6 @@ class PageState extends State<ClassTableWindow> {
               ),
             ),
           ),
-          _bottomView
         ],
       ),
     );
@@ -273,7 +270,7 @@ class PageState extends State<ClassTableWindow> {
           return TextButton(onPressed: (){}, child: Text("第$index周"));
         }),
   );
-
+  /*
   Widget _centerView = Expanded(
     child: GridView.builder(
         itemCount: 63,
@@ -305,4 +302,5 @@ class PageState extends State<ClassTableWindow> {
       ],
     ),
   );
+  */
 }

@@ -136,7 +136,7 @@ class ProgressDialog {
     FontWeight valueFontWeight = FontWeight.normal,
     double valueFontSize = 15.0,
     double msgFontSize = 17.0,
-    int msgMaxLines = 1,
+    int msgMaxLines = 10,
     double elevation = 5.0,
     double borderRadius = 15.0,
     bool barrierDismissible = false,
@@ -231,11 +231,11 @@ class ProgressDialog {
                             textAlign: msgTextAlign,
                             maxLines: msgMaxLines,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            /*style: TextStyle(
                               fontSize: msgFontSize,
                               color: msgColor,
                               fontWeight: msgFontWeight,
-                            ),
+                            ),*/
                           ),
                         ),
                       ),

@@ -21,8 +21,7 @@ Future<void> initUser() async {
   /// Temporary solution.
   user["sportPassword"] = prefs.getString("sportPassword");
   if (user["idsAccount"] == null ||
-      user["idsPassword"] == null ||
-      user["sportPassword"] == null) {
+      user["idsPassword"] == null) {
     throw "有未注册用户，跳转至登录界面";
   }
   user["name"] = prefs.getString("name");

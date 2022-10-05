@@ -36,6 +36,7 @@ void main() async {
   } on String {
     isFirst = true;
   }
+  print(isFirst);
   runApp(MyApp(isFirst: isFirst));
 }
 
