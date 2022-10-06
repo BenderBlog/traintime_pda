@@ -251,7 +251,7 @@ class EhallSession extends IDSSession {
         place: i["JASDM"],
       ));
     }
-
+    classData.isDone = true;
     onResponse(100, "课表已获取");
   }
 

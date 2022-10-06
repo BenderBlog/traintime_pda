@@ -11,7 +11,8 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTable extends StatelessWidget {
   const ClassTable({Key? key}) : super(key: key);
@@ -56,22 +57,28 @@ class PageState extends State<ClassTableWindow> {
   var dateList = [];
   var currentWeekIndex = 0;
 
+  String pageTitle = "我的课表";
+
+  double aspect = 0.5;
 
   @override
   void initState() {
     super.initState();
 
+    // Get the start day of the semester.
+    var startDay = DateTime.parse(classData.termStartDay);
+
+    // Get the day of Monday of this week.
     var monday = 1;
     var mondayTime = DateTime.now();
-
-    //获取本周星期一是几号
     while (mondayTime.weekday != monday) {
       mondayTime = mondayTime.subtract(const Duration(days: 1));
     }
 
-    mondayTime.year;
-    mondayTime.month;
-    mondayTime.day;
+    // Get the current index.
+    currentWeekIndex = (Jiffy(mondayTime).dayOfYear - Jiffy(startDay).dayOfYear) % 7;
+
+    //
     for (int i = 0; i < 7; i++) {
       dateList.add(
           "${mondayTime.month}/${mondayTime.day + i}");
@@ -85,14 +92,13 @@ class PageState extends State<ClassTableWindow> {
 
   @override
   Widget build(BuildContext context) {
-    const double aspect = 0.48;
-    String chosenWeek = "";
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          _topView,
-          /// Top line to show the date
+          // Top line to show the date
+          _topView(),
+          // The main class table.
           SizedBox(
             child: GridView.builder(
                 shrinkWrap: true,
@@ -100,7 +106,7 @@ class PageState extends State<ClassTableWindow> {
                 itemCount: 8,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 8,
-                  childAspectRatio: 1 / 1,
+                  childAspectRatio: 1,
                 ),
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
@@ -112,9 +118,13 @@ class PageState extends State<ClassTableWindow> {
                           ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Text("星期",
-                              style: TextStyle(
-                                  fontSize: 14, color: Colors.black87)),
+                          Text(
+                            "星期",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
                           SizedBox(height: 5),
                           Text("日期", style: TextStyle(fontSize: 12)),
                         ],
@@ -151,27 +161,33 @@ class PageState extends State<ClassTableWindow> {
                         shrinkWrap: true,
                         // physics:ClampingScrollPhysics(),
                         itemCount: 10,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1, childAspectRatio: aspect*2,),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          childAspectRatio: aspect * 2,
+                        ),
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
-                              decoration: const BoxDecoration(
-                                color: Color(0x00ff5ff5),
-                                border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.black12, width: 0.5),
-                                  right: BorderSide(
-                                      color: Colors.black12, width: 0.5),
+                            decoration: const BoxDecoration(
+                              color: Color(0x00ff5ff5),
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.black12,
+                                  width: 0.5,
+                                ),
+                                right: BorderSide(
+                                  color: Colors.black12,
+                                  width: 0.5,
                                 ),
                               ),
-                              width: 25,
-                              height: MediaQuery.of(context).size.height/5,
-                              child: Center(
-                                child: Text(
-                                  (index + 1).toInt().toString(),
-                                  style: const TextStyle(fontSize: 15),
-                                ),
+                            ),
+                            width: 25,
+                            height: MediaQuery.of(context).size.height/5,
+                            child: Center(
+                              child: Text(
+                                (index + 1).toInt().toString(),
+                                style: const TextStyle(fontSize: 15),
                               ),
+                            ),
                           );
                         }),
                   ),
@@ -180,9 +196,11 @@ class PageState extends State<ClassTableWindow> {
                     child: GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 35,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7, childAspectRatio: aspect),
+                        itemCount: 70,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 7,
+                          childAspectRatio: aspect * 2,
+                        ),
                         itemBuilder: (BuildContext context, int index) {
                           return Stack(
                             children: [
@@ -192,42 +210,45 @@ class PageState extends State<ClassTableWindow> {
                                   Flexible(
                                     flex: 1,
                                     child: Container(
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.black12,
-                                                width: 0.5),
-                                            right: BorderSide(
-                                                color: Colors.black12,
-                                                width: 0.5),
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black12,
+                                            width: 0.5,
+                                          ),
+                                          right: BorderSide(
+                                            color: Colors.black12,
+                                            width: 0,
                                           ),
                                         ),
                                       ),
+                                    ),
                                   ),
                                   Flexible(
                                     flex: 1,
                                     child: Container(
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          // border: Border.all(color: Colors.black12, width: 0.5),
-                                          border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.black12,
-                                                width: 0.5),
-                                            right: BorderSide(
-                                                color: Colors.black12,
-                                                width: 0.5),
-                                          ),
-                                        )),
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        // border: Border.all(color: Colors.black12, width: 0.5),
+                                        border: Border(
+                                          bottom: BorderSide(
+                                              color: Colors.black12,
+                                              width: 0.5),
+                                          right: BorderSide(
+                                              color: Colors.black12,
+                                              width: 0.5),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              if (index % 5 == 0 || index % 5 == 1)
+                              if (classData.classTable[currentWeekIndex]![index%7][index~/7] != null)
                                 Container(
                                   margin: const EdgeInsets.all(1),
                                   decoration: BoxDecoration(
@@ -236,12 +257,12 @@ class PageState extends State<ClassTableWindow> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      infoList[index % 2],
+                                      classData.classTable[currentWeekIndex]![index%7][index~/7].toString(),
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          letterSpacing: 1,
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        letterSpacing: 1,
                                       ),
                                     ),
                                   ),
@@ -259,48 +280,27 @@ class PageState extends State<ClassTableWindow> {
     );
   }
 
-  String pageTitle() => "我的课表";
 
-  final Widget _topView = SizedBox(
+
+  Widget _topView() => SizedBox(
     height: 80,
     child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: 7,
+        itemCount: classData.classTable.length,
         itemBuilder: (BuildContext context, int index) {
-          return TextButton(onPressed: (){}, child: Text("第$index周"));
-        }),
-  );
-  /*
-  Widget _centerView = Expanded(
-    child: GridView.builder(
-        itemCount: 63,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 7,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            // width: 25,
-            // height: 80,
-              child: Center(
-                child: Text(
-                  (index + 1).toString(),
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
-              decoration: BoxDecoration(
-                color: Color(0xff5ff5),
-                border: Border.all(color: Colors.black12, width: 0.5),
-              ));
-        }),
-  );
-
-  Widget _bottomView = SizedBox(
-    height: 30,
-    child: Row(
-      children: [
-        //底部view可自行扩充
-      ],
+          return TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: currentWeekIndex == index ? Colors.deepPurpleAccent : Colors.white,
+              foregroundColor: currentWeekIndex == index ? Colors.white : Colors.deepPurpleAccent,
+            ),
+            onPressed: () {
+              setState(() {
+                currentWeekIndex = index;
+              });
+            },
+            child: Text("第${index+1}周"),
+          );
+        },
     ),
   );
-  */
 }

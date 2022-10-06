@@ -7,11 +7,19 @@ class ClassDetail{
     this.teacher,
     this.place,
   });
+  @override
+  String toString() {
+    if (place != null) {
+      return "$name\n$place";
+    } else {
+      return "$name";
+    }
+  }
 }
 
 class Classes{
   List<ClassDetail> notOnTable = [];
-  /// Must be List.generate(7, (_) => List.filled(9, null, growable: false))
+  /// Must be List.generate(7, (_) => List.filled(10, null, growable: false))
   Map<int,List<List<ClassDetail?>>> classTable = {};
   String semesterCode = "";
   String termStartDay = "";

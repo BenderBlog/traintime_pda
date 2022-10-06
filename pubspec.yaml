@@ -40,6 +40,7 @@ dependencies:
   sn_progress_dialog: ^1.0.8
   settings_ui: ^2.0.2
   audioplayers: ^1.0.1
+  jiffy: ^5.0.0
 
   flutter:
     sdk: flutter

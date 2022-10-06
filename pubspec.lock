@@ -42,49 +42,49 @@ packages:
       name: audioplayers
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.0"
   audioplayers_android:
     dependency: transitive
     description:
       name: audioplayers_android
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.0"
   audioplayers_darwin:
     dependency: transitive
     description:
       name: audioplayers_darwin
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   audioplayers_linux:
     dependency: transitive
     description:
       name: audioplayers_linux
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   audioplayers_platform_interface:
     dependency: transitive
     description:
       name: audioplayers_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0"
+    version: "2.0.0"
   audioplayers_web:
     dependency: transitive
     description:
       name: audioplayers_web
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0"
+    version: "2.0.0"
   audioplayers_windows:
     dependency: transitive
     description:
       name: audioplayers_windows
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   beautiful_soup_dart:
     dependency: "direct main"
     description:
@@ -289,6 +289,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.1"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.17.0"
+  jiffy:
+    dependency: "direct main"
+    description:
+      name: jiffy
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "5.0.0"
   js:
     dependency: transitive
     description:
@@ -323,7 +337,7 @@ packages:
       name: logging
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.2"
+    version: "1.1.0"
   matcher:
     dependency: transitive
     description:
@@ -400,7 +414,7 @@ packages:
       name: path_provider_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.4"
+    version: "2.0.5"
   path_provider_windows:
     dependency: transitive
     description:
@@ -428,7 +442,7 @@ packages:
       name: plugin_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.2"
+    version: "2.1.3"
   pointycastle:
     dependency: transitive
     description:
@@ -559,14 +573,14 @@ packages:
       name: sqflite
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.3+1"
+    version: "2.1.0"
   sqflite_common:
     dependency: transitive
     description:
       name: sqflite_common
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.2.1+1"
+    version: "2.3.0"
   stack_trace:
     dependency: transitive
     description:
@@ -659,5 +673,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.17.6 <3.0.0"
-  flutter: ">=3.0.0"
+  dart: ">=2.18.0-0 <3.0.0"
+  flutter: ">=3.3.0-0"
