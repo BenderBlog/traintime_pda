@@ -18,7 +18,7 @@ class ClassDetail{
 }
 
 class Classes{
-  List<ClassDetail> notOnTable = [];
+  // List<ClassDetail> notOnTable = [];
   /// Must be List.generate(7, (_) => List.filled(10, null, growable: false))
   Map<int,List<List<ClassDetail?>>> classTable = {};
   String semesterCode = "";

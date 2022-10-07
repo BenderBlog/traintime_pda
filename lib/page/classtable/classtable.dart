@@ -51,7 +51,6 @@ class PageState extends State<ClassTableWindow> {
     Colors.deepPurpleAccent,
     Colors.purpleAccent
   ];
-  var infoList = ["高等数学\nD-201", "大学英语\n信远I-501"];
   var weekList = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
   var dateList = [];
@@ -61,6 +60,8 @@ class PageState extends State<ClassTableWindow> {
 
   double aspect = 0.5;
 
+  var mondayTime = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -69,16 +70,15 @@ class PageState extends State<ClassTableWindow> {
     var startDay = DateTime.parse(classData.termStartDay);
 
     // Get the day of Monday of this week.
-    var monday = 1;
-    var mondayTime = DateTime.now();
-    while (mondayTime.weekday != monday) {
+    while (mondayTime.weekday != 1) {
       mondayTime = mondayTime.subtract(const Duration(days: 1));
     }
 
     // Get the current index.
-    currentWeekIndex = (Jiffy(mondayTime).dayOfYear - Jiffy(startDay).dayOfYear) % 7;
+    currentWeekIndex = (Jiffy(mondayTime).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+    print(currentWeekIndex);
 
-    //
+    // Update the dateList.
     for (int i = 0; i < 7; i++) {
       dateList.add(
           "${mondayTime.month}/${mondayTime.day + i}");
@@ -89,6 +89,42 @@ class PageState extends State<ClassTableWindow> {
       }
     }
   }
+
+  Widget _topView() => SizedBox(
+    height: 80,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: classData.classTable.length,
+      itemBuilder: (BuildContext context, int index) {
+        return TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: currentWeekIndex == index ? Colors.deepPurpleAccent : Colors.white,
+            foregroundColor: currentWeekIndex == index ? Colors.white : Colors.deepPurpleAccent,
+          ),
+          onPressed: () {
+            setState(() {
+              print(currentWeekIndex);
+              currentWeekIndex = index;
+              mondayTime = DateTime.parse(classData.termStartDay).add(Duration(days: index*7));
+              // Update the dateList.
+              dateList = [];
+              for (int i = 0; i < 7; i++) {
+                dateList.add(
+                    "${mondayTime.month}/${mondayTime.day + i}");
+                if ((mondayTime.day + i) == DateTime.now().day) {
+                  setState(() {
+                    currentWeekIndex = i + 1;
+                  });
+                }
+              }
+            });
+          },
+          child: Text("第${index+1}周"),
+        );
+      },
+    ),
+  );
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,156 +187,135 @@ class PageState extends State<ClassTableWindow> {
                   );
                 }),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: GridView.builder(
-                        shrinkWrap: true,
-                        // physics:ClampingScrollPhysics(),
-                        itemCount: 10,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          childAspectRatio: aspect * 2,
-                        ),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0x00ff5ff5),
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black12,
-                                  width: 0.5,
-                                ),
-                                right: BorderSide(
-                                  color: Colors.black12,
-                                  width: 0.5,
-                                ),
-                              ),
-                            ),
-                            width: 25,
-                            height: MediaQuery.of(context).size.height/5,
-                            child: Center(
-                              child: Text(
-                                (index + 1).toInt().toString(),
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                            ),
-                          );
-                        }),
-                  ),
-                  Expanded(
-                    flex: 7,
-                    child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 70,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 7,
-                          childAspectRatio: aspect * 2,
-                        ),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Stack(
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    flex: 1,
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: Colors.black12,
-                                            width: 0.5,
-                                          ),
-                                          right: BorderSide(
-                                            color: Colors.black12,
-                                            width: 0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    flex: 1,
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        // border: Border.all(color: Colors.black12, width: 0.5),
-                                        border: Border(
-                                          bottom: BorderSide(
-                                              color: Colors.black12,
-                                              width: 0.5),
-                                          right: BorderSide(
-                                              color: Colors.black12,
-                                              width: 0.5),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (classData.classTable[currentWeekIndex]![index%7][index~/7] != null)
-                                Container(
-                                  margin: const EdgeInsets.all(1),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: colorList[index % 7],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      classData.classTable[currentWeekIndex]![index%7][index~/7].toString(),
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                            ],
-                          );
-                        }),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _classTable(classData.classTable[currentWeekIndex]),
         ],
       ),
     );
   }
 
-
-
-  Widget _topView() => SizedBox(
-    height: 80,
-    child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: classData.classTable.length,
-        itemBuilder: (BuildContext context, int index) {
-          return TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: currentWeekIndex == index ? Colors.deepPurpleAccent : Colors.white,
-              foregroundColor: currentWeekIndex == index ? Colors.white : Colors.deepPurpleAccent,
+  Widget _classTable(List<List<ClassDetail?>>? classTable) => Expanded(
+    child: SingleChildScrollView(
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: GridView.builder(
+                shrinkWrap: true,
+                // physics:ClampingScrollPhysics(),
+                itemCount: 10,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  childAspectRatio: aspect * 2,
+                ),
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0x00ff5ff5),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.black12,
+                          width: 0.5,
+                        ),
+                        right: BorderSide(
+                          color: Colors.black12,
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+                    width: 25,
+                    height: MediaQuery.of(context).size.height/5,
+                    child: Center(
+                      child: Text(
+                        (index + 1).toInt().toString(),
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  );
+                }),
+          ),
+          Expanded(
+            flex: 7,
+            child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 70,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
+                  childAspectRatio: aspect * 2,
+                ),
+                itemBuilder: (BuildContext context, int index) {
+                  return Stack(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            flex: 1,
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.black12,
+                                    width: 0.5,
+                                  ),
+                                  right: BorderSide(
+                                    color: Colors.black12,
+                                    width: 0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                // border: Border.all(color: Colors.black12, width: 0.5),
+                                border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.black12,
+                                      width: 0.5),
+                                  right: BorderSide(
+                                      color: Colors.black12,
+                                      width: 0.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (classTable![index%7][index~/7] != null)
+                        Container(
+                          margin: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: colorList[index % 7],
+                          ),
+                          child: Center(
+                            child: Text(
+                              classTable[index%7][index~/7].toString(),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ),
+                        )
+                    ],
+                  );
+                },
             ),
-            onPressed: () {
-              setState(() {
-                currentWeekIndex = index;
-              });
-            },
-            child: Text("第${index+1}周"),
-          );
-        },
+          ),
+        ],
+      ),
     ),
   );
 }

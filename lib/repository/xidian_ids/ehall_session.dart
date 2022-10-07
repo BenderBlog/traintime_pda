@@ -13,8 +13,9 @@ Thanks xidian-script and libxdauth!
 */
 
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -185,34 +186,62 @@ class EhallSession extends IDSSession {
       return;
     }
 
+    Map<String, dynamic> qResult = {};
+
     onResponse(10, "准备获取课表");
-    await useApp("4770397878132218");
-    onResponse(15, "获取学期信息");
-    String semesterCode = await dio
-        .post(
-          "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-        )
-        .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    classData.semesterCode = semesterCode;
-    onResponse(10, "获取开学日期");
-    String termStartDay = await dio.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-      data: {
-        'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
-        'XQ': semesterCode.split('-')[2]
-      },
-    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    classData.termStartDay = termStartDay;
-    onResponse(20, "获取课表内容");
-    var qResult = await dio.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
-      data: {'XNXQDM': semesterCode},
-    ).then((value) => value.data['datas']['xskcb']);
-    if (qResult['extParams']['code'] != 1) {
-      throw qResult['extParams']['msg'] + "在已安排课程";
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    print(appDocDir.path);
+    var file = File("${appDocDir.path}/org.superbart.watermeter/ClassTable.json");
+    bool isExist = file.existsSync();
+
+    print(isExist);
+    onResponse(5, isExist ? "读取缓存" : "从网络获取");
+
+    // Try to add some sort of cache support.
+    if (!isExist) {
+
+      onResponse(10, "进入教务系统");
+      await useApp("4770397878132218");
+
+      onResponse(15, "获取学期信息");
+      String semesterCode = await dio
+          .post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+      ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
+
+      onResponse(20, "获取开学日期");
+      String termStartDay = await dio.post(
+        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+        data: {
+          'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
+          'XQ': semesterCode.split('-')[2]
+        },
+      ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
+
+      onResponse(30, "获取课表内容");
+      qResult = await dio.post(
+        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
+        data: {'XNXQDM': semesterCode},
+      ).then((value) => value.data['datas']['xskcb']);
+      if (qResult['extParams']['code'] != 1) {
+        throw qResult['extParams']['msg'] + "在已安排课程";
+      }
+
+      onResponse(40, "缓存课表内容");
+      qResult["semesterCode"] = semesterCode;
+      qResult["termStartDay"] = termStartDay;
+      file.writeAsStringSync(jsonEncode(qResult));
+
+    } else {
+      onResponse(40, "读取课表缓存");
+      qResult = jsonDecode(file.readAsStringSync());
     }
+
     onResponse(50, "处理课表内容");
-    print(qResult["rows"]);
+
+    classData.semesterCode = qResult["semesterCode"];
+    classData.termStartDay = qResult["termStartDay"];
+
     for (var i in qResult["rows"]) {
       ClassDetail hell = ClassDetail(
         name: i["KCM"],
@@ -227,14 +256,14 @@ class EhallSession extends IDSSession {
           }
           print("$j, ${classData.classTable[j]}");
           for (var l = int.parse(i["KSJC"]); l <= int.parse(i["JSJC"]); ++l) {
-            print(l);
             // SKXQ 上课星期
-            classData.classTable[j]![int.parse(i["SKXQ"])][l-1] = hell;
+            classData.classTable[j]![int.parse(i["SKXQ"])-1][l-1] = hell;
           }
         }
       }
     }
     print(classData.classTable);
+    /*
     onResponse(70, "获取未安排内容");
     var notOnTable = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
@@ -251,6 +280,7 @@ class EhallSession extends IDSSession {
         place: i["JASDM"],
       ));
     }
+    */
     classData.isDone = true;
     onResponse(100, "课表已获取");
   }
