@@ -57,8 +57,8 @@ class TabForScore extends StatelessWidget {
   }
 
   Widget aboutDialog(context) => AlertDialog(
-        title: const Text("Are you agree?"),
-        content: Image.asset("assets/Farnsworth-Score.jpg"),
+        title: const Text("For VB, are you agree?"),
+        content: Image.asset("assets/Humpy-Score.jpg"),
         actions: <Widget>[
           TextButton(
             child: const Text("确定"),

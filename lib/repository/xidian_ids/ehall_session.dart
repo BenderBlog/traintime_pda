@@ -191,7 +191,11 @@ class EhallSession extends IDSSession {
     onResponse(10, "准备获取课表");
     Directory appDocDir = await getApplicationDocumentsDirectory();
     print(appDocDir.path);
-    var file = File("${appDocDir.path}/org.superbart.watermeter/ClassTable.json");
+    Directory destination = Directory("${appDocDir.path}/org.superbart.watermeter");
+    if (!destination.existsSync()){
+      await destination.create();
+    }
+    var file = File("${destination.path}/ClassTable.json");
     bool isExist = file.existsSync();
 
     print(isExist);

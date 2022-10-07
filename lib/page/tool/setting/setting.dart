@@ -84,7 +84,7 @@ class _SettingDetailsState extends State<SettingDetails> {
           tiles: <SettingsTile>[
             SettingsTile.navigation(
               title: const Text('Watermeter'),
-              value: const Text("version Pre-Alpha 0.0.1, MPL v2.0"),
+              value: const Text("version Pre-Alpha 0.0.2, MPL v2.0"),
             ),
             SettingsTile.navigation(
               title: const Text('Main Developer'),

@@ -28,10 +28,34 @@ class ClassTable extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => aboutDialog(context),
+              );
+            },
+          ),
+        ],
       ),
       body: const ClassTableWindow(),
     );
   }
+
+  Widget aboutDialog(context) => AlertDialog(
+    title: const Text("不过我还是每次去教室"),
+    content: Image.asset("assets/Farnsworth-Class.jpg"),
+    actions: <Widget>[
+      TextButton(
+        child: const Text("确定"),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    ],
+  );
 }
 
 class ClassTableWindow extends StatefulWidget {
