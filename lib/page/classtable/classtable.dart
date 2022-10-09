@@ -84,7 +84,7 @@ class PageState extends State<ClassTableWindow> {
 
   String pageTitle = "我的课表";
 
-  double aspect = 0.5;
+  double aspect = 15;
 
   void dateListUpdate(DateTime firstDay) {
     dateList = [firstDay];
@@ -206,125 +206,74 @@ class PageState extends State<ClassTableWindow> {
     child: SingleChildScrollView(
       child: Row(
         children: [
-          Expanded(
-            flex: 1,
-            child: GridView.builder(
-                shrinkWrap: true,
-                // physics:ClampingScrollPhysics(),
-                itemCount: 10,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  childAspectRatio: aspect * 2,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0x00ff5ff5),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.black12,
-                          width: 0.5,
-                        ),
-                        right: BorderSide(
-                          color: Colors.black12,
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    width: 25,
-                    height: MediaQuery.of(context).size.height/5,
-                    child: Center(
-                      child: Text(
-                        (index + 1).toInt().toString(),
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ),
-                  );
-                }),
-          ),
-          Expanded(
-            flex: 7,
-            child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 70,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                  childAspectRatio: aspect * 2,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return Stack(
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            flex: 1,
-                            child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.black12,
-                                    width: 0.5,
-                                  ),
-                                  right: BorderSide(
-                                    color: Colors.black12,
-                                    width: 0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 1,
-                            child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                // border: Border.all(color: Colors.black12, width: 0.5),
-                                border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.black12,
-                                      width: 0.5),
-                                  right: BorderSide(
-                                      color: Colors.black12,
-                                      width: 0.5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (classTable![index%7][index~/7] != null)
-                        Container(
-                          margin: const EdgeInsets.all(1),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: colorList[index % 7],
-                          ),
-                          child: Center(
-                            child: Text(
-                              classTable[index%7][index~/7].toString(),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ),
-                        )
-                    ],
-                  );
-                },
+          for (int i = -1; i < 7; ++i)
+            Expanded(
+              child: Column(children: _classSubRow(i)),
             ),
-          ),
         ],
       ),
     ),
   );
+
+  List<Widget> _classSubRow(int index) {
+
+    List<Widget> thisRow = [];
+
+    for (int i = 0; i < 10; ++i) {
+
+      print(i);
+
+      if (index == -1) {
+        thisRow.add(SizedBox(
+          height: MediaQuery.of(context).size.height/15,
+          child: Center(child: Text("${i+1}"),),
+        ));
+        continue;
+      }
+
+      if (classData.classTable[currentWeekIndex]!.classList[index][i] == null) {
+        thisRow.add(SizedBox(
+          height: MediaQuery.of(context).size.height/15,
+        ));
+      } else {
+        ClassDetail toAppend = classData.classTable[currentWeekIndex]!.classList[index][i]!;
+        int count = 1;
+
+        print("toAppend: ${i} $toAppend index: ${index}");
+        print("Next: ${i+1} ${classData.classTable[currentWeekIndex]!.classList[index][i+1]}");
+        while (i < 10 && classData.classTable[currentWeekIndex]!.classList[index][i+1] == toAppend ) {
+          count++;
+          i++;
+        }
+
+        thisRow.add(_classCard(
+          index,
+          count * (MediaQuery.of(context).size.height/15),
+          toAppend,
+        ));
+      }
+    }
+    return thisRow;
+  }
+
+  Widget _classCard(int index, double height, ClassDetail information) =>
+      Container(
+        margin: const EdgeInsets.all(1),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: colorList[index % 7],
+        ),
+        height: height,
+        child: Center(
+          child: Text(
+            information.toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+      );
 }
