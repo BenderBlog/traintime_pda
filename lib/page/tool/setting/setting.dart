@@ -89,23 +89,72 @@ class _SettingDetailsState extends State<SettingDetails> {
             SettingsTile.navigation(
               title: const Text('Main Developer'),
               value: const Text("BenderBlog"),
+              // Quake: This would give you 100HP, but takes down gradually.
               onPressed: (context) => _playEffect("Megahealth.wav"),
             ),
             SettingsTile.navigation(
               title: const Text('Inspired by'),
               value: const Text("Robotxm's Myxdu"),
+              // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
               onPressed: (context) => _playEffect("QuadDamage.wav"),
             ),
             SettingsTile.navigation(
               title: const Text('Backend'),
               value:
                   const Text("Xidian-script by Xidian Open Source Community"),
+              // Quake: You don't need to fear about anything, even Shub-Niggurath...
               onPressed: (context) => _playEffect("HellProtecting.wav"),
             ),
             SettingsTile.navigation(
               title: const Text('Xidian Directory Backend'),
               value: const Text("hawa130"),
+              // Quake: ...with the power of HELL, the updown Pentagram.
               onPressed: (context) => _playEffect("HellProtection.wav"),
+            ),
+            SettingsTile.navigation(
+              title: const Text('Cygnus X-1'),
+              value: const Text('A mysterious trip to the black hole.'),
+              onPressed: (context) => showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Taken from the third paragraph of the book.'),
+                    // 降临到黑洞的过程，飞船在旋转，身体在扭曲，没有终结
+                    // 周围的杂音砸向我的内心，每一丝精神即将被扯断！
+                    content: const Text('''
+                    
+                      Spinning, whirling,
+                      Still descending
+                      Like a spiral sea,
+                      Unending
+                     
+                      Sound and fury
+                      Drowns my heart
+                      Every nerve
+                      Is torn apart!
+                    '''),
+                    actions: <Widget>[
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        child: const Text('What? I need to stand back...'),
+                        // You have no choice.
+                        onPressed: () {},
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        child: const Text('Let\'s go! What the heck.'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ),

@@ -12,15 +12,24 @@ class ClassDetail{
     if (place != null) {
       return "$name\n$place";
     } else {
-      return "$name";
+      return name;
     }
   }
+}
+
+class WeekClassInformation {
+  DateTime startOfTheWeek;
+  List<List<ClassDetail?>> classList;
+  WeekClassInformation({
+    required this.startOfTheWeek,
+    required this.classList,
+  });
 }
 
 class Classes{
   // List<ClassDetail> notOnTable = [];
   /// Must be List.generate(7, (_) => List.filled(10, null, growable: false))
-  Map<int,List<List<ClassDetail?>>> classTable = {};
+  Map<int,WeekClassInformation> classTable = {};
   String semesterCode = "";
   String termStartDay = "";
   bool isDone = false;

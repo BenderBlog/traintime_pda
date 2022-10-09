@@ -75,16 +75,23 @@ class PageState extends State<ClassTableWindow> {
     Colors.deepPurpleAccent,
     Colors.purpleAccent
   ];
-  var weekList = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
-  var dateList = [];
-  var currentWeekIndex = 0;
+  List<String> weekList = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+  List<DateTime> dateList = [];
+
+  int currentWeekIndex = 0;
 
   String pageTitle = "我的课表";
 
   double aspect = 0.5;
 
-  var mondayTime = DateTime.now();
+  void dateListUpdate(DateTime firstDay) {
+    dateList = [firstDay];
+    for (int i = 1; i < 7; ++i){
+      dateList.add(dateList.last.add(const Duration(days: 1)));
+    }
+  }
 
   @override
   void initState() {
@@ -93,25 +100,12 @@ class PageState extends State<ClassTableWindow> {
     // Get the start day of the semester.
     var startDay = DateTime.parse(classData.termStartDay);
 
-    // Get the day of Monday of this week.
-    while (mondayTime.weekday != 1) {
-      mondayTime = mondayTime.subtract(const Duration(days: 1));
-    }
-
     // Get the current index.
-    currentWeekIndex = (Jiffy(mondayTime).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+    currentWeekIndex = (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
     print(currentWeekIndex);
 
-    // Update the dateList.
-    for (int i = 0; i < 7; i++) {
-      dateList.add(
-          "${mondayTime.month}/${mondayTime.day + i}");
-      if ((mondayTime.day + i) == DateTime.now().day) {
-        setState(() {
-          currentWeekIndex = i + 1;
-        });
-      }
-    }
+    // Update dateList
+    dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);
   }
 
   Widget _topView() => SizedBox(
@@ -127,20 +121,8 @@ class PageState extends State<ClassTableWindow> {
           ),
           onPressed: () {
             setState(() {
-              print(currentWeekIndex);
               currentWeekIndex = index;
-              mondayTime = DateTime.parse(classData.termStartDay).add(Duration(days: index*7));
-              // Update the dateList.
-              dateList = [];
-              for (int i = 0; i < 7; i++) {
-                dateList.add(
-                    "${mondayTime.month}/${mondayTime.day + i}");
-                if ((mondayTime.day + i) == DateTime.now().day) {
-                  setState(() {
-                    currentWeekIndex = i + 1;
-                  });
-                }
-              }
+              dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);
             });
           },
           child: Text("第${index+1}周"),
@@ -170,9 +152,10 @@ class PageState extends State<ClassTableWindow> {
                 ),
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
-                    color: index == currentWeekIndex
-                        ? const Color(0x00f7f7f7)
-                        : Colors.white,
+                    color: index != 0 &&
+                        dateList[index - 1].month == DateTime.now().month &&
+                        dateList[index - 1].day == DateTime.now().day
+                         ? const Color(0x00f7f7f7) : Colors.white,
                     child: Center(
                       child: index == 0
                           ? Column(
@@ -195,14 +178,16 @@ class PageState extends State<ClassTableWindow> {
                           Text(weekList[index - 1],
                               style: TextStyle(
                                   fontSize: 14,
-                                  color: index == currentWeekIndex
+                                  color: (dateList[index - 1].month == DateTime.now().month &&
+                                      dateList[index - 1].day == DateTime.now().day)
                                       ? Colors.lightBlue
                                       : Colors.black87)),
                           const SizedBox(height: 5),
-                          Text(dateList[index - 1],
+                          Text("${dateList[index - 1].month}/${dateList[index - 1].day}",
                               style: TextStyle(
                                   fontSize: 12,
-                                  color: index == currentWeekIndex
+                                  color: (dateList[index - 1].month == DateTime.now().month &&
+                                      dateList[index - 1].day == DateTime.now().day)
                                       ? Colors.lightBlue
                                       : Colors.black87)),
                         ],
@@ -211,7 +196,7 @@ class PageState extends State<ClassTableWindow> {
                   );
                 }),
           ),
-          _classTable(classData.classTable[currentWeekIndex]),
+          _classTable(classData.classTable[currentWeekIndex]!.classList),
         ],
       ),
     );

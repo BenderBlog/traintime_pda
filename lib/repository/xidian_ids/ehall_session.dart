@@ -190,7 +190,6 @@ class EhallSession extends IDSSession {
 
     onResponse(10, "准备获取课表");
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    print(appDocDir.path);
     Directory destination = Directory("${appDocDir.path}/org.superbart.watermeter");
     if (!destination.existsSync()){
       await destination.create();
@@ -198,7 +197,6 @@ class EhallSession extends IDSSession {
     var file = File("${destination.path}/ClassTable.json");
     bool isExist = file.existsSync();
 
-    print(isExist);
     onResponse(5, isExist ? "读取缓存" : "从网络获取");
 
     // Try to add some sort of cache support.
@@ -208,8 +206,7 @@ class EhallSession extends IDSSession {
       await useApp("4770397878132218");
 
       onResponse(15, "获取学期信息");
-      String semesterCode = await dio
-          .post(
+      String semesterCode = await dio.post(
         "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
       ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
 
@@ -255,18 +252,26 @@ class EhallSession extends IDSSession {
       for (var j = 0; j < i["SKZC"].toString().length; ++j){
         // KSJC 开始(进程?) JSJC 结束
         if (i["SKZC"][j] == "1" && int.parse(i["JSJC"]) <= 10) {
+          var startDay = DateTime.parse(classData.termStartDay);
+          // If not exist, create the entire week.
           if (classData.classTable[j] == null) {
-            classData.classTable[j] = List.generate(7, (_) => List.filled(10, null, growable: false));
+            classData.classTable[j] = WeekClassInformation(
+              startOfTheWeek: startDay.add(Duration(days: 7*j)),
+              classList: List.generate(7, (_) => List.filled(10, null, growable: false)),
+            );
           }
-          print("$j, ${classData.classTable[j]}");
           for (var l = int.parse(i["KSJC"]); l <= int.parse(i["JSJC"]); ++l) {
             // SKXQ 上课星期
-            classData.classTable[j]![int.parse(i["SKXQ"])-1][l-1] = hell;
+            classData.classTable[j]!.classList[int.parse(i["SKXQ"])-1][l-1] = hell;
           }
         }
       }
     }
-    print(classData.classTable);
+
+    for (var i in classData.classTable.keys) {
+      print("$i, ${classData.classTable[i]!.startOfTheWeek}");
+    }
+
     /*
     onResponse(70, "获取未安排内容");
     var notOnTable = await dio.post(
