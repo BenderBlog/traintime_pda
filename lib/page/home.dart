@@ -133,7 +133,7 @@ class _ToolWindowState extends State<ToolWindow> {
     }
   }
 
-  void _getClassTable() async {
+  void _getClassTable(bool isFocus) async {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
@@ -150,6 +150,7 @@ class _ToolWindowState extends State<ToolWindow> {
     );
     try {
       await ses.getClasstable(
+        focus: isFocus,
         onResponse: (int number, String status) =>
             pd.update(msg: status, value: number),
       );
@@ -199,7 +200,8 @@ class _ToolWindowState extends State<ToolWindow> {
                 ),
               ],
             ),
-            onPressed: () => _getClassTable(),
+            onPressed: () => _getClassTable(false),
+            onLongPress: () => _getClassTable(true),
           ),
           MaterialButton(
             color: Colors.cyan,

@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
+
 class ClassTable extends StatelessWidget {
   const ClassTable({Key? key}) : super(key: key);
 
@@ -102,7 +103,7 @@ class PageState extends State<ClassTableWindow> {
 
     // Get the current index.
     currentWeekIndex = (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
-    print(currentWeekIndex);
+    print(classData.classTable[currentWeekIndex]!.classList);
 
     // Update dateList
     dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);
@@ -240,8 +241,8 @@ class PageState extends State<ClassTableWindow> {
         int count = 1;
 
         print("toAppend: ${i} $toAppend index: ${index}");
-        print("Next: ${i+1} ${classData.classTable[currentWeekIndex]!.classList[index][i+1]}");
-        while (i < 10 && classData.classTable[currentWeekIndex]!.classList[index][i+1] == toAppend ) {
+        print("Next: ${i+1} ${toAppend == classData.classTable[currentWeekIndex]!.classList[index][i+1]}");
+        while (i < 9 && classData.classTable[currentWeekIndex]!.classList[index][i+1] == toAppend ) {
           count++;
           i++;
         }

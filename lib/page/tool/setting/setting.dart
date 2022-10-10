@@ -85,7 +85,32 @@ class _SettingDetailsState extends State<SettingDetails> {
             SettingsTile.navigation(
               title: const Text('Watermeter'),
               value: const Text("version Pre-Alpha 0.0.2, MPL v2.0"),
+              onPressed: (context) => showDialog (
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('About this software'),
+                    content: const Text("Main Developer: BenderBlog\n"
+                    "Thanks to:\n"
+                    "Robotxm: Concept\n"
+                    "Xidian Open Source Community: Logic\n"
+                    "Hawa130: Xidian Directory"),
+                    actions: <Widget>[
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        child: const Text('Salute!'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              )
             ),
+            /*
             SettingsTile.navigation(
               title: const Text('Main Developer'),
               value: const Text("BenderBlog"),
@@ -111,6 +136,7 @@ class _SettingDetailsState extends State<SettingDetails> {
               // Quake: ...with the power of HELL, the updown Pentagram.
               onPressed: (context) => _playEffect("HellProtection.wav"),
             ),
+            */
             SettingsTile.navigation(
               title: const Text('Cygnus X-1'),
               value: const Text('A mysterious trip to the black hole.'),
@@ -121,26 +147,30 @@ class _SettingDetailsState extends State<SettingDetails> {
                     title: const Text('Taken from the third paragraph of the book.'),
                     // 降临到黑洞的过程，飞船在旋转，身体在扭曲，没有终结
                     // 周围的杂音砸向我的内心，每一丝精神即将被扯断！
-                    content: const Text('''
-                    
-                      Spinning, whirling,
-                      Still descending
-                      Like a spiral sea,
-                      Unending
-                     
-                      Sound and fury
-                      Drowns my heart
-                      Every nerve
-                      Is torn apart!
-                    '''),
+                    content: const Text(
+                      "Spinning, whirling,\n"
+                      "Still descending\n"
+                      "Like a spiral sea,\n"
+                      "Unending\n"
+                      "\n"
+                      "Sound and fury\n"
+                      "Drowns my heart\n"
+                      "Every nerve\n"
+                      "Is torn apart!"
+                    ),
                     actions: <Widget>[
                       TextButton(
                         style: TextButton.styleFrom(
                           textStyle: Theme.of(context).textTheme.labelLarge,
                         ),
                         child: const Text('What? I need to stand back...'),
-                        // You have no choice.
-                        onPressed: () {},
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('You have no choice.'),
+                            ),
+                          );
+                        },
                       ),
                       TextButton(
                         style: TextButton.styleFrom(

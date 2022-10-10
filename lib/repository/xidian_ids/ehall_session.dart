@@ -197,10 +197,10 @@ class EhallSession extends IDSSession {
     var file = File("${destination.path}/ClassTable.json");
     bool isExist = file.existsSync();
 
-    onResponse(5, isExist ? "读取缓存" : "从网络获取");
+    onResponse(5, isExist || focus == true ? "读取缓存" : "从网络获取");
 
     // Try to add some sort of cache support.
-    if (!isExist) {
+    if (!isExist || focus == true) {
 
       onResponse(10, "进入教务系统");
       await useApp("4770397878132218");

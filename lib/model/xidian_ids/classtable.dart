@@ -10,7 +10,7 @@ class ClassDetail{
   @override
   String toString() {
     if (place != null) {
-      return "$name\n$place";
+      return "${name.length <= 15 ? name : "${name.substring(0,14)}..."} $place";
     } else {
       return name;
     }
