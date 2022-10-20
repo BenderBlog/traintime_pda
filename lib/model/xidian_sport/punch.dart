@@ -7,6 +7,9 @@ class PunchData {
 
   PunchData(this.machineName, this.weekNum, this.punchDay, this.punchTime,
       this.state);
+
+  @override
+  String toString() => "$machineName $weekNum $punchDay $punchTime $state";
 }
 
 class PunchDataList {

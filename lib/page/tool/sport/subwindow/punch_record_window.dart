@@ -57,9 +57,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
                           Expanded(
                             child: ListView(
                               children: [
-                                for (int i = snapshot.data.all.length - 1;
-                                    i >= 0;
-                                    --i)
+                                for (int i = snapshot.data.all.length - 1; i >= 0; i--)
                                   RecordCard(
                                       mark: i + 1, toUse: snapshot.data.all[i]),
                               ],
@@ -124,7 +122,7 @@ class RecordCard extends StatelessWidget {
     String toShow;
     Color background;
     if (toUse.state.contains("成功")) {
-      toShow = "成功：${toUse.state.substring(18)}";
+      toShow = toUse.state.length == 4 ? toUse.state : "成功：${toUse.state.substring(18)}";
       background = Colors.green;
     } else if (toUse.state.contains("失败")) {
       toShow = "失败";

@@ -10,9 +10,9 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/user.dart';
 
 class SettingWindow extends StatelessWidget {
@@ -44,12 +44,6 @@ class SettingDetails extends StatefulWidget {
 }
 
 class _SettingDetailsState extends State<SettingDetails> {
-  /// Play easter egg sound effect.
-  final player = AudioPlayer();
-
-  void _playEffect(String soundRoute) async {
-    await player.play(AssetSource(soundRoute));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,108 +77,42 @@ class _SettingDetailsState extends State<SettingDetails> {
           title: const Text('关于本软件'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-              title: const Text('Watermeter'),
-              value: const Text("version Pre-Alpha 0.0.2, MPL v2.0"),
-              onPressed: (context) => showDialog (
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('About this software'),
-                    content: const Text("Main Developer: BenderBlog\n"
-                    "Thanks to:\n"
-                    "Robotxm: Concept\n"
-                    "Xidian Open Source Community: Logic\n"
-                    "Hawa130: Xidian Directory"),
-                    actions: <Widget>[
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          textStyle: Theme.of(context).textTheme.labelLarge,
-                        ),
-                        child: const Text('Salute!'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              )
-            ),
-            /*
-            SettingsTile.navigation(
-              title: const Text('Main Developer'),
-              value: const Text("BenderBlog"),
-              // Quake: This would give you 100HP, but takes down gradually.
-              onPressed: (context) => _playEffect("Megahealth.wav"),
-            ),
-            SettingsTile.navigation(
-              title: const Text('Inspired by'),
-              value: const Text("Robotxm's Myxdu"),
-              // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
-              onPressed: (context) => _playEffect("QuadDamage.wav"),
-            ),
-            SettingsTile.navigation(
-              title: const Text('Backend'),
-              value:
-                  const Text("Xidian-script by Xidian Open Source Community"),
-              // Quake: You don't need to fear about anything, even Shub-Niggurath...
-              onPressed: (context) => _playEffect("HellProtecting.wav"),
-            ),
-            SettingsTile.navigation(
-              title: const Text('Xidian Directory Backend'),
-              value: const Text("hawa130"),
-              // Quake: ...with the power of HELL, the updown Pentagram.
-              onPressed: (context) => _playEffect("HellProtection.wav"),
-            ),
-            */
-            SettingsTile.navigation(
-              title: const Text('Cygnus X-1'),
-              value: const Text('A mysterious trip to the black hole.'),
-              onPressed: (context) => showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Taken from the third paragraph of the book.'),
-                    // 降临到黑洞的过程，飞船在旋转，身体在扭曲，没有终结
-                    // 周围的杂音砸向我的内心，每一丝精神即将被扯断！
-                    content: const Text(
-                      "Spinning, whirling,\n"
-                      "Still descending\n"
-                      "Like a spiral sea,\n"
-                      "Unending\n"
-                      "\n"
-                      "Sound and fury\n"
-                      "Drowns my heart\n"
-                      "Every nerve\n"
-                      "Is torn apart!"
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          textStyle: Theme.of(context).textTheme.labelLarge,
-                        ),
-                        child: const Text('What? I need to stand back...'),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('You have no choice.'),
-                            ),
-                          );
-                        },
-                      ),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          textStyle: Theme.of(context).textTheme.labelLarge,
-                        ),
-                        child: const Text('Let\'s go! What the heck.'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
+              title: const Text('Watermeter 水表 by BenderBlog'),
+              value: const Text("版本号 Pre-Alpha 0.0.2, MPL v2.0"),
+              onPressed: (context) => launchUrl(
+                Uri.parse("https://github.com/BenderBlog/watermeter"),
+                mode: LaunchMode.externalApplication,
               ),
+            ),
+            SettingsTile.navigation(
+              title: const Text('受到这个软件的启发'),
+              value: const Text("Robotxm's Myxdu (电表)"),
+              onPressed: (context) => launchUrl(
+                Uri.parse("https://myxdu.moefactory.com/"),
+                mode: LaunchMode.externalApplication,
+              ),
+              // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
+              // onPressed: (context) => _playEffect("QuadDamage.wav"),
+            ),
+            SettingsTile.navigation(
+              title: const Text('网络逻辑'),
+              value: const Text("西电开源社区的 Xidian-Script"),
+              onPressed: (context) => launchUrl(
+                Uri.parse("https://github.com/xdlinux/xidian-scripts"),
+                mode: LaunchMode.externalApplication,
+              ),
+              // Quake: You don't need to fear about anything, even Shub-Niggurath...
+              // onPressed: (context) => _playEffect("HellProtecting.wav"),
+            ),
+            SettingsTile.navigation(
+              title: const Text('西电目录数据提供商'),
+              value: const Text("hawa130, SuperBart, and others."),
+              onPressed: (context) => launchUrl(
+                Uri.parse("https://ncov.hawa130.com/about"),
+                mode: LaunchMode.externalApplication,
+              ),
+              // Quake: ...with the power of HELL, the updown Pentagram.
+              // onPressed: (context) => _playEffect("HellProtection.wav"),
             ),
           ],
         ),

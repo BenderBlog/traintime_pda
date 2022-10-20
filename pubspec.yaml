@@ -39,7 +39,7 @@ dependencies:
   beautiful_soup_dart: ^0.3.0
   sn_progress_dialog: ^1.0.8
   settings_ui: ^2.0.2
-  audioplayers: ^1.0.1
+  url_launcher: ^6.1.6
   jiffy: ^5.0.0
 
   flutter:
