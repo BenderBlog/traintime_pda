@@ -39,7 +39,7 @@ class ScoreList {
       }
     }
     for (var i in scoreTable) {
-      if (i.isPassed != '1') {
+      if (i.isPassed != '1' && i.isPassed != "-1") {
         unPassed.add(i.name);
       }
       if (unPassed.contains(i.name) && i.isPassed == "1") {
@@ -50,6 +50,9 @@ class ScoreList {
         i.score = 60;
         i.name += "(非初修通过)";
         unPassed.remove(i.name);
+      }
+      if (i.isPassed == "-1") {
+        i.name += "(成绩没登完)";
       }
     }
   }

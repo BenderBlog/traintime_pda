@@ -140,12 +140,12 @@ class EhallSession extends IDSSession {
       scoreTable.add(Score(
           mark: j,
           name: i["XSKCM"],
-          score: i["ZCJ"],
+          score: i["ZCJ"] ?? 0.0,
           year: i["XNXQDM"],
           credit: i["XF"],
           status: i["KCXZDM_DISPLAY"],
           classID: i["JXBID"],
-          isPassed: i["SFJG"]));
+          isPassed: i["SFJG"] ?? "-1"));
       j++;
       /* Unable to work.
       if (i["DJCJLXDM"] == "100") {
