@@ -102,8 +102,13 @@ class PageState extends State<ClassTableWindow> {
     var startDay = DateTime.parse(classData.termStartDay);
 
     // Get the current index.
-    currentWeekIndex = (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
-    print(classData.classTable[currentWeekIndex]!.classList);
+    // If they decide to start the class in the next semester, well...
+    if (DateTime.now().millisecondsSinceEpoch >= startDay.millisecondsSinceEpoch) {
+      currentWeekIndex = (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+      print(classData.classTable[currentWeekIndex]!.classList);
+    }
+
+
 
     // Update dateList
     dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);

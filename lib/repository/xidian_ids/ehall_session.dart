@@ -253,6 +253,7 @@ class EhallSession extends IDSSession {
         // KSJC 开始(进程?) JSJC 结束
         if (i["SKZC"][j] == "1" && int.parse(i["JSJC"]) <= 10) {
           var startDay = DateTime.parse(classData.termStartDay);
+          print(startDay);
           // If not exist, create the entire week.
           if (classData.classTable[j] == null) {
             classData.classTable[j] = WeekClassInformation(
@@ -266,10 +267,6 @@ class EhallSession extends IDSSession {
           }
         }
       }
-    }
-
-    for (var i in classData.classTable.keys) {
-      print("$i, ${classData.classTable[i]!.startOfTheWeek}");
     }
 
     /*
