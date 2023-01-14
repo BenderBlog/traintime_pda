@@ -22,14 +22,17 @@ class DiningHallWindow extends StatefulWidget {
   State<DiningHallWindow> createState() => _DiningHallWindowState();
 }
 
-/// TODO: Add a random button and a general report button.
-/// TODO: Add a button, which could hide the details of the window.
-class _DiningHallWindowState extends State<DiningHallWindow> {
+class _DiningHallWindowState extends State<DiningHallWindow>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   String toSearch = "";
   String goToWhere = "竹园一楼";
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(children: [
       Container(
         decoration: BoxDecoration(
@@ -99,10 +102,17 @@ class _DiningHallWindowState extends State<DiningHallWindow> {
                   return Center(
                       child: Text("坏事: ${snapshot.error} + ${snapshot.data}"));
                 } else {
-                  return ListView(
-                    children: [
-                      for (var i in snapshot.data) CafeteriaCard(toUse: i),
-                    ],
+                  return ListView.separated(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) {
+                      return CafeteriaCard(toUse: snapshot.data[index]);
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(height: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12.5,
+                      vertical: 9.0,
+                    ),
                   );
                 }
               } else {
@@ -135,28 +145,30 @@ class CafeteriaCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                if (toUse.number != null)
-                  Row(
-                    children: [
-                      TagsBoxes(
-                        text: toUse.number.toString(),
-                        backgroundColor: Colors.grey,
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
-                SizedBox(
-                  width: 150,
-                  child: Text(
-                    toUse.name,
-                    textAlign: TextAlign.left,
-                    textScaleFactor: 1.5,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                  ),
-                )
-              ]),
+              Row(
+                children: [
+                  if (toUse.number != null)
+                    Row(
+                      children: [
+                        TagsBoxes(
+                          text: toUse.number.toString(),
+                          backgroundColor: Colors.grey,
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                    ),
+                  SizedBox(
+                    width: 150,
+                    child: Text(
+                      toUse.name,
+                      textAlign: TextAlign.left,
+                      textScaleFactor: 1.25,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: true,
+                    ),
+                  )
+                ],
+              ),
               Row(
                 children: [
                   TagsBoxes(
@@ -170,6 +182,7 @@ class CafeteriaCard extends StatelessWidget {
               ),
             ],
           ),
+          if (toUse.commit != null) const SizedBox(height: 10),
           if (toUse.commit != null)
             Row(
               children: [
@@ -180,13 +193,15 @@ class CafeteriaCard extends StatelessWidget {
               ],
             ),
           const Divider(height: 28.0),
-          for (var i in toUse.items)
-            Column(
-              children: [
-                ItemBox(toUse: i),
+          ListView.separated(
+            separatorBuilder: (BuildContext context, int index) =>
                 const SizedBox(height: 10),
-              ],
-            ),
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: toUse.items.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) =>
+                ItemBox(toUse: toUse.items.elementAt(index)),
+          ),
         ],
       ),
     ));
@@ -195,7 +210,6 @@ class CafeteriaCard extends StatelessWidget {
 
 class ItemBox extends StatelessWidget {
   final WindowItemsGroup toUse;
-
   const ItemBox({Key? key, required this.toUse}) : super(key: key);
 
   @override
@@ -207,42 +221,34 @@ class ItemBox extends StatelessWidget {
       ),
       child: Container(
         padding: const EdgeInsets.all(10),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Flexible(
+              child: Text(
+                toUse.commit == null
+                    ? toUse.name
+                    : "${toUse.name}\n${toUse.commit!}",
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  decoration: !toUse.status
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
+                ),
+              ),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  toUse.name,
-                  textScaleFactor: 1.10,
+                  "${toUse.price.join(" 或 ")} 元每${toUse.unit}",
                   style: TextStyle(
                     decoration: !toUse.status
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
                   ),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "${toUse.price.join(" 或 ")} 元每${toUse.unit}",
-                      textScaleFactor: 1.10,
-                      style: TextStyle(
-                        decoration: !toUse.status
-                            ? TextDecoration.lineThrough
-                            : TextDecoration.none,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
-            if (toUse.commit != null)
-              Row(children: [
-                const SizedBox(height: 10),
-                Flexible(
-                  child: Text(toUse.commit!),
-                )
-              ])
           ],
         ),
       ),

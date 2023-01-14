@@ -22,12 +22,17 @@ class ComprehensiveWindow extends StatefulWidget {
   State<ComprehensiveWindow> createState() => _ComprehensiveWindowState();
 }
 
-class _ComprehensiveWindowState extends State<ComprehensiveWindow> {
+class _ComprehensiveWindowState extends State<ComprehensiveWindow>
+    with AutomaticKeepAliveClientMixin {
   String categoryToSent = "所有";
   String toSearch = "";
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: [
         Container(
@@ -97,10 +102,17 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow> {
                   if (snapshot.hasError) {
                     return Center(child: Text("坏事: ${snapshot.error}"));
                   } else {
-                    return ListView(
-                      children: [
-                        for (var i in snapshot.data.results) ShopCard(toUse: i),
-                      ],
+                    return ListView.separated(
+                      itemCount: snapshot.data.results.length,
+                      itemBuilder: (context, index) {
+                        return ShopCard(toUse: snapshot.data.results[index]);
+                      },
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const SizedBox(height: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.5,
+                        vertical: 9.0,
+                      ),
                     );
                   }
                 } else {
@@ -147,64 +159,78 @@ class ShopCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadowBox(
-        child: Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                toUse.name,
-                textAlign: TextAlign.left,
-                textScaleFactor: 1.5,
-              ),
-              TagsBoxes(
-                text: toUse.status ? "开放" : "关闭",
-                backgroundColor: toUse.status ? Colors.green : Colors.red,
-              )
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              _iconForTarget(),
-              const SizedBox(width: 5),
-              for (var i in toUse.tags)
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        toUse.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                        textScaleFactor: 1.25,
+                      ),
+                    ),
+                    TagsBoxes(
+                      text: toUse.status ? "开放" : "关闭",
+                      backgroundColor: toUse.status ? Colors.green : Colors.red,
+                    )
+                  ],
+                ),
+                const Divider(),
                 Row(
                   children: [
-                    TagsBoxes(
-                      text: i,
+                    _iconForTarget(),
+                    const SizedBox(width: 7.5),
+                    Wrap(
+                      spacing: 5,
+                      children: List.generate(
+                        toUse.tags.length,
+                        (index) => TagsBoxes(text: toUse.tags[index]),
+                      ),
                     ),
-                    const SizedBox(width: 4)
                   ],
-                )
-            ],
-          ),
-          const Divider(height: 15.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Text(
-              toUse.description == null ? "没有描述" : toUse.description!,
-              textScaleFactor: 1.10,
+                ),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(2.5, 0, 0, 0),
+                  child: Text(
+                    toUse.description ?? "没有描述",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const Divider(height: 15.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                // To be implemented.
-                onPressed: () {},
-                child: const Text("纠正"),
-              ),
-              Text(
-                  "上次更新在 ${toUse.updatedAt.toLocal().toString().substring(0, 19)}"),
-            ],
-          ),
-        ],
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /*
+                TextButton(
+                  // To be implemented.
+                  onPressed: () {},
+                  child: const Text("纠正"),
+                ),
+                */
+                Text(
+                  "上次更新 ${toUse.updatedAt.toLocal().toString().substring(0, 19)}",
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

@@ -19,25 +19,21 @@ const double roundRadius = 10;
 /// Use it as a larger box.
 class ShadowBox extends StatelessWidget {
   final Widget child;
-  final double padding;
-  final Color backgroundColor;
 
   const ShadowBox({
     Key? key,
     required this.child,
-    this.padding = 10.0,
-    this.backgroundColor = Colors.white,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(roundRadius),
+    return Card(
+      // color: Colors.deepPurple,
+      elevation: 10.0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
       ),
+      semanticContainer: false,
       child: child,
     );
   }
