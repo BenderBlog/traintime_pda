@@ -18,7 +18,7 @@ import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/page/home.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({Key? key}) : super(key: key);
@@ -72,7 +72,7 @@ class _LoginWindowState extends State<LoginWindow> {
         }
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomePage()),
-              (route) => false,
+          (route) => false,
         );
       }
     }
@@ -122,7 +122,9 @@ class _LoginWindowState extends State<LoginWindow> {
                     floatingLabelBehavior: FloatingLabelBehavior.never,
                     hintText: "一站式登录密码",
                     suffixIcon: IconButton(
-                        icon: Icon(_couldNotView ? Icons.visibility : Icons.visibility_off),
+                        icon: Icon(_couldNotView
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                         onPressed: () {
                           setState(() {
                             _couldNotView = !_couldNotView;

@@ -127,3 +127,18 @@ Widget inputField({
         ),
       ),
     );
+
+/// A listview widget.
+Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init) =>
+    ListView.separated(
+      itemCount: a.length,
+      itemBuilder: (context, index) {
+        return init(a[index]);
+      },
+      separatorBuilder: (BuildContext context, int index) =>
+          const SizedBox(height: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12.5,
+        vertical: 9.0,
+      ),
+    );

@@ -13,7 +13,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 
 TagsBoxes situation(String rank) => TagsBoxes(
       text: rank,
@@ -40,10 +40,9 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
               return Center(
                   child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
             } else {
-              return ListView(
-                children: [
-                  ShadowBox(
-                      child: Container(
+              List things = [
+                ShadowBox(
+                  child: Container(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -53,10 +52,15 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
                             "${snapshot.data.detail.substring(0, snapshot.data.detail.indexOf("\\"))}"),
                       ],
                     ),
-                  )),
-                  for (int i = snapshot.data.list.length - 1; i >= 0; --i)
-                    ScoreCard(toUse: snapshot.data.list[i]),
-                ],
+                  ),
+                ),
+              ];
+              things.addAll(List.generate(snapshot.data.list.length,
+                      (index) => ScoreCard(toUse: snapshot.data.list[index]))
+                  .reversed);
+              return dataList<dynamic, Widget>(
+                things,
+                (toUse) => toUse,
               );
             }
           } else {
@@ -75,13 +79,8 @@ class ScoreCard extends StatelessWidget {
 
   const ScoreCard({Key? key, required this.toUse}) : super(key: key);
 
-  String unitToShow(String eval) {
-    if (eval.contains(".")) {
-      return eval.substring(0, eval.indexOf("."));
-    } else {
-      return eval;
-    }
-  }
+  String unitToShow(String eval) =>
+      eval.contains(".") ? eval.substring(0, eval.indexOf(".")) : eval;
 
   @override
   Widget build(BuildContext context) {

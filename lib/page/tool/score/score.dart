@@ -12,7 +12,7 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 
 class ScoreWindow extends StatelessWidget {
   const ScoreWindow({Key? key}) : super(key: key);
@@ -175,6 +175,7 @@ class _ScoreTableState extends State<ScoreTable> {
                   onPressed: () {
                     setState(() {
                       isSelectMod = !isSelectMod;
+
                       /// Do not remember anything when quit calculating.
                       if (!isSelectMod) {
                         for (var i = isSelected.length - 1; i >= 0; --i) {
@@ -211,7 +212,6 @@ class _ScoreTableState extends State<ScoreTable> {
                               BoxDecoration(color: _getColor(toShow()[index])),
                           child: ScoreCard(toUse: toShow()[index]),
                         )),
-
                   ],
                 );
               },

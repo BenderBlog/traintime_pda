@@ -13,7 +13,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
 import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 
 class DiningHallWindow extends StatefulWidget {
   const DiningHallWindow({Key? key}) : super(key: key);
@@ -102,18 +102,8 @@ class _DiningHallWindowState extends State<DiningHallWindow>
                   return Center(
                       child: Text("坏事: ${snapshot.error} + ${snapshot.data}"));
                 } else {
-                  return ListView.separated(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return CafeteriaCard(toUse: snapshot.data[index]);
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const SizedBox(height: 3),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12.5,
-                      vertical: 9.0,
-                    ),
-                  );
+                  return dataList<WindowInformation, CafeteriaCard>(
+                      snapshot.data, (toUse) => CafeteriaCard(toUse: toUse));
                 }
               } else {
                 return const Center(child: CircularProgressIndicator());

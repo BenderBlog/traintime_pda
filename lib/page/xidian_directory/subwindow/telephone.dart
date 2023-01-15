@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/model/xidian_directory/telephone.dart';
 import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
 
@@ -11,28 +11,18 @@ class TeleBookWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: list.length,
-      itemBuilder: (context, index) {
-        return DepartmentWindow(toUse: list[index]);
-      },
-      separatorBuilder: (BuildContext context, int index) =>
-          const SizedBox(height: 12.5),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12.5,
-        vertical: 12.5,
-      ),
-    );
+    return dataList<TeleyInformation, DepartmentWindow>(
+        list, (a) => DepartmentWindow(a));
   }
 }
 
 /// Each entry of the telephone book is shown in a card,
 /// which stored in an information class called [TeleyInformation].
 class DepartmentWindow extends StatelessWidget {
-  final TeleyInformation toUse;
+  late final TeleyInformation toUse;
   final List<Widget> mainCourse = [];
 
-  DepartmentWindow({Key? key, required this.toUse}) : super(key: key) {
+  DepartmentWindow(TeleyInformation toUse, {Key? key}) : super(key: key) {
     mainCourse.addAll(
       [
         Text(

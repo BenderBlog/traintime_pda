@@ -13,7 +13,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 
 class PunchRecordWindow extends StatefulWidget {
   const PunchRecordWindow({Key? key}) : super(key: key);
@@ -22,11 +22,16 @@ class PunchRecordWindow extends StatefulWidget {
   State<PunchRecordWindow> createState() => _PunchRecordWindowState();
 }
 
-class _PunchRecordWindowState extends State<PunchRecordWindow> {
+class _PunchRecordWindowState extends State<PunchRecordWindow>
+    with AutomaticKeepAliveClientMixin {
   bool isValid = false;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Row(
       children: [
         Expanded(
@@ -57,7 +62,9 @@ class _PunchRecordWindowState extends State<PunchRecordWindow> {
                           Expanded(
                             child: ListView(
                               children: [
-                                for (int i = snapshot.data.all.length - 1; i >= 0; i--)
+                                for (int i = snapshot.data.all.length - 1;
+                                    i >= 0;
+                                    i--)
                                   RecordCard(
                                       mark: i + 1, toUse: snapshot.data.all[i]),
                               ],
@@ -122,7 +129,9 @@ class RecordCard extends StatelessWidget {
     String toShow;
     Color background;
     if (toUse.state.contains("成功")) {
-      toShow = toUse.state.length == 4 ? toUse.state : "成功：${toUse.state.substring(18)}";
+      toShow = toUse.state.length == 4
+          ? toUse.state
+          : "成功：${toUse.state.substring(18)}";
       background = Colors.green;
     } else if (toUse.state.contains("失败")) {
       toShow = "失败";

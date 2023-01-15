@@ -13,7 +13,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
 import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
-import 'package:watermeter/page/weight.dart';
+import 'package:watermeter/page/widget.dart';
 
 class ComprehensiveWindow extends StatefulWidget {
   const ComprehensiveWindow({Key? key}) : super(key: key);
@@ -102,18 +102,9 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow>
                   if (snapshot.hasError) {
                     return Center(child: Text("坏事: ${snapshot.error}"));
                   } else {
-                    return ListView.separated(
-                      itemCount: snapshot.data.results.length,
-                      itemBuilder: (context, index) {
-                        return ShopCard(toUse: snapshot.data.results[index]);
-                      },
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const SizedBox(height: 3),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.5,
-                        vertical: 9.0,
-                      ),
-                    );
+                    return dataList<ShopInformationResults, ShopCard>(
+                        snapshot.data.results,
+                        (toUse) => ShopCard(toUse: toUse));
                   }
                 } else {
                   return const Center(child: CircularProgressIndicator());
