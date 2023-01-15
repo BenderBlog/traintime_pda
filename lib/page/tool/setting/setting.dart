@@ -44,7 +44,6 @@ class SettingDetails extends StatefulWidget {
 }
 
 class _SettingDetailsState extends State<SettingDetails> {
-
   @override
   Widget build(BuildContext context) {
     return SettingsList(
@@ -155,7 +154,6 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
               onPressed: () {
                 setState(() {
                   _couldView = !_couldView;
-                  print(_couldView);
                 });
               }),
         ),

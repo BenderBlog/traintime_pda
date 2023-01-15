@@ -48,26 +48,26 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                       body: Column(
                         children: [
                           TitleLine(
-                              child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "总次数：${snapshot.data.allTime}      成功次数：${snapshot.data.valid}",
-                                  textScaleFactor: 1.2,
-                                ),
-                              ],
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "总次数：${snapshot.data.allTime}      成功次数：${snapshot.data.valid}",
+                                    textScaleFactor: 1.2,
+                                  ),
+                                ],
+                              ),
                             ),
-                          )),
+                          ),
                           Expanded(
-                            child: ListView(
-                              children: [
-                                for (int i = snapshot.data.all.length - 1;
-                                    i >= 0;
-                                    i--)
-                                  RecordCard(
-                                      mark: i + 1, toUse: snapshot.data.all[i]),
-                              ],
+                            child: dataList<RecordCard, RecordCard>(
+                              List.generate(
+                                snapshot.data.all.length,
+                                (i) => RecordCard(
+                                    mark: i + 1, toUse: snapshot.data.all[i]),
+                              ),
+                              (toUse) => toUse,
                             ),
                           ),
                         ],
