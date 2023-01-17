@@ -190,8 +190,9 @@ class EhallSession extends IDSSession {
 
     onResponse(10, "准备获取课表");
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    Directory destination = Directory("${appDocDir.path}/org.superbart.watermeter");
-    if (!destination.existsSync()){
+    Directory destination =
+        Directory("${appDocDir.path}/org.superbart.watermeter");
+    if (!destination.existsSync()) {
       await destination.create();
     }
     var file = File("${destination.path}/ClassTable.json");
@@ -201,14 +202,15 @@ class EhallSession extends IDSSession {
 
     // Try to add some sort of cache support.
     if (!isExist || focus == true) {
-
       onResponse(10, "进入教务系统");
       await useApp("4770397878132218");
 
       onResponse(15, "获取学期信息");
-      String semesterCode = await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-      ).then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
+      String semesterCode = await dio
+          .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+          )
+          .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
 
       onResponse(20, "获取开学日期");
       String termStartDay = await dio.post(
@@ -231,8 +233,8 @@ class EhallSession extends IDSSession {
       onResponse(40, "缓存课表内容");
       qResult["semesterCode"] = semesterCode;
       qResult["termStartDay"] = termStartDay;
-      file.writeAsStringSync(jsonEncode(qResult));
 
+      file.writeAsStringSync(jsonEncode(qResult));
     } else {
       onResponse(40, "读取课表缓存");
       qResult = jsonDecode(file.readAsStringSync());
@@ -249,21 +251,22 @@ class EhallSession extends IDSSession {
         teacher: i["SKJS"],
         place: i["JASDM"],
       );
-      for (var j = 0; j < i["SKZC"].toString().length; ++j){
+      for (var j = 0; j < i["SKZC"].toString().length; ++j) {
         // KSJC 开始(进程?) JSJC 结束
         if (i["SKZC"][j] == "1" && int.parse(i["JSJC"]) <= 10) {
           var startDay = DateTime.parse(classData.termStartDay);
-          print(startDay);
           // If not exist, create the entire week.
           if (classData.classTable[j] == null) {
             classData.classTable[j] = WeekClassInformation(
-              startOfTheWeek: startDay.add(Duration(days: 7*j)),
-              classList: List.generate(7, (_) => List.filled(10, null, growable: false)),
+              startOfTheWeek: startDay.add(Duration(days: 7 * j)),
+              classList: List.generate(
+                  7, (_) => List.filled(10, null, growable: false)),
             );
           }
           for (var l = int.parse(i["KSJC"]); l <= int.parse(i["JSJC"]); ++l) {
             // SKXQ 上课星期
-            classData.classTable[j]!.classList[int.parse(i["SKXQ"])-1][l-1] = hell;
+            classData.classTable[j]!.classList[int.parse(i["SKXQ"]) - 1]
+                [l - 1] = hell;
           }
         }
       }

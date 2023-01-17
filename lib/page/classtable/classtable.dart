@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
-
 class ClassTable extends StatelessWidget {
   const ClassTable({Key? key}) : super(key: key);
 
@@ -46,17 +45,17 @@ class ClassTable extends StatelessWidget {
   }
 
   Widget aboutDialog(context) => AlertDialog(
-    title: const Text("不过我还是每次去教室"),
-    content: Image.asset("assets/Farnsworth-Class.jpg"),
-    actions: <Widget>[
-      TextButton(
-        child: const Text("确定"),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
-    ],
-  );
+        title: const Text("不过我还是每次去教室"),
+        content: Image.asset("assets/Farnsworth-Class.jpg"),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("确定"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
 }
 
 class ClassTableWindow extends StatefulWidget {
@@ -67,14 +66,30 @@ class ClassTableWindow extends StatefulWidget {
 }
 
 class PageState extends State<ClassTableWindow> {
-  var colorList = [
-    Colors.red,
-    Colors.lightBlueAccent,
-    Colors.grey,
-    Colors.cyan,
-    Colors.amber,
-    Colors.deepPurpleAccent,
-    Colors.purpleAccent
+  /// Colors from
+  /// https://github.com/zfman/TimetableView/blob/master/AndroidTimetableView/TimetableView/res/values/colors.xml
+  static const colorList = [
+    // color_1 to color_11
+    Color(0xFFAAA3DB),
+    Color(0xFF86ACE9),
+    Color(0xFF92D261),
+    Color(0xFF80D8A3),
+    Color(0xFFF1C672),
+    Color(0xFFFDAD8B),
+    Color(0xFFADBEFF),
+    Color(0xFF94D6FA),
+    Color(0xFFC3B5F6),
+    Color(0xFF99CCFF),
+    Color(0xFFFBA6ED),
+    // color_30 to color_35
+    Color(0xFFEE8262),
+    Color(0xFFEE6363),
+    Color(0xFFEEB4B4),
+    Color(0xFFD2B48C),
+    Color(0xFFCD9B9B),
+    Color(0xFF5F9EA0),
+    // Useless
+    Color(0xFFE6E6E6),
   ];
 
   List<String> weekList = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
@@ -89,7 +104,7 @@ class PageState extends State<ClassTableWindow> {
 
   void dateListUpdate(DateTime firstDay) {
     dateList = [firstDay];
-    for (int i = 1; i < 7; ++i){
+    for (int i = 1; i < 7; ++i) {
       dateList.add(dateList.last.add(const Duration(days: 1)));
     }
   }
@@ -103,40 +118,44 @@ class PageState extends State<ClassTableWindow> {
 
     // Get the current index.
     // If they decide to start the class in the next semester, well...
-    if (DateTime.now().millisecondsSinceEpoch >= startDay.millisecondsSinceEpoch) {
-      currentWeekIndex = (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+    if (DateTime.now().millisecondsSinceEpoch >=
+        startDay.millisecondsSinceEpoch) {
+      currentWeekIndex =
+          (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
       print(classData.classTable[currentWeekIndex]!.classList);
     }
-
-
 
     // Update dateList
     dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);
   }
 
   Widget _topView() => SizedBox(
-    height: 80,
-    child: ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: classData.classTable.length,
-      itemBuilder: (BuildContext context, int index) {
-        return TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: currentWeekIndex == index ? Colors.deepPurpleAccent : Colors.white,
-            foregroundColor: currentWeekIndex == index ? Colors.white : Colors.deepPurpleAccent,
-          ),
-          onPressed: () {
-            setState(() {
-              currentWeekIndex = index;
-              dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);
-            });
+        height: 80,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: classData.classTable.length,
+          itemBuilder: (BuildContext context, int index) {
+            return TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: currentWeekIndex == index
+                    ? Colors.deepPurpleAccent
+                    : Colors.white,
+                foregroundColor: currentWeekIndex == index
+                    ? Colors.white
+                    : Colors.deepPurpleAccent,
+              ),
+              onPressed: () {
+                setState(() {
+                  currentWeekIndex = index;
+                  dateListUpdate(
+                      classData.classTable[currentWeekIndex]!.startOfTheWeek);
+                });
+              },
+              child: Text("第${index + 1}周"),
+            );
           },
-          child: Text("第${index+1}周"),
-        );
-      },
-    ),
-  );
-
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -159,45 +178,51 @@ class PageState extends State<ClassTableWindow> {
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                     color: index != 0 &&
-                        dateList[index - 1].month == DateTime.now().month &&
-                        dateList[index - 1].day == DateTime.now().day
-                         ? const Color(0x00f7f7f7) : Colors.white,
+                            dateList[index - 1].month == DateTime.now().month &&
+                            dateList[index - 1].day == DateTime.now().day
+                        ? const Color(0x00f7f7f7)
+                        : Colors.white,
                     child: Center(
                       child: index == 0
                           ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "星期",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text("日期", style: TextStyle(fontSize: 12)),
-                        ],
-                      )
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  "星期",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                                Text("日期", style: TextStyle(fontSize: 12)),
+                              ],
+                            )
                           : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(weekList[index - 1],
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: (dateList[index - 1].month == DateTime.now().month &&
-                                      dateList[index - 1].day == DateTime.now().day)
-                                      ? Colors.lightBlue
-                                      : Colors.black87)),
-                          const SizedBox(height: 5),
-                          Text("${dateList[index - 1].month}/${dateList[index - 1].day}",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: (dateList[index - 1].month == DateTime.now().month &&
-                                      dateList[index - 1].day == DateTime.now().day)
-                                      ? Colors.lightBlue
-                                      : Colors.black87)),
-                        ],
-                      ),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(weekList[index - 1],
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: (dateList[index - 1].month ==
+                                                    DateTime.now().month &&
+                                                dateList[index - 1].day ==
+                                                    DateTime.now().day)
+                                            ? Colors.lightBlue
+                                            : Colors.black87)),
+                                const SizedBox(height: 5),
+                                Text(
+                                    "${dateList[index - 1].month}/${dateList[index - 1].day}",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: (dateList[index - 1].month ==
+                                                    DateTime.now().month &&
+                                                dateList[index - 1].day ==
+                                                    DateTime.now().day)
+                                            ? Colors.lightBlue
+                                            : Colors.black87)),
+                              ],
+                            ),
                     ),
                   );
                 }),
@@ -209,52 +234,56 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _classTable(List<List<ClassDetail?>>? classTable) => Expanded(
-    child: SingleChildScrollView(
-      child: Row(
-        children: [
-          for (int i = -1; i < 7; ++i)
-            Expanded(
-              child: Column(children: _classSubRow(i)),
-            ),
-        ],
-      ),
-    ),
-  );
+        child: SingleChildScrollView(
+          child: Row(
+            children: [
+              for (int i = -1; i < 7; ++i)
+                Expanded(
+                  child: Column(children: _classSubRow(i)),
+                ),
+            ],
+          ),
+        ),
+      );
 
   List<Widget> _classSubRow(int index) {
-
     List<Widget> thisRow = [];
 
     for (int i = 0; i < 10; ++i) {
-
       print(i);
 
       if (index == -1) {
         thisRow.add(SizedBox(
-          height: MediaQuery.of(context).size.height/15,
-          child: Center(child: Text("${i+1}"),),
+          height: MediaQuery.of(context).size.height / 15,
+          child: Center(
+            child: Text("${i + 1}"),
+          ),
         ));
         continue;
       }
 
       if (classData.classTable[currentWeekIndex]!.classList[index][i] == null) {
         thisRow.add(SizedBox(
-          height: MediaQuery.of(context).size.height/15,
+          height: MediaQuery.of(context).size.height / 15,
         ));
       } else {
-        ClassDetail toAppend = classData.classTable[currentWeekIndex]!.classList[index][i]!;
+        ClassDetail toAppend =
+            classData.classTable[currentWeekIndex]!.classList[index][i]!;
         int count = 1;
 
         print("toAppend: ${i} $toAppend index: ${index}");
-        print("Next: ${i+1} ${toAppend == classData.classTable[currentWeekIndex]!.classList[index][i+1]}");
-        while (i < 9 && classData.classTable[currentWeekIndex]!.classList[index][i+1] == toAppend ) {
+        print(
+            "Next: ${i + 1} ${toAppend == classData.classTable[currentWeekIndex]!.classList[index][i + 1]}");
+        while (i < 9 &&
+            classData.classTable[currentWeekIndex]!.classList[index][i + 1] ==
+                toAppend) {
           count++;
           i++;
         }
 
         thisRow.add(_classCard(
           index,
-          count * (MediaQuery.of(context).size.height/15),
+          count * (MediaQuery.of(context).size.height / 15),
           toAppend,
         ));
       }

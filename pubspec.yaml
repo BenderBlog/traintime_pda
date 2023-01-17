@@ -27,20 +27,26 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  # Network
   dio: ^4.0.6
   dio_http_cache: ^0.3.0
   crypto: ^3.0.2
   encrypt: ^5.0.1
+  # Stroage Cache
   shared_preferences: ^2.0.15
   dio_cookie_manager: ^2.0.0
   cookie_jar: ^3.0.1
   path_provider: ^2.0.11
+  # Deal with html
   html: ^0.15.0
   beautiful_soup_dart: ^0.3.0
   sn_progress_dialog: ^1.0.8
+  # Setting
   settings_ui: ^2.0.2
+  # Others
   url_launcher: ^6.1.6
   jiffy: ^5.0.0
+  icalendar_parser: any
 
   flutter:
     sdk: flutter
