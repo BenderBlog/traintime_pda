@@ -246,11 +246,12 @@ class EhallSession extends IDSSession {
     classData.termStartDay = qResult["termStartDay"];
 
     for (var i in qResult["rows"]) {
-      ClassDetail hell = ClassDetail(
+      classData.onTable.add(ClassDetail(
         name: i["KCM"],
         teacher: i["SKJS"],
         place: i["JASDM"],
-      );
+      ));
+      int index = classData.onTable.length - 1;
       for (var j = 0; j < i["SKZC"].toString().length; ++j) {
         // KSJC 开始(进程?) JSJC 结束
         if (i["SKZC"][j] == "1" && int.parse(i["JSJC"]) <= 10) {
@@ -266,7 +267,7 @@ class EhallSession extends IDSSession {
           for (var l = int.parse(i["KSJC"]); l <= int.parse(i["JSJC"]); ++l) {
             // SKXQ 上课星期
             classData.classTable[j]!.classList[int.parse(i["SKXQ"]) - 1]
-                [l - 1] = hell;
+                [l - 1] = index;
           }
         }
       }

@@ -19,7 +19,7 @@ class ClassDetail {
 
 class WeekClassInformation {
   DateTime startOfTheWeek;
-  List<List<ClassDetail?>> classList;
+  List<List<int?>> classList;
   WeekClassInformation({
     required this.startOfTheWeek,
     required this.classList,
@@ -27,6 +27,7 @@ class WeekClassInformation {
 }
 
 class Classes {
+  List<ClassDetail> onTable = [];
   // List<ClassDetail> notOnTable = [];
   /// Must be List.generate(7, (_) => List.filled(10, null, growable: false))
   Map<int, WeekClassInformation> classTable = {};

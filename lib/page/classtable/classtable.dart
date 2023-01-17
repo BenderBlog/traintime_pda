@@ -88,9 +88,9 @@ class PageState extends State<ClassTableWindow> {
     Color(0xFFD2B48C),
     Color(0xFFCD9B9B),
     Color(0xFF5F9EA0),
-    // Useless
-    Color(0xFFE6E6E6),
   ];
+  // Useless colors
+  static const uselessColor = Color(0xFFE6E6E6);
 
   List<String> weekList = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
@@ -233,7 +233,7 @@ class PageState extends State<ClassTableWindow> {
     );
   }
 
-  Widget _classTable(List<List<ClassDetail?>>? classTable) => Expanded(
+  Widget _classTable(List<List<int?>>? classTable) => Expanded(
         child: SingleChildScrollView(
           child: Row(
             children: [
@@ -250,8 +250,7 @@ class PageState extends State<ClassTableWindow> {
     List<Widget> thisRow = [];
 
     for (int i = 0; i < 10; ++i) {
-      print(i);
-
+      // For the left side, which mark the lines.
       if (index == -1) {
         thisRow.add(SizedBox(
           height: MediaQuery.of(context).size.height / 15,
@@ -262,29 +261,34 @@ class PageState extends State<ClassTableWindow> {
         continue;
       }
 
+      // Actual data. If it's empty, render a empty box. Else render the class.
       if (classData.classTable[currentWeekIndex]!.classList[index][i] == null) {
         thisRow.add(SizedBox(
           height: MediaQuery.of(context).size.height / 15,
         ));
       } else {
-        ClassDetail toAppend =
+        // Places in the onTable array.
+        int places =
             classData.classTable[currentWeekIndex]!.classList[index][i]!;
+        // The length to render.
         int count = 1;
 
-        print("toAppend: ${i} $toAppend index: ${index}");
+        print("toAppend: $i $places index: $index");
         print(
-            "Next: ${i + 1} ${toAppend == classData.classTable[currentWeekIndex]!.classList[index][i + 1]}");
+            "Next: ${i + 1} ${places == classData.classTable[currentWeekIndex]!.classList[index][i + 1]}");
+
+        // Decide the length to render. i limit the end.
         while (i < 9 &&
             classData.classTable[currentWeekIndex]!.classList[index][i + 1] ==
-                toAppend) {
+                places) {
           count++;
           i++;
         }
 
         thisRow.add(_classCard(
-          index,
+          places,
           count * (MediaQuery.of(context).size.height / 15),
-          toAppend,
+          classData.onTable[places],
         ));
       }
     }
@@ -296,7 +300,7 @@ class PageState extends State<ClassTableWindow> {
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: colorList[index % 7],
+          color: colorList[index % 17],
         ),
         height: height,
         child: Center(
