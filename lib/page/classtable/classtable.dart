@@ -300,8 +300,7 @@ class PageState extends State<ClassTableWindow> {
           conflict.addAll(pretendLayout[i].toSet());
         }
 
-        // Do not include itself and empty spaces...
-        conflict.remove(places);
+        // Do not include empty spaces...
         conflict.remove(-1);
 
         // Generate the row.
@@ -325,7 +324,7 @@ class PageState extends State<ClassTableWindow> {
   Widget _classCard(int index, double height, Set<int>? conflict) => SizedBox(
         height: height,
         child: Padding(
-          padding: const EdgeInsets.all(2),
+          padding: const EdgeInsets.all(1),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
@@ -335,18 +334,34 @@ class PageState extends State<ClassTableWindow> {
                       : colorList[index % 17]
                   : const Color(0x00000000),
             ),
-            child: Center(
-              child: Text(
-                conflict == null
-                    ? "${index + 1}"
-                    : index == -1
-                        ? "$index BOCCHI RULES!"
-                        : "${classData.onTable[index].toString()}\n${conflict.isEmpty ? "无冲突" : "重叠${conflict.length}"}",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: conflict == null ? Colors.black : Colors.white,
-                  fontSize: 11,
-                  letterSpacing: 1,
+            child: TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.resolveWith(
+                  (status) => EdgeInsets.zero,
+                ),
+                overlayColor: MaterialStateProperty.resolveWith(
+                  (status) => Colors.transparent,
+                ),
+              ),
+              onPressed: () => showModalBottomSheet(
+                builder: (((context) {
+                  return Text(conflict.toString());
+                })),
+                context: context,
+              ),
+              child: Center(
+                child: Text(
+                  conflict == null
+                      ? "${index + 1}"
+                      : index == -1
+                          ? "$index BOCCHI RULES!"
+                          : "${classData.onTable[index].toString()}\n${conflict.isEmpty ? "无冲突" : "重叠${conflict.length}"}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: conflict == null ? Colors.black : Colors.white,
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  ),
                 ),
               ),
             ),
