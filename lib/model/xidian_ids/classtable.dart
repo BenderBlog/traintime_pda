@@ -7,6 +7,7 @@ class ClassDetail {
   int day; // 星期几上课
   int start; // 上课开始
   int stop; // 上课结束
+  late int step; // 上课长度
   ClassDetail({
     required this.name,
     required this.weekList,
@@ -15,9 +16,9 @@ class ClassDetail {
     required this.stop,
     this.teacher,
     this.place,
-  });
-
-  int step() => stop - start + 1;
+  }) {
+    step = stop - start;
+  }
 
   @override
   String toString() {

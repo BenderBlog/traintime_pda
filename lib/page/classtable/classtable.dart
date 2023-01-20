@@ -244,22 +244,16 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _classTable() => Expanded(
-        child: SingleChildScrollView(
-          child: Row(
-            children: List.generate(
-              8,
-              (i) => Expanded(
-                child: Column(children: _classSubRow(i)),
-              ),
-            ),
-          ),
-        ),
-      );
+          child: SingleChildScrollView(
+              child: Row(
+        children: List.generate(
+            8, (i) => Expanded(child: Column(children: _classSubRow(i)))),
+      )));
 
   List<Widget> _classSubRow(int index) {
-    List<Widget> thisRow = [];
-
     if (index != 0) {
+      List<Widget> thisRow = [];
+
       // 1. Choice the class in this day.
       List<ClassDetail> thisDay = [];
       for (var element in classData.onTable) {
@@ -272,7 +266,7 @@ class PageState extends State<ClassTableWindow> {
       }
 
       // 2. The longest class should be solved first.
-      thisDay.sort(((a, b) => a.step().compareTo(b.step())));
+      thisDay.sort((a, b) => b.step.compareTo(a.step));
 
       // 3. Arrange the layout. Solve the conflex.
       List<List<int>> pretendLayout = List.generate(10, (index) => <int>[]);
@@ -282,77 +276,79 @@ class PageState extends State<ClassTableWindow> {
         }
       }
 
-      // 4. Draw it!
-      for (int i = 0; i < 10; ++i) {
-        if (pretendLayout[i].isEmpty) {
-          thisRow.add(SizedBox(
-            height: MediaQuery.of(context).size.height / 15,
-          ));
-        } else {
-          // Places in the onTable array.
-          int places = pretendLayout[i].first;
-          // The length to render.
-          int count = 1;
-          Set<int> conflict = pretendLayout[i].toSet();
-
-          print("toAppend: $i $places index: $index");
-          print("Next: ${i + 1} ${places == pretendLayout[i + 1].first}");
-
-          // Decide the length to render. i limit the end.
-          while (i < 9 &&
-              pretendLayout[i + 1].isNotEmpty &&
-              pretendLayout[i + 1].first == places) {
-            count++;
-            i++;
-            conflict.addAll(pretendLayout[i].toSet());
-          }
-
-          conflict.remove(places);
-
-          thisRow.add(_classCard(
-            places,
-            count * (MediaQuery.of(context).size.height / 15),
-            classData.onTable[places],
-            conflict,
-          ));
+      // 4. Deal with the empty space.
+      for (var i in pretendLayout) {
+        if (i.isEmpty) {
+          i.add(-1);
         }
       }
+
+      // 5. Render it!
+      for (int i = 0; i < 10; ++i) {
+        // Places in the onTable array.
+        int places = pretendLayout[i].first;
+        // The length to render.
+        int count = 1;
+        Set<int> conflict = pretendLayout[i].toSet();
+
+        // Decide the length to render. i limit the end.
+        while (i < 9 &&
+            pretendLayout[i + 1].isNotEmpty &&
+            pretendLayout[i + 1].first == places) {
+          count++;
+          i++;
+          conflict.addAll(pretendLayout[i].toSet());
+        }
+
+        // Do not include itself and empty spaces...
+        conflict.remove(places);
+        conflict.remove(-1);
+
+        // Generate the row.
+        thisRow.add(_classCard(
+          places,
+          count * (MediaQuery.of(context).size.height / 15),
+          conflict,
+        ));
+      }
+
+      return thisRow;
     } else {
       // Leftest side, the index array.
-      for (int i = 0; i < 10; ++i) {
-        // The leftest index role.
-        if (index == 0) {
-          thisRow.add(SizedBox(
-            height: MediaQuery.of(context).size.height / 15,
-            child: Center(
-              child: Text("${i + 1}"),
-            ),
-          ));
-          continue;
-        }
-      }
+      return List.generate(
+          10,
+          (index) => _classCard(
+              index, (MediaQuery.of(context).size.height / 15), null));
     }
-
-    return thisRow;
   }
 
-  Widget _classCard(int index, double height, ClassDetail information,
-          Set<int> conflict) =>
-      Container(
-        padding: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: colorList[index % 17],
-        ),
+  Widget _classCard(int index, double height, Set<int>? conflict) => SizedBox(
         height: height,
-        child: Center(
-          child: Text(
-            information.toString(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              letterSpacing: 1,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: conflict != null
+                  ? index == -1
+                      ? const Color(0x00000000)
+                      : colorList[index % 17]
+                  : const Color(0x00000000),
+            ),
+            child: Center(
+              child: Text(
+                conflict == null
+                    ? "${index + 1}"
+                    : index == -1
+                        ? "$index BOCCHI RULES!"
+                        : "${classData.onTable[index].toString()}\n${conflict.isEmpty ? "无冲突" : "重叠${conflict.length}"}",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: conflict == null ? Colors.black : Colors.white,
+                  fontSize: 11,
+                  letterSpacing: 1,
+                ),
+              ),
             ),
           ),
         ),

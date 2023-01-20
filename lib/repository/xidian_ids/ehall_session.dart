@@ -257,11 +257,24 @@ class EhallSession extends IDSSession {
           weekList: i["SKZC"].toString(),
         ),
       );
-      print(i["KCM"] + " " + "${i["SKZC"].toString().length}");
       if (i["SKZC"].toString().length > classData.semesterLength) {
         classData.semesterLength = i["SKZC"].toString().length;
       }
     }
+
+    /*
+    classData.onTable.add(
+      ClassDetail(
+        name: "测试连课",
+        teacher: "SPRT",
+        place: "Flutter",
+        start: 2,
+        stop: 8,
+        day: 4,
+        weekList: "1111111111111111111111",
+      ),
+    );
+    */
 
     /*
     onResponse(70, "获取未安排内容");
