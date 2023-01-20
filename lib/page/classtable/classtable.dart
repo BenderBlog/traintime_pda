@@ -92,7 +92,18 @@ class PageState extends State<ClassTableWindow> {
   // Useless colors
   static const uselessColor = Color(0xFFE6E6E6);
 
-  List<String> weekList = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  List<String> weekList = [
+    '周一',
+    '周二',
+    '周三',
+    '周四',
+    '周五',
+    '周六',
+    '周日',
+  ];
+
+  // The start day of the semester.
+  var startDay = DateTime.parse(classData.termStartDay);
 
   List<DateTime> dateList = [];
 
@@ -102,7 +113,8 @@ class PageState extends State<ClassTableWindow> {
 
   double aspect = 15;
 
-  void dateListUpdate(DateTime firstDay) {
+  void dateListUpdate() {
+    DateTime firstDay = startDay.add(Duration(days: currentWeekIndex * 7));
     dateList = [firstDay];
     for (int i = 1; i < 7; ++i) {
       dateList.add(dateList.last.add(const Duration(days: 1)));
@@ -111,8 +123,6 @@ class PageState extends State<ClassTableWindow> {
 
   @override
   void initState() {
-    super.initState();
-
     // Get the start day of the semester.
     var startDay = DateTime.parse(classData.termStartDay);
 
@@ -122,18 +132,19 @@ class PageState extends State<ClassTableWindow> {
         startDay.millisecondsSinceEpoch) {
       currentWeekIndex =
           (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
-      print(classData.classTable[currentWeekIndex]!.classList);
     }
 
     // Update dateList
-    dateListUpdate(classData.classTable[currentWeekIndex]!.startOfTheWeek);
+    dateListUpdate();
+
+    super.initState();
   }
 
   Widget _topView() => SizedBox(
         height: 80,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: classData.classTable.length,
+          itemCount: classData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
             return TextButton(
               style: TextButton.styleFrom(
@@ -147,8 +158,7 @@ class PageState extends State<ClassTableWindow> {
               onPressed: () {
                 setState(() {
                   currentWeekIndex = index;
-                  dateListUpdate(
-                      classData.classTable[currentWeekIndex]!.startOfTheWeek);
+                  dateListUpdate();
                 });
               },
               child: Text("第${index + 1}周"),
@@ -227,21 +237,21 @@ class PageState extends State<ClassTableWindow> {
                   );
                 }),
           ),
-          _classTable(classData.classTable[currentWeekIndex]!.classList),
+          _classTable(),
         ],
       ),
     );
   }
 
-  Widget _classTable(List<List<int?>>? classTable) => Expanded(
+  Widget _classTable() => Expanded(
         child: SingleChildScrollView(
           child: Row(
-            children: [
-              for (int i = -1; i < 7; ++i)
-                Expanded(
-                  child: Column(children: _classSubRow(i)),
-                ),
-            ],
+            children: List.generate(
+              8,
+              (i) => Expanded(
+                child: Column(children: _classSubRow(i)),
+              ),
+            ),
           ),
         ),
       );
@@ -249,55 +259,87 @@ class PageState extends State<ClassTableWindow> {
   List<Widget> _classSubRow(int index) {
     List<Widget> thisRow = [];
 
-    for (int i = 0; i < 10; ++i) {
-      // For the left side, which mark the lines.
-      if (index == -1) {
-        thisRow.add(SizedBox(
-          height: MediaQuery.of(context).size.height / 15,
-          child: Center(
-            child: Text("${i + 1}"),
-          ),
-        ));
-        continue;
+    if (index != 0) {
+      // 1. Choice the class in this day.
+      List<ClassDetail> thisDay = [];
+      for (var element in classData.onTable) {
+        if (element.weekList.length < classData.semesterLength) {
+          continue;
+        }
+        if (element.weekList[currentWeekIndex] == "1" && element.day == index) {
+          thisDay.add(element);
+        }
       }
 
-      // Actual data. If it's empty, render a empty box. Else render the class.
-      if (classData.classTable[currentWeekIndex]!.classList[index][i] == null) {
-        thisRow.add(SizedBox(
-          height: MediaQuery.of(context).size.height / 15,
-        ));
-      } else {
-        // Places in the onTable array.
-        int places =
-            classData.classTable[currentWeekIndex]!.classList[index][i]!;
-        // The length to render.
-        int count = 1;
+      // 2. The longest class should be solved first.
+      thisDay.sort(((a, b) => a.step().compareTo(b.step())));
 
-        print("toAppend: $i $places index: $index");
-        print(
-            "Next: ${i + 1} ${places == classData.classTable[currentWeekIndex]!.classList[index][i + 1]}");
-
-        // Decide the length to render. i limit the end.
-        while (i < 9 &&
-            classData.classTable[currentWeekIndex]!.classList[index][i + 1] ==
-                places) {
-          count++;
-          i++;
+      // 3. Arrange the layout. Solve the conflex.
+      List<List<int>> pretendLayout = List.generate(10, (index) => <int>[]);
+      for (var i in thisDay) {
+        for (int j = i.start - 1; j <= i.stop - 1; ++j) {
+          pretendLayout[j].add(classData.onTable.indexOf(i));
         }
+      }
 
-        thisRow.add(_classCard(
-          places,
-          count * (MediaQuery.of(context).size.height / 15),
-          classData.onTable[places],
-        ));
+      // 4. Draw it!
+      for (int i = 0; i < 10; ++i) {
+        if (pretendLayout[i].isEmpty) {
+          thisRow.add(SizedBox(
+            height: MediaQuery.of(context).size.height / 15,
+          ));
+        } else {
+          // Places in the onTable array.
+          int places = pretendLayout[i].first;
+          // The length to render.
+          int count = 1;
+          Set<int> conflict = pretendLayout[i].toSet();
+
+          print("toAppend: $i $places index: $index");
+          print("Next: ${i + 1} ${places == pretendLayout[i + 1].first}");
+
+          // Decide the length to render. i limit the end.
+          while (i < 9 &&
+              pretendLayout[i + 1].isNotEmpty &&
+              pretendLayout[i + 1].first == places) {
+            count++;
+            i++;
+            conflict.addAll(pretendLayout[i].toSet());
+          }
+
+          conflict.remove(places);
+
+          thisRow.add(_classCard(
+            places,
+            count * (MediaQuery.of(context).size.height / 15),
+            classData.onTable[places],
+            conflict,
+          ));
+        }
+      }
+    } else {
+      // Leftest side, the index array.
+      for (int i = 0; i < 10; ++i) {
+        // The leftest index role.
+        if (index == 0) {
+          thisRow.add(SizedBox(
+            height: MediaQuery.of(context).size.height / 15,
+            child: Center(
+              child: Text("${i + 1}"),
+            ),
+          ));
+          continue;
+        }
       }
     }
+
     return thisRow;
   }
 
-  Widget _classCard(int index, double height, ClassDetail information) =>
+  Widget _classCard(int index, double height, ClassDetail information,
+          Set<int> conflict) =>
       Container(
-        margin: const EdgeInsets.all(1),
+        padding: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           color: colorList[index % 17],

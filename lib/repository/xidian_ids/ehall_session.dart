@@ -244,32 +244,22 @@ class EhallSession extends IDSSession {
 
     classData.semesterCode = qResult["semesterCode"];
     classData.termStartDay = qResult["termStartDay"];
-
+    classData.semesterLength = 0;
     for (var i in qResult["rows"]) {
-      classData.onTable.add(ClassDetail(
-        name: i["KCM"],
-        teacher: i["SKJS"],
-        place: i["JASDM"],
-      ));
-      int index = classData.onTable.length - 1;
-      for (var j = 0; j < i["SKZC"].toString().length; ++j) {
-        // KSJC 开始(进程?) JSJC 结束
-        if (i["SKZC"][j] == "1" && int.parse(i["JSJC"]) <= 10) {
-          var startDay = DateTime.parse(classData.termStartDay);
-          // If not exist, create the entire week.
-          if (classData.classTable[j] == null) {
-            classData.classTable[j] = WeekClassInformation(
-              startOfTheWeek: startDay.add(Duration(days: 7 * j)),
-              classList: List.generate(
-                  7, (_) => List.filled(10, null, growable: false)),
-            );
-          }
-          for (var l = int.parse(i["KSJC"]); l <= int.parse(i["JSJC"]); ++l) {
-            // SKXQ 上课星期
-            classData.classTable[j]!.classList[int.parse(i["SKXQ"]) - 1]
-                [l - 1] = index;
-          }
-        }
+      classData.onTable.add(
+        ClassDetail(
+          name: i["KCM"],
+          teacher: i["SKJS"],
+          place: i["JASDM"],
+          start: int.parse(i["KSJC"]),
+          stop: int.parse(i["JSJC"]),
+          day: int.parse(i["SKXQ"]),
+          weekList: i["SKZC"].toString(),
+        ),
+      );
+      print(i["KCM"] + " " + "${i["SKZC"].toString().length}");
+      if (i["SKZC"].toString().length > classData.semesterLength) {
+        classData.semesterLength = i["SKZC"].toString().length;
       }
     }
 

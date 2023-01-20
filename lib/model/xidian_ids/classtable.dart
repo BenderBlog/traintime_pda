@@ -1,12 +1,24 @@
 class ClassDetail {
-  String name;
-  String? teacher;
-  String? place;
+  String name; // 名称
+  String? teacher; // 老师
+  String? place; // 地方
+  // 返回的是 0 和 1 组成的数组，0 代表这周没课程，1 代表这周有课
+  String weekList; // 上课周次
+  int day; // 星期几上课
+  int start; // 上课开始
+  int stop; // 上课结束
   ClassDetail({
     required this.name,
+    required this.weekList,
+    required this.day,
+    required this.start,
+    required this.stop,
     this.teacher,
     this.place,
   });
+
+  int step() => stop - start + 1;
+
   @override
   String toString() {
     if (place != null) {
@@ -17,22 +29,11 @@ class ClassDetail {
   }
 }
 
-class WeekClassInformation {
-  DateTime startOfTheWeek;
-  List<List<int?>> classList;
-  WeekClassInformation({
-    required this.startOfTheWeek,
-    required this.classList,
-  });
-}
-
 class Classes {
   List<ClassDetail> onTable = [];
-  // List<ClassDetail> notOnTable = [];
-  /// Must be List.generate(7, (_) => List.filled(10, null, growable: false))
-  Map<int, WeekClassInformation> classTable = {};
   String semesterCode = "";
   String termStartDay = "";
+  int semesterLength = 0;
   bool isDone = false;
 }
 
