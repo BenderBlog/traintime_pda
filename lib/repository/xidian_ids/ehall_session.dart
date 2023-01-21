@@ -262,6 +262,7 @@ class EhallSession extends IDSSession {
       }
     }
 
+    // Uncomment to see the conflict.
     /*
     classData.onTable.add(
       ClassDetail(
@@ -270,7 +271,7 @@ class EhallSession extends IDSSession {
         place: "Flutter",
         start: 2,
         stop: 8,
-        day: 4,
+        day: 2,
         weekList: "1111111111111111111111",
       ),
     );

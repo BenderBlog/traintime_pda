@@ -90,6 +90,30 @@ class PageState extends State<ClassTableWindow> {
     '周日',
   ];
 
+  // Even means start, odd means end.
+  List<String> time = [
+    "8:30",
+    "9:15",
+    "9:20",
+    "10:05",
+    "10:25",
+    "11:10",
+    "11:15",
+    "12:00",
+    "14:00",
+    "14:45",
+    "14:50",
+    "15:35",
+    "15:55",
+    "16:40",
+    "16:45",
+    "17:30",
+    "19:00",
+    "19:45",
+    "19:55",
+    "20:30",
+  ];
+
   // The start day of the semester.
   var startDay = DateTime.parse(classData.termStartDay);
 
@@ -100,6 +124,17 @@ class PageState extends State<ClassTableWindow> {
   String pageTitle = "我的课表";
 
   double aspect = 15;
+
+  Set<int> weekToShow(String weekList) {
+    Set<int> toReturn =
+        Set.from(List.generate(weekList.length, (index) => index + 1));
+    for (int i = 0; i < weekList.length; ++i) {
+      if (weekList[i] == "0") {
+        toReturn.remove(i + 1);
+      }
+    }
+    return toReturn;
+  }
 
   void dateListUpdate() {
     DateTime firstDay = startDay.add(Duration(days: currentWeekIndex * 7));
@@ -372,7 +407,7 @@ class PageState extends State<ClassTableWindow> {
             ),
             onPressed: () => showModalBottomSheet(
               builder: (((context) {
-                return Text(conflict.toString());
+                return _buttomInformation(conflict);
               })),
               context: context,
             ),
@@ -415,4 +450,78 @@ class PageState extends State<ClassTableWindow> {
       ),
     );
   }
+
+  Widget _buttomInformation(Set<int> conflict) {
+    List<ClassDetail> information = List.generate(conflict.length,
+        (index) => classData.onTable[conflict.elementAt(index)]);
+
+    List<Widget> toShow = [
+      _classInfoBox(information.first),
+    ];
+
+    if (conflict.length > 1) {
+      toShow.addAll([
+        for (int i = 1; i < conflict.length; ++i) _classInfoBox(information[i]),
+      ]);
+    }
+
+    return ListView(
+      shrinkWrap: true,
+      children: toShow,
+    );
+  }
+
+  Widget _classInfoBox(ClassDetail i) => Card(
+        margin: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 10,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.class_),
+                  const SizedBox(),
+                  Text(i.name),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.person),
+                  const SizedBox(),
+                  Text(i.teacher ?? "老师未定"),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.room),
+                  const SizedBox(),
+                  Text(i.place ?? "地点未定"),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.access_time),
+                  const SizedBox(),
+                  Text(
+                      "${time[(i.start - 1) * 2]} - ${time[(i.stop - 1) * 2 + 1]}"),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_month),
+                  const SizedBox(),
+                  Expanded(
+                    child: Text(
+                      weekToShow(i.weekList).toString(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
 }
