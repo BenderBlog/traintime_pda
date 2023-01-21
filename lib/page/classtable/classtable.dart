@@ -1,5 +1,5 @@
 /*
-Class Table
+Class Table Interface.
 Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTable extends StatelessWidget {
@@ -66,31 +66,19 @@ class ClassTableWindow extends StatefulWidget {
 }
 
 class PageState extends State<ClassTableWindow> {
-  /// Colors from
-  /// https://github.com/zfman/TimetableView/blob/master/AndroidTimetableView/TimetableView/res/values/colors.xml
   static const colorList = [
-    // color_1 to color_11
-    Color(0xFFAAA3DB),
-    Color(0xFF86ACE9),
-    Color(0xFF92D261),
-    Color(0xFF80D8A3),
-    Color(0xFFF1C672),
-    Color(0xFFFDAD8B),
-    Color(0xFFADBEFF),
-    Color(0xFF94D6FA),
-    Color(0xFFC3B5F6),
-    Color(0xFF99CCFF),
-    Color(0xFFFBA6ED),
-    // color_30 to color_35
-    Color(0xFFEE8262),
-    Color(0xFFEE6363),
-    Color(0xFFEEB4B4),
-    Color(0xFFD2B48C),
-    Color(0xFFCD9B9B),
-    Color(0xFF5F9EA0),
+    Colors.indigo,
+    Colors.blue,
+    Colors.lightBlue,
+    Colors.cyan,
+    Colors.teal,
+    Colors.green,
+    Colors.lightGreen,
+    Colors.orange,
+    Colors.red,
   ];
   // Useless colors
-  static const uselessColor = Color(0xFFE6E6E6);
+  static const uselessColor = Colors.grey;
 
   List<String> weekList = [
     '周一',
@@ -178,64 +166,70 @@ class PageState extends State<ClassTableWindow> {
           // The main class table.
           SizedBox(
             child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 8,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 8,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    color: index != 0 &&
-                            dateList[index - 1].month == DateTime.now().month &&
-                            dateList[index - 1].day == DateTime.now().day
-                        ? const Color(0x00f7f7f7)
-                        : Colors.white,
-                    child: Center(
-                      child: index == 0
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  "星期",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black87,
-                                  ),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 8,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 8,
+                childAspectRatio: 1,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  color: index != 0 &&
+                          dateList[index - 1].month == DateTime.now().month &&
+                          dateList[index - 1].day == DateTime.now().day
+                      ? const Color(0x00f7f7f7)
+                      : Colors.white,
+                  child: Center(
+                    child: index == 0
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Text(
+                                "星期",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
                                 ),
-                                SizedBox(height: 5),
-                                Text("日期", style: TextStyle(fontSize: 12)),
-                              ],
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(weekList[index - 1],
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: (dateList[index - 1].month ==
-                                                    DateTime.now().month &&
-                                                dateList[index - 1].day ==
-                                                    DateTime.now().day)
-                                            ? Colors.lightBlue
-                                            : Colors.black87)),
-                                const SizedBox(height: 5),
-                                Text(
-                                    "${dateList[index - 1].month}/${dateList[index - 1].day}",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: (dateList[index - 1].month ==
-                                                    DateTime.now().month &&
-                                                dateList[index - 1].day ==
-                                                    DateTime.now().day)
-                                            ? Colors.lightBlue
-                                            : Colors.black87)),
-                              ],
-                            ),
-                    ),
-                  );
-                }),
+                              ),
+                              SizedBox(height: 5),
+                              Text("日期", style: TextStyle(fontSize: 12)),
+                            ],
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                weekList[index - 1],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: (dateList[index - 1].month ==
+                                              DateTime.now().month &&
+                                          dateList[index - 1].day ==
+                                              DateTime.now().day)
+                                      ? Colors.lightBlue
+                                      : Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                "${dateList[index - 1].month}/${dateList[index - 1].day}",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: (dateList[index - 1].month ==
+                                              DateTime.now().month &&
+                                          dateList[index - 1].day ==
+                                              DateTime.now().day)
+                                      ? Colors.lightBlue
+                                      : Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                );
+              },
+            ),
           ),
           _classTable(),
         ],
@@ -315,52 +309,29 @@ class PageState extends State<ClassTableWindow> {
     } else {
       // Leftest side, the index array.
       return List.generate(
-          10,
-          (index) => _classCard(
-              index, (MediaQuery.of(context).size.height / 15), null));
-    }
-  }
-
-  Widget _classCard(int index, double height, Set<int>? conflict) => SizedBox(
-        height: height,
-        child: Padding(
-          padding: const EdgeInsets.all(1),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: conflict != null
-                  ? index == -1
-                      ? const Color(0x00000000)
-                      : colorList[index % 17]
-                  : const Color(0x00000000),
-            ),
-            child: TextButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.resolveWith(
-                  (status) => EdgeInsets.zero,
-                ),
-                overlayColor: MaterialStateProperty.resolveWith(
-                  (status) => Colors.transparent,
-                ),
+        10,
+        (index) => SizedBox(
+          height: MediaQuery.of(context).size.height / 15,
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                // Uncommit to adjust the layout.
+                // border: Border.all(),
+                borderRadius: BorderRadius.circular(10),
+                color: const Color(0x00000000),
               ),
-              onPressed: () => showModalBottomSheet(
-                builder: (((context) {
-                  return Text(conflict.toString());
-                })),
-                context: context,
-              ),
-              child: Center(
-                child: Text(
-                  conflict == null
-                      ? "${index + 1}"
-                      : index == -1
-                          ? "$index BOCCHI RULES!"
-                          : "${classData.onTable[index].toString()}\n${conflict.isEmpty ? "无冲突" : "重叠${conflict.length}"}",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: conflict == null ? Colors.black : Colors.white,
-                    fontSize: 11,
-                    letterSpacing: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: Center(
+                  child: Text(
+                    "${index + 1}",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: Colors.black,
+                      letterSpacing: 1,
+                    ),
                   ),
                 ),
               ),
@@ -368,4 +339,80 @@ class PageState extends State<ClassTableWindow> {
           ),
         ),
       );
+    }
+  }
+
+  Widget _classCard(int index, double height, Set<int> conflict) {
+    Widget inside = index == -1
+        ? Padding(
+            padding: const EdgeInsets.all(3),
+            // Easter egg, usless you read the code, or reverse engineering...
+            child: Center(
+              child: Text(
+                "BOCCHI RULES!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: index != -1
+                      ? colorList[index % colorList.length].shade800
+                      : Colors.white,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          )
+        : TextButton(
+            style: ButtonStyle(
+              padding: MaterialStateProperty.resolveWith(
+                (status) => EdgeInsets.zero,
+              ),
+              overlayColor: MaterialStateProperty.resolveWith(
+                (status) => Colors.transparent,
+              ),
+            ),
+            onPressed: () => showModalBottomSheet(
+              builder: (((context) {
+                return Text(conflict.toString());
+              })),
+              context: context,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: Center(
+                child: Text(
+                  classData.onTable[index].toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: index != -1
+                        ? colorList[index % colorList.length].shade800
+                        : Colors.white,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+          );
+    return SizedBox(
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.all(2),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: index == -1
+                ? null
+                : Border.all(
+                    width: 1,
+                    color: colorList[index % colorList.length].withAlpha(128),
+                  ),
+            borderRadius: BorderRadius.circular(8),
+            color: index == -1
+                ? const Color(0x00000000)
+                : colorList[index % colorList.length].shade100,
+          ),
+          child: inside,
+        ),
+      ),
+    );
+  }
 }
