@@ -378,6 +378,8 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _classCard(int index, double height, Set<int> conflict) {
+    var border = BorderSide(
+        width: 2, color: colorList[index % colorList.length].withAlpha(128));
     Widget inside = index == -1
         ? Padding(
             padding: const EdgeInsets.all(3),
@@ -418,7 +420,7 @@ class PageState extends State<ClassTableWindow> {
                   classData.onTable[index].toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 12,
                     color: index != -1
                         ? colorList[index % colorList.length].shade800
                         : Colors.white,
@@ -432,20 +434,28 @@ class PageState extends State<ClassTableWindow> {
       height: height,
       child: Padding(
         padding: const EdgeInsets.all(2),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: index == -1
-                ? null
-                : Border.all(
-                    width: 1,
-                    color: colorList[index % colorList.length].withAlpha(128),
-                  ),
-            borderRadius: BorderRadius.circular(8),
+        child: ClipRRect(
+          // 最外层
+          borderRadius: BorderRadius.circular(5),
+          child: Container(
+            // 边框层
             color: index == -1
                 ? const Color(0x00000000)
-                : colorList[index % colorList.length].shade100,
+                : colorList[index % colorList.length].shade300,
+            padding: conflict.length == 1
+                ? const EdgeInsets.all(2)
+                : const EdgeInsets.fromLTRB(2, 2, 2, 16),
+            child: ClipRRect(
+              // 里层
+              borderRadius: BorderRadius.circular(3),
+              child: Container(
+                color: index == -1
+                    ? const Color(0x00000000)
+                    : colorList[index % colorList.length].shade100,
+                child: inside,
+              ),
+            ),
           ),
-          child: inside,
         ),
       ),
     );
@@ -506,7 +516,7 @@ class PageState extends State<ClassTableWindow> {
                   const Icon(Icons.access_time),
                   const SizedBox(),
                   Text(
-                      "${time[(i.start - 1) * 2]} - ${time[(i.stop - 1) * 2 + 1]}"),
+                      "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}"),
                 ],
               ),
               Row(
