@@ -166,13 +166,11 @@ class _ToolWindowState extends State<ToolWindow> {
       }
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) {
-          return const ClassTable();
+          return ClassTable();
         }),
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

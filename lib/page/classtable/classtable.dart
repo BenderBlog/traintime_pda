@@ -16,7 +16,11 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTable extends StatelessWidget {
-  const ClassTable({Key? key}) : super(key: key);
+  final Classes toUse = classData;
+  ClassTable({
+    Key? key,
+    /*required this.classData*/
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +46,10 @@ class ClassTable extends StatelessWidget {
         ],
       ),
       body: LayoutBuilder(
-        builder: (context, constraints) =>
-            ClassTableWindow(constraints: constraints),
+        builder: (context, constraints) => ClassTableWindow(
+          constraints: constraints,
+          classData: classData,
+        ),
       ),
     );
   }
@@ -63,8 +69,13 @@ class ClassTable extends StatelessWidget {
 }
 
 class ClassTableWindow extends StatefulWidget {
+  final Classes classData;
   final BoxConstraints constraints;
-  const ClassTableWindow({super.key, required this.constraints});
+  const ClassTableWindow({
+    super.key,
+    required this.constraints,
+    required this.classData,
+  });
 
   @override
   State<StatefulWidget> createState() => PageState();
@@ -72,10 +83,10 @@ class ClassTableWindow extends StatefulWidget {
 
 class PageState extends State<ClassTableWindow> {
   // The height ratio for the top and the middle.
-  static const heightRatio = [0.1, 0.075, 0.82];
+  static const heightRatio = [0.1, 0.08, 0.82];
 
   // The width ratio for the week column.
-  static const weekWidthRatio = 0.135;
+  static const weekWidthRatio = 0.13;
 
   // Colors for the class information card.
   static const colorList = [
@@ -128,7 +139,7 @@ class PageState extends State<ClassTableWindow> {
   ];
 
   // The start day of the semester.
-  var startDay = DateTime.parse(classData.termStartDay);
+  var startDay = DateTime.parse("2022-01-22");
 
   // The date which shown in the table.
   List<DateTime> dateList = [];
@@ -151,7 +162,7 @@ class PageState extends State<ClassTableWindow> {
   @override
   void initState() {
     // Get the start day of the semester.
-    var startDay = DateTime.parse(classData.termStartDay);
+    startDay = DateTime.parse(widget.classData.termStartDay);
 
     // Get the current index.
     // If they decide to start the class in the next semester, well...
@@ -184,7 +195,7 @@ class PageState extends State<ClassTableWindow> {
         height: widget.constraints.maxHeight * heightRatio[0],
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: classData.semesterLength,
+          itemCount: widget.classData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
             return TextButton(
               style: TextButton.styleFrom(
@@ -209,11 +220,12 @@ class PageState extends State<ClassTableWindow> {
 
   // The middle row is used to show the date and week.
   Widget _middleView() {
-    Widget leftest = SizedBox(
+    Widget leftest = Container(
+      color: Colors.white,
       width: widget.constraints.maxWidth * (1 - 7 * weekWidthRatio),
       child: Center(
         child: AutoSizeText(
-          "课次",
+          "课\n次",
           textAlign: TextAlign.center,
           group: AutoSizeGroup(),
           style: const TextStyle(
@@ -222,42 +234,40 @@ class PageState extends State<ClassTableWindow> {
         ),
       ),
     );
-    Widget weekInformation(int index) => SizedBox(
+    Widget weekInformation(int index) => Container(
           width: widget.constraints.maxWidth * weekWidthRatio,
-          child: Container(
-            color: dateList[index - 1].month == DateTime.now().month &&
-                    dateList[index - 1].day == DateTime.now().day
-                ? const Color(0x00f7f7f7)
-                : Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AutoSizeText(
-                  weekList[index - 1],
-                  group: AutoSizeGroup(),
-                  textScaleFactor: 1.0,
-                  style: TextStyle(
-                    //fontSize: 14,
-                    color: (dateList[index - 1].month == DateTime.now().month &&
-                            dateList[index - 1].day == DateTime.now().day)
-                        ? Colors.lightBlue
-                        : Colors.black87,
-                  ),
+          color: dateList[index - 1].month == DateTime.now().month &&
+                  dateList[index - 1].day == DateTime.now().day
+              ? const Color(0x00f7f7f7)
+              : Colors.white,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AutoSizeText(
+                weekList[index - 1],
+                group: AutoSizeGroup(),
+                textScaleFactor: 1.0,
+                style: TextStyle(
+                  //fontSize: 14,
+                  color: (dateList[index - 1].month == DateTime.now().month &&
+                          dateList[index - 1].day == DateTime.now().day)
+                      ? Colors.lightBlue
+                      : Colors.black87,
                 ),
-                const SizedBox(height: 5),
-                AutoSizeText(
-                  "${dateList[index - 1].month}/${dateList[index - 1].day}",
-                  group: AutoSizeGroup(),
-                  textScaleFactor: 0.8,
-                  style: TextStyle(
-                    color: (dateList[index - 1].month == DateTime.now().month &&
-                            dateList[index - 1].day == DateTime.now().day)
-                        ? Colors.lightBlue
-                        : Colors.black87,
-                  ),
+              ),
+              const SizedBox(height: 5),
+              AutoSizeText(
+                "${dateList[index - 1].month}/${dateList[index - 1].day}",
+                group: AutoSizeGroup(),
+                textScaleFactor: 0.8,
+                style: TextStyle(
+                  color: (dateList[index - 1].month == DateTime.now().month &&
+                          dateList[index - 1].day == DateTime.now().day)
+                      ? Colors.lightBlue
+                      : Colors.black87,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
     return SizedBox(
@@ -309,7 +319,7 @@ class PageState extends State<ClassTableWindow> {
       );
 
   List<Widget> _classSubRow(int index) {
-    Widget _classCard(int index, double height, Set<int> conflict) {
+    Widget classCard(int index, double height, Set<int> conflict) {
       Widget inside = index == -1
           ? Padding(
               padding: const EdgeInsets.all(3),
@@ -347,7 +357,7 @@ class PageState extends State<ClassTableWindow> {
                 padding: const EdgeInsets.all(3),
                 child: Center(
                   child: Text(
-                    classData.onTable[index].toString(),
+                    widget.classData.classDetail[index].toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 11.5,
@@ -365,18 +375,18 @@ class PageState extends State<ClassTableWindow> {
           padding: const EdgeInsets.all(2),
           child: ClipRRect(
             // Out
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(7),
             child: Container(
               // Border
               color: index == -1
                   ? const Color(0x00000000)
                   : colorList[index % colorList.length].shade300,
               padding: conflict.length == 1
-                  ? const EdgeInsets.all(2)
-                  : const EdgeInsets.fromLTRB(2, 2, 2, 16),
+                  ? const EdgeInsets.all(1)
+                  : const EdgeInsets.fromLTRB(1, 1, 1, 8),
               child: ClipRRect(
                 // Inner
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(6),
                 child: Container(
                   color: index == -1
                       ? const Color(0x00000000)
@@ -394,13 +404,13 @@ class PageState extends State<ClassTableWindow> {
       List<Widget> thisRow = [];
 
       // 1. Choice the class in this day.
-      List<ClassDetail> thisDay = [];
-      for (var element in classData.onTable) {
-        if (element.weekList.length < classData.semesterLength) {
+      List<TimeArrangement> thisDay = [];
+      for (var i in widget.classData.timeArrangement) {
+        if (i.weekList.length < widget.classData.semesterLength) {
           continue;
         }
-        if (element.weekList[currentWeekIndex] == "1" && element.day == index) {
-          thisDay.add(element);
+        if (i.weekList[currentWeekIndex] == "1" && i.day == index) {
+          thisDay.add(i);
         }
       }
 
@@ -411,7 +421,7 @@ class PageState extends State<ClassTableWindow> {
       List<List<int>> pretendLayout = List.generate(10, (index) => <int>[]);
       for (var i in thisDay) {
         for (int j = i.start - 1; j <= i.stop - 1; ++j) {
-          pretendLayout[j].add(classData.onTable.indexOf(i));
+          pretendLayout[j].add(i.index);
         }
       }
 
@@ -443,7 +453,7 @@ class PageState extends State<ClassTableWindow> {
         conflict.remove(-1);
 
         // Generate the row.
-        thisRow.add(_classCard(
+        thisRow.add(classCard(
           places,
           count * widget.constraints.maxHeight * heightRatio[2] / 10,
           conflict,
@@ -473,8 +483,8 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _buttomInformation(Set<int> conflict) {
-    List<ClassDetail> information = List.generate(conflict.length,
-        (index) => classData.onTable[conflict.elementAt(index)]);
+    List<TimeArrangement> information = List.generate(conflict.length,
+        (index) => widget.classData.timeArrangement[conflict.elementAt(index)]);
 
     List<Widget> toShow = [
       _classInfoBox(information.first),
@@ -492,57 +502,60 @@ class PageState extends State<ClassTableWindow> {
     );
   }
 
-  Widget _classInfoBox(ClassDetail i) => Card(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 10,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.class_),
-                  const SizedBox(),
-                  Text(i.name),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.person),
-                  const SizedBox(),
-                  Text(i.teacher ?? "老师未定"),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.room),
-                  const SizedBox(),
-                  Text(i.place ?? "地点未定"),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.access_time),
-                  const SizedBox(),
-                  Text(
-                      "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}"),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.calendar_month),
-                  const SizedBox(),
-                  Expanded(
-                    child: Text(
-                      weekToShow(i.weekList).toString(),
-                    ),
+  Widget _classInfoBox(TimeArrangement i) {
+    ClassDetail toShow = widget.classData.classDetail[i.index];
+    return Card(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 10,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.class_),
+                const SizedBox(),
+                Text(toShow.name),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.person),
+                const SizedBox(),
+                Text(toShow.teacher ?? "老师未定"),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.room),
+                const SizedBox(),
+                Text(toShow.place ?? "地点未定"),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.access_time),
+                const SizedBox(),
+                Text(
+                    "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}"),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.calendar_month),
+                const SizedBox(),
+                Expanded(
+                  child: Text(
+                    weekToShow(i.weekList).toString(),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 }

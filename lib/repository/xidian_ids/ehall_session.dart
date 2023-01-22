@@ -246,11 +246,17 @@ class EhallSession extends IDSSession {
     classData.termStartDay = qResult["termStartDay"];
     classData.semesterLength = 0;
     for (var i in qResult["rows"]) {
-      classData.onTable.add(
-        ClassDetail(
-          name: i["KCM"],
-          teacher: i["SKJS"],
-          place: i["JASDM"],
+      var toDeal = ClassDetail(
+        name: i["KCM"],
+        teacher: i["SKJS"],
+        place: i["JASDM"],
+      );
+      if (!classData.classDetail.contains(toDeal)) {
+        classData.classDetail.add(toDeal);
+      }
+      classData.timeArrangement.add(
+        TimeArrangement(
+          index: classData.classDetail.indexOf(toDeal),
           start: int.parse(i["KSJC"]),
           stop: int.parse(i["JSJC"]),
           day: int.parse(i["SKXQ"]),
@@ -264,17 +270,27 @@ class EhallSession extends IDSSession {
 
     // Uncomment to see the conflict.
     /*
-    classData.onTable.add(
-      ClassDetail(
-        name: "测试连课",
-        teacher: "SPRT",
-        place: "Flutter",
+    classData.classDetail.add(ClassDetail(
+      name: "测试连课",
+      teacher: "SPRT",
+      place: "Flutter",
+    ));
+    classData.timeArrangement.addAll([
+      TimeArrangement(
+        index: classData.classDetail.length - 1,
         start: 2,
         stop: 8,
         day: 2,
         weekList: "1111111111111111111111",
       ),
-    );
+      TimeArrangement(
+        index: classData.classDetail.length - 1,
+        start: 4,
+        stop: 8,
+        day: 6,
+        weekList: "1111111111111111111111",
+      ),
+    ]);
     */
 
     /*
