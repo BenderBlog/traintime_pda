@@ -12,6 +12,7 @@ if you want to use.
 
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTable extends StatelessWidget {
@@ -40,7 +41,10 @@ class ClassTable extends StatelessWidget {
           ),
         ],
       ),
-      body: const ClassTableWindow(),
+      body: LayoutBuilder(
+        builder: (context, constraints) =>
+            ClassTableWindow(constraints: constraints),
+      ),
     );
   }
 
@@ -59,13 +63,21 @@ class ClassTable extends StatelessWidget {
 }
 
 class ClassTableWindow extends StatefulWidget {
-  const ClassTableWindow({super.key});
+  final BoxConstraints constraints;
+  const ClassTableWindow({super.key, required this.constraints});
 
   @override
   State<StatefulWidget> createState() => PageState();
 }
 
 class PageState extends State<ClassTableWindow> {
+  // The height ratio for the top and the middle.
+  static const heightRatio = [0.1, 0.075, 0.82];
+
+  // The width ratio for the week column.
+  static const weekWidthRatio = 0.135;
+
+  // Colors for the class information card.
   static const colorList = [
     Colors.indigo,
     Colors.blue,
@@ -77,7 +89,7 @@ class PageState extends State<ClassTableWindow> {
     Colors.orange,
     Colors.red,
   ];
-  // Useless colors
+  // Colors for class information card which not in this week.
   static const uselessColor = Colors.grey;
 
   List<String> weekList = [
@@ -90,6 +102,7 @@ class PageState extends State<ClassTableWindow> {
     '周日',
   ];
 
+  // Time arrangements.
   // Even means start, odd means end.
   List<String> time = [
     "8:30",
@@ -117,6 +130,7 @@ class PageState extends State<ClassTableWindow> {
   // The start day of the semester.
   var startDay = DateTime.parse(classData.termStartDay);
 
+  // The date which shown in the table.
   List<DateTime> dateList = [];
 
   int currentWeekIndex = 0;
@@ -125,17 +139,7 @@ class PageState extends State<ClassTableWindow> {
 
   double aspect = 15;
 
-  Set<int> weekToShow(String weekList) {
-    Set<int> toReturn =
-        Set.from(List.generate(weekList.length, (index) => index + 1));
-    for (int i = 0; i < weekList.length; ++i) {
-      if (weekList[i] == "0") {
-        toReturn.remove(i + 1);
-      }
-    }
-    return toReturn;
-  }
-
+  // Update the weeklist.
   void dateListUpdate() {
     DateTime firstDay = startDay.add(Duration(days: currentWeekIndex * 7));
     dateList = [firstDay];
@@ -163,8 +167,21 @@ class PageState extends State<ClassTableWindow> {
     super.initState();
   }
 
+  // For the avaliable weeks in the class information.
+  Set<int> weekToShow(String weekList) {
+    Set<int> toReturn =
+        Set.from(List.generate(weekList.length, (index) => index + 1));
+    for (int i = 0; i < weekList.length; ++i) {
+      if (weekList[i] == "0") {
+        toReturn.remove(i + 1);
+      }
+    }
+    return toReturn;
+  }
+
+  // The top row is used to change the weeks.
   Widget _topView() => SizedBox(
-        height: 80,
+        height: widget.constraints.maxHeight * heightRatio[0],
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: classData.semesterLength,
@@ -190,6 +207,73 @@ class PageState extends State<ClassTableWindow> {
         ),
       );
 
+  // The middle row is used to show the date and week.
+  Widget _middleView() {
+    Widget leftest = SizedBox(
+      width: widget.constraints.maxWidth * (1 - 7 * weekWidthRatio),
+      child: Center(
+        child: AutoSizeText(
+          "课次",
+          textAlign: TextAlign.center,
+          group: AutoSizeGroup(),
+          style: const TextStyle(
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    );
+    Widget weekInformation(int index) => SizedBox(
+          width: widget.constraints.maxWidth * weekWidthRatio,
+          child: Container(
+            color: dateList[index - 1].month == DateTime.now().month &&
+                    dateList[index - 1].day == DateTime.now().day
+                ? const Color(0x00f7f7f7)
+                : Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AutoSizeText(
+                  weekList[index - 1],
+                  group: AutoSizeGroup(),
+                  textScaleFactor: 1.0,
+                  style: TextStyle(
+                    //fontSize: 14,
+                    color: (dateList[index - 1].month == DateTime.now().month &&
+                            dateList[index - 1].day == DateTime.now().day)
+                        ? Colors.lightBlue
+                        : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                AutoSizeText(
+                  "${dateList[index - 1].month}/${dateList[index - 1].day}",
+                  group: AutoSizeGroup(),
+                  textScaleFactor: 0.8,
+                  style: TextStyle(
+                    color: (dateList[index - 1].month == DateTime.now().month &&
+                            dateList[index - 1].day == DateTime.now().day)
+                        ? Colors.lightBlue
+                        : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+    return SizedBox(
+      height: widget.constraints.maxHeight * heightRatio[1],
+      child: Row(
+        children: List.generate(8, (index) {
+          if (index > 0) {
+            return weekInformation(index);
+          } else {
+            return leftest;
+          }
+        }),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -199,73 +283,8 @@ class PageState extends State<ClassTableWindow> {
           // Top line to show the date
           _topView(),
           // The main class table.
-          SizedBox(
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 8,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 8,
-                childAspectRatio: 1,
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  color: index != 0 &&
-                          dateList[index - 1].month == DateTime.now().month &&
-                          dateList[index - 1].day == DateTime.now().day
-                      ? const Color(0x00f7f7f7)
-                      : Colors.white,
-                  child: Center(
-                    child: index == 0
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Text(
-                                "星期",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text("日期", style: TextStyle(fontSize: 12)),
-                            ],
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                weekList[index - 1],
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: (dateList[index - 1].month ==
-                                              DateTime.now().month &&
-                                          dateList[index - 1].day ==
-                                              DateTime.now().day)
-                                      ? Colors.lightBlue
-                                      : Colors.black87,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                "${dateList[index - 1].month}/${dateList[index - 1].day}",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: (dateList[index - 1].month ==
-                                              DateTime.now().month &&
-                                          dateList[index - 1].day ==
-                                              DateTime.now().day)
-                                      ? Colors.lightBlue
-                                      : Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
-                );
-              },
-            ),
-          ),
+          _middleView(),
+          // The rest of the table.
           _classTable(),
         ],
       ),
@@ -273,13 +292,104 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _classTable() => Expanded(
-          child: SingleChildScrollView(
-              child: Row(
-        children: List.generate(
-            8, (i) => Expanded(child: Column(children: _classSubRow(i)))),
-      )));
+        child: SingleChildScrollView(
+            child: Row(
+          children: List.generate(
+              8,
+              (i) => SizedBox(
+                    width: i > 0
+                        ? widget.constraints.maxWidth * weekWidthRatio
+                        : widget.constraints.maxWidth *
+                            (1 - 7 * weekWidthRatio),
+                    child: Column(
+                      children: _classSubRow(i),
+                    ),
+                  )),
+        )),
+      );
 
   List<Widget> _classSubRow(int index) {
+    Widget _classCard(int index, double height, Set<int> conflict) {
+      Widget inside = index == -1
+          ? Padding(
+              padding: const EdgeInsets.all(3),
+              // Easter egg, usless you read the code, or reverse engineering...
+              child: Center(
+                child: Text(
+                  "BOCCHI RULES!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: index != -1
+                        ? colorList[index % colorList.length].shade800
+                        : Colors.white,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            )
+          : TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.resolveWith(
+                  (status) => EdgeInsets.zero,
+                ),
+                overlayColor: MaterialStateProperty.resolveWith(
+                  (status) => Colors.transparent,
+                ),
+              ),
+              onPressed: () => showModalBottomSheet(
+                builder: (((context) {
+                  return _buttomInformation(conflict);
+                })),
+                context: context,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: Center(
+                  child: Text(
+                    classData.onTable[index].toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: index != -1
+                          ? colorList[index % colorList.length].shade800
+                          : Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            );
+      return SizedBox(
+        height: height,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: ClipRRect(
+            // Out
+            borderRadius: BorderRadius.circular(5),
+            child: Container(
+              // Border
+              color: index == -1
+                  ? const Color(0x00000000)
+                  : colorList[index % colorList.length].shade300,
+              padding: conflict.length == 1
+                  ? const EdgeInsets.all(2)
+                  : const EdgeInsets.fromLTRB(2, 2, 2, 16),
+              child: ClipRRect(
+                // Inner
+                borderRadius: BorderRadius.circular(3),
+                child: Container(
+                  color: index == -1
+                      ? const Color(0x00000000)
+                      : colorList[index % colorList.length].shade100,
+                  child: inside,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     if (index != 0) {
       List<Widget> thisRow = [];
 
@@ -335,7 +445,7 @@ class PageState extends State<ClassTableWindow> {
         // Generate the row.
         thisRow.add(_classCard(
           places,
-          count * (MediaQuery.of(context).size.height / 15),
+          count * widget.constraints.maxHeight * heightRatio[2] / 10,
           conflict,
         ));
       }
@@ -346,119 +456,20 @@ class PageState extends State<ClassTableWindow> {
       return List.generate(
         10,
         (index) => SizedBox(
-          height: MediaQuery.of(context).size.height / 15,
-          child: Padding(
-            padding: const EdgeInsets.all(2),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                // Uncommit to adjust the layout.
-                // border: Border.all(),
-                borderRadius: BorderRadius.circular(10),
-                color: const Color(0x00000000),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(3),
-                child: Center(
-                  child: Text(
-                    "${index + 1}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      color: Colors.black,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
+          height: widget.constraints.maxHeight * heightRatio[2] / 10,
+          child: Center(
+            child: AutoSizeText(
+              "${index + 1}",
+              group: AutoSizeGroup(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.black,
               ),
             ),
           ),
         ),
       );
     }
-  }
-
-  Widget _classCard(int index, double height, Set<int> conflict) {
-    var border = BorderSide(
-        width: 2, color: colorList[index % colorList.length].withAlpha(128));
-    Widget inside = index == -1
-        ? Padding(
-            padding: const EdgeInsets.all(3),
-            // Easter egg, usless you read the code, or reverse engineering...
-            child: Center(
-              child: Text(
-                "BOCCHI RULES!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  color: index != -1
-                      ? colorList[index % colorList.length].shade800
-                      : Colors.white,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-          )
-        : TextButton(
-            style: ButtonStyle(
-              padding: MaterialStateProperty.resolveWith(
-                (status) => EdgeInsets.zero,
-              ),
-              overlayColor: MaterialStateProperty.resolveWith(
-                (status) => Colors.transparent,
-              ),
-            ),
-            onPressed: () => showModalBottomSheet(
-              builder: (((context) {
-                return _buttomInformation(conflict);
-              })),
-              context: context,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(3),
-              child: Center(
-                child: Text(
-                  classData.onTable[index].toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: index != -1
-                        ? colorList[index % colorList.length].shade800
-                        : Colors.white,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
-            ),
-          );
-    return SizedBox(
-      height: height,
-      child: Padding(
-        padding: const EdgeInsets.all(2),
-        child: ClipRRect(
-          // 最外层
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            // 边框层
-            color: index == -1
-                ? const Color(0x00000000)
-                : colorList[index % colorList.length].shade300,
-            padding: conflict.length == 1
-                ? const EdgeInsets.all(2)
-                : const EdgeInsets.fromLTRB(2, 2, 2, 16),
-            child: ClipRRect(
-              // 里层
-              borderRadius: BorderRadius.circular(3),
-              child: Container(
-                color: index == -1
-                    ? const Color(0x00000000)
-                    : colorList[index % colorList.length].shade100,
-                child: inside,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buttomInformation(Set<int> conflict) {
