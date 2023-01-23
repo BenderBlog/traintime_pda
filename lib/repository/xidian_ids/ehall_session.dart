@@ -63,6 +63,7 @@ class EhallSession extends IDSSession {
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
           }),
     );
+    print("转移地址:" + value.headers['location']![0]);
     return value.headers['location']![0];
   }
 
@@ -189,6 +190,7 @@ class EhallSession extends IDSSession {
     Map<String, dynamic> qResult = {};
 
     onResponse(10, "准备获取课表");
+    print("课表获取开始");
     Directory appDocDir = await getApplicationDocumentsDirectory();
     Directory destination =
         Directory("${appDocDir.path}/org.superbart.watermeter");
@@ -199,11 +201,13 @@ class EhallSession extends IDSSession {
     bool isExist = file.existsSync();
 
     onResponse(5, isExist || focus == true ? "读取缓存" : "从网络获取");
+    print(isExist || focus == true ? "读取缓存" : "从网络获取");
 
     // Try to add some sort of cache support.
     if (!isExist || focus == true) {
       onResponse(10, "进入教务系统");
-      await useApp("4770397878132218");
+      String get = await useApp("4770397878132218");
+      await dio.post(get);
 
       onResponse(15, "获取学期信息");
       String semesterCode = await dio

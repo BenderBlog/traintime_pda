@@ -172,6 +172,11 @@ class PageState extends State<ClassTableWindow> {
           (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
     }
 
+    // Deal with the minus currentWeekIndex
+    if (currentWeekIndex < 0) {
+      currentWeekIndex = widget.classData.semesterLength - 1;
+    }
+
     // Update dateList
     dateListUpdate();
 

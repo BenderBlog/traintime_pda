@@ -50,7 +50,7 @@ class IDSSession {
       contentType: Headers.formUrlEncodedContentType,
       headers: {
         HttpHeaders.userAgentHeader:
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
       },
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
@@ -153,7 +153,9 @@ class IDSSession {
     print(data.statusCode);
     if (data.statusCode == 401) {
       throw "用户名或密码错误";
-    } else if (data.statusCode == 301 || data.statusCode == 302) {
+    } else if (data.statusCode == 301 ||
+        data.statusCode == 302 ||
+        data.statusCode == 200) {
       /// Post login progress.
       if (onResponse != null) {
         onResponse(80, "登录后处理");
@@ -170,7 +172,7 @@ class IDSSession {
       }
       return;
     } else {
-      throw "登陆失败了，原因不明";
+      throw "登陆失败了，原因不明\n返回值代码：${data.statusCode}\n";
     }
   }
 }
