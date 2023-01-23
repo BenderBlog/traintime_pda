@@ -110,7 +110,6 @@ awb4B45zUwIDAQAB
     if (username == null || password == null) {
       throw "请在设置里面设置体适能密码";
     }
-    print("userId: $userId");
     if (userId != "") {
       if (onResponse != null) {
         onResponse(100, "登录成功");

@@ -86,7 +86,7 @@ class PageState extends State<ClassTableWindow> {
   static const heightRatio = [0.1, 0.08, 0.82];
 
   // The width ratio for the week column.
-  static const weekWidthRatio = 0.13;
+  static const leftRow = 45.0;
 
   // Colors for the class information card.
   static const colorList = [
@@ -196,7 +196,7 @@ class PageState extends State<ClassTableWindow> {
   }
 
   // The top row is used to change the weeks.
-  Widget _topView() => SizedBox(
+  Widget _topViewHorizontal() => SizedBox(
         height: widget.constraints.maxHeight * heightRatio[0],
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -217,7 +217,41 @@ class PageState extends State<ClassTableWindow> {
                   dateListUpdate();
                 });
               },
-              child: Text("第${index + 1}周"),
+              child: AutoSizeText(
+                "第${index + 1}周",
+                group: AutoSizeGroup(),
+              ),
+            );
+          },
+        ),
+      );
+
+  // The top row is used to change the weeks.
+  Widget _topViewVertical() => SizedBox(
+        height: widget.constraints.maxHeight * heightRatio[0],
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: widget.classData.semesterLength,
+          itemBuilder: (BuildContext context, int index) {
+            return TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: currentWeekIndex == index
+                    ? Colors.deepPurpleAccent
+                    : Colors.white,
+                foregroundColor: currentWeekIndex == index
+                    ? Colors.white
+                    : Colors.deepPurpleAccent,
+              ),
+              onPressed: () {
+                setState(() {
+                  currentWeekIndex = index;
+                  dateListUpdate();
+                });
+              },
+              child: AutoSizeText(
+                "第${index + 1}周",
+                group: AutoSizeGroup(),
+              ),
             );
           },
         ),
@@ -227,10 +261,10 @@ class PageState extends State<ClassTableWindow> {
   Widget _middleView() {
     Widget leftest = Container(
       color: Colors.white,
-      width: widget.constraints.maxWidth * (1 - 7 * weekWidthRatio),
+      width: leftRow,
       child: Center(
         child: AutoSizeText(
-          "课\n次",
+          "课次",
           textAlign: TextAlign.center,
           group: AutoSizeGroup(),
           style: const TextStyle(
@@ -239,53 +273,65 @@ class PageState extends State<ClassTableWindow> {
         ),
       ),
     );
-    Widget weekInformation(int index) => Container(
-          width: widget.constraints.maxWidth * weekWidthRatio,
-          color: dateList[index - 1].month == DateTime.now().month &&
-                  dateList[index - 1].day == DateTime.now().day
-              ? const Color(0x00f7f7f7)
-              : Colors.white,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AutoSizeText(
-                weekList[index - 1],
-                group: AutoSizeGroup(),
-                textScaleFactor: 1.0,
-                style: TextStyle(
-                  //fontSize: 14,
-                  color: (dateList[index - 1].month == DateTime.now().month &&
-                          dateList[index - 1].day == DateTime.now().day)
-                      ? Colors.lightBlue
-                      : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 5),
-              AutoSizeText(
-                "${dateList[index - 1].month}/${dateList[index - 1].day}",
-                group: AutoSizeGroup(),
-                textScaleFactor: 0.8,
-                style: TextStyle(
-                  color: (dateList[index - 1].month == DateTime.now().month &&
-                          dateList[index - 1].day == DateTime.now().day)
-                      ? Colors.lightBlue
-                      : Colors.black87,
-                ),
-              ),
-            ],
+
+    Widget weekInformation(int index) {
+      var list = [
+        AutoSizeText(
+          weekList[index - 1],
+          group: AutoSizeGroup(),
+          textScaleFactor: 1.0,
+          style: TextStyle(
+            //fontSize: 14,
+            color: (dateList[index - 1].month == DateTime.now().month &&
+                    dateList[index - 1].day == DateTime.now().day)
+                ? Colors.lightBlue
+                : Colors.black87,
           ),
-        );
-    return SizedBox(
-      height: widget.constraints.maxHeight * heightRatio[1],
-      child: Row(
-        children: List.generate(8, (index) {
-          if (index > 0) {
-            return weekInformation(index);
-          } else {
-            return leftest;
-          }
-        }),
-      ),
+        ),
+        widget.constraints.maxWidth / widget.constraints.maxHeight > 1
+            ? const SizedBox(width: 5)
+            : const SizedBox(height: 5),
+        AutoSizeText(
+          "${dateList[index - 1].month}/${dateList[index - 1].day}",
+          group: AutoSizeGroup(),
+          textScaleFactor:
+              widget.constraints.maxWidth / widget.constraints.maxHeight > 1
+                  ? 1.0
+                  : 0.8,
+          style: TextStyle(
+            color: (dateList[index - 1].month == DateTime.now().month &&
+                    dateList[index - 1].day == DateTime.now().day)
+                ? Colors.lightBlue
+                : Colors.black87,
+          ),
+        ),
+      ];
+      return Container(
+        width: (widget.constraints.maxWidth - leftRow) / 7,
+        color: dateList[index - 1].month == DateTime.now().month &&
+                dateList[index - 1].day == DateTime.now().day
+            ? const Color(0x00f7f7f7)
+            : Colors.white,
+        child: widget.constraints.maxWidth / widget.constraints.maxHeight > 1
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: list,
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: list,
+              ),
+      );
+    }
+
+    return Row(
+      children: List.generate(8, (index) {
+        if (index > 0) {
+          return weekInformation(index);
+        } else {
+          return leftest;
+        }
+      }),
     );
   }
 
@@ -296,7 +342,7 @@ class PageState extends State<ClassTableWindow> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Top line to show the date
-          _topView(),
+          _topViewHorizontal(),
           // The main class table.
           _middleView(),
           // The rest of the table.
@@ -313,9 +359,8 @@ class PageState extends State<ClassTableWindow> {
               8,
               (i) => SizedBox(
                     width: i > 0
-                        ? widget.constraints.maxWidth * weekWidthRatio
-                        : widget.constraints.maxWidth *
-                            (1 - 7 * weekWidthRatio),
+                        ? (widget.constraints.maxWidth - leftRow) / 7
+                        : leftRow,
                     child: Column(
                       children: _classSubRow(i),
                     ),
@@ -326,8 +371,8 @@ class PageState extends State<ClassTableWindow> {
   List<Widget> _classSubRow(int index) {
     Widget classCard(int index, double height, Set<int> conflict) {
       Widget inside = index == -1
-          ? Padding(
-              padding: const EdgeInsets.all(3),
+          ? const Padding(
+              padding: EdgeInsets.all(3),
               // Easter egg, usless you read the code, or reverse engineering...
               child: Center(
                 child: Text(
@@ -335,9 +380,7 @@ class PageState extends State<ClassTableWindow> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11.5,
-                    color: index != -1
-                        ? colorList[index % colorList.length].shade800
-                        : Colors.white,
+                    color: Colors.white,
                     letterSpacing: 1,
                   ),
                 ),
@@ -362,12 +405,19 @@ class PageState extends State<ClassTableWindow> {
                 padding: const EdgeInsets.all(3),
                 child: Center(
                   child: Text(
-                    widget.classData.classDetail[index].toString(),
+                    widget
+                        .classData
+                        .classDetail[
+                            widget.classData.timeArrangement[index].index]
+                        .toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 11.5,
                       color: index != -1
-                          ? colorList[index % colorList.length].shade800
+                          ? colorList[widget
+                                      .classData.timeArrangement[index].index %
+                                  colorList.length]
+                              .shade900
                           : Colors.white,
                     ),
                   ),
@@ -385,7 +435,9 @@ class PageState extends State<ClassTableWindow> {
               // Border
               color: index == -1
                   ? const Color(0x00000000)
-                  : colorList[index % colorList.length].shade300,
+                  : colorList[widget.classData.timeArrangement[index].index %
+                          colorList.length]
+                      .shade300,
               padding: conflict.length == 1
                   ? const EdgeInsets.all(1)
                   : const EdgeInsets.fromLTRB(1, 1, 1, 8),
@@ -395,7 +447,10 @@ class PageState extends State<ClassTableWindow> {
                 child: Container(
                   color: index == -1
                       ? const Color(0x00000000)
-                      : colorList[index % colorList.length].shade100,
+                      : colorList[
+                              widget.classData.timeArrangement[index].index %
+                                  colorList.length]
+                          .shade100,
                   child: inside,
                 ),
               ),
@@ -411,7 +466,7 @@ class PageState extends State<ClassTableWindow> {
       // 1. Choice the class in this day.
       List<TimeArrangement> thisDay = [];
       for (var i in widget.classData.timeArrangement) {
-        if (i.weekList.length < widget.classData.semesterLength) {
+        if (i.weekList.length < currentWeekIndex + 1) {
           continue;
         }
         if (i.weekList[currentWeekIndex] == "1" && i.day == index) {
@@ -426,7 +481,7 @@ class PageState extends State<ClassTableWindow> {
       List<List<int>> pretendLayout = List.generate(10, (index) => <int>[]);
       for (var i in thisDay) {
         for (int j = i.start - 1; j <= i.stop - 1; ++j) {
-          pretendLayout[j].add(i.index);
+          pretendLayout[j].add(widget.classData.timeArrangement.indexOf(i));
         }
       }
 
@@ -471,6 +526,7 @@ class PageState extends State<ClassTableWindow> {
       return List.generate(
         10,
         (index) => SizedBox(
+          width: leftRow,
           height: widget.constraints.maxHeight * heightRatio[2] / 10,
           child: Center(
             child: AutoSizeText(
@@ -508,6 +564,7 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _classInfoBox(TimeArrangement i) {
+    print("${i.index} ${i.day} ${i.start}");
     ClassDetail toShow = widget.classData.classDetail[i.index];
     return Card(
       margin: const EdgeInsets.symmetric(
@@ -544,7 +601,7 @@ class PageState extends State<ClassTableWindow> {
                 const Icon(Icons.access_time),
                 const SizedBox(),
                 Text(
-                    "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}"),
+                    "${weekList[i.day - 1]} ${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}"),
               ],
             ),
             Row(

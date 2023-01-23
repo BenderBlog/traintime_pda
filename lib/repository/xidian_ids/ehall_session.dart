@@ -148,7 +148,7 @@ class EhallSession extends IDSSession {
           classID: i["JXBID"],
           isPassed: i["SFJG"] ?? "-1"));
       j++;
-      /* Unable to work.
+      /* //Unable to work.
       if (i["DJCJLXDM"] == "100") {
         try {
           var anotherResponse = await dio.post(

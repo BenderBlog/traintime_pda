@@ -10,6 +10,15 @@ class ClassDetail {
   });
 
   @override
+  int get hashCode => name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ClassDetail &&
+      other.runtimeType == runtimeType &&
+      name == other.name;
+
+  @override
   String toString() {
     if (place != null) {
       return "${name.length <= 15 ? name : "${name.substring(0, 14)}..."}\n$place";
