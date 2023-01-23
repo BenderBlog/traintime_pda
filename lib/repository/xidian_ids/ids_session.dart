@@ -44,13 +44,24 @@ String aesEncrypt(String toEnc, String key) {
 }
 
 class IDSSession {
+  static const _header = [
+    // "username",
+    // "password",
+    // "captcha",
+    //"_eventId",
+    "lt",
+    //"cllt",
+    //"dllt",
+    "execution",
+  ];
+
   @protected
   Dio get dio {
     Dio toReturn = Dio(BaseOptions(
       contentType: Headers.formUrlEncodedContentType,
       headers: {
         HttpHeaders.userAgentHeader:
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+            "Mozilla/5.0 (Linux; Android 11; KB2000 Build/RP1A.201005.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/3263 MMWEBSDK/20211001 Mobile Safari/537.36 MMWEBID/3667 MicroMessenger/8.0.16.2040(0x28001037) Process/toolsmp WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64"
       },
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
@@ -99,7 +110,7 @@ class IDSSession {
 
     /// Start getting data from webpage.
     var page = BeautifulSoup(response);
-    var form = page.find("form", attrs: {'id': 'pwdFromId'});
+    var form = page.findAll("input", attrs: {"type": "hidden"});
 
     /// Check whether it need CAPTCHA or not:-P
     if (onResponse != null) {
@@ -117,12 +128,12 @@ class IDSSession {
       throw "需要验证码，请去浏览器登陆";
     }
 
-    /// Get AES encrypt key.
+    /// Get AES encrypt key. There must be.
     if (onResponse != null) {
       onResponse(30, "获取密码加密密钥");
     }
-    String keys =
-        form!.find("input", id: 'pwdEncryptSalt')!.getAttrValue("value")!;
+    String keys = form
+        .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
 
     /// Prepare for login.
     if (onResponse != null) {
@@ -132,41 +143,57 @@ class IDSSession {
       'username': username,
       'password': aesEncrypt(password, keys),
       'rememberMe': 'true',
+      'cllt': 'userNameLogin',
+      'dllt': 'generalLogin',
+      '_eventId': 'submit',
     };
-    for (var i in form.findAll("input", attrs: {"type": "hidden"})) {
-      head[i["id"]!] = i["value"] ?? "";
+
+    form.forEach((element) {
+      print(element);
+    });
+
+    print(head);
+
+    for (var i in _header) {
+      print(i);
+      head[i] = form.firstWhere(
+          (element) => element["name"] == i || element.id == i)["value"]!;
     }
+
+    print(head);
 
     /// Post login request.
     if (onResponse != null) {
       onResponse(50, "准备登录");
     }
-    var data = await dio.post("http://ids.xidian.edu.cn/authserver/login",
-        queryParameters: {'service': target},
-        data: head,
+    var data = await dio.post(
+      "http://ids.xidian.edu.cn/authserver/login",
+      queryParameters: {'service': target},
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+      data: head,
+    );
+    // print(data);
+    if (data.statusCode == 401) {
+      throw "用户名或密码错误";
+    } else if (data.statusCode == 301 || data.statusCode == 302) {
+      /// Post login progress.
+      if (onResponse != null) {
+        onResponse(80, "登录后处理");
+      }
+      var whatever = await dio.get(
+        data.headers['location']![0],
         options: Options(
           followRedirects: false,
           validateStatus: (status) {
             return status! < 500;
           },
-        ));
-    print(data.statusCode);
-    if (data.statusCode == 401) {
-      throw "用户名或密码错误";
-    } else if (data.statusCode == 301 ||
-        data.statusCode == 302 ||
-        data.statusCode == 200) {
-      /// Post login progress.
-      if (onResponse != null) {
-        onResponse(80, "登录后处理");
-      }
-      var whatever = await dio.get(data.headers['location']![0],
-          options: Options(
-            followRedirects: false,
-            validateStatus: (status) {
-              return status! < 500;
-            },
-          ));
+        ),
+      );
       if (whatever.data.contains("验证码错误")) {
         throw "不知为啥还是说让输验证码";
       }
