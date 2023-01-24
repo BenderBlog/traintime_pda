@@ -83,13 +83,20 @@ class ClassTableWindow extends StatefulWidget {
 
 class PageState extends State<ClassTableWindow> {
   // The height ratio for the top and the middle.
-  static const heightRatio = [0.1, 0.08, 0.82];
+  static const heightRatio = [0.15, 0.08, 0.9];
 
   // The width ratio for the week column.
-  static const leftRow = 45.0;
+  static const leftRow = 40.0;
+
+  // Mark the current week.
+  int? currentWeek;
 
   // Colors for the class information card.
   static const colorList = [
+    Colors.red,
+    Colors.pink,
+    Colors.purple,
+    Colors.deepPurple,
     Colors.indigo,
     Colors.blue,
     Colors.lightBlue,
@@ -97,11 +104,17 @@ class PageState extends State<ClassTableWindow> {
     Colors.teal,
     Colors.green,
     Colors.lightGreen,
+    Colors.lime,
+    Colors.yellow,
     Colors.orange,
-    Colors.red,
+    Colors.deepOrange,
+    Colors.brown,
   ];
   // Colors for class information card which not in this week.
   static const uselessColor = Colors.grey;
+
+  // A list as an index of the classtable items.
+  late List<List<List<List<int>>>> pretendLayout;
 
   List<String> weekList = [
     '周一',
@@ -172,6 +185,12 @@ class PageState extends State<ClassTableWindow> {
           (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
     }
 
+    // Remember the current week.
+    if (currentWeekIndex >= 0 &&
+        currentWeekIndex < widget.classData.semesterLength) {
+      currentWeek = currentWeekIndex;
+    }
+
     // Deal with the minus currentWeekIndex
     if (currentWeekIndex < 0) {
       currentWeekIndex = widget.classData.semesterLength - 1;
@@ -180,6 +199,48 @@ class PageState extends State<ClassTableWindow> {
     // Update dateList
     dateListUpdate();
 
+    // Init the matrix.
+    // 1. prepare the structure, a three-deminision array.
+    //    for week-day~class array
+    pretendLayout = List.generate(
+      widget.classData.semesterLength,
+      (week) => List.generate(7, (day) => List.generate(10, (classes) => [])),
+    );
+
+    // 2. init each week's array
+    for (int week = 0; week < widget.classData.semesterLength; ++week) {
+      for (int day = 0; day < 7; ++day) {
+        // 2.a. Choice the class in this day.
+        List<TimeArrangement> thisDay = [];
+        for (var i in widget.classData.timeArrangement) {
+          // If the class has ended, skip.
+          if (i.weekList.length < week + 1) {
+            continue;
+          }
+          if (i.weekList[week] == "1" && i.day == day + 1) {
+            thisDay.add(i);
+          }
+        }
+
+        // 2.b. The longest class should be solved first.
+        thisDay.sort((a, b) => b.step.compareTo(a.step));
+
+        // 2.c Arrange the layout. Solve the conflex.
+        for (var i in thisDay) {
+          for (int j = i.start - 1; j <= i.stop - 1; ++j) {
+            pretendLayout[week][day][j]
+                .add(widget.classData.timeArrangement.indexOf(i));
+          }
+        }
+
+        // 2.d. Deal with the empty space.
+        for (var i in pretendLayout[week][day]) {
+          if (i.isEmpty) {
+            i.add(-1);
+          }
+        }
+      }
+    }
     super.initState();
   }
 
@@ -196,66 +257,89 @@ class PageState extends State<ClassTableWindow> {
   }
 
   // The top row is used to change the weeks.
-  Widget _topViewHorizontal() => SizedBox(
-        height: widget.constraints.maxHeight * heightRatio[0],
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: widget.classData.semesterLength,
-          itemBuilder: (BuildContext context, int index) {
-            return TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: currentWeekIndex == index
-                    ? Colors.deepPurpleAccent
-                    : Colors.white,
-                foregroundColor: currentWeekIndex == index
-                    ? Colors.white
-                    : Colors.deepPurpleAccent,
-              ),
-              onPressed: () {
-                setState(() {
-                  currentWeekIndex = index;
-                  dateListUpdate();
-                });
-              },
-              child: AutoSizeText(
-                "第${index + 1}周",
-                group: AutoSizeGroup(),
-              ),
-            );
-          },
-        ),
-      );
+  Widget _topView() {
+    Widget dot(bool isOccupied) => ClipOval(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .primaryColor
+                  .withOpacity(isOccupied ? 1 : 0.25),
+            ),
+          ),
+        );
 
-  // The top row is used to change the weeks.
-  Widget _topViewVertical() => SizedBox(
-        height: widget.constraints.maxHeight * heightRatio[0],
+    return SizedBox(
+      height: widget.constraints.maxHeight * heightRatio[0],
+      child: Container(
+        padding: const EdgeInsets.only(
+          top: 2,
+          bottom: 5,
+        ),
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: widget.classData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
-            return TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: currentWeekIndex == index
-                    ? Colors.deepPurpleAccent
-                    : Colors.white,
-                foregroundColor: currentWeekIndex == index
-                    ? Colors.white
-                    : Colors.deepPurpleAccent,
-              ),
-              onPressed: () {
-                setState(() {
-                  currentWeekIndex = index;
-                  dateListUpdate();
-                });
-              },
-              child: AutoSizeText(
-                "第${index + 1}周",
-                group: AutoSizeGroup(),
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              child: SizedBox(
+                width: widget.constraints.maxWidth / 6,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Theme.of(context)
+                        .primaryColor
+                        .withOpacity(currentWeekIndex == index ? 0.3 : 0.0),
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      currentWeekIndex = index;
+                      dateListUpdate();
+                    });
+                  },
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AutoSizeText(
+                          "第${index + 1}周",
+                          group: AutoSizeGroup(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 4,
+                            right: 4,
+                            top: 4,
+                            bottom: 2,
+                          ),
+                          child: GridView.count(
+                            shrinkWrap: true,
+                            crossAxisCount: 5,
+                            mainAxisSpacing: 2,
+                            crossAxisSpacing: 2,
+                            children: [
+                              for (int i = 0; i < 10; i += 2)
+                                for (int day = 0; day < 5; ++day)
+                                  dot(!pretendLayout[index][day][i]
+                                      .contains(-1))
+                            ],
+                          ),
+                        ),
+                        AutoSizeText(
+                          index == currentWeek ? "(本周)" : "",
+                          textScaleFactor: 0.8,
+                          group: AutoSizeGroup(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             );
           },
         ),
-      );
+      ),
+    );
+  }
 
   // The middle row is used to show the date and week.
   Widget _middleView() {
@@ -342,7 +426,7 @@ class PageState extends State<ClassTableWindow> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Top line to show the date
-          _topViewHorizontal(),
+          _topView(),
           // The main class table.
           _middleView(),
           // The rest of the table.
@@ -463,50 +547,23 @@ class PageState extends State<ClassTableWindow> {
     if (index != 0) {
       List<Widget> thisRow = [];
 
-      // 1. Choice the class in this day.
-      List<TimeArrangement> thisDay = [];
-      for (var i in widget.classData.timeArrangement) {
-        if (i.weekList.length < currentWeekIndex + 1) {
-          continue;
-        }
-        if (i.weekList[currentWeekIndex] == "1" && i.day == index) {
-          thisDay.add(i);
-        }
-      }
-
-      // 2. The longest class should be solved first.
-      thisDay.sort((a, b) => b.step.compareTo(a.step));
-
-      // 3. Arrange the layout. Solve the conflex.
-      List<List<int>> pretendLayout = List.generate(10, (index) => <int>[]);
-      for (var i in thisDay) {
-        for (int j = i.start - 1; j <= i.stop - 1; ++j) {
-          pretendLayout[j].add(widget.classData.timeArrangement.indexOf(i));
-        }
-      }
-
-      // 4. Deal with the empty space.
-      for (var i in pretendLayout) {
-        if (i.isEmpty) {
-          i.add(-1);
-        }
-      }
-
-      // 5. Render it!
+      // Choice the day and render it!
       for (int i = 0; i < 10; ++i) {
         // Places in the onTable array.
-        int places = pretendLayout[i].first;
+        int places = pretendLayout[currentWeekIndex][index - 1][i].first;
+
         // The length to render.
         int count = 1;
-        Set<int> conflict = pretendLayout[i].toSet();
+        Set<int> conflict =
+            pretendLayout[currentWeekIndex][index - 1][i].toSet();
 
         // Decide the length to render. i limit the end.
         while (i < 9 &&
-            pretendLayout[i + 1].isNotEmpty &&
-            pretendLayout[i + 1].first == places) {
+            pretendLayout[currentWeekIndex][index - 1][i + 1].first == places) {
           count++;
           i++;
-          conflict.addAll(pretendLayout[i].toSet());
+          conflict
+              .addAll(pretendLayout[currentWeekIndex][index - 1][i].toSet());
         }
 
         // Do not include empty spaces...
@@ -564,7 +621,6 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _classInfoBox(TimeArrangement i) {
-    print("${i.index} ${i.day} ${i.start}");
     ClassDetail toShow = widget.classData.classDetail[i.index];
     return Card(
       margin: const EdgeInsets.symmetric(
