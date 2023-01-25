@@ -87,6 +87,7 @@ flutter:
     - assets/Humpy-Score.jpg
     - assets/Why-4-Years-Sport.jpg
     - assets/Login-Background.jpg
+    - assets/Deep-Purple-Mk4.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

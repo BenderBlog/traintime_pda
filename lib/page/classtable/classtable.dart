@@ -82,11 +82,8 @@ class ClassTableWindow extends StatefulWidget {
 }
 
 class PageState extends State<ClassTableWindow> {
-  // The height ratio for the top and the middle.
-  static const heightRatio = [0.15, 0.08, 0.9];
-
   // The width ratio for the week column.
-  static const leftRow = 40.0;
+  static const leftRow = 39.5;
 
   // Mark the current week.
   int? currentWeek;
@@ -269,20 +266,21 @@ class PageState extends State<ClassTableWindow> {
         );
 
     return SizedBox(
-      height: widget.constraints.maxHeight * heightRatio[0],
+      height: 100,
       child: Container(
         padding: const EdgeInsets.only(
           top: 2,
           bottom: 5,
         ),
         child: ListView.builder(
+          shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: widget.classData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               child: SizedBox(
-                width: widget.constraints.maxWidth / 6,
+                width: 75,
                 child: TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context)
@@ -298,18 +296,21 @@ class PageState extends State<ClassTableWindow> {
                   },
                   child: Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AutoSizeText(
+                        Text(
                           "第${index + 1}周",
-                          group: AutoSizeGroup(),
+                          style: TextStyle(
+                              fontWeight: index == currentWeek
+                                  ? FontWeight.bold
+                                  : FontWeight.normal),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(
-                            left: 4,
-                            right: 4,
-                            top: 4,
-                            bottom: 2,
+                            left: 7.5,
+                            right: 7.5,
+                            top: 8,
+                            bottom: 3,
                           ),
                           child: GridView.count(
                             shrinkWrap: true,
@@ -324,11 +325,6 @@ class PageState extends State<ClassTableWindow> {
                             ],
                           ),
                         ),
-                        AutoSizeText(
-                          index == currentWeek ? "(本周)" : "",
-                          textScaleFactor: 0.8,
-                          group: AutoSizeGroup(),
-                        ),
                       ],
                     ),
                   ),
@@ -341,10 +337,39 @@ class PageState extends State<ClassTableWindow> {
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // Top line to show the date
+          _topView(),
+          Expanded(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                image: AssetImage("assets/Deep-Purple-Mk4.jpg"),
+                fit: BoxFit.cover,
+              )),
+              child: Column(
+                children: [
+                  // The main class table.
+                  _middleView(),
+                  // The rest of the table.
+                  _classTable(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // The middle row is used to show the date and week.
   Widget _middleView() {
-    Widget leftest = Container(
-      color: Colors.white,
+    Widget leftest = SizedBox(
       width: leftRow,
       child: Center(
         child: AutoSizeText(
@@ -395,7 +420,7 @@ class PageState extends State<ClassTableWindow> {
         color: dateList[index - 1].month == DateTime.now().month &&
                 dateList[index - 1].day == DateTime.now().day
             ? const Color(0x00f7f7f7)
-            : Colors.white,
+            : Colors.transparent,
         child: widget.constraints.maxWidth / widget.constraints.maxHeight > 1
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -408,30 +433,17 @@ class PageState extends State<ClassTableWindow> {
       );
     }
 
-    return Row(
-      children: List.generate(8, (index) {
-        if (index > 0) {
-          return weekInformation(index);
-        } else {
-          return leftest;
-        }
-      }),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Top line to show the date
-          _topView(),
-          // The main class table.
-          _middleView(),
-          // The rest of the table.
-          _classTable(),
-        ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      color: Colors.grey.shade200.withOpacity(0.75),
+      child: Row(
+        children: List.generate(8, (index) {
+          if (index > 0) {
+            return weekInformation(index);
+          } else {
+            return leftest;
+          }
+        }),
       ),
     );
   }
@@ -440,15 +452,18 @@ class PageState extends State<ClassTableWindow> {
         child: SingleChildScrollView(
             child: Row(
           children: List.generate(
-              8,
-              (i) => SizedBox(
-                    width: i > 0
-                        ? (widget.constraints.maxWidth - leftRow) / 7
-                        : leftRow,
-                    child: Column(
-                      children: _classSubRow(i),
-                    ),
-                  )),
+            8,
+            (i) => Container(
+                color: i == 0 ? Colors.grey.shade200.withOpacity(0.75) : null,
+                child: SizedBox(
+                  width: i > 0
+                      ? (widget.constraints.maxWidth - leftRow) / 7
+                      : leftRow,
+                  child: Column(
+                    children: _classSubRow(i),
+                  ),
+                )),
+          ),
         )),
       );
 
@@ -464,7 +479,7 @@ class PageState extends State<ClassTableWindow> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11.5,
-                    color: Colors.white,
+                    color: Colors.transparent,
                     letterSpacing: 1,
                   ),
                 ),
@@ -572,7 +587,7 @@ class PageState extends State<ClassTableWindow> {
         // Generate the row.
         thisRow.add(classCard(
           places,
-          count * widget.constraints.maxHeight * heightRatio[2] / 10,
+          count * widget.constraints.maxHeight * 0.95 / 10,
           conflict,
         ));
       }
@@ -584,7 +599,7 @@ class PageState extends State<ClassTableWindow> {
         10,
         (index) => SizedBox(
           width: leftRow,
-          height: widget.constraints.maxHeight * heightRatio[2] / 10,
+          height: widget.constraints.maxHeight * 0.95 / 10,
           child: Center(
             child: AutoSizeText(
               "${index + 1}",
