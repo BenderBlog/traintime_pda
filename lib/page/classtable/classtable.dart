@@ -85,9 +85,6 @@ class PageState extends State<ClassTableWindow> {
   // The width ratio for the week column.
   static const leftRow = 39.5;
 
-  // Mark the current week.
-  int? currentWeek;
-
   // Colors for the class information card.
   static const colorList = [
     Colors.red,
@@ -154,7 +151,11 @@ class PageState extends State<ClassTableWindow> {
   // The date which shown in the table.
   List<DateTime> dateList = [];
 
-  int currentWeekIndex = 0;
+  // Mark the current week.
+  int? currentWeek;
+
+  // Week index.
+  int currentWeekIndex = -1;
 
   String pageTitle = "我的课表";
 
@@ -266,7 +267,7 @@ class PageState extends State<ClassTableWindow> {
         );
 
     return SizedBox(
-      height: 100,
+      height: widget.constraints.maxHeight >= 500 ? 100 : 50,
       child: Container(
         padding: const EdgeInsets.only(
           top: 2,
@@ -305,26 +306,27 @@ class PageState extends State<ClassTableWindow> {
                                   ? FontWeight.bold
                                   : FontWeight.normal),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 7.5,
-                            right: 7.5,
-                            top: 8,
-                            bottom: 3,
+                        if (widget.constraints.maxHeight >= 500)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 7.5,
+                              right: 7.5,
+                              top: 8,
+                              bottom: 3,
+                            ),
+                            child: GridView.count(
+                              shrinkWrap: true,
+                              crossAxisCount: 5,
+                              mainAxisSpacing: 2,
+                              crossAxisSpacing: 2,
+                              children: [
+                                for (int i = 0; i < 10; i += 2)
+                                  for (int day = 0; day < 5; ++day)
+                                    dot(!pretendLayout[index][day][i]
+                                        .contains(-1))
+                              ],
+                            ),
                           ),
-                          child: GridView.count(
-                            shrinkWrap: true,
-                            crossAxisCount: 5,
-                            mainAxisSpacing: 2,
-                            crossAxisSpacing: 2,
-                            children: [
-                              for (int i = 0; i < 10; i += 2)
-                                for (int day = 0; day < 5; ++day)
-                                  dot(!pretendLayout[index][day][i]
-                                      .contains(-1))
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -347,11 +349,12 @@ class PageState extends State<ClassTableWindow> {
           _topView(),
           Expanded(
             child: DecoratedBox(
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                image: AssetImage("assets/Deep-Purple-Mk4.jpg"),
-                fit: BoxFit.cover,
-              )),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/Deep-Purple-Mk4.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
               child: Column(
                 children: [
                   // The main class table.
@@ -536,7 +539,8 @@ class PageState extends State<ClassTableWindow> {
                   ? const Color(0x00000000)
                   : colorList[widget.classData.timeArrangement[index].index %
                           colorList.length]
-                      .shade300,
+                      .shade300
+                      .withOpacity(0.75),
               padding: conflict.length == 1
                   ? const EdgeInsets.all(1)
                   : const EdgeInsets.fromLTRB(1, 1, 1, 8),
@@ -549,7 +553,8 @@ class PageState extends State<ClassTableWindow> {
                       : colorList[
                               widget.classData.timeArrangement[index].index %
                                   colorList.length]
-                          .shade100,
+                          .shade100
+                          .withOpacity(0.7),
                   child: inside,
                 ),
               ),
