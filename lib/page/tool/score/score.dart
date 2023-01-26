@@ -288,7 +288,12 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width < 700
+              ? 10
+              : MediaQuery.of(context).size.width * 0.15,
+          vertical: 10,
+        ),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,6 +326,15 @@ class ScoreCard extends StatelessWidget {
                   ),
                   Text(
                     "学分: ${toUse.credit}",
+                    textScaleFactor: 0.9,
+                  ),
+                  Text(
+                    "等级：${toUse.level}",
+                    style: TextStyle(
+                      color: toUse.how == 1 || toUse.how == 2
+                          ? Colors.black
+                          : Colors.transparent,
+                    ),
                     textScaleFactor: 0.9,
                   ),
                   Text(

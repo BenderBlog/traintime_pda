@@ -140,11 +140,15 @@ class EhallSession extends IDSSession {
     for (var i in getData['datas']['xscjcx']['rows']) {
       scoreTable.add(Score(
           mark: j,
-          name: i["XSKCM"],
+          name: "${i["XSKCM"]}",
           score: i["ZCJ"] ?? 0.0,
           year: i["XNXQDM"],
           credit: i["XF"],
           status: i["KCXZDM_DISPLAY"],
+          how: int.parse(i["DJCJLXDM"]),
+          level: i["DJCJLXDM"] == "01" || i["DJCJLXDM"] == "02"
+              ? i["DJCJMC"]
+              : null,
           classID: i["JXBID"],
           isPassed: i["SFJG"] ?? "-1"));
       j++;

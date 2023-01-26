@@ -5,6 +5,9 @@ class Score {
   String year; // 学年
   double credit; // 学分
   String status; // 修读状态
+  // DJCJLXDM 01 三级成绩 02 五级成绩
+  int how; // 评分方式
+  String? level; // 等级
   String? classID; // 教学班序列号
   String? scoreStructure; //成绩构成
   String? scoreDetail; //分项成绩
@@ -17,6 +20,8 @@ class Score {
     required this.credit,
     required this.status,
     required this.isPassed,
+    required this.how,
+    this.level,
     this.classID,
     this.scoreStructure,
     this.scoreDetail,
