@@ -79,6 +79,9 @@ class ClassTableWindow extends StatefulWidget {
 }
 
 class PageState extends State<ClassTableWindow> {
+  // The width of the button.
+  static const weekButtonWidth = 75.0;
+
   // The width ratio for the week column.
   static const leftRow = 39.5;
 
@@ -150,10 +153,12 @@ class PageState extends State<ClassTableWindow> {
 
   // Week index.
   int currentWeekIndex = -1;
+  bool isTopRowLocked = false;
 
   String pageTitle = "我的课表";
 
   late PageController pageControl;
+  late ScrollController rowControl;
 
   @override
   void initState() {
@@ -228,6 +233,9 @@ class PageState extends State<ClassTableWindow> {
       viewportFraction: 1,
       keepPage: true,
     );
+    rowControl = ScrollController(
+      initialScrollOffset: 75.0 * currentWeekIndex,
+    );
     super.initState();
   }
 
@@ -255,6 +263,41 @@ class PageState extends State<ClassTableWindow> {
           ),
         );
 
+    Widget buttonInformaion(int index) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "第${index + 1}周",
+                style: TextStyle(
+                    fontWeight: index == currentWeek
+                        ? FontWeight.bold
+                        : FontWeight.normal),
+              ),
+              if (widget.constraints.maxHeight >= 500)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 7.5,
+                    right: 7.5,
+                    top: 8,
+                    bottom: 3,
+                  ),
+                  child: GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 2,
+                    crossAxisSpacing: 2,
+                    children: [
+                      for (int i = 0; i < 10; i += 2)
+                        for (int day = 0; day < 5; ++day)
+                          dot(!pretendLayout[index][day][i].contains(-1))
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+
     return SizedBox(
       height: widget.constraints.maxHeight >= 500 ? 100 : 50,
       child: Container(
@@ -263,6 +306,7 @@ class PageState extends State<ClassTableWindow> {
           bottom: 5,
         ),
         child: ListView.builder(
+          controller: rowControl,
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: widget.classData.semesterLength,
@@ -270,7 +314,7 @@ class PageState extends State<ClassTableWindow> {
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               child: SizedBox(
-                width: 75,
+                width: weekButtonWidth,
                 child: TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context)
@@ -280,51 +324,16 @@ class PageState extends State<ClassTableWindow> {
                   ),
                   onPressed: () {
                     setState(() {
-                      int delta = (currentWeekIndex - index).abs();
+                      isTopRowLocked = true;
                       currentWeekIndex = index;
                       pageControl.animateToPage(
                         index,
-                        curve: Curves.easeInOut,
-                        duration: Duration(
-                            milliseconds: 1000 * delta < 3 ? delta : 3),
+                        curve: Curves.easeInOutQuart,
+                        duration: const Duration(milliseconds: 750),
                       );
                     });
                   },
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "第${index + 1}周",
-                          style: TextStyle(
-                              fontWeight: index == currentWeek
-                                  ? FontWeight.bold
-                                  : FontWeight.normal),
-                        ),
-                        if (widget.constraints.maxHeight >= 500)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 7.5,
-                              right: 7.5,
-                              top: 8,
-                              bottom: 3,
-                            ),
-                            child: GridView.count(
-                              shrinkWrap: true,
-                              crossAxisCount: 5,
-                              mainAxisSpacing: 2,
-                              crossAxisSpacing: 2,
-                              children: [
-                                for (int i = 0; i < 10; i += 2)
-                                  for (int day = 0; day < 5; ++day)
-                                    dot(!pretendLayout[index][day][i]
-                                        .contains(-1))
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
+                  child: buttonInformaion(index),
                 ),
               ),
             );
@@ -350,23 +359,29 @@ class PageState extends State<ClassTableWindow> {
                   fit: BoxFit.cover,
                 ),
               ),
-              child: PageView(
+              child: PageView.builder(
                 scrollDirection: Axis.horizontal,
                 controller: pageControl,
-                onPageChanged: (value) => setState(() {
-                  currentWeekIndex = value;
-                }),
-                children: [
-                  for (int i = 0; i < widget.classData.semesterLength; ++i)
-                    Column(
-                      children: [
-                        // The main class table.
-                        _middleView(i),
-                        // The rest of the table.
-                        _classTable(i)
-                      ],
-                    ),
-                ],
+                onPageChanged: (value) {
+                  if (!isTopRowLocked) {
+                    setState(() {
+                      currentWeekIndex = value;
+                      rowControl.jumpTo(weekButtonWidth * value);
+                    });
+                  }
+                  if (currentWeekIndex == value) {
+                    isTopRowLocked = false;
+                  }
+                },
+                itemCount: widget.classData.semesterLength,
+                itemBuilder: (context, index) => Column(
+                  children: [
+                    // The main class table.
+                    _middleView(index),
+                    // The rest of the table.
+                    _classTable(index)
+                  ],
+                ),
               ),
             ),
           ),
