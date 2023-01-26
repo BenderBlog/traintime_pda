@@ -82,6 +82,12 @@ class PageState extends State<ClassTableWindow> {
   // The width of the button.
   static const weekButtonWidth = 75.0;
 
+  // The horizontal padding of the button.
+  static const weekButtonHorizontalPadding = 2.0;
+
+  // Change page time in milliseconds.
+  static const changePageTime = 500;
+
   // The width ratio for the week column.
   static const leftRow = 39.5;
 
@@ -152,7 +158,7 @@ class PageState extends State<ClassTableWindow> {
   int? currentWeek;
 
   // Week index.
-  int currentWeekIndex = -1;
+  int? currentWeekIndex;
   bool isTopRowLocked = false;
 
   String pageTitle = "我的课表";
@@ -171,16 +177,17 @@ class PageState extends State<ClassTableWindow> {
         startDay.millisecondsSinceEpoch) {
       currentWeekIndex =
           (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
-    }
-
-    // Remember the current week.
-    if (currentWeekIndex >= 0 &&
-        currentWeekIndex < widget.classData.semesterLength) {
-      currentWeek = currentWeekIndex;
+      // Remember the current week.
+      if (currentWeekIndex! >= 0 &&
+          currentWeekIndex! < widget.classData.semesterLength) {
+        currentWeek = currentWeekIndex;
+      }
     }
 
     // Deal with the minus currentWeekIndex
-    if (currentWeekIndex < 0) {
+    if (currentWeekIndex == null) {
+      currentWeekIndex = 0;
+    } else if (currentWeekIndex! < 0) {
       currentWeekIndex = widget.classData.semesterLength - 1;
     }
 
@@ -229,13 +236,14 @@ class PageState extends State<ClassTableWindow> {
 
     // Init the controller.
     pageControl = PageController(
-      initialPage: currentWeekIndex,
-      viewportFraction: 1,
+      initialPage: currentWeekIndex!,
       keepPage: true,
     );
+
     rowControl = ScrollController(
-      initialScrollOffset: 75.0 * currentWeekIndex,
+      initialScrollOffset: 75.0 * currentWeekIndex!,
     );
+
     super.initState();
   }
 
@@ -250,6 +258,13 @@ class PageState extends State<ClassTableWindow> {
     }
     return toReturn;
   }
+
+  // Change the position in the topRow
+  void changeTopRow(int index) => rowControl.animateTo(
+        (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
+        curve: Curves.fastOutSlowIn,
+        duration: const Duration(milliseconds: changePageTime),
+      );
 
   // The top row is used to change the weeks.
   Widget _topView() {
@@ -312,7 +327,8 @@ class PageState extends State<ClassTableWindow> {
           itemCount: widget.classData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 2),
+              margin: const EdgeInsets.symmetric(
+                  horizontal: weekButtonHorizontalPadding),
               child: SizedBox(
                 width: weekButtonWidth,
                 child: TextButton(
@@ -323,14 +339,15 @@ class PageState extends State<ClassTableWindow> {
                     foregroundColor: Colors.black,
                   ),
                   onPressed: () {
+                    isTopRowLocked = true;
                     setState(() {
-                      isTopRowLocked = true;
                       currentWeekIndex = index;
                       pageControl.animateToPage(
                         index,
                         curve: Curves.easeInOutQuart,
-                        duration: const Duration(milliseconds: 750),
+                        duration: const Duration(milliseconds: changePageTime),
                       );
+                      changeTopRow(index);
                     });
                   },
                   child: buttonInformaion(index),
@@ -365,8 +382,8 @@ class PageState extends State<ClassTableWindow> {
                 onPageChanged: (value) {
                   if (!isTopRowLocked) {
                     setState(() {
+                      changeTopRow(value);
                       currentWeekIndex = value;
-                      rowControl.jumpTo(weekButtonWidth * value);
                     });
                   }
                   if (currentWeekIndex == value) {
