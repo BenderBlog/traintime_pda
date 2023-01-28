@@ -40,7 +40,6 @@ dependencies:
   # Deal with html
   html: ^0.15.0
   beautiful_soup_dart: ^0.3.0
-  sn_progress_dialog: ^1.0.8
   # Setting
   settings_ui: ^2.0.2
   # Others

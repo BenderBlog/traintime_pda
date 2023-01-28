@@ -94,6 +94,14 @@ class PageState extends State<ClassTableWindow> {
   // A list as an index of the classtable items.
   late List<List<List<List<int>>>> pretendLayout;
 
+  // The height of the top row.
+  static const topRowHeightBig = 100.0;
+  static const topRowHeightSmall = 50.0;
+
+  // The height of the middle row.
+  static const midRowHeightVertical = 60.0;
+  static const midRowHeightHorizontal = 30.0;
+
   // Colors for the class information card.
   static const colorList = [
     Colors.red,
@@ -314,7 +322,9 @@ class PageState extends State<ClassTableWindow> {
         );
 
     return SizedBox(
-      height: widget.constraints.maxHeight >= 500 ? 100 : 50,
+      height: widget.constraints.maxHeight >= 500
+          ? topRowHeightBig
+          : topRowHeightSmall,
       child: Container(
         padding: const EdgeInsets.only(
           top: 2,
@@ -443,14 +453,14 @@ class PageState extends State<ClassTableWindow> {
                 : Colors.black87,
           ),
         ),
-        widget.constraints.maxWidth / widget.constraints.maxHeight > 1
+        widget.constraints.maxWidth >= widget.constraints.maxHeight
             ? const SizedBox(width: 5)
             : const SizedBox(height: 5),
         AutoSizeText(
           "${dateList[index - 1].month}/${dateList[index - 1].day}",
           group: AutoSizeGroup(),
           textScaleFactor:
-              widget.constraints.maxWidth / widget.constraints.maxHeight > 1
+              widget.constraints.maxWidth >= widget.constraints.maxHeight
                   ? 1.0
                   : 0.8,
           style: TextStyle(
@@ -467,19 +477,23 @@ class PageState extends State<ClassTableWindow> {
                 dateList[index - 1].day == DateTime.now().day
             ? const Color(0x00f7f7f7)
             : Colors.transparent,
-        child: widget.constraints.maxWidth / widget.constraints.maxHeight > 1
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: list,
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: list,
-              ),
+        child:
+            widget.constraints.maxWidth / widget.constraints.maxHeight >= 1.20
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: list,
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: list,
+                  ),
       );
     }
 
     return Container(
+      height: widget.constraints.maxWidth / widget.constraints.maxHeight >= 1.20
+          ? midRowHeightHorizontal
+          : midRowHeightVertical,
       padding: const EdgeInsets.symmetric(vertical: 5),
       color: Colors.grey.shade200.withOpacity(0.75),
       child: Row(
@@ -615,7 +629,17 @@ class PageState extends State<ClassTableWindow> {
           // Generate the row.
           thisRow.add(classCard(
             places,
-            count * widget.constraints.maxHeight * 0.95 / 10,
+            count *
+                (widget.constraints.maxHeight < 800
+                    ? widget.constraints.maxHeight * 0.95
+                    : widget.constraints.maxHeight -
+                        topRowHeightBig -
+                        (widget.constraints.maxWidth /
+                                    widget.constraints.maxHeight >=
+                                1.20
+                            ? midRowHeightHorizontal
+                            : midRowHeightVertical)) /
+                10,
             conflict,
           ));
         }
@@ -627,7 +651,16 @@ class PageState extends State<ClassTableWindow> {
           10,
           (index) => SizedBox(
             width: leftRow,
-            height: widget.constraints.maxHeight * 0.95 / 10,
+            height: (widget.constraints.maxHeight < 800
+                    ? widget.constraints.maxHeight * 0.95
+                    : widget.constraints.maxHeight -
+                        topRowHeightBig -
+                        (widget.constraints.maxWidth /
+                                    widget.constraints.maxHeight >=
+                                1.20
+                            ? midRowHeightHorizontal
+                            : midRowHeightVertical)) /
+                10,
             child: Center(
               child: AutoSizeText(
                 "${index + 1}",
