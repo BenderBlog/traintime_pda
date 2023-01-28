@@ -86,7 +86,7 @@ class PageState extends State<ClassTableWindow> {
   static const weekButtonHorizontalPadding = 2.0;
 
   // Change page time in milliseconds.
-  static const changePageTime = 500;
+  static const changePageTime = 600;
 
   // The width ratio for the week column.
   static const leftRow = 39.5;
@@ -271,7 +271,7 @@ class PageState extends State<ClassTableWindow> {
   void changeTopRow(int index) => rowControl.animateTo(
         (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
         curve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: changePageTime),
+        duration: const Duration(milliseconds: changePageTime ~/ 1.5),
       );
 
   // The top row is used to change the weeks.
@@ -354,7 +354,7 @@ class PageState extends State<ClassTableWindow> {
                       currentWeekIndex = index;
                       pageControl.animateToPage(
                         index,
-                        curve: Curves.easeInOutQuart,
+                        curve: Curves.easeInOutCubic,
                         duration: const Duration(milliseconds: changePageTime),
                       );
                       changeTopRow(index);
