@@ -372,49 +372,75 @@ class PageState extends State<ClassTableWindow> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Top line to show the date
-          _topView(),
-          Expanded(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/Deep-Purple-Mk4.jpg"),
-                  fit: BoxFit.cover,
+    if (classData.timeArrangement.isNotEmpty &&
+        classData.classDetail.isNotEmpty) {
+      return Scaffold(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            // Top line to show the date
+            _topView(),
+            Expanded(
+              child: DecoratedBox(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/Deep-Purple-Mk4.jpg"),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              child: PageView.builder(
-                scrollDirection: Axis.horizontal,
-                controller: pageControl,
-                onPageChanged: (value) {
-                  if (!isTopRowLocked) {
-                    setState(() {
-                      changeTopRow(value);
-                      currentWeekIndex = value;
-                    });
-                  }
-                  if (currentWeekIndex == value) {
-                    isTopRowLocked = false;
-                  }
-                },
-                itemCount: widget.classData.semesterLength,
-                itemBuilder: (context, index) => Column(
-                  children: [
-                    // The main class table.
-                    _middleView(index),
-                    // The rest of the table.
-                    _classTable(index)
-                  ],
+                child: PageView.builder(
+                  scrollDirection: Axis.horizontal,
+                  controller: pageControl,
+                  onPageChanged: (value) {
+                    if (!isTopRowLocked) {
+                      setState(() {
+                        changeTopRow(value);
+                        currentWeekIndex = value;
+                      });
+                    }
+                    if (currentWeekIndex == value) {
+                      isTopRowLocked = false;
+                    }
+                  },
+                  itemCount: widget.classData.semesterLength,
+                  itemBuilder: (context, index) => Column(
+                    children: [
+                      // The main class table.
+                      _middleView(index),
+                      // The rest of the table.
+                      _classTable(index)
+                    ],
+                  ),
                 ),
               ),
             ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        color: Colors.grey.shade200.withOpacity(0.75),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error,
+                size: 100,
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              Text("${classData.semesterCode} 学期没有课程，不会吧?"),
+              const Text("如果搞错学期，快去设置调整。"),
+              const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
+              const Text("如果你要毕业了，祝你前程似锦。"),
+              const Text("如果你已经毕业，快去关注 SuperBart 哔哩哔哩帐号！"),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    }
   }
 
   // The middle row is used to show the date and week.
