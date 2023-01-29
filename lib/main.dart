@@ -42,7 +42,7 @@ void main() async {
     isFirst = true;
   }
   developer.log(
-    "Logged in status: $isFirst",
+    "Logged in status: ${!isFirst}",
     name: "Watermeter",
   );
   runApp(MyApp(isFirst: isFirst));

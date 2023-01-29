@@ -256,11 +256,8 @@ class PageState extends State<ClassTableWindow> {
   }
 
   // Change the position in the topRow
-  void changeTopRow(int index) => rowControl.animateTo(
-        (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
-        curve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: changePageTime ~/ 1.5),
-      );
+  void changeTopRow(int index) => rowControl
+      .jumpTo((weekButtonWidth + 2 * weekButtonHorizontalPadding) * index);
 
   // The top row is used to change the weeks.
   Widget _topView() {
@@ -340,11 +337,7 @@ class PageState extends State<ClassTableWindow> {
                     isTopRowLocked = true;
                     setState(() {
                       currentWeekIndex = index;
-                      pageControl.animateToPage(
-                        index,
-                        curve: Curves.easeInOutCubic,
-                        duration: const Duration(milliseconds: changePageTime),
-                      );
+                      pageControl.jumpToPage(index);
                       changeTopRow(index);
                     });
                   },
