@@ -13,6 +13,7 @@ if you want to use.
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTable extends StatelessWidget {
@@ -178,6 +179,9 @@ class PageState extends State<ClassTableWindow> {
   void initState() {
     // Get the start day of the semester.
     startDay = DateTime.parse(widget.classData.termStartDay);
+    if (user["swift"] != null) {
+      startDay = startDay.add(Duration(days: 7 * int.parse(user["swift"]!)));
+    }
 
     // Get the current index.
     // If they decide to start the class in the next semester, well...

@@ -11,6 +11,7 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/user.dart';
@@ -79,11 +80,13 @@ class _SettingDetailsState extends State<SettingDetails> {
           tiles: <SettingsTile>[
             SettingsTile.navigation(
                 title: const Text('课程偏移设置'),
-                value: const Text("为应对某些紧急状况，可通过这个调整开学日期"),
+                value: const Text("为应对某些紧急状况，可通过这个调整开学日期\n"
+                    "输入负数提前开学日期，输入正数延后开学日期\n"
+                    "(希望以后没有因为疫情导致提前上下学期课程的情况，tmd 这大学真白上了)"),
                 onPressed: (content) {
                   showDialog(
                     context: context,
-                    builder: (context) => const SportPasswordDialog(),
+                    builder: (context) => ChangeSwiftDialog(),
                   );
                 }),
             SettingsTile.navigation(
@@ -165,7 +168,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   /// Sport Password Text Editing Controller
   final TextEditingController _sportPasswordController =
       TextEditingController.fromValue(TextEditingValue(
-    text: user["sportPassword"] == null ? "" : user["sportPassword"]!,
+    text: user["sportPassword"] ?? "",
     selection: TextSelection.fromPosition(TextPosition(
       affinity: TextAffinity.downstream,
       offset: user["sportPassword"] == null ? 0 : user["sportPassword"]!.length,
@@ -204,8 +207,70 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
             backgroundColor: Colors.green,
           ),
           onPressed: () async {
-            debugPrint(_sportPasswordController.text);
             addUser("sportPassword", _sportPasswordController.text);
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            '提交',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 12, 24),
+    );
+  }
+}
+
+class ChangeSwiftDialog extends StatelessWidget {
+  final TextEditingController _getNumberController =
+      TextEditingController.fromValue(
+    TextEditingValue(
+      text: user["swift"] ?? "",
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          affinity: TextAffinity.downstream,
+          offset: user["swift"] == null ? 0 : user["swift"]!.length,
+        ),
+      ),
+    ),
+  );
+
+  ChangeSwiftDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('课程偏移设置'),
+      content: TextField(
+        controller: _getNumberController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*'))
+        ],
+        decoration: const InputDecoration(
+          hintText: "请在此输入数字",
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('取消更改'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+          ),
+          onPressed: () async {
+            if (_getNumberController.text.isEmpty) {
+              addUser("swift", "0");
+            } else {
+              addUser("swift", _getNumberController.text);
+            }
+
             Navigator.of(context).pop();
           },
           child: const Text(

@@ -11,7 +11,7 @@ Map<String, String?> user = {
   "idsAccount": null,
   "idsPassword": null,
   "sportPassword": null,
-  "swift": null,
+  "swift": "0",
   "semester": null,
 };
 
