@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -27,6 +28,8 @@ class EhallSession extends IDSSession {
     var response = await dio.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
+    developer.log("Ehall isLoggedin: ${response.data["hasLogin"]}",
+        name: "Ehall isLoggedIn");
     return response.data["hasLogin"];
   }
 
@@ -37,6 +40,9 @@ class EhallSession extends IDSSession {
     void Function(int, String)? onResponse,
   }) async {
     if (await isLoggedIn() == false || forceReLogin == true) {
+      developer.log(
+          "Ready to log in the ehall. Is force relogin: $forceReLogin.",
+          name: "Ehall login");
       await super.login(
         username: username,
         password: password,
@@ -48,8 +54,11 @@ class EhallSession extends IDSSession {
   }
 
   Future<String> useApp(String appID) async {
+    developer.log("Ready to use the app $appID.", name: "Ehall useApp");
+    developer.log("Try to login.", name: "Ehall useApp");
     await loginEhall(
         username: user["idsAccount"]!, password: user["idsPassword"]!);
+    developer.log("Try to use the $appID.", name: "Ehall useApp");
     var value = await dio.get(
       "https://ehall.xidian.edu.cn/appShow",
       queryParameters: {'appId': appID},
@@ -63,17 +72,22 @@ class EhallSession extends IDSSession {
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
           }),
     );
-    print("转移地址:" + value.headers['location']![0]);
+    developer.log("Transfer address: ${value.headers['location']![0]}.",
+        name: "Ehall useApp");
     return value.headers['location']![0];
   }
 
   /// 学生个人信息  4585275700341858 Unable to use because of xgxt.xidian.edu.cn (学工系统)
   /// 宿舍学生住宿  4618295887225301
   Future<void> getInformation() async {
+    developer.log("Ready to get the user information.",
+        name: "Ehall getInformation");
     var firstPost = await useApp("4618295887225301");
     await dio.get(firstPost).then((value) => value.data);
 
     /// Get information here. resultCode==00000 is successful.
+    developer.log("Getting the user information.",
+        name: "Ehall getInformation");
     var detailed = await dio.post(
       "https://ehall.xidian.edu.cn/xsfw/sys/xszsapp/commoncall/callQuery/xsjbxxcx-MINE-QUERY.do",
       data: {
@@ -83,6 +97,10 @@ class EhallSession extends IDSSession {
         "dataModelAction": "QUERY",
       },
     ).then((value) => value.data);
+
+    /// Get information here. resultCode==00000 is successful.
+    developer.log("Storing the user information.",
+        name: "Ehall getInformation");
     if (detailed["resultCode"] != "00000") {
       throw detailed["msg"];
     } else {
@@ -104,6 +122,9 @@ class EhallSession extends IDSSession {
     bool focus = false,
     required void Function(int, String) onResponse,
   }) async {
+    /// Get information here. resultCode==00000 is successful.
+    developer.log("Check whether the score has fetched in this session.",
+        name: "Ehall getScore");
     if (scores != null && focus == false) {
       onResponse(100, "成绩已获取");
       return;
@@ -111,15 +132,21 @@ class EhallSession extends IDSSession {
     List<Score> scoreTable = [];
 
     /// Get all scores here.
+    developer.log("Start getting the score.", name: "Ehall getScore");
     Map<String, dynamic> querySetting = {
       'name': 'SFYX',
       'value': '1',
       'linkOpt': 'and',
       'builder': 'm_value_equal',
     };
+
+    developer.log("Ready to login the system.", name: "Ehall getScore");
     onResponse(10, "准备获取成绩，正在登录");
     var firstPost = await useApp("4768574631264620");
     await dio.get(firstPost);
+
+    developer.log("Getting the score data.", name: "Ehall getScore");
+    onResponse(60, "准备获取成绩，正在处理数据");
     var getData = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
       data: {
@@ -130,9 +157,8 @@ class EhallSession extends IDSSession {
         'pageNumber': 1,
       },
     ).then((value) => value.data);
-    onResponse(60, "准备获取成绩，正在处理数据");
 
-    /// Hope this check could work.
+    developer.log("Dealing the score data.", name: "Ehall getScore");
     if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
       throw getData['datas']['xscjcx']["extParams"]["msg"];
     }
@@ -186,15 +212,17 @@ class EhallSession extends IDSSession {
     bool focus = false,
     required void Function(int, String) onResponse,
   }) async {
+    developer.log("Check whether the classtable has fetched.",
+        name: "Ehall getClasstable");
     if (classData.isDone == true) {
       onResponse(100, "课表已获取");
       return;
     }
 
     Map<String, dynamic> qResult = {};
-
     onResponse(10, "准备获取课表");
-    print("课表获取开始");
+    developer.log("Start fetching the classtable.",
+        name: "Ehall getClasstable");
     Directory appDocDir = await getApplicationDocumentsDirectory();
     Directory destination =
         Directory("${appDocDir.path}/org.superbart.watermeter");
@@ -205,15 +233,19 @@ class EhallSession extends IDSSession {
     bool isExist = file.existsSync();
 
     onResponse(5, isExist || focus == true ? "读取缓存" : "从网络获取");
-    print(isExist || focus == true ? "读取缓存" : "从网络获取");
+    developer.log(isExist || focus == true ? "Cache" : "Fetch from internet.",
+        name: "Ehall getClasstable");
 
     // Try to add some sort of cache support.
     if (!isExist || focus == true) {
       onResponse(10, "进入教务系统");
+      developer.log("Login the system.", name: "Ehall getClasstable");
       String get = await useApp("4770397878132218");
       await dio.post(get);
 
       onResponse(15, "获取学期信息");
+      developer.log("Fetch the semester information.",
+          name: "Ehall getClasstable");
       String semesterCode = await dio
           .post(
             "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
@@ -221,6 +253,8 @@ class EhallSession extends IDSSession {
           .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
 
       onResponse(20, "获取开学日期");
+      developer.log("Fetch the day the semester begin.",
+          name: "Ehall getClasstable");
       String termStartDay = await dio.post(
         'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
         data: {
@@ -229,6 +263,9 @@ class EhallSession extends IDSSession {
         },
       ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
 
+      developer.log(
+          "Will get $semesterCode which start at $termStartDay, fetching...",
+          name: "Ehall getClasstable");
       onResponse(30, "获取课表内容");
       qResult = await dio.post(
         'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
@@ -239,16 +276,20 @@ class EhallSession extends IDSSession {
       }
 
       onResponse(40, "缓存课表内容");
+      developer.log("Caching...", name: "Ehall getClasstable");
       qResult["semesterCode"] = semesterCode;
       qResult["termStartDay"] = termStartDay;
 
       file.writeAsStringSync(jsonEncode(qResult));
     } else {
       onResponse(40, "读取课表缓存");
+      developer.log("Reading cache...", name: "Ehall getClasstable");
       qResult = jsonDecode(file.readAsStringSync());
     }
 
     onResponse(50, "处理课表内容");
+    developer.log("Dealing with the classtable...",
+        name: "Ehall getClasstable");
 
     classData.semesterCode = qResult["semesterCode"];
     classData.termStartDay = qResult["termStartDay"];
@@ -271,6 +312,7 @@ class EhallSession extends IDSSession {
           weekList: i["SKZC"].toString(),
         ),
       );
+      developer.log("$toDeal", name: "Ehall getClasstable");
       if (i["SKZC"].toString().length > classData.semesterLength) {
         classData.semesterLength = i["SKZC"].toString().length;
       }
@@ -326,7 +368,7 @@ class EhallSession extends IDSSession {
   /// 考试安排 4768687067472349
   Future<void> getExamTime() async {
     var firstPost = await useApp("4768687067472349");
-    print(firstPost);
+    // print(firstPost);
     await dio.get(firstPost);
 
     /// Get semester information.
@@ -363,7 +405,7 @@ class EhallSession extends IDSSession {
     if (data["extParams"]["msg"] != "查询成功") {
       throw "没有数据，也许没安排考试？";
     }
-    print(data);
+    // print(data);
   }
 }
 

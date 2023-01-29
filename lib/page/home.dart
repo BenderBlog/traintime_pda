@@ -156,7 +156,6 @@ class _ToolWindowState extends State<ToolWindow> {
       );
     } on Exception catch (e) {
       isGood = false;
-      print(e);
       pd.update(value: -1, msg: e.toString());
     }
     if (!mounted) return;

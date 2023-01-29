@@ -19,8 +19,13 @@ import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login.dart';
+import 'dart:developer' as developer;
 
 void main() async {
+  developer.log(
+    "Watermeter, by SuperBart, with dragon power.",
+    name: "Watermeter",
+  );
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
   // Loading cookiejar.
@@ -36,7 +41,10 @@ void main() async {
   } on String {
     isFirst = true;
   }
-  print(isFirst);
+  developer.log(
+    "Logged in status: $isFirst",
+    name: "Watermeter",
+  );
   runApp(MyApp(isFirst: isFirst));
 }
 

@@ -12,7 +12,7 @@ if you want to use.
 
 import 'dart:convert';
 import 'dart:io';
-
+import 'dart:developer' as developer;
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -86,7 +86,9 @@ class IDSSession {
                 return status! < 500;
               },
             ));
-    //print("登录回复信息：${response.headers}");
+    developer.log(
+        "isLoggedIn result: ${response.statusCode == 302 ? true : false}",
+        name: "ids isLoggedIn");
     if (response.statusCode == 302) {
       throw "没有登录";
     }
@@ -102,6 +104,7 @@ class IDSSession {
     /// Get the login webpage.
     if (onResponse != null) {
       onResponse(10, "准备获取登录网页");
+      developer.log("Ready to get the login webpage.", name: "ids login");
     }
     var response = await dio.get(
       "http://ids.xidian.edu.cn/authserver/login",
@@ -124,6 +127,7 @@ class IDSSession {
       },
     ).then((value) => value.data);
     bool isNeed = checkCAPTCHA.contains("true");
+    developer.log("isNeedCAPTCHA: $isNeed.", name: "ids login");
     if (isNeed) {
       throw "需要验证码，请去浏览器登陆";
     }
@@ -134,6 +138,7 @@ class IDSSession {
     }
     String keys = form
         .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
+    developer.log("encrypt key: $keys.", name: "ids login");
 
     /// Prepare for login.
     if (onResponse != null) {
@@ -148,19 +153,10 @@ class IDSSession {
       '_eventId': 'submit',
     };
 
-    form.forEach((element) {
-      print(element);
-    });
-
-    print(head);
-
     for (var i in _header) {
-      print(i);
       head[i] = form.firstWhere(
           (element) => element["name"] == i || element.id == i)["value"]!;
     }
-
-    print(head);
 
     /// Post login request.
     if (onResponse != null) {
@@ -177,7 +173,7 @@ class IDSSession {
       ),
       data: head,
     );
-    // print(data);
+    developer.log("Received: $data.", name: "ids login");
     if (data.statusCode == 401) {
       throw "用户名或密码错误";
     } else if (data.statusCode == 301 || data.statusCode == 302) {
@@ -185,6 +181,7 @@ class IDSSession {
       if (onResponse != null) {
         onResponse(80, "登录后处理");
       }
+      developer.log("Post deal...", name: "ids login");
       var whatever = await dio.get(
         data.headers['location']![0],
         options: Options(
