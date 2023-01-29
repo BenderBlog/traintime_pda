@@ -15,7 +15,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
+import 'package:dio_http_cache_lts/dio_http_cache_lts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
 import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
@@ -67,7 +67,6 @@ class XidianDirectorySession {
     if (kDebugMode) {
       if (null != response.headers.value(DIO_CACHE_HEADER_KEY_DATA_SOURCE)) {
         //print({"data source": "data come from cache"});
-
       } else {
         //print({"data source": "data come from net"});
       }

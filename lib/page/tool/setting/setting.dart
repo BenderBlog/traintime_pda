@@ -52,18 +52,52 @@ class _SettingDetailsState extends State<SettingDetails> {
           title: const Text('用户相关'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-                leading: const Icon(Icons.person),
                 title: const Text('用户信息'),
-                value: Text(
-                    "${user["name"]} ${user["execution"]}\n${user["institutes"]} ${user["subject"]}")),
+                value: Text("${user["name"]} ${user["execution"]}\n"
+                    "${user["institutes"]} ${user["subject"]}")),
+            SettingsTile.navigation(
+                title: const Text('退出登录'),
+                value: const Text("退出登录该帐号，该帐号在本地的所有信息均将被删除！")),
           ],
         ),
         SettingsSection(
           title: const Text('体育查询设置'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-                leading: const Icon(Icons.run_circle_outlined),
                 title: const Text('体适能密码'),
+                value: const Text("你体育帐号密码，要是忘了找体育部"),
+                onPressed: (content) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const SportPasswordDialog(),
+                  );
+                }),
+          ],
+        ),
+        SettingsSection(
+          title: const Text('课表相关设置'),
+          tiles: <SettingsTile>[
+            SettingsTile.navigation(
+                title: const Text('课程偏移设置'),
+                value: const Text("为应对某些紧急状况，可通过这个调整开学日期"),
+                onPressed: (content) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const SportPasswordDialog(),
+                  );
+                }),
+            SettingsTile.navigation(
+                title: const Text('强制设置学期'),
+                value: const Text("强制获取该学期的课表，要没有数据可不怪我啊"),
+                onPressed: (content) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const SportPasswordDialog(),
+                  );
+                }),
+            SettingsTile.navigation(
+                title: const Text('课表背景图'),
+                value: const Text("好看是好看了，但可能会导致课表卡顿"),
                 onPressed: (content) {
                   showDialog(
                     context: context,

@@ -255,18 +255,6 @@ class PageState extends State<ClassTableWindow> {
     super.initState();
   }
 
-  // For the avaliable weeks in the class information.
-  Set<int> weekToShow(String weekList) {
-    Set<int> toReturn =
-        Set.from(List.generate(weekList.length, (index) => index + 1));
-    for (int i = 0; i < weekList.length; ++i) {
-      if (weekList[i] == "0") {
-        toReturn.remove(i + 1);
-      }
-    }
-    return toReturn;
-  }
-
   // Change the position in the topRow
   void changeTopRow(int index) => rowControl.animateTo(
         (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
@@ -723,6 +711,18 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _buttomInformation(Set<int> conflict) {
+    // For the avaliable weeks in the class information.
+    Set<int> weekToShow(String weekList) {
+      Set<int> toReturn =
+          Set.from(List.generate(weekList.length, (index) => index + 1));
+      for (int i = 0; i < weekList.length; ++i) {
+        if (weekList[i] == "0") {
+          toReturn.remove(i + 1);
+        }
+      }
+      return toReturn;
+    }
+
     Widget classInfoBox(TimeArrangement i) {
       ClassDetail toShow = widget.classData.classDetail[i.index];
       return Card(

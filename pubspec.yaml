@@ -29,7 +29,7 @@ environment:
 dependencies:
   # Network
   dio: ^4.0.6
-  dio_http_cache: ^0.3.0
+  dio_http_cache_lts: ^0.4.1
   crypto: ^3.0.2
   encrypt: ^5.0.1
   # Stroage Cache

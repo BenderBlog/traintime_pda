@@ -11,6 +11,8 @@ Map<String, String?> user = {
   "idsAccount": null,
   "idsPassword": null,
   "sportPassword": null,
+  "swift": null,
+  "semester": null,
 };
 
 Future<void> initUser() async {
@@ -29,6 +31,8 @@ Future<void> initUser() async {
   user["institutes"] = prefs.getString("institutes");
   user["subject"] = prefs.getString("subject");
   user["dorm"] = prefs.getString("dorm");
+  user["swift"] = prefs.getString("swift");
+  user["semester"] = prefs.getString("semester");
 }
 
 Future<void> addUser(String key, String value) async {
