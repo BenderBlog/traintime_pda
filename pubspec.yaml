@@ -38,6 +38,7 @@ dependencies:
   cookie_jar: ^3.0.1
   path_provider: ^2.0.11
   sqflite: ^2.2.4+1
+  file_picker: ^5.2.5
   # Deal with html
   html: ^0.15.0
   beautiful_soup_dart: ^0.3.0
@@ -87,7 +88,6 @@ flutter:
     - assets/Humpy-Score.jpg
     - assets/Why-4-Years-Sport.jpg
     - assets/Login-Background.jpg
-    - assets/Deep-Purple-Mk4.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -11,8 +11,9 @@ Map<String, String?> user = {
   "idsAccount": null,
   "idsPassword": null,
   "sportPassword": null,
+  "decorated": "false",
+  "decoration": "",
   "swift": "0",
-  "semester": null,
 };
 
 Future<void> initUser() async {
@@ -32,7 +33,8 @@ Future<void> initUser() async {
   user["subject"] = prefs.getString("subject");
   user["dorm"] = prefs.getString("dorm");
   user["swift"] = prefs.getString("swift");
-  user["semester"] = prefs.getString("semester");
+  user["decorated"] = prefs.getString("decorated");
+  user["decoration"] = prefs.getString("decoration");
 }
 
 Future<void> addUser(String key, String value) async {

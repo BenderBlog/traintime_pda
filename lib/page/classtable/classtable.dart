@@ -10,6 +10,8 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:io';
+
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -175,6 +177,8 @@ class PageState extends State<ClassTableWindow> {
   late PageController pageControl;
   late ScrollController rowControl;
 
+  late BoxDecoration decoration;
+
   @override
   void initState() {
     // Get the start day of the semester.
@@ -256,12 +260,26 @@ class PageState extends State<ClassTableWindow> {
       initialScrollOffset: 75.0 * currentWeekIndex!,
     );
 
+    // Init the background.
+    File image = File(user["decoration"]!);
+    decoration = BoxDecoration(
+      image: (user["decorated"] == "true" && image.existsSync())
+          ? DecorationImage(
+              image: FileImage(image),
+              fit: BoxFit.cover,
+            )
+          : null,
+    );
+
     super.initState();
   }
 
   // Change the position in the topRow
-  void changeTopRow(int index) => rowControl
-      .jumpTo((weekButtonWidth + 2 * weekButtonHorizontalPadding) * index);
+  void changeTopRow(int index) => rowControl.animateTo(
+        (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
+        curve: Curves.fastOutSlowIn,
+        duration: const Duration(milliseconds: changePageTime ~/ 1.5),
+      );
 
   // The top row is used to change the weeks.
   Widget _topView() {
@@ -341,7 +359,11 @@ class PageState extends State<ClassTableWindow> {
                     isTopRowLocked = true;
                     setState(() {
                       currentWeekIndex = index;
-                      pageControl.jumpToPage(index);
+                      pageControl.animateToPage(
+                        index,
+                        curve: Curves.easeInOutCubic,
+                        duration: const Duration(milliseconds: changePageTime),
+                      );
                       changeTopRow(index);
                     });
                   },
@@ -367,36 +389,8 @@ class PageState extends State<ClassTableWindow> {
             _topView(),
             Expanded(
               child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/Deep-Purple-Mk4.jpg"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: PageView.builder(
-                  scrollDirection: Axis.horizontal,
-                  controller: pageControl,
-                  onPageChanged: (value) {
-                    if (!isTopRowLocked) {
-                      setState(() {
-                        changeTopRow(value);
-                        currentWeekIndex = value;
-                      });
-                    }
-                    if (currentWeekIndex == value) {
-                      isTopRowLocked = false;
-                    }
-                  },
-                  itemCount: widget.classData.semesterLength,
-                  itemBuilder: (context, index) => Column(
-                    children: [
-                      // The main class table.
-                      _middleView(index),
-                      // The rest of the table.
-                      _classTable(index)
-                    ],
-                  ),
-                ),
+                decoration: decoration,
+                child: _classTablePage(),
               ),
             ),
           ],
@@ -404,7 +398,8 @@ class PageState extends State<ClassTableWindow> {
       );
     } else {
       return Container(
-        color: Colors.grey.shade200.withOpacity(0.75),
+        decoration: decoration,
+        // color: Colors.grey.shade200.withOpacity(0.75),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -427,6 +422,31 @@ class PageState extends State<ClassTableWindow> {
       );
     }
   }
+
+  Widget _classTablePage() => PageView.builder(
+        scrollDirection: Axis.horizontal,
+        controller: pageControl,
+        onPageChanged: (value) {
+          if (!isTopRowLocked) {
+            setState(() {
+              changeTopRow(value);
+              currentWeekIndex = value;
+            });
+          }
+          if (currentWeekIndex == value) {
+            isTopRowLocked = false;
+          }
+        },
+        itemCount: widget.classData.semesterLength,
+        itemBuilder: (context, index) => Column(
+          children: [
+            // The main class table.
+            _middleView(index),
+            // The rest of the table.
+            _classTable(index)
+          ],
+        ),
+      );
 
   // The middle row is used to show the date and week.
   Widget _middleView(int weekIndex) {

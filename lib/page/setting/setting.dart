@@ -10,7 +10,11 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/user.dart';
@@ -58,6 +62,10 @@ class _SettingDetailsState extends State<SettingDetails> {
                 value: Text("${user["name"]} ${user["execution"]}\n"
                     "${user["institutes"]} ${user["subject"]}")),
             SettingsTile.navigation(
+              title: const Text('清除缓存'),
+              value: const Text("清除所有缓存"),
+            ),
+            SettingsTile.navigation(
                 title: const Text('退出登录'),
                 value: const Text("退出登录该帐号，该帐号在本地的所有信息均将被删除！")),
           ],
@@ -90,23 +98,53 @@ class _SettingDetailsState extends State<SettingDetails> {
                     builder: (context) => ChangeSwiftDialog(),
                   );
                 }),
+            SettingsTile.switchTile(
+              title: const Text("开启课表背景图"),
+              initialValue: user["decorated"]! == "true" ? true : false,
+              onToggle: (bool value) {
+                if (value == true &&
+                    (user["decoration"] == null ||
+                        user["decoration"]!.isEmpty)) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('你先选个图片罢，就在下面'),
+                  ));
+                } else {
+                  setState(() {
+                    addUser("decorated", value.toString());
+                  });
+                }
+              },
+            ),
             SettingsTile.navigation(
-                title: const Text('强制设置学期'),
-                value: const Text("强制获取该学期的课表，要没有数据可不怪我啊"),
-                onPressed: (content) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const SportPasswordDialog(),
-                  );
-                }),
-            SettingsTile.navigation(
-                title: const Text('课表背景图'),
-                value: const Text("好看是好看了，但可能会导致课表卡顿"),
-                onPressed: (content) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const SportPasswordDialog(),
-                  );
+                title: const Text('课表背景图选择'),
+                value: const Text("把你的对象搁课程表上面，上课没事就看(这不神经病)"),
+                onPressed: (content) async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(type: FileType.image);
+                  if (mounted) {
+                    if (result != null) {
+                      Directory appDocDir =
+                          await getApplicationDocumentsDirectory();
+                      Directory destination = Directory(
+                          "${appDocDir.path}/org.superbart.watermeter");
+                      if (!destination.existsSync()) {
+                        await destination.create();
+                      }
+                      var decorated = File(result.files.single.path!)
+                          .copySync("${destination.path}/decoration.jpg");
+                      addUser("decoration", decorated.path);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('设定成功'),
+                        ));
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('你没有选捏，目前设置${user["decoration"]}'),
+                      ));
+                    }
+                  }
                 }),
           ],
         ),
@@ -114,8 +152,9 @@ class _SettingDetailsState extends State<SettingDetails> {
           title: const Text('关于本软件'),
           tiles: <SettingsTile>[
             SettingsTile.navigation(
-              title: const Text('Watermeter 水表 by BenderBlog'),
-              value: const Text("版本号 Pre-Alpha 0.0.2, MPL v2.0"),
+              title: const Text('Traintime PDA by BenderBlog'),
+              value: const Text(
+                  "版本号 Pre-Alpha 0.0.2, MPL v2.0\n(codename watermeter)"),
               onPressed: (context) => launchUrl(
                 Uri.parse("https://github.com/BenderBlog/watermeter"),
                 mode: LaunchMode.externalApplication,
