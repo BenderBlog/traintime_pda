@@ -10,8 +10,8 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/tool/sport/subwindow/punch_record_window.dart';
-import 'package:watermeter/page/tool/sport/subwindow/sport_score_window.dart';
+import 'package:watermeter/page/sport/subwindow/punch_record_window.dart';
+import 'package:watermeter/page/sport/subwindow/sport_score_window.dart';
 
 class SportWindow extends StatelessWidget {
   const SportWindow({Key? key}) : super(key: key);

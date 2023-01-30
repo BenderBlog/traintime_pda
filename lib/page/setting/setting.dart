@@ -11,10 +11,11 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/user.dart';
+import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
+import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
 
 class SettingWindow extends StatelessWidget {
   const SettingWindow({Key? key}) : super(key: key);
@@ -153,135 +154,6 @@ class _SettingDetailsState extends State<SettingDetails> {
           ],
         ),
       ],
-    );
-  }
-}
-
-class SportPasswordDialog extends StatefulWidget {
-  const SportPasswordDialog({Key? key}) : super(key: key);
-
-  @override
-  State<SportPasswordDialog> createState() => _SportPasswordDialogState();
-}
-
-class _SportPasswordDialogState extends State<SportPasswordDialog> {
-  /// Sport Password Text Editing Controller
-  final TextEditingController _sportPasswordController =
-      TextEditingController.fromValue(TextEditingValue(
-    text: user["sportPassword"] ?? "",
-    selection: TextSelection.fromPosition(TextPosition(
-      affinity: TextAffinity.downstream,
-      offset: user["sportPassword"] == null ? 0 : user["sportPassword"]!.length,
-    )),
-  ));
-
-  bool _couldView = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('修改体适能密码'),
-      content: TextField(
-        controller: _sportPasswordController,
-        obscureText: _couldView,
-        decoration: InputDecoration(
-          hintText: "请在此输入密码",
-          suffixIcon: IconButton(
-              icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _couldView = !_couldView;
-                });
-              }),
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('取消更改'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.green,
-          ),
-          onPressed: () async {
-            addUser("sportPassword", _sportPasswordController.text);
-            Navigator.of(context).pop();
-          },
-          child: const Text(
-            '提交',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 12, 24),
-    );
-  }
-}
-
-class ChangeSwiftDialog extends StatelessWidget {
-  final TextEditingController _getNumberController =
-      TextEditingController.fromValue(
-    TextEditingValue(
-      text: user["swift"] ?? "",
-      selection: TextSelection.fromPosition(
-        TextPosition(
-          affinity: TextAffinity.downstream,
-          offset: user["swift"] == null ? 0 : user["swift"]!.length,
-        ),
-      ),
-    ),
-  );
-
-  ChangeSwiftDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('课程偏移设置'),
-      content: TextField(
-        controller: _getNumberController,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*'))
-        ],
-        decoration: const InputDecoration(
-          hintText: "请在此输入数字",
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('取消更改'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.green,
-          ),
-          onPressed: () async {
-            if (_getNumberController.text.isEmpty) {
-              addUser("swift", "0");
-            } else {
-              addUser("swift", _getNumberController.text);
-            }
-
-            Navigator.of(context).pop();
-          },
-          child: const Text(
-            '提交',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 12, 24),
     );
   }
 }

@@ -16,10 +16,11 @@ import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
-import 'package:watermeter/page/tool/score/score.dart';
-import 'package:watermeter/page/tool/setting/setting.dart';
-import 'package:watermeter/page/tool/sport/sport_window.dart';
+import 'package:watermeter/page/score/score.dart';
+import 'package:watermeter/page/setting/setting.dart';
+import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
+import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
