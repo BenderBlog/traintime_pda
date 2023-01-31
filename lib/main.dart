@@ -23,7 +23,7 @@ import 'dart:developer' as developer;
 
 void main() async {
   developer.log(
-    "Watermeter, by SuperBart, with dragon power.",
+    "Watermeter, by BenderBlog, with dragon power.",
     name: "Watermeter",
   );
   // Make sure the library is initialized.

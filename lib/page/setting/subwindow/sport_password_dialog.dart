@@ -63,8 +63,13 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
             backgroundColor: Colors.green,
           ),
           onPressed: () async {
-            addUser("sportPassword", _sportPasswordController.text);
-            Navigator.of(context).pop();
+            if (_sportPasswordController.text.isNotEmpty) {
+              addUser("sportPassword", _sportPasswordController.text);
+              Navigator.of(context).pop();
+            } else {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text("输入空白!")));
+            }
           },
           child: const Text(
             '提交',
