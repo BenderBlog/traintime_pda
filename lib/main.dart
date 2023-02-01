@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'WaterMeter Pre-Alpha',
       theme: ThemeData(
+        useMaterial3: true,
         primarySwatch: Colors.deepPurple,
       ),
       home: isFirst ? const LoginWindow() : const HomePage(),
