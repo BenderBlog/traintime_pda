@@ -49,7 +49,7 @@ class DepartmentWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadowBox(
+    return Card(
       child: Container(
         padding: const EdgeInsets.all(12.5),
         child: Column(

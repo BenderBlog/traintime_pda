@@ -148,7 +148,7 @@ class RecordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadowBox(
+    return Card(
       child: Container(
         padding: const EdgeInsets.all(20),
         child: Column(

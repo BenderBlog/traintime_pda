@@ -41,7 +41,7 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
                   child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
             } else {
               List things = [
-                ShadowBox(
+                Card(
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -84,7 +84,7 @@ class ScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadowBox(
+    return Card(
       child: Container(
         padding: const EdgeInsets.all(20),
         child: Column(

@@ -16,29 +16,6 @@ import 'package:flutter/material.dart';
 const double widthOfSquare = 30.0;
 const double roundRadius = 10;
 
-/// Use it as a larger box.
-class ShadowBox extends StatelessWidget {
-  final Widget child;
-
-  const ShadowBox({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      // color: Colors.deepPurple,
-      elevation: 10.0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
-      semanticContainer: false,
-      child: child,
-    );
-  }
-}
-
 /// Use it to show the small items.
 class TagsBoxes extends StatelessWidget {
   final String text;
