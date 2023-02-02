@@ -37,6 +37,10 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('修改体适能密码'),
+      titleTextStyle: const TextStyle(
+        fontSize: 20,
+        color: Colors.black,
+      ),
       content: TextField(
         autofocus: true,
         style: const TextStyle(fontSize: 20),
@@ -80,7 +84,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
           },
         ),
       ],
-      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
       actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
     );
   }
