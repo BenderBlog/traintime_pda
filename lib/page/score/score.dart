@@ -19,55 +19,8 @@ class ScoreWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const TabForScore();
+    return const ScoreTable();
   }
-}
-
-class TabForScore extends StatelessWidget {
-  const TabForScore({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("成绩查询"),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.info),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => aboutDialog(context),
-                );
-              },
-            ),
-          ],
-        ),
-        body: const ScoreTable(),
-      ),
-    );
-  }
-
-  Widget aboutDialog(context) => AlertDialog(
-        title: const Text("For VB, are you agree?"),
-        content: Image.asset("assets/Humpy-Score.jpg"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("确定"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
 }
 
 class ScoreTable extends StatefulWidget {
@@ -89,14 +42,23 @@ class _ScoreTableState extends State<ScoreTable> {
   /// Empty means all status.
   String chosenStatus = "";
 
+  double _evalCredit(bool isAll) {
+    double totalCredit = 0.0;
+    for (var i = 0; i < isSelected.length; ++i) {
+      if ((isSelected[i] == true && isAll == false) || isAll == true) {
+        totalCredit += scores!.scoreTable[i].credit;
+      }
+    }
+    return totalCredit;
+  }
+
   double _evalAvgScore(bool isAll) {
     double totalScore = 0.0;
-    double totalCredit = 0.0;
+    double totalCredit = _evalCredit(isAll);
     for (var i = 0; i < isSelected.length; ++i) {
       if ((isSelected[i] == true && isAll == false) || isAll == true) {
         totalScore +=
             scores!.scoreTable[i].score * scores!.scoreTable[i].credit;
-        totalCredit += scores!.scoreTable[i].credit;
       }
     }
     return totalCredit != 0 ? totalScore / totalCredit : 0.0;
@@ -125,6 +87,51 @@ class _ScoreTableState extends State<ScoreTable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("成绩查询"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calculate),
+            onPressed: () {
+              setState(() {
+                isSelectMod = !isSelectMod;
+
+                /// Do not remember anything when quit calculating.
+                if (!isSelectMod) {
+                  for (var i = isSelected.length - 1; i >= 0; --i) {
+                    isSelected[i] = false;
+                  }
+                }
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.info),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: const Text("For VB, are you agree?"),
+                        content: Image.asset("assets/Humpy-Score.jpg"),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("确定"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ));
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           TitleLine(
@@ -171,27 +178,6 @@ class _ScoreTableState extends State<ScoreTable> {
                     );
                   },
                 ),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      isSelectMod = !isSelectMod;
-
-                      /// Do not remember anything when quit calculating.
-                      if (!isSelectMod) {
-                        for (var i = isSelected.length - 1; i >= 0; --i) {
-                          isSelected[i] = false;
-                        }
-                      }
-                    });
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  child: const Text(
-                    "计算均分",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
               ],
             ),
           ),
@@ -218,57 +204,54 @@ class _ScoreTableState extends State<ScoreTable> {
               itemCount: toShow().length,
             ),
           ),
-          if (isSelectMod)
-            TitleLine(
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      "目前选中科目计算的均分 ${_evalAvgScore(false).toStringAsFixed(2)}",
-                      textScaleFactor: 1.2,
-                    ),
-                  )
-                ],
-              ),
-            ),
         ],
       ),
-      floatingActionButton: _buildDetailsWindow(),
+      bottomNavigationBar: isSelectMod
+          ? BottomAppBar(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "目前选中科目的学分 ${_evalCredit(false).toStringAsFixed(2)}\n"
+                    "目前选中科目的均分 ${_evalAvgScore(false).toStringAsFixed(2)}",
+                    textScaleFactor: 1.2,
+                  ),
+                  FloatingActionButton(
+                    elevation: 0.0,
+                    highlightElevation: 0.0,
+                    focusElevation: 0.0,
+                    disabledElevation: 0.0,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('小总结'),
+                          content: Text(
+                              "所有科目的均分：${_evalAvgScore(true).toStringAsFixed(2)}\n"
+                              "所有科目的学分：${_evalCredit(true).toStringAsFixed(2)}\n"
+                              "未通过科目：${unPassed()}\n"
+                              "公共选修课已经修得学分：${scores!.randomChoice} / 8.0\n"
+                              "本程序提供的数据仅供参考，开发者对其准确性不负责"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("确定"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.panorama_fisheye,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : null,
     );
-  }
-
-  Widget? _buildDetailsWindow() {
-    if (isSelectMod) {
-      return FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('小总结'),
-              content:
-                  Text("所有科目计算均分：${_evalAvgScore(true).toStringAsFixed(2)}\n"
-                      "未通过科目：${unPassed()}\n"
-                      "公共选修课已经修得学分：${scores!.randomChoice} / 8.0\n"
-                      "本程序提供的数据仅供参考，开发者对其准确性不负责"),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text("确定"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-        child: const Icon(
-          Icons.panorama_fisheye,
-        ),
-      );
-    } else {
-      return null;
-    }
   }
 
   Color _getColor(Score data) {
