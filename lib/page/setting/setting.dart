@@ -53,6 +53,8 @@ class _SettingDetailsState extends State<SettingDetails> {
   @override
   Widget build(BuildContext context) {
     return SettingsList(
+      lightTheme: SettingsThemeData(
+          settingsListBackground: Theme.of(context).colorScheme.background),
       sections: [
         SettingsSection(
           title: const Text('用户相关'),
