@@ -81,7 +81,6 @@ class _LoginWindowState extends State<LoginWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F1F6),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -97,11 +96,27 @@ class _LoginWindowState extends State<LoginWindow> {
                 fontSize: 26,
               )),
           const SizedBox(height: 40.0),
-          inputField(
-            text: "学号",
-            icon: const Icon(Icons.person),
-            controller: _idsAccountController,
-            isAutoFocus: true,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(roundRadius),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: TextField(
+                  autofocus: true,
+                  controller: _idsAccountController,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    hintText: "学号",
+                  ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 20.0),
           Padding(

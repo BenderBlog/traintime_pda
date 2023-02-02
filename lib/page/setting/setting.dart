@@ -102,7 +102,10 @@ class _SettingDetailsState extends State<SettingDetails> {
                 }),
             SettingsTile.switchTile(
               title: const Text("开启课表背景图"),
-              initialValue: user["decorated"]! == "true" ? true : false,
+              initialValue:
+                  user["decorated"] != null && user["decorated"]! == "true"
+                      ? true
+                      : false,
               onToggle: (bool value) {
                 if (value == true &&
                     (user["decoration"] == null ||

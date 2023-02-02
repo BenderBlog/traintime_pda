@@ -73,38 +73,6 @@ class TitleLine extends StatelessWidget {
   }
 }
 
-/// An input widget.
-Widget inputField({
-  required String text,
-  required Icon icon,
-  required TextEditingController controller,
-  bool isPassword = false,
-  bool isAutoFocus = false,
-}) =>
-    Padding(
-      padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black12),
-          borderRadius: BorderRadius.circular(roundRadius),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 20),
-          child: TextField(
-            autofocus: isAutoFocus,
-            controller: controller,
-            obscureText: isPassword,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-              hintText: text,
-            ),
-          ),
-        ),
-      ),
-    );
-
 /// A listview widget.
 Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init) =>
     ListView.separated(
