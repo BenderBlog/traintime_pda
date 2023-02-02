@@ -38,10 +38,19 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
     return AlertDialog(
       title: const Text('修改体适能密码'),
       content: TextField(
+        autofocus: true,
+        style: const TextStyle(fontSize: 20),
         controller: _sportPasswordController,
         obscureText: _couldView,
         decoration: InputDecoration(
+          fillColor: Colors.grey.withOpacity(0.4),
+          filled: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           hintText: "请在此输入密码",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide.none,
+          ),
           suffixIcon: IconButton(
               icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
@@ -53,15 +62,13 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('取消更改'),
+          child: const Text('取消'),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.green,
-          ),
+          child: const Text('提交'),
           onPressed: () async {
             if (_sportPasswordController.text.isNotEmpty) {
               addUser("sportPassword", _sportPasswordController.text);
@@ -71,15 +78,10 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
                   .showSnackBar(const SnackBar(content: Text("输入空白!")));
             }
           },
-          child: const Text(
-            '提交',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
         ),
       ],
-      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 12, 24),
+      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
     );
   }
 }

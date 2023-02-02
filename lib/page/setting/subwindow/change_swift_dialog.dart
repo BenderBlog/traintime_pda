@@ -35,26 +35,33 @@ class ChangeSwiftDialog extends StatelessWidget {
     return AlertDialog(
       title: const Text('课程偏移设置'),
       content: TextField(
+        autofocus: true,
+        style: const TextStyle(fontSize: 20),
         controller: _getNumberController,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*'))
         ],
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: "请在此输入数字",
+          fillColor: Colors.grey.withOpacity(0.4),
+          filled: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('取消更改'),
+          child: const Text('取消'),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.green,
-          ),
+          child: const Text('提交'),
           onPressed: () async {
             if (_getNumberController.text.isEmpty) {
               addUser("swift", "0");
@@ -64,15 +71,10 @@ class ChangeSwiftDialog extends StatelessWidget {
 
             Navigator.of(context).pop();
           },
-          child: const Text(
-            '提交',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
         ),
       ],
-      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 12, 24),
+      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
     );
   }
 }
