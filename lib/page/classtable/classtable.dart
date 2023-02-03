@@ -18,56 +18,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
-class ClassTable extends StatelessWidget {
-  final Classes toUse = classData;
-  ClassTable({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("课程表"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => aboutDialog(context),
-              );
-            },
-          ),
-        ],
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) => ClassTableWindow(
-          constraints: constraints,
-          classData: classData,
-        ),
-      ),
-    );
-  }
-
-  Widget aboutDialog(context) => AlertDialog(
-        title: const Text("不过我还是每次去教室"),
-        content: Image.asset("assets/Farnsworth-Class.jpg"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("确定"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-}
-
 class ClassTableWindow extends StatefulWidget {
   final Classes classData;
   final BoxConstraints constraints;
@@ -92,13 +42,13 @@ class PageState extends State<ClassTableWindow> {
   static const changePageTime = 600;
 
   // The width ratio for the week column.
-  static const leftRow = 39.5;
+  static const double leftRow = 32.5;
 
   // A list as an index of the classtable items.
   late List<List<List<List<int>>>> pretendLayout;
 
   // The height of the top row.
-  static const topRowHeightBig = 100.0;
+  static const topRowHeightBig = 95.0;
   static const topRowHeightSmall = 50.0;
 
   // The height of the middle row.
@@ -295,34 +245,27 @@ class PageState extends State<ClassTableWindow> {
 
     Widget buttonInformaion(int index) => Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
+              AutoSizeText(
                 "第${index + 1}周",
                 style: TextStyle(
                     fontWeight: index == currentWeek
                         ? FontWeight.bold
                         : FontWeight.normal),
+                maxLines: 1,
               ),
               if (widget.constraints.maxHeight >= 500)
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 7.5,
-                    right: 7.5,
-                    top: 8,
-                    bottom: 3,
-                  ),
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: 5,
-                    mainAxisSpacing: 2,
-                    crossAxisSpacing: 2,
-                    children: [
-                      for (int i = 0; i < 10; i += 2)
-                        for (int day = 0; day < 5; ++day)
-                          dot(!pretendLayout[index][day][i].contains(-1))
-                    ],
-                  ),
+                GridView.count(
+                  shrinkWrap: true,
+                  crossAxisCount: 5,
+                  mainAxisSpacing: 2,
+                  crossAxisSpacing: 2,
+                  children: [
+                    for (int i = 0; i < 10; i += 2)
+                      for (int day = 0; day < 5; ++day)
+                        dot(!pretendLayout[index][day][i].contains(-1))
+                  ],
                 ),
             ],
           ),
@@ -339,7 +282,6 @@ class PageState extends State<ClassTableWindow> {
         ),
         child: ListView.builder(
           controller: rowControl,
-          shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: widget.classData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
@@ -348,13 +290,15 @@ class PageState extends State<ClassTableWindow> {
                   horizontal: weekButtonHorizontalPadding),
               child: SizedBox(
                 width: weekButtonWidth,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                        .primaryColor
-                        .withOpacity(currentWeekIndex == index ? 0.3 : 0.0),
-                    foregroundColor: Colors.black,
-                  ),
+                child: MaterialButton(
+                  color: Theme.of(context)
+                      .primaryColor
+                      .withOpacity(currentWeekIndex == index ? 0.3 : 0.0),
+                  splashColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                  highlightColor:
+                      Theme.of(context).primaryColor.withOpacity(0.3),
+                  focusColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                  elevation: 0.0,
                   onPressed: () {
                     isTopRowLocked = true;
                     setState(() {
@@ -379,48 +323,73 @@ class PageState extends State<ClassTableWindow> {
 
   @override
   Widget build(BuildContext context) {
-    if (classData.timeArrangement.isNotEmpty &&
-        classData.classDetail.isNotEmpty) {
-      return Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            // Top line to show the date
-            _topView(),
-            Expanded(
-              child: DecoratedBox(
-                decoration: decoration,
-                child: _classTablePage(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("课程表"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => aboutDialog(context),
+              );
+            },
+          ),
+        ],
+        bottom: (classData.timeArrangement.isNotEmpty &&
+                classData.classDetail.isNotEmpty)
+            ? PreferredSize(
+                preferredSize: Size.fromHeight(
+                    widget.constraints.maxHeight >= 500
+                        ? topRowHeightBig
+                        : topRowHeightSmall),
+                child: _topView())
+            : null,
+      ),
+      body: (classData.timeArrangement.isNotEmpty &&
+              classData.classDetail.isNotEmpty)
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: decoration,
+                    child: _classTablePage(),
+                  ),
+                ),
+              ],
+            )
+          : Container(
+              decoration: decoration,
+              // color: Colors.grey.shade200.withOpacity(0.75),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error,
+                      size: 100,
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Text("${classData.semesterCode} 学期没有课程，不会吧?"),
+                    const Text("如果搞错学期，快去设置调整。"),
+                    const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
+                    const Text("如果你要毕业了，祝你前程似锦。"),
+                    const Text("如果你已经毕业，快去关注 SuperBart 哔哩哔哩帐号！"),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
-      );
-    } else {
-      return Container(
-        decoration: decoration,
-        // color: Colors.grey.shade200.withOpacity(0.75),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error,
-                size: 100,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Text("${classData.semesterCode} 学期没有课程，不会吧?"),
-              const Text("如果搞错学期，快去设置调整。"),
-              const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
-              const Text("如果你要毕业了，祝你前程似锦。"),
-              const Text("如果你已经毕业，快去关注 SuperBart 哔哩哔哩帐号！"),
-            ],
-          ),
-        ),
-      );
-    }
+    );
   }
 
   Widget _classTablePage() => PageView.builder(
@@ -602,7 +571,7 @@ class PageState extends State<ClassTableWindow> {
             padding: const EdgeInsets.all(2),
             child: ClipRRect(
               // Out
-              borderRadius: BorderRadius.circular(7),
+              borderRadius: BorderRadius.circular(15),
               child: Container(
                 // Border
                 color: index == -1
@@ -612,11 +581,11 @@ class PageState extends State<ClassTableWindow> {
                         .shade300
                         .withOpacity(0.75),
                 padding: conflict.length == 1
-                    ? const EdgeInsets.all(1)
+                    ? const EdgeInsets.all(1.5)
                     : const EdgeInsets.fromLTRB(1, 1, 1, 8),
                 child: ClipRRect(
                   // Inner
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(13.5),
                   child: Container(
                     color: index == -1
                         ? const Color(0x00000000)
@@ -800,19 +769,43 @@ class PageState extends State<ClassTableWindow> {
     List<TimeArrangement> information = List.generate(conflict.length,
         (index) => widget.classData.timeArrangement[conflict.elementAt(index)]);
 
-    List<Widget> toShow = [
-      classInfoBox(information.first),
-    ];
+    List<Widget> toShow = List.generate(
+      conflict.length,
+      (i) => classInfoBox(information[i]),
+    );
 
-    if (conflict.length > 1) {
-      toShow.addAll([
-        for (int i = 1; i < conflict.length; ++i) classInfoBox(information[i]),
-      ]);
-    }
-
-    return ListView(
-      shrinkWrap: true,
-      children: toShow,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 25,
+          child: Container(
+            width: 50,
+            margin: const EdgeInsets.only(top: 12, bottom: 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        ListView(
+          shrinkWrap: true,
+          children: toShow,
+        )
+      ],
     );
   }
+
+  Widget aboutDialog(context) => AlertDialog(
+        title: const Text("不过我还是每次去教室"),
+        content: Image.asset("assets/Farnsworth-Class.jpg"),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("确定"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
 }

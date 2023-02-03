@@ -131,10 +131,10 @@ class _ScoreTableState extends State<ScoreTable> {
             },
           ),
         ],
-      ),
-      body: Column(
-        children: [
-          TitleLine(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(40),
+          child: SizedBox(
+            height: 40,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -181,6 +181,10 @@ class _ScoreTableState extends State<ScoreTable> {
               ],
             ),
           ),
+        ),
+      ),
+      body: Column(
+        children: [
           Expanded(
             child: ListView.builder(
               itemBuilder: (builder, index) {

@@ -11,6 +11,7 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/user.dart';
@@ -166,7 +167,12 @@ class _ToolWindowState extends State<ToolWindow> {
       }
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) {
-          return ClassTable();
+          return LayoutBuilder(
+            builder: (context, constraints) => ClassTableWindow(
+              classData: classData,
+              constraints: constraints,
+            ),
+          );
         }),
       );
     }
