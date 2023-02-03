@@ -211,7 +211,7 @@ class PageState extends State<ClassTableWindow> {
     );
 
     // Init the background.
-    File image = File(user["decoration"]!);
+    File image = File(user["decoration"] ?? "");
     decoration = BoxDecoration(
       image: (user["decorated"] == "true" && image.existsSync())
           ? DecorationImage(
@@ -697,68 +697,100 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _buttomInformation(Set<int> conflict) {
-    // For the avaliable weeks in the class information.
-    Set<int> weekToShow(String weekList) {
-      Set<int> toReturn =
-          Set.from(List.generate(weekList.length, (index) => index + 1));
-      for (int i = 0; i < weekList.length; ++i) {
-        if (weekList[i] == "0") {
-          toReturn.remove(i + 1);
-        }
-      }
-      return toReturn;
-    }
-
     Widget classInfoBox(TimeArrangement i) {
       ClassDetail toShow = widget.classData.classDetail[i.index];
+      var infoColor = colorList[i.index % colorList.length];
+
+      Widget weekDoc(int index, bool isOccupied) => ClipOval(
+            child: Container(
+              decoration: BoxDecoration(
+                color: isOccupied ? infoColor.shade200 : null,
+              ),
+              child: Center(
+                child: Text(
+                  index.toString(),
+                  style: TextStyle(
+                    color: isOccupied
+                        ? infoColor.shade900
+                        : infoColor.shade300.withOpacity(0.8),
+                  ),
+                ),
+              ),
+            ),
+          );
+
+      Widget customListTile(IconData icon, String str) => Container(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: infoColor.shade900,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  str,
+                  style: TextStyle(
+                    color: infoColor.shade900,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          );
+
       return Card(
         margin: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 10,
         ),
+        elevation: 0,
+        // color: Theme.of(context).colorScheme.surfaceVariant,
+        color: infoColor.shade100,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(15),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.class_),
-                  const SizedBox(),
-                  Text(toShow.name),
-                ],
+              Text(
+                toShow.name,
+                // style: Theme.of(context).textTheme.titleLarge,
+                // The following is just a copy of this...
+                style: TextStyle(
+                  color: infoColor.shade900,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-              Row(
-                children: [
-                  const Icon(Icons.person),
-                  const SizedBox(),
-                  Text(toShow.teacher ?? "老师未定"),
-                ],
+              const SizedBox(height: 5),
+              customListTile(
+                Icons.person,
+                toShow.teacher ?? "老师未定",
               ),
-              Row(
-                children: [
-                  const Icon(Icons.room),
-                  const SizedBox(),
-                  Text(toShow.place ?? "地点未定"),
-                ],
+              customListTile(
+                Icons.room,
+                toShow.place ?? "地点未定",
               ),
-              Row(
-                children: [
-                  const Icon(Icons.access_time),
-                  const SizedBox(),
-                  Text(
-                      "${weekList[i.day - 1]} ${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}"),
-                ],
+              customListTile(
+                Icons.access_time_filled_outlined,
+                "${weekList[i.day - 1]}"
+                "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}",
               ),
-              Row(
-                children: [
-                  const Icon(Icons.calendar_month),
-                  const SizedBox(),
-                  Expanded(
-                    child: Text(
-                      weekToShow(i.weekList).toString(),
-                    ),
-                  ),
-                ],
+              Container(
+                margin: const EdgeInsets.only(top: 7),
+                child: GridView.extent(
+                  shrinkWrap: true,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 5,
+                  maxCrossAxisExtent: 30,
+                  children: List.generate(i.weekList.length, (index) {
+                    bool isOccupied = true;
+                    if (i.weekList[index] == "0") {
+                      isOccupied = false;
+                    }
+                    return weekDoc(index + 1, isOccupied);
+                  }),
+                ),
               ),
             ],
           ),
