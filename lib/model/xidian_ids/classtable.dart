@@ -2,11 +2,15 @@ class ClassDetail {
   String name; // 名称
   String? teacher; // 老师
   String? place; // 地方
+  String? code; // 课程序号
+  String? number; // 班级序号
 
   ClassDetail({
     required this.name,
     this.teacher,
     this.place,
+    this.code,
+    this.number,
   });
 
   @override

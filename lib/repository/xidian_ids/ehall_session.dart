@@ -299,6 +299,8 @@ class EhallSession extends IDSSession {
         name: i["KCM"],
         teacher: i["SKJS"],
         place: i["JASDM"],
+        code: i["KCH"],
+        number: i["KXH"],
       );
       if (!classData.classDetail.contains(toDeal)) {
         classData.classDetail.add(toDeal);

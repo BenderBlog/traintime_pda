@@ -12,6 +12,7 @@ if you want to use.
 
 import 'dart:io';
 
+import 'package:flutter/rendering.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -128,6 +129,10 @@ class PageState extends State<ClassTableWindow> {
   late ScrollController rowControl;
 
   late BoxDecoration decoration;
+
+  // isHorizontal?
+  bool isHorizontal() =>
+      widget.constraints.maxWidth >= widget.constraints.maxHeight;
 
   @override
   void initState() {
@@ -453,16 +458,11 @@ class PageState extends State<ClassTableWindow> {
                 : Colors.black87,
           ),
         ),
-        widget.constraints.maxWidth >= widget.constraints.maxHeight
-            ? const SizedBox(width: 5)
-            : const SizedBox(height: 5),
+        isHorizontal() ? const SizedBox(width: 5) : const SizedBox(height: 5),
         AutoSizeText(
           "${dateList[index - 1].month}/${dateList[index - 1].day}",
           group: AutoSizeGroup(),
-          textScaleFactor:
-              widget.constraints.maxWidth >= widget.constraints.maxHeight
-                  ? 1.0
-                  : 0.8,
+          textScaleFactor: isHorizontal() ? 1.0 : 0.8,
           style: TextStyle(
             color: (dateList[index - 1].month == DateTime.now().month &&
                     dateList[index - 1].day == DateTime.now().day)
@@ -705,6 +705,10 @@ class PageState extends State<ClassTableWindow> {
             child: Container(
               decoration: BoxDecoration(
                 color: isOccupied ? infoColor.shade200 : null,
+                borderRadius: const BorderRadius.all(Radius.circular(100.0)),
+                border: index - 1 == currentWeek
+                    ? Border.all(width: 2, color: infoColor)
+                    : null,
               ),
               child: Center(
                 child: Text(
@@ -712,7 +716,7 @@ class PageState extends State<ClassTableWindow> {
                   style: TextStyle(
                     color: isOccupied
                         ? infoColor.shade900
-                        : infoColor.shade300.withOpacity(0.8),
+                        : infoColor.shade400.withOpacity(0.8),
                   ),
                 ),
               ),
@@ -739,60 +743,87 @@ class PageState extends State<ClassTableWindow> {
             ),
           );
 
-      return Card(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 10,
-        ),
-        elevation: 0,
-        // color: Theme.of(context).colorScheme.surfaceVariant,
-        color: infoColor.shade100,
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                toShow.name,
-                // style: Theme.of(context).textTheme.titleLarge,
-                // The following is just a copy of this...
-                style: TextStyle(
-                  color: infoColor.shade900,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
+      Widget middlePart() => isHorizontal()
+          ? Row(
+              children: [
+                customListTile(
+                  Icons.person,
+                  toShow.teacher ?? "老师未定",
                 ),
-              ),
-              const SizedBox(height: 5),
-              customListTile(
-                Icons.person,
-                toShow.teacher ?? "老师未定",
-              ),
-              customListTile(
-                Icons.room,
-                toShow.place ?? "地点未定",
-              ),
-              customListTile(
-                Icons.access_time_filled_outlined,
-                "${weekList[i.day - 1]}"
-                "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}",
-              ),
-              Container(
-                margin: const EdgeInsets.only(top: 7),
-                child: GridView.extent(
-                  shrinkWrap: true,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  maxCrossAxisExtent: 30,
-                  children: List.generate(i.weekList.length, (index) {
-                    bool isOccupied = true;
-                    if (i.weekList[index] == "0") {
-                      isOccupied = false;
-                    }
-                    return weekDoc(index + 1, isOccupied);
-                  }),
+                const SizedBox(width: 10),
+                customListTile(
+                  Icons.room,
+                  toShow.place ?? "地点未定",
                 ),
-              ),
-            ],
+                const SizedBox(width: 10),
+                customListTile(
+                  Icons.access_time_filled_outlined,
+                  "${weekList[i.day - 1]}"
+                  "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}",
+                ),
+              ],
+            )
+          : Column(
+              children: [
+                customListTile(
+                  Icons.person,
+                  toShow.teacher ?? "老师未定",
+                ),
+                customListTile(
+                  Icons.room,
+                  toShow.place ?? "地点未定",
+                ),
+                customListTile(
+                  Icons.access_time_filled_outlined,
+                  "${weekList[i.day - 1]}"
+                  "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}",
+                ),
+              ],
+            );
+
+      // Don;t know why I need to add a goddame builder.
+      return LayoutBuilder(
+        builder: (context, constraints) => Card(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 10,
+          ),
+          elevation: 0,
+          // color: Theme.of(context).colorScheme.surfaceVariant,
+          color: infoColor.shade100,
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${toShow.name}${isHorizontal() ? " " : "\n"}${toShow.code} | ${toShow.number} 班",
+                  style: TextStyle(
+                    color: infoColor.shade900,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                middlePart(),
+                Container(
+                  margin: const EdgeInsets.only(top: 7),
+                  child: GridView.extent(
+                    shrinkWrap: true,
+                    mainAxisSpacing: 5,
+                    crossAxisSpacing: 5,
+                    maxCrossAxisExtent: 30,
+                    children: List.generate(i.weekList.length, (index) {
+                      bool isOccupied = true;
+                      if (i.weekList[index] == "0") {
+                        isOccupied = false;
+                      }
+                      return weekDoc(index + 1, isOccupied);
+                    }),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -810,19 +841,21 @@ class PageState extends State<ClassTableWindow> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: 25,
+          height: 20,
           child: Container(
             width: 50,
-            margin: const EdgeInsets.only(top: 12, bottom: 2),
+            margin: const EdgeInsets.only(top: 7, bottom: 7),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
               color: Colors.grey,
             ),
           ),
         ),
-        ListView(
-          shrinkWrap: true,
-          children: toShow,
+        Expanded(
+          child: ListView(
+            shrinkWrap: true,
+            children: toShow,
+          ),
         )
       ],
     );
