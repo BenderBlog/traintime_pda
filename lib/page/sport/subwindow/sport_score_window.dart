@@ -10,15 +10,12 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
 import 'package:watermeter/page/widget.dart';
-
-TagsBoxes situation(String rank) => TagsBoxes(
-      text: rank,
-      backgroundColor: rank.contains("不") ? Colors.red : Colors.green,
-    );
 
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({Key? key}) : super(key: key);
@@ -100,8 +97,11 @@ class ScoreCard extends StatelessWidget {
                         textScaleFactor: 1.2,
                       ),
                       const SizedBox(width: 10),
-                      situation(
-                        toUse.rank,
+                      TagsBoxes(
+                        text: toUse.rank,
+                        backgroundColor: toUse.rank.contains("不")
+                            ? Colors.red
+                            : Colors.green,
                       ),
                     ],
                   ),
@@ -113,7 +113,7 @@ class ScoreCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: double.parse(toUse.totalScore) >= 50
                           ? Colors.green
-                          : Colors.orange,
+                          : Colors.red,
                     ),
                   ),
                 ],
@@ -122,46 +122,52 @@ class ScoreCard extends StatelessWidget {
             const Divider(height: 15),
             DecoratedBox(
               decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 237, 242, 247),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Container(
                 padding: const EdgeInsets.all(10),
                 child: Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(1.25),
+                    1: FlexColumnWidth(0.75),
+                    2: FlexColumnWidth(0.75),
+                    3: FlexColumnWidth(1),
+                  },
                   children: [
                     for (var i in toUse.details)
                       TableRow(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Text(
-                              i.examName,
-                              textAlign: TextAlign.center,
-                            ),
+                          Text(
+                            i.examName,
+                            textAlign: TextAlign.center,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Text(
-                              "${i.actualScore} ${unitToShow(i.examunit)}",
-                              textAlign: TextAlign.end,
-                            ),
+                          Text(
+                            i.actualScore,
+                            style: const TextStyle(fontFeatures: [
+                              FontFeature.tabularFigures(),
+                            ]),
+                            textAlign: TextAlign.end,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            child: Text(
-                              "${i.score} 分",
-                              textAlign: TextAlign.end,
-                            ),
+                          Text(
+                            " ${unitToShow(i.examunit)}",
+                            textAlign: TextAlign.start,
                           ),
-                          Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(width: 12),
-                                  situation(i.rank),
-                                ],
-                              )),
+                          Text(
+                            "${i.score} 分",
+                            style: const TextStyle(fontFeatures: [
+                              FontFeature.tabularFigures(),
+                            ]),
+                            textAlign: TextAlign.end,
+                          ),
+                          Text(
+                            i.rank,
+                            style: TextStyle(
+                              color: i.rank.contains("不")
+                                  ? Colors.red
+                                  : Colors.green,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       ),
                   ],
