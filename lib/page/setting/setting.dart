@@ -159,7 +159,7 @@ class _SettingDetailsState extends State<SettingDetails> {
             SettingsTile.navigation(
               title: const Text('Traintime PDA by BenderBlog'),
               value: const Text(
-                  "版本号 Pre-Alpha 0.0.2, MPL v2.0\n(codename watermeter)"),
+                  "版本号 Pre-Alpha 0.0.3, MPL v2.0\n(codename watermeter)"),
               onPressed: (context) => launchUrl(
                 Uri.parse("https://github.com/BenderBlog/watermeter"),
                 mode: LaunchMode.externalApplication,
