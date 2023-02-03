@@ -46,33 +46,6 @@ class TagsBoxes extends StatelessWidget {
   }
 }
 
-/// Use it at the top of each page.
-class TitleLine extends StatelessWidget {
-  final Widget child;
-
-  const TitleLine({Key? key, required this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            spreadRadius: 0.1,
-            color: Colors.black.withOpacity(0.2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-        child: child,
-      ),
-    );
-  }
-}
-
 /// A listview widget.
 Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init) =>
     ListView.separated(

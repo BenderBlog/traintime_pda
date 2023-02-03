@@ -33,87 +33,70 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                spreadRadius: 0.1,
-                color: Colors.black.withOpacity(0.2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: "在此搜索",
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: (String text) {
-                      setState(() {
-                        toSearch = text;
-                        _get(false);
-                      });
-                    },
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: DropdownButton(
-                  value: categoryToSent,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                  ),
-                  underline: Container(
-                    height: 2,
-                  ),
-                  items: [
-                    for (var i in categories)
-                      DropdownMenuItem(value: i, child: Text(i))
-                  ],
-                  onChanged: (String? value) {
-                    setState(
-                      () {
-                        categoryToSent = value!;
-                        _get(false);
-                      },
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async => _get(true),
+        child: FutureBuilder<ShopInformationEntity>(
+          future: _get(false),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return Center(child: Text("坏事: ${snapshot.error}"));
+              } else {
+                return dataList<ShopInformationResults, ShopCard>(
+                    snapshot.data.results, (toUse) => ShopCard(toUse: toUse));
+              }
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
         ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: () async => _get(true),
-            child: FutureBuilder<ShopInformationEntity>(
-              future: _get(false),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    return Center(child: Text("坏事: ${snapshot.error}"));
-                  } else {
-                    return dataList<ShopInformationResults, ShopCard>(
-                        snapshot.data.results,
-                        (toUse) => ShopCard(toUse: toUse));
-                  }
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
+      ),
+      bottomSheet: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: TextField(
+                decoration: const InputDecoration(
+                  hintText: "在此搜索",
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (String text) {
+                  setState(() {
+                    toSearch = text;
+                    _get(false);
+                  });
+                },
+              ),
             ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: DropdownButton(
+              value: categoryToSent,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+              ),
+              underline: Container(
+                height: 2,
+              ),
+              items: [
+                for (var i in categories)
+                  DropdownMenuItem(value: i, child: Text(i))
+              ],
+              onChanged: (String? value) {
+                setState(
+                  () {
+                    categoryToSent = value!;
+                    _get(false);
+                  },
+                );
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -150,6 +133,7 @@ class ShopCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Theme.of(context).secondaryHeaderColor,
       child: Container(
         padding: const EdgeInsets.all(15),
         child: Column(
