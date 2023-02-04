@@ -71,7 +71,7 @@ class _LoginWindowState extends State<LoginWindow> {
           pd.close();
         }
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
           (route) => false,
         );
       }

@@ -20,7 +20,7 @@ import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTableWindow extends StatefulWidget {
-  final Classes classData;
+  final ClassTable classData;
   final BoxConstraints constraints;
   const ClassTableWindow({
     super.key,
@@ -348,8 +348,8 @@ class PageState extends State<ClassTableWindow> {
             },
           ),
         ],
-        bottom: (classData.timeArrangement.isNotEmpty &&
-                classData.classDetail.isNotEmpty)
+        bottom: (widget.classData.timeArrangement.isNotEmpty &&
+                widget.classData.classDetail.isNotEmpty)
             ? PreferredSize(
                 preferredSize: Size.fromHeight(
                     widget.constraints.maxHeight >= 500
@@ -358,8 +358,8 @@ class PageState extends State<ClassTableWindow> {
                 child: _topView())
             : null,
       ),
-      body: (classData.timeArrangement.isNotEmpty &&
-              classData.classDetail.isNotEmpty)
+      body: (widget.classData.timeArrangement.isNotEmpty &&
+              widget.classData.classDetail.isNotEmpty)
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -385,7 +385,7 @@ class PageState extends State<ClassTableWindow> {
                     const SizedBox(
                       height: 30,
                     ),
-                    Text("${classData.semesterCode} 学期没有课程，不会吧?"),
+                    Text("${widget.classData.semesterCode} 学期没有课程，不会吧?"),
                     const Text("如果搞错学期，快去设置调整。"),
                     const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
                     const Text("如果你要毕业了，祝你前程似锦。"),

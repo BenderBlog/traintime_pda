@@ -1,3 +1,15 @@
+/*
+The class table model.
+Copyright 2022 SuperBart
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
+if you want to use.
+*/
+
 class ClassDetail {
   String name; // 名称
   String? teacher; // 老师
@@ -51,13 +63,40 @@ class TimeArrangement {
   }
 }
 
-class Classes {
-  List<ClassDetail> classDetail = [];
-  List<TimeArrangement> timeArrangement = [];
+class ClassTable {
+  List<ClassDetail> classDetail = <ClassDetail>[];
+  List<TimeArrangement> timeArrangement = <TimeArrangement>[];
   String semesterCode = "";
   String termStartDay = "";
   int semesterLength = 0;
-  bool isDone = false;
-}
 
-Classes classData = Classes();
+  void update(Map<String, dynamic> qResult) {
+    semesterCode = qResult["semesterCode"];
+    termStartDay = qResult["termStartDay"];
+    semesterLength = 0;
+    for (var i in qResult["rows"]) {
+      var toDeal = ClassDetail(
+        name: i["KCM"],
+        teacher: i["SKJS"],
+        place: i["JASDM"],
+        code: i["KCH"],
+        number: i["KXH"],
+      );
+      if (!classDetail.contains(toDeal)) {
+        classDetail.add(toDeal);
+      }
+      timeArrangement.add(
+        TimeArrangement(
+          index: classDetail.indexOf(toDeal),
+          start: int.parse(i["KSJC"]),
+          stop: int.parse(i["JSJC"]),
+          day: int.parse(i["SKXQ"]),
+          weekList: i["SKZC"].toString(),
+        ),
+      );
+      if (i["SKZC"].toString().length > semesterLength) {
+        semesterLength = i["SKZC"].toString().length;
+      }
+    }
+  }
+}

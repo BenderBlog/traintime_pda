@@ -12,6 +12,7 @@ if you want to use.
 */
 
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 /// Will be initialized at the beginning of the program.
 late PersistCookieJar SportCookieJar;

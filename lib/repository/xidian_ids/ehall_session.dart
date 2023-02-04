@@ -13,13 +13,11 @@ Thanks xidian-script and libxdauth!
 */
 
 import 'dart:convert';
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/user.dart';
 
 class EhallSession extends IDSSession {
@@ -53,6 +51,7 @@ class EhallSession extends IDSSession {
     }
   }
 
+  @protected
   Future<String> useApp(String appID) async {
     developer.log("Ready to use the app $appID.", name: "Ehall useApp");
     developer.log("Try to login.", name: "Ehall useApp");
@@ -205,166 +204,6 @@ class EhallSession extends IDSSession {
     }
     scores = ScoreList(scoreTable: scoreTable);
     onResponse(100, "成绩已获取");
-  }
-
-  /// 课程表 4770397878132218
-  Future<void> getClasstable({
-    bool focus = false,
-    required void Function(int, String) onResponse,
-  }) async {
-    developer.log("Check whether the classtable has fetched.",
-        name: "Ehall getClasstable");
-    if (classData.isDone == true) {
-      onResponse(100, "课表已获取");
-      return;
-    }
-
-    Map<String, dynamic> qResult = {};
-    onResponse(10, "准备获取课表");
-    developer.log("Start fetching the classtable.",
-        name: "Ehall getClasstable");
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    Directory destination =
-        Directory("${appDocDir.path}/org.superbart.watermeter");
-    if (!destination.existsSync()) {
-      await destination.create();
-    }
-    var file = File("${destination.path}/ClassTable.json");
-    bool isExist = file.existsSync();
-
-    onResponse(5, isExist || focus == true ? "读取缓存" : "从网络获取");
-    developer.log(isExist || focus == true ? "Cache" : "Fetch from internet.",
-        name: "Ehall getClasstable");
-
-    // Try to add some sort of cache support.
-    if (!isExist || focus == true) {
-      onResponse(10, "进入教务系统");
-      developer.log("Login the system.", name: "Ehall getClasstable");
-      String get = await useApp("4770397878132218");
-      await dio.post(get);
-
-      onResponse(15, "获取学期信息");
-      developer.log("Fetch the semester information.",
-          name: "Ehall getClasstable");
-      String semesterCode = await dio
-          .post(
-            "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-          )
-          .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-
-      onResponse(20, "获取开学日期");
-      developer.log("Fetch the day the semester begin.",
-          name: "Ehall getClasstable");
-      String termStartDay = await dio.post(
-        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-        data: {
-          'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
-          'XQ': semesterCode.split('-')[2]
-        },
-      ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-
-      developer.log(
-          "Will get $semesterCode which start at $termStartDay, fetching...",
-          name: "Ehall getClasstable");
-      onResponse(30, "获取课表内容");
-      qResult = await dio.post(
-        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
-        data: {'XNXQDM': semesterCode},
-      ).then((value) => value.data['datas']['xskcb']);
-      if (qResult['extParams']['code'] != 1) {
-        throw qResult['extParams']['msg'] + "在已安排课程";
-      }
-
-      onResponse(40, "缓存课表内容");
-      developer.log("Caching...", name: "Ehall getClasstable");
-      qResult["semesterCode"] = semesterCode;
-      qResult["termStartDay"] = termStartDay;
-
-      file.writeAsStringSync(jsonEncode(qResult));
-    } else {
-      onResponse(40, "读取课表缓存");
-      developer.log("Reading cache...", name: "Ehall getClasstable");
-      qResult = jsonDecode(file.readAsStringSync());
-    }
-
-    onResponse(50, "处理课表内容");
-    developer.log("Dealing with the classtable...",
-        name: "Ehall getClasstable");
-
-    classData.semesterCode = qResult["semesterCode"];
-    classData.termStartDay = qResult["termStartDay"];
-    classData.semesterLength = 0;
-    for (var i in qResult["rows"]) {
-      var toDeal = ClassDetail(
-        name: i["KCM"],
-        teacher: i["SKJS"],
-        place: i["JASDM"],
-        code: i["KCH"],
-        number: i["KXH"],
-      );
-      if (!classData.classDetail.contains(toDeal)) {
-        classData.classDetail.add(toDeal);
-      }
-      classData.timeArrangement.add(
-        TimeArrangement(
-          index: classData.classDetail.indexOf(toDeal),
-          start: int.parse(i["KSJC"]),
-          stop: int.parse(i["JSJC"]),
-          day: int.parse(i["SKXQ"]),
-          weekList: i["SKZC"].toString(),
-        ),
-      );
-      developer.log("$toDeal", name: "Ehall getClasstable");
-      if (i["SKZC"].toString().length > classData.semesterLength) {
-        classData.semesterLength = i["SKZC"].toString().length;
-      }
-    }
-
-    // Uncomment to see the conflict.
-    /*
-    classData.classDetail.add(ClassDetail(
-      name: "测试连课",
-      teacher: "SPRT",
-      place: "Flutter",
-    ));
-    classData.timeArrangement.addAll([
-      TimeArrangement(
-        index: classData.classDetail.length - 1,
-        start: 2,
-        stop: 8,
-        day: 2,
-        weekList: "1111111111111111111111",
-      ),
-      TimeArrangement(
-        index: classData.classDetail.length - 1,
-        start: 4,
-        stop: 8,
-        day: 6,
-        weekList: "1111111111111111111111",
-      ),
-    ]);
-    */
-
-    /*
-    onResponse(70, "获取未安排内容");
-    var notOnTable = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
-      data: {'XNXQDM': semesterCode},
-    ).then((value) => value.data['datas']['cxxsllsywpk']);
-    if (qResult['extParams']['code'] != 1) {
-      throw qResult['extParams']['msg'] + "在未安排课程";
-    }
-    onResponse(90, "处理未安排内容");
-    for (var i in notOnTable["rows"]) {
-      classData.notOnTable.add(ClassDetail(
-        name: i["KCM"],
-        teacher: i["SKJS"],
-        place: i["JASDM"],
-      ));
-    }
-    */
-    classData.isDone = true;
-    onResponse(100, "课表已获取");
   }
 
   /// 考试安排 4768687067472349
