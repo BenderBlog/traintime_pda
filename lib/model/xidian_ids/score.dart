@@ -1,3 +1,15 @@
+/*
+The score model.
+Copyright 2022 SuperBart
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
+if you want to use.
+*/
+
 class Score {
   int mark; // 编号，用于某种计算，从 0 开始
   String name; // 学科名称
@@ -27,51 +39,3 @@ class Score {
     this.scoreDetail,
   });
 }
-
-class ScoreList {
-  late List<Score> scoreTable;
-  late Set<String> semester;
-  late Set<String> statuses;
-  Set<String> unPassed = {};
-  double randomChoice = 0.0;
-
-  ScoreList({required this.scoreTable}) {
-    semester = {for (var i in scoreTable) i.year};
-    statuses = {for (var i in scoreTable) i.status};
-    for (var i in scoreTable) {
-      if (i.status == "公共任选") {
-        randomChoice += i.credit;
-      }
-    }
-    for (var i in scoreTable) {
-      if (i.isPassed != '1' && i.isPassed != "-1") {
-        unPassed.add(i.name);
-      }
-      if (unPassed.contains(i.name) && i.isPassed == "1") {
-        unPassed.remove(i.name);
-
-        /// Whatever score is, if not passed in the first time, count as 60.
-        /// Please take a note of it.
-        i.score = 60;
-        i.name += "(非初修通过)";
-        unPassed.remove(i.name);
-      }
-      if (i.isPassed == "-1") {
-        i.name += "(成绩没登完)";
-      }
-    }
-  }
-}
-
-ScoreList? scores;
-/*
-Score xianbei = Score(
-  mark: 0,
-  name: "淫梦学",
-  score: 81,
-  year: "2010-2009-1",
-  credit: 4.0,
-  status: "必修课",
-  classID: "1145141919810"
-);
-*/

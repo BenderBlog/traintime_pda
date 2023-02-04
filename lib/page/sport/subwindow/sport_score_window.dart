@@ -13,9 +13,9 @@ if you want to use.
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/repository/xidian_sport/sport_score_session.dart';
 
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({Key? key}) : super(key: key);
@@ -34,8 +34,7 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
-              return Center(
-                  child: Text("坏事: ${snapshot.error} / ${toUse.userId}"));
+              return Center(child: Text("坏事: ${snapshot.error}"));
             } else {
               List things = [
                 Card(
@@ -68,7 +67,7 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
     );
   }
 
-  Future<SportScore> _get() async => getSportScore();
+  Future<SportScore> _get() async => SportScoreSession().getSportScore();
 }
 
 class ScoreCard extends StatelessWidget {

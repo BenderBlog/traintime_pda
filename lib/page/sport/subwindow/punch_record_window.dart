@@ -11,7 +11,8 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
+import 'package:get/get.dart';
+import 'package:watermeter/controller/punch_controller.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/page/widget.dart';
 
@@ -35,83 +36,85 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async => _get(),
-        child: FutureBuilder<PunchDataList>(
-          future: _get(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                return Center(child: Text("坏事: ${snapshot.error}"));
-              } else {
-                total = snapshot.data.allTime;
-                valid = snapshot.data.valid;
-                if (snapshot.data.all.length == 0) {
-                  return const Center(
-                    child: Text(
-                      "没有记录",
-                      textScaleFactor: 1.2,
+    return GetBuilder<PunchController>(
+      builder: (c) => Scaffold(
+        body: RefreshIndicator(
+          onRefresh: () async => c.updatePunch(),
+          child: FutureBuilder<PunchDataList>(
+            future: Future(() => c.punch),
+            builder:
+                (BuildContext context, AsyncSnapshot<PunchDataList> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.data != null) {
+                  return Center(child: Text("坏事: ${snapshot.error}"));
+                } else {
+                  total = snapshot.data!.valid;
+                  valid = snapshot.data!.valid;
+                  if (snapshot.data!.all.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "没有记录",
+                        textScaleFactor: 1.2,
+                      ),
+                    );
+                  }
+                  return dataList<RecordCard, RecordCard>(
+                    List.generate(
+                      snapshot.data!.all.length,
+                      (i) =>
+                          RecordCard(mark: i + 1, toUse: snapshot.data!.all[i]),
                     ),
+                    (toUse) => toUse,
                   );
                 }
-                return dataList<RecordCard, RecordCard>(
-                  List.generate(
-                    snapshot.data.all.length,
-                    (i) => RecordCard(mark: i + 1, toUse: snapshot.data.all[i]),
+              } else {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      CircularProgressIndicator(),
+                      Divider(color: Colors.transparent),
+                      Text(
+                        "正在获取信息...",
+                        textScaleFactor: 1.2,
+                      ),
+                    ],
                   ),
-                  (toUse) => toUse,
                 );
               }
-            } else {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(),
-                    Divider(color: Colors.transparent),
-                    Text(
-                      "正在获取信息...",
-                      textScaleFactor: 1.2,
-                    ),
-                  ],
-                ),
-              );
-            }
-          },
+            },
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "总次数：$total\n成功次数：$valid",
-              //"总次数：${snapshot.data.allTime}\n成功次数：${snapshot.data.valid}",
-              textScaleFactor: 1.2,
-            ),
-            FloatingActionButton.extended(
-              elevation: 0.0,
-              highlightElevation: 0.0,
-              focusElevation: 0.0,
-              disabledElevation: 0.0,
-              onPressed: () {
-                setState(() {
-                  isValid = !isValid;
-                });
-              },
-              label: Text(
-                isValid ? "查看所有记录" : "查看成功记录",
-                textScaleFactor: 1.1,
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "总次数：$total\n成功次数：$valid",
+                //"总次数：${snapshot.data.allTime}\n成功次数：${snapshot.data.valid}",
+                textScaleFactor: 1.2,
               ),
-            ),
-          ],
+              FloatingActionButton.extended(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                focusElevation: 0.0,
+                disabledElevation: 0.0,
+                onPressed: () {
+                  setState(() {
+                    isValid = !isValid;
+                  });
+                },
+                label: Text(
+                  isValid ? "查看所有记录" : "查看成功记录",
+                  textScaleFactor: 1.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
-  Future<PunchDataList> _get() async => getPunchData(isValid);
 }
 
 class RecordCard extends StatelessWidget {

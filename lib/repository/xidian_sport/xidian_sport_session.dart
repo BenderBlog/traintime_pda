@@ -18,10 +18,9 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:watermeter/repository/general.dart';
-import 'package:watermeter/model/xidian_sport/punch.dart';
-import 'package:watermeter/model/xidian_sport/score.dart';
+import 'package:flutter/foundation.dart';
 import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/general.dart';
 
 /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
 String rsaEncrypt(String toEnc, String pubKey) {
@@ -102,12 +101,11 @@ awb4B45zUwIDAQAB
     return response.data;
   }
 
+  @protected
   Future<void> login({
-    required String? username,
-    required String? password,
     void Function(int, String)? onResponse,
   }) async {
-    if (username == null || password == null) {
+    if (user["idsAccount"] == null || user["sportPassword"] == null) {
       throw "请在设置里面设置体适能密码";
     }
     if (userId != "") {
@@ -115,12 +113,11 @@ awb4B45zUwIDAQAB
         onResponse(100, "登录成功");
       }
     }
-    this.username = username;
     var response = await require(
       subWebsite: "/h5/login",
       body: {
         "uname": username,
-        "pwd": rsaEncrypt(password, rsaKey),
+        "pwd": rsaEncrypt(user["sportPassword"]!, rsaKey),
         "openid": ""
       },
     );
@@ -146,89 +143,4 @@ awb4B45zUwIDAQAB
       throw "获取学期信息失败：${response["returnMsg"]}";
     }
   }
-
-  /// Dynamic data.
-  Future<PunchDataList> getPunchData(bool isValid) async {
-    PunchDataList toReturn = PunchDataList();
-    if (userId == "") {
-      await login(
-          username: user["idsAccount"], password: user["sportPassword"]);
-    }
-    var response = await require(
-      subWebsite: "stuPunchRecord/findPager",
-      body: {
-        'userNum': username,
-        'sysTermId': await getTermID(),
-        'pageSize': "999",
-        'pageIndex': "1"
-      },
-    );
-    for (var i in response["data"]) {
-      toReturn.allTime++;
-      if (i["state"].toString().contains("恭喜你本次打卡成功")) {
-        toReturn.valid++;
-      }
-      if (isValid && !i["state"].toString().contains("恭喜你本次打卡成功")) {
-        continue;
-      }
-      toReturn.all.add(PunchData(i["machineName"], i["weekNum"], i["punchDay"],
-          i["punchTime"], i["state"]));
-    }
-    return toReturn;
-  }
-
-  /// "Static" Data.
-  Future<void> getSportScore() async {
-    SportScore toReturn = SportScore();
-    if (userId == "") {
-      await login(
-          username: user["idsAccount"], password: user["sportPassword"]);
-    }
-    var response = await require(
-      subWebsite: "measure/getStuTotalScore",
-      body: {"userId": userId},
-    );
-    for (var i in response["data"]) {
-      if (i.keys.contains("graduationStatus")) {
-        toReturn.total = i["totalScore"];
-        toReturn.detail = i["gradeType"];
-      } else {
-        SportScoreOfYear toAdd = SportScoreOfYear(
-            year: i["year"],
-            totalScore: i["totalScore"],
-            rank: i["rank"],
-            gradeType: i["gradeType"]);
-        var anotherResponse = await require(
-          subWebsite: "measure/getStuScoreDetail",
-          body: {"meaScoreId": i["meaScoreId"]},
-        );
-        for (var i in anotherResponse["data"]) {
-          toAdd.details.add(SportItems(
-              examName: i["examName"],
-              examunit: i["examunit"],
-              actualScore: i["actualScore"] ?? "0",
-              score: i["score"] ?? 0.0,
-              rank: i["rank"] ?? "不及格"));
-        }
-        toReturn.list.add(toAdd);
-      }
-    }
-    sportScore = toReturn;
-  }
 }
-
-var toUse = SportSession();
-
-Future<PunchDataList> getPunchData(bool isValid) => toUse.getPunchData(isValid);
-
-Future<SportScore> getSportScore() async {
-  if (sportScore.detail == "") {
-    await toUse.getSportScore();
-  }
-  return Future.delayed(const Duration(microseconds: 10), () => sportScore);
-}
-
-Future<void> sportLogin(void Function(int, String)? whatever) => toUse.login(
-    username: user["idsAccount"],
-    password: user["sportPassword"],
-    onResponse: whatever);

@@ -14,27 +14,23 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/widget.dart';
 
-class ScoreWindow extends StatelessWidget {
-  const ScoreWindow({Key? key}) : super(key: key);
+class ScoreWindow extends StatefulWidget {
+  final List<Score> scores;
+  const ScoreWindow({Key? key, required this.scores}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const ScoreTable();
-  }
+  State<ScoreWindow> createState() => _ScoreWindowState();
 }
 
-class ScoreTable extends StatefulWidget {
-  const ScoreTable({Key? key}) : super(key: key);
+class _ScoreWindowState extends State<ScoreWindow> {
+  late List<Score> scoreTable;
+  Set<String> semester = {};
+  Set<String> statuses = {};
+  Set<String> unPassedSet = {};
+  double randomChoice = 0.0;
 
-  @override
-  State<ScoreTable> createState() => _ScoreTableState();
-}
-
-class _ScoreTableState extends State<ScoreTable> {
   bool isSelectMod = false;
-
-  List<bool> isSelected =
-      List<bool>.generate(scores!.scoreTable.length, (int index) => false);
+  late List<bool> isSelected;
 
   /// Empty means all semester.
   String chosenSemester = "";
@@ -46,7 +42,7 @@ class _ScoreTableState extends State<ScoreTable> {
     double totalCredit = 0.0;
     for (var i = 0; i < isSelected.length; ++i) {
       if ((isSelected[i] == true && isAll == false) || isAll == true) {
-        totalCredit += scores!.scoreTable[i].credit;
+        totalCredit += scoreTable[i].credit;
       }
     }
     return totalCredit;
@@ -57,8 +53,7 @@ class _ScoreTableState extends State<ScoreTable> {
     double totalCredit = _evalCredit(isAll);
     for (var i = 0; i < isSelected.length; ++i) {
       if ((isSelected[i] == true && isAll == false) || isAll == true) {
-        totalScore +=
-            scores!.scoreTable[i].score * scores!.scoreTable[i].credit;
+        totalScore += scoreTable[i].score * scoreTable[i].credit;
       }
     }
     return totalCredit != 0 ? totalScore / totalCredit : 0.0;
@@ -67,7 +62,7 @@ class _ScoreTableState extends State<ScoreTable> {
   List<Score> toShow() {
     /// If I write "whatever = scores.scoreTable", every change I made to "whatever"
     /// also applies to scores.scoreTable. Since reference whatsoever.
-    List<Score> whatever = List.from(scores!.scoreTable);
+    List<Score> whatever = List.from(scoreTable);
     if (chosenSemester != "") {
       whatever.removeWhere((element) => element.year != chosenSemester);
     }
@@ -78,10 +73,41 @@ class _ScoreTableState extends State<ScoreTable> {
   }
 
   String unPassed() {
-    if (scores!.unPassed.isEmpty) {
+    if (unPassedSet.isEmpty) {
       return "没有";
     }
-    return scores!.unPassed.join(",");
+    return unPassedSet.join(",");
+  }
+
+  @override
+  void initState() {
+    scoreTable = widget.scores;
+    semester = {for (var i in scoreTable) i.year};
+    statuses = {for (var i in scoreTable) i.status};
+    for (var i in scoreTable) {
+      if (i.status == "公共任选") {
+        randomChoice += i.credit;
+      }
+    }
+    for (var i in scoreTable) {
+      if (i.isPassed != '1' && i.isPassed != "-1") {
+        unPassedSet.add(i.name);
+      }
+      if (unPassedSet.contains(i.name) && i.isPassed == "1") {
+        unPassedSet.remove(i.name);
+
+        /// Whatever score is, if not passed in the first time, count as 60.
+        /// Please take a note of it.
+        i.score = 60;
+        i.name += "(非初修通过)";
+        unPassedSet.remove(i.name);
+      }
+      if (i.isPassed == "-1") {
+        i.name += "(成绩没登完)";
+      }
+    }
+    isSelected = List<bool>.generate(scoreTable.length, (int index) => false);
+    super.initState();
   }
 
   @override
@@ -148,7 +174,7 @@ class _ScoreTableState extends State<ScoreTable> {
                   ),
                   items: [
                     const DropdownMenuItem(value: "", child: Text("所有学期")),
-                    for (var i in scores!.semester)
+                    for (var i in semester)
                       DropdownMenuItem(value: i, child: Text(i))
                   ],
                   onChanged: (String? value) {
@@ -167,7 +193,7 @@ class _ScoreTableState extends State<ScoreTable> {
                   ),
                   items: [
                     const DropdownMenuItem(value: "", child: Text("所有类型")),
-                    for (var i in scores!.statuses)
+                    for (var i in statuses)
                       DropdownMenuItem(value: i, child: Text(i))
                   ],
                   onChanged: (String? value) {
@@ -234,7 +260,7 @@ class _ScoreTableState extends State<ScoreTable> {
                               "所有科目的均分：${_evalAvgScore(true).toStringAsFixed(2)}\n"
                               "所有科目的学分：${_evalCredit(true).toStringAsFixed(2)}\n"
                               "未通过科目：${unPassed()}\n"
-                              "公共选修课已经修得学分：${scores!.randomChoice} / 8.0\n"
+                              "公共选修课已经修得学分：$randomChoice / 8.0\n"
                               "本程序提供的数据仅供参考，开发者对其准确性不负责"),
                           actions: <Widget>[
                             TextButton(

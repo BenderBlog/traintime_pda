@@ -98,5 +98,30 @@ class ClassTable {
         semesterLength = i["SKZC"].toString().length;
       }
     }
+
+    // Uncomment to see the conflict.
+    /*
+    classData.classDetail.add(ClassDetail(
+      name: "测试连课",
+      teacher: "SPRT",
+      place: "Flutter",
+    ));
+    classData.timeArrangement.addAll([
+      TimeArrangement(
+        index: classData.classDetail.length - 1,
+        start: 2,
+        stop: 8,
+        day: 2,
+        weekList: "1111111111111111111111",
+      ),
+      TimeArrangement(
+        index: classData.classDetail.length - 1,
+        start: 4,
+        stop: 8,
+        day: 6,
+        weekList: "1111111111111111111111",
+      ),
+    ]);
+    */
   }
 }

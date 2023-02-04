@@ -1,5 +1,5 @@
 /*
-The class table source.
+The class table window source.
 Copyright 2022 SuperBart
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,9 +16,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:path_provider/path_provider.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
+/// 课程表 4770397878132218
 class ClassTableFile extends EhallSession {
   Future<Map<String, dynamic>> getFromWeb() async {
     Map<String, dynamic> qResult = {};
@@ -62,7 +62,6 @@ class ClassTableFile extends EhallSession {
     return qResult;
   }
 
-  /// 课程表 4770397878132218
   Future<Map<String, dynamic>> get({
     bool focus = false,
   }) async {
@@ -80,41 +79,23 @@ class ClassTableFile extends EhallSession {
     var file = File("${destination.path}/ClassTable.json");
     bool isExist = file.existsSync();
 
-    developer.log(isExist && focus == false ? "Cache" : "Fetch from internet.",
+    developer.log(
+        isExist &&
+                focus == false &&
+                DateTime.now().difference(file.lastModifiedSync()).inDays <= 3
+            ? "Cache"
+            : "Fetch from internet.",
         name: "Ehall getClasstable");
 
-    if (isExist && focus == false) {
+    if (isExist &&
+        focus == false &&
+        DateTime.now().difference(file.lastModifiedSync()).inDays <= 3) {
       return jsonDecode(file.readAsStringSync());
     } else {
       var qResult = await getFromWeb();
       file.writeAsStringSync(jsonEncode(qResult));
       return qResult;
     }
-
-    // Uncomment to see the conflict.
-    /*
-    classData.classDetail.add(ClassDetail(
-      name: "测试连课",
-      teacher: "SPRT",
-      place: "Flutter",
-    ));
-    classData.timeArrangement.addAll([
-      TimeArrangement(
-        index: classData.classDetail.length - 1,
-        start: 2,
-        stop: 8,
-        day: 2,
-        weekList: "1111111111111111111111",
-      ),
-      TimeArrangement(
-        index: classData.classDetail.length - 1,
-        start: 4,
-        stop: 8,
-        day: 6,
-        weekList: "1111111111111111111111",
-      ),
-    ]);
-    */
 
     /*
     onResponse(70, "获取未安排内容");

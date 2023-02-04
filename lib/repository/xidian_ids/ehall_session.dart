@@ -12,12 +12,10 @@ if you want to use.
 Thanks xidian-script and libxdauth!
 */
 
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/user.dart';
 
 class EhallSession extends IDSSession {
@@ -51,7 +49,6 @@ class EhallSession extends IDSSession {
     }
   }
 
-  @protected
   Future<String> useApp(String appID) async {
     developer.log("Ready to use the app $appID.", name: "Ehall useApp");
     developer.log("Try to login.", name: "Ehall useApp");
@@ -116,97 +113,8 @@ class EhallSession extends IDSSession {
     }
   }
 
-  /// 考试成绩 4768574631264620
-  Future<void> getScore({
-    bool focus = false,
-    required void Function(int, String) onResponse,
-  }) async {
-    /// Get information here. resultCode==00000 is successful.
-    developer.log("Check whether the score has fetched in this session.",
-        name: "Ehall getScore");
-    if (scores != null && focus == false) {
-      onResponse(100, "成绩已获取");
-      return;
-    }
-    List<Score> scoreTable = [];
-
-    /// Get all scores here.
-    developer.log("Start getting the score.", name: "Ehall getScore");
-    Map<String, dynamic> querySetting = {
-      'name': 'SFYX',
-      'value': '1',
-      'linkOpt': 'and',
-      'builder': 'm_value_equal',
-    };
-
-    developer.log("Ready to login the system.", name: "Ehall getScore");
-    onResponse(10, "准备获取成绩，正在登录");
-    var firstPost = await useApp("4768574631264620");
-    await dio.get(firstPost);
-
-    developer.log("Getting the score data.", name: "Ehall getScore");
-    onResponse(60, "准备获取成绩，正在处理数据");
-    var getData = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
-      data: {
-        "*json": 1,
-        "querySetting": json.encode(querySetting),
-        "*order": '+XNXQDM,KCH,KXH',
-        'pageSize': 1000,
-        'pageNumber': 1,
-      },
-    ).then((value) => value.data);
-
-    developer.log("Dealing the score data.", name: "Ehall getScore");
-    if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
-      throw getData['datas']['xscjcx']["extParams"]["msg"];
-    }
-    int j = 0;
-    for (var i in getData['datas']['xscjcx']['rows']) {
-      scoreTable.add(Score(
-          mark: j,
-          name: "${i["XSKCM"]}",
-          score: i["ZCJ"] ?? 0.0,
-          year: i["XNXQDM"],
-          credit: i["XF"],
-          status: i["KCXZDM_DISPLAY"],
-          how: int.parse(i["DJCJLXDM"]),
-          level: i["DJCJLXDM"] == "01" || i["DJCJLXDM"] == "02"
-              ? i["DJCJMC"]
-              : null,
-          classID: i["JXBID"],
-          isPassed: i["SFJG"] ?? "-1"));
-      j++;
-      /* //Unable to work.
-      if (i["DJCJLXDM"] == "100") {
-        try {
-          var anotherResponse = await dio.post(
-              "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkxkgcxlrcj.do",
-              data: {
-                "JXBID": scoreTable.last.classID,
-                'XH': user["idsAccount"],
-                'XNXQDM':scoreTable.last.year,
-                'CKLY': "1",
-              },
-            options: Options(
-              headers: {
-                "DNT": "1",
-                "Referer": firstPost
-              },
-            )
-          );
-          //print(anotherResponse.data);
-        } on DioError catch (e) {
-          //print("WTF:" + e.toString());
-          break;
-        }
-      }*/
-    }
-    scores = ScoreList(scoreTable: scoreTable);
-    onResponse(100, "成绩已获取");
-  }
-
   /// 考试安排 4768687067472349
+  @protected
   Future<void> getExamTime() async {
     var firstPost = await useApp("4768687067472349");
     // print(firstPost);

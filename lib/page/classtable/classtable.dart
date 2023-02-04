@@ -12,7 +12,6 @@ if you want to use.
 
 import 'dart:io';
 
-import 'package:flutter/rendering.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';

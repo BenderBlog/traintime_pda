@@ -10,25 +10,17 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login.dart';
-import 'package:watermeter/page/classtable/classtable.dart';
-import 'package:watermeter/page/score/score.dart';
-import 'package:watermeter/page/setting/setting.dart';
-import 'package:watermeter/page/sport/sport_window.dart';
-import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 void main() async {
   developer.log(
@@ -70,15 +62,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.deepPurple,
       ),
-      initialRoute: '/',
-      getPages: [
-        GetPage(name: '/', page: () => HomePage()),
-        GetPage(name: '/login', page: () => const LoginWindow()),
-        GetPage(name: '/sport', page: () => const SportWindow()),
-        GetPage(name: '/score', page: () => const ScoreWindow()),
-        GetPage(name: '/directory', page: () => const XidianDirWindow()),
-        GetPage(name: '/setting', page: () => const SettingWindow()),
-      ],
       home: isFirst ? const LoginWindow() : HomePage(),
     );
   }
