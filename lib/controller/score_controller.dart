@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
@@ -9,13 +11,27 @@ class ScoreController extends GetxController {
 
   @override
   void onReady() async {
-    await ScoreFile().get().onError((error, stackTrace) {
-      error = error.toString();
-      throw error;
-    }).then((value) {
+    get();
+  }
+
+  Future<void> get() async {
+    try {
+      scores = await ScoreFile().get();
       isGet = true;
-      scores = value;
-    });
+      error = null;
+    } on DioError catch (e, s) {
+      developer.log(
+        "Network exception: ${e.message}\nStack: $s",
+        name: "ScoreController",
+      );
+      error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
+    } catch (e, s) {
+      developer.log(
+        "Other exception: $e\nStack: $s",
+        name: "ScoreController",
+      );
+      error = "未知错误，感兴趣的话，请接到电脑 adb 查看日志。";
+    }
     update();
   }
 }

@@ -14,9 +14,11 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/punch_controller.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
 import 'package:watermeter/page/score/score.dart';
+import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
@@ -24,6 +26,7 @@ import 'package:watermeter/page/classtable/classtable.dart';
 class HomePage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
   final scoreController = Get.put(ScoreController());
+  final punchController = Get.put(PunchController());
 
   HomePage({super.key});
 
@@ -72,72 +75,129 @@ class HomePage extends StatelessWidget {
                 child: Card(
                   elevation: 0,
                   color: Theme.of(context).colorScheme.surfaceVariant,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_month_sharp,
-                        size: 96.0,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "课程表 ${c.classTable.semesterCode}",
-                        textScaleFactor: 1.5,
-                      ),
-                    ],
-                  ),
+                  child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(children: [
+                        const Icon(
+                          Icons.calendar_month_outlined,
+                          size: 56,
+                        ),
+                        const SizedBox(width: 15),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "课程表",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            if (c.error != null)
+                              const Text("目前无法使用")
+                            else
+                              const Text("等待实现课程预告功能"),
+                          ],
+                        ),
+                      ])),
                 ),
               ),
             ),
-            GetBuilder<ScoreController>(
+            GetBuilder<PunchController>(
               builder: (c) => GestureDetector(
-                onTap: () {
-                  try {
-                    if (c.isGet == true) {
-                      Get.to(() => ScoreWindow(scores: c.scores));
-                    } else {
-                      Get.snackbar("无法打开", c.error ?? "正在获取成绩信息");
-                    }
-                  } on String catch (e) {
-                    Get.snackbar("遇到错误", e);
+                onTap: () async {
+                  if (c.isGet == true) {
+                    Get.to(() => const SportWindow());
+                  } else {
+                    Get.snackbar("遇到错误", c.error!);
                   }
                 },
                 child: Card(
                   elevation: 0,
                   color: Theme.of(context).colorScheme.surfaceVariant,
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.score,
-                        size: 96.0,
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "成绩查询",
-                        textScaleFactor: 1.5,
-                      ),
-                    ],
-                  ),
+                  child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(children: [
+                        const Icon(
+                          Icons.run_circle_outlined,
+                          size: 52,
+                        ),
+                        const SizedBox(width: 15),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "体育信息",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            if (c.error != null)
+                              const Text("目前无法使用")
+                            else
+                              Text(
+                                  "有效次数 ${c.punch.valid}    所有次数 ${c.punch.allTime}"),
+                          ],
+                        ),
+                      ])),
+                ),
+              ),
+            ),
+            GetBuilder<ScoreController>(
+              builder: (c) => GestureDetector(
+                onTap: () async {
+                  if (c.isGet == true) {
+                    Get.to(() => ScoreWindow(scores: c.scores));
+                  } else if (c.error == null) {
+                    Get.snackbar("请稍候", "正在获取成绩信息");
+                  } else {
+                    Get.snackbar("遇到错误，目前该功能被限制，若想重新启用，请重新启动该程序", c.error!);
+                  }
+                },
+                child: Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(children: [
+                        const Icon(
+                          Icons.score,
+                          size: 52,
+                        ),
+                        const SizedBox(width: 15),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "成绩查询",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const Text("可计算平均分"),
+                          ],
+                        ),
+                      ])),
                 ),
               ),
             ),
             GestureDetector(
-              onTap: () => Get.to(const XidianDirWindow()),
+              onTap: () => Get.to(() => const XidianDirWindow()),
               child: Card(
                 elevation: 0,
                 color: Theme.of(context).colorScheme.surfaceVariant,
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.nightlife,
-                      size: 96.0,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "生活信息",
-                      textScaleFactor: 1.5,
-                    ),
-                  ],
-                ),
+                child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Row(children: [
+                      const Icon(
+                        Icons.nightlife,
+                        size: 52,
+                      ),
+                      const SizedBox(width: 15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "生活信息",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const Text("查询学校服务"),
+                        ],
+                      ),
+                    ])),
               ),
             ),
           ],

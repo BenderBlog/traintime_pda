@@ -1,10 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/repository/xidian_sport/punch_session.dart';
 
 class PunchController extends GetxController {
+  String? error;
   bool isGet = false;
-  String error = "";
   PunchDataList punch = PunchDataList();
 
   @override
@@ -13,14 +15,30 @@ class PunchController extends GetxController {
   }
 
   void updatePunch() async {
-    await PunchSession().get().onError((error, stackTrace) {
+    try {
       isGet = false;
-      error = error.toString();
-      throw error;
-    }).then((value) {
+      punch = await PunchSession().get();
       isGet = true;
-      punch = value;
-    });
+      error = null;
+    } on DioError catch (e, s) {
+      developer.log(
+        "Network exception: ${e.message}\nStack: $s",
+        name: "ScoreController",
+      );
+      error = "网络错误，可能是没联网，可能是体适能服务器可以吃了:-P";
+    } on String catch (e, s) {
+      developer.log(
+        "PunchSession exception: $e\nStack: $s",
+        name: "ScoreController",
+      );
+      error = "来自 PunchSession 的错误：$e:-P";
+    } catch (e, s) {
+      developer.log(
+        "Other exception: $e\nStack: $s",
+        name: "ScoreController",
+      );
+      error = "未知错误，感兴趣的话，请接到电脑 adb 查看日志。";
+    }
     update();
   }
 }
