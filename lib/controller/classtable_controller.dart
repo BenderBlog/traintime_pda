@@ -24,6 +24,11 @@ class ClassTableController extends GetxController {
   // Mark the current week.
   late int currentWeek;
 
+  // Current Information
+  ClassDetail? classToShow;
+  TimeArrangement? timeArrangementToShow;
+  bool? isNext;
+
   @override
   void onReady() async {
     await ClassTableFile().get().onError((error, stackTrace) {
@@ -135,6 +140,49 @@ class ClassTableController extends GetxController {
               }
             }
           }
+        }
+      }
+
+      // Get the current time.
+      DateTime now = DateTime.now();
+      if ((now.hour < 8) ||
+          (now.hour >= 21) ||
+          (now.hour == 20 && now.minute > 35)) {
+        // Empty forever
+      } else {
+        // Check the index.
+        int index = -1;
+        for (int i = 0; i < time.length; ++i) {
+          var split = time[i].split(":");
+          if (now.hour == int.parse(split[0])) {
+            if (now.minute > int.parse(split[1])) {
+              // The time is after the time[i-1]
+              index = i - 1;
+              break;
+            }
+          }
+        }
+        // If in the class, the current class.
+        // Else, the previous class.
+        int anotherIndex =
+            pretendLayout[currentWeek][now.weekday - 1][index ~/ 2][0];
+        // In the class
+        if (index % 2 == 0) {
+          isNext = false;
+          timeArrangementToShow = timeArrangement[anotherIndex];
+        } else {
+          // See the next class.
+          int nextIndex =
+              pretendLayout[currentWeek][now.weekday - 1][index + 1 ~/ 2][0];
+          // If not the same, and really have class.
+          if (anotherIndex != nextIndex && nextIndex != -1) {
+            isNext = true;
+            timeArrangementToShow = timeArrangement[nextIndex];
+          }
+        }
+        if (timeArrangementToShow != null &&
+            timeArrangementToShow!.index != -1) {
+          classToShow = classDetail[timeArrangementToShow!.index];
         }
       }
       isGet = true;

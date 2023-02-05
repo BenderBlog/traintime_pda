@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/punch_controller.dart';
 import 'package:watermeter/controller/score_controller.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 import 'package:watermeter/page/score/score.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
@@ -87,7 +88,11 @@ class HomePage extends StatelessWidget {
                           ),
                           const SizedBox(width: 7.5),
                           Text(
-                            "课程表 下一节课是/正在上：",
+                            c.isNext == null
+                                ? "课程表"
+                                : c.isNext == true
+                                    ? "课程表 下一节课是："
+                                    : "课程表 正在上：",
                             style: TextStyle(
                               fontSize: 14,
                               color: Theme.of(context).colorScheme.primary,
@@ -97,102 +102,75 @@ class HomePage extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 2),
                           child: Text(
-                            "课程名字",
+                            c.classToShow == null
+                                ? "目前没课"
+                                : c.classToShow!.name,
                             style: TextStyle(
                               fontSize: 22,
                               color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
-                        Row(
-                          //mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.room,
+                        c.classToShow == null
+                            ? Text(
+                                "寻找什么呢，我也不知道",
+                                style: TextStyle(
+                                  fontSize: 15,
                                   color: Theme.of(context).colorScheme.primary,
-                                  size: 18,
                                 ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  "地点未定",
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontSize: 14,
+                              )
+                            : Row(
+                                //mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.room,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        c.classToShow!.place ?? "地点未定",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.access_time_filled_outlined,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  "1-4节课",
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontSize: 14,
+                                  const SizedBox(width: 10),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.access_time_filled_outlined,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        "${time[(c.timeArrangementToShow!.start - 1) * 2]}-"
+                                        "${time[(c.timeArrangementToShow!.stop - 1) * 2 + 1]}",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
+                                ],
+                              )
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-            Card(
-              elevation: 0,
-              color: Theme.of(context).colorScheme.secondaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: [
-                      Icon(
-                        Icons.calendar_month_outlined,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        "课程表",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ]),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        "目前没课",
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      "寻找什么呢，我也不知道",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),

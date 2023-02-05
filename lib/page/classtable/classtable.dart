@@ -83,31 +83,6 @@ class PageState extends State<ClassTableWindow> {
     '周日',
   ];
 
-  // Time arrangements.
-  // Even means start, odd means end.
-  List<String> time = [
-    "8:30",
-    "9:15",
-    "9:20",
-    "10:05",
-    "10:25",
-    "11:10",
-    "11:15",
-    "12:00",
-    "14:00",
-    "14:45",
-    "14:50",
-    "15:35",
-    "15:55",
-    "16:40",
-    "16:45",
-    "17:30",
-    "19:00",
-    "19:45",
-    "19:55",
-    "20:30",
-  ];
-
   // Week index.
   int? currentWeekIndex;
 
