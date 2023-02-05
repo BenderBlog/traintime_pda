@@ -59,10 +59,8 @@ class HomePage extends StatelessWidget {
                     if (c.isGet == true) {
                       Get.to(
                         () => LayoutBuilder(
-                          builder: (p0, p1) => ClassTableWindow(
-                            constraints: p1,
-                            classData: c.classTable,
-                          ),
+                          builder: (p0, p1) =>
+                              ClassTableWindow(constraints: p1),
                         ),
                       );
                     } else {

@@ -12,19 +12,18 @@ if you want to use.
 
 import 'dart:io';
 
-import 'package:jiffy/jiffy.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClassTableWindow extends StatefulWidget {
-  final ClassTable classData;
   final BoxConstraints constraints;
   const ClassTableWindow({
     super.key,
     required this.constraints,
-    required this.classData,
   });
 
   @override
@@ -43,9 +42,6 @@ class PageState extends State<ClassTableWindow> {
 
   // The width ratio for the week column.
   static const double leftRow = 32.5;
-
-  // A list as an index of the classtable items.
-  late List<List<List<List<int>>>> pretendLayout;
 
   // The height of the top row.
   static const topRowHeightBig = 95.0;
@@ -112,96 +108,33 @@ class PageState extends State<ClassTableWindow> {
     "20:30",
   ];
 
-  // The start day of the semester.
-  var startDay = DateTime.parse("2022-01-22");
-
-  // Mark the current week.
-  int? currentWeek;
-
   // Week index.
   int? currentWeekIndex;
+
   bool isTopRowLocked = false;
 
   String pageTitle = "我的课表";
 
   late PageController pageControl;
   late ScrollController rowControl;
-
   late BoxDecoration decoration;
 
   // isHorizontal?
   bool isHorizontal() =>
       widget.constraints.maxWidth >= widget.constraints.maxHeight;
 
+  // From now lots of things is inside the Controller.
+  ClassTableController controller = Get.put(ClassTableController());
+
   @override
   void initState() {
-    // Get the start day of the semester.
-    startDay = DateTime.parse(widget.classData.termStartDay);
-    if (user["swift"] != null) {
-      startDay = startDay.add(Duration(days: 7 * int.parse(user["swift"]!)));
-    }
-
-    // Get the current index.
-    // If they decide to start the class in the next semester, well...
-    if (DateTime.now().millisecondsSinceEpoch >=
-        startDay.millisecondsSinceEpoch) {
-      currentWeekIndex =
-          (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
-      // Remember the current week.
-      if (currentWeekIndex! >= 0 &&
-          currentWeekIndex! < widget.classData.semesterLength) {
-        currentWeek = currentWeekIndex;
-      }
-    }
-
     // Deal with the minus currentWeekIndex
-    if (currentWeekIndex == null) {
+    if (controller.currentWeek < 0) {
       currentWeekIndex = 0;
-    } else if (currentWeekIndex! < 0) {
-      currentWeekIndex = widget.classData.semesterLength - 1;
-    }
-
-    // Init the matrix.
-    // 1. prepare the structure, a three-deminision array.
-    //    for week-day~class array
-    pretendLayout = List.generate(
-      widget.classData.semesterLength,
-      (week) => List.generate(7, (day) => List.generate(10, (classes) => [])),
-    );
-
-    // 2. init each week's array
-    for (int week = 0; week < widget.classData.semesterLength; ++week) {
-      for (int day = 0; day < 7; ++day) {
-        // 2.a. Choice the class in this day.
-        List<TimeArrangement> thisDay = [];
-        for (var i in widget.classData.timeArrangement) {
-          // If the class has ended, skip.
-          if (i.weekList.length < week + 1) {
-            continue;
-          }
-          if (i.weekList[week] == "1" && i.day == day + 1) {
-            thisDay.add(i);
-          }
-        }
-
-        // 2.b. The longest class should be solved first.
-        thisDay.sort((a, b) => b.step.compareTo(a.step));
-
-        // 2.c Arrange the layout. Solve the conflex.
-        for (var i in thisDay) {
-          for (int j = i.start - 1; j <= i.stop - 1; ++j) {
-            pretendLayout[week][day][j]
-                .add(widget.classData.timeArrangement.indexOf(i));
-          }
-        }
-
-        // 2.d. Deal with the empty space.
-        for (var i in pretendLayout[week][day]) {
-          if (i.isEmpty) {
-            i.add(-1);
-          }
-        }
-      }
+    } else if (controller.currentWeek >= controller.semesterLength) {
+      currentWeekIndex = controller.semesterLength - 1;
+    } else {
+      currentWeekIndex = controller.currentWeek;
     }
 
     // Init the controller.
@@ -254,7 +187,7 @@ class PageState extends State<ClassTableWindow> {
               AutoSizeText(
                 "第${index + 1}周",
                 style: TextStyle(
-                    fontWeight: index == currentWeek
+                    fontWeight: index == controller.currentWeek
                         ? FontWeight.bold
                         : FontWeight.normal),
                 maxLines: 1,
@@ -268,7 +201,8 @@ class PageState extends State<ClassTableWindow> {
                   children: [
                     for (int i = 0; i < 10; i += 2)
                       for (int day = 0; day < 5; ++day)
-                        dot(!pretendLayout[index][day][i].contains(-1))
+                        dot(!controller.pretendLayout[index][day][i]
+                            .contains(-1))
                   ],
                 ),
             ],
@@ -287,7 +221,7 @@ class PageState extends State<ClassTableWindow> {
         child: ListView.builder(
           controller: rowControl,
           scrollDirection: Axis.horizontal,
-          itemCount: widget.classData.semesterLength,
+          itemCount: controller.semesterLength,
           itemBuilder: (BuildContext context, int index) {
             return Container(
               margin: const EdgeInsets.symmetric(
@@ -347,8 +281,8 @@ class PageState extends State<ClassTableWindow> {
             },
           ),
         ],
-        bottom: (widget.classData.timeArrangement.isNotEmpty &&
-                widget.classData.classDetail.isNotEmpty)
+        bottom: (controller.timeArrangement.isNotEmpty &&
+                controller.classDetail.isNotEmpty)
             ? PreferredSize(
                 preferredSize: Size.fromHeight(
                     widget.constraints.maxHeight >= 500
@@ -357,8 +291,8 @@ class PageState extends State<ClassTableWindow> {
                 child: _topView())
             : null,
       ),
-      body: (widget.classData.timeArrangement.isNotEmpty &&
-              widget.classData.classDetail.isNotEmpty)
+      body: (controller.timeArrangement.isNotEmpty &&
+              controller.classDetail.isNotEmpty)
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -384,7 +318,7 @@ class PageState extends State<ClassTableWindow> {
                     const SizedBox(
                       height: 30,
                     ),
-                    Text("${widget.classData.semesterCode} 学期没有课程，不会吧?"),
+                    Text("${controller.semesterCode} 学期没有课程，不会吧?"),
                     const Text("如果搞错学期，快去设置调整。"),
                     const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
                     const Text("如果你要毕业了，祝你前程似锦。"),
@@ -410,7 +344,7 @@ class PageState extends State<ClassTableWindow> {
             isTopRowLocked = false;
           }
         },
-        itemCount: widget.classData.semesterLength,
+        itemCount: controller.semesterLength,
         itemBuilder: (context, index) => Column(
           children: [
             // The main class table.
@@ -424,7 +358,7 @@ class PageState extends State<ClassTableWindow> {
   // The middle row is used to show the date and week.
   Widget _middleView(int weekIndex) {
     // Update the weeklist.
-    DateTime firstDay = startDay.add(Duration(days: weekIndex * 7));
+    DateTime firstDay = controller.startDay.add(Duration(days: weekIndex * 7));
     List<DateTime> dateList =
         List.generate(7, (i) => firstDay.add(Duration(days: i)));
 
@@ -545,18 +479,16 @@ class PageState extends State<ClassTableWindow> {
                   padding: const EdgeInsets.all(3),
                   child: Center(
                     child: Text(
-                      widget
-                          .classData
-                          .classDetail[
-                              widget.classData.timeArrangement[index].index]
+                      controller
+                          .classDetail[controller.timeArrangement[index].index]
                           .toString(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 11.5,
                         color: index != -1
-                            ? colorList[widget.classData.timeArrangement[index]
-                                        .index %
-                                    colorList.length]
+                            ? colorList[
+                                    controller.timeArrangement[index].index %
+                                        colorList.length]
                                 .shade900
                             : Colors.white,
                       ),
@@ -575,7 +507,7 @@ class PageState extends State<ClassTableWindow> {
                 // Border
                 color: index == -1
                     ? const Color(0x00000000)
-                    : colorList[widget.classData.timeArrangement[index].index %
+                    : colorList[controller.timeArrangement[index].index %
                             colorList.length]
                         .shade300
                         .withOpacity(0.75),
@@ -588,9 +520,8 @@ class PageState extends State<ClassTableWindow> {
                   child: Container(
                     color: index == -1
                         ? const Color(0x00000000)
-                        : colorList[
-                                widget.classData.timeArrangement[index].index %
-                                    colorList.length]
+                        : colorList[controller.timeArrangement[index].index %
+                                colorList.length]
                             .shade100
                             .withOpacity(0.7),
                     child: inside,
@@ -608,18 +539,21 @@ class PageState extends State<ClassTableWindow> {
         // Choice the day and render it!
         for (int i = 0; i < 10; ++i) {
           // Places in the onTable array.
-          int places = pretendLayout[weekIndex][index - 1][i].first;
+          int places = controller.pretendLayout[weekIndex][index - 1][i].first;
 
           // The length to render.
           int count = 1;
-          Set<int> conflict = pretendLayout[weekIndex][index - 1][i].toSet();
+          Set<int> conflict =
+              controller.pretendLayout[weekIndex][index - 1][i].toSet();
 
           // Decide the length to render. i limit the end.
           while (i < 9 &&
-              pretendLayout[weekIndex][index - 1][i + 1].first == places) {
+              controller.pretendLayout[weekIndex][index - 1][i + 1].first ==
+                  places) {
             count++;
             i++;
-            conflict.addAll(pretendLayout[weekIndex][index - 1][i].toSet());
+            conflict.addAll(
+                controller.pretendLayout[weekIndex][index - 1][i].toSet());
           }
 
           // Do not include empty spaces...
@@ -697,7 +631,7 @@ class PageState extends State<ClassTableWindow> {
 
   Widget _buttomInformation(Set<int> conflict) {
     Widget classInfoBox(TimeArrangement i) {
-      ClassDetail toShow = widget.classData.classDetail[i.index];
+      ClassDetail toShow = controller.classDetail[i.index];
       var infoColor = colorList[i.index % colorList.length];
 
       Widget weekDoc(int index, bool isOccupied) => ClipOval(
@@ -705,7 +639,7 @@ class PageState extends State<ClassTableWindow> {
               decoration: BoxDecoration(
                 color: isOccupied ? infoColor.shade200 : null,
                 borderRadius: const BorderRadius.all(Radius.circular(100.0)),
-                border: index - 1 == currentWeek
+                border: index - 1 == controller.currentWeek
                     ? Border.all(width: 2, color: infoColor)
                     : null,
               ),
@@ -829,7 +763,7 @@ class PageState extends State<ClassTableWindow> {
     }
 
     List<TimeArrangement> information = List.generate(conflict.length,
-        (index) => widget.classData.timeArrangement[conflict.elementAt(index)]);
+        (index) => controller.timeArrangement[conflict.elementAt(index)]);
 
     List<Widget> toShow = List.generate(
       conflict.length,
