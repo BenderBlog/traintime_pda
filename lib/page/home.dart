@@ -50,7 +50,7 @@ class HomePage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: ListView(
           children: [
             GetBuilder<ClassTableController>(
               builder: (c) => GestureDetector(
@@ -74,131 +74,284 @@ class HomePage extends StatelessWidget {
                 },
                 child: Card(
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.secondaryContainer,
                   child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(children: [
-                        const Icon(
-                          Icons.calendar_month_outlined,
-                          size: 56,
-                        ),
-                        const SizedBox(width: 15),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "课程表",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            if (c.error != null)
-                              const Text("目前无法使用")
-                            else
-                              const Text("等待实现课程预告功能"),
-                          ],
-                        ),
-                      ])),
-                ),
-              ),
-            ),
-            GetBuilder<PunchController>(
-              builder: (c) => GestureDetector(
-                onTap: () async {
-                  if (c.isGet == true) {
-                    Get.to(() => const SportWindow());
-                  } else {
-                    Get.snackbar("遇到错误", c.error!);
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(children: [
-                        const Icon(
-                          Icons.run_circle_outlined,
-                          size: 52,
-                        ),
-                        const SizedBox(width: 15),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "体育信息",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            if (c.error != null)
-                              const Text("目前无法使用")
-                            else
-                              Text(
-                                  "有效次数 ${c.punch.valid}    所有次数 ${c.punch.allTime}"),
-                          ],
-                        ),
-                      ])),
-                ),
-              ),
-            ),
-            GetBuilder<ScoreController>(
-              builder: (c) => GestureDetector(
-                onTap: () async {
-                  if (c.isGet == true) {
-                    Get.to(() => ScoreWindow(scores: c.scores));
-                  } else if (c.error == null) {
-                    Get.snackbar("请稍候", "正在获取成绩信息");
-                  } else {
-                    Get.snackbar("遇到错误，目前该功能被限制，若想重新启用，请重新启动该程序", c.error!);
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(children: [
-                        const Icon(
-                          Icons.score,
-                          size: 52,
-                        ),
-                        const SizedBox(width: 15),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "成绩查询",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const Text("可计算平均分"),
-                          ],
-                        ),
-                      ])),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () => Get.to(() => const XidianDirWindow()),
-              child: Card(
-                elevation: 0,
-                color: Theme.of(context).colorScheme.surfaceVariant,
-                child: Padding(
                     padding: const EdgeInsets.all(15),
-                    child: Row(children: [
-                      const Icon(
-                        Icons.nightlife,
-                        size: 52,
-                      ),
-                      const SizedBox(width: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "生活信息",
-                            style: Theme.of(context).textTheme.titleLarge,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Icon(
+                            Icons.calendar_month_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 14,
                           ),
-                          const Text("查询学校服务"),
-                        ],
-                      ),
-                    ])),
+                          const SizedBox(width: 7.5),
+                          Text(
+                            "课程表 下一节课是/正在上：",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ]),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text(
+                            "课程名字",
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.room,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  "地点未定",
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 10),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time_filled_outlined,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  "1-4节课",
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
               ),
+            ),
+            Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Icon(
+                        Icons.calendar_month_outlined,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "课程表",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ]),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text(
+                        "目前没课",
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      "寻找什么呢，我也不知道",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              childAspectRatio: 1.75,
+              children: [
+                GetBuilder<PunchController>(
+                  builder: (c) => GestureDetector(
+                    onTap: () async {
+                      if (c.isGet == true) {
+                        Get.to(() => const SportWindow());
+                      } else {
+                        Get.snackbar("遇到错误", c.error!);
+                      }
+                    },
+                    child: Card(
+                      elevation: 0,
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
+                                Icon(
+                                  Icons.run_circle,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 7.5),
+                                Text(
+                                  "体育信息",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                              ]),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: Center(
+                                  child: c.error != null
+                                      ? Text(
+                                          "目前无法使用",
+                                          textScaleFactor: 1.5,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                        )
+                                      : Text(
+                                          "有效次数 ${c.punch.valid}\n"
+                                          "所有次数 ${c.punch.allTime}",
+                                          textScaleFactor: 1.15,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ]),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              childAspectRatio: 2.25,
+              children: [
+                GetBuilder<ScoreController>(
+                  builder: (c) => GestureDetector(
+                    onTap: () async {
+                      if (c.isGet == true) {
+                        Get.to(() => ScoreWindow(scores: c.scores));
+                      } else if (c.error == null) {
+                        Get.snackbar("请稍候", "正在获取成绩信息");
+                      } else {
+                        Get.snackbar("遇到错误，目前该功能被限制，若想重新启用，请重新启动该程序", c.error!);
+                      }
+                    },
+                    child: Card(
+                      elevation: 0,
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const Icon(
+                                Icons.score,
+                                size: 48,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    "成绩查询",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  Text(
+                                    "可计算平均分",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Get.to(() => const XidianDirWindow()),
+                  child: Card(
+                    elevation: 0,
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            const Icon(
+                              Icons.nightlife_rounded,
+                              size: 48,
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  "生活信息",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                Text(
+                                  "查询学校服务",
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
