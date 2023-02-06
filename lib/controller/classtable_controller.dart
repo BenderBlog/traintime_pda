@@ -74,8 +74,8 @@ class ClassTableController extends GetxController {
       timeArrangement.addAll([
         TimeArrangement(
           index: classDetail.length - 1,
-          start: 5,
-          stop: 6,
+          start: 9,
+          stop: 10,
           day: 1,
           weekList: "1111111111111111111111",
         ),
@@ -153,16 +153,19 @@ class ClassTableController extends GetxController {
             name: "ClassTableController",
           );
           for (int i = 0; i < time.length; ++i) {
-            // developer.log("deal with time[$i] = ${time[i]}", name: "ClassTableController");
+            print(time[i]);
             var split = time[i].split(":");
-            if (now.hour == int.parse(split[0])) {
-              if (now.minute < int.parse(split[1])) {
-                // The time is after the time[i-1]
-                index = i - 1;
-                break;
-              }
+
+            int toDeal = 60 * int.parse(split[0]) + int.parse(split[1]);
+            int currentTime = 60 * now.hour + now.minute;
+
+            if (currentTime < toDeal) {
+              // The time is after the time[i-1]
+              index = i - 1;
+              break;
             }
           }
+          print(index);
           developer.log(
             "Current time is after ${time[index]} $index",
             name: "ClassTableController",

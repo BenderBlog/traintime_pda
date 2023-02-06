@@ -37,10 +37,8 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   cookie_jar: ^3.0.1
   path_provider: ^2.0.11
-  sqflite: ^2.2.4+1
   file_picker: ^5.2.5
   # Deal with html
-  html: ^0.15.0
   beautiful_soup_dart: ^0.3.0
   # Setting
   settings_ui: ^2.0.2
