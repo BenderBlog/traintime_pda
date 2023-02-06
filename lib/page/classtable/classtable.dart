@@ -155,20 +155,28 @@ class PageState extends State<ClassTableWindow> {
           ),
         );
 
-    Widget buttonInformaion(int index) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              AutoSizeText(
-                "第${index + 1}周",
-                style: TextStyle(
-                    fontWeight: index == controller.currentWeek
-                        ? FontWeight.bold
-                        : FontWeight.normal),
-                maxLines: 1,
-              ),
-              if (widget.constraints.maxHeight >= 500)
-                GridView.count(
+    Widget buttonInformaion(int index) => Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            AutoSizeText(
+              "第${index + 1}周",
+              style: TextStyle(
+                  fontWeight: index == controller.currentWeek
+                      ? FontWeight.bold
+                      : FontWeight.normal),
+              maxLines: 1,
+              textScaleFactor: 0.9,
+              group: AutoSizeGroup(),
+            ),
+            if (widget.constraints.maxHeight >= 500)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  7.5,
+                  1.0,
+                  7.5,
+                  3.0,
+                ),
+                child: GridView.count(
                   shrinkWrap: true,
                   crossAxisCount: 5,
                   mainAxisSpacing: 2,
@@ -180,8 +188,8 @@ class PageState extends State<ClassTableWindow> {
                             .contains(-1))
                   ],
                 ),
-            ],
-          ),
+              ),
+          ],
         );
 
     return SizedBox(
@@ -200,31 +208,40 @@ class PageState extends State<ClassTableWindow> {
           itemBuilder: (BuildContext context, int index) {
             return Container(
               margin: const EdgeInsets.symmetric(
-                  horizontal: weekButtonHorizontalPadding),
+                horizontal: weekButtonHorizontalPadding,
+              ),
               child: SizedBox(
                 width: weekButtonWidth,
-                child: MaterialButton(
+                child: Card(
                   color: Theme.of(context)
                       .primaryColor
                       .withOpacity(currentWeekIndex == index ? 0.3 : 0.0),
-                  splashColor: Theme.of(context).primaryColor.withOpacity(0.3),
-                  highlightColor:
-                      Theme.of(context).primaryColor.withOpacity(0.3),
-                  focusColor: Theme.of(context).primaryColor.withOpacity(0.3),
                   elevation: 0.0,
-                  onPressed: () {
-                    isTopRowLocked = true;
-                    setState(() {
-                      currentWeekIndex = index;
-                      pageControl.animateToPage(
-                        index,
-                        curve: Curves.easeInOutCubic,
-                        duration: const Duration(milliseconds: changePageTime),
-                      );
-                      changeTopRow(index);
-                    });
-                  },
-                  child: buttonInformaion(index),
+                  child: InkWell(
+                    // The same as the Material 3 Card Radius.
+                    borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+                    splashColor:
+                        Theme.of(context).primaryColor.withOpacity(0.1),
+                    highlightColor:
+                        Theme.of(context).primaryColor.withOpacity(0.3),
+                    onTap: () {
+                      isTopRowLocked = true;
+                      setState(() {
+                        currentWeekIndex = index;
+                        pageControl.animateToPage(
+                          index,
+                          curve: Curves.easeInOutCubic,
+                          duration:
+                              const Duration(milliseconds: changePageTime),
+                        );
+                        changeTopRow(index);
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: buttonInformaion(index),
+                    ),
+                  ),
                 ),
               ),
             );

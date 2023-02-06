@@ -65,7 +65,7 @@ class ClassTableController extends GetxController {
       }
 
       // Uncomment to see the conflict.
-
+      /*
       classDetail.add(ClassDetail(
         name: "测试连课",
         teacher: "SPRT",
@@ -86,7 +86,8 @@ class ClassTableController extends GetxController {
           day: 3,
           weekList: "1111111111111111111111",
         ),
-      ]);
+      ]);*/
+
       // Get the start day of the semester.
       startDay = DateTime.parse(termStartDay);
       if (user["swift"] != null) {
@@ -186,8 +187,8 @@ class ClassTableController extends GetxController {
               name: "ClassTableController",
             );
             // See the next class.
-            int nextIndex =
-                pretendLayout[currentWeek][now.weekday - 1][index + 1 ~/ 2][0];
+            int nextIndex = pretendLayout[currentWeek][now.weekday - 1]
+                [(index + 1) ~/ 2][0];
             // If really have class.
             if (nextIndex != -1) {
               if (currentClassIndex != nextIndex) {
