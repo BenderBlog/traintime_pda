@@ -153,7 +153,6 @@ class ClassTableController extends GetxController {
             name: "ClassTableController",
           );
           for (int i = 0; i < time.length; ++i) {
-            print(time[i]);
             var split = time[i].split(":");
 
             int toDeal = 60 * int.parse(split[0]) + int.parse(split[1]);
@@ -165,7 +164,6 @@ class ClassTableController extends GetxController {
               break;
             }
           }
-          print(index);
           developer.log(
             "Current time is after ${time[index]} $index",
             name: "ClassTableController",
