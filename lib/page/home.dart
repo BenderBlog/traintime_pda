@@ -65,10 +65,12 @@ class HomePage extends StatelessWidget {
                         ),
                       );
                     } else {
-                      Get.snackbar("无法打开", c.error ?? "正在获取课表");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(c.error ?? "正在获取课表")));
                     }
                   } on String catch (e) {
-                    Get.snackbar("遇到错误", e);
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text("遇到错误$e")));
                   }
                 },
                 child: Card(
@@ -255,9 +257,18 @@ class HomePage extends StatelessWidget {
                       if (c.isGet == true) {
                         Get.to(() => ScoreWindow(scores: c.scores));
                       } else if (c.error == null) {
-                        Get.snackbar("请稍候", "正在获取成绩信息");
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          content: Text(
+                            "请稍候 正在获取成绩信息",
+                          ),
+                        ));
                       } else {
-                        Get.snackbar("遇到错误，目前该功能被限制，若想重新启用，请重新启动该程序", c.error!);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          content: Text("遇到错误，信息如下：\n${c.error!}"),
+                        ));
                       }
                     },
                     child: Card(
