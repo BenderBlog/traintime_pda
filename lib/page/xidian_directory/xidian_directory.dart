@@ -11,7 +11,6 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/page/xidian_directory/subwindow/comprehensive.dart';
 import 'package:watermeter/page/xidian_directory/subwindow/dininghall.dart';
 import 'package:watermeter/page/xidian_directory/subwindow/telephone.dart';
@@ -34,22 +33,6 @@ class TabForXDDir extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("生活信息"),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.info),
-              onPressed: () => launchUrl(
-                Uri.parse("https://ncov.hawa130.com/about"),
-                mode: LaunchMode.externalApplication,
-              ),
-            ),
-          ],
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.store_mall_directory)),

@@ -34,19 +34,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static const _pageItems = [
-    BottomNavigationBarItem(
-      icon: Icon(Icons.home),
-      label: '主页',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.settings),
-      label: '设置',
-    ),
-  ];
-
   static final _page = [
     MainPage(),
+    const XidianDirWindow(),
+    const Placeholder(),
     const SettingWindow(),
   ];
 
@@ -55,10 +46,35 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       //extendBodyBehindAppBar: true,
       body: _page[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: _pageItems,
-        currentIndex: _selectedIndex,
-        onTap: (int index) {
+      bottomNavigationBar: NavigationBar(
+        destinations: [
+          NavigationDestination(
+            icon: _selectedIndex == 0
+                ? const Icon(Icons.home)
+                : const Icon(Icons.home_outlined),
+            label: '主页',
+          ),
+          NavigationDestination(
+            icon: _selectedIndex == 1
+                ? const Icon(Icons.store)
+                : const Icon(Icons.store_outlined),
+            label: '西电目录',
+          ),
+          NavigationDestination(
+            icon: _selectedIndex == 2
+                ? const Icon(Icons.feed)
+                : const Icon(Icons.feed_outlined),
+            label: 'XDU Planet',
+          ),
+          NavigationDestination(
+            icon: _selectedIndex == 3
+                ? const Icon(Icons.settings)
+                : const Icon(Icons.settings_outlined),
+            label: '设置',
+          ),
+        ],
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
           setState(() {
             _selectedIndex = index;
           });
@@ -87,11 +103,13 @@ class MainPage extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 // Bing Pic https://api.cyrilstudio.top/bing/image.php
-                // Another ACG https://px.s.rainchan.win/random
-                // Random ACG https://acgapi.shifeiti.com/api/
-                // Touhou https://img.paulzzh.tech/touhou/random
-                image: Image.network("https://img.paulzzh.tech/touhou/random")
-                    .image,
+                // Shifeiti ACG API https://acgapi.shifeiti.com/api/
+                // Touhou Pic API https://img.paulzzh.tech/touhou/random
+                image: ResizeImage(
+                  Image.network("https://api.cyrilstudio.top/bing/image.php")
+                      .image,
+                  width: MediaQuery.of(context).size.width.toInt() * 2,
+                ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -361,41 +379,6 @@ class MainPage extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Get.to(() => const XidianDirWindow()),
-                        child: Card(
-                          elevation: 0,
-                          color: Theme.of(context).colorScheme.surfaceVariant,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Icon(
-                                    Icons.nightlife_rounded,
-                                    size: 48,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Text(
-                                        "生活信息",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      Text(
-                                        "查询学校服务",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ],
                               ),
                             ),
                           ),
