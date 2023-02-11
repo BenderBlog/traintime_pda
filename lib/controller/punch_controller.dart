@@ -12,11 +12,13 @@ class PunchController extends GetxController {
   @override
   void onReady() async {
     updatePunch();
+    update();
   }
 
   void updatePunch() async {
+    isGet = false;
+    error = null;
     try {
-      isGet = false;
       punch = await PunchSession().get();
       isGet = true;
       error = null;

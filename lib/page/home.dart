@@ -160,11 +160,13 @@ class MainPage extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 7.5),
                                 Text(
-                                  c.isNext == null
-                                      ? "课程表"
-                                      : c.isNext == true
-                                          ? "课程表 下一节课是："
-                                          : "课程表 正在上：",
+                                  c.isGet == true
+                                      ? c.isNext == null
+                                          ? "课程表"
+                                          : c.isNext == true
+                                              ? "课程表 下一节课是："
+                                              : "课程表 正在上："
+                                      : "课程表",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -175,9 +177,13 @@ class MainPage extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 2),
                                 child: Text(
-                                  c.classToShow == null
-                                      ? "目前没课"
-                                      : c.classToShow!.name,
+                                  c.isGet == true
+                                      ? c.classToShow == null
+                                          ? "目前没课"
+                                          : c.classToShow!.name
+                                      : c.error == null
+                                          ? "正在加载"
+                                          : "遇到错误",
                                   style: TextStyle(
                                     fontSize: 22,
                                     color:
@@ -187,7 +193,11 @@ class MainPage extends StatelessWidget {
                               ),
                               c.classToShow == null
                                   ? Text(
-                                      "寻找什么呢，我也不知道",
+                                      c.isGet == true
+                                          ? "寻找什么呢，我也不知道"
+                                          : c.error == null
+                                              ? "请耐心等待片刻"
+                                              : "课表获取失败",
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Theme.of(context)
@@ -260,8 +270,18 @@ class MainPage extends StatelessWidget {
                           onTap: () async {
                             if (c.isGet == true) {
                               Get.to(() => const SportWindow());
+                            } else if (c.error != null) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                content: Text("遇到错误"),
+                              ));
                             } else {
-                              Get.snackbar("遇到错误", c.error!);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                content: Text("请稍候，正在刷新信息"),
+                              ));
                             }
                           },
                           child: Card(
@@ -304,16 +324,26 @@ class MainPage extends StatelessWidget {
                                                       .primary,
                                                 ),
                                               )
-                                            : Text(
-                                                "有效次数 ${c.punch.valid}\n"
-                                                "所有次数 ${c.punch.allTime}",
-                                                textScaleFactor: 1.15,
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                ),
-                                              ),
+                                            : c.isGet == false
+                                                ? Text(
+                                                    "正在加载",
+                                                    textScaleFactor: 1.15,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primary,
+                                                    ),
+                                                  )
+                                                : Text(
+                                                    "有效次数 ${c.punch.valid}\n"
+                                                    "所有次数 ${c.punch.allTime}",
+                                                    textScaleFactor: 1.15,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primary,
+                                                    ),
+                                                  ),
                                       ),
                                     ),
                                   ]),
@@ -385,6 +415,21 @@ class MainPage extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text("请稍候，正在刷新信息"),
+                      ));
+                      classTableController.updateClassTable(isForce: true);
+                      classTableController.update();
+                      scoreController.get();
+                      scoreController.update();
+                      punchController.updatePunch();
+                      punchController.update();
+                    },
+                    color: Colors.deepPurple,
                   ),
                 ],
               ),

@@ -32,12 +32,24 @@ class ClassTableController extends GetxController {
 
   @override
   void onReady() async {
+    await updateClassTable();
+    update();
+  }
+
+  Future<void> updateClassTable({bool isForce = false}) async {
+    isGet = false;
+    error = null;
     try {
-      var value = await ClassTableFile().get();
+      var value = await ClassTableFile().get(isForce: isForce);
+
+      // Init the arraies.
+      classDetail = [];
+      timeArrangement = [];
 
       // Deal with the classtable data.
       semesterCode = value["semesterCode"];
       termStartDay = value["termStartDay"];
+      developer.log(termStartDay, name: "updateClassTable");
       semesterLength = 0;
       for (var i in value["rows"]) {
         var toDeal = ClassDetail(
@@ -207,11 +219,10 @@ class ClassTableController extends GetxController {
         }
       }
       isGet = true;
+      update();
     } catch (e, s) {
       error = e.toString() + s.toString();
       throw error!;
     }
-
-    update();
   }
 }

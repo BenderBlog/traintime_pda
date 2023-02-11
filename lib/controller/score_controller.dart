@@ -12,9 +12,12 @@ class ScoreController extends GetxController {
   @override
   void onReady() async {
     get();
+    update();
   }
 
   Future<void> get() async {
+    isGet = false;
+    error = null;
     try {
       scores = await ScoreFile().get();
       isGet = true;

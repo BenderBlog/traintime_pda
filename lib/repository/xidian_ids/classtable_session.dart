@@ -63,7 +63,7 @@ class ClassTableFile extends EhallSession {
   }
 
   Future<Map<String, dynamic>> get({
-    bool focus = false,
+    bool isForce = false,
   }) async {
     developer.log("Check whether the classtable has fetched.",
         name: "Ehall getClasstable");
@@ -81,14 +81,14 @@ class ClassTableFile extends EhallSession {
 
     developer.log(
         isExist &&
-                focus == false &&
+                isForce == false &&
                 DateTime.now().difference(file.lastModifiedSync()).inDays <= 3
             ? "Cache"
             : "Fetch from internet.",
         name: "Ehall getClasstable");
 
     if (isExist &&
-        focus == false &&
+        isForce == false &&
         DateTime.now().difference(file.lastModifiedSync()).inDays <= 3) {
       return jsonDecode(file.readAsStringSync());
     } else {
