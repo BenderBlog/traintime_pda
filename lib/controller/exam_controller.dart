@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:developer' as developer;
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 
@@ -22,9 +23,14 @@ class ExamController extends GetxController {
     error = null;
     try {
       var qResult = await ExamFile().get(semester: semesterStr);
+      int grade = int.parse("20${user["idsAccount"]!.substring(0, 1)}");
+
       if (semesterStr == null) {
         for (var i in qResult["semester"]) {
-          semesters.add(i["DM"]);
+          int start = int.parse(i["DM"].toString().substring(0, 3));
+          if (start >= grade && start < grade + 4) {
+            semesters.add(i["DM"]);
+          }
         }
       }
 

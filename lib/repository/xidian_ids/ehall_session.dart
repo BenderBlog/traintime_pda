@@ -13,7 +13,6 @@ Thanks xidian-script and libxdauth!
 */
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/model/user.dart';

@@ -89,7 +89,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     ),
                     (toUse) => toUse,
                   )
-                : const Center(child: Text("没有考试安排，考古愉快(确信)"))
+                : const Center(child: Text("没有考试安排"))
             : c.error != null
                 ? Center(child: Text(c.error.toString()))
                 : const Center(child: Text("正在加载")),
