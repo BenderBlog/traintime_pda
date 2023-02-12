@@ -7,6 +7,12 @@ class Subject {
   String time;
   String place;
   int seat;
+
+  @override
+  String toString() {
+    return "$subject $type $teacher $time $place $seat\n";
+  }
+
   Subject({
     required this.subject,
     required this.type,
@@ -24,6 +30,12 @@ class ToBeArranged {
   String subject;
   String? teacher;
   String id;
+
+  @override
+  String toString() {
+    return "$subject $teacher $id\n";
+  }
+
   ToBeArranged({
     required this.subject,
     this.teacher,

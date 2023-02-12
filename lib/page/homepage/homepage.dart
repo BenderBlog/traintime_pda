@@ -13,6 +13,8 @@ if you want to use.
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/page/exam/exam.dart';
 
 import 'package:watermeter/page/homepage/clipper.dart';
 
@@ -29,6 +31,7 @@ class MainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
   final scoreController = Get.put(ScoreController());
   final punchController = Get.put(PunchController());
+  final examController = Get.put(ExamController());
 
   Widget classTableCard(BuildContext context) =>
       GetBuilder<ClassTableController>(
@@ -312,6 +315,58 @@ class MainPage extends StatelessWidget {
                 ),
               ),
             ),
+            GetBuilder<ExamController>(
+              builder: (c) => GestureDetector(
+                onTap: () async {
+                  if (c.isGet == true) {
+                    Get.to(() => const ExamInfoWindow());
+                  } else if (c.error == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text(
+                        "请稍候 正在获取考试信息",
+                      ),
+                    ));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text("遇到错误，信息如下：\n${c.error!}"),
+                    ));
+                  }
+                },
+                child: Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Icon(
+                            Icons.calendar_month,
+                            size: 48,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Text(
+                                "考试查询",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Text(
+                                "上天保佑时间",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       );
@@ -335,6 +390,8 @@ class MainPage extends StatelessWidget {
         scoreController.update();
         punchController.updatePunch();
         punchController.update();
+        examController.get();
+        examController.update();
       },
       header: BuilderHeader(
         clamping: false,

@@ -62,3 +62,26 @@ Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init,
         vertical: 9.0,
       ),
     );
+
+/// Colors for the class information card.
+const colorList = [
+  Colors.red,
+  Colors.pink,
+  Colors.purple,
+  Colors.deepPurple,
+  Colors.indigo,
+  Colors.blue,
+  Colors.lightBlue,
+  Colors.cyan,
+  Colors.teal,
+  Colors.green,
+  Colors.lightGreen,
+  Colors.lime,
+  Colors.yellow,
+  Colors.orange,
+  Colors.deepOrange,
+  Colors.brown,
+];
+
+/// Colors for class information card which not in this week.
+const uselessColor = Colors.grey;

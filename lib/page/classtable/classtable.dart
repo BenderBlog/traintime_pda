@@ -14,10 +14,11 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/user.dart';
+import 'package:watermeter/page/widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 
 class ClassTableWindow extends StatefulWidget {
   final BoxConstraints constraints;
@@ -50,28 +51,6 @@ class PageState extends State<ClassTableWindow> {
   // The height of the middle row.
   static const midRowHeightVertical = 60.0;
   static const midRowHeightHorizontal = 30.0;
-
-  // Colors for the class information card.
-  static const colorList = [
-    Colors.red,
-    Colors.pink,
-    Colors.purple,
-    Colors.deepPurple,
-    Colors.indigo,
-    Colors.blue,
-    Colors.lightBlue,
-    Colors.cyan,
-    Colors.teal,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.yellow,
-    Colors.orange,
-    Colors.deepOrange,
-    Colors.brown,
-  ];
-  // Colors for class information card which not in this week.
-  static const uselessColor = Colors.grey;
 
   List<String> weekList = [
     '周一',

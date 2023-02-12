@@ -27,15 +27,19 @@ class ExamController extends GetxController {
           semesters.add(i["DM"]);
         }
       }
+
       subjects = [];
-      for (var i in qResult["subjects"]) {
-        subjects.add(Subject(
-          subject: i["KCM"],
-          type: i["KSMC"],
-          time: i["KSSJMS"],
-          place: i["JASMC"],
-          seat: int.parse(i["ZWH"]),
-        ));
+      if (qResult["subjects"] != null) {
+        for (var i in qResult["subjects"]) {
+          subjects.add(Subject(
+            subject: i["KCM"],
+            type: i["KSMC"],
+            time: i["KSSJMS"],
+            place: i["JASMC"],
+            teacher: i["ZJJSXM"],
+            seat: int.parse(i["ZWH"]),
+          ));
+        }
       }
 
       toBeArranged = [];

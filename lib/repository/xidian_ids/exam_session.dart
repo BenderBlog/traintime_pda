@@ -40,7 +40,9 @@ class ExamFile extends EhallSession {
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)
     /// If failed, it is more likely that no exam has arranged.
-    developer.log("My exam arrangemet", name: "getExam");
+    developer.log(
+        "My exam arrangemet ${semester ?? qResult["semester"][0]["DM"]}",
+        name: "getExam");
     var data = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
       queryParameters: {
@@ -48,12 +50,7 @@ class ExamFile extends EhallSession {
         "*order": "-KSRQ,-KSSJMS"
       },
     ).then((value) => value.data["datas"]["wdksap"]);
-    if (data["extParams"]["msg"] != "查询成功") {
-      developer.log("No exam arranged", name: "getExam");
-      qResult["subject"] = {};
-    } else {
-      qResult["subject"] = data["rows"];
-    }
+    qResult["subjects"] = data["rows"];
 
     /// cxwapdksrw 查询未安排的考试任务
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)
@@ -62,7 +59,7 @@ class ExamFile extends EhallSession {
     data = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/cxyxkwapkwdkc.do",
       queryParameters: {"XNXQDM": semester ?? qResult["semester"][0]["DM"]},
-    ).then((value) => value.data["datas"]["wdksap"]);
+    ).then((value) => value.data["datas"]["cxyxkwapkwdkc"]);
     qResult["tobearranged"] = data["rows"];
 
     return qResult;
