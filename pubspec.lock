@@ -185,6 +185,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.4.1"
+  easy_refresh:
+    dependency: "direct main"
+    description:
+      name: easy_refresh
+      sha256: "924316c44ff5c0506c7690c98189adb7956dbd36905aeb050370335857144215"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.3.0+1"
   encrypt:
     dependency: "direct main"
     description:
@@ -392,6 +400,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.2"
+  path_drawing:
+    dependency: transitive
+    description:
+      name: path_drawing
+      sha256: bbb1934c0cbb03091af082a6389ca2080345291ef07a5fa6d6e078ba8682f977
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.1"
+  path_parsing:
+    dependency: transitive
+    description:
+      name: path_parsing
+      sha256: e3e67b1629e6f7e8100b367d3db6ba6af4b1f0bb80f64db18ef1fbabd2fa9ccf
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.1"
   path_provider:
     dependency: "direct main"
     description:

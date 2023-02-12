@@ -42,6 +42,8 @@ dependencies:
   beautiful_soup_dart: ^0.3.0
   # Setting
   settings_ui: ^2.0.2
+  # Homepage and others
+  easy_refresh: ^3.3.0+1
   # Others
   url_launcher: ^6.1.6
   jiffy: ^5.0.0

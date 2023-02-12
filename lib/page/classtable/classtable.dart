@@ -778,6 +778,7 @@ class PageState extends State<ClassTableWindow> {
         ),
         Expanded(
           child: ListView(
+            physics: const ClampingScrollPhysics(),
             shrinkWrap: true,
             children: toShow,
           ),
