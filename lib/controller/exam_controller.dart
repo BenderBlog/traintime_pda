@@ -33,7 +33,7 @@ class ExamController extends GetxController {
         for (var i in qResult["subjects"]) {
           subjects.add(Subject(
             subject: i["KCM"],
-            type: i["KSMC"],
+            type: i["KSMC"].toString().contains("期末考试") ? "期末考试" : i["KSMC"],
             time: i["KSSJMS"],
             place: i["JASMC"],
             teacher: i["ZJJSXM"],
