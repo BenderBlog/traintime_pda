@@ -10,6 +10,7 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/punch_controller.dart';
@@ -26,6 +27,7 @@ class PunchRecordWindow extends StatefulWidget {
 class _PunchRecordWindowState extends State<PunchRecordWindow>
     with AutomaticKeepAliveClientMixin {
   bool isValid = false;
+  late EasyRefreshController _controller;
 
   @override
   bool get wantKeepAlive => true;
@@ -34,56 +36,109 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
   int valid = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     return GetBuilder<PunchController>(
       builder: (c) => Scaffold(
-        body: RefreshIndicator(
-          onRefresh: () async => c.updatePunch(),
-          child: FutureBuilder<PunchDataList>(
-            future: Future(() => c.punch),
-            builder:
-                (BuildContext context, AsyncSnapshot<PunchDataList> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.data != null) {
-                  return Center(child: Text("坏事: ${snapshot.error}"));
-                } else {
-                  total = snapshot.data!.valid;
-                  valid = snapshot.data!.valid;
-                  if (snapshot.data!.all.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "没有记录",
-                        textScaleFactor: 1.2,
+        body: EasyRefresh.builder(
+          controller: _controller,
+          clipBehavior: Clip.none,
+          header: const MaterialHeader(
+            clamping: true,
+            showBezierBackground: false,
+            bezierBackgroundAnimation: false,
+            bezierBackgroundBounce: false,
+            springRebound: false,
+          ),
+          onRefresh: () async {
+            c.updatePunch();
+            _controller.finishRefresh();
+          },
+          childBuilder: (context, physics) {
+            if (c.isGet == false && c.error != null) {
+              return ListView(
+                physics: physics,
+                children: [
+                  SizedBox(
+                    height: context.height * 0.7,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error),
+                          Text(
+                            "坏事 ${c.error}",
+                            textScaleFactor: 1.5,
+                          ),
+                        ],
                       ),
-                    );
-                  }
-                  return dataList<RecordCard, RecordCard>(
-                    List.generate(
-                      snapshot.data!.all.length,
-                      (i) =>
-                          RecordCard(mark: i + 1, toUse: snapshot.data!.all[i]),
                     ),
-                    (toUse) => toUse,
-                  );
-                }
-              } else {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircularProgressIndicator(),
-                      Divider(color: Colors.transparent),
-                      Text(
-                        "正在获取信息...",
-                        textScaleFactor: 1.2,
-                      ),
-                    ],
                   ),
+                ],
+              );
+            }
+            if (c.punch.all.isNotEmpty) {
+              if (!isValid) {
+                return dataList<RecordCard, RecordCard>(
+                  List.generate(
+                    c.punch.all.length,
+                    (i) => RecordCard(mark: i + 1, toUse: c.punch.all[i]),
+                  ),
+                  (toUse) => toUse,
+                  physics: physics,
+                );
+              } else {
+                int count = 0;
+                List<RecordCard> toUse = [];
+                for (var i in c.punch.all) {
+                  if (i.state.contains("恭喜你本次打卡成功")) {
+                    toUse.add(RecordCard(mark: count + 1, toUse: i));
+                  }
+                }
+                return dataList<RecordCard, RecordCard>(
+                  toUse,
+                  (toUse) => toUse,
+                  physics: physics,
                 );
               }
-            },
-          ),
+            } else {
+              return ListView(
+                physics: physics,
+                children: [
+                  SizedBox(
+                    height: context.height * 0.7,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.warning),
+                          Text(
+                            "列表为空",
+                            textScaleFactor: 1.5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
@@ -103,6 +158,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                   setState(() {
                     isValid = !isValid;
                   });
+                  _controller.callRefresh();
                 },
                 label: Text(
                   isValid ? "查看所有记录" : "查看成功记录",

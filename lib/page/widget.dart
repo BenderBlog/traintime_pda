@@ -47,8 +47,10 @@ class TagsBoxes extends StatelessWidget {
 }
 
 /// A listview widget.
-Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init) =>
+Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init,
+        {ScrollPhysics? physics}) =>
     ListView.separated(
+      physics: physics,
       itemCount: a.length,
       itemBuilder: (context, index) {
         return init(a[index]);

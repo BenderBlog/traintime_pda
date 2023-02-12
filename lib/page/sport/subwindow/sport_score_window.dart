@@ -54,10 +54,7 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
               things.addAll(List.generate(snapshot.data.list.length,
                       (index) => ScoreCard(toUse: snapshot.data.list[index]))
                   .reversed);
-              return dataList<dynamic, Widget>(
-                things,
-                (toUse) => toUse,
-              );
+              return dataList<dynamic, Widget>(things, (toUse) => toUse);
             }
           } else {
             return const Center(child: CircularProgressIndicator());
