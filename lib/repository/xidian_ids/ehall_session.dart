@@ -112,50 +112,6 @@ class EhallSession extends IDSSession {
       await addUser("dorm", detailed["data"][0]["ZSDZ"]);
     }
   }
-
-  /// 考试安排 4768687067472349
-  @protected
-  Future<void> getExamTime() async {
-    var firstPost = await useApp("4768687067472349");
-    // print(firstPost);
-    await dio.get(firstPost);
-
-    /// Get semester information.
-    /*  Hard to use, I would rather do it by myself.
-    var whatever = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
-      data: {"*order": "-PX,-DM"},
-    );
-    int totalSize = whatever.data["datas"]["xnxqcx"]['totalSize'];
-    List<String> semester = [];
-    for (var i in whatever.data["datas"]["xnxqcx"]['rows']) {
-      semester.add(i["DM"]);
-    }
-    //print(semester);
-    */
-    int now = DateTime.now().month;
-    String semester = "";
-    if (now == 1) {
-      semester = "${DateTime.now().year - 1}-${DateTime.now().year}-1";
-    } else if (now >= 2 && now <= 7) {
-      semester = "${DateTime.now().year - 1}-${DateTime.now().year}-2";
-    } else {
-      semester = "${DateTime.now().year}-${DateTime.now().year + 1}-1";
-    }
-
-    /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中？)
-    /// wdksap 我的考试安排
-    /// cxwapdksrw 查询未安排的考试任务
-    /// If failed, it is more likely that no exam has arranged.
-    var data = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
-      queryParameters: {"XNXQDM": semester, "*order": "-KSRQ,-KSSJMS"},
-    ).then((value) => value.data["datas"]["wdksap"]);
-    if (data["extParams"]["msg"] != "查询成功") {
-      throw "没有数据，也许没安排考试？";
-    }
-    // print(data);
-  }
 }
 
 var ses = EhallSession();
