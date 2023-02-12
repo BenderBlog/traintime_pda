@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.deepPurple,
       ),
-      home: isFirst ? const LoginWindow() : HomePage(),
+      home: isFirst ? const LoginWindow() : const HomePage(),
     );
   }
 }
