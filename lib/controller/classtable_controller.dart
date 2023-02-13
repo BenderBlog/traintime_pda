@@ -176,44 +176,57 @@ class ClassTableController extends GetxController {
               break;
             }
           }
-          developer.log(
-            "Current time is after ${time[index]} $index",
-            name: "ClassTableController",
-          );
-          // If in the class, the current class.
-          // Else, the previous class.
-          int currentClassIndex =
-              pretendLayout[currentWeek][now.weekday - 1][index ~/ 2][0];
-          // In the class
-          if (index % 2 == 0) {
+
+          if (index >= 0) {
             developer.log(
-              "In class.",
+              "Current time is after ${time[index]} $index",
               name: "ClassTableController",
             );
-            if (currentClassIndex != -1) {
-              isNext = false;
-              timeArrangementToShow = timeArrangement[currentClassIndex];
+            // If in the class, the current class.
+            // Else, the previous class.
+            int currentClassIndex =
+                pretendLayout[currentWeek][now.weekday - 1][index ~/ 2][0];
+            // In the class
+            if (index % 2 == 0) {
+              developer.log(
+                "In class.",
+                name: "ClassTableController",
+              );
+              if (currentClassIndex != -1) {
+                isNext = false;
+                timeArrangementToShow = timeArrangement[currentClassIndex];
+              }
+            } else {
+              developer.log(
+                "Not in class, seek the next class...",
+                name: "ClassTableController",
+              );
+              // See the next class.
+              int nextIndex = pretendLayout[currentWeek][now.weekday - 1]
+                  [(index + 1) ~/ 2][0];
+              // If really have class.
+              if (nextIndex != -1) {
+                if (currentClassIndex != nextIndex) {
+                  isNext = true;
+                } else {
+                  isNext = false;
+                }
+                timeArrangementToShow = timeArrangement[nextIndex];
+              }
+            }
+            if (timeArrangementToShow != null &&
+                timeArrangementToShow!.index != -1) {
+              classToShow = classDetail[timeArrangementToShow!.index];
             }
           } else {
             developer.log(
-              "Not in class, seek the next class...",
+              "Current time is before ${time[0]} 0",
               name: "ClassTableController",
             );
-            // See the next class.
-            int nextIndex = pretendLayout[currentWeek][now.weekday - 1]
-                [(index + 1) ~/ 2][0];
-            // If really have class.
-            if (nextIndex != -1) {
-              if (currentClassIndex != nextIndex) {
-                isNext = true;
-              } else {
-                isNext = false;
-              }
-              timeArrangementToShow = timeArrangement[nextIndex];
-            }
-          }
-          if (timeArrangementToShow != null &&
-              timeArrangementToShow!.index != -1) {
+            isNext = true;
+            int currentClassIndex =
+                pretendLayout[currentWeek][now.weekday - 1][0][0];
+            timeArrangementToShow = timeArrangement[currentClassIndex];
             classToShow = classDetail[timeArrangementToShow!.index];
           }
         }
