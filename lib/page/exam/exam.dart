@@ -34,11 +34,14 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
           title: const Text("考试安排"),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Get.back(),
           ),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.more_time),
+              onPressed: () =>
+                  Get.to(() => NoArrangedInfo(list: c.toBeArranged)),
+            ),
             IconButton(
               icon: const Icon(Icons.info),
               onPressed: () {
@@ -103,12 +106,37 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
         actions: <Widget>[
           TextButton(
             child: const Text("确定"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: () => Get.back(),
           ),
         ],
       );
+}
+
+class NoArrangedInfo extends StatelessWidget {
+  final List<ToBeArranged> list;
+  const NoArrangedInfo({super.key, required this.list});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("目前无安排考试的科目"),
+      ),
+      body: dataList<Card, Card>(
+        List.generate(
+          list.length,
+          (index) => Card(
+            child: ListTile(
+              title: Text(list[index].subject),
+              subtitle: Text("编号: ${list[index].id}\n"
+                  "老师: ${list[index].teacher ?? "没有数据"}"),
+            ),
+          ),
+        ),
+        (toUse) => toUse,
+      ),
+    );
+  }
 }
 
 class InfoCard extends StatelessWidget {
