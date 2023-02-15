@@ -152,6 +152,8 @@ class ClassTableController extends GetxController {
         }
       }
 
+      isGet = true;
+
       // Get the current time.
       if (currentWeek >= 0 && currentWeek < semesterLength) {
         developer.log("Get the current class", name: "ClassTableController");
@@ -231,7 +233,7 @@ class ClassTableController extends GetxController {
           }
         }
       }
-      isGet = true;
+
       update();
     } catch (e, s) {
       error = e.toString() + s.toString();

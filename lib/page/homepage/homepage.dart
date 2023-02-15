@@ -99,61 +99,94 @@ class MainPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  c.classToShow == null
-                      ? Text(
-                          c.isGet == true
-                              ? "寻找什么呢，我也不知道"
-                              : c.error == null
-                                  ? "请耐心等待片刻"
-                                  : "课表获取失败",
+                  c.isGet == true
+                      ? c.classToShow == null
+                          ? Text(
+                              "寻找什么呢，我也不知道",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            )
+                          : Row(
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.person,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      c.classToShow!.teacher == null
+                                          ? "没有老师数据"
+                                          : c.classToShow!.teacher!.length >= 7
+                                              ? c.classToShow!.teacher!
+                                                  .substring(0, 7)
+                                              : c.classToShow!.teacher!,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 10),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.room,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      c.classToShow!.place ?? "地点未定",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 10),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time_filled_outlined,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      "${time[(c.timeArrangementToShow!.start - 1) * 2]}-"
+                                      "${time[(c.timeArrangementToShow!.stop - 1) * 2 + 1]}",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                      : Text(
+                          c.error == null ? "请耐心等待片刻" : "课表获取失败",
                           style: TextStyle(
                             fontSize: 15,
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                        )
-                      : Row(
-                          //mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.room,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  c.classToShow!.place ?? "地点未定",
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.access_time_filled_outlined,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  "${time[(c.timeArrangementToShow!.start - 1) * 2]}-"
-                                  "${time[(c.timeArrangementToShow!.stop - 1) * 2 + 1]}",
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
+                        ),
                 ],
               ),
             ),

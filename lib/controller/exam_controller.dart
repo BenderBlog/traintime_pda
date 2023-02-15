@@ -25,7 +25,7 @@ class ExamController extends GetxController {
       var qResult = await ExamFile().get(semester: semesterStr);
       int grade = int.parse("20${user["idsAccount"]!.substring(0, 1)}");
 
-      if (semesterStr == null) {
+      if (semesterStr == null && semesters.isEmpty) {
         for (var i in qResult["semester"]) {
           int start = int.parse(i["DM"].toString().substring(0, 3));
           if (start >= grade && start < grade + 4) {
