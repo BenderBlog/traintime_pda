@@ -443,7 +443,6 @@ class MainPage extends StatelessWidget {
                 ),
                 child: Container(
                   height: height,
-                  width: double.infinity,
                   color: themeData.colorScheme.primary,
                 ),
               ),
@@ -456,7 +455,7 @@ class MainPage extends StatelessWidget {
                   child: Container(
                     height: 2,
                     width: double.infinity,
-                    color: Colors.transparent,
+                    color: themeData.colorScheme.primary,
                   ),
                 ),
               ),
@@ -477,8 +476,10 @@ class MainPage extends StatelessWidget {
           SliverAppBar(
             backgroundColor: themeData.colorScheme.primary,
             foregroundColor: themeData.colorScheme.onPrimary,
-            expandedHeight: MediaQuery.of(context).size.width * 0.10,
-            pinned: false,
+            expandedHeight: MediaQuery.of(context).size.width * 0.125,
+            pinned: true,
+            elevation: 0,
+            title: const Text("Traintime PDA"),
           ),
           const HeaderLocator.sliver(paintExtent: classCardHeight),
           SliverToBoxAdapter(
