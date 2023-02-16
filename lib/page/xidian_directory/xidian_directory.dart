@@ -33,7 +33,7 @@ class TabForXDDir extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          bottom: const TabBar(
+          title: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.store_mall_directory)),
               Tab(icon: Icon(Icons.restaurant)),
