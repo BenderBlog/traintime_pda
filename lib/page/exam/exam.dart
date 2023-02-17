@@ -54,30 +54,39 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48.0),
-            child: Container(
-              height: 48.0,
-              alignment: Alignment.center,
-              child: DropdownButton<int>(
-                value: dropdownValue,
-                icon: const Icon(Icons.arrow_downward),
-                elevation: 16,
-                style: const TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 2,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: (int? value) {
-                  setState(() {
-                    dropdownValue = value!;
-                  });
-                  c.get(semesterStr: c.semesters[dropdownValue]);
-                },
-                items: List.generate(
-                  c.semesters.length,
-                  (index) => DropdownMenuItem(
-                    value: index,
-                    child: Text(c.semesters[index]),
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Container(
+                height: 36.0,
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("当前展示的学期："),
+                    DropdownButton(
+                      focusColor: Theme.of(context).appBarTheme.backgroundColor,
+                      borderRadius: const BorderRadius.all(Radius.circular(30)),
+                      value: dropdownValue,
+                      style: const TextStyle(color: Colors.black),
+                      underline: Container(color: Colors.transparent),
+                      onChanged: (int? value) {
+                        setState(() {
+                          dropdownValue = value!;
+                        });
+                        c.get(semesterStr: c.semesters[dropdownValue]);
+                      },
+                      items: List.generate(
+                        c.semesters.length,
+                        (index) => DropdownMenuItem(
+                          value: index,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(c.semesters[index]),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -128,8 +137,10 @@ class NoArrangedInfo extends StatelessWidget {
           (index) => Card(
             child: ListTile(
               title: Text(list[index].subject),
-              subtitle: Text("编号: ${list[index].id}\n"
-                  "老师: ${list[index].teacher ?? "没有数据"}"),
+              subtitle: Text(
+                "编号: ${list[index].id}\n"
+                "老师: ${list[index].teacher ?? "没有数据"}",
+              ),
             ),
           ),
         ),
@@ -148,41 +159,42 @@ class InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 10,
+        horizontal: 10,
+        vertical: 5,
       ),
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceVariant,
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Container(
         padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
               children: [
                 Text(
-                  toUse.subject.length > 12
-                      ? "${toUse.subject.substring(0, 11)}..."
-                      : toUse.subject,
+                  toUse.subject,
+                  textScaleFactor: 1.1,
                 ),
-                Text(toUse.type),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time_filled_rounded,
-                  size: 14,
-                  color: Theme.of(context).colorScheme.primary,
+                TagsBoxes(
+                  text: toUse.type,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(width: 2),
-                Text(toUse.time),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+                const Divider(
+                  color: Colors.transparent,
+                  height: 5,
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_filled_rounded,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(toUse.time),
+                  ],
+                ),
                 Row(
                   children: [
                     Icon(
@@ -190,34 +202,45 @@ class InfoCard extends StatelessWidget {
                       size: 14,
                       color: Theme.of(context).colorScheme.primary,
                     ),
-                    const SizedBox(width: 2),
-                    Text(toUse.teacher != null
-                        ? toUse.teacher!.length > 10
-                            ? "${toUse.teacher!.substring(0, 10)}..."
-                            : toUse.teacher!
-                        : "未知老师"),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        toUse.teacher ?? "未知老师",
+                      ),
+                    ),
                   ],
                 ),
-                Row(
+                Flex(
+                  direction: Axis.horizontal,
                   children: [
-                    Icon(
-                      Icons.room,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.primary,
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.room,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(toUse.place),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 2),
-                    Text(toUse.place),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.chair,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.primary,
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.chair,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(toUse.seat.toString()),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 2),
-                    Text(toUse.seat.toString()),
                   ],
                 ),
               ],
