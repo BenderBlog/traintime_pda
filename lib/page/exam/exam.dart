@@ -24,8 +24,6 @@ class ExamInfoWindow extends StatefulWidget {
 }
 
 class _ExamInfoWindowState extends State<ExamInfoWindow> {
-  int dropdownValue = 0;
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ExamController>(
@@ -66,14 +64,14 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     DropdownButton(
                       focusColor: Theme.of(context).appBarTheme.backgroundColor,
                       borderRadius: const BorderRadius.all(Radius.circular(30)),
-                      value: dropdownValue,
+                      value: c.dropdownValue,
                       style: const TextStyle(color: Colors.black),
                       underline: Container(color: Colors.transparent),
                       onChanged: (int? value) {
                         setState(() {
-                          dropdownValue = value!;
+                          c.dropdownValue = value!;
                         });
-                        c.get(semesterStr: c.semesters[dropdownValue]);
+                        c.get(semesterStr: c.semesters[c.dropdownValue]);
                       },
                       items: List.generate(
                         c.semesters.length,
@@ -175,6 +173,9 @@ class InfoCard extends StatelessWidget {
                 Text(
                   toUse.subject,
                   textScaleFactor: 1.1,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 TagsBoxes(
                   text: toUse.type,
@@ -189,7 +190,7 @@ class InfoCard extends StatelessWidget {
                     Icon(
                       Icons.access_time_filled_rounded,
                       size: 14,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                     const SizedBox(width: 5),
                     Text(toUse.time),
@@ -200,7 +201,7 @@ class InfoCard extends StatelessWidget {
                     Icon(
                       Icons.person,
                       size: 14,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                     const SizedBox(width: 5),
                     Expanded(
@@ -220,7 +221,7 @@ class InfoCard extends StatelessWidget {
                           Icon(
                             Icons.room,
                             size: 14,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context).colorScheme.tertiary,
                           ),
                           const SizedBox(width: 5),
                           Text(toUse.place),
@@ -234,7 +235,7 @@ class InfoCard extends StatelessWidget {
                           Icon(
                             Icons.chair,
                             size: 14,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context).colorScheme.tertiary,
                           ),
                           const SizedBox(width: 5),
                           Text(toUse.seat.toString()),

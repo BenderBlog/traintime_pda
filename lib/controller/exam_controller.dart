@@ -11,6 +11,7 @@ class ExamController extends GetxController {
   List<String> semesters = [];
   late List<Subject> subjects;
   late List<ToBeArranged> toBeArranged;
+  int dropdownValue = 0;
 
   @override
   void onReady() async {
