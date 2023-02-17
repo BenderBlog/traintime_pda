@@ -1,4 +1,6 @@
 # watermeter 水表
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FBenderBlog%2Fwatermeter.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FBenderBlog%2Fwatermeter?ref=badge_shield)
+
 
 (watermeter 是核心代号，项目最终成品将会是 Traintime PDA)
 
@@ -56,3 +58,7 @@
 > The PDA (personal digital assistant) is one of the most useful items. It acts as a media player, email reader and access key for restricted areas.
 >
 > Besides the player's personal PDA, other PDAs can be picked up and scanned to read helpful hints (including backstory, hints to monster types ahead, and combination codes for lockers).
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FBenderBlog%2Fwatermeter.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FBenderBlog%2Fwatermeter?ref=badge_large)
