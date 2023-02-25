@@ -13,6 +13,7 @@ if you want to use.
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam.dart';
 
@@ -32,6 +33,7 @@ class MainPage extends StatelessWidget {
   final scoreController = Get.put(ScoreController());
   final punchController = Get.put(PunchController());
   final examController = Get.put(ExamController());
+  final electricController = Get.put(ElectricController());
 
   Widget classTableCard(BuildContext context) =>
       GetBuilder<ClassTableController>(
@@ -226,59 +228,141 @@ class MainPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(children: [
-                            Icon(
-                              Icons.run_circle,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Icon(
+                            Icons.run_circle,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 7.5),
+                          Text(
+                            "体育信息",
+                            style: TextStyle(
+                              fontSize: 14,
                               color: Theme.of(context).colorScheme.primary,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 7.5),
-                            Text(
-                              "体育信息",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ]),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: Center(
-                              child: c.error != null
-                                  ? Text(
-                                      "目前无法使用",
-                                      textScaleFactor: 1.5,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    )
-                                  : c.isGet == false
-                                      ? Text(
-                                          "正在加载",
-                                          textScaleFactor: 1.15,
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          ),
-                                        )
-                                      : Text(
-                                          "有效次数 ${c.punch.valid}\n"
-                                          "所有次数 ${c.punch.allTime}",
-                                          textScaleFactor: 1.15,
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          ),
-                                        ),
                             ),
                           ),
                         ]),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Center(
+                            child: c.error != null
+                                ? Text(
+                                    "目前无法使用",
+                                    textScaleFactor: 1.5,
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  )
+                                : c.isGet == false
+                                    ? Text(
+                                        "正在加载",
+                                        textScaleFactor: 1.15,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      )
+                                    : Text(
+                                        "有效次数 ${c.punch.valid}\n"
+                                        "所有次数 ${c.punch.allTime}",
+                                        textScaleFactor: 1.15,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            GetBuilder<ElectricController>(
+              builder: (c) => GestureDetector(
+                onTap: () async {
+                  if (c.isGet == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text("电费帐号：${c.electricityAccount()}"),
+                    ));
+                  } else if (c.error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text("遇到错误"),
+                    ));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text("请稍候，正在刷新信息"),
+                    ));
+                  }
+                },
+                child: Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Icon(
+                            Icons.electric_meter_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 7.5),
+                          Text(
+                            "电量信息",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ]),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Center(
+                            child: c.error != null
+                                ? Text(
+                                    "目前无法使用",
+                                    textScaleFactor: 1.5,
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  )
+                                : c.isGet == false
+                                    ? Text(
+                                        "正在加载",
+                                        textScaleFactor: 1.15,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      )
+                                    : Text(
+                                        "${c.number} 度",
+                                        textScaleFactor: 1.15,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -412,18 +496,20 @@ class MainPage extends StatelessWidget {
     const double classCardHeight = 120.0;
 
     return EasyRefresh(
-      onRefresh: () {
+      onRefresh: () async {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text("请稍候，正在刷新信息"),
         ));
-        classTableController.updateClassTable(isForce: true);
+        await classTableController.updateClassTable(isForce: true);
         classTableController.update();
-        scoreController.get();
+        await scoreController.get();
         scoreController.update();
-        punchController.updatePunch();
+        await electricController.updateData();
+        electricController.update();
+        await punchController.updatePunch();
         punchController.update();
-        examController.get();
+        await examController.get();
         examController.update();
       },
       header: BuilderHeader(
