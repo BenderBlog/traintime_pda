@@ -32,9 +32,6 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
   @override
   bool get wantKeepAlive => true;
 
-  int total = 0;
-  int valid = 0;
-
   @override
   void initState() {
     super.initState();
@@ -145,8 +142,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "总次数：$total\n成功次数：$valid",
-                //"总次数：${snapshot.data.allTime}\n成功次数：${snapshot.data.valid}",
+                "总次数: ${c.punch.allTime}\n成功次数: ${c.punch.valid}",
                 textScaleFactor: 1.2,
               ),
               FloatingActionButton.extended(
@@ -205,42 +201,29 @@ class RecordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+        padding: const EdgeInsets.all(15),
+        child: Wrap(
+          alignment: WrapAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TagsBoxes(
-                  text: mark.toString(),
-                  backgroundColor: Colors.deepPurple,
-                ),
-                situation(),
-              ],
+            TagsBoxes(
+              text: "第 $mark 条",
+              backgroundColor: Colors.deepPurple,
             ),
-            const Divider(height: 15),
-            Row(
-              children: [
-                const SizedBox(width: 5),
-                Text(
-                  "于 ${toUse.punchDay} ${toUse.punchTime} 在 ${toUse.machineName}",
-                  textScaleFactor: 1.1,
-                ),
-              ],
+            situation(),
+            const Divider(
+              color: Colors.transparent,
+              height: 5,
             ),
+            informationWithIcon(Icons.punch_clock,
+                "${toUse.punchDay}-${toUse.punchTime}", context),
+            informationWithIcon(Icons.place, toUse.machineName, context),
             if (!toUse.state.contains("成功"))
-              Row(
-                children: [
-                  const SizedBox(width: 5),
-                  Expanded(
-                      child: Text(
-                    toUse.state.contains("锻炼间隔需30分钟以上")
-                        ? toUse.state.replaceAll("锻炼间隔需30分钟以上", "")
-                        : toUse.state,
-                    textScaleFactor: 1.1,
-                  )),
-                ],
-              )
+              informationWithIcon(
+                  Icons.error_outline,
+                  toUse.state.contains("锻炼间隔需30分钟以上")
+                      ? toUse.state.replaceAll("锻炼间隔需30分钟以上", "")
+                      : toUse.state,
+                  context),
           ],
         ),
       ),

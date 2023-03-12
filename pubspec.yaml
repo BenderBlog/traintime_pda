@@ -49,6 +49,7 @@ dependencies:
   jiffy: ^5.0.0
   icalendar_parser: any
   auto_size_text: ^3.0.0
+  alice: ^0.3.2
   get:
 
   flutter:

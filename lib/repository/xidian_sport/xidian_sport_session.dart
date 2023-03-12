@@ -22,6 +22,8 @@ import 'package:flutter/foundation.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/repository/general.dart';
 
+import '../../main.dart';
+
 /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
 String rsaEncrypt(String toEnc, String pubKey) {
   dynamic publicKey = RSAKeyParser().parse(pubKey);
@@ -29,8 +31,6 @@ String rsaEncrypt(String toEnc, String pubKey) {
 }
 
 class SportSession {
-  var username = "";
-
   var userId = '';
 
   final _baseURL = 'http://xd.5itsn.com/app/';
@@ -84,6 +84,7 @@ awb4B45zUwIDAQAB
       contentType: Headers.formUrlEncodedContentType,
     ));
     toReturn.interceptors.add(CookieManager(SportCookieJar));
+    toReturn.interceptors.add(alice.getDioInterceptor());
     return toReturn;
   }
 

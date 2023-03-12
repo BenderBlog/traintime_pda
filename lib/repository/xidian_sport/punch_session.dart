@@ -1,3 +1,4 @@
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 
@@ -11,10 +12,10 @@ class PunchSession extends SportSession {
     var response = await require(
       subWebsite: "stuPunchRecord/findPager",
       body: {
-        'userNum': username,
+        'userNum': user["idsAccount"],
         'sysTermId': await getTermID(),
-        'pageSize': "999",
-        'pageIndex': "1"
+        'pageSize': 999,
+        'pageIndex': 1
       },
     );
     for (var i in response["data"]) {

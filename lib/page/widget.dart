@@ -85,3 +85,17 @@ const colorList = [
 
 /// Colors for class information card which not in this week.
 const uselessColor = Colors.grey;
+
+Widget informationWithIcon(IconData icon, String text, context) => Row(
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: Theme.of(context).colorScheme.tertiary,
+        ),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(text),
+        ),
+      ],
+    );
