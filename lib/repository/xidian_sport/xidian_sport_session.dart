@@ -84,7 +84,6 @@ awb4B45zUwIDAQAB
       contentType: Headers.formUrlEncodedContentType,
     ));
     toReturn.interceptors.add(CookieManager(SportCookieJar));
-    toReturn.interceptors.add(alice.getDioInterceptor());
     return toReturn;
   }
 

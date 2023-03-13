@@ -185,62 +185,22 @@ class InfoCard extends StatelessWidget {
                   color: Colors.transparent,
                   height: 5,
                 ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_filled_rounded,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(toUse.time),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(
-                        toUse.teacher ?? "未知老师",
-                      ),
-                    ),
-                  ],
-                ),
+                informationWithIcon(
+                    Icons.access_time_filled_rounded, toUse.time, context),
+                informationWithIcon(
+                    Icons.person, toUse.teacher ?? "未知老师", context),
                 Flex(
                   direction: Axis.horizontal,
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.room,
-                            size: 14,
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(toUse.place),
-                        ],
-                      ),
+                      child:
+                          informationWithIcon(Icons.room, toUse.place, context),
                     ),
                     Expanded(
                       flex: 1,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.chair,
-                            size: 14,
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(toUse.seat.toString()),
-                        ],
-                      ),
+                      child: informationWithIcon(
+                          Icons.chair, toUse.seat.toString(), context),
                     ),
                   ],
                 ),

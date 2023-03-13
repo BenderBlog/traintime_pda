@@ -13,7 +13,7 @@ if you want to use.
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/repository/general.dart';
@@ -24,6 +24,7 @@ import 'dart:developer' as developer;
 import 'package:get/get.dart';
 
 import 'package:alice/alice.dart';
+import 'package:flutter/foundation.dart';
 
 Alice alice = Alice(
   showNotification: kDebugMode,
