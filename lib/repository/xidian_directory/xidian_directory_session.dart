@@ -16,82 +16,65 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache_lts/dio_http_cache_lts.dart';
-import 'package:flutter/foundation.dart';
 import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
 import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
 import 'package:watermeter/model/xidian_directory/telephone.dart';
 
-class XidianDirectorySession {
-  final String _apiKey = 'ya0UhH6yzo8nKmWyrHfkLEyb';
-  final String _xlId = 'qvGPBI8zLfAyNs9yWxBxd0iW-MdYXbMMI';
+const String _apiKey = 'ya0UhH6yzo8nKmWyrHfkLEyb';
+const String _xlId = 'qvGPBI8zLfAyNs9yWxBxd0iW-MdYXbMMI';
 
-  String sign() {
-    var timestamp = DateTime.now().millisecondsSinceEpoch;
-    return '${md5.convert(utf8.encode(timestamp.toString() + _apiKey))},$timestamp';
-  }
-
-  Map<String, String> _head() => {
-        'X-LC-Id': _xlId,
-        'X-LC-Sign': sign(),
-        'referer': "https://ncov.hawa130.com/",
-      };
-
-  Dio get _dio {
-    Dio toReturn = Dio();
-    toReturn.options = BaseOptions(
-      baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
-      headers: _head(),
-    );
-    toReturn.interceptors.add(DioCacheManager(CacheConfig(
-      baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
-    )).interceptor);
-    return toReturn;
-  }
-
-  Future<String> require({
-    required String subWebsite,
-    required Map<String, String> body,
-    bool isForce = false,
-  }) async {
-    var response = await _dio.get(
-      subWebsite,
-      queryParameters: body,
-      options: buildCacheOptions(
-        const Duration(days: 2),
-        forceRefresh: isForce,
-      ),
-    );
-
-    /// Cache is not working in Linux/Windows/Web due to the
-    /// platform limitation of dio_http_cache.
-    if (kDebugMode) {
-      if (null != response.headers.value(DIO_CACHE_HEADER_KEY_DATA_SOURCE)) {
-        //print({"data source": "data come from cache"});
-      } else {
-        //print({"data source": "data come from net"});
-      }
-    }
-
-    /// Default return a Map<String,dynamic>, but I ordered him to get json!
-    return json.encode(response.data).toString();
-  }
+String sign() {
+  var timestamp = DateTime.now().millisecondsSinceEpoch;
+  return '${md5.convert(utf8.encode(timestamp.toString() + _apiKey))},$timestamp';
 }
 
-var getTool = XidianDirectorySession();
+Map<String, String> _head() => {
+      'X-LC-Id': _xlId,
+      'X-LC-Sign': sign(),
+      'referer': "https://ncov.hawa130.com/",
+    };
+
+Dio get _dio {
+  Dio toReturn = Dio();
+  toReturn.options = BaseOptions(
+    baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
+    headers: _head(),
+  );
+  toReturn.interceptors.add(DioCacheManager(CacheConfig(
+    baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
+  )).interceptor);
+  return toReturn;
+}
+
+Future<String> require({
+  required String subWebsite,
+  required Map<String, String> body,
+}) async {
+  var response = await _dio.get(
+    subWebsite,
+    queryParameters: body,
+    options: buildCacheOptions(
+      const Duration(minutes: 15),
+    ),
+  );
+
+  /// Default return a Map<String,dynamic>, but I ordered him to get json!
+  return json.encode(response.data).toString();
+}
 
 /// Structure of the formula, getdata -> evaldata -> sendtowindow.
-Future<ShopInformationEntity> getShopData(
-    {required String category,
-    required String toFind,
-    bool isForceUpdate = false}) async {
+Future<ShopInformationEntity> getShopData({
+  required String category,
+  required String toFind,
+  bool isForceUpdate = false,
+}) async {
   // Get Data
-  String jsonData = await getTool.require(
+  String jsonData = await require(
     subWebsite: "/info",
     body: {
       'order': '-status,-updatedAt',
       'limit': '1000',
     },
-    isForce: isForceUpdate,
   );
   // Choose Data
   final jsonResult = ShopInformationEntity.fromJson(json.decode(jsonData));
@@ -106,19 +89,19 @@ Future<ShopInformationEntity> getShopData(
 }
 
 /// Memory want to say dirty words.
-Future<List<WindowInformation>> getCafeteriaData(
-    {required String where,
-    required String toFind,
-    bool isForceUpdate = false}) async {
+Future<List<WindowInformation>> getCafeteriaData({
+  required String where,
+  required String toFind,
+  bool isForceUpdate = false,
+}) async {
   // Get data
-  String jsonData = await getTool.require(
+  String jsonData = await require(
     subWebsite: "/canteen",
     body: {
       "where": "{\"place\":{\"\$regex\":\"$where\"}}",
       'order': '-status,-updatedAt',
       'limit': '1000',
     },
-    isForce: isForceUpdate,
   );
   final jsonResult = CafeteriaWindowItemEntity.fromJson(json.decode(jsonData));
   if (toFind != "") {
@@ -151,7 +134,7 @@ Future<List<WindowInformation>> getCafeteriaData(
   return toReturn;
 }
 
-// History, this was from a website, but he let it offline...
+// In history, this was from a website, but it is not nessary...
 List<TeleyInformation> getTelephoneData() {
   List<TeleyInformation> toReturn = [];
   var result = json.decode('''

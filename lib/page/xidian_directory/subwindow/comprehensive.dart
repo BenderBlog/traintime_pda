@@ -25,10 +25,19 @@ class ComprehensiveWindow extends StatefulWidget {
 class _ComprehensiveWindowState extends State<ComprehensiveWindow>
     with AutomaticKeepAliveClientMixin {
   String categoryToSent = "所有";
-  String toSearch = "";
+  TextEditingController text =
+      TextEditingController.fromValue(const TextEditingValue(text: ""));
+  bool isSearch = false;
+  late Future<ShopInformationEntity> data;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _get(true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +46,7 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow>
       body: RefreshIndicator(
         onRefresh: () async => _get(true),
         child: FutureBuilder<ShopInformationEntity>(
-          future: _get(false),
+          future: data,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
@@ -52,56 +61,72 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow>
           },
         ),
       ),
-      bottomSheet: Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: TextField(
-                decoration: const InputDecoration(
-                  hintText: "在此搜索",
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (String text) {
-                  setState(() {
-                    toSearch = text;
-                    _get(false);
-                  });
-                },
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: DropdownButton(
-              value: categoryToSent,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-              ),
-              underline: Container(
-                height: 2,
-              ),
-              items: [
-                for (var i in categories)
-                  DropdownMenuItem(value: i, child: Text(i))
-              ],
-              onChanged: (String? value) {
-                setState(
-                  () {
-                    categoryToSent = value!;
-                    _get(false);
-                  },
-                );
-              },
-            ),
-          )
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => setState(() {
+          isSearch = !isSearch;
+        }),
+        elevation: 5,
+        child: const Icon(Icons.search),
       ),
+      bottomSheet: isSearch
+          ? BottomAppBar(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: TextField(
+                        controller: text,
+                        decoration: const InputDecoration(
+                          hintText: "在此搜索",
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                        onChanged: (String text) {
+                          setState(() {
+                            _get(false);
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: DropdownButton(
+                      value: categoryToSent,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                      ),
+                      underline: Container(
+                        height: 2,
+                      ),
+                      items: [
+                        for (var i in categories)
+                          DropdownMenuItem(value: i, child: Text(i))
+                      ],
+                      onChanged: (String? value) {
+                        setState(
+                          () {
+                            categoryToSent = value!;
+                            _get(false);
+                          },
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+            )
+          : null,
     );
   }
 
-  Future<ShopInformationEntity> _get(bool isForceUpdate) async => getShopData(
-      category: categoryToSent, toFind: toSearch, isForceUpdate: isForceUpdate);
+  Future<void> _get(bool isForceUpdate) async {
+    data = getShopData(
+      category: categoryToSent,
+      toFind: text.text,
+      isForceUpdate: isForceUpdate,
+    );
+  }
 }
 
 class ShopCard extends StatelessWidget {
@@ -109,97 +134,89 @@ class ShopCard extends StatelessWidget {
 
   const ShopCard({Key? key, required this.toUse}) : super(key: key);
 
-  Icon _iconForTarget() {
+  IconData _iconForTarget() {
     switch (toUse.category) {
       case '饮食':
-        return const Icon(Icons.restaurant);
+        return Icons.restaurant;
       case '生活':
-        return const Icon(Icons.nightlife);
+        return Icons.nightlife;
       case '打印':
-        return const Icon(Icons.print);
+        return Icons.print;
       case '学习':
-        return const Icon(Icons.book);
+        return Icons.book;
       case '快递':
-        return const Icon(Icons.local_shipping);
+        return Icons.local_shipping;
       case '超市':
-        return const Icon(Icons.store);
+        return Icons.store;
       case '饮用水':
-        return const Icon(Icons.water_drop);
+        return Icons.water_drop;
       default:
-        return const Icon(Icons.lightbulb);
+        return Icons.lightbulb;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Theme.of(context).secondaryHeaderColor,
+      elevation: 0,
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Container(
         padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(
-                      child: Text(
-                        toUse.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.left,
-                        textScaleFactor: 1.25,
+                    Text(
+                      toUse.name,
+                      textScaleFactor: 1.1,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     TagsBoxes(
                       text: toUse.status ? "开放" : "关闭",
                       backgroundColor: toUse.status ? Colors.green : Colors.red,
-                    )
-                  ],
-                ),
-                const Divider(),
-                Row(
-                  children: [
-                    _iconForTarget(),
-                    const SizedBox(width: 7.5),
-                    Wrap(
-                      spacing: 5,
-                      children: List.generate(
-                        toUse.tags.length,
-                        (index) => TagsBoxes(text: toUse.tags[index]),
-                      ),
                     ),
                   ],
                 ),
-                const Divider(),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(2.5, 0, 0, 0),
-                  child: Text(
-                    toUse.description ?? "没有描述",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                const Divider(
+                  color: Colors.transparent,
+                  height: 2.5,
                 ),
-              ],
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /*
-                TextButton(
-                  // To be implemented.
-                  onPressed: () {},
-                  child: const Text("纠正"),
+                Row(
+                  children: [
+                    Icon(
+                      _iconForTarget(),
+                      size: 14,
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
+                    const SizedBox(width: 5),
+                    Wrap(
+                      spacing: 5,
+                      children: [
+                        for (var i in toUse.tags) TagsBoxes(text: i),
+                      ],
+                    ),
+                  ],
                 ),
-                */
-                Text(
-                  "上次更新 ${toUse.updatedAt.toLocal().toString().substring(0, 19)}",
-                  overflow: TextOverflow.ellipsis,
+                const Divider(
+                  color: Colors.transparent,
+                  height: 2.5,
+                ),
+                informationWithIcon(
+                  Icons.description,
+                  toUse.description ?? "没有描述",
+                  context,
+                ),
+                informationWithIcon(
+                  Icons.update,
+                  toUse.updatedAt.toLocal().toString().substring(0, 19),
+                  context,
                 ),
               ],
             ),
