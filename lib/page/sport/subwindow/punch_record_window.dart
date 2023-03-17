@@ -90,29 +90,19 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
               );
             }
             if (c.punch.all.isNotEmpty) {
-              if (!isValid) {
-                return dataList<RecordCard, RecordCard>(
-                  List.generate(
-                    c.punch.all.length,
-                    (i) => RecordCard(mark: i + 1, toUse: c.punch.all[i]),
-                  ),
-                  (toUse) => toUse,
-                  physics: physics,
-                );
-              } else {
-                int count = 0;
-                List<RecordCard> toUse = [];
-                for (var i in c.punch.all) {
-                  if (i.state.contains("恭喜你本次打卡成功")) {
-                    toUse.add(RecordCard(mark: count + 1, toUse: i));
-                  }
+              int count = 0;
+              List<RecordCard> toUse = [];
+              for (var i in c.punch.all) {
+                if ((isValid && i.state.contains("恭喜你本次打卡成功")) || !isValid) {
+                  toUse.insertAll(0, [RecordCard(mark: count + 1, toUse: i)]);
+                  count++;
                 }
-                return dataList<RecordCard, RecordCard>(
-                  toUse,
-                  (toUse) => toUse,
-                  physics: physics,
-                );
               }
+              return dataList<RecordCard, RecordCard>(
+                toUse,
+                (toUse) => toUse,
+                physics: physics,
+              );
             } else {
               return ListView(
                 physics: physics,
@@ -200,6 +190,8 @@ class RecordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Container(
         padding: const EdgeInsets.all(15),
         child: Wrap(

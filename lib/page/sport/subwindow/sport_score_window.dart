@@ -38,8 +38,10 @@ class _SportScoreWindowState extends State<SportScoreWindow> {
             } else {
               List things = [
                 Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(15),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -78,6 +80,8 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Container(
         padding: const EdgeInsets.all(20),
         child: Column(
