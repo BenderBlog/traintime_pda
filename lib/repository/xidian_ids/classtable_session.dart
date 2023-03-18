@@ -92,9 +92,17 @@ class ClassTableFile extends EhallSession {
         DateTime.now().difference(file.lastModifiedSync()).inDays <= 3) {
       return jsonDecode(file.readAsStringSync());
     } else {
-      var qResult = await getFromWeb();
-      file.writeAsStringSync(jsonEncode(qResult));
-      return qResult;
+      try {
+        var qResult = await getFromWeb();
+        file.writeAsStringSync(jsonEncode(qResult));
+        return qResult;
+      } catch (e) {
+        if (isExist) {
+          return jsonDecode(file.readAsStringSync());
+        } else {
+          rethrow;
+        }
+      }
     }
 
     /*

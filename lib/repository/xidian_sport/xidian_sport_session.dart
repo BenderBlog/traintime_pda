@@ -22,8 +22,6 @@ import 'package:flutter/foundation.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/repository/general.dart';
 
-import '../../main.dart';
-
 /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
 String rsaEncrypt(String toEnc, String pubKey) {
   dynamic publicKey = RSAKeyParser().parse(pubKey);
