@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
       title: 'WaterMeter Pre-Alpha',
       theme: ThemeData(
         useMaterial3: true,
-        primarySwatch: Colors.deepPurple,
+        //primarySwatch: Colors.lightGreen,
       ),
       home: isFirst ? const LoginWindow() : const HomePage(),
     );

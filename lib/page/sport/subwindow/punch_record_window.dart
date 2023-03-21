@@ -199,7 +199,7 @@ class RecordCard extends StatelessWidget {
           children: [
             TagsBoxes(
               text: "第 $mark 条",
-              backgroundColor: Colors.deepPurple,
+              backgroundColor: Theme.of(context).primaryColor,
             ),
             situation(),
             const Divider(

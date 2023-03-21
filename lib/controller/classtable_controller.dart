@@ -11,6 +11,7 @@ class ClassTableController extends GetxController {
 
   // Classtable Data
   List<ClassDetail> classDetail = <ClassDetail>[];
+  List<ClassDetail> notArranged = <ClassDetail>[];
   List<TimeArrangement> timeArrangement = <TimeArrangement>[];
   String semesterCode = "";
   String termStartDay = "";
@@ -74,6 +75,16 @@ class ClassTableController extends GetxController {
         if (i["SKZC"].toString().length > semesterLength) {
           semesterLength = i["SKZC"].toString().length;
         }
+      }
+
+      // Deal with the not arranged data.
+      for (var i in value["notArranged"]) {
+        notArranged.add(ClassDetail(
+          name: i["KCM"],
+          teacher: i["SKJS"],
+          code: i["KCH"],
+          number: i["KXH"],
+        ));
       }
 
       // Uncomment to see the conflict.

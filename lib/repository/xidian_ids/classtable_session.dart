@@ -59,6 +59,15 @@ class ClassTableFile extends EhallSession {
     developer.log("Caching...", name: "Ehall getClasstable");
     qResult["semesterCode"] = semesterCode;
     qResult["termStartDay"] = termStartDay;
+
+    var notOnTable = await dio.post(
+      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
+      data: {'XNXQDM': semesterCode},
+    ).then((value) => value.data['datas']['cxxsllsywpk']);
+
+    developer.log(notOnTable.toString(), name: "Ehall getClasstable");
+    qResult["notArranged"] = notOnTable["rows"];
+
     return qResult;
   }
 
@@ -104,24 +113,5 @@ class ClassTableFile extends EhallSession {
         }
       }
     }
-
-    /*
-    onResponse(70, "获取未安排内容");
-    var notOnTable = await dio.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
-      data: {'XNXQDM': semesterCode},
-    ).then((value) => value.data['datas']['cxxsllsywpk']);
-    if (qResult['extParams']['code'] != 1) {
-      throw qResult['extParams']['msg'] + "在未安排课程";
-    }
-    onResponse(90, "处理未安排内容");
-    for (var i in notOnTable["rows"]) {
-      classData.notOnTable.add(ClassDetail(
-        name: i["KCM"],
-        teacher: i["SKJS"],
-        place: i["JASDM"],
-      ));
-    }
-    */
   }
 }

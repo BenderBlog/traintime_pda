@@ -243,6 +243,12 @@ class PageState extends State<ClassTableWindow> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.cancel_schedule_send),
+            onPressed: () {
+              Get.to(NotArrangedClassList(list: controller.notArranged));
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.info),
             onPressed: () {
               showDialog(
@@ -778,4 +784,33 @@ class PageState extends State<ClassTableWindow> {
           ),
         ],
       );
+}
+
+class NotArrangedClassList extends StatelessWidget {
+  final List<ClassDetail> list;
+  const NotArrangedClassList({super.key, required this.list});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("没有时间安排的科目"),
+      ),
+      body: dataList<Card, Card>(
+        List.generate(
+          list.length,
+          (index) => Card(
+            child: ListTile(
+              title: Text(list[index].name),
+              subtitle: Text(
+                "编号: ${list[index].code} | ${list[index].number}\n"
+                "老师: ${list[index].teacher ?? "没有数据"}",
+              ),
+            ),
+          ),
+        ),
+        (toUse) => toUse,
+      ),
+    );
+  }
 }
