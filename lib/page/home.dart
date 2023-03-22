@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //extendBodyBehindAppBar: true,
       body: _page[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         destinations: [

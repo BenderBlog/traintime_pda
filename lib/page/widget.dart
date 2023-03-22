@@ -83,6 +83,25 @@ const colorList = [
   Colors.brown,
 ];
 
+/// App Color patten.
+/// Copied from https://github.com/flutter/samples/blob/main/material_3_demo/lib/constants.dart
+enum ColorSeed {
+  baseColor('M3 Baseline', Color(0xff6750a4)),
+  deepPurple('Deep Purple', Colors.deepPurple),
+  indigo('Indigo', Colors.indigo),
+  blue('Blue', Colors.blue),
+  teal('Teal', Colors.teal),
+  green('Green', Colors.green),
+  yellow('Yellow', Colors.yellow),
+  orange('Orange', Colors.orange),
+  deepOrange('Deep Orange', Colors.deepOrange),
+  pink('Pink', Colors.pink);
+
+  const ColorSeed(this.label, this.color);
+  final String label;
+  final Color color;
+}
+
 /// Colors for class information card which not in this week.
 const uselessColor = Colors.grey;
 

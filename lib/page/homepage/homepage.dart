@@ -57,7 +57,7 @@ class MainPage extends StatelessWidget {
           },
           child: Card(
             elevation: 0,
-            color: Theme.of(context).colorScheme.secondaryContainer,
+            color: Theme.of(context).colorScheme.primaryContainer,
             child: Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
@@ -67,7 +67,7 @@ class MainPage extends StatelessWidget {
                   Row(children: [
                     Icon(
                       Icons.calendar_month_outlined,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
                       size: 14,
                     ),
                     const SizedBox(width: 7.5),
@@ -81,7 +81,7 @@ class MainPage extends StatelessWidget {
                           : "课程表",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ]),
@@ -97,7 +97,7 @@ class MainPage extends StatelessWidget {
                               : "遇到错误",
                       style: TextStyle(
                         fontSize: 22,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ),
@@ -107,7 +107,9 @@ class MainPage extends StatelessWidget {
                               "寻找什么呢，我也不知道",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
                               ),
                             )
                           : Row(
@@ -116,8 +118,9 @@ class MainPage extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.person,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 2),
@@ -142,8 +145,9 @@ class MainPage extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.room,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 2),
@@ -152,7 +156,7 @@ class MainPage extends StatelessWidget {
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .primary,
+                                            .onPrimaryContainer,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -163,8 +167,9 @@ class MainPage extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.access_time_filled_outlined,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 2),
@@ -224,7 +229,7 @@ class MainPage extends StatelessWidget {
                 },
                 child: Card(
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -233,7 +238,9 @@ class MainPage extends StatelessWidget {
                         Row(children: [
                           Icon(
                             Icons.run_circle,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                             size: 14,
                           ),
                           const SizedBox(width: 7.5),
@@ -241,7 +248,9 @@ class MainPage extends StatelessWidget {
                             "体育信息",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                             ),
                           ),
                         ]),
@@ -253,8 +262,9 @@ class MainPage extends StatelessWidget {
                                     "目前无法使用",
                                     textScaleFactor: 1.5,
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                     ),
                                   )
                                 : c.isGet == false
@@ -264,7 +274,7 @@ class MainPage extends StatelessWidget {
                                         style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .primary,
+                                              .onPrimaryContainer,
                                         ),
                                       )
                                     : Text(
@@ -274,7 +284,7 @@ class MainPage extends StatelessWidget {
                                         style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .primary,
+                                              .onPrimaryContainer,
                                         ),
                                       ),
                           ),
@@ -307,7 +317,7 @@ class MainPage extends StatelessWidget {
                 },
                 child: Card(
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -316,7 +326,9 @@ class MainPage extends StatelessWidget {
                         Row(children: [
                           Icon(
                             Icons.electric_meter_rounded,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                             size: 14,
                           ),
                           const SizedBox(width: 7.5),
@@ -324,7 +336,9 @@ class MainPage extends StatelessWidget {
                             "电量信息",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                             ),
                           ),
                         ]),
@@ -336,8 +350,9 @@ class MainPage extends StatelessWidget {
                                     "目前无法使用",
                                     textScaleFactor: 1.5,
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                     ),
                                   )
                                 : c.isGet == false
@@ -347,7 +362,7 @@ class MainPage extends StatelessWidget {
                                         style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .primary,
+                                              .onPrimaryContainer,
                                         ),
                                       )
                                     : Text(
@@ -356,7 +371,7 @@ class MainPage extends StatelessWidget {
                                         style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .primary,
+                                              .onPrimaryContainer,
                                         ),
                                       ),
                           ),
@@ -401,7 +416,7 @@ class MainPage extends StatelessWidget {
                 },
                 child: Card(
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Center(
@@ -453,7 +468,7 @@ class MainPage extends StatelessWidget {
                 },
                 child: Card(
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Center(

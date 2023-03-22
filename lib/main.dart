@@ -23,14 +23,6 @@ import 'package:watermeter/page/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 
-import 'package:alice/alice.dart';
-import 'package:flutter/foundation.dart';
-
-Alice alice = Alice(
-  showNotification: kDebugMode,
-  showInspectorOnShake: kDebugMode,
-);
-
 void main() async {
   developer.log(
     "Watermeter, by BenderBlog, with dragon power.",
@@ -66,11 +58,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      navigatorKey: alice.getNavigatorKey(),
       title: 'WaterMeter Pre-Alpha',
       theme: ThemeData(
         useMaterial3: true,
-        //primarySwatch: Colors.lightGreen,
+        colorSchemeSeed: Colors.blue,
       ),
       home: isFirst ? const LoginWindow() : const HomePage(),
     );
