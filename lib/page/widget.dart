@@ -85,17 +85,15 @@ const colorList = [
 
 /// App Color patten.
 /// Copied from https://github.com/flutter/samples/blob/main/material_3_demo/lib/constants.dart
+
 enum ColorSeed {
-  baseColor('M3 Baseline', Color(0xff6750a4)),
-  deepPurple('Deep Purple', Colors.deepPurple),
-  indigo('Indigo', Colors.indigo),
-  blue('Blue', Colors.blue),
-  teal('Teal', Colors.teal),
-  green('Green', Colors.green),
-  yellow('Yellow', Colors.yellow),
-  orange('Orange', Colors.orange),
-  deepOrange('Deep Orange', Colors.deepOrange),
-  pink('Pink', Colors.pink);
+  deepPurple('基佬紫', Colors.deepPurple),
+  indigo('贵族蓝', Colors.indigo),
+  blue('天空蓝', Colors.blue),
+  teal('稳重绿', Colors.teal),
+  green('夏天绿', Colors.green),
+  orange('活力橙', Colors.orange),
+  pink('少女粉', Colors.pink);
 
   const ColorSeed(this.label, this.color);
   final String label;

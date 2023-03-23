@@ -20,6 +20,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
+import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({Key? key}) : super(key: key);
@@ -47,15 +48,15 @@ class _SettingWindowState extends State<SettingWindow> {
                   mode: LaunchMode.externalApplication,
                 ),
               ),
-            ],
-          ),
-          SettingsSection(
-            title: const Text('用户相关'),
-            tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('用户信息'),
                   value: Text("${user["name"]} ${user["execution"]}\n"
                       "${user["institutes"]} ${user["subject"]}")),
+            ],
+          ),
+          SettingsSection(
+            title: const Text('缓存设置'),
+            tiles: <SettingsTile>[
               SettingsTile.navigation(
                 title: const Text('清除缓存'),
                 value: const Text("清除所有缓存"),
@@ -63,6 +64,20 @@ class _SettingWindowState extends State<SettingWindow> {
               SettingsTile.navigation(
                   title: const Text('退出登录'),
                   value: const Text("退出登录该帐号，该帐号在本地的所有信息均将被删除！")),
+            ],
+          ),
+          SettingsSection(
+            title: const Text('颜色设置'),
+            tiles: <SettingsTile>[
+              SettingsTile.navigation(
+                  title: const Text('设置程序主题色'),
+                  value: const Text("改变程序的色调，符合你的品味"),
+                  onPressed: (content) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const ChangeColorDialog(),
+                    );
+                  }),
             ],
           ),
           SettingsSection(

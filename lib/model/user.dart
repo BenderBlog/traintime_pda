@@ -14,6 +14,7 @@ Map<String, String?> user = {
   "decorated": "false",
   "decoration": "",
   "swift": "0",
+  "color": "0",
 };
 
 Future<void> initUser() async {
@@ -35,6 +36,7 @@ Future<void> initUser() async {
   user["swift"] = prefs.getString("swift");
   user["decorated"] = prefs.getString("decorated");
   user["decoration"] = prefs.getString("decoration");
+  user["color"] = prefs.getString("color");
 }
 
 Future<void> addUser(String key, String value) async {
