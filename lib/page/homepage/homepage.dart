@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/exam/exam.dart';
 
 import 'package:watermeter/page/homepage/clipper.dart';
@@ -25,6 +26,7 @@ import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 import 'package:watermeter/page/score/score.dart';
+import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 
@@ -215,18 +217,25 @@ class MainPage extends StatelessWidget {
             GetBuilder<PunchController>(
               builder: (c) => GestureDetector(
                 onTap: () async {
-                  if (c.isGet == true) {
-                    Get.to(() => const SportWindow());
-                  } else if (c.error != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误"),
-                    ));
+                  if (user["sportPassword"] != "") {
+                    if (c.isGet == true) {
+                      Get.to(() => const SportWindow());
+                    } else if (c.error != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text("遇到错误"),
+                      ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text("请稍候，正在刷新信息"),
+                      ));
+                    }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("请稍候，正在刷新信息"),
-                    ));
+                    showDialog(
+                      context: context,
+                      builder: (context) => const SportPasswordDialog(),
+                    );
                   }
                 },
                 child: Card(
