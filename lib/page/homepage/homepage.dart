@@ -53,8 +53,8 @@ class MainPage extends StatelessWidget {
                     .showSnackBar(SnackBar(content: Text(c.error ?? "正在获取课表")));
               }
             } on String catch (e) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text("遇到错误$e")));
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("遇到错误：${e.substring(0, 150)}")));
             }
           },
           child: Card(
@@ -217,13 +217,19 @@ class MainPage extends StatelessWidget {
             GetBuilder<PunchController>(
               builder: (c) => GestureDetector(
                 onTap: () async {
-                  if (user["sportPassword"] != "") {
+                  if (user["sportPassword"] == "" ||
+                      c.error.toString().contains("用户名或密码错误")) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const SportPasswordDialog(),
+                    );
+                  } else {
                     if (c.isGet == true) {
                       Get.to(() => const SportWindow());
                     } else if (c.error != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         behavior: SnackBarBehavior.floating,
-                        content: Text("遇到错误"),
+                        content: Text("遇到错误：${c.error}"),
                       ));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -231,11 +237,6 @@ class MainPage extends StatelessWidget {
                         content: Text("请稍候，正在刷新信息"),
                       ));
                     }
-                  } else {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const SportPasswordDialog(),
-                    );
                   }
                 },
                 child: Card(
@@ -315,9 +316,9 @@ class MainPage extends StatelessWidget {
                       content: Text("电费帐号：${c.electricityAccount()}"),
                     ));
                   } else if (c.error != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误"),
+                      content: Text("遇到错误 ${c.error}"),
                     ));
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -421,7 +422,7 @@ class MainPage extends StatelessWidget {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误，信息如下：\n${c.error!}"),
+                      content: Text("遇到错误：${c.error!}"),
                     ));
                   }
                 },
@@ -473,7 +474,7 @@ class MainPage extends StatelessWidget {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误，信息如下：\n${c.error!}"),
+                      content: Text("遇到错误：${c.error!}"),
                     ));
                   }
                 },
