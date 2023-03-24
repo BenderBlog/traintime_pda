@@ -544,7 +544,7 @@ class MainPage extends StatelessWidget {
                 ),
                 child: Container(
                   height: height,
-                  color: themeData.colorScheme.primary,
+                  color: themeData.colorScheme.surfaceVariant,
                 ),
               ),
               Positioned(
@@ -556,7 +556,7 @@ class MainPage extends StatelessWidget {
                   child: Container(
                     height: 2,
                     width: double.infinity,
-                    color: themeData.colorScheme.primary,
+                    color: themeData.colorScheme.surfaceVariant,
                   ),
                 ),
               ),
@@ -575,8 +575,8 @@ class MainPage extends StatelessWidget {
       child: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: themeData.colorScheme.primary,
-            foregroundColor: themeData.colorScheme.onPrimary,
+            backgroundColor: themeData.colorScheme.surfaceVariant,
+            foregroundColor: themeData.colorScheme.onSurfaceVariant,
             expandedHeight: MediaQuery.of(context).size.width * 0.125,
             pinned: true,
             elevation: 0,
