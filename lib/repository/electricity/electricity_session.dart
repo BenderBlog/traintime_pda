@@ -15,14 +15,12 @@ Thanks xidian-script!
 
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
+import 'package:watermeter/model/user.dart';
 
 // ignore: constant_identifier_names
 const BASE = "http://10.168.55.50:8088";
 
-Future<String> electricitySession({
-  required String username,
-  String password = "123456",
-}) async {
+Future<String> electricitySession({required String username}) async {
   Dio dio = Dio();
   // ASP session id.
   var sessionId = await dio
@@ -40,7 +38,7 @@ Future<String> electricitySession({
         "$BASE/ajaxpro/SearchWap_Login,App_Web_fghipt60.ashx",
         data: {
           "webName": username,
-          "webPass": password,
+          "webPass": user["electricityPassword"]!,
         },
         options: Options(headers: {
           "AjaxPro-Method": "getLoginInput",
