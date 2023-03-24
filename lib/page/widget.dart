@@ -90,8 +90,7 @@ enum ColorSeed {
   deepPurple('基佬紫', Colors.deepPurple),
   indigo('贵族蓝', Colors.indigo),
   blue('天空蓝', Colors.blue),
-  teal('稳重绿', Colors.teal),
-  green('夏天绿', Colors.green),
+  green('夏日绿', Colors.green),
   orange('活力橙', Colors.orange),
   pink('少女粉', Colors.pink);
 

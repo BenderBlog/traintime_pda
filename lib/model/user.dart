@@ -44,3 +44,23 @@ Future<void> addUser(String key, String value) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString(key, value);
 }
+
+void prefrenceClear() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
+  user = {
+    "name": null,
+    "sex": null,
+    "execution": null,
+    "institutes": null,
+    "subject": null,
+    "dorm": null,
+    "idsAccount": null,
+    "idsPassword": null,
+    "sportPassword": null,
+    "decorated": "false",
+    "decoration": "",
+    "swift": "0",
+    "color": "0",
+  };
+}

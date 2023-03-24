@@ -140,7 +140,8 @@ class CafeteriaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-        color: Theme.of(context).secondaryHeaderColor,
+        elevation: 0,
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         child: Container(
           padding: const EdgeInsets.all(20),
           child: Wrap(

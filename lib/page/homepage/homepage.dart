@@ -179,7 +179,7 @@ class MainPage extends StatelessWidget {
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .primary,
+                                            .onPrimaryContainer,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -191,7 +191,9 @@ class MainPage extends StatelessWidget {
                           c.error == null ? "请耐心等待片刻" : "课表获取失败",
                           style: TextStyle(
                             fontSize: 15,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                           ),
                         ),
                 ],

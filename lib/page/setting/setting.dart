@@ -14,13 +14,17 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/user.dart';
+import 'package:watermeter/page/login.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
+import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/repository/general.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({Key? key}) : super(key: key);
@@ -58,12 +62,63 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('缓存设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: const Text('清除缓存'),
-                value: const Text("清除所有缓存"),
+                title: const Text('清除 Cookie'),
+                value: const Text("清除所有 Cookie，适用于重新登录"),
+                onPressed: (context) async {
+                  try {
+                    await IDSCookieJar.deleteAll();
+                    await SportCookieJar.deleteAll();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Cookie 已被清除'),
+                      ));
+                    }
+                  } on PathNotFoundException {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('目前没有缓存 Cookie'),
+                    ));
+                  }
+                },
               ),
               SettingsTile.navigation(
-                  title: const Text('退出登录'),
-                  value: const Text("退出登录该帐号，该帐号在本地的所有信息均将被删除！")),
+                title: const Text('退出登录'),
+                value: const Text("返回登录界面"),
+                onPressed: (context) async {
+                  /// Clean Cookie
+                  try {
+                    await IDSCookieJar.deleteAll();
+                    await SportCookieJar.deleteAll();
+                    // ignore: empty_catches
+                  } on Exception {}
+
+                  /// Clean Classtable cache.
+                  Directory appDocDir =
+                      await getApplicationDocumentsDirectory();
+                  Directory destination =
+                      Directory("${appDocDir.path}/org.superbart.watermeter");
+                  if (!destination.existsSync()) {
+                    await destination.create();
+                  }
+                  var file = File("${destination.path}/ClassTable.json");
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  /// Clean user information
+                  prefrenceClear();
+
+                  /// Theme back to default
+                  Get.changeTheme(
+                    ThemeData(
+                      useMaterial3: true,
+                      colorSchemeSeed: ColorSeed.values[0].color,
+                    ),
+                  );
+
+                  /// Return homepage
+                  Get.off(() => const LoginWindow());
+                },
+              ),
             ],
           ),
           SettingsSection(
