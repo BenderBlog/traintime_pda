@@ -10,13 +10,13 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-// Color card: https://colorhunt.co/palette/be9fe1c9b6e4e1ccecf1f1f6
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+import 'package:watermeter/main.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
-import 'package:watermeter/modified_library/sprt_sn_progress_dialog/sprt_sn_progress_dialog.dart';
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/widget.dart';
 
@@ -35,46 +35,39 @@ class _LoginWindowState extends State<LoginWindow> {
   /// Can I see the password?
   bool _couldNotView = true;
 
-  void _login() async {
+  void _login(String? captcha) async {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
       msg: '正在登录学校一站式',
       max: 100,
       hideValue: true,
-      completed: Completed(
-        completedMsg: "登录成功",
-        closedDelay: 2500,
-      ),
-      error: ErrorSignal(
-        closedDelay: 2500,
-      ),
+      completed: Completed(completedMsg: "登录成功"),
     );
     try {
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
+        captcha: captcha,
         onResponse: (int number, String status) =>
             pd.update(msg: status, value: number),
       );
+      if (!mounted) return;
+      if (isGood == true) {
+        addUser("idsAccount", _idsAccountController.text);
+        addUser("idsPassword", _idsPasswordController.text);
+        await ses.getInformation();
+        if (mounted) {
+          if (pd.isOpen()) pd.close();
+          Get.off(const HomePage());
+        }
+      }
     } catch (e) {
       isGood = false;
-      pd.update(value: -1, msg: e.toString());
-    }
-    if (!mounted) return;
-    if (isGood == true) {
-      addUser("idsAccount", _idsAccountController.text);
-      addUser("idsPassword", _idsPasswordController.text);
-      await ses.getInformation();
-      if (mounted) {
-        if (pd.isOpen()) {
-          pd.close();
-        }
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false,
-        );
-      }
+      pd.close();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
   }
 
@@ -168,10 +161,33 @@ class _LoginWindowState extends State<LoginWindow> {
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0),
               ),
-              onPressed: () {
+              onPressed: () async {
                 if (_idsAccountController.text.length == 11 &&
                     _idsPasswordController.text.isNotEmpty) {
-                  _login();
+                  String? captcha;
+                  await ses.initLogin(
+                      target:
+                          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html");
+
+                  /// Check captcha.
+                  bool isNeedCaptcha = await ses.captchaCheck(
+                      username: _idsAccountController.text);
+                  var cookie = await IDSCookieJar.loadForRequest(
+                      Uri.parse("http://ids.xidian.edu.cn/authserver"));
+                  String cookieStr = "";
+                  for (var i in cookie) {
+                    cookieStr += "${i.name}=${i.value}; ";
+                  }
+                  if (mounted && isNeedCaptcha) {
+                    print("需要验证码");
+                    captcha = await showDialog<String>(
+                        context: context,
+                        builder: ((context) => CaptchaInputDialog(
+                            cookie:
+                                cookieStr.substring(0, cookieStr.length - 2))));
+                    if (captcha == null) return;
+                  }
+                  _login(captcha);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -203,11 +219,90 @@ class _LoginWindowState extends State<LoginWindow> {
                     ),
                   );
                 },
+              ),
+              TextButton(
+                child: const Text(
+                  '查看缓存设定',
+                  style: TextStyle(
+                    color: Color(0xFFA267AC),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () {
+                  alice.showInspector();
+                },
               )
             ],
           )
         ],
       ),
+    );
+  }
+}
+
+class CaptchaInputDialog extends StatelessWidget {
+  final TextEditingController _captchaController = TextEditingController();
+  String cookie;
+
+  CaptchaInputDialog({super.key, required this.cookie});
+
+  @override
+  Widget build(BuildContext context) {
+    NetworkImage cappic = NetworkImage(
+        "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
+        headers: {"Cookie": cookie});
+
+    return AlertDialog(
+      title: const Text('请输入验证码'),
+      titleTextStyle: const TextStyle(
+        fontSize: 20,
+        color: Colors.black,
+      ),
+      content: Column(
+        children: [
+          Image(image: cappic),
+          TextField(
+            autofocus: true,
+            style: const TextStyle(fontSize: 20),
+            controller: _captchaController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: "输入验证码",
+              fillColor: Colors.grey.withOpacity(0.4),
+              filled: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('取消'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: const Text('提交'),
+          onPressed: () async {
+            if (_captchaController.text.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('请输入验证码'),
+                ),
+              );
+            } else {
+              Navigator.of(context).pop(_captchaController.text);
+            }
+          },
+        ),
+      ],
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+      actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
     );
   }
 }

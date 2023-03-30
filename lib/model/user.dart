@@ -22,13 +22,16 @@ Future<void> initUser() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   user["idsAccount"] = prefs.getString("idsAccount");
   user["idsPassword"] = prefs.getString("idsPassword");
-  if (user["idsAccount"] == null || user["idsPassword"] == null) {
+  user["name"] = prefs.getString("name");
+  if (user["idsAccount"] == null ||
+      user["idsPassword"] == null ||
+      user["name"] == null) {
     throw "有未注册用户，跳转至登录界面";
   }
 
   user["sportPassword"] = prefs.getString("sportPassword");
   user["electricityPassword"] = prefs.getString("electricityPassword");
-  user["name"] = prefs.getString("name");
+
   user["sex"] = prefs.getString("sex");
   user["execution"] = prefs.getString("execution");
   user["institutes"] = prefs.getString("institutes");

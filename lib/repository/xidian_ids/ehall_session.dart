@@ -32,6 +32,7 @@ class EhallSession extends IDSSession {
     required String username,
     required String password,
     bool forceReLogin = false,
+    String? captcha,
     void Function(int, String)? onResponse,
   }) async {
     if (await isLoggedIn() == false || forceReLogin == true) {
@@ -41,9 +42,8 @@ class EhallSession extends IDSSession {
       await super.login(
         username: username,
         password: password,
-        target:
-            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
         onResponse: onResponse,
+        captcha: captcha,
       );
     }
   }
@@ -63,8 +63,8 @@ class EhallSession extends IDSSession {
             return status! < 500;
           },
           headers: {
-            "Accept":
-                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            "Accept": "text/html,application/xhtml+xml,application/xml;"
+                "q=0.9,image/webp,image/apng,*/*;q=0.8",
           }),
     );
     developer.log("Transfer address: ${value.headers['location']![0]}.",

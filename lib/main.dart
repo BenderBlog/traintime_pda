@@ -12,6 +12,7 @@ if you want to use.
 
 import 'dart:io';
 
+import 'package:alice/alice.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
 import 'package:flutter/material.dart';
@@ -24,6 +25,10 @@ import 'package:watermeter/page/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 
+Alice alice = Alice(
+    //showNotification: true,
+    );
+
 void main() async {
   developer.log(
     "Watermeter, by BenderBlog, with dragon power.",
@@ -31,6 +36,7 @@ void main() async {
   );
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
+
   // Loading cookiejar.
   Directory supportPath = await getApplicationSupportDirectory();
   SportCookieJar = PersistCookieJar(
@@ -63,10 +69,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorKey: alice.getNavigatorKey(),
       title: 'WaterMeter Pre-Alpha',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: ColorSeed.values[int.parse(user["color"]!)].color,
+        colorSchemeSeed:
+            ColorSeed.values[int.parse(user["color"] ?? "0")].color,
       ),
       home: widget.isFirst ? const LoginWindow() : const HomePage(),
     );

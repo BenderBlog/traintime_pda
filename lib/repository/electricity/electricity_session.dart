@@ -66,9 +66,9 @@ Future<String> electricitySession({required String username}) async {
 
   for (int i = 0; i < nameArray.length; ++i) {
     String match = nameArray[i][0]!;
-    if (match.contains("MBUS电表1.0")) {
+    if (match.contains("派诺单相轨道电表")) {
       return dataArray[i][0]!.substring(4);
-    } else if (match.contains("派诺单相轨道电表")) {
+    } else if (match.contains("MBUS电表1.0")) {
       return dataArray[i][0]!.substring(4);
     }
   }
