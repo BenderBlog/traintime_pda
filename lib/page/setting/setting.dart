@@ -20,7 +20,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/main.dart';
 import 'package:watermeter/model/user.dart';
-import 'package:watermeter/page/login.dart';
+import 'package:watermeter/page/login/login.dart';
 import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';

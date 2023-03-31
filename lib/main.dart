@@ -21,7 +21,7 @@ import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/home.dart';
-import 'package:watermeter/page/login.dart';
+import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 

@@ -18,16 +18,17 @@ import 'dart:developer' as developer;
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' hide Key;
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter/material.dart';
 import 'package:watermeter/main.dart';
+import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
 import 'package:watermeter/repository/general.dart';
 
 /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
 /// Padding part is copied from libxduauth's idea.
 String aesEncrypt(String toEnc, String key) {
-  dynamic k = Key.fromUtf8(key);
-  var crypt = AES(k, mode: AESMode.cbc, padding: null);
+  dynamic k = encrypt.Key.fromUtf8(key);
+  var crypt = encrypt.AES(k, mode: encrypt.AESMode.cbc, padding: null);
 
   /// Start padding
   int blockSize = 16;
@@ -41,8 +42,8 @@ String aesEncrypt(String toEnc, String key) {
   String readyToEnc = utf8.decode(dataToPad);
 
   /// Start encrypt.
-  return Encrypter(crypt)
-      .encrypt(readyToEnc, iv: IV.fromUtf8('xidianscriptsxdu'))
+  return encrypt.Encrypter(crypt)
+      .encrypt(readyToEnc, iv: encrypt.IV.fromUtf8('xidianscriptsxdu'))
       .base64;
 }
 
@@ -57,10 +58,6 @@ class IDSSession {
     //"dllt",
     "execution",
   ];
-
-  String _keys = "";
-  String _target = "";
-  List<Bs4Element> _form = [];
 
   @protected
   Dio get dio {
@@ -93,50 +90,64 @@ class IDSSession {
     return response.statusCode == 302 ? false : true;
   }
 
-  Future<bool> captchaCheck({required String username}) async {
+  Future<void> login({
+    required String username,
+    required String password,
+    required String target,
+    Future<String?> Function(String)? getCaptcha,
+    bool forceReLogin = false,
+    void Function(int, String)? onResponse,
+  }) async {
+    /// Get the login webpage.
+    if (onResponse != null) {
+      onResponse(10, "准备获取登录网页");
+      developer.log("Ready to get the login webpage.", name: "ids login");
+    }
+    var response = await dio.get(
+      "http://ids.xidian.edu.cn/authserver/login",
+      queryParameters: {'service': target, 'type': 'userNameLogin'},
+    ).then((value) => value.data);
+
+    /// Start getting data from webpage.
+    var page = BeautifulSoup(response);
+    var form = page.findAll("input", attrs: {"type": "hidden"});
+
+    /// Check whether it need CAPTCHA or not:-P
+    if (onResponse != null) {
+      onResponse(20, "查询是否需要验证码");
+    }
     var checkCAPTCHA = await dio.get(
-      "https://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
+      "http://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl",
       queryParameters: {
         'username': username,
         '_': DateTime.now().millisecondsSinceEpoch.toString()
       },
     ).then((value) => value.data);
-    return checkCAPTCHA.contains("true");
-  }
-
-  Future<void> initLogin({required String target}) async {
-    if (_form.isEmpty || _keys == "" || _target == "") {
-      _target = target;
-
-      /// Get the login webpage.
-      developer.log("Ready to get the login webpage.", name: "ids login");
-      String loginaddress = await dio
-          .get(_target,
-              options: Options(
-                  followRedirects: false,
-                  validateStatus: (status) => status! < 500))
-          .then((value) => value.headers["location"]![0]);
-      developer.log(loginaddress, name: "ids login");
-      var response = await dio.get(loginaddress).then((value) => value.data);
-
-      /// Start getting data from webpage.
-      var page = BeautifulSoup(response);
-      _form = page.findAll("input", attrs: {"type": "hidden"});
-      _keys = _form
-          .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
-      developer.log("encrypt key: $_keys.", name: "ids login");
+    bool isNeed = checkCAPTCHA.contains("true");
+    developer.log("isNeedCAPTCHA: $isNeed.", name: "ids login");
+    String? captcha;
+    if (isNeed && getCaptcha != null) {
+      var cookie = await IDSCookieJar.loadForRequest(
+          Uri.parse("http://ids.xidian.edu.cn/authserver"));
+      String cookieStr = "";
+      for (var i in cookie) {
+        cookieStr += "${i.name}=${i.value}; ";
+      }
+      developer.log("cookie: $cookieStr.", name: "ids login");
+      captcha = await getCaptcha(cookieStr);
+      developer.log("captcha: $captcha.", name: "ids login");
+      if (captcha == null) return;
+    } else if (isNeed && getCaptcha == null) {
+      throw "你的帐号需要验证码，请登出后重新登录，或去电脑端登录";
     }
-  }
 
-  Future<void> login({
-    required String username,
-    required String password,
-    required String target,
-    bool forceReLogin = false,
-    String? captcha,
-    void Function(int, String)? onResponse,
-  }) async {
-    initLogin(target: target);
+    /// Get AES encrypt key. There must be.
+    if (onResponse != null) {
+      onResponse(30, "获取密码加密密钥");
+    }
+    String keys = form
+        .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
+    developer.log("encrypt key: $keys.", name: "ids login");
 
     /// Prepare for login.
     if (onResponse != null) {
@@ -144,7 +155,7 @@ class IDSSession {
     }
     Map<String, dynamic> head = {
       'username': username,
-      'password': aesEncrypt(password, _keys),
+      'password': aesEncrypt(password, keys),
       'rememberMe': 'true',
       'cllt': 'userNameLogin',
       'dllt': 'generalLogin',
@@ -152,11 +163,11 @@ class IDSSession {
     };
 
     if (captcha != null) {
-      head['captcha'] = captcha;
+      head["captcha"] = captcha;
     }
 
     for (var i in _header) {
-      head[i] = _form.firstWhere(
+      head[i] = form.firstWhere(
           (element) => element["name"] == i || element.id == i)["value"]!;
     }
 
@@ -165,30 +176,27 @@ class IDSSession {
       onResponse(50, "准备登录");
     }
     var data = await dio.post(
-      "https://ids.xidian.edu.cn/authserver/login",
-      queryParameters: {'service': _target},
+      "http://ids.xidian.edu.cn/authserver/login",
+      queryParameters: {'service': target},
       options: Options(
         followRedirects: false,
-        validateStatus: (status) => status! < 500,
+        validateStatus: (status) {
+          return status! < 500;
+        },
       ),
       data: head,
     );
     developer.log("Received: $data.", name: "ids login");
     if (data.statusCode == 401) {
-      throw "用户名或密码错误，或验证码错误";
+      throw "用户名或密码错误";
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress.
       if (onResponse != null) {
         onResponse(80, "登录后处理");
       }
       developer.log("Post deal...", name: "ids login");
-      String refUrl = data.headers['location']![0].split("?")[1];
-      List<String> option = refUrl.split("&");
       var whatever = await dio.get(
         data.headers['location']![0],
-        queryParameters: {
-          option[1].split("=")[0]: option[1].split("=")[1],
-        },
         options: Options(
           followRedirects: false,
           validateStatus: (status) {
@@ -196,6 +204,9 @@ class IDSSession {
           },
         ),
       );
+      if (whatever.data.contains("验证码错误")) {
+        throw "不知为啥还是说让输验证码";
+      }
       return;
     } else {
       throw "登陆失败了，原因不明\n返回值代码：${data.statusCode}\n";

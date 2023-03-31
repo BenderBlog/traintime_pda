@@ -32,7 +32,7 @@ class EhallSession extends IDSSession {
     required String username,
     required String password,
     bool forceReLogin = false,
-    String? captcha,
+    Future<String?> Function(String)? getCaptcha,
     void Function(int, String)? onResponse,
   }) async {
     if (await isLoggedIn() == false || forceReLogin == true) {
@@ -45,7 +45,7 @@ class EhallSession extends IDSSession {
         onResponse: onResponse,
         target:
             "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
-        captcha: captcha,
+        getCaptcha: getCaptcha,
       );
     }
   }
