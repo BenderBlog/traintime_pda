@@ -131,10 +131,13 @@ class IDSSession {
   Future<void> login({
     required String username,
     required String password,
+    required String target,
     bool forceReLogin = false,
     String? captcha,
     void Function(int, String)? onResponse,
   }) async {
+    initLogin(target: target);
+
     /// Prepare for login.
     if (onResponse != null) {
       onResponse(40, "准备登录");

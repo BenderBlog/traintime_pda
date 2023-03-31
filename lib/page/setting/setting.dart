@@ -18,6 +18,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:watermeter/main.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/login.dart';
 import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
@@ -223,6 +224,11 @@ class _SettingWindowState extends State<SettingWindow> {
                   /// Return homepage
                   Get.off(() => const LoginWindow());
                 },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Alice 拦截器查看'),
+                value: const Text("查询本软件网络通讯状况"),
+                onPressed: (context) => alice.showInspector(),
               ),
             ],
           ),

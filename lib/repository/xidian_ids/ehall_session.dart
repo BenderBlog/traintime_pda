@@ -43,6 +43,8 @@ class EhallSession extends IDSSession {
         username: username,
         password: password,
         onResponse: onResponse,
+        target:
+            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
         captcha: captcha,
       );
     }

@@ -60,15 +60,14 @@ Future<String> electricitySession({required String username}) async {
 
   RegExp name = RegExp(r"表名称：.*");
   RegExp data = RegExp(r"剩余量：.*");
+  RegExp info = RegExp(r"安装位置：.*");
 
   List<RegExpMatch> nameArray = name.allMatches(page).toList();
   List<RegExpMatch> dataArray = data.allMatches(page).toList();
+  List<RegExpMatch> infoArray = info.allMatches(page).toList();
 
   for (int i = 0; i < nameArray.length; ++i) {
-    String match = nameArray[i][0]!;
-    if (match.contains("派诺单相轨道电表")) {
-      return dataArray[i][0]!.substring(4);
-    } else if (match.contains("MBUS电表1.0")) {
+    if (nameArray[i][0]!.contains("电表") && infoArray[i][0]!.contains("房间")) {
       return dataArray[i][0]!.substring(4);
     }
   }
