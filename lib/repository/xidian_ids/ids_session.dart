@@ -21,7 +21,6 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:watermeter/main.dart';
-import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
 import 'package:watermeter/repository/general.dart';
 
 /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
