@@ -11,7 +11,6 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/main.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
@@ -157,7 +156,10 @@ class _LoginWindowState extends State<LoginWindow> {
                       await ses.getInformation();
                       if (mounted) {
                         if (pd.isOpen()) pd.close();
-                        Get.off(const HomePage());
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (context) => const HomePage()),
+                        );
                       }
                     }
                   } catch (e) {

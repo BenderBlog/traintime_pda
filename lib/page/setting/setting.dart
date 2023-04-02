@@ -18,6 +18,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/main.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/login/login.dart';
@@ -194,6 +195,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   try {
                     await IDSCookieJar.deleteAll();
                     await SportCookieJar.deleteAll();
+                    // I don't care.
                     // ignore: empty_catches
                   } on Exception {}
 
@@ -214,15 +216,14 @@ class _SettingWindowState extends State<SettingWindow> {
                   prefrenceClear();
 
                   /// Theme back to default
-                  Get.changeTheme(
-                    ThemeData(
-                      useMaterial3: true,
-                      colorSchemeSeed: ColorSeed.values[0].color,
-                    ),
-                  );
+                  ThemeController toChange = Get.put(ThemeController());
+                  toChange.onUpdate();
 
                   /// Return homepage
-                  Get.off(() => const LoginWindow());
+                  if (mounted) {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => const LoginWindow()));
+                  }
                 },
               ),
               SettingsTile.navigation(

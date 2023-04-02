@@ -245,7 +245,13 @@ class PageState extends State<ClassTableWindow> {
           IconButton(
             icon: const Icon(Icons.cancel_schedule_send),
             onPressed: () {
-              Get.to(NotArrangedClassList(list: controller.notArranged));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return NotArrangedClassList(list: controller.notArranged);
+                  },
+                ),
+              );
             },
           ),
           IconButton(

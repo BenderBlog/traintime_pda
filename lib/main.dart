@@ -17,6 +17,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
@@ -25,9 +26,7 @@ import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 
-Alice alice = Alice(
-    //showNotification: true,
-    );
+Alice alice = Alice();
 
 void main() async {
   developer.log(
@@ -66,17 +65,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  ThemeController appTheme = Get.put(ThemeController());
+
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      navigatorKey: alice.getNavigatorKey(),
-      title: 'WaterMeter Pre-Alpha',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed:
-            ColorSeed.values[int.parse(user["color"] ?? "0")].color,
+    return GetBuilder<ThemeController>(
+      builder: (c) => MaterialApp(
+        navigatorKey: alice.getNavigatorKey(),
+        title: 'WaterMeter Pre-Alpha',
+        theme: c.apptheme,
+        home: widget.isFirst ? const LoginWindow() : const HomePage(),
       ),
-      home: widget.isFirst ? const LoginWindow() : const HomePage(),
     );
   }
 }

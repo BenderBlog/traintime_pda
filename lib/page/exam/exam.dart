@@ -32,13 +32,13 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
           title: const Text("考试安排"),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.more_time),
-              onPressed: () =>
-                  Get.to(() => NoArrangedInfo(list: c.toBeArranged)),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => NoArrangedInfo(list: c.toBeArranged))),
             ),
             IconButton(
               icon: const Icon(Icons.info),
@@ -113,7 +113,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
         actions: <Widget>[
           TextButton(
             child: const Text("确定"),
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       );

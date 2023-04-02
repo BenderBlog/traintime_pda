@@ -43,9 +43,11 @@ class MainPage extends StatelessWidget {
           onTap: () {
             try {
               if (c.isGet == true) {
-                Get.to(
-                  () => LayoutBuilder(
-                    builder: (p0, p1) => ClassTableWindow(constraints: p1),
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => LayoutBuilder(
+                      builder: (p0, p1) => ClassTableWindow(constraints: p1),
+                    ),
                   ),
                 );
               } else {
@@ -225,7 +227,8 @@ class MainPage extends StatelessWidget {
                     );
                   } else {
                     if (c.isGet == true) {
-                      Get.to(() => const SportWindow());
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const SportWindow()));
                     } else if (c.error != null) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         behavior: SnackBarBehavior.floating,
@@ -411,7 +414,8 @@ class MainPage extends StatelessWidget {
               builder: (c) => GestureDetector(
                 onTap: () async {
                   if (c.isGet == true) {
-                    Get.to(() => ScoreWindow(scores: c.scores));
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ScoreWindow(scores: c.scores)));
                   } else if (c.error == null) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       behavior: SnackBarBehavior.floating,
@@ -463,7 +467,8 @@ class MainPage extends StatelessWidget {
               builder: (c) => GestureDetector(
                 onTap: () async {
                   if (c.isGet == true) {
-                    Get.to(() => const ExamInfoWindow());
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ExamInfoWindow()));
                   } else if (c.error == null) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       behavior: SnackBarBehavior.floating,

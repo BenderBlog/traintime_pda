@@ -55,7 +55,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                   ],
                 ),
                 value: ColorSeed.values[i].index,
-                groupValue: int.parse(user["color"]!),
+                groupValue: int.parse(user["color"] ?? "0"),
                 onChanged: (int? value) {
                   setState(() {
                     addUser("color", value.toString());
