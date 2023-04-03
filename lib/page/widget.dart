@@ -12,6 +12,10 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 
+/// Check the width
+bool isPhone(context) => MediaQuery.of(context).size.width < 600;
+bool isDesktop(context) => MediaQuery.of(context).size.width > 840;
+
 /// Something related to the box.
 const double widthOfSquare = 30.0;
 const double roundRadius = 10;

@@ -7,10 +7,9 @@ class ThemeController extends GetxController {
   late ThemeData apptheme;
 
   @override
-  void onReady() {
+  void onInit() {
     super.onInit();
     onUpdate();
-    update();
   }
 
   void onUpdate() {
@@ -18,5 +17,6 @@ class ThemeController extends GetxController {
       useMaterial3: true,
       colorSchemeSeed: ColorSeed.values[int.parse(user["color"] ?? "0")].color,
     );
+    update();
   }
 }

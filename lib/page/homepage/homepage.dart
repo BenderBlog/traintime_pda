@@ -29,6 +29,7 @@ import 'package:watermeter/page/score/score.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/page/widget.dart';
 
 class MainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
@@ -37,13 +38,31 @@ class MainPage extends StatelessWidget {
   final examController = Get.put(ExamController());
   final electricController = Get.put(ElectricController());
 
-  Widget classTableCard(BuildContext context) =>
-      GetBuilder<ClassTableController>(
+  late BuildContext _context;
+  late ThemeData _themeData;
+  late NavigatorState _navigator;
+  late ScaffoldMessengerState _scaffoldMessenger;
+  late MediaQueryData _mediaQuery;
+
+  Future<void> _update() async {
+    await classTableController.updateClassTable(isForce: true);
+    classTableController.update();
+    await scoreController.get();
+    scoreController.update();
+    await electricController.updateData();
+    electricController.update();
+    await punchController.updatePunch();
+    punchController.update();
+    await examController.get();
+    examController.update();
+  }
+
+  Widget _classTableCard() => GetBuilder<ClassTableController>(
         builder: (c) => GestureDetector(
           onTap: () {
             try {
               if (c.isGet == true) {
-                Navigator.of(context).push(
+                _navigator.push(
                   MaterialPageRoute(
                     builder: (context) => LayoutBuilder(
                       builder: (p0, p1) => ClassTableWindow(constraints: p1),
@@ -51,17 +70,17 @@ class MainPage extends StatelessWidget {
                   ),
                 );
               } else {
-                ScaffoldMessenger.of(context)
+                _scaffoldMessenger
                     .showSnackBar(SnackBar(content: Text(c.error ?? "正在获取课表")));
               }
             } on String catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              _scaffoldMessenger.showSnackBar(
                   SnackBar(content: Text("遇到错误：${e.substring(0, 150)}")));
             }
           },
           child: Card(
             elevation: 0,
-            color: Theme.of(context).colorScheme.primaryContainer,
+            color: _themeData.colorScheme.primaryContainer,
             child: Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
@@ -71,7 +90,7 @@ class MainPage extends StatelessWidget {
                   Row(children: [
                     Icon(
                       Icons.calendar_month_outlined,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: _themeData.colorScheme.onPrimaryContainer,
                       size: 14,
                     ),
                     const SizedBox(width: 7.5),
@@ -85,7 +104,7 @@ class MainPage extends StatelessWidget {
                           : "课程表",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        color: _themeData.colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ]),
@@ -101,7 +120,7 @@ class MainPage extends StatelessWidget {
                               : "遇到错误",
                       style: TextStyle(
                         fontSize: 22,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        color: _themeData.colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ),
@@ -111,9 +130,8 @@ class MainPage extends StatelessWidget {
                               "寻找什么呢，我也不知道",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
+                                color:
+                                    _themeData.colorScheme.onPrimaryContainer,
                               ),
                             )
                           : Row(
@@ -122,9 +140,8 @@ class MainPage extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.person,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
+                                      color: _themeData
+                                          .colorScheme.onPrimaryContainer,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 2),
@@ -136,9 +153,7 @@ class MainPage extends StatelessWidget {
                                                   .substring(0, 7)
                                               : c.classToShow!.teacher!,
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: _themeData.colorScheme.primary,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -149,18 +164,16 @@ class MainPage extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.room,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
+                                      color: _themeData
+                                          .colorScheme.onPrimaryContainer,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
                                       c.classToShow!.place ?? "地点未定",
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
+                                        color: _themeData
+                                            .colorScheme.onPrimaryContainer,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -171,9 +184,8 @@ class MainPage extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.access_time_filled_outlined,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
+                                      color: _themeData
+                                          .colorScheme.onPrimaryContainer,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 2),
@@ -181,9 +193,8 @@ class MainPage extends StatelessWidget {
                                       "${time[(c.timeArrangementToShow!.start - 1) * 2]}-"
                                       "${time[(c.timeArrangementToShow!.stop - 1) * 2 + 1]}",
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
+                                        color: _themeData
+                                            .colorScheme.onPrimaryContainer,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -195,9 +206,7 @@ class MainPage extends StatelessWidget {
                           c.error == null ? "请耐心等待片刻" : "课表获取失败",
                           style: TextStyle(
                             fontSize: 15,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
+                            color: _themeData.colorScheme.onPrimaryContainer,
                           ),
                         ),
                 ],
@@ -207,347 +216,339 @@ class MainPage extends StatelessWidget {
         ),
       );
 
-  Widget dymaticTools(BuildContext context) => MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: GridView.count(
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          childAspectRatio: 1.75,
-          children: [
-            GetBuilder<PunchController>(
-              builder: (c) => GestureDetector(
-                onTap: () async {
-                  if (user["sportPassword"] == "" ||
-                      c.error.toString().contains("用户名或密码错误")) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const SportPasswordDialog(),
-                    );
-                  } else {
-                    if (c.isGet == true) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const SportWindow()));
-                    } else if (c.error != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text("遇到错误：${c.error}"),
-                      ));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text("请稍候，正在刷新信息"),
-                      ));
-                    }
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          Icon(
-                            Icons.run_circle,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 7.5),
-                          Text(
-                            "体育信息",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ]),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Center(
-                            child: c.error != null
-                                ? Text(
-                                    "目前无法使用",
-                                    textScaleFactor: 1.5,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  )
-                                : c.isGet == false
-                                    ? Text(
-                                        "正在加载",
-                                        textScaleFactor: 1.15,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                        ),
-                                      )
-                                    : Text(
-                                        "有效次数 ${c.punch.valid}\n"
-                                        "所有次数 ${c.punch.allTime}",
-                                        textScaleFactor: 1.15,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                        ),
-                                      ),
-                          ),
-                        ),
-                      ],
+  Widget _sportInformationCard() => GetBuilder<PunchController>(
+        builder: (c) => GestureDetector(
+          onTap: () async {
+            if (user["sportPassword"] == "" ||
+                c.error.toString().contains("用户名或密码错误")) {
+              showDialog(
+                context: _context,
+                builder: (context) => const SportPasswordDialog(),
+              );
+            } else {
+              if (c.isGet == true) {
+                _navigator.push(MaterialPageRoute(
+                    builder: (context) => const SportWindow()));
+              } else if (c.error != null) {
+                _scaffoldMessenger.showSnackBar(SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Text("遇到错误：${c.error}"),
+                ));
+              } else {
+                _scaffoldMessenger.showSnackBar(const SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Text("请稍候，正在刷新信息"),
+                ));
+              }
+            }
+          },
+          child: Card(
+            elevation: 0,
+            color: _themeData.colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Icon(
+                      Icons.run_circle,
+                      color: _themeData.colorScheme.onPrimaryContainer,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 7.5),
+                    Text(
+                      "体育信息",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: _themeData.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ]),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Center(
+                      child: c.error != null
+                          ? Text(
+                              "目前无法使用",
+                              textScaleFactor: 1.5,
+                              style: TextStyle(
+                                  color: _themeData
+                                      .colorScheme.onPrimaryContainer),
+                            )
+                          : c.isGet == false
+                              ? Text(
+                                  "正在加载",
+                                  textScaleFactor: 1.15,
+                                  style: TextStyle(
+                                    color: _themeData
+                                        .colorScheme.onPrimaryContainer,
+                                  ),
+                                )
+                              : Text(
+                                  "有效次数 ${c.punch.valid}\n"
+                                  "所有次数 ${c.punch.allTime}",
+                                  textScaleFactor: 1.15,
+                                  style: TextStyle(
+                                    color: _themeData
+                                        .colorScheme.onPrimaryContainer,
+                                  ),
+                                ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-            GetBuilder<ElectricController>(
-              builder: (c) => GestureDetector(
-                onTap: () async {
-                  if (c.isGet == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("电费帐号：${c.electricityAccount()}"),
-                    ));
-                  } else if (c.error != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误 ${c.error}"),
-                    ));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("请稍候，正在刷新信息"),
-                    ));
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          Icon(
-                            Icons.electric_meter_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 7.5),
-                          Text(
-                            "电量信息",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ]),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Center(
-                            child: c.error != null
-                                ? Text(
-                                    "目前无法使用",
-                                    textScaleFactor: 1.5,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  )
-                                : c.isGet == false
-                                    ? Text(
-                                        "正在加载",
-                                        textScaleFactor: 1.15,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                        ),
-                                      )
-                                    : Text(
-                                        "${c.number} 度",
-                                        textScaleFactor: 1.15,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                        ),
-                                      ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       );
 
-  Widget staticTools(BuildContext context) => MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: GridView.count(
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          childAspectRatio: 2.25,
-          children: [
-            GetBuilder<ScoreController>(
-              builder: (c) => GestureDetector(
-                onTap: () async {
-                  if (c.isGet == true) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => ScoreWindow(scores: c.scores)));
-                  } else if (c.error == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        "请稍候 正在获取成绩信息",
-                      ),
-                    ));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误：${c.error!}"),
-                    ));
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Icon(
-                            Icons.score,
-                            size: 48,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Text(
-                                "成绩查询",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                "可计算平均分",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ],
+  Widget _electricCard() => GetBuilder<ElectricController>(
+        builder: (c) => GestureDetector(
+          onTap: () async {
+            if (c.isGet == true) {
+              _scaffoldMessenger.showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text("电费帐号：${c.electricityAccount()}"),
+              ));
+            } else if (c.error != null) {
+              _scaffoldMessenger.showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text("遇到错误 ${c.error}"),
+              ));
+            } else {
+              _scaffoldMessenger.showSnackBar(const SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text("请稍候，正在刷新信息"),
+              ));
+            }
+          },
+          child: Card(
+            elevation: 0,
+            color: _themeData.colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Icon(
+                      Icons.electric_meter_rounded,
+                      color: _themeData.colorScheme.onPrimaryContainer,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 7.5),
+                    Text(
+                      "电量信息",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: _themeData.colorScheme.onPrimaryContainer,
                       ),
                     ),
+                  ]),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Center(
+                      child: c.error != null
+                          ? Text(
+                              "目前无法使用",
+                              textScaleFactor: 1.5,
+                              style: TextStyle(
+                                color:
+                                    _themeData.colorScheme.onPrimaryContainer,
+                              ),
+                            )
+                          : c.isGet == false
+                              ? Text(
+                                  "正在加载",
+                                  textScaleFactor: 1.15,
+                                  style: TextStyle(
+                                    color: _themeData
+                                        .colorScheme.onPrimaryContainer,
+                                  ),
+                                )
+                              : Text(
+                                  "${c.number} 度",
+                                  textScaleFactor: 1.15,
+                                  style: TextStyle(
+                                    color: _themeData
+                                        .colorScheme.onPrimaryContainer,
+                                  ),
+                                ),
+                    ),
                   ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Widget _scoreCard() => GetBuilder<ScoreController>(
+        builder: (c) => GestureDetector(
+          onTap: () async {
+            if (c.isGet == true) {
+              _navigator.push(MaterialPageRoute(
+                  builder: (context) => ScoreWindow(scores: c.scores)));
+            } else if (c.error == null) {
+              _scaffoldMessenger.showSnackBar(const SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  "请稍候 正在获取成绩信息",
+                ),
+              ));
+            } else {
+              _scaffoldMessenger.showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text("遇到错误：${c.error!}"),
+              ));
+            }
+          },
+          child: Card(
+            elevation: 0,
+            color: _themeData.colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Icon(
+                      Icons.score,
+                      size: 48,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "成绩查询",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        Text(
+                          "可计算平均分",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
-            GetBuilder<ExamController>(
-              builder: (c) => GestureDetector(
-                onTap: () async {
-                  if (c.isGet == true) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const ExamInfoWindow()));
-                  } else if (c.error == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        "请稍候 正在获取考试信息",
-                      ),
-                    ));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text("遇到错误：${c.error!}"),
-                    ));
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Icon(
-                            Icons.calendar_month,
-                            size: 48,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Text(
-                                "考试查询",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                "上天保佑时间",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+          ),
+        ),
+      );
+
+  Widget _examCard() => GetBuilder<ExamController>(
+        builder: (c) => GestureDetector(
+          onTap: () async {
+            if (c.isGet == true) {
+              _navigator.push(MaterialPageRoute(
+                  builder: (context) => const ExamInfoWindow()));
+            } else if (c.error == null) {
+              _scaffoldMessenger.showSnackBar(const SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  "请稍候 正在获取考试信息",
+                ),
+              ));
+            } else {
+              _scaffoldMessenger.showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text("遇到错误：${c.error!}"),
+              ));
+            }
+          },
+          child: Card(
+            elevation: 0,
+            color: _themeData.colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Icon(
+                      Icons.calendar_month,
+                      size: 48,
                     ),
-                  ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "考试查询",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        Text(
+                          "上天保佑时间",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       );
 
   MainPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var themeData = Theme.of(context);
+  /*
+  Widget _padMainPage() {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Welcome to traintime pda."),
+          actions: [
+            IconButton(
+              onPressed: () async => _update(),
+              icon: const Icon(Icons.update),
+            ),
+          ],
+        ),
+        body: ListView(
+          children: [
+            Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: _classTableCard(),
+                ),
+                Flexible(
+                  child: MediaQuery.removePadding(
+                    context: _context,
+                    removeTop: true,
+                    child: GridView.count(
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      childAspectRatio: 1.75,
+                      children: [
+                        _sportInformationCard(),
+                        _electricCard(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ));
+  }
+  */
+  Widget _phoneMainPage() {
     const double classCardHeight = 120.0;
-
     return EasyRefresh(
       onRefresh: () async {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        _scaffoldMessenger.showSnackBar(const SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text("请稍候，正在刷新信息"),
         ));
-        await classTableController.updateClassTable(isForce: true);
-        classTableController.update();
-        await scoreController.get();
-        scoreController.update();
-        await electricController.updateData();
-        electricController.update();
-        await punchController.updatePunch();
-        punchController.update();
-        await examController.get();
-        examController.update();
+        await _update();
       },
       header: BuilderHeader(
         clamping: false,
         position: IndicatorPosition.locator,
-        triggerOffset: context.height * 0.025,
+        triggerOffset: _context.height * 0.025,
         notifyWhenInvisible: true,
         builder: (context, state) {
           final height = state.offset + classCardHeight;
@@ -561,7 +562,7 @@ class MainPage extends StatelessWidget {
                 ),
                 child: Container(
                   height: height,
-                  color: themeData.colorScheme.surfaceVariant,
+                  color: _themeData.colorScheme.surfaceVariant,
                 ),
               ),
               Positioned(
@@ -573,7 +574,7 @@ class MainPage extends StatelessWidget {
                   child: Container(
                     height: 2,
                     width: double.infinity,
-                    color: themeData.colorScheme.surfaceVariant,
+                    color: _themeData.colorScheme.surfaceVariant,
                   ),
                 ),
               ),
@@ -582,7 +583,7 @@ class MainPage extends StatelessWidget {
                 child: SizedBox(
                   height: classCardHeight,
                   width: context.width * 0.9,
-                  child: classTableCard(context),
+                  child: _classTableCard(),
                 ),
               ),
             ],
@@ -592,9 +593,9 @@ class MainPage extends StatelessWidget {
       child: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: themeData.colorScheme.surfaceVariant,
-            foregroundColor: themeData.colorScheme.onSurfaceVariant,
-            expandedHeight: MediaQuery.of(context).size.width * 0.125,
+            backgroundColor: _themeData.colorScheme.surfaceVariant,
+            foregroundColor: _themeData.colorScheme.onSurfaceVariant,
+            expandedHeight: _mediaQuery.size.width * 0.125,
             pinned: true,
             elevation: 0,
             title: const Text("Traintime PDA"),
@@ -604,13 +605,39 @@ class MainPage extends StatelessWidget {
             child: Card(
               elevation: 0,
               margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
+                horizontal: _mediaQuery.size.width * 0.05,
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
-                  dymaticTools(context),
-                  staticTools(context),
+                  MediaQuery.removePadding(
+                    context: _context,
+                    removeTop: true,
+                    child: GridView.count(
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      childAspectRatio: 1.75,
+                      children: [
+                        _sportInformationCard(),
+                        _electricCard(),
+                      ],
+                    ),
+                  ),
+                  MediaQuery.removePadding(
+                    context: _context,
+                    removeTop: true,
+                    child: GridView.count(
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      childAspectRatio: 2.25,
+                      children: [
+                        _scoreCard(),
+                        _examCard(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -618,5 +645,16 @@ class MainPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _context = context;
+    _themeData = Theme.of(context);
+    _navigator = Navigator.of(context);
+    _scaffoldMessenger = ScaffoldMessenger.of(context);
+    _mediaQuery = MediaQuery.of(context);
+
+    return _phoneMainPage();
   }
 }

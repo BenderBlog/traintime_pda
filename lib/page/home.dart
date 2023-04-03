@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/setting/setting.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
 
 class PageInformation {
@@ -61,9 +62,6 @@ class _HomePageState extends State<HomePage> {
     const SettingWindow(),
   ];
 
-  bool _isPhone(context) => MediaQuery.of(context).size.width < 600;
-  bool _isDesktop(context) => MediaQuery.of(context).size.width > 840;
-
   Widget _buildPhone() => Scaffold(
         body: _page[_selectedIndex],
         bottomNavigationBar: NavigationBar(
@@ -107,31 +105,8 @@ class _HomePageState extends State<HomePage> {
                     _selectedIndex = index;
                   });
                 },
-              ),
-              Expanded(child: _page[_selectedIndex]),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildDesktop() => Scaffold(
-        body: SafeArea(
-          child: Row(
-            children: [
-              NavigationDrawer(
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (int index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                children: destinations
-                    .map((e) => NavigationDrawerDestination(
-                          label: Text(e.name),
-                          icon: Icon(e.icon),
-                          selectedIcon: Icon(e.iconChoice),
-                        ))
-                    .toList(),
+                leading: const Icon(Icons.person),
+                extended: isDesktop(context),
               ),
               Expanded(child: _page[_selectedIndex]),
             ],
@@ -141,10 +116,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return _isPhone(context)
-        ? _buildPhone()
-        : _isDesktop(context)
-            ? _buildDesktop()
-            : _buildPad();
+    return isPhone(context) ? _buildPhone() : _buildPad();
   }
 }
