@@ -16,12 +16,18 @@ Thanks xidian-script!
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/general.dart';
 
 // ignore: constant_identifier_names
 const BASE = "http://10.168.55.50:8088";
 
 Future<String> electricitySession({required String username}) async {
   Dio dio = Dio();
+
+  if (await isInSchool() == false) {
+    return "没有在校园网环境";
+  }
+
   // ASP session id.
   var sessionId = await dio
       .get("$BASE/searchWap/Login.aspx")

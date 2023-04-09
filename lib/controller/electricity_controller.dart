@@ -72,6 +72,10 @@ class ElectricController extends GetxController {
       );
 
       number = await electricitySession(username: electricityAccount());
+      if (number != "没有在校园网环境") {
+        isGet = false;
+        error = "没有在校园网环境";
+      }
       if (number != "无法获取") {
         isGet = true;
         error = null;
@@ -81,7 +85,7 @@ class ElectricController extends GetxController {
         "Network exception: ${e.message}\nStack: $s",
         name: "ElectricController",
       );
-      error = "非校园网环境无法使用";
+      error = "网络故障，无法使用";
     } catch (e, s) {
       developer.log(
         "Other exception: $e\nStack: $s",
