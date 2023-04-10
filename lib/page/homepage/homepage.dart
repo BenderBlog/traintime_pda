@@ -13,7 +13,6 @@ if you want to use.
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/exam/exam.dart';
@@ -24,19 +23,18 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/punch_controller.dart';
 import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 
 import 'package:watermeter/page/score/score.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
-import 'package:watermeter/page/widget.dart';
 
 class MainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
   final scoreController = Get.put(ScoreController());
   final punchController = Get.put(PunchController());
   final examController = Get.put(ExamController());
-  final electricController = Get.put(ElectricController());
 
   late BuildContext _context;
   late ThemeData _themeData;
@@ -49,8 +47,6 @@ class MainPage extends StatelessWidget {
     classTableController.update();
     await scoreController.get();
     scoreController.update();
-    await electricController.updateData();
-    electricController.update();
     await punchController.updatePunch();
     punchController.update();
     await examController.get();
@@ -303,87 +299,6 @@ class MainPage extends StatelessWidget {
         ),
       );
 
-  Widget _electricCard() => GetBuilder<ElectricController>(
-        builder: (c) => GestureDetector(
-          onTap: () async {
-            if (c.isGet == true) {
-              _scaffoldMessenger.showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("电费帐号：${c.electricityAccount()}"),
-              ));
-            } else if (c.error != null) {
-              _scaffoldMessenger.showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("遇到错误 ${c.error}"),
-              ));
-            } else {
-              _scaffoldMessenger.showSnackBar(const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("请稍候，正在刷新信息"),
-              ));
-            }
-          },
-          child: Card(
-            elevation: 0,
-            color: _themeData.colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    Icon(
-                      Icons.electric_meter_rounded,
-                      color: _themeData.colorScheme.onPrimaryContainer,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 7.5),
-                    Text(
-                      "电量信息",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: _themeData.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ]),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Center(
-                      child: c.error != null
-                          ? Text(
-                              "目前无法使用",
-                              textScaleFactor: 1.5,
-                              style: TextStyle(
-                                color:
-                                    _themeData.colorScheme.onPrimaryContainer,
-                              ),
-                            )
-                          : c.isGet == false
-                              ? Text(
-                                  "正在加载",
-                                  textScaleFactor: 1.15,
-                                  style: TextStyle(
-                                    color: _themeData
-                                        .colorScheme.onPrimaryContainer,
-                                  ),
-                                )
-                              : Text(
-                                  "${c.number} 度",
-                                  textScaleFactor: 1.15,
-                                  style: TextStyle(
-                                    color: _themeData
-                                        .colorScheme.onPrimaryContainer,
-                                  ),
-                                ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
   Widget _scoreCard() => GetBuilder<ScoreController>(
         builder: (c) => GestureDetector(
           onTap: () async {
@@ -620,7 +535,7 @@ class MainPage extends StatelessWidget {
                       childAspectRatio: 1.75,
                       children: [
                         _sportInformationCard(),
-                        _electricCard(),
+                        const ElectricityCard(),
                       ],
                     ),
                   ),
