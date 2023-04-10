@@ -9,6 +9,9 @@ class SportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (punchData.value.situation == null && punchData.value.allTime == -1) {
+      getPunch();
+    }
     return Obx(
       () => GestureDetector(
         onTap: () async {

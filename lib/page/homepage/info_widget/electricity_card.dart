@@ -7,6 +7,9 @@ class ElectricityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (electricityInfo.value.isEmpty) {
+      update();
+    }
     return GestureDetector(
       onTap: () async {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

@@ -16,7 +16,7 @@ class PunchData {
 
 class PunchDataList {
   String? situation;
-  int allTime = 0;
-  int valid = 0;
+  int allTime = -1;
+  int valid = -1;
   List<PunchData> all = [];
 }
