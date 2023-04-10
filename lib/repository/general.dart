@@ -21,7 +21,7 @@ late PersistCookieJar IDSCookieJar;
 Future<bool> isInSchool() async {
   Dio dio = Dio();
   bool isInSchool = await dio
-      .get("https://isxdu.ripic.tech/")
+      .get("http://server.superbart.xyz:51080/")
       .then((value) => value.data["isxdu"])
       .onError((error, stackTrace) => false);
   return isInSchool;
