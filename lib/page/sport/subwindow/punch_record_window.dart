@@ -10,12 +10,12 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:watermeter/controller/punch_controller.dart';
-import 'package:watermeter/model/xidian_sport/punch.dart';
+import 'package:flutter/material.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:easy_refresh/easy_refresh.dart';
+import 'package:watermeter/model/xidian_sport/punch.dart';
+import 'package:watermeter/repository/xidian_sport/punch_session.dart';
 
 class PunchRecordWindow extends StatefulWidget {
   const PunchRecordWindow({Key? key}) : super(key: key);
@@ -50,8 +50,8 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return GetBuilder<PunchController>(
-      builder: (c) => Scaffold(
+    return Obx(
+      () => Scaffold(
         body: EasyRefresh.builder(
           controller: _controller,
           clipBehavior: Clip.none,
@@ -63,67 +63,51 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             springRebound: false,
           ),
           onRefresh: () async {
-            c.updatePunch();
+            await getPunch();
             _controller.finishRefresh();
           },
           childBuilder: (context, physics) {
-            if (c.isGet == false && c.error != null) {
-              return ListView(
-                physics: physics,
-                children: [
-                  SizedBox(
-                    height: context.height * 0.7,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error),
-                          Text(
-                            "坏事 ${c.error}",
-                            textScaleFactor: 1.5,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }
-            if (c.punch.all.isNotEmpty) {
-              int count = 0;
-              List<RecordCard> toUse = [];
-              for (var i in c.punch.all) {
-                if ((isValid && i.state.contains("恭喜你本次打卡成功")) || !isValid) {
-                  toUse.insertAll(0, [RecordCard(mark: count + 1, toUse: i)]);
-                  count++;
+            if (punchData.value.situation == null) {
+              if (punchData.value.all.isNotEmpty) {
+                int count = 0;
+                List<RecordCard> toUse = [];
+                for (var i in punchData.value.all) {
+                  if ((isValid && i.state.contains("恭喜你本次打卡成功")) || !isValid) {
+                    toUse.insertAll(0, [RecordCard(mark: count + 1, toUse: i)]);
+                    count++;
+                  }
                 }
-              }
-              return dataList<RecordCard, RecordCard>(
-                toUse,
-                (toUse) => toUse,
-                physics: physics,
-              );
-            } else {
-              return ListView(
-                physics: physics,
-                children: [
-                  SizedBox(
-                    height: context.height * 0.7,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.warning),
-                          Text(
-                            "列表为空",
-                            textScaleFactor: 1.5,
-                          ),
-                        ],
+                return dataList<RecordCard, RecordCard>(
+                  toUse,
+                  (toUse) => toUse,
+                  physics: physics,
+                );
+              } else {
+                return ListView(
+                  physics: physics,
+                  children: [
+                    SizedBox(
+                      height: context.height * 0.7,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.warning),
+                            Text(
+                              "列表为空",
+                              textScaleFactor: 1.5,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              );
+                  ],
+                );
+              }
+            } else if (punchData.value.situation == "正在加载") {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return Center(child: Text("坏事: ${punchData.value.situation}"));
             }
           },
         ),
@@ -132,7 +116,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "总次数: ${c.punch.allTime}\n成功次数: ${c.punch.valid}",
+                "总次数: ${punchData.value.allTime}\n成功次数: ${punchData.value.valid}",
                 textScaleFactor: 1.2,
               ),
               FloatingActionButton.extended(

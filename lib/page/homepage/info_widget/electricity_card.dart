@@ -1,6 +1,6 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/electricity/electricity_session.dart';
-import 'package:get/get.dart';
 
 class ElectricityCard extends StatelessWidget {
   const ElectricityCard({super.key});

@@ -5,11 +5,17 @@ class PunchData {
   String punchTime;
   String state;
 
-  PunchData(this.machineName, this.weekNum, this.punchDay, this.punchTime,
-      this.state);
+  PunchData(
+    this.machineName,
+    this.weekNum,
+    this.punchDay,
+    this.punchTime,
+    this.state,
+  );
 }
 
 class PunchDataList {
+  String? situation;
   int allTime = 0;
   int valid = 0;
   List<PunchData> all = [];

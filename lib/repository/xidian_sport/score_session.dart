@@ -1,10 +1,16 @@
+import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_sport/score.dart';
 import 'package:watermeter/repository/xidian_sport/xidian_sport_session.dart';
 
-class SportScoreSession extends SportSession {
-  /// "Static" Data.
-  Future<SportScore> getSportScore() async {
-    SportScore toReturn = SportScore();
+var sportScore = SportScore().obs;
+
+Future<void> getScore() async {
+  sportScore.value.situation = "正在获取";
+  developer.log("开始获取打卡信息", name: "GetPunchSession");
+  SportScore toReturn = SportScore();
+  try {
     if (userId == "") {
       await login();
     }
@@ -37,6 +43,21 @@ class SportScoreSession extends SportSession {
         toReturn.list.add(toAdd);
       }
     }
-    return toReturn;
+  } on NoPasswordException {
+    toReturn.situation = "无密码信息";
+  } on LoginFailedException catch (e) {
+    developer.log("登录失败：$e", name: "GetPunchSession");
+    toReturn.situation = "登录失败";
+  } on SemesterFailedException catch (e) {
+    developer.log("未获取学期值：$e", name: "GetPunchSession");
+    toReturn.situation = "未获取学期值";
+  } on DioError catch (e) {
+    developer.log("网络故障：$e", name: "GetPunchSession");
+    toReturn.situation = "网络故障";
+  } catch (e) {
+    developer.log("未知故障：$e", name: "GetPunchSession");
+    toReturn.situation = "未知故障";
+  } finally {
+    sportScore.value = toReturn;
   }
 }

@@ -11,11 +11,12 @@ if you want to use.
 */
 
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/xidian_sport/score.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/repository/xidian_sport/sport_score_session.dart';
+import 'package:easy_refresh/easy_refresh.dart';
+import 'package:watermeter/model/xidian_sport/score.dart';
+import 'package:watermeter/repository/xidian_sport/score_session.dart';
 
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({Key? key}) : super(key: key);
@@ -24,49 +25,84 @@ class SportScoreWindow extends StatefulWidget {
   State<SportScoreWindow> createState() => _SportScoreWindowState();
 }
 
-class _SportScoreWindowState extends State<SportScoreWindow> {
+class _SportScoreWindowState extends State<SportScoreWindow>
+    with AutomaticKeepAliveClientMixin {
   @override
-  Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async => _get(),
-      child: FutureBuilder<SportScore>(
-        future: _get(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return Center(child: Text("坏事: ${snapshot.error}"));
-            } else {
-              List things = [
-                Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  child: Container(
-                    padding: const EdgeInsets.all(15),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text("目前四年总分 ${snapshot.data.total}"),
-                        Text(
-                            "${snapshot.data.detail.substring(0, snapshot.data.detail.indexOf("\\"))}"),
-                      ],
-                    ),
-                  ),
-                ),
-              ];
-              things.addAll(List.generate(snapshot.data.list.length,
-                      (index) => ScoreCard(toUse: snapshot.data.list[index]))
-                  .reversed);
-              return dataList<dynamic, Widget>(things, (toUse) => toUse);
-            }
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+  bool get wantKeepAlive => true;
+  late EasyRefreshController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
     );
   }
 
-  Future<SportScore> _get() async => SportScoreSession().getSportScore();
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (sportScore.value.situation == null && sportScore.value.detail.isEmpty) {
+      getScore();
+    }
+    super.build(context);
+    return EasyRefresh.builder(
+      controller: _controller,
+      clipBehavior: Clip.none,
+      header: const MaterialHeader(
+        clamping: true,
+        showBezierBackground: false,
+        bezierBackgroundAnimation: false,
+        bezierBackgroundBounce: false,
+        springRebound: false,
+      ),
+      onRefresh: () async {
+        await getScore();
+        _controller.finishRefresh();
+      },
+      refreshOnStart: true,
+      childBuilder: (context, physics) => Obx(() {
+        if (sportScore.value.situation == null &&
+            sportScore.value.detail.isNotEmpty) {
+          List things = [
+            Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("目前四年总分 ${sportScore.value.total}"),
+                    Text(sportScore.value.detail
+                        .substring(0, sportScore.value.detail.indexOf("\\"))),
+                  ],
+                ),
+              ),
+            ),
+          ];
+          things.addAll(List.generate(sportScore.value.list.length,
+                  (index) => ScoreCard(toUse: sportScore.value.list[index]))
+              .reversed);
+          return dataList<dynamic, Widget>(
+            things,
+            (toUse) => toUse,
+            physics: physics,
+          );
+        } else if (sportScore.value.situation == "正在获取") {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return Center(child: Text("坏事: ${sportScore.value.situation}"));
+        }
+      }),
+    );
+  }
 }
 
 class ScoreCard extends StatelessWidget {
