@@ -79,13 +79,13 @@ String electricityAccount() {
   }
   // 南校区6、7#公寓不分区，C段编码默认为00；D段首位编码默认为0
   if ([6, 7].contains(building)) {
-    accountC == "00";
-    accountD == nums[2][0]!.toString().padLeft(4, "0");
+    accountC = "00";
+    accountD = nums[2][0]!.toString().padLeft(4, "0");
   }
   // 南校区13、15#公寓不分区，C段编码默认为01；D段首位编码默认为1
   if ([13, 15].contains(building)) {
-    accountC == "01";
-    accountD == nums[2][0]!.toString().padLeft(4, "1");
+    accountC = "01";
+    accountD = nums[2][0]!.toString().padLeft(4, "1");
   }
 
   return accountA + accountB + accountC + accountD;
