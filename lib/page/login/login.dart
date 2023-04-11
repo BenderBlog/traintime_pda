@@ -136,6 +136,7 @@ class _LoginWindowState extends State<LoginWindow> {
                     hideValue: true,
                     completed: Completed(completedMsg: "登录成功"),
                   );
+                  EhallSession ses = EhallSession();
                   try {
                     await ses.loginEhall(
                       username: _idsAccountController.text,

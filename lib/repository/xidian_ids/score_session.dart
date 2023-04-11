@@ -14,12 +14,18 @@ Thanks xidian-script and libxdauth!
 
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:math';
+import 'package:dio/dio.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
+var scoreList = <Score>[];
+var situation = "";
+
 /// 考试成绩 4768574631264620
 class ScoreFile extends EhallSession {
-  Future<List<Score>> get() async {
+  Future<void> get() async {
+    situation = "正在加载";
     List<Score> toReturn = [];
 
     /// Get information here. resultCode==00000 is successful.
@@ -52,7 +58,8 @@ class ScoreFile extends EhallSession {
     ).then((value) => value.data);
     developer.log("Dealing the score data.", name: "Ehall getScore");
     if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
-      throw getData['datas']['xscjcx']["extParams"]["msg"];
+      throw GetScoreFailedException(
+          getData['datas']['xscjcx']["extParams"]["msg"]);
     }
     int j = 0;
     for (var i in getData['datas']['xscjcx']['rows']) {
@@ -95,6 +102,30 @@ class ScoreFile extends EhallSession {
         }
       }*/
     }
-    return toReturn;
+    scoreList = toReturn;
+    situation = "";
   }
+}
+
+Future<void> getScore() async {
+  try {
+    ScoreFile().get();
+  } on GetScoreFailedException {
+    developer.log("没有获取到成绩：$e", name: "ScoreSession");
+    situation = "没有获取到成绩：$e";
+  } on DioError catch (e) {
+    developer.log("网络故障：$e", name: "ScoreSession");
+    situation = "网络故障";
+  } catch (e) {
+    developer.log("未知故障：$e", name: "ScoreSession");
+    situation = "未知故障：${e.toString().substring(0, 20)}";
+  }
+}
+
+class GetScoreFailedException implements Exception {
+  final String msg;
+  const GetScoreFailedException(this.msg);
+
+  @override
+  String toString() => msg;
 }

@@ -137,7 +137,7 @@ class IDSSession {
       developer.log("captcha: $captcha.", name: "ids login");
       if (captcha == null) return;
     } else if (isNeed && getCaptcha == null) {
-      throw "你的帐号需要验证码，请登出后重新登录，或去电脑端登录";
+      throw NeedCaptchaException();
     }
 
     /// Get AES encrypt key. There must be.
@@ -187,14 +187,14 @@ class IDSSession {
     );
     developer.log("Received: $data.", name: "ids login");
     if (data.statusCode == 401) {
-      throw "用户名或密码错误";
+      throw PasswordWrongException();
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress.
       if (onResponse != null) {
         onResponse(80, "登录后处理");
       }
       developer.log("Post deal...", name: "ids login");
-      var whatever = await dio.get(
+      await dio.get(
         data.headers['location']![0],
         options: Options(
           followRedirects: false,
@@ -203,12 +203,20 @@ class IDSSession {
           },
         ),
       );
-      if (whatever.data.contains("验证码错误")) {
-        throw "不知为啥还是说让输验证码";
-      }
       return;
     } else {
-      throw "登陆失败了，原因不明\n返回值代码：${data.statusCode}\n";
+      throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
     }
   }
+}
+
+class NeedCaptchaException implements Exception {}
+
+class PasswordWrongException implements Exception {}
+
+class LoginFailedException implements Exception {
+  final String msg;
+  const LoginFailedException({required this.msg});
+  @override
+  String toString() => msg;
 }

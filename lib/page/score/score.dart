@@ -226,7 +226,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                         child: Container(
                           decoration:
                               BoxDecoration(color: _getColor(toShow()[index])),
-                          child: ScoreCard(toUse: toShow()[index]),
+                          child: ScoreInfoCard(toUse: toShow()[index]),
                         )),
                   ],
                 );
@@ -293,10 +293,10 @@ class _ScoreWindowState extends State<ScoreWindow> {
   }
 }
 
-class ScoreCard extends StatelessWidget {
+class ScoreInfoCard extends StatelessWidget {
   final Score toUse;
 
-  const ScoreCard({Key? key, required this.toUse}) : super(key: key);
+  const ScoreInfoCard({Key? key, required this.toUse}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

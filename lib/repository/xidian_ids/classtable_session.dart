@@ -53,7 +53,7 @@ class ClassTableFile extends EhallSession {
       data: {'XNXQDM': semesterCode},
     ).then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
-      throw qResult['extParams']['msg'] + "在已安排课程";
+      throw Exception("${qResult['extParams']['msg']}在已安排课程");
     }
 
     developer.log("Caching...", name: "Ehall getClasstable");

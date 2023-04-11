@@ -19,17 +19,15 @@ import 'package:watermeter/page/exam/exam.dart';
 import 'package:watermeter/page/homepage/clipper.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
 
-import 'package:watermeter/page/score/score.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 
 class MainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
-  final scoreController = Get.put(ScoreController());
   final examController = Get.put(ExamController());
 
   late BuildContext _context;
@@ -41,8 +39,6 @@ class MainPage extends StatelessWidget {
   Future<void> _update() async {
     await classTableController.updateClassTable(isForce: true);
     classTableController.update();
-    await scoreController.get();
-    scoreController.update();
     await examController.get();
     examController.update();
   }
@@ -200,60 +196,6 @@ class MainPage extends StatelessWidget {
                           ),
                         ),
                 ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-  Widget _scoreCard() => GetBuilder<ScoreController>(
-        builder: (c) => GestureDetector(
-          onTap: () async {
-            if (c.isGet == true) {
-              _navigator.push(MaterialPageRoute(
-                  builder: (context) => ScoreWindow(scores: c.scores)));
-            } else if (c.error == null) {
-              _scaffoldMessenger.showSnackBar(const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  "请稍候 正在获取成绩信息",
-                ),
-              ));
-            } else {
-              _scaffoldMessenger.showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("遇到错误：${c.error!}"),
-              ));
-            }
-          },
-          child: Card(
-            elevation: 0,
-            color: _themeData.colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const Icon(
-                      Icons.score,
-                      size: 48,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "成绩查询",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Text(
-                          "可计算平均分",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
               ),
             ),
           ),
@@ -455,7 +397,7 @@ class MainPage extends StatelessWidget {
                       shrinkWrap: true,
                       childAspectRatio: 2.25,
                       children: [
-                        _scoreCard(),
+                        const ScoreCard(),
                         _examCard(),
                       ],
                     ),

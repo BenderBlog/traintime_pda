@@ -99,7 +99,7 @@ class EhallSession extends IDSSession {
     developer.log("Storing the user information.",
         name: "Ehall getInformation");
     if (detailed["resultCode"] != "00000") {
-      throw detailed["msg"];
+      throw GetInformationFailedException(detailed["msg"]);
     } else {
       await addUser("name", detailed["data"][0]["XM"]);
       await addUser("sex", detailed["data"][0]["XBDM_DISPLAY"]);
@@ -115,4 +115,10 @@ class EhallSession extends IDSSession {
   }
 }
 
-var ses = EhallSession();
+class GetInformationFailedException implements Exception {
+  final String msg;
+  const GetInformationFailedException(this.msg);
+
+  @override
+  String toString() => msg;
+}

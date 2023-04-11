@@ -248,7 +248,7 @@ class ClassTableController extends GetxController {
       update();
     } catch (e, s) {
       error = e.toString() + s.toString();
-      throw error!;
+      rethrow;
     }
   }
 }
