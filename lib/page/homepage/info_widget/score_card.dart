@@ -8,10 +8,10 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (situation == "" && scoreList.isEmpty) {
-      getScore();
+      ScoreFile().getScore();
     }
     return GestureDetector(
-      onTap: () async {
+      onTap: () {
         if (situation.isEmpty) {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => ScoreWindow(scores: scoreList)));
@@ -29,7 +29,7 @@ class ScoreCard extends StatelessWidget {
           ));
         }
       },
-      onLongPress: getScore,
+      onLongPress: ScoreFile().getScore,
       child: Card(
         elevation: 0,
         color: Theme.of(context).colorScheme.primaryContainer,

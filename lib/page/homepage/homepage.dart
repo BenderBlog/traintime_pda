@@ -362,7 +362,9 @@ class MainPage extends StatelessWidget {
             expandedHeight: _mediaQuery.size.width * 0.125,
             pinned: true,
             elevation: 0,
-            title: const Text("Traintime PDA"),
+            title: GetBuilder<ClassTableController>(
+              builder: (c) => Text("第 ${c.currentWeek} 周"),
+            ),
           ),
           const HeaderLocator.sliver(paintExtent: classCardHeight),
           SliverToBoxAdapter(
