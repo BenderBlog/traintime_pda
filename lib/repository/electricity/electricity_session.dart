@@ -110,12 +110,14 @@ Future<void> updateInformation() async {
     name: "ElectricSession",
   );
 
+  var account = electricityAccount();
+
   /// Login function.
   await dio
       .post(
         "$base/ajaxpro/SearchWap_Login,App_Web_fghipt60.ashx",
         data: {
-          "webName": electricityAccount(),
+          "webName": account,
           "webPass": user["electricityPassword"]!,
         },
         options: Options(headers: {
@@ -137,18 +139,31 @@ Future<void> updateInformation() async {
     name: "ElectricSession",
   );
 
+  int building = int.parse(account.substring(1, 3));
+
   RegExp name = RegExp(r"表名称：.*");
   RegExp data = RegExp(r"剩余量：.*");
-  RegExp info = RegExp(r"安装位置：.*");
 
   List<RegExpMatch> nameArray = name.allMatches(page).toList();
   List<RegExpMatch> dataArray = data.allMatches(page).toList();
-  List<RegExpMatch> infoArray = info.allMatches(page).toList();
 
-  for (int i = 0; i < nameArray.length; ++i) {
-    if (nameArray[i][0]!.contains("电表") && infoArray[i][0]!.contains("房间")) {
-      electricityInfo.value = "${dataArray[i][0]!.substring(4)} 度";
-      return;
+  if (building >= 1 && building <= 10) {
+    for (int i = 0; i < nameArray.length; ++i) {
+      if ((building >= 1 && building <= 4 && nameArray[i][0]!.contains("派诺")) ||
+          (building >= 5 &&
+              building <= 10 &&
+              nameArray[i][0]!.contains("科德"))) {
+        electricityInfo.value = "${dataArray[i][0]!.substring(4)} 度";
+        return;
+      }
+    }
+  } else {
+    int dingXiangElectricity = 0;
+    for (int i = nameArray.length; i >= 0; ++i) {
+      if (nameArray[i][0]!.contains("电表")) {
+        electricityInfo.value = "$dingXiangElectricity 度";
+        return;
+      }
     }
   }
 
