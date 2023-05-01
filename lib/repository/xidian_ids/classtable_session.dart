@@ -16,6 +16,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:path_provider/path_provider.dart';
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 课程表 4770397878132218
@@ -33,6 +34,9 @@ class ClassTableFile extends EhallSession {
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
+    if (user["currentSemester"] != semesterCode) {
+      user["currentSemester"] = semesterCode;
+    }
 
     developer.log("Fetch the day the semester begin.",
         name: "Ehall getClasstable");
@@ -43,6 +47,9 @@ class ClassTableFile extends EhallSession {
         'XQ': semesterCode.split('-')[2]
       },
     ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
+    if (user["currentStartDay"] != termStartDay) {
+      user["currentStartDay"] = termStartDay;
+    }
 
     developer.log(
         "Will get $semesterCode which start at $termStartDay, fetching...",

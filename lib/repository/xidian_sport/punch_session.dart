@@ -36,6 +36,8 @@ Future<void> getPunch() async {
         i["state"],
       ));
     }
+    toReturn.allTime++;
+    toReturn.valid++;
   } on NoPasswordException {
     toReturn.situation = "无密码信息";
   } on LoginFailedException catch (e) {

@@ -8,10 +8,17 @@ import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 class ExamController extends GetxController {
   bool isGet = false;
   String? error;
+  String currentSemester = "";
   List<String> semesters = [];
   late List<Subject> subjects;
   late List<ToBeArranged> toBeArranged;
   int dropdownValue = 0;
+
+  @override
+  void onInit() {
+    currentSemester = user["currentSemester"]!;
+    super.onInit();
+  }
 
   @override
   void onReady() async {
@@ -24,12 +31,19 @@ class ExamController extends GetxController {
     error = null;
     try {
       var qResult = await ExamFile().get(semester: semesterStr);
-      int grade = int.parse("20${user["idsAccount"]!.substring(0, 1)}");
+      int grade = int.parse("20${user["idsAccount"]!.substring(0, 2)}");
 
-      if (semesterStr == null && semesters.isEmpty) {
+      if (semesters.isEmpty) {
+        double current = int.parse(currentSemester.substring(0, 4)) +
+            (int.parse(currentSemester.substring(10)) - 1) * 0.5;
         for (var i in qResult["semester"]) {
-          int start = int.parse(i["DM"].toString().substring(0, 3));
-          if (start >= grade && start < grade + 4) {
+          double data = int.parse(i["DM"].toString().substring(0, 4)) +
+              (int.parse(i["DM"].substring(10)) - 1) * 0.5;
+          if (int.parse(i["DM"].toString().substring(0, 4)) < grade) {
+            break;
+          } else if (data > current) {
+            continue;
+          } else {
             semesters.add(i["DM"]);
           }
         }

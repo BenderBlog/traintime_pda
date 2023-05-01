@@ -28,14 +28,12 @@ class ExamFile extends EhallSession {
     /// Get semester information.
     /// Hard to use, I would rather do it by myself.
     /// Nope, I need to choose~
-    if (semester == null) {
-      developer.log("Seek for the semesters", name: "getExam");
-      var whatever = await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
-        data: {"*order": "-PX,-DM"},
-      );
-      qResult["semester"] = whatever.data["datas"]["xnxqcx"]['rows'];
-    }
+    developer.log("Seek for the semesters", name: "getExam");
+    var whatever = await dio.post(
+      "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
+      data: {"*order": "-PX,-DM"},
+    );
+    qResult["semester"] = whatever.data["datas"]["xnxqcx"]['rows'];
 
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)

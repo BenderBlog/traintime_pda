@@ -134,13 +134,7 @@ Future<void> updateInformation() async {
           options: Options(headers: {"Cookie": sessionId}))
       .then((value) => value.data);
 
-  developer.log(
-    page,
-    name: "ElectricSession",
-  );
-
-  int building = int.parse(account.substring(1, 3));
-
+  int building = int.parse(account.substring(0, 1));
   RegExp name = RegExp(r"表名称：.*");
   RegExp data = RegExp(r"剩余量：.*");
 
@@ -159,7 +153,7 @@ Future<void> updateInformation() async {
     }
   } else {
     int dingXiangElectricity = 0;
-    for (int i = nameArray.length; i >= 0; ++i) {
+    for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
         electricityInfo.value = "$dingXiangElectricity 度";
         return;

@@ -94,8 +94,6 @@ class EhallSession extends IDSSession {
         "dataModelAction": "QUERY",
       },
     ).then((value) => value.data);
-
-    /// Get information here. resultCode==00000 is successful.
     developer.log("Storing the user information.",
         name: "Ehall getInformation");
     if (detailed["resultCode"] != "00000") {
@@ -112,6 +110,28 @@ class EhallSession extends IDSSession {
       await addUser("subject", detailed["data"][0]["ZYDM_DISPLAY"]);
       await addUser("dorm", detailed["data"][0]["ZSDZ"]);
     }
+
+    developer.log("Get the semester information.",
+        name: "Ehall getInformation");
+    String get = await useApp("4770397878132218");
+    await dio.post(get);
+    String semesterCode = await dio
+        .post(
+          "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+        )
+        .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
+    await addUser("currentSemester", semesterCode);
+
+    developer.log("Get the day the semester begin.",
+        name: "Ehall getInformation");
+    String termStartDay = await dio.post(
+      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+      data: {
+        'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
+        'XQ': semesterCode.split('-')[2]
+      },
+    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
+    await addUser("currentStartDay", termStartDay);
   }
 }
 

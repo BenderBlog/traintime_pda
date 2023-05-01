@@ -32,6 +32,17 @@ class ClassTableController extends GetxController {
   bool? isNext;
 
   @override
+  void onInit() {
+    // For info
+    semesterCode = user["currentSemester"]!;
+    termStartDay = user["currentStartDay"]!;
+    startDay = DateTime.parse(termStartDay);
+    currentWeek =
+        (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+    super.onInit();
+  }
+
+  @override
   void onReady() async {
     await updateClassTable();
     update();
