@@ -24,6 +24,7 @@ import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 Alice alice = Alice();
 
@@ -45,13 +46,16 @@ void main() async {
   bool isFirst = false;
   try {
     await initUser();
+    await EhallSession().loginEhall(
+        username: user["idsAccount"]!, password: user["idsPassword"]!);
   } on String {
     isFirst = true;
   }
   developer.log(
-    "Logged in status: ${!isFirst}",
+    "Registered in status: ${!isFirst}",
     name: "Watermeter",
   );
+
   runApp(MyApp(isFirst: isFirst));
 }
 
