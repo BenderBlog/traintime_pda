@@ -26,7 +26,6 @@ import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.da
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
-import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/general.dart';
 
 class SettingWindow extends StatefulWidget {

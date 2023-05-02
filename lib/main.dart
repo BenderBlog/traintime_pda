@@ -26,7 +26,7 @@ import 'dart:developer' as developer;
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
-Alice alice = Alice();
+Alice alice = Alice(showNotification: false);
 
 void main() async {
   developer.log(

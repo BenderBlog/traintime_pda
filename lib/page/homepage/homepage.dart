@@ -11,7 +11,7 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/homepage/phone/phone_main_page.dart';
+import 'package:watermeter/page/homepage/phone_main_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});

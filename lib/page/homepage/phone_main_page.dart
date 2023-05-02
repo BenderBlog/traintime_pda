@@ -1,14 +1,14 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/page/homepage/phone/clipper.dart';
-import 'package:watermeter/page/homepage/phone/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/phone/info_widget/electricity_card.dart';
-import 'package:watermeter/page/homepage/phone/info_widget/exam_card.dart';
-import 'package:watermeter/page/homepage/phone/info_widget/score_card.dart';
-import 'package:watermeter/page/homepage/phone/info_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/clipper.dart';
+import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/score_card.dart';
+import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
 
 class PhoneMainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
@@ -23,9 +23,10 @@ class PhoneMainPage extends StatelessWidget {
     examController.update();
   }
 
+  final inBetweenCardHeight = 135.0;
+
   @override
   Widget build(BuildContext context) {
-    const double classCardHeight = 120.0;
     return EasyRefresh(
       onRefresh: () async {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -40,7 +41,7 @@ class PhoneMainPage extends StatelessWidget {
         triggerOffset: MediaQuery.of(context).size.height * 0.025,
         notifyWhenInvisible: true,
         builder: (context, state) {
-          final height = state.offset + classCardHeight;
+          final height = state.offset + inBetweenCardHeight;
           return Stack(
             alignment: Alignment.center,
             clipBehavior: Clip.none,
@@ -59,7 +60,7 @@ class PhoneMainPage extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: ClipPath(
-                  clipper: FillLineClipper(classCardHeight),
+                  clipper: FillLineClipper(inBetweenCardHeight),
                   child: Container(
                     height: 2,
                     width: double.infinity,
@@ -70,9 +71,13 @@ class PhoneMainPage extends StatelessWidget {
               Positioned(
                 bottom: 0,
                 child: SizedBox(
-                  height: classCardHeight,
+                  height: inBetweenCardHeight,
                   width: MediaQuery.of(context).size.width * 0.9,
-                  child: const ClassTableCard(),
+                  child: AspectRatio(
+                    aspectRatio:
+                        MediaQuery.of(context).size.width / inBetweenCardHeight,
+                    child: const ClassTableCard(),
+                  ),
                 ),
               ),
             ],
@@ -84,53 +89,46 @@ class PhoneMainPage extends StatelessWidget {
           SliverAppBar(
             backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
             foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-            expandedHeight: MediaQuery.of(context).size.width * 0.125,
+            expandedHeight: MediaQuery.of(context).size.width * 0.3,
             pinned: true,
             elevation: 0,
             title: GetBuilder<ClassTableController>(
               builder: (c) => Text("第 ${c.currentWeek} 周"),
             ),
           ),
-          const HeaderLocator.sliver(paintExtent: classCardHeight),
+          HeaderLocator.sliver(paintExtent: inBetweenCardHeight),
           SliverToBoxAdapter(
-            child: Card(
-              elevation: 0,
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  MediaQuery.removePadding(
-                    context: context,
-                    removeTop: true,
-                    child: GridView.count(
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      childAspectRatio: 1.75,
-                      children: const [
-                        SportCard(),
-                        ElectricityCard(),
-                      ],
-                    ),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: AspectRatio(
+                    aspectRatio: MediaQuery.of(context).size.width / 260,
+                    child: const SportCard(),
                   ),
-                  MediaQuery.removePadding(
-                    context: context,
-                    removeTop: true,
-                    child: GridView.count(
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      childAspectRatio: 2.25,
-                      children: const [
-                        ScoreCard(),
-                        ExamCard(),
-                      ],
-                    ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: AspectRatio(
+                    aspectRatio: MediaQuery.of(context).size.width / 100,
+                    child: const ElectricityCard(),
                   ),
-                ],
-              ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: GridView.count(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    childAspectRatio: MediaQuery.of(context).size.width / 160,
+                    children: const [
+                      ScoreCard(),
+                      ExamCard(),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
