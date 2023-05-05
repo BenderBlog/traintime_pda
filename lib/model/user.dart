@@ -32,6 +32,9 @@ Future<void> initUser() async {
 
   user["sportPassword"] = prefs.getString("sportPassword");
   user["electricityPassword"] = prefs.getString("electricityPassword");
+  if (user["electricityPassword"] == null) {
+    user["electricityPassword"] = "123456";
+  }
 
   user["sex"] = prefs.getString("sex");
   user["execution"] = prefs.getString("execution");

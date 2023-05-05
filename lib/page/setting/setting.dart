@@ -46,18 +46,17 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: const Text('Traintime PDA by BenderBlog'),
-                value: const Text(
-                    "版本号 Pre-Alpha 0.0.4, MPL v2.0\n(codename watermeter)"),
+                title: const Text('Traintime PDA 0.0.4'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://github.com/BenderBlog/watermeter"),
                   mode: LaunchMode.externalApplication,
                 ),
               ),
               SettingsTile.navigation(
-                  title: const Text('用户信息'),
-                  value: Text("${user["name"]} ${user["execution"]}\n"
-                      "${user["institutes"]} ${user["subject"]}")),
+                title: const Text('用户信息'),
+                value: Text("${user["name"]} ${user["execution"]}\n"
+                    "${user["institutes"]} ${user["subject"]}"),
+              ),
             ],
           ),
           SettingsSection(
@@ -65,7 +64,6 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('设置程序主题色'),
-                  value: const Text("改变程序的色调，符合你的品味"),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -79,7 +77,6 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('体适能密码'),
-                  value: const Text("你体育帐号密码，要是忘了找体育部"),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -88,7 +85,6 @@ class _SettingWindowState extends State<SettingWindow> {
                   }),
               SettingsTile.navigation(
                   title: const Text('电费帐号密码'),
-                  value: const Text("如果你的密码不是123456，请修改这里"),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -102,9 +98,6 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('课程偏移设置'),
-                  value: const Text("为应对某些紧急状况，可通过这个调整开学日期\n"
-                      "输入负数提前开学日期，输入正数延后开学日期\n"
-                      "(希望以后没有因为疫情导致提前上下学期课程的情况，tmd 这大学真白上了)"),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -133,7 +126,6 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
               SettingsTile.navigation(
                   title: const Text('课表背景图选择'),
-                  value: const Text("把你的对象搁课程表上面，上课没事就看(这不神经病)"),
                   onPressed: (content) async {
                     FilePickerResult? result = await FilePicker.platform
                         .pickFiles(type: FileType.image);
@@ -169,7 +161,6 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                 title: const Text('清除 Cookie'),
-                value: const Text("清除所有 Cookie，适用于重新登录"),
                 onPressed: (context) async {
                   try {
                     await IDSCookieJar.deleteAll();
@@ -188,7 +179,6 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
               SettingsTile.navigation(
                 title: const Text('退出登录'),
-                value: const Text("返回登录界面"),
                 onPressed: (context) async {
                   /// Clean Cookie
                   try {
@@ -227,7 +217,6 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
               SettingsTile.navigation(
                 title: const Text('Alice 拦截器查看'),
-                value: const Text("查询本软件网络通讯状况"),
                 onPressed: (context) => alice.showInspector(),
               ),
             ],
@@ -236,8 +225,7 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('关于本软件'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: const Text('受到这个软件的启发'),
-                value: const Text("Robotxm's Myxdu (电表)"),
+                title: const Text('受到 Myxdu (电表)启发'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://myxdu.moefactory.com/"),
                   mode: LaunchMode.externalApplication,
@@ -246,8 +234,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 // onPressed: (context) => _playEffect("QuadDamage.wav"),
               ),
               SettingsTile.navigation(
-                title: const Text('网络逻辑'),
-                value: const Text("西电开源社区的 Xidian-Script"),
+                title: const Text('网络逻辑 xidian-script'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://github.com/xdlinux/xidian-scripts"),
                   mode: LaunchMode.externalApplication,
@@ -256,8 +243,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 // onPressed: (context) => _playEffect("HellProtecting.wav"),
               ),
               SettingsTile.navigation(
-                title: const Text('西电目录数据提供商'),
-                value: const Text("hawa130, SuperBart, and others."),
+                title: const Text('西电目录原版'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://ncov.hawa130.com/about"),
                   mode: LaunchMode.externalApplication,
