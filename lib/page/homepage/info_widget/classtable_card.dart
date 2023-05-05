@@ -107,8 +107,9 @@ class ClassTableCard extends StatelessWidget {
                                                 .substring(0, 7)
                                             : c.classToShow!.teacher!,
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -128,8 +129,9 @@ class ClassTableCard extends StatelessWidget {
                                   Text(
                                     c.classToShow!.place ?? "地点未定",
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -140,8 +142,9 @@ class ClassTableCard extends StatelessWidget {
                                 children: [
                                   Icon(
                                     Icons.access_time_filled_outlined,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
                                     size: 18,
                                   ),
                                   const SizedBox(width: 2),
@@ -149,8 +152,9 @@ class ClassTableCard extends StatelessWidget {
                                     "${time[(c.timeArrangementToShow!.start - 1) * 2]}-"
                                     "${time[(c.timeArrangementToShow!.stop - 1) * 2 + 1]}",
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       fontSize: 14,
                                     ),
                                   ),

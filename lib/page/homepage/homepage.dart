@@ -11,13 +11,15 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/homepage/pad_main_page.dart';
 import 'package:watermeter/page/homepage/phone_main_page.dart';
+import 'package:watermeter/page/widget.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return PhoneMainPage();
+    return isPhone(context) ? PhoneMainPage() : PadMainPage();
   }
 }

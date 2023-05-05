@@ -64,7 +64,7 @@ class SportCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "上次有效记录：",
+                  "最近记录：",
                   textScaleFactor: 1.15,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
