@@ -26,6 +26,7 @@ import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.da
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/general.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -45,14 +46,15 @@ class _SettingWindowState extends State<SettingWindow> {
         sections: [
           SettingsSection(
             tiles: <SettingsTile>[
-              SettingsTile.navigation(
-                title: const Text('Traintime PDA 0.0.4'),
+              SettingsTile(
+                title: const Text('XDYou 0.0.4'),
+                value: const Text('Codebase Traintime PDA 0.0.4'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://github.com/BenderBlog/watermeter"),
                   mode: LaunchMode.externalApplication,
                 ),
               ),
-              SettingsTile.navigation(
+              SettingsTile(
                 title: const Text('用户信息'),
                 value: Text("${user["name"]} ${user["execution"]}\n"
                     "${user["institutes"]} ${user["subject"]}"),
@@ -64,6 +66,8 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('设置程序主题色'),
+                  value: Text(
+                      ColorSeed.values[int.parse(user["color"] ?? "0")].label),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -76,7 +80,7 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('帐号设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                  title: const Text('体适能密码'),
+                  title: const Text('体适能密码设置'),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -84,7 +88,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   }),
               SettingsTile.navigation(
-                  title: const Text('电费帐号密码'),
+                  title: const Text('电费帐号密码设置'),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -98,6 +102,7 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('课程偏移设置'),
+                  value: Text("目前为 ${user["swift"] ?? '0'}"),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -216,7 +221,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 },
               ),
               SettingsTile.navigation(
-                title: const Text('Alice 拦截器查看'),
+                title: const Text('网络拦截器查看'),
                 onPressed: (context) => alice.showInspector(),
               ),
             ],
@@ -225,6 +230,15 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('关于本软件'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
+                title: const Text('Developed by BenderBlog'),
+                onPressed: (context) => launchUrl(
+                  Uri.parse("https://legacy.superbart.xyz/"),
+                  mode: LaunchMode.externalApplication,
+                ),
+                // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
+                // onPressed: (context) => _playEffect("QuadDamage.wav"),
+              ),
+              SettingsTile(
                 title: const Text('受到 Myxdu (电表)启发'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://myxdu.moefactory.com/"),
@@ -233,7 +247,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
                 // onPressed: (context) => _playEffect("QuadDamage.wav"),
               ),
-              SettingsTile.navigation(
+              SettingsTile(
                 title: const Text('网络逻辑 xidian-script'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://github.com/xdlinux/xidian-scripts"),
@@ -242,7 +256,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 // Quake: You don't need to fear about anything, even Shub-Niggurath...
                 // onPressed: (context) => _playEffect("HellProtecting.wav"),
               ),
-              SettingsTile.navigation(
+              SettingsTile(
                 title: const Text('西电目录原版'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://ncov.hawa130.com/about"),
@@ -250,6 +264,31 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 // Quake: ...with the power of HELL, the updown Pentagram.
                 // onPressed: (context) => _playEffect("HellProtection.wav"),
+              ),
+              SettingsTile(
+                title: const Text('Apple 硬件支援者自画像'),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Self-Portrait of this person"),
+                      content: Image.asset("assets/Ray.jpg"),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text("文章"),
+                          onPressed: () => launchUrl(
+                            Uri.parse("https://www.coolapk.com/feed/45104934"),
+                            mode: LaunchMode.externalApplication,
+                          ),
+                        ),
+                        TextButton(
+                          child: const Text("确定"),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),

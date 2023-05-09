@@ -13,14 +13,12 @@ if you want to use.
 class ClassDetail {
   String name; // 名称
   String? teacher; // 老师
-  String? place; // 地方
   String? code; // 课程序号
   String? number; // 班级序号
 
   ClassDetail({
     required this.name,
     this.teacher,
-    this.place,
     this.code,
     this.number,
   });
@@ -33,15 +31,6 @@ class ClassDetail {
       other is ClassDetail &&
       other.runtimeType == runtimeType &&
       name == other.name;
-
-  @override
-  String toString() {
-    if (place != null) {
-      return "${name.length <= 15 ? name : "${name.substring(0, 14)}..."}\n$place";
-    } else {
-      return name;
-    }
-  }
 }
 
 class TimeArrangement {
@@ -51,10 +40,12 @@ class TimeArrangement {
   int day; // 星期几上课
   int start; // 上课开始
   int stop; // 上课结束
+  String? classroom; // 上课教室
   late int step; // 上课长度
   TimeArrangement({
     required this.index,
     required this.weekList,
+    this.classroom,
     required this.day,
     required this.start,
     required this.stop,

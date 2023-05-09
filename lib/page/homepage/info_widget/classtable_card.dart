@@ -127,7 +127,8 @@ class ClassTableCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 2),
                                   Text(
-                                    c.classToShow!.place ?? "地点未定",
+                                    c.timeArrangementToShow!.classroom ??
+                                        "地点未定",
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme

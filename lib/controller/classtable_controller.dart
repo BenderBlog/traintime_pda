@@ -67,7 +67,6 @@ class ClassTableController extends GetxController {
         var toDeal = ClassDetail(
           name: i["KCM"],
           teacher: i["SKJS"],
-          place: i["JASDM"],
           code: i["KCH"],
           number: i["KXH"],
         );
@@ -81,6 +80,7 @@ class ClassTableController extends GetxController {
             stop: int.parse(i["JSJC"]),
             day: int.parse(i["SKXQ"]),
             weekList: i["SKZC"].toString(),
+            classroom: i["JASDM"],
           ),
         );
         if (i["SKZC"].toString().length > semesterLength) {
@@ -180,6 +180,7 @@ class ClassTableController extends GetxController {
       if (currentWeek >= 0 && currentWeek < semesterLength) {
         developer.log("Get the current class", name: "ClassTableController");
         DateTime now = DateTime.now();
+        print(now);
         if ((now.hour >= 8 && now.hour < 20) ||
             (now.hour == 20 && now.minute < 35)) {
           // Check the index.

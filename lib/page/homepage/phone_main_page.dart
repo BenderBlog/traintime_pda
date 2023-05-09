@@ -93,7 +93,7 @@ class PhoneMainPage extends StatelessWidget {
             pinned: true,
             elevation: 0,
             title: GetBuilder<ClassTableController>(
-              builder: (c) => Text("第 ${c.currentWeek} 周"),
+              builder: (c) => Text("第 ${c.currentWeek + 1} 周"),
             ),
           ),
           HeaderLocator.sliver(paintExtent: inBetweenCardHeight),

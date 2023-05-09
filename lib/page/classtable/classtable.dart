@@ -424,12 +424,24 @@ class PageState extends State<ClassTableWindow> {
     );
   }
 
+  double classTableContentHeight(int count) =>
+      count *
+      (widget.constraints.maxHeight < 800
+          ? widget.constraints.maxHeight * 0.85
+          : widget.constraints.maxHeight -
+              topRowHeightBig -
+              (widget.constraints.maxWidth / widget.constraints.maxHeight >=
+                      1.20
+                  ? midRowHeightHorizontal
+                  : midRowHeightVertical)) /
+      10;
+
   Widget _classTable(int weekIndex) {
     List<Widget> classSubRow(int index) {
       Widget classCard(int index, double height, Set<int> conflict) {
         Widget inside = index == -1
             ? const Padding(
-                padding: EdgeInsets.all(3),
+                padding: EdgeInsets.all(1.5),
                 // Easter egg, usless you read the code, or reverse engineering...
                 child: Center(
                   child: Text(
@@ -459,12 +471,11 @@ class PageState extends State<ClassTableWindow> {
                   context: context,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(1.5),
                   child: Center(
                     child: Text(
-                      controller
-                          .classDetail[controller.timeArrangement[index].index]
-                          .toString(),
+                      "${controller.classDetail[controller.timeArrangement[index].index].name}\n"
+                      "${controller.timeArrangement[index].classroom}",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 11.5,
@@ -485,7 +496,7 @@ class PageState extends State<ClassTableWindow> {
             padding: const EdgeInsets.all(2),
             child: ClipRRect(
               // Out
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
               child: Container(
                 // Border
                 color: index == -1
@@ -499,7 +510,7 @@ class PageState extends State<ClassTableWindow> {
                     : const EdgeInsets.fromLTRB(1, 1, 1, 8),
                 child: ClipRRect(
                   // Inner
-                  borderRadius: BorderRadius.circular(13.5),
+                  borderRadius: BorderRadius.circular(8.5),
                   child: Container(
                     color: index == -1
                         ? const Color(0x00000000)
@@ -545,17 +556,7 @@ class PageState extends State<ClassTableWindow> {
           // Generate the row.
           thisRow.add(classCard(
             places,
-            count *
-                (widget.constraints.maxHeight < 800
-                    ? widget.constraints.maxHeight * 0.95
-                    : widget.constraints.maxHeight -
-                        topRowHeightBig -
-                        (widget.constraints.maxWidth /
-                                    widget.constraints.maxHeight >=
-                                1.20
-                            ? midRowHeightHorizontal
-                            : midRowHeightVertical)) /
-                10,
+            classTableContentHeight(count),
             conflict,
           ));
         }
@@ -567,16 +568,7 @@ class PageState extends State<ClassTableWindow> {
           10,
           (index) => SizedBox(
             width: leftRow,
-            height: (widget.constraints.maxHeight < 800
-                    ? widget.constraints.maxHeight * 0.95
-                    : widget.constraints.maxHeight -
-                        topRowHeightBig -
-                        (widget.constraints.maxWidth /
-                                    widget.constraints.maxHeight >=
-                                1.20
-                            ? midRowHeightHorizontal
-                            : midRowHeightVertical)) /
-                10,
+            height: classTableContentHeight(1),
             child: Center(
               child: AutoSizeText(
                 "${index + 1}",
@@ -613,9 +605,9 @@ class PageState extends State<ClassTableWindow> {
   }
 
   Widget _buttomInformation(Set<int> conflict) {
-    Widget classInfoBox(TimeArrangement i) {
-      ClassDetail toShow = controller.classDetail[i.index];
-      var infoColor = colorList[i.index % colorList.length];
+    Widget classInfoBox(TimeArrangement timeArrangement) {
+      ClassDetail toShow = controller.classDetail[timeArrangement.index];
+      var infoColor = colorList[timeArrangement.index % colorList.length];
 
       Widget weekDoc(int index, bool isOccupied) => ClipOval(
             child: Container(
@@ -669,13 +661,14 @@ class PageState extends State<ClassTableWindow> {
                 const SizedBox(width: 10),
                 customListTile(
                   Icons.room,
-                  toShow.place ?? "地点未定",
+                  timeArrangement.classroom ?? "地点未定",
                 ),
                 const SizedBox(width: 10),
                 customListTile(
                   Icons.access_time_filled_outlined,
-                  "${weekList[i.day - 1]}"
-                  "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}",
+                  "${weekList[timeArrangement.day - 1]}"
+                  "${timeArrangement.start}-${timeArrangement.stop}节课 "
+                  "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
                 ),
               ],
             )
@@ -687,12 +680,13 @@ class PageState extends State<ClassTableWindow> {
                 ),
                 customListTile(
                   Icons.room,
-                  toShow.place ?? "地点未定",
+                  timeArrangement.classroom ?? "地点未定",
                 ),
                 customListTile(
                   Icons.access_time_filled_outlined,
-                  "${weekList[i.day - 1]}"
-                  "${i.start}-${i.stop}节课 ${time[(i.start - 1) * 2]}-${time[(i.stop - 1) * 2 + 1]}",
+                  "${weekList[timeArrangement.day - 1]}"
+                  "${timeArrangement.start}-${timeArrangement.stop}节课 "
+                  "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
                 ),
               ],
             );
@@ -729,9 +723,10 @@ class PageState extends State<ClassTableWindow> {
                     mainAxisSpacing: 5,
                     crossAxisSpacing: 5,
                     maxCrossAxisExtent: 30,
-                    children: List.generate(i.weekList.length, (index) {
+                    children:
+                        List.generate(timeArrangement.weekList.length, (index) {
                       bool isOccupied = true;
-                      if (i.weekList[index] == "0") {
+                      if (timeArrangement.weekList[index] == "0") {
                         isOccupied = false;
                       }
                       return weekDoc(index + 1, isOccupied);
