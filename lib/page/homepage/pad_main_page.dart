@@ -46,7 +46,8 @@ class PadMainPage extends StatelessWidget {
       body: Row(
         children: [
           Expanded(
-            child: Column(
+            child: ListView(
+              shrinkWrap: true,
               children: [
                 SizedBox(
                   height: inBetweenCardHeight,
