@@ -12,7 +12,6 @@ if you want to use.
 
 import 'dart:io';
 
-import 'package:alice/alice.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
 import 'package:flutter/material.dart';
@@ -25,8 +24,6 @@ import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-
-Alice alice = Alice(showNotification: false);
 
 void main() async {
   developer.log(
@@ -74,7 +71,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
-        navigatorKey: alice.getNavigatorKey(),
         title: 'WaterMeter Pre-Alpha',
         theme: c.apptheme,
         home: widget.isFirst ? const LoginWindow() : const HomePage(),

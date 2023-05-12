@@ -20,7 +20,6 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
-import 'package:watermeter/main.dart';
 import 'package:watermeter/repository/general.dart';
 
 /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
@@ -72,7 +71,6 @@ class IDSSession {
       },
     ));
     toReturn.interceptors.add(CookieManager(IDSCookieJar));
-    toReturn.interceptors.add(alice.getDioInterceptor());
     return toReturn;
   }
 

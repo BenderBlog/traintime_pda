@@ -12,7 +12,6 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
-import 'package:watermeter/main.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
@@ -210,9 +209,7 @@ class _LoginWindowState extends State<LoginWindow> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onPressed: () {
-                  alice.showInspector();
-                },
+                onPressed: () {},
               )
             ],
           )

@@ -50,7 +50,7 @@ dependencies:
   jiffy: ^6.1.0
   icalendar_parser: any
   auto_size_text: ^3.0.0
-  alice: ^0.3.2 # Internet Inscripter
+  #alice: ^0.3.2 # Internet Inscripter
   async: ^2.10.0 # For AsyncMemoizer
   get:
 

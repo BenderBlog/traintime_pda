@@ -19,7 +19,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/main.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/login/login.dart';
 import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
@@ -219,10 +218,6 @@ class _SettingWindowState extends State<SettingWindow> {
                         builder: (context) => const LoginWindow()));
                   }
                 },
-              ),
-              SettingsTile.navigation(
-                title: const Text('网络拦截器查看'),
-                onPressed: (context) => alice.showInspector(),
               ),
             ],
           ),
