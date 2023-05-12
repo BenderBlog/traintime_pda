@@ -38,7 +38,8 @@ class ClassTableController extends GetxController {
     termStartDay = user["currentStartDay"]!;
     startDay = DateTime.parse(termStartDay);
     currentWeek =
-        (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+        (Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
+            7;
     super.onInit();
   }
 
@@ -129,8 +130,9 @@ class ClassTableController extends GetxController {
       }
 
       // Get the current index.
-      currentWeek =
-          (Jiffy(DateTime.now()).dayOfYear - Jiffy(startDay).dayOfYear) ~/ 7;
+      currentWeek = (Jiffy.now().dayOfYear -
+              Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
+          7;
 
       // Init the matrix.
       // 1. prepare the structure, a three-deminision array.
@@ -180,7 +182,6 @@ class ClassTableController extends GetxController {
       if (currentWeek >= 0 && currentWeek < semesterLength) {
         developer.log("Get the current class", name: "ClassTableController");
         DateTime now = DateTime.now();
-        print(now);
         if ((now.hour >= 8 && now.hour < 20) ||
             (now.hour == 20 && now.minute < 35)) {
           // Check the index.

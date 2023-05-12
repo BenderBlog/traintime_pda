@@ -101,7 +101,7 @@ class ClassTableCard extends StatelessWidget {
                                   const SizedBox(width: 2),
                                   Text(
                                     c.classToShow!.teacher == null
-                                        ? "没有老师数据"
+                                        ? "老师未知"
                                         : c.classToShow!.teacher!.length >= 7
                                             ? c.classToShow!.teacher!
                                                 .substring(0, 7)

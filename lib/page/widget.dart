@@ -94,8 +94,8 @@ enum ColorSeed {
   deepPurple('基佬紫', Colors.deepPurple),
   indigo('贵族蓝', Colors.indigo),
   blue('天空蓝', Colors.blue),
-  green('夏日绿', Colors.green),
-  orange('活力橙', Colors.orange),
+  green('早苗绿', Colors.green),
+  orange('果粒橙', Colors.orange),
   pink('少女粉', Colors.pink);
 
   const ColorSeed(this.label, this.color);
