@@ -98,7 +98,8 @@ class PageState extends State<ClassTableWindow> {
     );
 
     rowControl = ScrollController(
-      initialScrollOffset: 75.0 * currentWeekIndex!,
+      initialScrollOffset: (weekButtonWidth + 2 * weekButtonHorizontalPadding) *
+          currentWeekIndex!,
     );
 
     // Init the background.
@@ -118,7 +119,7 @@ class PageState extends State<ClassTableWindow> {
   // Change the position in the topRow
   void changeTopRow(int index) => rowControl.animateTo(
         (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
-        curve: Curves.fastOutSlowIn,
+        curve: Curves.linear,
         duration: const Duration(milliseconds: changePageTime ~/ 1.5),
       );
 
