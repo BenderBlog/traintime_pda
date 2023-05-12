@@ -88,10 +88,10 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                   children: [
                     SizedBox(
                       height: context.height * 0.7,
-                      child: Center(
+                      child: const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(Icons.warning),
                             Text(
                               "列表为空",

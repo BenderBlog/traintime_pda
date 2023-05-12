@@ -33,19 +33,19 @@ class ScoreCard extends StatelessWidget {
       child: Card(
         elevation: 0,
         color: Theme.of(context).colorScheme.primaryContainer,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
+        child: const Padding(
+          padding: EdgeInsets.all(10),
           child: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Icon(
+                Icon(
                   Icons.score,
                   size: 48,
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
                       "成绩查询",
                       style: TextStyle(fontSize: 18),

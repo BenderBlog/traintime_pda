@@ -64,8 +64,8 @@ class PadMainPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.20 < 200
                 ? 200
                 : MediaQuery.of(context).size.width * 0.20,
-            child: Column(
-              children: const [
+            child: const Column(
+              children: [
                 SizedBox(
                   height: 100,
                   child: ElectricityCard(),

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
@@ -22,14 +23,18 @@ class PhoneMainPage extends StatelessWidget {
     examController.update();
   }
 
-  final inBetweenCardHeight = 135.0;
+  final classCardHeight = 135.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: GetBuilder<ClassTableController>(
-          builder: (c) => Text("第 ${c.currentWeek + 1} 周"),
+          builder: (c) => Text(
+            "第 ${c.currentWeek + 1} 周",
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ),
       body: EasyRefresh(
@@ -47,13 +52,28 @@ class PhoneMainPage extends StatelessWidget {
         ),
         child: ListView(
           children: [
-            const HeaderLocator(
-              paintExtent: 1.0,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025),
-              child: const ClassTableCard(),
+            const HeaderLocator(),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                ClipPath(
+                  clipper: RoundClipper(
+                    height: classCardHeight,
+                  ),
+                  child: Container(
+                    height: classCardHeight,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.025),
+                  child: SizedBox(
+                    height: classCardHeight,
+                    child: const ClassTableCard(),
+                  ),
+                ),
+              ],
             ),
             Padding(
               padding: EdgeInsets.symmetric(
