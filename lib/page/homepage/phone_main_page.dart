@@ -9,19 +9,13 @@ import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
 import 'package:watermeter/page/homepage/info_widget/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
 
   PhoneMainPage({super.key});
-
-  Future<void> _update() async {
-    await classTableController.updateClassTable(isForce: true);
-    classTableController.update();
-    await examController.get();
-    examController.update();
-  }
 
   final classCardHeight = 135.0;
 
@@ -43,7 +37,7 @@ class PhoneMainPage extends StatelessWidget {
             behavior: SnackBarBehavior.floating,
             content: Text("请稍候，正在刷新信息"),
           ));
-          await _update();
+          await update();
         },
         header: PhoenixHeader(
           skyColor: Theme.of(context).colorScheme.primary,

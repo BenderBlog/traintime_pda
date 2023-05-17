@@ -81,15 +81,19 @@ class ClassTableCard extends StatelessWidget {
                 ),
                 c.isGet == true
                     ? c.classToShow == null
-                        ? Text(
-                            "寻找什么呢，我也不知道",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          )
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                                Text(
+                                  "寻找什么呢，我也不知道",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
+                                )
+                              ])
                         : Column(
                             children: [
                               Row(

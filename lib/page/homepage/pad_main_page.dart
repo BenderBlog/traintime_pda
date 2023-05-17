@@ -7,19 +7,13 @@ import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
 import 'package:watermeter/page/homepage/info_widget/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 
 class PadMainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
 
   PadMainPage({super.key});
-
-  Future<void> _update() async {
-    await classTableController.updateClassTable(isForce: true);
-    classTableController.update();
-    await examController.get();
-    examController.update();
-  }
 
   final inBetweenCardHeight = 135.0;
 
@@ -37,7 +31,7 @@ class PadMainPage extends StatelessWidget {
                 behavior: SnackBarBehavior.floating,
                 content: Text("请稍候，正在刷新信息"),
               ));
-              await _update();
+              await update();
             },
             icon: const Icon(Icons.refresh),
           ),
