@@ -10,17 +10,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 
-The binary is provided by ylwind.
+The service is provided by xidian ruisi (ylwind).
 */
 
 import 'package:dio/dio.dart';
 
 Future<bool> isInSchool() async {
   Dio dio = Dio();
-  bool isInSchool = await dio
-      .get("https://server.superbart.xyz/isxdu/")
-      .then((value) => value.data["isxdu"])
-      .onError((error, stackTrace) => false);
+  String ip = await dio
+      .head("http://202.117.119.3:34898")
+      .then((value) => value.headers["ip"]![0])
+      .onError((error, stackTrace) {
+    print(error);
+    return "255.255.255.255";
+  });
+  bool isInSchool = ip.split('.')[0] == "10";
+  print(isInSchool);
   return isInSchool;
 }
 
