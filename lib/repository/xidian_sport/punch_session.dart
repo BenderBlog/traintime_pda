@@ -14,6 +14,11 @@ Future<void> getPunch() async {
     if (userId == "") {
       await login();
     }
+    var getStore = await require(
+      subWebsite: "stuTermPunchRecord/findList",
+      body: {'userId': userId},
+    );
+    toReturn.score = getStore["data"][0]["score"];
     var response = await require(
       subWebsite: "stuPunchRecord/findPager",
       body: {
