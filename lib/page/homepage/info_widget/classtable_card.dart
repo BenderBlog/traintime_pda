@@ -60,21 +60,24 @@ class ClassTableCard extends StatelessWidget {
                     ),
                   ),
                 ]),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(
-                    c.isGet == true
-                        ? c.classToShow == null
-                            ? "目前没课"
-                            : c.classToShow!.name
-                        : c.error == null
-                            ? "正在加载"
-                            : "遇到错误",
-                    style: TextStyle(
-                      fontSize: 22,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      c.isGet == true
+                          ? c.classToShow == null
+                              ? "目前没课"
+                              : c.classToShow!.name
+                          : c.error == null
+                              ? "正在加载"
+                              : "遇到错误",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    )
+                  ],
                 ),
                 c.isGet == true
                     ? c.classToShow == null
@@ -87,59 +90,66 @@ class ClassTableCard extends StatelessWidget {
                                   .onPrimaryContainer,
                             ),
                           )
-                        : Row(
+                        : Column(
                             children: [
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Icon(
-                                    Icons.person,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                    size: 18,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.person,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        c.classToShow!.teacher == null
+                                            ? "老师未知"
+                                            : c.classToShow!.teacher!.length >=
+                                                    7
+                                                ? c.classToShow!.teacher!
+                                                    .substring(0, 7)
+                                                : c.classToShow!.teacher!,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    c.classToShow!.teacher == null
-                                        ? "老师未知"
-                                        : c.classToShow!.teacher!.length >= 7
-                                            ? c.classToShow!.teacher!
-                                                .substring(0, 7)
-                                            : c.classToShow!.teacher!,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                      fontSize: 14,
-                                    ),
+                                  const SizedBox(width: 10),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.room,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        c.timeArrangementToShow!.classroom ??
+                                            "地点未定",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              const SizedBox(width: 10),
                               Row(
-                                children: [
-                                  Icon(
-                                    Icons.room,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    c.timeArrangementToShow!.classroom ??
-                                        "地点未定",
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 10),
-                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.access_time_filled_outlined,
