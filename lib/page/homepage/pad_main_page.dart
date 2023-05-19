@@ -26,12 +26,12 @@ class PadMainPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () async {
+            onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 behavior: SnackBarBehavior.floating,
                 content: Text("请稍候，正在刷新信息"),
               ));
-              await update();
+              update();
             },
             icon: const Icon(Icons.refresh),
           ),

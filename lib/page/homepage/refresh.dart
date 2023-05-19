@@ -18,7 +18,7 @@ import 'package:watermeter/repository/electricity/electricity_session.dart'
 import 'package:watermeter/repository/xidian_sport/punch_session.dart' as punch;
 import 'dart:developer' as developer;
 
-Future<void> update() async {
+void update() {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
   // Update Classtable
@@ -26,25 +26,25 @@ Future<void> update() async {
     "Updating classtable",
     name: "Homepage Update",
   );
-  await classTableController.updateClassTable(isForce: true);
-  classTableController.update();
+  classTableController
+      .updateClassTable(isForce: true)
+      .then((value) => classTableController.update());
   // Update Examation Info
   developer.log(
     "Updating exam info",
     name: "Homepage Update",
   );
-  await examController.get();
-  examController.update();
+  examController.get().then((value) => examController.update());
   // Update Electricity
   developer.log(
     "Updating electricity",
     name: "Homepage Update",
   );
-  await electricity.update();
+  electricity.update();
   // Update Sport
   developer.log(
     "Updating punch data",
     name: "Homepage Update",
   );
-  await punch.getPunch();
+  punch.getPunch();
 }

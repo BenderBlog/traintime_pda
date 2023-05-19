@@ -32,12 +32,12 @@ class PhoneMainPage extends StatelessWidget {
         ),
       ),
       body: EasyRefresh(
-        onRefresh: () async {
+        onRefresh: () {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text("请稍候，正在刷新信息"),
           ));
-          await update();
+          update();
         },
         header: PhoenixHeader(
           skyColor: Theme.of(context).colorScheme.primary,

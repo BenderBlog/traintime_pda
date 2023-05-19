@@ -21,11 +21,9 @@ Future<bool> isInSchool() async {
       .head("http://202.117.119.3:34898")
       .then((value) => value.headers["ip"]![0])
       .onError((error, stackTrace) {
-    print(error);
     return "255.255.255.255";
   });
   bool isInSchool = ip.split('.')[0] == "10";
-  print(isInSchool);
   return isInSchool;
 }
 
