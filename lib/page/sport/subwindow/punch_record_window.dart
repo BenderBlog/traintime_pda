@@ -191,7 +191,7 @@ class RecordCard extends StatelessWidget {
               height: 5,
             ),
             informationWithIcon(Icons.punch_clock,
-                "${toUse.punchDay}-${toUse.punchTime}", context),
+                toUse.time.format(pattern: "yyyy-MM-dd HH:mm:ss"), context),
             informationWithIcon(Icons.place, toUse.machineName, context),
             if (!toUse.state.contains("成功"))
               informationWithIcon(

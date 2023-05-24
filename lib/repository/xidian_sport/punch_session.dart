@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:jiffy/jiffy.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
@@ -36,11 +37,11 @@ Future<void> getPunch() async {
       toReturn.all.add(PunchData(
         i["machineName"],
         i["weekNum"],
-        i["punchDay"],
-        i["punchTime"],
+        Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
         i["state"],
       ));
     }
+    toReturn.all.sort((a, b) => a.time.diff(b.time).toInt());
     toReturn.allTime++;
     toReturn.valid++;
   } on NoPasswordException {

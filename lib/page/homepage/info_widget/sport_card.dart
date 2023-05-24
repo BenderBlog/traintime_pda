@@ -92,8 +92,8 @@ class SportCard extends StatelessWidget {
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
-                                    "${punchData.value.all.last.punchDay}"
-                                    " ${punchData.value.all.last.punchTime}",
+                                    punchData.value.all.last.time
+                                        .format(pattern: "yyyy-MM-dd HH:mm:ss"),
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme

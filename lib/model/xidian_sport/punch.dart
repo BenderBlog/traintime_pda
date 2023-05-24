@@ -1,15 +1,15 @@
+import 'package:jiffy/jiffy.dart';
+
 class PunchData {
   String machineName;
   String weekNum;
-  String punchDay;
-  String punchTime;
+  Jiffy time;
   String state;
 
   PunchData(
     this.machineName,
     this.weekNum,
-    this.punchDay,
-    this.punchTime,
+    this.time,
     this.state,
   );
 }
