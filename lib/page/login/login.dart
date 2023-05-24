@@ -42,7 +42,7 @@ class _LoginWindowState extends State<LoginWindow> {
         children: [
           /// Temporary symbol of watermeter.
           const CircleAvatar(
-            backgroundImage: AssetImage("assets/Login-Background.jpg"),
+            backgroundImage: AssetImage("assets/icon.png"),
             radius: 60.0,
           ),
           const SizedBox(height: 15.0),

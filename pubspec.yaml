@@ -96,6 +96,7 @@ flutter:
     - assets/Why-4-Years-Sport.jpg
     - assets/Boochi-Afraid-Work.jpg
     - assets/Ray.jpg
+    - assets/icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
