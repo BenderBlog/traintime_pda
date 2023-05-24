@@ -23,12 +23,11 @@ void update() {
   final examController = Get.put(ExamController());
   // Update Classtable
   developer.log(
-    "Updating classtable",
+    "Updating current class",
     name: "Homepage Update",
   );
-  classTableController
-      .updateClassTable(isForce: true)
-      .then((value) => classTableController.update());
+  classTableController.updateCurrent();
+  classTableController.update();
   // Update Examation Info
   developer.log(
     "Updating exam info",

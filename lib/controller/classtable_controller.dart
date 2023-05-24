@@ -49,6 +49,88 @@ class ClassTableController extends GetxController {
     update();
   }
 
+  void updateCurrent() {
+    // Get the current time.
+    if (currentWeek >= 0 && currentWeek < semesterLength) {
+      developer.log("Get the current class", name: "ClassTableController");
+      DateTime now = DateTime.now();
+      if ((now.hour >= 8 && now.hour < 20) ||
+          (now.hour == 20 && now.minute < 35)) {
+        // Check the index.
+        int index = -1;
+        developer.log(
+          "Current time is $now",
+          name: "ClassTableController",
+        );
+        for (int i = 0; i < time.length; ++i) {
+          var split = time[i].split(":");
+
+          int toDeal = 60 * int.parse(split[0]) + int.parse(split[1]);
+          int currentTime = 60 * now.hour + now.minute;
+
+          if (currentTime < toDeal) {
+            // The time is after the time[i-1]
+            index = i - 1;
+            break;
+          }
+        }
+
+        if (index >= 0) {
+          developer.log(
+            "Current time is after ${time[index]} $index",
+            name: "ClassTableController",
+          );
+          // If in the class, the current class.
+          // Else, the previous class.
+          int currentClassIndex =
+              pretendLayout[currentWeek][now.weekday - 1][index ~/ 2][0];
+          // In the class
+          if (index % 2 == 0) {
+            developer.log(
+              "In class.",
+              name: "ClassTableController",
+            );
+            if (currentClassIndex != -1) {
+              isNext = false;
+              timeArrangementToShow = timeArrangement[currentClassIndex];
+            }
+          } else {
+            developer.log(
+              "Not in class, seek the next class...",
+              name: "ClassTableController",
+            );
+            // See the next class.
+            int nextIndex = pretendLayout[currentWeek][now.weekday - 1]
+                [(index + 1) ~/ 2][0];
+            // If really have class.
+            if (nextIndex != -1) {
+              if (currentClassIndex != nextIndex) {
+                isNext = true;
+              } else {
+                isNext = false;
+              }
+              timeArrangementToShow = timeArrangement[nextIndex];
+            }
+          }
+          if (timeArrangementToShow != null &&
+              timeArrangementToShow!.index != -1) {
+            classToShow = classDetail[timeArrangementToShow!.index];
+          }
+        } else {
+          developer.log(
+            "Current time is before ${time[0]} 0",
+            name: "ClassTableController",
+          );
+          isNext = true;
+          int currentClassIndex =
+              pretendLayout[currentWeek][now.weekday - 1][0][0];
+          timeArrangementToShow = timeArrangement[currentClassIndex];
+          classToShow = classDetail[timeArrangementToShow!.index];
+        }
+      }
+    }
+  }
+
   Future<void> updateClassTable({bool isForce = false}) async {
     isGet = false;
     error = null;
@@ -177,87 +259,7 @@ class ClassTableController extends GetxController {
       }
 
       isGet = true;
-
-      // Get the current time.
-      if (currentWeek >= 0 && currentWeek < semesterLength) {
-        developer.log("Get the current class", name: "ClassTableController");
-        DateTime now = DateTime.now();
-        if ((now.hour >= 8 && now.hour < 20) ||
-            (now.hour == 20 && now.minute < 35)) {
-          // Check the index.
-          int index = -1;
-          developer.log(
-            "Current time is $now",
-            name: "ClassTableController",
-          );
-          for (int i = 0; i < time.length; ++i) {
-            var split = time[i].split(":");
-
-            int toDeal = 60 * int.parse(split[0]) + int.parse(split[1]);
-            int currentTime = 60 * now.hour + now.minute;
-
-            if (currentTime < toDeal) {
-              // The time is after the time[i-1]
-              index = i - 1;
-              break;
-            }
-          }
-
-          if (index >= 0) {
-            developer.log(
-              "Current time is after ${time[index]} $index",
-              name: "ClassTableController",
-            );
-            // If in the class, the current class.
-            // Else, the previous class.
-            int currentClassIndex =
-                pretendLayout[currentWeek][now.weekday - 1][index ~/ 2][0];
-            // In the class
-            if (index % 2 == 0) {
-              developer.log(
-                "In class.",
-                name: "ClassTableController",
-              );
-              if (currentClassIndex != -1) {
-                isNext = false;
-                timeArrangementToShow = timeArrangement[currentClassIndex];
-              }
-            } else {
-              developer.log(
-                "Not in class, seek the next class...",
-                name: "ClassTableController",
-              );
-              // See the next class.
-              int nextIndex = pretendLayout[currentWeek][now.weekday - 1]
-                  [(index + 1) ~/ 2][0];
-              // If really have class.
-              if (nextIndex != -1) {
-                if (currentClassIndex != nextIndex) {
-                  isNext = true;
-                } else {
-                  isNext = false;
-                }
-                timeArrangementToShow = timeArrangement[nextIndex];
-              }
-            }
-            if (timeArrangementToShow != null &&
-                timeArrangementToShow!.index != -1) {
-              classToShow = classDetail[timeArrangementToShow!.index];
-            }
-          } else {
-            developer.log(
-              "Current time is before ${time[0]} 0",
-              name: "ClassTableController",
-            );
-            isNext = true;
-            int currentClassIndex =
-                pretendLayout[currentWeek][now.weekday - 1][0][0];
-            timeArrangementToShow = timeArrangement[currentClassIndex];
-            classToShow = classDetail[timeArrangementToShow!.index];
-          }
-        }
-      }
-
+      updateCurrent();
       update();
     } catch (e, s) {
       error = e.toString() + s.toString();
