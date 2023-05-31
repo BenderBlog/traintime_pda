@@ -134,7 +134,7 @@ Future<void> updateInformation() async {
           options: Options(headers: {"Cookie": sessionId}))
       .then((value) => value.data);
 
-  int building = int.parse(account.substring(0, 1));
+  int building = int.parse(account.substring(1, 4));
   RegExp name = RegExp(r"表名称：.*");
   RegExp data = RegExp(r"剩余量：.*");
 
@@ -152,13 +152,10 @@ Future<void> updateInformation() async {
       }
     }
   } else {
-    int dingXiangElectricity = 0;
-    for (int i = nameArray.length - 1; i >= 0; --i) {
-      if (nameArray[i][0]!.contains("电表")) {
-        electricityInfo.value = "$dingXiangElectricity 度";
-        return;
-      }
-    }
+    //by ZCWzy
+    String? dingXiangElectricity = dataArray[nameArray.length - 1][0];
+    electricityInfo.value = "$dingXiangElectricity 度";
+    return;
   }
 
   throw NotFoundException();
