@@ -141,6 +141,14 @@ Future<void> updateInformation() async {
   List<RegExpMatch> nameArray = name.allMatches(page).toList();
   List<RegExpMatch> dataArray = data.allMatches(page).toList();
 
+  for (int i = nameArray.length - 1; i >= 0; --i) {
+    if (nameArray[i][0]!.contains("电表")) {
+      electricityInfo.value = "${dataArray[i][0]!} 度";
+      return;
+    }
+  }
+
+  /*
   if (building >= 1 && building <= 10) {
     for (int i = 0; i < nameArray.length; ++i) {
       if ((building >= 1 && building <= 4 && nameArray[i][0]!.contains("派诺")) ||
@@ -157,6 +165,7 @@ Future<void> updateInformation() async {
     electricityInfo.value = "$dingXiangElectricity 度";
     return;
   }
+  */
 
   throw NotFoundException();
 }
