@@ -51,7 +51,7 @@ Future<void> getScore() async {
   } on SemesterFailedException catch (e) {
     developer.log("未获取学期值：$e", name: "GetPunchSession");
     toReturn.situation = "未获取学期值";
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     developer.log("网络故障：$e", name: "GetPunchSession");
     toReturn.situation = "网络故障";
   } catch (e) {

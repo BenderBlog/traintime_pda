@@ -22,7 +22,7 @@ class ExamController extends GetxController {
 
   @override
   void onReady() async {
-    get();
+    get(semesterStr: currentSemester);
     update();
   }
 
@@ -74,7 +74,7 @@ class ExamController extends GetxController {
 
       isGet = true;
       error = null;
-    } on DioError catch (e, s) {
+    } on DioException catch (e, s) {
       developer.log(
         "Network exception: ${e.message}\nStack: $s",
         name: "ScoreController",

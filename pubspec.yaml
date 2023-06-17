@@ -28,14 +28,13 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   # Network
-  dio: ^4.0.6
-  dio_http_cache_lts: ^0.4.1
+  dio: ^5.0.0
   crypto: ^3.0.2
   encrypt: ^5.0.1
   # Stroage Cache
   shared_preferences: ^2.0.15
-  dio_cookie_manager: ^2.0.0
-  cookie_jar: ^3.0.1
+  dio_cookie_manager: ^3.0.0
+  cookie_jar: ^4.0.3
   path_provider: ^2.0.11
   file_picker: ^5.2.5
   # Deal with html

@@ -15,7 +15,6 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache_lts/dio_http_cache_lts.dart';
 import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
 import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
 import 'package:watermeter/model/xidian_directory/telephone.dart';
@@ -40,9 +39,6 @@ Dio get _dio {
     baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
     headers: _head(),
   );
-  toReturn.interceptors.add(DioCacheManager(CacheConfig(
-    baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
-  )).interceptor);
   return toReturn;
 }
 
@@ -53,9 +49,6 @@ Future<String> require({
   var response = await _dio.get(
     subWebsite,
     queryParameters: body,
-    options: buildCacheOptions(
-      const Duration(minutes: 15),
-    ),
   );
 
   /// Default return a Map<String,dynamic>, but I ordered him to get json!

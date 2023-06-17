@@ -27,7 +27,7 @@ Future<void> update() async {
     await updateInformation();
   } on NotSchoolNetworkException {
     electricityInfo.value = "目前不是校园网";
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     developer.log(
       "Network error: $e",
       name: "ElectricSession",
@@ -47,6 +47,8 @@ Future<void> update() async {
 String electricityAccount() {
   RegExp numsExp = RegExp(r"[0-9]+");
   List<RegExpMatch> nums = numsExp.allMatches(user["dorm"]!).toList();
+  developer.log(user.toString(), name: "ElectricSession");
+  developer.log(nums.toString(), name: "ElectricSession");
   // 校区，默认南校区
   String accountA = "2";
   // 楼号
@@ -134,13 +136,14 @@ Future<void> updateInformation() async {
           options: Options(headers: {"Cookie": sessionId}))
       .then((value) => value.data);
 
-  int building = int.parse(account.substring(1, 4));
+  //int building = int.parse(account.substring(1, 4));
   RegExp name = RegExp(r"表名称：.*");
   RegExp data = RegExp(r"剩余量：.*");
 
   List<RegExpMatch> nameArray = name.allMatches(page).toList();
   List<RegExpMatch> dataArray = data.allMatches(page).toList();
 
+  //by ZCWzy
   for (int i = nameArray.length - 1; i >= 0; --i) {
     if (nameArray[i][0]!.contains("电表")) {
       electricityInfo.value = "${dataArray[i][0]!} 度";

@@ -97,7 +97,7 @@ class ScoreFile extends EhallSession {
             )
           );
           //print(anotherResponse.data);
-        } on DioError catch (e) {
+        } on DioException catch (e) {
           //print("WTF:" + e.toString());
           break;
         }
@@ -108,7 +108,7 @@ class ScoreFile extends EhallSession {
     } on GetScoreFailedException {
       developer.log("没有获取到成绩：$e", name: "ScoreSession");
       situation = "没有获取到成绩：$e";
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       developer.log("网络故障：$e", name: "ScoreSession");
       situation = "网络故障";
     } catch (e) {
