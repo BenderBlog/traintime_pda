@@ -257,7 +257,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                 children: [
                   Text(
                     "目前选中科目的学分 ${_evalCredit(false).toStringAsFixed(2)}\n"
-                    "均分 ${_evalAvg(false).toStringAsFixed(2)} GPA ${_evalAvg(false, isGPA: true).toStringAsFixed(1)}",
+                    "均分 ${_evalAvg(false).toStringAsFixed(2)} GPA ${_evalAvg(false, isGPA: true).toStringAsFixed(2)}",
                     textScaleFactor: 1.2,
                   ),
                   FloatingActionButton(
