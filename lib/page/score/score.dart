@@ -29,6 +29,10 @@ class _ScoreWindowState extends State<ScoreWindow> {
   Set<String> unPassedSet = {};
   double randomChoice = 0.0;
 
+  static const notFinish = "(成绩没登完)";
+  static const randomChoiceType = "公共任选";
+  static const notFirstTime = "(非初修通过)";
+
   bool isSelectMod = false;
   late List<bool> isSelected;
 
@@ -38,22 +42,30 @@ class _ScoreWindowState extends State<ScoreWindow> {
   /// Empty means all status.
   String chosenStatus = "";
 
+  bool _evalCount(Score eval) => !(eval.name.contains(notFinish) ||
+      (eval.score < 60 && !unPassedSet.contains(eval.name)) ||
+      (eval.name.contains(notFirstTime) && eval.score < 60));
+
   double _evalCredit(bool isAll) {
     double totalCredit = 0.0;
     for (var i = 0; i < isSelected.length; ++i) {
-      if ((isSelected[i] == true && isAll == false) || isAll == true) {
+      if (((isSelected[i] == true && isAll == false) || isAll == true) &&
+          _evalCount(scoreTable[i])) {
         totalCredit += scoreTable[i].credit;
       }
     }
     return totalCredit;
   }
 
-  double _evalAvgScore(bool isAll) {
+  /// [isGPA] true for the GPA, false for the avgScore
+  double _evalAvg(bool isAll, {bool isGPA = false}) {
     double totalScore = 0.0;
     double totalCredit = _evalCredit(isAll);
     for (var i = 0; i < isSelected.length; ++i) {
-      if ((isSelected[i] == true && isAll == false) || isAll == true) {
-        totalScore += scoreTable[i].score * scoreTable[i].credit;
+      if (((isSelected[i] == true && isAll == false) || isAll == true) &&
+          _evalCount(scoreTable[i])) {
+        totalScore += (isGPA ? scoreTable[i].gpa : scoreTable[i].score) *
+            scoreTable[i].credit;
       }
     }
     return totalCredit != 0 ? totalScore / totalCredit : 0.0;
@@ -85,12 +97,17 @@ class _ScoreWindowState extends State<ScoreWindow> {
     semester = {for (var i in scoreTable) i.year};
     statuses = {for (var i in scoreTable) i.status};
     for (var i in scoreTable) {
-      if (i.status == "公共任选") {
+      if (i.isPassed == "-1") {
+        i.name += notFinish;
+        continue;
+      }
+      if (i.status == randomChoiceType && i.isPassed == '1') {
         randomChoice += i.credit;
       }
-    }
-    for (var i in scoreTable) {
-      if (i.isPassed != '1' && i.isPassed != "-1") {
+      // Do not consider random choice.
+      if (i.isPassed != '1' &&
+          i.isPassed != "-1" &&
+          i.status != randomChoiceType) {
         unPassedSet.add(i.name);
       }
       if (unPassedSet.contains(i.name) && i.isPassed == "1") {
@@ -99,11 +116,8 @@ class _ScoreWindowState extends State<ScoreWindow> {
         /// Whatever score is, if not passed in the first time, count as 60.
         /// Please take a note of it.
         i.score = 60;
-        i.name += "(非初修通过)";
+        i.name += notFirstTime;
         unPassedSet.remove(i.name);
-      }
-      if (i.isPassed == "-1") {
-        i.name += "(成绩没登完)";
       }
     }
     isSelected = List<bool>.generate(scoreTable.length, (int index) => false);
@@ -243,7 +257,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                 children: [
                   Text(
                     "目前选中科目的学分 ${_evalCredit(false).toStringAsFixed(2)}\n"
-                    "目前选中科目的均分 ${_evalAvgScore(false).toStringAsFixed(2)}",
+                    "均分 ${_evalAvg(false).toStringAsFixed(2)} GPA ${_evalAvg(false, isGPA: true).toStringAsFixed(1)}",
                     textScaleFactor: 1.2,
                   ),
                   FloatingActionButton(
@@ -257,7 +271,8 @@ class _ScoreWindowState extends State<ScoreWindow> {
                         builder: (context) => AlertDialog(
                           title: const Text('小总结'),
                           content: Text(
-                              "所有科目的均分：${_evalAvgScore(true).toStringAsFixed(2)}\n"
+                              "所有科目的均分：${_evalAvg(true).toStringAsFixed(2)}\n"
+                              "所有科目的GPA: ${_evalAvg(true, isGPA: true).toStringAsFixed(2)}\n"
                               "所有科目的学分：${_evalCredit(true).toStringAsFixed(2)}\n"
                               "未通过科目：${unPassed()}\n"
                               "公共选修课已经修得学分：$randomChoice / 8.0\n"
@@ -342,16 +357,11 @@ class ScoreInfoCard extends StatelessWidget {
                     textScaleFactor: 0.9,
                   ),
                   Text(
-                    "等级：${toUse.level}",
-                    style: TextStyle(
-                      color: toUse.how == 1 || toUse.how == 2
-                          ? Colors.black
-                          : Colors.transparent,
-                    ),
+                    "GPA: ${toUse.gpa}",
                     textScaleFactor: 0.9,
                   ),
                   Text(
-                    "成绩：${toUse.score}",
+                    "成绩：${toUse.how == 1 || toUse.how == 2 ? toUse.level : toUse.score}",
                     textScaleFactor: 0.9,
                   )
                 ],

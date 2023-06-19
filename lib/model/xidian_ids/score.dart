@@ -38,4 +38,55 @@ class Score {
     this.scoreStructure,
     this.scoreDetail,
   });
+
+  double get gpa {
+    switch (how) {
+      case 1:
+        if (level == "优秀") {
+          return 4.0;
+        } else if (level == "通过") {
+          return 3.2;
+        } else {
+          return 0.0;
+        }
+      case 2:
+        if (level == "优秀") {
+          return 4.0;
+        } else if (level == "良好") {
+          return 3.8;
+        } else if (level == "中等") {
+          return 3.2;
+        } else if (level == "及格") {
+          return 2.4;
+        } else {
+          return 0.0;
+        }
+      default:
+        if (score >= 95) {
+          return 4.0;
+        } else if (score >= 90) {
+          return 3.9;
+        } else if (score >= 84) {
+          return 3.8;
+        } else if (score >= 80) {
+          return 3.6;
+        } else if (score >= 76) {
+          return 3.4;
+        } else if (score >= 73) {
+          return 3.2;
+        } else if (score >= 70) {
+          return 3.0;
+        } else if (score >= 67) {
+          return 2.7;
+        } else if (score >= 64) {
+          return 2.4;
+        } else if (score >= 62) {
+          return 2.2;
+        } else if (score >= 60) {
+          return 2.0;
+        } else {
+          return 0.0;
+        }
+    }
+  }
 }

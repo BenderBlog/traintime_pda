@@ -47,8 +47,6 @@ Future<void> update() async {
 String electricityAccount() {
   RegExp numsExp = RegExp(r"[0-9]+");
   List<RegExpMatch> nums = numsExp.allMatches(user["dorm"]!).toList();
-  developer.log(user.toString(), name: "ElectricSession");
-  developer.log(nums.toString(), name: "ElectricSession");
   // 校区，默认南校区
   String accountA = "2";
   // 楼号
@@ -147,6 +145,10 @@ Future<void> updateInformation() async {
   for (int i = nameArray.length - 1; i >= 0; --i) {
     if (nameArray[i][0]!.contains("电表")) {
       electricityInfo.value = "${dataArray[i][0]!} 度";
+      developer.log(
+        electricityInfo.value,
+        name: "ElectricSession",
+      );
       return;
     }
   }
