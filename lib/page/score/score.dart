@@ -174,98 +174,93 @@ class ScoreWindow extends StatelessWidget {
         bottom: dropDownButton,
       ),
       body: GetBuilder<ScoreController>(
-        builder: (c) => ListView.builder(
-          itemBuilder: (builder, index) {
-            return Column(
-              children: [
-                InkWell(
-                  onTap: () {
-                    if (c.isSelectMod) {
-                      c.isSelected[c.toShow[index].mark] =
-                          !c.isSelected[c.toShow[index].mark];
-                      c.update();
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: c.isSelectMod && c.isSelected[c.toShow[index].mark]
-                          ? Colors.yellow.shade100
-                          : Colors.white,
-                    ),
-                    child: ScoreInfoCard(toUse: c.toShow[index]),
-                  ),
-                ),
-              ],
-            );
-          },
-          itemCount: c.toShow.length,
-        ),
-      ),
+          builder: (c) => dataList<ScoreInfoCard, ScoreInfoCard>(
+              List.generate(
+                  c.toShow.length, (index) => ScoreInfoCard(index: index)),
+              (toUse) => toUse)),
       bottomNavigationBar: bottomInfo,
     );
   }
 }
 
 class ScoreInfoCard extends StatelessWidget {
-  final Score toUse;
-
-  const ScoreInfoCard({Key? key, required this.toUse}) : super(key: key);
+  final int index;
+  const ScoreInfoCard({super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width < 700
-              ? 10
-              : MediaQuery.of(context).size.width * 0.15,
-          vertical: 10,
-        ),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    toUse.name,
-                    textAlign: TextAlign.left,
-                    //textScaleFactor: 0.9,
-                  ),
-                  Row(
-                    children: [
-                      TagsBoxes(
-                        text: toUse.status,
-                        backgroundColor: Colors.blue,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "学期：${toUse.year}",
-                    textScaleFactor: 0.9,
-                  ),
-                  Text(
-                    "学分: ${toUse.credit}",
-                    textScaleFactor: 0.9,
-                  ),
-                  Text(
-                    "GPA: ${toUse.gpa}",
-                    textScaleFactor: 0.9,
-                  ),
-                  Text(
-                    "成绩：${toUse.how == 1 || toUse.how == 2 ? toUse.level : toUse.score}",
-                    textScaleFactor: 0.9,
-                  )
-                ],
-              ),
-            ],
+    return GetBuilder<ScoreController>(
+      builder: (c) => GestureDetector(
+        onTap: () {
+          if (c.isSelectMod) {
+            c.isSelected[c.toShow[index].mark] =
+                !c.isSelected[c.toShow[index].mark];
+            c.update();
+          }
+        },
+        child: Card(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 5,
           ),
-        ));
+          elevation: 0,
+          color: c.isSelectMod && c.isSelected[c.toShow[index].mark]
+              ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
+              : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      c.toShow[index].name,
+                      textScaleFactor: 1.1,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const Divider(
+                      color: Colors.transparent,
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        TagsBoxes(
+                          text: c.toShow[index].year,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 5),
+                        TagsBoxes(
+                          text: c.toShow[index].status,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                      color: Colors.transparent,
+                      height: 5,
+                    ),
+                    Text(
+                      "学分: ${c.toShow[index].credit}",
+                    ),
+                    Text(
+                      "GPA: ${c.toShow[index].gpa}",
+                    ),
+                    Text(
+                      "成绩：${c.toShow[index].how == 1 || c.toShow[index].how == 2 ? c.toShow[index].level : c.toShow[index].score}",
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
