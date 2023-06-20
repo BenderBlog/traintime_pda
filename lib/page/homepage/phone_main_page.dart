@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
@@ -12,6 +13,7 @@ import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {
+  final controller = Get.put(ScoreController());
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
 
@@ -94,9 +96,9 @@ class PhoneMainPage extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 2,
                 childAspectRatio: MediaQuery.of(context).size.width / 160,
-                children: const [
+                children: [
                   ScoreCard(),
-                  ExamCard(),
+                  const ExamCard(),
                 ],
               ),
             ),

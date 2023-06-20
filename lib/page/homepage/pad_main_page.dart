@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
@@ -12,6 +13,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 class PadMainPage extends StatelessWidget {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
+  final scoreController = Get.put(ScoreController());
 
   PadMainPage({super.key});
 
@@ -58,14 +60,14 @@ class PadMainPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.20 < 200
                 ? 200
                 : MediaQuery.of(context).size.width * 0.20,
-            child: const Column(
+            child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 100,
                   child: ElectricityCard(),
                 ),
                 ScoreCard(),
-                ExamCard(),
+                const ExamCard(),
               ],
             ),
           )

@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/score/score.dart';
-import 'package:watermeter/repository/xidian_ids/score_session.dart';
+import 'package:watermeter/controller/score_controller.dart';
 
 class ScoreCard extends StatelessWidget {
-  const ScoreCard({super.key});
+  ScoreCard({super.key});
+
+  final ScoreController c = ScoreController();
 
   @override
   Widget build(BuildContext context) {
-    if (situation == "" && scoreList.isEmpty) {
-      ScoreFile().getScore();
-    }
     return GestureDetector(
       onTap: () {
-        if (situation.isEmpty) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => ScoreWindow(scores: scoreList)));
-        } else if (situation == "正在加载") {
+        if (c.error == null) {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => ScoreWindow()));
+        } else if (c.error == "正在加载") {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
@@ -25,11 +24,15 @@ class ScoreCard extends StatelessWidget {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
-            content: Text("遇到错误，$situation"),
+            content: Text("遇到错误，${c.error}"),
           ));
         }
       },
-      onLongPress: ScoreFile().getScore,
+      onLongPress: () {
+        if (c.isGet) {
+          c.get();
+        }
+      },
       child: Card(
         elevation: 0,
         color: Theme.of(context).colorScheme.primaryContainer,

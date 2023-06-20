@@ -11,121 +11,148 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/controller/score_controller.dart';
 
-class ScoreWindow extends StatefulWidget {
-  final List<Score> scores;
-  const ScoreWindow({Key? key, required this.scores}) : super(key: key);
+class ScoreWindow extends StatelessWidget {
+  ScoreWindow({super.key});
 
-  @override
-  State<ScoreWindow> createState() => _ScoreWindowState();
-}
+  late final BuildContext context;
 
-class _ScoreWindowState extends State<ScoreWindow> {
-  late List<Score> scoreTable;
-  Set<String> semester = {};
-  Set<String> statuses = {};
-  Set<String> unPassedSet = {};
-  double randomChoice = 0.0;
+  Future<void> easterEgg() => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("For VB, are you agree?"),
+          content: Image.asset("assets/Humpy-Score.jpg"),
+          actions: [
+            TextButton(
+              child: const Text("确定"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
 
-  static const notFinish = "(成绩没登完)";
-  static const randomChoiceType = "公共任选";
-  static const notFirstTime = "(非初修通过)";
+  Future<void> scoreInfoDialog() => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('小总结'),
+          content: GetBuilder<ScoreController>(
+            builder: (c) => Text(
+                "所有科目的GPA：${c.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
+                "所有科目的均分：${c.evalAvg(true).toStringAsFixed(2)}\n"
+                "所有科目的学分：${c.evalCredit(true).toStringAsFixed(2)}\n"
+                "未通过科目：${c.unPassed}\n"
+                "公共选修课已经修得学分：${c.notCoreClass}\n"
+                "本程序提供的数据仅供参考，开发者对其准确性不负责"),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("确定"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
 
-  bool isSelectMod = false;
-  late List<bool> isSelected;
+  final Widget selectModeButton = GetBuilder<ScoreController>(
+    builder: (c) => IconButton(
+        icon: const Icon(Icons.calculate),
+        onPressed: () {
+          c.isSelectMod = !c.isSelectMod;
+          c.update();
+        }),
+  );
 
-  /// Empty means all semester.
-  String chosenSemester = "";
+  Widget get bottomInfo => GetBuilder<ScoreController>(
+        builder: (c) => Visibility(
+          visible: c.isSelectMod,
+          child: BottomAppBar(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "目前选中科目的学分 ${c.evalCredit(false).toStringAsFixed(2)}\n"
+                  "均分 ${c.evalAvg(false).toStringAsFixed(2)} GPA ${c.evalAvg(false, isGPA: true).toStringAsFixed(2)}",
+                  textScaleFactor: 1.2,
+                ),
+                FloatingActionButton(
+                  elevation: 0.0,
+                  highlightElevation: 0.0,
+                  focusElevation: 0.0,
+                  disabledElevation: 0.0,
+                  onPressed: () {
+                    scoreInfoDialog();
+                  },
+                  child: const Icon(
+                    Icons.panorama_fisheye,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 
-  /// Empty means all status.
-  String chosenStatus = "";
-
-  bool _evalCount(Score eval) => !(eval.name.contains(notFinish) ||
-      (eval.score < 60 && !unPassedSet.contains(eval.name)) ||
-      (eval.name.contains(notFirstTime) && eval.score < 60));
-
-  double _evalCredit(bool isAll) {
-    double totalCredit = 0.0;
-    for (var i = 0; i < isSelected.length; ++i) {
-      if (((isSelected[i] == true && isAll == false) || isAll == true) &&
-          _evalCount(scoreTable[i])) {
-        totalCredit += scoreTable[i].credit;
-      }
-    }
-    return totalCredit;
-  }
-
-  /// [isGPA] true for the GPA, false for the avgScore
-  double _evalAvg(bool isAll, {bool isGPA = false}) {
-    double totalScore = 0.0;
-    double totalCredit = _evalCredit(isAll);
-    for (var i = 0; i < isSelected.length; ++i) {
-      if (((isSelected[i] == true && isAll == false) || isAll == true) &&
-          _evalCount(scoreTable[i])) {
-        totalScore += (isGPA ? scoreTable[i].gpa : scoreTable[i].score) *
-            scoreTable[i].credit;
-      }
-    }
-    return totalCredit != 0 ? totalScore / totalCredit : 0.0;
-  }
-
-  List<Score> toShow() {
-    /// If I write "whatever = scores.scoreTable", every change I made to "whatever"
-    /// also applies to scores.scoreTable. Since reference whatsoever.
-    List<Score> whatever = List.from(scoreTable);
-    if (chosenSemester != "") {
-      whatever.removeWhere((element) => element.year != chosenSemester);
-    }
-    if (chosenStatus != "") {
-      whatever.removeWhere((element) => element.status != chosenStatus);
-    }
-    return whatever;
-  }
-
-  String unPassed() {
-    if (unPassedSet.isEmpty) {
-      return "没有";
-    }
-    return unPassedSet.join(",");
-  }
-
-  @override
-  void initState() {
-    scoreTable = widget.scores;
-    semester = {for (var i in scoreTable) i.year};
-    statuses = {for (var i in scoreTable) i.status};
-    for (var i in scoreTable) {
-      if (i.isPassed == "-1") {
-        i.name += notFinish;
-        continue;
-      }
-      if (i.status == randomChoiceType && i.isPassed == '1') {
-        randomChoice += i.credit;
-      }
-      // Do not consider random choice.
-      if (i.isPassed != '1' &&
-          i.isPassed != "-1" &&
-          i.status != randomChoiceType) {
-        unPassedSet.add(i.name);
-      }
-      if (unPassedSet.contains(i.name) && i.isPassed == "1") {
-        unPassedSet.remove(i.name);
-
-        /// Whatever score is, if not passed in the first time, count as 60.
-        /// Please take a note of it.
-        i.score = 60;
-        i.name += notFirstTime;
-        unPassedSet.remove(i.name);
-      }
-    }
-    isSelected = List<bool>.generate(scoreTable.length, (int index) => false);
-    super.initState();
-  }
+  final PreferredSizeWidget dropDownButton = PreferredSize(
+    preferredSize: const Size.fromHeight(40),
+    child: GetBuilder<ScoreController>(
+      builder: (c) => SizedBox(
+        height: 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            DropdownButton(
+              value: c.chosenSemester,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+              ),
+              underline: Container(
+                height: 2,
+              ),
+              items: [
+                const DropdownMenuItem(value: "", child: Text("所有学期")),
+                for (var i in c.semester)
+                  DropdownMenuItem(value: i, child: Text(i))
+              ],
+              onChanged: (String? value) {
+                c.chosenSemester = value!;
+                c.update();
+              },
+            ),
+            DropdownButton(
+              value: c.chosenStatus,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+              ),
+              underline: Container(
+                height: 2,
+              ),
+              items: [
+                const DropdownMenuItem(value: "", child: Text("所有类型")),
+                for (var i in c.statuses)
+                  DropdownMenuItem(value: i, child: Text(i))
+              ],
+              onChanged: (String? value) {
+                c.chosenStatus = value!;
+                c.update();
+              },
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
     return Scaffold(
       appBar: AppBar(
         title: const Text("成绩查询"),
@@ -136,175 +163,46 @@ class _ScoreWindowState extends State<ScoreWindow> {
           },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calculate),
-            onPressed: () {
-              setState(() {
-                isSelectMod = !isSelectMod;
-
-                /// Do not remember anything when quit calculating.
-                if (!isSelectMod) {
-                  for (var i = isSelected.length - 1; i >= 0; --i) {
-                    isSelected[i] = false;
-                  }
-                }
-              });
-            },
-          ),
+          selectModeButton,
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                        title: const Text("For VB, are you agree?"),
-                        content: Image.asset("assets/Humpy-Score.jpg"),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text("确定"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ));
+              easterEgg();
             },
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        bottom: dropDownButton,
+      ),
+      body: GetBuilder<ScoreController>(
+        builder: (c) => ListView.builder(
+          itemBuilder: (builder, index) {
+            return Column(
               children: [
-                DropdownButton(
-                  value: chosenSemester,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                  ),
-                  underline: Container(
-                    height: 2,
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: "", child: Text("所有学期")),
-                    for (var i in semester)
-                      DropdownMenuItem(value: i, child: Text(i))
-                  ],
-                  onChanged: (String? value) {
-                    setState(() {
-                      chosenSemester = value!;
-                    });
+                InkWell(
+                  onTap: () {
+                    if (c.isSelectMod) {
+                      c.isSelected[c.toShow[index].mark] =
+                          !c.isSelected[c.toShow[index].mark];
+                      c.update();
+                    }
                   },
-                ),
-                DropdownButton(
-                  value: chosenStatus,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: c.isSelectMod && c.isSelected[c.toShow[index].mark]
+                          ? Colors.yellow.shade100
+                          : Colors.white,
+                    ),
+                    child: ScoreInfoCard(toUse: c.toShow[index]),
                   ),
-                  underline: Container(
-                    height: 2,
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: "", child: Text("所有类型")),
-                    for (var i in statuses)
-                      DropdownMenuItem(value: i, child: Text(i))
-                  ],
-                  onChanged: (String? value) {
-                    setState(
-                      () {
-                        chosenStatus = value!;
-                      },
-                    );
-                  },
                 ),
               ],
-            ),
-          ),
+            );
+          },
+          itemCount: c.toShow.length,
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (builder, index) {
-                return Column(
-                  children: [
-                    InkWell(
-                        onTap: () => setState(() {
-                              if (isSelectMod) {
-                                isSelected[toShow()[index].mark] =
-                                    !isSelected[toShow()[index].mark];
-                              }
-                            }),
-                        child: Container(
-                          decoration:
-                              BoxDecoration(color: _getColor(toShow()[index])),
-                          child: ScoreInfoCard(toUse: toShow()[index]),
-                        )),
-                  ],
-                );
-              },
-              itemCount: toShow().length,
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: isSelectMod
-          ? BottomAppBar(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "目前选中科目的学分 ${_evalCredit(false).toStringAsFixed(2)}\n"
-                    "均分 ${_evalAvg(false).toStringAsFixed(2)} GPA ${_evalAvg(false, isGPA: true).toStringAsFixed(2)}",
-                    textScaleFactor: 1.2,
-                  ),
-                  FloatingActionButton(
-                    elevation: 0.0,
-                    highlightElevation: 0.0,
-                    focusElevation: 0.0,
-                    disabledElevation: 0.0,
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('小总结'),
-                          content: Text(
-                              "所有科目的均分：${_evalAvg(true).toStringAsFixed(2)}\n"
-                              "所有科目的GPA: ${_evalAvg(true, isGPA: true).toStringAsFixed(2)}\n"
-                              "所有科目的学分：${_evalCredit(true).toStringAsFixed(2)}\n"
-                              "未通过科目：${unPassed()}\n"
-                              "公共选修课已经修得学分：$randomChoice / 8.0\n"
-                              "本程序提供的数据仅供参考，开发者对其准确性不负责"),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text("确定"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    child: const Icon(
-                      Icons.panorama_fisheye,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : null,
+      bottomNavigationBar: bottomInfo,
     );
-  }
-
-  Color _getColor(Score data) {
-    if (isSelectMod && isSelected[data.mark]) {
-      return Colors.yellow.shade100;
-    } else {
-      return Colors.white;
-    }
   }
 }
 
