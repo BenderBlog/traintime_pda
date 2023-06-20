@@ -225,7 +225,7 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('关于本软件'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: const Text('Developed by BenderBlog'),
+                title: const Text('Developed by BenderBlog Rodriguez'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://legacy.superbart.xyz/"),
                   mode: LaunchMode.externalApplication,

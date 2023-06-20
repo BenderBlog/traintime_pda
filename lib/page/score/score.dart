@@ -12,7 +12,6 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
