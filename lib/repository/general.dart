@@ -12,6 +12,9 @@ if you want to use.
 */
 
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:alice_lightweight/alice.dart';
+
+Alice alice = Alice();
 
 /// Will be initialized at the beginning of the program.
 late PersistCookieJar SportCookieJar;

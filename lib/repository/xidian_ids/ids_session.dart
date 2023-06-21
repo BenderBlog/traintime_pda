@@ -58,21 +58,19 @@ class IDSSession {
   ];
 
   @protected
-  Dio get dio {
-    Dio toReturn = Dio(BaseOptions(
-      contentType: Headers.formUrlEncodedContentType,
-      headers: {
-        HttpHeaders.userAgentHeader:
-            "Mozilla/5.0 (Linux; Android 11; KB2000 Build/RP1A.201005.001; wv)"
-                "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99"
-                "XWEB/3263 MMWEBSDK/20211001 Mobile Safari/537.36 MMWEBID/3667"
-                "MicroMessenger/8.0.16.2040(0x28001037) Process/toolsmp WeChat/arm64"
-                "Weixin NetType/WIFI Language/zh_CN ABI/arm64"
-      },
-    ));
-    toReturn.interceptors.add(CookieManager(IDSCookieJar));
-    return toReturn;
-  }
+  Dio dio = Dio(BaseOptions(
+    contentType: Headers.formUrlEncodedContentType,
+    headers: {
+      HttpHeaders.userAgentHeader:
+          "Mozilla/5.0 (Linux; Android 11; KB2000 Build/RP1A.201005.001; wv)"
+              "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99"
+              "XWEB/3263 MMWEBSDK/20211001 Mobile Safari/537.36 MMWEBID/3667"
+              "MicroMessenger/8.0.16.2040(0x28001037) Process/toolsmp WeChat/arm64"
+              "Weixin NetType/WIFI Language/zh_CN ABI/arm64"
+    },
+  ))
+    ..interceptors.add(CookieManager(IDSCookieJar))
+    ..interceptors.add(alice.getDioInterceptor());
 
   Future<bool> isLoggedIn() async {
     var response =

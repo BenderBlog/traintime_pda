@@ -209,7 +209,9 @@ class _LoginWindowState extends State<LoginWindow> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  alice.showInspector();
+                },
               )
             ],
           )

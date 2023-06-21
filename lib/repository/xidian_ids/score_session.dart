@@ -14,8 +14,11 @@ Thanks xidian-script and libxdauth!
 
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:dio/dio.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+
+import '../../model/user.dart';
 
 /// 考试成绩 4768574631264620
 class ScoreFile extends EhallSession {
@@ -71,30 +74,24 @@ class ScoreFile extends EhallSession {
           classID: i["JXBID"],
           isPassed: i["SFJG"] ?? "-1"));
       j++;
-      /* //Unable to work.
+      /*
+      //Unable to work.
       if (i["DJCJLXDM"] == "100") {
         try {
           var anotherResponse = await dio.post(
               "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkxkgcxlrcj.do",
               data: {
-                "JXBID": scoreTable.last.classID,
+                "JXBID": i["JXBID"],
                 'XH': user["idsAccount"],
-                'XNXQDM':scoreTable.last.year,
-                'CKLY': "1",
-              },
-            options: Options(
-              headers: {
-                "DNT": "1",
-                "Referer": firstPost
-              },
-            )
-          );
-          //print(anotherResponse.data);
+                'XNXQDM': i["XNXQDM"],
+              });
+          developer.log(anotherResponse.data);
         } on DioException catch (e) {
-          //print("WTF:" + e.toString());
-          break;
+          developer.log("WTF: $e");
+          continue;
         }
-      }*/
+      }
+      */
     }
     return toReturn;
   }

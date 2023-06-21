@@ -164,6 +164,10 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('缓存登录设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
+                title: const Text("Alice 网络拦截器"),
+                onPressed: (context) => alice.showInspector(),
+              ),
+              SettingsTile.navigation(
                 title: const Text('清除 Cookie'),
                 onPressed: (context) async {
                   try {

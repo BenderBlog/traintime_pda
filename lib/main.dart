@@ -71,6 +71,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
+        navigatorKey: alice.getNavigatorKey(),
         title: 'WaterMeter Pre-Alpha',
         theme: c.apptheme,
         home: widget.isFirst ? const LoginWindow() : const HomePage(),
