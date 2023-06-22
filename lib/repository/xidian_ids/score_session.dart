@@ -14,11 +14,8 @@ Thanks xidian-script and libxdauth!
 
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:dio/dio.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-
-import '../../model/user.dart';
 
 /// 考试成绩 4768574631264620
 class ScoreFile extends EhallSession {
