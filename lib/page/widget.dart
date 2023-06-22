@@ -36,7 +36,7 @@ class TagsBoxes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
+      padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: const BorderRadius.all(Radius.circular(9)),

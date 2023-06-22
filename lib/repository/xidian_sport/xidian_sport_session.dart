@@ -93,7 +93,9 @@ Future<Map<String, dynamic>> require({
 }
 
 Future<void> login() async {
-  if (user["idsAccount"] == null || user["sportPassword"] == "") {
+  if (user["idsAccount"] == null ||
+      user["sportPassword"] == "" ||
+      user["sportPassword"] == null) {
     throw NoPasswordException();
   }
   if (userId != "") {

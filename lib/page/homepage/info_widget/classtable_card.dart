@@ -33,7 +33,7 @@ class ClassTableCard extends StatelessWidget {
         },
         child: MainPageCard(
           height: 135,
-          icon: Icons.calendar_month_outlined,
+          icon: Icons.access_time_filled,
           text: c.isGet == true
               ? c.isNext == null
                   ? "课程表"
