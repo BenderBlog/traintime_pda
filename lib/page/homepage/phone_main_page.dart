@@ -61,32 +61,11 @@ class PhoneMainPage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.025),
-                  child: SizedBox(
-                    height: classCardHeight,
-                    child: const ClassTableCard(),
-                  ),
-                ),
+                const ClassTableCard(),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025),
-              child: AspectRatio(
-                aspectRatio: MediaQuery.of(context).size.width / 260,
-                child: const SportCard(),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025),
-              child: AspectRatio(
-                aspectRatio: MediaQuery.of(context).size.width / 100,
-                child: const ElectricityCard(),
-              ),
-            ),
+            const SportCard(),
+            const ElectricityCard(),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),
