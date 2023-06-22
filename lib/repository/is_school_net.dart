@@ -10,20 +10,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 
-The service is provided by xidian ruisi (ylwind).
+The service is provided by xidian open source community.
 */
 
 import 'package:dio/dio.dart';
 
 Future<bool> isInSchool() async {
-  Dio dio = Dio();
-  String ip = await dio
-      .head("http://202.117.119.3:34898")
-      .then((value) => value.headers["ip"]![0])
-      .onError((error, stackTrace) {
-    return "255.255.255.255";
-  });
-  bool isInSchool = ip.split('.')[0] == "10";
+  bool isInSchool = false;
+  Dio dio = Dio()..options.connectTimeout = const Duration(milliseconds: 2000);
+  await dio
+      .get("http://linux.xidian.edu.cn")
+      .then((value) => isInSchool = true)
+      .onError((error, stackTrace) => isInSchool = false);
   return isInSchool;
 }
 
