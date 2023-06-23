@@ -84,6 +84,11 @@ class ScoreController extends GetxController {
     return unPassedSet.join(",");
   }
 
+  // ignore: non_constant_identifier_names
+  Future<Compose> getDetail(String JXBID, String XNXQDM) async {
+    return await ScoreFile().getDetail(JXBID, XNXQDM);
+  }
+
   @override
   void onInit() {
     currentSemester = user["currentSemester"]!;

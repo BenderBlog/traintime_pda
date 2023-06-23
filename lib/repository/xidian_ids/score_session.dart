@@ -14,11 +14,86 @@ Thanks xidian-script and libxdauth!
 
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 考试成绩 4768574631264620
 class ScoreFile extends EhallSession {
+  /// [JXBID] 教学班ID
+  /// [XNXQDM] 学年学期代码
+  // ignore: non_constant_identifier_names
+  Future<Compose> getDetail(String JXBID, String XNXQDM) async {
+    Compose toReturn = Compose();
+
+    /// Detail of your score, may not exist.
+    var response = await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
+        data: {
+          "JXBID": JXBID,
+          'XH': user["idsAccount"],
+          'XNXQDM': XNXQDM,
+          'CKLY': 1
+        }).then((value) => value.data);
+
+    if (response["datas"]["cxkckgcxlrcj"]["rows"][0]["GCXKHLRCJGS"] != null) {
+      List<String> formula = response["datas"]["cxkckgcxlrcj"]["rows"][0]
+              ["GCXKHLRCJGS"]
+          .toString()
+          .split(RegExp(r'( \+ |\*| = )'));
+      List<String> detailList = response["datas"]["cxkckgcxlrcj"]["rows"][0]
+              ["KCGCXKHLRCJ"]
+          .toString()
+          .split(RegExp(r','));
+      Map<String, String> detail = {
+        for (var v in detailList) v.split(':')[0]: v.split(':')[1]
+      };
+      developer.log("Formula: $formula");
+      developer.log("Detail: $detail");
+      int i = 0;
+      while (i < formula.length) {
+        if (formula[i] == "总评成绩") {
+          i++;
+          continue;
+        }
+        toReturn.score.add(ComposeDetail(
+            content: formula[i],
+            ratio: "${double.parse(formula[i + 1]) * 100}%",
+            score: detail[formula[i]] ?? '未登记'));
+        i += 2;
+      }
+    }
+
+    return toReturn;
+
+    //return toReturn;
+    /*
+    /// Highest, average, lowest score.
+    await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
+        data: {
+          "JXBID": JXBID,
+          'XH': user["idsAccount"],
+          'XNXQDM': XNXQDM,
+          'CKLY': 1
+        }).then(
+      (value) => developer.log(value.toString()),
+    );
+
+    ///
+    await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
+        data: {
+          "JXBID": JXBID,
+          'XH': user["idsAccount"],
+          'XNXQDM': XNXQDM,
+          'CKLY': 1
+        }).then(
+      (value) => developer.log(value.toString()),
+    );
+    */
+  }
+
   Future<List<Score>> get() async {
     List<Score> toReturn = [];
 

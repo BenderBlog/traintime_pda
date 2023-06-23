@@ -10,6 +10,18 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+class ComposeDetail {
+  String content;
+  String ratio;
+  String score;
+  ComposeDetail(
+      {required this.content, required this.ratio, required this.score});
+}
+
+class Compose {
+  List<ComposeDetail> score = [];
+}
+
 class Score {
   int mark; // 编号，用于某种计算，从 0 开始
   String name; // 学科名称

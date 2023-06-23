@@ -12,6 +12,7 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
@@ -190,11 +191,20 @@ class ScoreInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<ScoreController>(
       builder: (c) => GestureDetector(
-        onTap: () {
+        onTap: () async {
           if (c.isSelectMod) {
             c.isSelected[c.toShow[index].mark] =
                 !c.isSelected[c.toShow[index].mark];
             c.update();
+          } else {
+            showModalBottomSheet(
+              builder: (((context) {
+                return ScoreComposeCard(
+                  score: c.toShow[index],
+                );
+              })),
+              context: context,
+            );
           }
         },
         child: Card(
@@ -259,6 +269,157 @@ class ScoreInfoCard extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ScoreComposeCard extends StatelessWidget {
+  final Score score;
+  const ScoreComposeCard({
+    super.key,
+    required this.score,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Card(
+        margin: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 10,
+        ),
+        elevation: 0,
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Card(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
+              elevation: 0,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              child: GetBuilder<ScoreController>(
+                builder: (c) => FutureBuilder<Compose>(
+                  future: c.getDetail(score.classID!, score.year),
+                  builder: (context, snapshot) {
+                    List<Widget> infomation = [];
+                    if (snapshot.hasData) {
+                      if (snapshot.data == null ||
+                          snapshot.data!.score.isEmpty) {
+                        infomation.add(const InfoDetailBox(
+                            child: Center(child: Text("未提供详情信息"))));
+                      } else {
+                        for (var i in snapshot.data!.score) {
+                          infomation.add(
+                            Wrap(
+                              direction: Axis.horizontal,
+                              alignment: WrapAlignment.spaceBetween,
+                              children: [
+                                Text(i.content),
+                                Text(i.ratio),
+                                Text(i.score),
+                              ],
+                            ),
+                          );
+                        }
+                      }
+                    } else if (snapshot.hasError) {
+                      infomation.add(const InfoDetailBox(
+                          child: Center(child: Text("未获取详情信息"))));
+                    } else {
+                      infomation.add(const InfoDetailBox(
+                          child: Center(child: Text("正在获取"))));
+                    }
+                    return Container(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                score.name,
+                                textScaleFactor: 1.1,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              const Divider(
+                                color: Colors.transparent,
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  TagsBoxes(
+                                    text: score.year,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  TagsBoxes(
+                                    text: score.status,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ],
+                              ),
+                              const Divider(
+                                color: Colors.transparent,
+                                height: 5,
+                              ),
+                              Text(
+                                "学分: ${score.credit}",
+                              ),
+                              Text(
+                                "GPA: ${score.gpa}",
+                              ),
+                              Text(
+                                "成绩：${score.how == 1 || score.how == 2 ? "${score.level}(${score.score})" : score.score}",
+                              ),
+                              ListView.separated(
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        const SizedBox(height: 10),
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: infomation.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) =>
+                                    infomation[index],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class InfoDetailBox extends StatelessWidget {
+  final Widget child;
+  const InfoDetailBox({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        child: child,
       ),
     );
   }
