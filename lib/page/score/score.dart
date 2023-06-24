@@ -191,7 +191,7 @@ class ScoreInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<ScoreController>(
       builder: (c) => GestureDetector(
-        onTap: () async {
+        onTap: () {
           if (c.isSelectMod) {
             c.isSelected[c.toShow[index].mark] =
                 !c.isSelected[c.toShow[index].mark];
@@ -290,48 +290,57 @@ class ScoreComposeCard extends StatelessWidget {
           vertical: 10,
         ),
         elevation: 0,
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Card(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
               elevation: 0,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               child: GetBuilder<ScoreController>(
                 builder: (c) => FutureBuilder<Compose>(
                   future: c.getDetail(score.classID!, score.year),
                   builder: (context, snapshot) {
-                    List<Widget> infomation = [];
+                    late Widget info;
                     if (snapshot.hasData) {
                       if (snapshot.data == null ||
                           snapshot.data!.score.isEmpty) {
-                        infomation.add(const InfoDetailBox(
-                            child: Center(child: Text("未提供详情信息"))));
+                        info = const InfoDetailBox(
+                            child: Center(child: Text("未提供详情信息")));
                       } else {
-                        for (var i in snapshot.data!.score) {
-                          infomation.add(
-                            Wrap(
-                              direction: Axis.horizontal,
-                              alignment: WrapAlignment.spaceBetween,
-                              children: [
-                                Text(i.content),
-                                Text(i.ratio),
-                                Text(i.score),
-                              ],
-                            ),
-                          );
-                        }
+                        info = InfoDetailBox(
+                          child: Table(
+                            children: [
+                              for (var i in snapshot.data!.score)
+                                TableRow(
+                                  children: <Widget>[
+                                    TableCell(
+                                      child: Text(i.content),
+                                    ),
+                                    TableCell(
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(i.ratio),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(i.score),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        );
                       }
                     } else if (snapshot.hasError) {
-                      infomation.add(const InfoDetailBox(
-                          child: Center(child: Text("未获取详情信息"))));
+                      info = const InfoDetailBox(
+                          child: Center(child: Text("未获取详情信息")));
                     } else {
-                      infomation.add(const InfoDetailBox(
-                          child: Center(child: Text("正在获取"))));
+                      info = const InfoDetailBox(
+                          child: Center(child: Text("正在获取")));
                     }
                     return Container(
                       padding: const EdgeInsets.all(15),
@@ -380,15 +389,9 @@ class ScoreComposeCard extends StatelessWidget {
                               Text(
                                 "成绩：${score.how == 1 || score.how == 2 ? "${score.level}(${score.score})" : score.score}",
                               ),
-                              ListView.separated(
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        const SizedBox(height: 10),
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: infomation.length,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) =>
-                                    infomation[index],
+                              Card(
+                                elevation: 0,
+                                child: info,
                               ),
                             ],
                           ),
@@ -418,7 +421,7 @@ class InfoDetailBox extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Container(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(8),
         child: child,
       ),
     );

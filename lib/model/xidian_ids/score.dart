@@ -10,12 +10,33 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+class ScoreStatistics {
+  String level;
+  int people;
+  ScoreStatistics({
+    required this.level,
+    required this.people,
+  });
+}
+
+class ScorePlace {
+  int? place;
+  int? total;
+  double? highest;
+  double? lowest;
+  double? average;
+  List<ScoreStatistics> statistics = [];
+}
+
 class ComposeDetail {
   String content;
   String ratio;
   String score;
-  ComposeDetail(
-      {required this.content, required this.ratio, required this.score});
+  ComposeDetail({
+    required this.content,
+    required this.ratio,
+    required this.score,
+  });
 }
 
 class Compose {
@@ -33,6 +54,7 @@ class Score {
   int how; // 评分方式
   String? level; // 等级
   String? classID; // 教学班序列号
+  String? courseID;
   String? scoreStructure; //成绩构成
   String? scoreDetail; //分项成绩
   String isPassed; //是否及格
@@ -47,6 +69,7 @@ class Score {
     required this.how,
     this.level,
     this.classID,
+    this.courseID,
     this.scoreStructure,
     this.scoreDetail,
   });

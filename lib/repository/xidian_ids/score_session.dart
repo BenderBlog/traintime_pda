@@ -22,11 +22,10 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 class ScoreFile extends EhallSession {
   /// [JXBID] 教学班ID
   /// [XNXQDM] 学年学期代码
+  /// This function gets the composement of the score.
   // ignore: non_constant_identifier_names
   Future<Compose> getDetail(String JXBID, String XNXQDM) async {
     Compose toReturn = Compose();
-
-    /// Detail of your score, may not exist.
     var response = await dio.post(
         "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
         data: {
@@ -48,8 +47,6 @@ class ScoreFile extends EhallSession {
       Map<String, String> detail = {
         for (var v in detailList) v.split(':')[0]: v.split(':')[1]
       };
-      developer.log("Formula: $formula");
-      developer.log("Detail: $detail");
       int i = 0;
       while (i < formula.length) {
         if (formula[i] == "总评成绩") {
@@ -65,33 +62,117 @@ class ScoreFile extends EhallSession {
     }
 
     return toReturn;
+  }
 
-    //return toReturn;
-    /*
-    /// Highest, average, lowest score.
+  /// [KCH] 学科ID
+  /// [XNXQDM] 学年学期代码
+  /// This function gets the place of your score in class.
+  // ignore: non_constant_identifier_names
+  Future<ScorePlace> getPlaceInGrade(String KCH, String XNXQDM) async {
+    ScorePlace data = ScorePlace();
+
+    /// Place in the class.
+    await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
+        data: {
+          'XH': user["idsAccount"],
+          'JXBID': '*',
+          'XNXQDM': XNXQDM,
+          'KCH': KCH,
+          'TJLX': "02"
+        }).then((value) {
+      data.place = int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"]);
+      data.total =
+          int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"]);
+    });
+
+    /// Highest, lowest, average score of the grade.
+    await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
+        data: {
+          "JXBID": '*',
+          'XNXQDM': XNXQDM,
+          'KCH': KCH,
+          'TJLX': "02"
+        }).then((value) {
+      data.highest =
+          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"]);
+      data.lowest =
+          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"]);
+      data.average =
+          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"]);
+    });
+
+    await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
+        data: {
+          "JXBID": '*',
+          'XNXQDM': XNXQDM,
+          'KCH': KCH,
+          'TJLX': "02",
+          '*order': '+DJDM',
+        }).then((value) {
+      for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
+        data.statistics.add(
+            ScoreStatistics(level: i["DJDM"], people: int.parse(i["DJSL"])));
+      }
+    });
+
+    return data;
+  }
+
+  /// [JXBID] 教学班ID
+  /// [XNXQDM] 学年学期代码
+  /// This function gets the place of your score in class.
+  // ignore: non_constant_identifier_names
+  Future<ScorePlace> getPlaceInClass(String JXBID, String XNXQDM) async {
+    ScorePlace data = ScorePlace();
+
+    /// Place in the class.
+    await dio.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
+        data: {
+          'XH': user["idsAccount"],
+          'JXBID': JXBID,
+          'XNXQDM': XNXQDM,
+          'TJLX': "01"
+        }).then((value) {
+      data.place = int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"]);
+      data.total =
+          int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"]);
+    });
+
+    /// Highest, lowest, average score of the grade.
     await dio.post(
         "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
         data: {
           "JXBID": JXBID,
-          'XH': user["idsAccount"],
           'XNXQDM': XNXQDM,
-          'CKLY': 1
-        }).then(
-      (value) => developer.log(value.toString()),
-    );
+          'TJLX': "01",
+        }).then((value) {
+      data.highest =
+          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"]);
+      data.lowest =
+          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"]);
+      data.average =
+          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"]);
+    });
 
-    ///
     await dio.post(
         "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
         data: {
           "JXBID": JXBID,
-          'XH': user["idsAccount"],
           'XNXQDM': XNXQDM,
-          'CKLY': 1
-        }).then(
-      (value) => developer.log(value.toString()),
-    );
-    */
+          'TJLX': "01",
+          '*order': '+DJDM',
+        }).then((value) {
+      for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
+        data.statistics.add(
+            ScoreStatistics(level: i["DJDM"], people: int.parse(i["DJSL"])));
+      }
+    });
+
+    return data;
   }
 
   Future<List<Score>> get() async {
@@ -144,26 +225,9 @@ class ScoreFile extends EhallSession {
               ? i["DJCJMC"]
               : null,
           classID: i["JXBID"],
+          courseID: i["KCH"],
           isPassed: i["SFJG"] ?? "-1"));
       j++;
-      /*
-      //Unable to work.
-      if (i["DJCJLXDM"] == "100") {
-        try {
-          var anotherResponse = await dio.post(
-              "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkxkgcxlrcj.do",
-              data: {
-                "JXBID": i["JXBID"],
-                'XH': user["idsAccount"],
-                'XNXQDM': i["XNXQDM"],
-              });
-          developer.log(anotherResponse.data);
-        } on DioException catch (e) {
-          developer.log("WTF: $e");
-          continue;
-        }
-      }
-      */
     }
     return toReturn;
   }
