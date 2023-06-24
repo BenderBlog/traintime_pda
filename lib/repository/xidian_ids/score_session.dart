@@ -71,7 +71,7 @@ class ScoreFile extends EhallSession {
   Future<ScorePlace> getPlaceInGrade(String KCH, String XNXQDM) async {
     ScorePlace data = ScorePlace();
 
-    /// Place in the class.
+    /// Place in the grade.
     await dio.post(
         "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
         data: {
@@ -81,9 +81,10 @@ class ScoreFile extends EhallSession {
           'KCH': KCH,
           'TJLX': "02"
         }).then((value) {
-      data.place = int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"]);
-      data.total =
-          int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"]);
+      if (value.data["datas"]["jxbxspmcx"]["totalSize"] != 0) {
+        data.place = value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"];
+        data.total = value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"];
+      }
     });
 
     /// Highest, lowest, average score of the grade.
@@ -95,12 +96,11 @@ class ScoreFile extends EhallSession {
           'KCH': KCH,
           'TJLX': "02"
         }).then((value) {
-      data.highest =
-          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"]);
-      data.lowest =
-          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"]);
-      data.average =
-          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"]);
+      if (value.data["datas"]["jxbcjtjcx"]["totalSize"] != 0) {
+        data.highest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"];
+        data.lowest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"];
+        data.average = value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"];
+      }
     });
 
     await dio.post(
@@ -113,8 +113,8 @@ class ScoreFile extends EhallSession {
           '*order': '+DJDM',
         }).then((value) {
       for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
-        data.statistics.add(
-            ScoreStatistics(level: i["DJDM"], people: int.parse(i["DJSL"])));
+        data.statistics
+            .add(ScoreStatistics(level: i["DJDM"], people: i["DJSL"]));
       }
     });
 
@@ -137,9 +137,10 @@ class ScoreFile extends EhallSession {
           'XNXQDM': XNXQDM,
           'TJLX': "01"
         }).then((value) {
-      data.place = int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"]);
-      data.total =
-          int.parse(value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"]);
+      if (value.data["datas"]["jxbxspmcx"]["totalSize"] != 0) {
+        data.place = value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"];
+        data.total = value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"];
+      }
     });
 
     /// Highest, lowest, average score of the grade.
@@ -150,12 +151,11 @@ class ScoreFile extends EhallSession {
           'XNXQDM': XNXQDM,
           'TJLX': "01",
         }).then((value) {
-      data.highest =
-          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"]);
-      data.lowest =
-          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"]);
-      data.average =
-          double.parse(value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"]);
+      if (value.data["datas"]["jxbcjtjcx"]["totalSize"] != 0) {
+        data.highest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"];
+        data.lowest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"];
+        data.average = value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"];
+      }
     });
 
     await dio.post(
@@ -167,8 +167,8 @@ class ScoreFile extends EhallSession {
           '*order': '+DJDM',
         }).then((value) {
       for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
-        data.statistics.add(
-            ScoreStatistics(level: i["DJDM"], people: int.parse(i["DJSL"])));
+        data.statistics
+            .add(ScoreStatistics(level: i["DJDM"], people: i["DJSL"]));
       }
     });
 

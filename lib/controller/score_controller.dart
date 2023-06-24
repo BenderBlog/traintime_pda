@@ -18,6 +18,8 @@ class ScoreController extends GetxController {
   Set<String> unPassedSet = {};
   double notCoreClass = 0.0;
 
+  bool allowDetail = false;
+
   static const notFinish = "(成绩没登完)";
   static const notCoreClassType = "公共任选";
   static const notFirstTime = "(非初修)";
@@ -85,8 +87,30 @@ class ScoreController extends GetxController {
   }
 
   // ignore: non_constant_identifier_names
-  Future<Compose> getDetail(String JXBID, String XNXQDM) async {
-    return await ScoreFile().getDetail(JXBID, XNXQDM);
+  Future<Compose> getDetail(String? JXBID, String XNXQDM) async {
+    if (JXBID == null) {
+      return Compose();
+    } else {
+      return await ScoreFile().getDetail(JXBID, XNXQDM);
+    }
+  }
+
+  // ignore: non_constant_identifier_names
+  Future<ScorePlace> getPlaceInClass(String? JXBID, String XNXQDM) async {
+    if (JXBID == null) {
+      return ScorePlace();
+    } else {
+      return await ScoreFile().getPlaceInClass(JXBID, XNXQDM);
+    }
+  }
+
+  // ignore: non_constant_identifier_names
+  Future<ScorePlace> getPlaceInGrade(String? KCM, String XNXQDM) async {
+    if (KCM == null) {
+      return ScorePlace();
+    } else {
+      return await ScoreFile().getPlaceInGrade(KCM, XNXQDM);
+    }
   }
 
   @override
