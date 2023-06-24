@@ -114,7 +114,7 @@ class ScoreFile extends EhallSession {
         }).then((value) {
       for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
         data.statistics
-            .add(ScoreStatistics(level: i["DJDM"], people: i["DJSL"]));
+            .add(ScoreStatistics(level: i["DJDM_DISPLAY"], people: i["DJSL"]));
       }
     });
 
@@ -168,7 +168,7 @@ class ScoreFile extends EhallSession {
         }).then((value) {
       for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
         data.statistics
-            .add(ScoreStatistics(level: i["DJDM"], people: i["DJSL"]));
+            .add(ScoreStatistics(level: i["DJDM_DISPLAY"], people: i["DJSL"]));
       }
     });
 

@@ -264,6 +264,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.6.5"
+  graphic:
+    dependency: "direct main"
+    description:
+      name: graphic
+      sha256: "5eebd9a45af4a0a72fa47498e4b8df6a9afde3c59be7cac56e08985ec7be4382"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.2.0"
   html:
     dependency: transitive
     description:

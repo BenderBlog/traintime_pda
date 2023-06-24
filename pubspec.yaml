@@ -51,6 +51,7 @@ dependencies:
   auto_size_text: ^3.0.0
   alice_lightweight: ^3.4.0 # Internet Inscripter
   async: ^2.10.0 # For AsyncMemoizer
+  graphic: ^2.2.0
   get:
 
   flutter:

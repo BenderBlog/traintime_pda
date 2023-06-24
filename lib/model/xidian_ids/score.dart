@@ -10,6 +10,8 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:math' as math;
+
 class ScoreStatistics {
   String level;
   int people;
@@ -25,6 +27,14 @@ class ScorePlace {
   double? highest;
   double? lowest;
   double? average;
+  List<double> get people => List.generate(
+      statistics.length, (index) => statistics[index].people.toDouble());
+  List<String> get levels =>
+      List.generate(statistics.length, (index) => statistics[index].level);
+  double get maxOfPeople =>
+      List.generate(statistics.length, (index) => statistics[index].people)
+          .reduce((v, e) => math.max(v, e))
+          .toDouble();
   List<ScoreStatistics> statistics = [];
 }
 
