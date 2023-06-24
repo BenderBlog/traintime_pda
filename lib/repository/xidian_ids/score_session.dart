@@ -64,23 +64,18 @@ class ScoreFile extends EhallSession {
     return toReturn;
   }
 
-  /// [KCH] 学科ID
-  /// [XNXQDM] 学年学期代码
-  /// This function gets the place of your score in class.
-  // ignore: non_constant_identifier_names
-  Future<ScorePlace> getPlaceInGrade(String KCH, String XNXQDM) async {
+  Future<ScorePlace> _getPlace(
+      {required Map<String, String?> forPlace,
+      required Map<String, String?> forScoreRanking,
+      required Map<String, String?> forScoreDistribution}) async {
     ScorePlace data = ScorePlace();
 
     /// Place in the grade.
-    await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
-        data: {
-          'XH': user["idsAccount"],
-          'JXBID': '*',
-          'XNXQDM': XNXQDM,
-          'KCH': KCH,
-          'TJLX': "02"
-        }).then((value) {
+    await dio
+        .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
+            data: forPlace)
+        .then((value) {
       if (value.data["datas"]["jxbxspmcx"]["totalSize"] != 0) {
         data.place = value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"];
         data.total = value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"];
@@ -88,14 +83,11 @@ class ScoreFile extends EhallSession {
     });
 
     /// Highest, lowest, average score of the grade.
-    await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
-        data: {
-          "JXBID": '*',
-          'XNXQDM': XNXQDM,
-          'KCH': KCH,
-          'TJLX': "02"
-        }).then((value) {
+    await dio
+        .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
+            data: forScoreRanking)
+        .then((value) {
       if (value.data["datas"]["jxbcjtjcx"]["totalSize"] != 0) {
         data.highest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"];
         data.lowest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"];
@@ -103,15 +95,12 @@ class ScoreFile extends EhallSession {
       }
     });
 
-    await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
-        data: {
-          "JXBID": '*',
-          'XNXQDM': XNXQDM,
-          'KCH': KCH,
-          'TJLX': "02",
-          '*order': '+DJDM',
-        }).then((value) {
+    /// Distribution of the score.
+    await dio
+        .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
+            data: forScoreDistribution)
+        .then((value) {
       for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
         data.statistics
             .add(ScoreStatistics(level: i["DJDM_DISPLAY"], people: i["DJSL"]));
@@ -121,58 +110,51 @@ class ScoreFile extends EhallSession {
     return data;
   }
 
+  /// [KCH] 学科ID
+  /// [XNXQDM] 学年学期代码
+  /// This function gets the place of your score in class.
+  // ignore: non_constant_identifier_names
+  Future<ScorePlace> getPlaceInGrade(String KCH, String XNXQDM) async {
+    return await _getPlace(forPlace: {
+      'XH': user["idsAccount"],
+      'JXBID': '*',
+      'XNXQDM': XNXQDM,
+      'KCH': KCH,
+      'TJLX': "02"
+    }, forScoreRanking: {
+      "JXBID": '*',
+      'XNXQDM': XNXQDM,
+      'KCH': KCH,
+      'TJLX': "02"
+    }, forScoreDistribution: {
+      "JXBID": '*',
+      'XNXQDM': XNXQDM,
+      'KCH': KCH,
+      'TJLX': "02",
+      '*order': '+DJDM',
+    });
+  }
+
   /// [JXBID] 教学班ID
   /// [XNXQDM] 学年学期代码
   /// This function gets the place of your score in class.
   // ignore: non_constant_identifier_names
   Future<ScorePlace> getPlaceInClass(String JXBID, String XNXQDM) async {
-    ScorePlace data = ScorePlace();
-
-    /// Place in the class.
-    await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
-        data: {
-          'XH': user["idsAccount"],
-          'JXBID': JXBID,
-          'XNXQDM': XNXQDM,
-          'TJLX': "01"
-        }).then((value) {
-      if (value.data["datas"]["jxbxspmcx"]["totalSize"] != 0) {
-        data.place = value.data["datas"]["jxbxspmcx"]["rows"][0]["PM"];
-        data.total = value.data["datas"]["jxbxspmcx"]["rows"][0]["ZRS"];
-      }
+    return await _getPlace(forPlace: {
+      'XH': user["idsAccount"],
+      'JXBID': JXBID,
+      'XNXQDM': XNXQDM,
+      'TJLX': "01"
+    }, forScoreRanking: {
+      "JXBID": JXBID,
+      'XNXQDM': XNXQDM,
+      'TJLX': "01",
+    }, forScoreDistribution: {
+      "JXBID": JXBID,
+      'XNXQDM': XNXQDM,
+      'TJLX': "01",
+      '*order': '+DJDM',
     });
-
-    /// Highest, lowest, average score of the grade.
-    await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
-        data: {
-          "JXBID": JXBID,
-          'XNXQDM': XNXQDM,
-          'TJLX': "01",
-        }).then((value) {
-      if (value.data["datas"]["jxbcjtjcx"]["totalSize"] != 0) {
-        data.highest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZGF"];
-        data.lowest = value.data["datas"]["jxbcjtjcx"]["rows"][0]["ZDF"];
-        data.average = value.data["datas"]["jxbcjtjcx"]["rows"][0]["PJF"];
-      }
-    });
-
-    await dio.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
-        data: {
-          "JXBID": JXBID,
-          'XNXQDM': XNXQDM,
-          'TJLX': "01",
-          '*order': '+DJDM',
-        }).then((value) {
-      for (var i in value.data["datas"]["jxbcjfbcx"]["rows"]) {
-        data.statistics
-            .add(ScoreStatistics(level: i["DJDM_DISPLAY"], people: i["DJSL"]));
-      }
-    });
-
-    return data;
   }
 
   Future<List<Score>> get() async {
