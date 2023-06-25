@@ -18,6 +18,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/login/login.dart';
@@ -186,7 +187,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 },
               ),
               SettingsTile.navigation(
-                title: const Text('退出登录'),
+                title: const Text('退出登录并重启应用'),
                 onPressed: (context) async {
                   /// Clean Cookie
                   try {
@@ -216,10 +217,9 @@ class _SettingWindowState extends State<SettingWindow> {
                   ThemeController toChange = Get.put(ThemeController());
                   toChange.onUpdate();
 
-                  /// Return homepage
+                  /// Restart app
                   if (mounted) {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const LoginWindow()));
+                    Restart.restartApp();
                   }
                 },
               ),

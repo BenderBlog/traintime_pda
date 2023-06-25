@@ -18,6 +18,7 @@ class ScoreController extends GetxController {
   Set<String> unPassedSet = {};
   double notCoreClass = 0.0;
 
+  /// User could see the place only if they pressed easter egg five times.
   int presscount = 0;
   bool allowDetail = false;
 

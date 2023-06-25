@@ -504,6 +504,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.2.4"
+  restart_app:
+    dependency: "direct main"
+    description:
+      name: restart_app
+      sha256: b37daeb1c02fcab30e19d9e30b6fdd215bd53577efd927042eb77cf6f09daadb
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.2.1"
   rxdart:
     dependency: transitive
     description:
