@@ -24,12 +24,13 @@ class ScoreWindow extends StatelessWidget {
   Future<void> easterEgg() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("For VB, are you agree?"),
+          title: const Text("和人家比不如和自己比"),
           content: Image.asset("assets/Humpy-Score.jpg"),
           actions: [
             TextButton(
               child: const Text("确定"),
               onPressed: () {
+                Get.put(ScoreController()).addCount();
                 Navigator.of(context).pop();
               },
             ),
@@ -167,6 +168,11 @@ class ScoreWindow extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () {
+              if (Get.put(ScoreController()).presscount >= 5) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("行吧，不过别自找麻烦，我可不管"),
+                ));
+              }
               easterEgg();
             },
           ),
@@ -174,10 +180,14 @@ class ScoreWindow extends StatelessWidget {
         bottom: dropDownButton,
       ),
       body: GetBuilder<ScoreController>(
-          builder: (c) => dataList<ScoreInfoCard, ScoreInfoCard>(
-              List.generate(
-                  c.toShow.length, (index) => ScoreInfoCard(index: index)),
-              (toUse) => toUse)),
+        builder: (c) => dataList<ScoreInfoCard, ScoreInfoCard>(
+          List.generate(
+            c.toShow.length,
+            (index) => ScoreInfoCard(index: index),
+          ),
+          (toUse) => toUse,
+        ),
+      ),
       bottomNavigationBar: bottomInfo,
     );
   }

@@ -18,7 +18,18 @@ class ScoreController extends GetxController {
   Set<String> unPassedSet = {};
   double notCoreClass = 0.0;
 
+  int presscount = 0;
   bool allowDetail = false;
+
+  void addCount() {
+    if (presscount < 5) {
+      presscount++;
+    } else {
+      if (allowDetail == false) {
+        allowDetail = true;
+      }
+    }
+  }
 
   static const notFinish = "(成绩没登完)";
   static const notCoreClassType = "公共任选";

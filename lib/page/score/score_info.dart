@@ -310,8 +310,10 @@ class ScoreComposeCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                scoreInfo(true, context),
-                scoreInfo(false, context),
+                if (Get.put(ScoreController()).allowDetail)
+                  scoreInfo(true, context),
+                if (Get.put(ScoreController()).allowDetail)
+                  scoreInfo(false, context),
               ],
             ),
             Watermark(
