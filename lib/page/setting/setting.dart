@@ -21,7 +21,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/model/user.dart';
-import 'package:watermeter/page/login/login.dart';
 import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
@@ -47,8 +46,8 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile(
-                title: const Text('XDYou 0.0.4'),
-                value: const Text('Codebase Traintime PDA 0.0.4'),
+                title: const Text('XDYou 0.0.5'),
+                value: const Text('Codebase Traintime PDA 0.0.5'),
                 onPressed: (context) => launchUrl(
                   Uri.parse("https://github.com/BenderBlog/watermeter"),
                   mode: LaunchMode.externalApplication,
