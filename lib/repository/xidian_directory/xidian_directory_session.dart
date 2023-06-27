@@ -15,8 +15,8 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
-import 'package:watermeter/model/xidian_directory/shop_information_entity.dart';
+import 'package:watermeter/model/xidian_directory/cafeteria_window_item.dart';
+import 'package:watermeter/model/xidian_directory/shop_information.dart';
 import 'package:watermeter/model/xidian_directory/telephone.dart';
 
 const String _apiKey = 'ya0UhH6yzo8nKmWyrHfkLEyb';

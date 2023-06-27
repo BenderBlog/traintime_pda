@@ -12,7 +12,7 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
-import 'package:watermeter/model/xidian_directory/cafeteria_window_item_entity.dart';
+import 'package:watermeter/model/xidian_directory/cafeteria_window_item.dart';
 import 'package:watermeter/page/widget.dart';
 
 class DiningHallWindow extends StatefulWidget {

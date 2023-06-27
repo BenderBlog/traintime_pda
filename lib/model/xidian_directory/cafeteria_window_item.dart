@@ -2,27 +2,17 @@
 Cafeteria Data Structure of the Xidian Directory.
 Copyright (C) 2022 SuperBart
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
 
-import 'package:watermeter/generated/json/base/json_field.dart';
-import 'package:watermeter/generated/json/cafeteria_window_item_entity.g.dart';
+part 'cafeteria_window_item.g.dart';
 
 // Modified to simplify searching.
 const categories = ['竹园一楼', '竹园二楼', '海棠一楼', '海棠二楼', '丁香'];
@@ -34,49 +24,39 @@ class CafeteriaWindowItemEntity {
   CafeteriaWindowItemEntity();
 
   factory CafeteriaWindowItemEntity.fromJson(Map<String, dynamic> json) =>
-      $CafeteriaWindowItemEntityFromJson(json);
+      _$CafeteriaWindowItemEntityFromJson(json);
 
-  Map<String, dynamic> toJson() => $CafeteriaWindowItemEntityToJson(this);
-
-  @override
-  String toString() {
-    return jsonEncode(this);
-  }
+  Map<String, dynamic> toJson() => _$CafeteriaWindowItemEntityToJson(this);
 }
 
 @JsonSerializable()
 class CafeteriaWindowItemResults {
   late DateTime updatedAt;
   late String place;
-  int? number;
+  String? number;
   String unit = "份";
   String name = "录数据的看不清";
   late String objectId;
   late DateTime createdAt;
   late String window;
   bool status = true;
-  late List<int> price;
+  late List<double> price;
   String? comment;
   String? shopComment;
 
   CafeteriaWindowItemResults();
 
   factory CafeteriaWindowItemResults.fromJson(Map<String, dynamic> json) =>
-      $CafeteriaWindowItemResultsFromJson(json);
+      _$CafeteriaWindowItemResultsFromJson(json);
 
-  Map<String, dynamic> toJson() => $CafeteriaWindowItemResultsToJson(this);
-
-  @override
-  String toString() {
-    return jsonEncode(this);
-  }
+  Map<String, dynamic> toJson() => _$CafeteriaWindowItemResultsToJson(this);
 }
 
 class WindowInformation {
   late String name;
   late String places;
   late DateTime updateTime;
-  int? number;
+  String? number;
   String? commit;
   Set<WindowItemsGroup> items = {};
 
@@ -102,7 +82,7 @@ class WindowInformation {
 
 class WindowItemsGroup {
   String name;
-  List<int> price;
+  List<double> price;
   String unit;
   late bool status;
   String? commit;
