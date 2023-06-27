@@ -37,6 +37,7 @@ dependencies:
   cookie_jar: ^4.0.3
   path_provider: ^2.0.11
   file_picker: ^5.2.5
+  json_annotation: ^4.8.0
   # Deal with html
   beautiful_soup_dart: ^0.3.0
   # Setting
@@ -67,6 +68,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

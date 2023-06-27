@@ -10,12 +10,7 @@ class ClassTableController extends GetxController {
   String? error;
 
   // Classtable Data
-  List<ClassDetail> classDetail = <ClassDetail>[];
-  List<ClassDetail> notArranged = <ClassDetail>[];
-  List<TimeArrangement> timeArrangement = <TimeArrangement>[];
-  String semesterCode = "";
-  String termStartDay = "";
-  int semesterLength = 0;
+  ClassTableData classTableData = ClassTableData();
 
   // The start day of the semester.
   var startDay = DateTime.parse("2022-01-22");
@@ -24,24 +19,12 @@ class ClassTableController extends GetxController {
   late List<List<List<List<int>>>> pretendLayout;
 
   // Mark the current week.
-  late int currentWeek;
+  int currentWeek = 0;
 
   // Current Information
   ClassDetail? classToShow;
   TimeArrangement? timeArrangementToShow;
   bool? isNext;
-
-  @override
-  void onInit() {
-    // For info
-    semesterCode = user["currentSemester"]!;
-    termStartDay = user["currentStartDay"]!;
-    startDay = DateTime.parse(termStartDay);
-    currentWeek =
-        (Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-            7;
-    super.onInit();
-  }
 
   @override
   void onReady() async {
@@ -51,7 +34,7 @@ class ClassTableController extends GetxController {
 
   void updateCurrent() {
     // Get the current time.
-    if (currentWeek >= 0 && currentWeek < semesterLength) {
+    if (currentWeek >= 0 && currentWeek < classTableData.semesterLength) {
       developer.log("Get the current class", name: "ClassTableController");
       DateTime now = DateTime.now();
       if ((now.hour >= 8 && now.hour < 20) ||
@@ -92,7 +75,8 @@ class ClassTableController extends GetxController {
             );
             if (currentClassIndex != -1) {
               isNext = false;
-              timeArrangementToShow = timeArrangement[currentClassIndex];
+              timeArrangementToShow =
+                  classTableData.timeArrangement[currentClassIndex];
             }
           } else {
             developer.log(
@@ -109,12 +93,13 @@ class ClassTableController extends GetxController {
               } else {
                 isNext = false;
               }
-              timeArrangementToShow = timeArrangement[nextIndex];
+              timeArrangementToShow = classTableData.timeArrangement[nextIndex];
             }
           }
           if (timeArrangementToShow != null &&
               timeArrangementToShow!.index != -1) {
-            classToShow = classDetail[timeArrangementToShow!.index];
+            classToShow =
+                classTableData.classDetail[timeArrangementToShow!.index];
           }
         } else {
           developer.log(
@@ -124,8 +109,10 @@ class ClassTableController extends GetxController {
           isNext = true;
           int currentClassIndex =
               pretendLayout[currentWeek][now.weekday - 1][0][0];
-          timeArrangementToShow = timeArrangement[currentClassIndex];
-          classToShow = classDetail[timeArrangementToShow!.index];
+          timeArrangementToShow =
+              classTableData.timeArrangement[currentClassIndex];
+          classToShow =
+              classTableData.classDetail[timeArrangementToShow!.index];
         }
       }
     }
@@ -135,51 +122,11 @@ class ClassTableController extends GetxController {
     isGet = false;
     error = null;
     try {
-      var value = await ClassTableFile().get(isForce: isForce);
-
-      // Init the arraies.
-      classDetail = [];
-      timeArrangement = [];
-
-      // Deal with the classtable data.
-      semesterCode = value["semesterCode"];
-      termStartDay = value["termStartDay"];
-      developer.log(termStartDay, name: "updateClassTable");
-      semesterLength = 0;
-      for (var i in value["rows"]) {
-        var toDeal = ClassDetail(
-          name: i["KCM"],
-          teacher: i["SKJS"],
-          code: i["KCH"],
-          number: i["KXH"],
-        );
-        if (!classDetail.contains(toDeal)) {
-          classDetail.add(toDeal);
-        }
-        timeArrangement.add(
-          TimeArrangement(
-            index: classDetail.indexOf(toDeal),
-            start: int.parse(i["KSJC"]),
-            stop: int.parse(i["JSJC"]),
-            day: int.parse(i["SKXQ"]),
-            weekList: i["SKZC"].toString(),
-            classroom: i["JASDM"],
-          ),
-        );
-        if (i["SKZC"].toString().length > semesterLength) {
-          semesterLength = i["SKZC"].toString().length;
-        }
-      }
-
-      // Deal with the not arranged data.
-      for (var i in value["notArranged"]) {
-        notArranged.add(ClassDetail(
-          name: i["KCM"],
-          teacher: i["SKJS"],
-          code: i["KCH"],
-          number: i["KXH"],
-        ));
-      }
+      classTableData = await ClassTableFile().get(isForce: isForce);
+      startDay = DateTime.parse(classTableData.termStartDay);
+      currentWeek = (Jiffy.now().dayOfYear -
+              Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
+          7;
 
       // Uncomment to see the conflict.
       /*
@@ -206,7 +153,7 @@ class ClassTableController extends GetxController {
       ]);*/
 
       // Get the start day of the semester.
-      startDay = DateTime.parse(termStartDay);
+      startDay = DateTime.parse(classTableData.termStartDay);
       if (user["swift"] != null) {
         startDay = startDay.add(Duration(days: 7 * int.parse(user["swift"]!)));
       }
@@ -220,16 +167,16 @@ class ClassTableController extends GetxController {
       // 1. prepare the structure, a three-deminision array.
       //    for week-day~class array
       pretendLayout = List.generate(
-        semesterLength,
+        classTableData.semesterLength,
         (week) => List.generate(7, (day) => List.generate(10, (classes) => [])),
       );
 
       // 2. init each week's array
-      for (int week = 0; week < semesterLength; ++week) {
+      for (int week = 0; week < classTableData.semesterLength; ++week) {
         for (int day = 0; day < 7; ++day) {
           // 2.a. Choice the class in this day.
           List<TimeArrangement> thisDay = [];
-          for (var i in timeArrangement) {
+          for (var i in classTableData.timeArrangement) {
             // If the class has ended, skip.
             if (i.weekList.length < week + 1) {
               continue;
@@ -245,7 +192,8 @@ class ClassTableController extends GetxController {
           // 2.c Arrange the layout. Solve the conflex.
           for (var i in thisDay) {
             for (int j = i.start - 1; j <= i.stop - 1; ++j) {
-              pretendLayout[week][day][j].add(timeArrangement.indexOf(i));
+              pretendLayout[week][day][j]
+                  .add(classTableData.timeArrangement.indexOf(i));
             }
           }
 

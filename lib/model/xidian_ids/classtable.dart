@@ -10,6 +10,11 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'classtable.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class ClassDetail {
   String name; // 名称
   String? teacher; // 老师
@@ -23,6 +28,11 @@ class ClassDetail {
     this.number,
   });
 
+  factory ClassDetail.fromJson(Map<String, dynamic> json) =>
+      _$ClassDetailFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassDetailToJson(this);
+
   @override
   int get hashCode => name.hashCode;
 
@@ -33,15 +43,25 @@ class ClassDetail {
       name == other.name;
 }
 
+@JsonSerializable(explicitToJson: true)
 class TimeArrangement {
   int index; // 课程索引
   // 返回的是 0 和 1 组成的数组，0 代表这周没课程，1 代表这周有课
+  @JsonKey(name: 'week_list')
   String weekList; // 上课周次
   int day; // 星期几上课
   int start; // 上课开始
   int stop; // 上课结束
+  @JsonKey(includeIfNull: false)
   String? classroom; // 上课教室
-  late int step; // 上课长度
+
+  int get step => stop - start; // 上课长度
+
+  factory TimeArrangement.fromJson(Map<String, dynamic> json) =>
+      _$TimeArrangementFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TimeArrangementToJson(this);
+
   TimeArrangement({
     required this.index,
     required this.weekList,
@@ -49,9 +69,33 @@ class TimeArrangement {
     required this.day,
     required this.start,
     required this.stop,
-  }) {
-    step = stop - start;
-  }
+  });
+}
+
+@JsonSerializable(explicitToJson: true)
+class ClassTableData {
+  int semesterLength;
+  String semesterCode;
+  String termStartDay;
+  List<ClassDetail> classDetail;
+  List<ClassDetail> notArranged;
+  List<TimeArrangement> timeArrangement;
+
+  ClassTableData({
+    this.semesterLength = 1,
+    this.semesterCode = "",
+    this.termStartDay = "",
+    List<ClassDetail>? classDetail,
+    List<ClassDetail>? notArranged,
+    List<TimeArrangement>? timeArrangement,
+  })  : classDetail = classDetail ?? [],
+        notArranged = notArranged ?? [],
+        timeArrangement = timeArrangement ?? [];
+
+  factory ClassTableData.fromJson(Map<String, dynamic> json) =>
+      _$ClassTableDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassTableDataToJson(this);
 }
 
 // Time arrangements.

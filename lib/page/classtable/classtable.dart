@@ -85,8 +85,9 @@ class PageState extends State<ClassTableWindow> {
     // Deal with the minus currentWeekIndex
     if (controller.currentWeek < 0) {
       currentWeekIndex = 0;
-    } else if (controller.currentWeek >= controller.semesterLength) {
-      currentWeekIndex = controller.semesterLength - 1;
+    } else if (controller.currentWeek >=
+        controller.classTableData.semesterLength) {
+      currentWeekIndex = controller.classTableData.semesterLength - 1;
     } else {
       currentWeekIndex = controller.currentWeek;
     }
@@ -184,7 +185,7 @@ class PageState extends State<ClassTableWindow> {
         child: ListView.builder(
           controller: rowControl,
           scrollDirection: Axis.horizontal,
-          itemCount: controller.semesterLength,
+          itemCount: controller.classTableData.semesterLength,
           itemBuilder: (BuildContext context, int index) {
             return Container(
               margin: const EdgeInsets.symmetric(
@@ -249,7 +250,8 @@ class PageState extends State<ClassTableWindow> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext context) {
-                    return NotArrangedClassList(list: controller.notArranged);
+                    return NotArrangedClassList(
+                        list: controller.classTableData.notArranged);
                   },
                 ),
               );
@@ -265,8 +267,8 @@ class PageState extends State<ClassTableWindow> {
             },
           ),
         ],
-        bottom: (controller.timeArrangement.isNotEmpty &&
-                controller.classDetail.isNotEmpty)
+        bottom: (controller.classTableData.timeArrangement.isNotEmpty &&
+                controller.classTableData.classDetail.isNotEmpty)
             ? PreferredSize(
                 preferredSize: Size.fromHeight(
                     widget.constraints.maxHeight >= 500
@@ -275,8 +277,8 @@ class PageState extends State<ClassTableWindow> {
                 child: _topView())
             : null,
       ),
-      body: (controller.timeArrangement.isNotEmpty &&
-              controller.classDetail.isNotEmpty)
+      body: (controller.classTableData.timeArrangement.isNotEmpty &&
+              controller.classTableData.classDetail.isNotEmpty)
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -302,8 +304,8 @@ class PageState extends State<ClassTableWindow> {
                     const SizedBox(
                       height: 30,
                     ),
-                    Text("${controller.semesterCode} 学期没有课程，不会吧?"),
-                    const Text("如果搞错学期，快去设置调整。"),
+                    Text(
+                        "${controller.classTableData.semesterCode} 学期没有课程，不会吧?"),
                     const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
                     const Text("如果你要毕业了，祝你前程似锦。"),
                     const Text("如果你已经毕业，快去关注 SuperBart 哔哩哔哩帐号！"),
@@ -328,7 +330,7 @@ class PageState extends State<ClassTableWindow> {
             isTopRowLocked = false;
           }
         },
-        itemCount: controller.semesterLength,
+        itemCount: controller.classTableData.semesterLength,
         itemBuilder: (context, index) => Column(
           children: [
             // The main class table.
@@ -475,15 +477,15 @@ class PageState extends State<ClassTableWindow> {
                   padding: const EdgeInsets.all(1.5),
                   child: Center(
                     child: Text(
-                      "${controller.classDetail[controller.timeArrangement[index].index].name}\n"
-                      "${controller.timeArrangement[index].classroom}",
+                      "${controller.classTableData.classDetail[controller.classTableData.timeArrangement[index].index].name}\n"
+                      "${controller.classTableData.timeArrangement[index].classroom}",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 11.5,
                         color: index != -1
-                            ? colorList[
-                                    controller.timeArrangement[index].index %
-                                        colorList.length]
+                            ? colorList[controller.classTableData
+                                        .timeArrangement[index].index %
+                                    colorList.length]
                                 .shade900
                             : Colors.white,
                       ),
@@ -502,7 +504,8 @@ class PageState extends State<ClassTableWindow> {
                 // Border
                 color: index == -1
                     ? const Color(0x00000000)
-                    : colorList[controller.timeArrangement[index].index %
+                    : colorList[controller
+                                .classTableData.timeArrangement[index].index %
                             colorList.length]
                         .shade300
                         .withOpacity(0.75),
@@ -515,7 +518,8 @@ class PageState extends State<ClassTableWindow> {
                   child: Container(
                     color: index == -1
                         ? const Color(0x00000000)
-                        : colorList[controller.timeArrangement[index].index %
+                        : colorList[controller.classTableData
+                                    .timeArrangement[index].index %
                                 colorList.length]
                             .shade100
                             .withOpacity(0.7),
@@ -607,7 +611,8 @@ class PageState extends State<ClassTableWindow> {
 
   Widget _buttomInformation(Set<int> conflict) {
     Widget classInfoBox(TimeArrangement timeArrangement) {
-      ClassDetail toShow = controller.classDetail[timeArrangement.index];
+      ClassDetail toShow =
+          controller.classTableData.classDetail[timeArrangement.index];
       var infoColor = colorList[timeArrangement.index % colorList.length];
 
       Widget weekDoc(int index, bool isOccupied) => ClipOval(
@@ -741,8 +746,10 @@ class PageState extends State<ClassTableWindow> {
       );
     }
 
-    List<TimeArrangement> information = List.generate(conflict.length,
-        (index) => controller.timeArrangement[conflict.elementAt(index)]);
+    List<TimeArrangement> information = List.generate(
+        conflict.length,
+        (index) => controller
+            .classTableData.timeArrangement[conflict.elementAt(index)]);
 
     List<Widget> toShow = List.generate(
       conflict.length,

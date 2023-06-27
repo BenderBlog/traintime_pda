@@ -23,7 +23,7 @@ class ScoreController extends GetxController {
   bool allowDetail = false;
 
   void addCount() {
-    if (presscount < 5) {
+    if (presscount < 4) {
       presscount++;
     } else {
       if (allowDetail == false) {

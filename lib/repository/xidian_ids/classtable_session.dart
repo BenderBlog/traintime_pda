@@ -17,11 +17,59 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/model/user.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 课程表 4770397878132218
 class ClassTableFile extends EhallSession {
-  Future<Map<String, dynamic>> getFromWeb() async {
+  ClassTableData simplifyData(Map<String, dynamic> qResult) {
+    ClassTableData toReturn = ClassTableData();
+
+    toReturn.semesterCode = qResult["semesterCode"];
+    toReturn.termStartDay = qResult["termStartDay"];
+
+    developer.log("${toReturn.semesterCode} ${toReturn.termStartDay}",
+        name: "Ehall getClasstable");
+
+    for (var i in qResult["rows"]) {
+      var toDeal = ClassDetail(
+        name: i["KCM"],
+        teacher: i["SKJS"],
+        code: i["KCH"],
+        number: i["KXH"],
+      );
+      if (!toReturn.classDetail.contains(toDeal)) {
+        toReturn.classDetail.add(toDeal);
+      }
+      toReturn.timeArrangement.add(
+        TimeArrangement(
+          index: toReturn.classDetail.indexOf(toDeal),
+          start: int.parse(i["KSJC"]),
+          stop: int.parse(i["JSJC"]),
+          day: int.parse(i["SKXQ"]),
+          weekList: i["SKZC"].toString(),
+          classroom: i["JASDM"],
+        ),
+      );
+      if (i["SKZC"].toString().length > toReturn.semesterLength) {
+        toReturn.semesterLength = i["SKZC"].toString().length;
+      }
+    }
+
+    // Deal with the not arranged data.
+    for (var i in qResult["notArranged"]) {
+      toReturn.notArranged.add(ClassDetail(
+        name: i["KCM"],
+        teacher: i["SKJS"],
+        code: i["KCH"],
+        number: i["KXH"],
+      ));
+    }
+
+    return toReturn;
+  }
+
+  Future<ClassTableData> getFromWeb() async {
     Map<String, dynamic> qResult = {};
     developer.log("Login the system.", name: "Ehall getClasstable");
     String get = await useApp("4770397878132218");
@@ -75,10 +123,10 @@ class ClassTableFile extends EhallSession {
     developer.log(notOnTable.toString(), name: "Ehall getClasstable");
     qResult["notArranged"] = notOnTable["rows"];
 
-    return qResult;
+    return simplifyData(qResult);
   }
 
-  Future<Map<String, dynamic>> get({
+  Future<ClassTableData> get({
     bool isForce = false,
   }) async {
     developer.log("Check whether the classtable has fetched.",
@@ -94,6 +142,7 @@ class ClassTableFile extends EhallSession {
     }
     var file = File("${destination.path}/ClassTable.json");
     bool isExist = file.existsSync();
+    developer.log("File exist: $isExist.", name: "Ehall getClasstable");
 
     developer.log(
         isExist &&
@@ -106,15 +155,15 @@ class ClassTableFile extends EhallSession {
     if (isExist &&
         isForce == false &&
         DateTime.now().difference(file.lastModifiedSync()).inDays <= 3) {
-      return jsonDecode(file.readAsStringSync());
+      return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
     } else {
       try {
-        var qResult = await getFromWeb();
-        file.writeAsStringSync(jsonEncode(qResult));
-        return qResult;
+        var toUse = await getFromWeb();
+        file.writeAsStringSync(jsonEncode(toUse.toJson()));
+        return toUse;
       } catch (e) {
         if (isExist) {
-          return jsonDecode(file.readAsStringSync());
+          return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
         } else {
           rethrow;
         }
