@@ -134,13 +134,12 @@ class ClassTableFile extends EhallSession {
 
     developer.log("Start fetching the classtable.",
         name: "Ehall getClasstable");
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    Directory destination =
-        Directory("${appDocDir.path}/org.superbart.watermeter");
-    if (!destination.existsSync()) {
-      await destination.create();
+    Directory appDocDir = await getApplicationSupportDirectory();
+    if (!await appDocDir.exists()) {
+      await appDocDir.create();
     }
-    var file = File("${destination.path}/ClassTable.json");
+    developer.log("Path at ${appDocDir.path}.", name: "Ehall getClasstable");
+    var file = File("${appDocDir.path}/ClassTable.json");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "Ehall getClasstable");
 
