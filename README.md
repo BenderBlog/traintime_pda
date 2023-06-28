@@ -9,6 +9,11 @@
 
 还在开发中，也没有终点。
 
+# 需要赞助
+
+由于上架苹果商店需要 700 块，而我掏不起。我在此请求使用者们通过[爱发电](http://afdian.net/a/benderblog)给我捐款。
+当然，如果你认识我，直接打钱也可以。(前提跟我说一声)
+
 # 目前已经实现
 
 1. 西电目录，曾经在疫情封校期间运行的学校综合楼目录 + 食堂目录。
@@ -16,7 +21,7 @@
 3. 根据[Timetable](https://github.com/zfman/TimetableView)重写的 Flutter 课程表。
 4. 成绩查询，包括可以自行选择科目计算均分。查看排名目前无法实现。
 5. 自行选择学期的考试安排查询。
-6. 电费查询是部分实现状态。
+6. 电费查询。
 7. iOS 版本能够编译，目前只能侧载。
 8. 每个功能都有彩蛋。
 
@@ -39,8 +44,8 @@
 > Leavin' town, baby, ain't comin' home no more.  
 > Get the train, you know that's why I'm leavin'  
 > Ain't no use to greavin', well, I guess I'm leavin'  
-> Well, I'm leavin' town' well, I'm leavin' town    
-> Leave town, baby, ain't comin' home no more.   
+> Well, I'm leavin' town' well, I'm leavin' town  
+> Leave town, baby, ain't comin' home no more.  
 > Traintime, baby, traintime's almost here  
 > Traintime, baby, traintime's almost here  
 > So give me one more time so now, do-dah-yeah.  
