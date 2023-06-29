@@ -1,5 +1,4 @@
 import 'package:home_widget/home_widget.dart';
-import 'package:watermeter/repository/electricity/electricity_session.dart';
 import 'package:workmanager/workmanager.dart';
 
 /// Used for Background Updates using Workmanager Plugin
@@ -8,6 +7,9 @@ void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) {
     return Future.wait<bool?>([
       //TODO do background updates
+
+      //TODO update all widgets
+      HomeWidget.updateWidget(name: 'ElectricityWidgetProvider', iOSName: ''),
     ]).then((value) {
       return !value.contains(false);
     });
