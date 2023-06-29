@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_classtable_description"
-    android:minWidth="160dp"
+    android:minWidth="240dp"
+    android:targetCellWidth="3"
+    android:targetCellHeight="2"
     android:minHeight="80dp"
     android:updatePeriodMillis="86400000"
-    android:initialLayout="@layout/widget_classtable"
+    android:initialLayout="@layout/widget_class_table_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>
