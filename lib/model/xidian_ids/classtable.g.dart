@@ -6,6 +6,34 @@ part of 'classtable.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+ClassToShow _$ClassToShowFromJson(Map<String, dynamic> json) => ClassToShow(
+      name: json['name'] as String,
+      teacher: json['teacher'] as String?,
+      place: json['place'] as String?,
+      startTime: json['start_time'] as int,
+      endTime: json['end_time'] as int,
+    );
+
+Map<String, dynamic> _$ClassToShowToJson(ClassToShow instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'teacher': instance.teacher,
+      'place': instance.place,
+      'start_time': instance.startTime,
+      'end_time': instance.endTime,
+    };
+
+ClassToShowList _$ClassToShowListFromJson(Map<String, dynamic> json) =>
+    ClassToShowList()
+      ..list = (json['list'] as List<dynamic>)
+          .map((e) => ClassToShow.fromJson(e as Map<String, dynamic>))
+          .toSet();
+
+Map<String, dynamic> _$ClassToShowListToJson(ClassToShowList instance) =>
+    <String, dynamic>{
+      'list': instance.list.toList(),
+    };
+
 ClassDetail _$ClassDetailFromJson(Map<String, dynamic> json) => ClassDetail(
       name: json['name'] as String,
       teacher: json['teacher'] as String?,

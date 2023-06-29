@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:jiffy/jiffy.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
@@ -36,7 +39,28 @@ class ClassTableController extends GetxController {
     // Get the current time.
     if (currentWeek >= 0 && currentWeek < classTableData.semesterLength) {
       developer.log("Get the current class", name: "ClassTableController");
-      DateTime now = DateTime.now();
+      DateTime now = DateTime(2023, 4, 4, 11, 0, 00);
+
+      ClassToShowList toApplet = ClassToShowList();
+      // Get the class happens today
+      for (var i in pretendLayout[currentWeek][now.weekday - 1]) {
+        for (var j in i) {
+          if (j != -1) {
+            toApplet.list.add(ClassToShow(
+              name: classTableData
+                  .classDetail[classTableData.timeArrangement[j].index].name,
+              teacher: classTableData
+                  .classDetail[classTableData.timeArrangement[j].index].teacher,
+              place: classTableData.timeArrangement[j].classroom,
+              startTime: classTableData.timeArrangement[j].start,
+              endTime: classTableData.timeArrangement[j].stop,
+            ));
+          }
+        }
+      }
+
+      developer.log(jsonEncode(toApplet.toJson()));
+
       if ((now.hour >= 8 && now.hour < 20) ||
           (now.hour == 20 && now.minute < 35)) {
         // Check the index.
@@ -124,9 +148,10 @@ class ClassTableController extends GetxController {
     try {
       classTableData = await ClassTableFile().get(isForce: isForce);
       startDay = DateTime.parse(classTableData.termStartDay);
-      currentWeek = (Jiffy.now().dayOfYear -
-              Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-          7;
+      currentWeek =
+          (Jiffy.parseFromDateTime(DateTime(2023, 4, 4, 11, 0, 00)).dayOfYear -
+                  Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
+              7;
 
       // Uncomment to see the conflict.
       /*
@@ -159,9 +184,10 @@ class ClassTableController extends GetxController {
       }
 
       // Get the current index.
-      currentWeek = (Jiffy.now().dayOfYear -
-              Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-          7;
+      currentWeek =
+          (Jiffy.parseFromDateTime(DateTime(2023, 4, 4, 11, 0, 00)).dayOfYear -
+                  Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
+              7;
 
       // Init the matrix.
       // 1. prepare the structure, a three-deminision array.

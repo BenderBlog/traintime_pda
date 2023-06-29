@@ -36,8 +36,8 @@ dependencies:
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.3
   path_provider: ^2.0.11
-  file_picker: ^5.2.5
-  json_annotation: ^4.8.0
+  file_picker: ^5.2.10
+  json_annotation: ^4.8.1
   # Deal with html
   beautiful_soup_dart: ^0.3.0
   # Setting
@@ -54,6 +54,8 @@ dependencies:
   async: ^2.10.0 # For AsyncMemoizer
   graphic: ^2.2.0
   restart_app: ^1.2.1
+  home_widget: ^0.2.1
+  workmanager: ^0.5.1
   get:
 
   flutter:
@@ -62,14 +64,13 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  lucide_icons: ^0.248.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-  build_runner: ^2.3.3
-  json_serializable: ^6.6.0
+  build_runner: ^2.4.5
+  json_serializable: ^6.7.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

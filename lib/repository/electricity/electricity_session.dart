@@ -15,6 +15,7 @@ Thanks xidian-script!
 
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:home_widget/home_widget.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/repository/is_school_net.dart';
@@ -148,6 +149,17 @@ Future<void> updateInformation() async {
       developer.log(
         electricityInfo.value,
         name: "ElectricSession",
+      );
+      developer.log(
+        "Try to send electric data to widget.",
+        name: "ElectricSession",
+      );
+      await HomeWidget.saveWidgetData<String>('title', "电费");
+      await HomeWidget.saveWidgetData<String>('message', electricityInfo.value);
+      await HomeWidget.updateWidget(
+        name: 'HomeWidgetExampleProvider',
+        androidName: 'HomeWidgetExampleProvider',
+        iOSName: 'HomeWidgetExample',
       );
       return;
     }

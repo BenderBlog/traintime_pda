@@ -11,8 +11,10 @@ if you want to use.
 */
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,14 +26,68 @@ import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:workmanager/workmanager.dart';
+
+/// Used for Background Updates using Workmanager Plugin
+@pragma("vm:entry-point")
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) {
+    final now = DateTime.now();
+    return Future.wait<bool?>([
+      HomeWidget.saveWidgetData(
+        'title',
+        'Updated from Background',
+      ),
+      HomeWidget.saveWidgetData(
+        'message',
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+      ),
+      HomeWidget.updateWidget(
+        name: 'HomeWidgetExampleProvider',
+        iOSName: 'HomeWidgetExample',
+      ),
+    ]).then((value) {
+      return !value.contains(false);
+    });
+  });
+}
+
+/// Called when Doing Background Work initiated from Widget
+@pragma("vm:entry-point")
+void backgroundCallback(Uri? data) async {
+  print(data);
+
+  if (data?.host == 'titleclicked') {
+    final greetings = [
+      'Hello',
+      'Hallo',
+      'Bonjour',
+      'Hola',
+      'Ciao',
+      '哈洛',
+      '안녕하세요',
+      'xin chào'
+    ];
+    final selectedGreeting = greetings[Random().nextInt(greetings.length)];
+
+    await HomeWidget.saveWidgetData<String>('title', selectedGreeting);
+    await HomeWidget.updateWidget(
+        name: 'HomeWidgetExampleProvider', iOSName: 'HomeWidgetExample');
+  }
+}
 
 void main() async {
   developer.log(
     "Watermeter, by BenderBlog, with dragon power.",
     name: "Watermeter",
   );
+
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Init the widget data.
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
 
   // Loading cookiejar.
   Directory supportPath = await getApplicationSupportDirectory();
