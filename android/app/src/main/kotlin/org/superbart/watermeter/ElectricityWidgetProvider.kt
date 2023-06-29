@@ -28,7 +28,7 @@ class ElectricityWidgetProvider : HomeWidgetProvider() {
                         ?: "No Title Set")
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
                         context,
-                        Uri.parse("homeWidgetExample://titleClicked")
+                        Uri.parse("widget://titleClicked?widgetName=electricityWidget")
                 )
                 setOnClickPendingIntent(R.id.widget_title, backgroundIntent)
 
@@ -39,7 +39,7 @@ class ElectricityWidgetProvider : HomeWidgetProvider() {
                 val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
                         context,
                         MainActivity::class.java,
-                        Uri.parse("homeWidgetExample://message?message=$message"))
+                        Uri.parse("widget://message?message=$message?widgetName=electricityWidget"))
                 setOnClickPendingIntent(R.id.widget_message, pendingIntentWithData)
             }
 

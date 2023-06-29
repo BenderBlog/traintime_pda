@@ -28,45 +28,7 @@ import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:workmanager/workmanager.dart';
 
-/// Used for Background Updates using Workmanager Plugin
-@pragma("vm:entry-point")
-void callbackDispatcher() {
-  Workmanager().executeTask((taskName, inputData) {
-    final now = DateTime.now();
-    return Future.wait<bool?>([
-      HomeWidget.updateWidget(
-        name: 'ElectricityWidgetProvider',
-        iOSName: 'ElectricityWidgetProvider',
-      ),
-    ]).then((value) {
-      return !value.contains(false);
-    });
-  });
-}
-
-/// Called when Doing Background Work initiated from Widget
-@pragma("vm:entry-point")
-void backgroundCallback(Uri? data) async {
-  print(data);
-
-  if (data?.host == 'titleclicked') {
-    final greetings = [
-      'Hello',
-      'Hallo',
-      'Bonjour',
-      'Hola',
-      'Ciao',
-      '哈洛',
-      '안녕하세요',
-      'xin chào'
-    ];
-    final selectedGreeting = greetings[Random().nextInt(greetings.length)];
-
-    await HomeWidget.saveWidgetData<String>('title', selectedGreeting);
-    await HomeWidget.updateWidget(
-        name: 'ElectricityWidgetProvider', iOSName: 'ElectricityWidget');
-  }
-}
+import 'applet/widget_worker.dart';
 
 void main() async {
   developer.log(
