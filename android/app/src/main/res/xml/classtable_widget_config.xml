@@ -3,7 +3,7 @@
     android:minWidth="100dp"
     android:minHeight="100dp"
     android:updatePeriodMillis="86400000"
-    android:initialLayout="@layout/example_layout"
+    android:initialLayout="@layout/widget_electricity_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>

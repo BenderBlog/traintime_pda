@@ -10,36 +10,37 @@ import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
-class HomeWidgetExampleProvider : HomeWidgetProvider() {
+class ClassTableWidgetProvider : HomeWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, widgetData: SharedPreferences) {
         appWidgetIds.forEach { widgetId ->
 
-            Log.i("ElectricitySession",widgetData.all.toString())
-            val views = RemoteViews(context.packageName, R.layout.example_layout).apply {
-                // Open App on Widget Click
+            Log.i("ClassTableToShow",widgetData.all.toString())
+            val views = RemoteViews(context.packageName, R.layout.widget_electricity_layout).apply {
+                // Open App on Widget Click.
+                // TODO: Open to classtable page.
                 val pendingIntent = HomeWidgetLaunchIntent.getActivity(
-                        context,
-                        MainActivity::class.java)
+                    context,
+                    MainActivity::class.java)
                 setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
                 // Swap Title Text by calling Dart Code in the Background
                 setTextViewText(R.id.widget_title, widgetData.getString("title", null)
-                        ?: "No Title Set")
+                    ?: "No Title Set")
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
-                        context,
-                        Uri.parse("homeWidgetExample://titleClicked")
+                    context,
+                    Uri.parse("homeWidgetExample://titleClicked")
                 )
                 setOnClickPendingIntent(R.id.widget_title, backgroundIntent)
 
                 val message = widgetData.getString("message", null)
                 setTextViewText(R.id.widget_message, message
-                        ?: "No Message Set")
+                    ?: "No Message Set")
                 // Detect App opened via Click inside Flutter
                 val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
-                        context,
-                        MainActivity::class.java,
-                        Uri.parse("homeWidgetExample://message?message=$message"))
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("homeWidgetExample://message?message=$message"))
                 setOnClickPendingIntent(R.id.widget_message, pendingIntentWithData)
             }
 
