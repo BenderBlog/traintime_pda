@@ -34,6 +34,18 @@
                 android:resource="@xml/electricity_widget_config" />
         </receiver>
 
+        <receiver
+            android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="es.antonborri.home_widget.action.BACKGROUND" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="es.antonborri.home_widget.HomeWidgetBackgroundService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver android:name="ClassTableWidgetProvider" android:exported="true">
             <intent-filter>
@@ -42,6 +54,8 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/classtable_widget_config" />
         </receiver>
+
+
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

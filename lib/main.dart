@@ -10,23 +10,22 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login/login.dart';
-import 'dart:developer' as developer;
-import 'package:get/get.dart';
+import 'package:watermeter/repository/general.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
 /// Used for Background Updates using Workmanager Plugin
@@ -35,17 +34,9 @@ void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) {
     final now = DateTime.now();
     return Future.wait<bool?>([
-      HomeWidget.saveWidgetData(
-        'title',
-        'Updated from Background',
-      ),
-      HomeWidget.saveWidgetData(
-        'message',
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
-      ),
       HomeWidget.updateWidget(
-        name: 'HomeWidgetExampleProvider',
-        iOSName: 'HomeWidgetExample',
+        name: 'ElectricityWidgetProvider',
+        iOSName: 'ElectricityWidgetProvider',
       ),
     ]).then((value) {
       return !value.contains(false);
@@ -73,7 +64,7 @@ void backgroundCallback(Uri? data) async {
 
     await HomeWidget.saveWidgetData<String>('title', selectedGreeting);
     await HomeWidget.updateWidget(
-        name: 'HomeWidgetExampleProvider', iOSName: 'HomeWidgetExample');
+        name: 'ElectricityWidgetProvider', iOSName: 'ElectricityWidget');
   }
 }
 
@@ -114,6 +105,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final bool isFirst;
+
   const MyApp({super.key, required this.isFirst});
 
   @override
@@ -122,6 +114,32 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ThemeController appTheme = Get.put(ThemeController());
+
+  @override
+  void initState() {
+    super.initState();
+    //TODO replace YOUR_GROUP_ID with the proper one
+    HomeWidget.setAppGroupId('YOUR_GROUP_ID');
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkForWidgetLaunch();
+    HomeWidget.widgetClicked.listen(_launchedFromWidget);
+  }
+
+  void _checkForWidgetLaunch() {
+    HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
+  }
+
+  void _launchedFromWidget(Uri? uri) {
+    if (uri != null) {
+      //TODO do work when start app from home widgets
+      print(uri);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
