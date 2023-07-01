@@ -29,10 +29,10 @@ void backgroundCallback(Uri? data) async {
     return;
   }
   switch (widgetName) {
-    case 'electricityWidget':
+    case 'ElectricityWidget':
       //TODO refresh the data of electricity
       break;
-    case 'classTableWidget':
+    case 'ClassTableWidget':
       //TODO process events from classTableWidget
       break;
     default:
