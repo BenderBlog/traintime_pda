@@ -34,8 +34,8 @@ class ElectricityWidgetProvider : HomeWidgetProvider() {
 
                 // Swap Title Text by calling Dart Code in the Background
                 setTextViewText(
-                    R.id.widget_electricity_title, widgetData.getString(ElectricityWidgetKeys.TITLE, null)
-                        ?: "Title Loading"
+                    R.id.widget_electricity_title,
+                    widgetData.getString(ElectricityWidgetKeys.TITLE, null) ?: "电费"
                 )
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
                     context,
@@ -45,8 +45,7 @@ class ElectricityWidgetProvider : HomeWidgetProvider() {
 
                 val message = widgetData.getString(ElectricityWidgetKeys.INFO, null)
                 setTextViewText(
-                    R.id.widget_electricity_info, message
-                        ?: "Info Loading"
+                    R.id.widget_electricity_info, message ?: "电费加载中..."
                 )
                 // Detect App opened via Click inside Flutter
                 val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
