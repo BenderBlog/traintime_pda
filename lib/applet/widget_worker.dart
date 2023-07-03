@@ -6,10 +6,14 @@ import 'package:workmanager/workmanager.dart';
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) {
     return Future.wait<bool?>([
-      //TODO do background updates
-
+      //TODO do data updates
+      HomeWidget.saveWidgetData(
+          'class_table_date', DateTime(2023, 4, 4, 12, 0, 0, 0, 0)),
+      HomeWidget.saveWidgetData('class_table_json',
+          '{"list":[{"name":"算法分析与设计","teacher":"覃桂敏","place":"B-706","start_time":1,"end_time":2},{"name":"算法分析与设计","teacher":"覃桂敏","place":"B-706","start_time":1,"end_time":2},{"name":"软件过程与项目管理","teacher":"Angaj（印）","place":"B-707","start_time":3,"end_time":4},{"name":"软件过程与项目管理","teacher":"Angaj（印）","place":"B-707","start_time":3,"end_time":4},{"name":"软件体系结构","teacher":"蔺一帅,李飞","place":"A-222","start_time":7,"end_time":8},{"name":"软件体系结构","teacher":"蔺一帅,李飞","place":"A-222","start_time":7,"end_time":8}]}'),
       //TODO update all widgets
       HomeWidget.updateWidget(name: 'ElectricityWidgetProvider', iOSName: ''),
+      HomeWidget.updateWidget(name: 'ClassTableWidgetProvider', iOSName: ''),
     ]).then((value) {
       return !value.contains(false);
     });
@@ -20,21 +24,53 @@ void callbackDispatcher() {
 /// [data] uri passed from the native
 @pragma("vm:entry-point")
 void backgroundCallback(Uri? data) async {
-  if (data?.scheme != 'widget') {
+  if (data == null) {
+    return;
+  }
+  if (data.scheme != 'widget') {
     return;
   }
   //only for scheme 'widget'
-  final widgetName = data?.queryParameters['widgetName'];
+  final widgetName = data.queryParameters['widgetName'];
   if (widgetName == null) {
     return;
   }
   switch (widgetName) {
-    case 'ElectricityWidget':
+    case 'Electricity':
       //TODO refresh the data of electricity
       break;
-    case 'ClassTableWidget':
-      //TODO process events from classTableWidget
+    case 'ClassTable':
+      processClassTableEvents(data);
       break;
     default:
   }
+}
+
+void processClassTableEvents(Uri data) async {
+  //host name is converted to lowercase,
+  //for which we must use host name in lowercase.
+  switch (data.host) {
+    case 'switcherclicked':
+      // isToday: true if class table shows classes today,
+      // false if class table shows classes tomorrow.
+      bool isToday = !(await HomeWidget.getWidgetData(
+          'class_table_switcher_next',
+          defaultValue: true) as bool);
+      //TODO replace the mock classes data with proper ones
+      if (isToday) {
+        await HomeWidget.saveWidgetData('class_table_date',
+            DateTime(2023, 4, 4, 12, 0, 0, 0, 0).toString());
+        await HomeWidget.saveWidgetData('class_table_json',
+            '{"list":[{"name":"算法分析与设计","teacher":"覃桂敏","place":"B-706","start_time":1,"end_time":2},{"name":"算法分析与设计","teacher":"覃桂敏","place":"B-706","start_time":1,"end_time":2},{"name":"软件过程与项目管理","teacher":"Angaj（印）","place":"B-707","start_time":3,"end_time":4},{"name":"软件过程与项目管理","teacher":"Angaj（印）","place":"B-707","start_time":3,"end_time":4},{"name":"软件体系结构","teacher":"蔺一帅,李飞","place":"A-222","start_time":7,"end_time":8},{"name":"软件体系结构","teacher":"蔺一帅,李飞","place":"A-222","start_time":7,"end_time":8}]}');
+      } else {
+        await HomeWidget.saveWidgetData('class_table_date',
+            DateTime(2023, 4, 5, 12, 0, 0, 0, 0).toString());
+        await HomeWidget.saveWidgetData('class_table_json',
+            '{"list":[{"name":"软件过程与项目管理","teacher":"Angaj（印）","place":"B-707","start_time":3,"end_time":4},{"name":"软件过程与项目管理","teacher":"Angaj（印）","place":"B-707","start_time":3,"end_time":4},{"name":"软件体系结构","teacher":"蔺一帅,李飞","place":"A-222","start_time":7,"end_time":8},{"name":"软件体系结构","teacher":"蔺一帅,李飞","place":"A-222","start_time":7,"end_time":8}]}');
+      }
+      await HomeWidget.saveWidgetData('class_table_switcher_next', isToday);
+      break;
+    default:
+  }
+  await HomeWidget.updateWidget(name: 'ClassTableWidgetProvider', iOSName: '');
 }
