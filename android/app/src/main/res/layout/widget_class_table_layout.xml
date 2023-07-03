@@ -35,8 +35,10 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:scaleType="center"
-            android:src="@drawable/icon_next" />
+            android:background="@drawable/clickable_background"
+            android:contentDescription="switcher"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_previous" />
     </RelativeLayout>
 
     <ListView
