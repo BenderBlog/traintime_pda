@@ -7,7 +7,6 @@ import org.superbart.watermeter.ClassTableItemsFactory
 class ClassTableItemsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent?): RemoteViewsFactory =
         ClassTableItemsFactory(
-            intent!!.getStringExtra("packageName")!!,
-            intent.getStringExtra("json")!!
+            intent!!.getStringExtra("packageName")!!
         )
 }

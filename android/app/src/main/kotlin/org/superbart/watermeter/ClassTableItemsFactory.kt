@@ -2,6 +2,30 @@ package org.superbart.watermeter
 
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService.RemoteViewsFactory
+import org.json.JSONObject
+
+private val CLASS_INDEX_TIME = arrayOf(
+    "08:30",
+    "09:15",
+    "09:20",
+    "10:05",
+    "10:25",
+    "11:10",
+    "11:15",
+    "12:00",
+    "14:00",
+    "14:45",
+    "14:50",
+    "15:35",
+    "15:55",
+    "16:40",
+    "16:45",
+    "17:30",
+    "19:00",
+    "19:45",
+    "19:55",
+    "20:30",
+)
 
 data class ClassItem(
     val name: String,
@@ -13,28 +37,58 @@ data class ClassItem(
     val endTime: String,
 )
 
-class ClassTableItemsFactory(private val packageName: String, private val json: String) :
+class ClassTableItemsFactory(private val packageName: String) :
     RemoteViewsFactory {
     private val classItems = ArrayList<ClassItem>()
 
+    companion object {
+        // It is difficult for RemoteViewsFactory to get access to SharedPreference.
+        // However we need SharedPreference to act as data bridge between Native and Dart,
+        // this json variable is used to store the latest data of class table.
+        // Also see ClassTableWidgetProvider.onUpdate(...), in which the json is updated.
+        var json = "{\"list\":[]}"
+            @Synchronized
+            set(value) {
+                field = value
+            }
+    }
+
     init {
-        //TODO parse json
-        classItems.add(
-            ClassItem(
-                "Test1", "Teacher1", 1, 2, "A-101", "08:30", "10:05"
-            )
-        )
-        classItems.add(
-            ClassItem(
-                "Test2", "Teacher2", 4, 5, "B-323", "14:00", "15:35"
-            )
-        )
+        reloadData()
+    }
+
+    private fun reloadData() {
+        try {
+            val jsonObject = JSONObject(ClassTableItemsFactory.json)
+            val classList = jsonObject.getJSONArray("list")
+            for (i in 0 until classList.length()) {
+                classList.getJSONObject(i).run {
+                    val start = getInt("start_time")
+                    val end = getInt("end_time")
+                    classItems.add(
+                        ClassItem(
+                            getString("name"),
+                            getString("teacher"),
+                            start,
+                            end,
+                            getString("place"),
+                            CLASS_INDEX_TIME[start - 1],
+                            CLASS_INDEX_TIME[end - 1]
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onCreate() {
     }
 
     override fun onDataSetChanged() {
+        classItems.clear()
+        reloadData()
     }
 
     override fun onDestroy() {
