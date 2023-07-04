@@ -154,13 +154,9 @@ Future<void> updateInformation() async {
         "Try to send electric data to widget.",
         name: "ElectricSession",
       );
-      await HomeWidget.saveWidgetData<String>('title', "电费");
-      await HomeWidget.saveWidgetData<String>('message', electricityInfo.value);
-      await HomeWidget.updateWidget(
-        name: 'HomeWidgetExampleProvider',
-        androidName: 'HomeWidgetExampleProvider',
-        iOSName: 'HomeWidgetExample',
-      );
+      await HomeWidget.saveWidgetData<String>('electricity_title', "电费");
+      await HomeWidget.saveWidgetData<String>(
+          'electricity_info', electricityInfo.value);
       return;
     }
   }
