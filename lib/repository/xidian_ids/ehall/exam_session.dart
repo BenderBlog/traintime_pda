@@ -13,7 +13,7 @@ Thanks xidian-script and libxdauth!
 */
 
 import 'dart:developer' as developer;
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
 /// 考试安排 4768687067472349
 class ExamFile extends EhallSession {

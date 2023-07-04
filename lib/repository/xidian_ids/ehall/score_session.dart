@@ -16,7 +16,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
 /// 考试成绩 4768574631264620
 class ScoreFile extends EhallSession {

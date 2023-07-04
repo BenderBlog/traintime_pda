@@ -23,7 +23,7 @@ import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
 void main() async {
   developer.log(

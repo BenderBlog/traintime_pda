@@ -18,7 +18,7 @@ import 'dart:developer' as developer;
 import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
 /// 课程表 4770397878132218
 class ClassTableFile extends EhallSession {

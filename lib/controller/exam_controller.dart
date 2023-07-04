@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
-import 'package:watermeter/repository/xidian_ids/exam_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall/exam_session.dart';
 
 class ExamController extends GetxController {
   bool isGet = false;

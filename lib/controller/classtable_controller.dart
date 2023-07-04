@@ -3,7 +3,7 @@ import 'package:jiffy/jiffy.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall/classtable_session.dart';
 
 class ClassTableController extends GetxController {
   bool isGet = false;
