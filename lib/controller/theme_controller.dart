@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/user.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ThemeController extends GetxController {
   late ThemeData apptheme;
@@ -15,7 +15,8 @@ class ThemeController extends GetxController {
   void onUpdate() {
     apptheme = ThemeData(
       useMaterial3: true,
-      colorSchemeSeed: ColorSeed.values[int.parse(user["color"] ?? "0")].color,
+      colorSchemeSeed: ColorSeed
+          .values[preference.getInt(preference.Preference.color)].color,
     );
     update();
   }

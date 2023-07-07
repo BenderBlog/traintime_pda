@@ -50,10 +50,10 @@ dependencies:
   jiffy: ^6.1.0
   icalendar_parser: any
   auto_size_text: ^3.0.0
-  alice_lightweight: ^3.4.0 # Internet Inscripter
   async: ^2.10.0 # For AsyncMemoizer
   graphic: ^2.2.0
   restart_app: ^1.2.1
+  pretty_dio_logger: ^1.3.1
   get:
 
   flutter:

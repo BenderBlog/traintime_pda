@@ -20,13 +20,13 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
 import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
 import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/repository/general.dart';
+import 'package:watermeter/repository/network_session.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({Key? key}) : super(key: key);
@@ -55,8 +55,9 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
               SettingsTile(
                 title: const Text('用户信息'),
-                value: Text("${user["name"]} ${user["execution"]}\n"
-                    "${user["institutes"]} ${user["subject"]}"),
+                value: Text(
+                    "${preference.getString(preference.Preference.name)} ${preference.getString(preference.Preference.execution)}\n"
+                    "${preference.getString(preference.Preference.institutes)} ${preference.getString(preference.Preference.subject)}"),
               ),
             ],
           ),
@@ -65,8 +66,9 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('设置程序主题色'),
-                  value: Text(
-                      ColorSeed.values[int.parse(user["color"] ?? "0")].label),
+                  value: Text(ColorSeed
+                      .values[preference.getInt(preference.Preference.color)]
+                      .label),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -101,7 +103,8 @@ class _SettingWindowState extends State<SettingWindow> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                   title: const Text('课程偏移设置'),
-                  value: Text("目前为 ${user["swift"] ?? '0'}"),
+                  value: Text(
+                      "目前为 ${preference.getInt(preference.Preference.swift)}"),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -111,19 +114,17 @@ class _SettingWindowState extends State<SettingWindow> {
               SettingsTile.switchTile(
                 title: const Text("开启课表背景图"),
                 initialValue:
-                    user["decorated"] != null && user["decorated"]! == "true"
-                        ? true
-                        : false,
+                    preference.getBool(preference.Preference.decorated),
                 onToggle: (bool value) {
                   if (value == true &&
-                      (user["decoration"] == null ||
-                          user["decoration"]!.isEmpty)) {
+                      preference.getBool(preference.Preference.decoration)) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text('你先选个图片罢，就在下面'),
                     ));
                   } else {
                     setState(() {
-                      addUser("decorated", value.toString());
+                      preference.setBool(
+                          preference.Preference.decorated, value);
                     });
                   }
                 },
@@ -135,16 +136,10 @@ class _SettingWindowState extends State<SettingWindow> {
                         .pickFiles(type: FileType.image);
                     if (mounted) {
                       if (result != null) {
-                        Directory appDocDir =
-                            await getApplicationDocumentsDirectory();
-                        Directory destination = Directory(
-                            "${appDocDir.path}/org.superbart.watermeter");
-                        if (!destination.existsSync()) {
-                          await destination.create();
-                        }
-                        var decorated = File(result.files.single.path!)
-                            .copySync("${destination.path}/decoration.jpg");
-                        addUser("decoration", decorated.path);
+                        File(result.files.single.path!)
+                            .copySync("${supportPath.path}/decoration.jpg");
+                        preference.setBool(
+                            preference.Preference.decoration, true);
                         if (mounted) {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(const SnackBar(
@@ -152,9 +147,8 @@ class _SettingWindowState extends State<SettingWindow> {
                           ));
                         }
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('你没有选捏，目前设置${user["decoration"]}'),
-                        ));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('你没有选图片捏')));
                       }
                     }
                   }),
@@ -164,15 +158,10 @@ class _SettingWindowState extends State<SettingWindow> {
             title: const Text('缓存登录设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: const Text("Alice 网络拦截器"),
-                onPressed: (context) => alice.showInspector(),
-              ),
-              SettingsTile.navigation(
                 title: const Text('清除 Cookie'),
                 onPressed: (context) async {
                   try {
-                    await IDSCookieJar.deleteAll();
-                    await SportCookieJar.deleteAll();
+                    await NetworkSession().clearCookieJar();
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Cookie 已被清除'),
@@ -190,8 +179,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 onPressed: (context) async {
                   /// Clean Cookie
                   try {
-                    await IDSCookieJar.deleteAll();
-                    await SportCookieJar.deleteAll();
+                    await NetworkSession().clearCookieJar();
                     // I don't care.
                     // ignore: empty_catches
                   } on Exception {}
@@ -210,7 +198,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   }
 
                   /// Clean user information
-                  prefrenceClear();
+                  preference.prefrenceClear();
 
                   /// Theme back to default
                   ThemeController toChange = Get.put(ThemeController());

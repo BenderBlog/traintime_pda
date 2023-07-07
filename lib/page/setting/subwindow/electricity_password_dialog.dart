@@ -11,7 +11,7 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ElectricityPasswordDialog extends StatefulWidget {
   const ElectricityPasswordDialog({Key? key}) : super(key: key);
@@ -25,12 +25,12 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
   /// Sport Password Text Editing Controller
   final TextEditingController _sportPasswordController =
       TextEditingController.fromValue(TextEditingValue(
-    text: user["electricityPassword"] ?? "",
+    text: preference.getString(preference.Preference.electricityPassword),
     selection: TextSelection.fromPosition(TextPosition(
       affinity: TextAffinity.downstream,
-      offset: user["electricityPassword"] == null
-          ? 0
-          : user["electricityPassword"]!.length,
+      offset: preference
+          .getString(preference.Preference.electricityPassword)
+          .length,
     )),
   ));
 
@@ -78,7 +78,10 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
           child: const Text('提交'),
           onPressed: () async {
             if (_sportPasswordController.text.isNotEmpty) {
-              addUser("electricityPassword", _sportPasswordController.text);
+              preference.setString(
+                preference.Preference.electricityPassword,
+                _sportPasswordController.text,
+              );
               Navigator.of(context).pop();
             } else {
               ScaffoldMessenger.of(context)

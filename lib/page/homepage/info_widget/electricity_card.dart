@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
-import 'package:watermeter/repository/electricity/electricity_session.dart';
+import 'package:watermeter/repository/electricity_session.dart';
 
 class ElectricityCard extends StatelessWidget {
   const ElectricityCard({super.key});
@@ -15,7 +15,8 @@ class ElectricityCard extends StatelessWidget {
       onTap: () async {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text("电费帐号：${electricityAccount()}\n长按可以重新加载"),
+          content:
+              Text("电费帐号：${ElectricitySession.electricityAccount()}\n长按可以重新加载"),
         ));
       },
       onLongPress: () async => await update(),

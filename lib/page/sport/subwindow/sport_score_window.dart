@@ -16,7 +16,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
-import 'package:watermeter/repository/xidian_sport/score_session.dart';
+import 'package:watermeter/repository/xidian_sport_session.dart';
 
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({Key? key}) : super(key: key);
@@ -49,7 +49,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   Widget build(BuildContext context) {
     if (sportScore.value.situation == null && sportScore.value.detail.isEmpty) {
-      getScore();
+      SportSession().getScore();
     }
     super.build(context);
     return EasyRefresh.builder(
@@ -63,7 +63,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
         springRebound: false,
       ),
       onRefresh: () async {
-        await getScore();
+        await SportSession().getScore();
         _controller.finishRefresh();
       },
       refreshOnStart: true,

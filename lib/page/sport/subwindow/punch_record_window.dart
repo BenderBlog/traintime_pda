@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
-import 'package:watermeter/repository/xidian_sport/punch_session.dart';
+import 'package:watermeter/repository/xidian_sport_session.dart';
 
 class PunchRecordWindow extends StatefulWidget {
   const PunchRecordWindow({Key? key}) : super(key: key);
@@ -63,7 +63,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             springRebound: false,
           ),
           onRefresh: () async {
-            await getPunch();
+            await SportSession().getPunch();
             _controller.finishRefresh();
           },
           childBuilder: (context, physics) {

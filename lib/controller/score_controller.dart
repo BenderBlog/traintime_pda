@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:developer' as developer;
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/score_session.dart';
 
@@ -127,7 +127,8 @@ class ScoreController extends GetxController {
 
   @override
   void onInit() {
-    currentSemester = user["currentSemester"]!;
+    currentSemester =
+        preference.getString(preference.Preference.currentSemester);
     super.onInit();
   }
 

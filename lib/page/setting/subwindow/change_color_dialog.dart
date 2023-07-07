@@ -13,7 +13,7 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/widget.dart';
 
 class ChangeColorDialog extends StatefulWidget {
@@ -56,10 +56,10 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                   ],
                 ),
                 value: ColorSeed.values[i].index,
-                groupValue: int.parse(user["color"] ?? "0"),
+                groupValue: preference.getInt(preference.Preference.color),
                 onChanged: (int? value) {
                   setState(() {
-                    addUser("color", value.toString());
+                    preference.setInt(preference.Preference.color, value!);
                     ThemeController toChange = Get.put(ThemeController());
                     toChange.onUpdate();
                   });

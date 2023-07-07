@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:developer' as developer;
-import 'package:watermeter/model/user.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ehall/exam_session.dart';
 
 class ExamController extends GetxController {
@@ -16,7 +16,8 @@ class ExamController extends GetxController {
 
   @override
   void onInit() {
-    currentSemester = user["currentSemester"]!;
+    currentSemester =
+        preference.getString(preference.Preference.currentSemester);
     super.onInit();
   }
 
@@ -31,7 +32,8 @@ class ExamController extends GetxController {
     error = null;
     try {
       var qResult = await ExamFile().get(semester: semesterStr);
-      int grade = int.parse("20${user["idsAccount"]!.substring(0, 2)}");
+      int grade = int.parse(
+          "20${preference.getString(preference.Preference.idsAccount).substring(0, 2)}");
 
       if (semesters.isEmpty) {
         double current = int.parse(currentSemester.substring(0, 4)) +

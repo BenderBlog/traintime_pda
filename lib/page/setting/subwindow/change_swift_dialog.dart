@@ -12,17 +12,18 @@ if you want to use.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ChangeSwiftDialog extends StatelessWidget {
   final TextEditingController _getNumberController =
       TextEditingController.fromValue(
     TextEditingValue(
-      text: user["swift"] ?? "",
+      text: preference.getInt(preference.Preference.swift).toString(),
       selection: TextSelection.fromPosition(
         TextPosition(
           affinity: TextAffinity.downstream,
-          offset: user["swift"] == null ? 0 : user["swift"]!.length,
+          offset:
+              preference.getInt(preference.Preference.swift).toString().length,
         ),
       ),
     ),
@@ -68,9 +69,12 @@ class ChangeSwiftDialog extends StatelessWidget {
           child: const Text('提交'),
           onPressed: () async {
             if (_getNumberController.text.isEmpty) {
-              addUser("swift", "0");
+              preference.setInt(preference.Preference.swift, 0);
             } else {
-              addUser("swift", _getNumberController.text);
+              preference.setInt(
+                preference.Preference.swift,
+                int.parse(_getNumberController.text),
+              );
             }
 
             Navigator.of(context).pop();

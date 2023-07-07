@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'dart:developer' as developer;
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/classtable_session.dart';
 
@@ -154,9 +154,8 @@ class ClassTableController extends GetxController {
 
       // Get the start day of the semester.
       startDay = DateTime.parse(classTableData.termStartDay);
-      if (user["swift"] != null) {
-        startDay = startDay.add(Duration(days: 7 * int.parse(user["swift"]!)));
-      }
+      startDay = startDay.add(
+          Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
       // Get the current index.
       currentWeek = (Jiffy.now().dayOfYear -

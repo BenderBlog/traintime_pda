@@ -14,7 +14,7 @@ Thanks xidian-script and libxdauth!
 
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
@@ -30,7 +30,9 @@ class ScoreFile extends EhallSession {
         "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
         data: {
           "JXBID": JXBID,
-          'XH': user["idsAccount"],
+          'XH': preference.getString(
+            preference.Preference.idsAccount,
+          ),
           'XNXQDM': XNXQDM,
           'CKLY': 1
         }).then((value) => value.data);
@@ -116,7 +118,9 @@ class ScoreFile extends EhallSession {
   // ignore: non_constant_identifier_names
   Future<ScorePlace> getPlaceInGrade(String KCH, String XNXQDM) async {
     return await _getPlace(forPlace: {
-      'XH': user["idsAccount"],
+      'XH': preference.getString(
+        preference.Preference.idsAccount,
+      ),
       'JXBID': '*',
       'XNXQDM': XNXQDM,
       'KCH': KCH,
@@ -141,7 +145,9 @@ class ScoreFile extends EhallSession {
   // ignore: non_constant_identifier_names
   Future<ScorePlace> getPlaceInClass(String JXBID, String XNXQDM) async {
     return await _getPlace(forPlace: {
-      'XH': user["idsAccount"],
+      'XH': preference.getString(
+        preference.Preference.idsAccount,
+      ),
       'JXBID': JXBID,
       'XNXQDM': XNXQDM,
       'TJLX': "01"

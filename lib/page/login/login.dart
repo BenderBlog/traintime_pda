@@ -13,8 +13,8 @@ if you want to use.
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
-import 'package:watermeter/repository/general.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/login/captcha_input_dialog.dart';
@@ -137,7 +137,7 @@ class _LoginWindowState extends State<LoginWindow> {
                   );
                   EhallSession ses = EhallSession();
                   try {
-                    await ses.loginEhall(
+                    await ses.login(
                       username: _idsAccountController.text,
                       password: _idsPasswordController.text,
                       onResponse: (int number, String status) =>
@@ -151,8 +151,14 @@ class _LoginWindowState extends State<LoginWindow> {
                     );
                     if (!mounted) return;
                     if (isGood == true) {
-                      addUser("idsAccount", _idsAccountController.text);
-                      addUser("idsPassword", _idsPasswordController.text);
+                      preference.setString(
+                        preference.Preference.idsAccount,
+                        _idsAccountController.text,
+                      );
+                      preference.setString(
+                        preference.Preference.idsPassword,
+                        _idsPasswordController.text,
+                      );
                       await ses.getInformation();
                       if (mounted) {
                         if (pd.isOpen()) pd.close();
@@ -192,27 +198,15 @@ class _LoginWindowState extends State<LoginWindow> {
                   ),
                 ),
                 onPressed: () {
-                  IDSCookieJar.deleteAll().then(
-                    (value) => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('清理缓存成功'),
-                      ),
-                    ),
-                  );
+                  NetworkSession().clearCookieJar().then(
+                        (value) => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('清理缓存成功'),
+                          ),
+                        ),
+                      );
                 },
               ),
-              TextButton(
-                child: const Text(
-                  '查看缓存设定',
-                  style: TextStyle(
-                    color: Color(0xFFA267AC),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () {
-                  alice.showInspector();
-                },
-              )
             ],
           )
         ],

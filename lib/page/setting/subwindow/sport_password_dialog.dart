@@ -11,7 +11,7 @@ if you want to use.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as user_perference;
 
 class SportPasswordDialog extends StatefulWidget {
   const SportPasswordDialog({Key? key}) : super(key: key);
@@ -23,13 +23,19 @@ class SportPasswordDialog extends StatefulWidget {
 class _SportPasswordDialogState extends State<SportPasswordDialog> {
   /// Sport Password Text Editing Controller
   final TextEditingController _sportPasswordController =
-      TextEditingController.fromValue(TextEditingValue(
-    text: user["sportPassword"] ?? "",
-    selection: TextSelection.fromPosition(TextPosition(
-      affinity: TextAffinity.downstream,
-      offset: user["sportPassword"] == null ? 0 : user["sportPassword"]!.length,
-    )),
-  ));
+      TextEditingController.fromValue(
+    TextEditingValue(
+      text: user_perference.getString(user_perference.Preference.sportPassword),
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          affinity: TextAffinity.downstream,
+          offset: user_perference
+              .getString(user_perference.Preference.sportPassword)
+              .length,
+        ),
+      ),
+    ),
+  );
 
   bool _couldView = true;
 
@@ -75,7 +81,10 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
           child: const Text('提交'),
           onPressed: () async {
             if (_sportPasswordController.text.isNotEmpty) {
-              addUser("sportPassword", _sportPasswordController.text);
+              user_perference.setString(
+                user_perference.Preference.sportPassword,
+                _sportPasswordController.text,
+              );
               Navigator.of(context).pop();
             } else {
               ScaffoldMessenger.of(context)

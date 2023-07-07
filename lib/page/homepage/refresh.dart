@@ -13,9 +13,8 @@ if you want to use.
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/repository/electricity/electricity_session.dart'
-    as electricity;
-import 'package:watermeter/repository/xidian_sport/punch_session.dart' as punch;
+import 'package:watermeter/repository/electricity_session.dart' as electricity;
+import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
 
 void update() {
@@ -45,5 +44,5 @@ void update() {
     "Updating punch data",
     name: "Homepage Update",
   );
-  punch.getPunch();
+  SportSession().getPunch();
 }

@@ -14,7 +14,8 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -104,9 +105,10 @@ class PageState extends State<ClassTableWindow> {
     );
 
     // Init the background.
-    File image = File(user["decoration"] ?? "");
+    File image = File("${supportPath.path}/decoration.jpg");
     decoration = BoxDecoration(
-      image: (user["decorated"] == "true" && image.existsSync())
+      image: (preference.getBool(preference.Preference.decorated) &&
+              image.existsSync())
           ? DecorationImage(
               image: FileImage(image),
               fit: BoxFit.cover,

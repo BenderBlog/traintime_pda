@@ -16,7 +16,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:path_provider/path_provider.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
@@ -82,8 +82,12 @@ class ClassTableFile extends EhallSession {
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    if (user["currentSemester"] != semesterCode) {
-      user["currentSemester"] = semesterCode;
+    if (preference.getString(preference.Preference.currentSemester) !=
+        semesterCode) {
+      preference.setString(
+        preference.Preference.currentSemester,
+        semesterCode,
+      );
     }
 
     developer.log("Fetch the day the semester begin.",
@@ -95,8 +99,12 @@ class ClassTableFile extends EhallSession {
         'XQ': semesterCode.split('-')[2]
       },
     ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    if (user["currentStartDay"] != termStartDay) {
-      user["currentStartDay"] = termStartDay;
+    if (preference.getString(preference.Preference.currentStartDay) !=
+        termStartDay) {
+      preference.setString(
+        preference.Preference.currentStartDay,
+        termStartDay,
+      );
     }
 
     developer.log(

@@ -10,15 +10,12 @@ Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
 if you want to use.
 */
 
-import 'dart:io';
-
-import 'package:cookie_jar/cookie_jar.dart';
-
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/repository/general.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/network_session.dart' as repo_general;
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
@@ -34,18 +31,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Loading cookiejar.
-  Directory supportPath = await getApplicationSupportDirectory();
-  SportCookieJar = PersistCookieJar(
-      ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
-  IDSCookieJar = PersistCookieJar(
-      ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
+  repo_general.supportPath = await getApplicationSupportDirectory();
+  preference.prefs = await SharedPreferences.getInstance();
   // Have user registered?
   bool isFirst = false;
-  try {
-    await initUser();
-    await EhallSession().loginEhall(
-        username: user["idsAccount"]!, password: user["idsPassword"]!);
-  } on String {
+  String username = preference.getString(preference.Preference.idsAccount);
+  String password = preference.getString(preference.Preference.idsPassword);
+  if (username.isNotEmpty && password.isNotEmpty) {
+    await EhallSession().login(username: username, password: password);
+  } else {
     isFirst = true;
   }
   developer.log(
@@ -71,7 +65,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
-        navigatorKey: alice.getNavigatorKey(),
         title: 'WaterMeter Pre-Alpha',
         theme: c.apptheme,
         home: widget.isFirst ? const LoginWindow() : const HomePage(),

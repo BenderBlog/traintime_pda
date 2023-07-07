@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
-import 'package:watermeter/repository/xidian_sport/punch_session.dart';
+import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
 
 class SportCard extends StatelessWidget {
@@ -11,7 +11,7 @@ class SportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (punchData.value.situation == null && punchData.value.allTime == -1) {
-      getPunch();
+      SportSession().getPunch();
     }
     return Obx(
       () => GestureDetector(
@@ -28,7 +28,7 @@ class SportCard extends StatelessWidget {
             }
           }
         },
-        onLongPress: getPunch,
+        onLongPress: SportSession().getPunch,
         child: MainPageCard(
           icon: Icons.run_circle,
           text: "体育信息",

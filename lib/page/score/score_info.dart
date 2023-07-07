@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/score/watermark.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/controller/score_controller.dart';
@@ -319,7 +319,8 @@ class ScoreComposeCard extends StatelessWidget {
             Watermark(
               rowCount: 3,
               columnCount: 10,
-              text: "${user["idsAccount"]} ${user["name"]}\n仅个人参考 他用无效",
+              text:
+                  "${preference.getString(preference.Preference.idsAccount)} ${preference.getString(preference.Preference.name)}\n仅个人参考 他用无效",
               textStyle: const TextStyle(
                 color: Color(0x48000000),
                 fontSize: 10,
