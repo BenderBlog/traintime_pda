@@ -14,7 +14,6 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart';
@@ -56,11 +55,7 @@ class IDSSession extends NetworkSession {
 
   Future<bool> isLoggedIn() async {
     var response =
-        await dio.post("https://ids.xidian.edu.cn/authserver/index.do",
-            options: Options(
-              followRedirects: false,
-              validateStatus: (status) => status! < 500,
-            ));
+        await dio.post("https://ids.xidian.edu.cn/authserver/index.do");
     developer.log(
         "isLoggedIn result: ${response.headers[HttpHeaders.locationHeader]!.contains("personalInfo")}",
         name: "ids isLoggedIn");
@@ -72,12 +67,10 @@ class IDSSession extends NetworkSession {
   Future<void> checkAndLogin({
     required String target,
   }) async {
+    developer.log("Ready to get $target.", name: "ids checkAndLogin");
+    /*
     bool response = await dio
-        .get("https://ids.xidian.edu.cn/authserver/index.do",
-            options: Options(
-              followRedirects: false,
-              validateStatus: (status) => status! < 500,
-            ))
+        .get("https://ids.xidian.edu.cn/authserver/index.do")
         .then((value) =>
             value.headers["location"]?.contains("personalInfo") ?? false);
 
@@ -87,34 +80,24 @@ class IDSSession extends NetworkSession {
         password: getString(Preference.idsPassword),
       );
     }
+    */
 
     var data = await dio.get(
       "https://ids.xidian.edu.cn/authserver/login",
       queryParameters: {
         'service': target,
       },
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) {
-          return status! < 500;
-        },
-      ),
     );
-    developer.log("Received: $data.", name: "ids login");
+    developer.log("Received: $data.", name: "ids checkAndLogin");
     if (data.statusCode == 401) {
       throw PasswordWrongException();
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress.
-      developer.log("Post deal...", name: "ids login");
-      await dio.get(
-        data.headers['location']![0],
-        options: Options(
-          followRedirects: false,
-          validateStatus: (status) {
-            return status! < 500;
-          },
-        ),
-      );
+      while (data.headers[HttpHeaders.locationHeader] != null) {
+        String location = data.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids checkAndLogin");
+        data = await dio.get(location);
+      }
       return;
     } else {
       throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
@@ -133,14 +116,9 @@ class IDSSession extends NetworkSession {
       onResponse(10, "准备获取登录网页");
       developer.log("Ready to get the login webpage.", name: "ids login");
     }
-    var response = await dio.get(
-      "https://ids.xidian.edu.cn/authserver/login",
-      queryParameters: {
-        'service':
-            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
-        'type': 'userNameLogin',
-      },
-    ).then((value) => value.data);
+    var response = await dio
+        .get("https://ids.xidian.edu.cn/authserver/login")
+        .then((value) => value.data);
 
     /// Start getting data from webpage.
     var page = BeautifulSoup(response);
@@ -211,16 +189,6 @@ class IDSSession extends NetworkSession {
     }
     var data = await dio.post(
       "https://ids.xidian.edu.cn/authserver/login",
-      queryParameters: {
-        'service':
-            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
-      },
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) {
-          return status! < 500;
-        },
-      ),
       data: head,
     );
     if (data.statusCode == 401) {
@@ -230,20 +198,11 @@ class IDSSession extends NetworkSession {
       if (onResponse != null) {
         onResponse(80, "登录后处理");
       }
-      String location = data.headers['location']![0];
-      developer.log("Received: $location.", name: "ids login");
-      location = await dio
-          .get(
-            location,
-            options: Options(
-              followRedirects: false,
-              validateStatus: (status) {
-                return status! < 500;
-              },
-            ),
-          )
-          .then((value) => data.headers['location']?[0] ?? "");
-      developer.log("Received: $location.", name: "ids login");
+      while (data.headers[HttpHeaders.locationHeader] != null) {
+        String location = data.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids login");
+        data = await dio.get(location);
+      }
       return;
     } else {
       throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");

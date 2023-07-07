@@ -207,6 +207,18 @@ class _LoginWindowState extends State<LoginWindow> {
                       );
                 },
               ),
+              TextButton(
+                child: const Text(
+                  '查看网络交互',
+                  style: TextStyle(
+                    color: Color(0xFFA267AC),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () {
+                  alice.showInspector();
+                },
+              ),
             ],
           )
         ],

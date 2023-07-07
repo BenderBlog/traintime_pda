@@ -15,6 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/network_session.dart' as repo_general;
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login/login.dart';
@@ -65,6 +66,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
+        navigatorKey: alice.getNavigatorKey(),
         title: 'WaterMeter Pre-Alpha',
         theme: c.apptheme,
         home: widget.isFirst ? const LoginWindow() : const HomePage(),

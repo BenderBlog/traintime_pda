@@ -16,8 +16,9 @@ import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:alice/alice.dart';
 
+Alice alice = Alice();
 late Directory supportPath;
 
 class NetworkSession {
@@ -39,17 +40,10 @@ class NetworkSession {
         ),
       )
         ..interceptors.add(CookieManager(cookieJar))
-        ..interceptors.add(
-          PrettyDioLogger(
-            requestHeader: true,
-            requestBody: true,
-            responseHeader: true,
-            responseBody: false,
-            error: true,
-            compact: false,
-            maxWidth: 90,
-          ),
-        );
+        ..interceptors.add(alice.getDioInterceptor())
+        ..options.followRedirects = false
+        ..options.validateStatus =
+            (status) => status != null && status >= 200 && status < 400;
 
   @protected
   Future<bool> isInSchool() async {

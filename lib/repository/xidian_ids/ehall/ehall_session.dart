@@ -32,7 +32,7 @@ class EhallSession extends IDSSession {
     developer.log("Ready to use the app $appID.", name: "Ehall useApp");
     developer.log("Try to login.", name: "Ehall useApp");
     if (!await isLoggedIn()) {
-      super.checkAndLogin(
+      await super.checkAndLogin(
         target:
             "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
       );
