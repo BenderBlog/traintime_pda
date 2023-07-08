@@ -6,8 +6,6 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
 */
 
 import 'package:flutter/material.dart';
@@ -21,7 +19,7 @@ import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
-import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 void main() async {
   developer.log(
@@ -39,7 +37,10 @@ void main() async {
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
   if (username.isNotEmpty && password.isNotEmpty) {
-    await EhallSession().login(username: username, password: password);
+    await IDSSession().checkAndLogin(
+      target:
+          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+    );
   } else {
     isFirst = true;
   }

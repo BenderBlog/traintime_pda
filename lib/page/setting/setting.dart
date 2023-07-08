@@ -6,8 +6,6 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
 */
 
 import 'dart:io';
@@ -90,6 +88,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   }),
               SettingsTile.navigation(
                   title: const Text('电费帐号密码设置'),
+                  description: const Text('非 123456 请设置'),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -157,6 +156,10 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             title: const Text('缓存登录设置'),
             tiles: <SettingsTile>[
+              SettingsTile.navigation(
+                title: const Text('查看网络拦截器'),
+                onPressed: (context) => alice.showInspector(),
+              ),
               SettingsTile.navigation(
                 title: const Text('清除 Cookie'),
                 onPressed: (context) async {

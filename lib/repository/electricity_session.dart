@@ -7,11 +7,11 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
 
 Thanks xidian-script!
 */
+
+import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
@@ -99,21 +99,24 @@ class ElectricitySession extends NetworkSession {
   }
 
   Future<void> updateInformation() async {
-    if (await isInSchool() == false) {
+    if (await NetworkSession.isInSchool() == false) {
       throw NotSchoolNetworkException();
     }
 
-    /// ASP session id.
-    var sessionId = await dio
-        .get("$base/searchWap/Login.aspx")
-        .then((value) => value.headers.map["Set-Cookie"]![0]);
-    sessionId = sessionId.substring(0, 42);
-
+    /// Get electricity password
+    String password = preference.getString(
+      preference.Preference.electricityPassword,
+    );
     developer.log(
-      "The electricity session id is: $sessionId.",
+      "Electricity password $password ${password.isEmpty}",
       name: "ElectricSession",
     );
+    if (password.isEmpty) {
+      password = "123456";
+    }
 
+    /// ASP session id.
+    await dio.get("$base/searchWap/Login.aspx");
     var account = electricityAccount();
 
     /// Login function.
@@ -122,23 +125,27 @@ class ElectricitySession extends NetworkSession {
           "$base/ajaxpro/SearchWap_Login,App_Web_fghipt60.ashx",
           data: {
             "webName": account,
-            "webPass": preference.getString(
-              preference.Preference.electricityPassword,
-            ),
+            "webPass": password,
           },
-          options: Options(headers: {
-            "AjaxPro-Method": "getLoginInput",
-            "Cookie": sessionId,
-            'Origin': "$base/ajaxpro/SearchWap_Login,App_Web_fghipt60.ashx",
-          }),
+          options: Options(
+            contentType: ContentType.json.toString(),
+            headers: {
+              "AjaxPro-Method": "getLoginInput",
+              'Origin': base,
+            },
+          ),
         )
         .then((value) => value.data.toString());
 
     /// Get data.
     var page = await dio
-        .get("$base/searchWap/webFrm/met.aspx",
-            options: Options(headers: {"Cookie": sessionId}))
+        .get("$base/searchWap/webFrm/met.aspx")
         .then((value) => value.data);
+
+    developer.log(
+      page,
+      name: "ElectricSession",
+    );
 
     //int building = int.parse(account.substring(1, 4));
     RegExp name = RegExp(r"表名称：.*");

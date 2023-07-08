@@ -6,8 +6,6 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-Please refer to ADDITIONAL TERMS APPLIED TO watermeter_postgraduate SOURCE CODE
-if you want to use.
 */
 
 import 'dart:io';
@@ -45,8 +43,7 @@ class NetworkSession {
         ..options.validateStatus =
             (status) => status != null && status >= 200 && status < 400;
 
-  @protected
-  Future<bool> isInSchool() async {
+  static Future<bool> isInSchool() async {
     bool isInSchool = false;
     Dio dio = Dio()
       ..options.connectTimeout = const Duration(milliseconds: 2000);

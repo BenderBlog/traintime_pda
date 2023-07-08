@@ -6,8 +6,6 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
 */
 
 import 'dart:convert';
@@ -16,7 +14,6 @@ import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/preference.dart';
 
 class IDSSession extends NetworkSession {
   /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
