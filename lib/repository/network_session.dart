@@ -22,7 +22,9 @@ late Directory supportPath;
 class NetworkSession {
   @protected
   final PersistCookieJar cookieJar = PersistCookieJar(
-      ignoreExpires: true, storage: FileStorage("${supportPath.path}/cookie/"));
+    persistSession: true,
+    storage: FileStorage("${supportPath.path}/cookie/general"),
+  );
 
   Future<void> clearCookieJar() => cookieJar.deleteAll();
 
@@ -31,9 +33,12 @@ class NetworkSession {
         BaseOptions(
           contentType: Headers.formUrlEncodedContentType,
           headers: {
-            HttpHeaders.connectionHeader: "keep-alive",
             HttpHeaders.userAgentHeader:
-                "Mozilla/5.0 (Linux; Android 13; SM-A037U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36  uacq",
+                "Mozilla/5.0 (Linux; Android 11; KB2000 Build/RP1A.201005.001; wv)"
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99"
+                    "XWEB/3263 MMWEBSDK/20211001 Mobile Safari/537.36 MMWEBID/3667"
+                    "MicroMessenger/8.0.16.2040(0x28001037) Process/toolsmp WeChat/arm64"
+                    "Weixin NetType/WIFI Language/zh_CN ABI/arm64",
           },
         ),
       )
