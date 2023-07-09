@@ -36,28 +36,6 @@ class TabForSport extends StatelessWidget {
               Navigator.pop(context);
             },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.info),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('谁想的让我们上四年体育的'),
-                    content: Image.asset("assets/Why-4-Years-Sport.jpg"),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text("确定"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.edit)),

@@ -1,5 +1,5 @@
 name: watermeter
-description: Traintime PDA is going to be a model app for school information protocol.
+description: Another personal data assistant for XDU.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.0.5+20230625
+version: 0.0.6+20230709
 
 environment:
   sdk: ">=3.0.0"
@@ -63,7 +63,6 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  lucide_icons: ^0.248.0
 
 dev_dependencies:
   flutter_test:
@@ -101,10 +100,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     # Easter egg for ironic things, long live Futurama!
-    - assets/Farnsworth-Class.jpg
     - assets/Humpy-Score.jpg
-    - assets/Why-4-Years-Sport.jpg
-    - assets/Boochi-Afraid-Work.jpg
+    - assets/Credit.jpg
     - assets/Ray.jpg
     - assets/icon.png
 

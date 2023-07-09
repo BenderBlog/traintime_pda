@@ -18,11 +18,12 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/controller/theme_controller.dart';
+import 'package:watermeter/page/setting/about_page.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
-import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
-import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
-import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -44,11 +45,11 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile(
-                title: const Text('XDYou 0.0.5'),
-                value: const Text('Codebase Traintime PDA 0.0.5'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://github.com/BenderBlog/watermeter"),
-                  mode: LaunchMode.externalApplication,
+                title: const Text('Traintime PDA 0.0.6'),
+                onPressed: (context) => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AboutPage(),
+                  ),
                 ),
               ),
               SettingsTile(
@@ -211,72 +212,6 @@ class _SettingWindowState extends State<SettingWindow> {
                   if (mounted) {
                     Restart.restartApp();
                   }
-                },
-              ),
-            ],
-          ),
-          SettingsSection(
-            title: const Text('关于本软件'),
-            tiles: <SettingsTile>[
-              SettingsTile.navigation(
-                title: const Text('Developed by BenderBlog Rodriguez'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://legacy.superbart.xyz/"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
-                // onPressed: (context) => _playEffect("QuadDamage.wav"),
-              ),
-              SettingsTile(
-                title: const Text('受到 Myxdu (电表)启发'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://myxdu.moefactory.com/"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
-                // onPressed: (context) => _playEffect("QuadDamage.wav"),
-              ),
-              SettingsTile(
-                title: const Text('网络逻辑 xidian-script'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://github.com/xdlinux/xidian-scripts"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: You don't need to fear about anything, even Shub-Niggurath...
-                // onPressed: (context) => _playEffect("HellProtecting.wav"),
-              ),
-              SettingsTile(
-                title: const Text('西电目录原版'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://ncov.hawa130.com/about"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: ...with the power of HELL, the updown Pentagram.
-                // onPressed: (context) => _playEffect("HellProtection.wav"),
-              ),
-              SettingsTile(
-                title: const Text('Apple 硬件支援者自画像'),
-                onPressed: (context) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Self-Portrait of this person"),
-                      content: Image.asset("assets/Ray.jpg"),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text("文章"),
-                          onPressed: () => launchUrl(
-                            Uri.parse("https://www.coolapk.com/feed/45104934"),
-                            mode: LaunchMode.externalApplication,
-                          ),
-                        ),
-                        TextButton(
-                          child: const Text("确定"),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                  );
                 },
               ),
             ],

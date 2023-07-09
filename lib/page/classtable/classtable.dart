@@ -257,15 +257,6 @@ class PageState extends State<ClassTableWindow> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.info),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => aboutDialog(context),
-              );
-            },
-          ),
         ],
         bottom: (controller.classTableData.timeArrangement.isNotEmpty &&
                 controller.classTableData.classDetail.isNotEmpty)
@@ -780,19 +771,6 @@ class PageState extends State<ClassTableWindow> {
       ],
     );
   }
-
-  Widget aboutDialog(context) => AlertDialog(
-        title: const Text("不过我还是每次去教室"),
-        content: Image.asset("assets/Farnsworth-Class.jpg"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("确定"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
 }
 
 class NotArrangedClassList extends StatelessWidget {

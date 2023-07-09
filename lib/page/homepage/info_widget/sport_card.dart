@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
-import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 
 class SportCard extends StatelessWidget {
   const SportCard({super.key});

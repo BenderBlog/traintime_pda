@@ -38,15 +38,6 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => NoArrangedInfo(list: c.toBeArranged))),
             ),
-            IconButton(
-              icon: const Icon(Icons.info),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => aboutDialog(context),
-                );
-              },
-            ),
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48.0),
@@ -104,17 +95,6 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
       ),
     );
   }
-
-  Widget aboutDialog(context) => AlertDialog(
-        title: const Text("考试还不是所有......"),
-        content: Image.asset("assets/Boochi-Afraid-Work.jpg"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("确定"),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      );
 }
 
 class NoArrangedInfo extends StatelessWidget {
