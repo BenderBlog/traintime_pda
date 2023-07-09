@@ -18,6 +18,7 @@ import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 
 var electricityInfo = "".obs;
 
@@ -162,6 +163,15 @@ class ElectricitySession extends NetworkSession {
           electricityInfo.value,
           name: "ElectricSession",
         );
+        try {
+          developer.log(
+            "try to get card money",
+            name: "ElectricSession",
+          );
+          SchoolCardSession().loginCard();
+        } catch (e) {
+          return;
+        }
         return;
       }
     }

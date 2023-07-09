@@ -15,6 +15,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class IDSSession extends NetworkSession {
   /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
@@ -55,7 +56,6 @@ class IDSSession extends NetworkSession {
     required String target,
   }) async {
     developer.log("Ready to get $target.", name: "ids checkAndLogin");
-
     var data = await dio.get(
       "https://ids.xidian.edu.cn/authserver/login",
       queryParameters: {
@@ -74,11 +74,14 @@ class IDSSession extends NetworkSession {
       }
       return data;
     } else {
-      throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
+      return await login(
+        username: preference.getString(preference.Preference.idsAccount),
+        password: preference.getString(preference.Preference.idsPassword),
+      );
     }
   }
 
-  Future<void> login({
+  Future<Response> login({
     required String username,
     required String password,
     Future<String?> Function(String)? getCaptcha,
@@ -122,7 +125,9 @@ class IDSSession extends NetworkSession {
       developer.log("cookie: $cookieStr.", name: "ids login");
       captcha = await getCaptcha(cookieStr);
       developer.log("captcha: $captcha.", name: "ids login");
-      if (captcha == null) return;
+      if (captcha == null) {
+        throw NeedCaptchaException;
+      }
     } else if (isNeed && getCaptcha == null) {
       throw NeedCaptchaException();
     }
@@ -177,7 +182,7 @@ class IDSSession extends NetworkSession {
         developer.log("Received: $location.", name: "ids login");
         data = await dio.get(location);
       }
-      return;
+      return data;
     } else {
       throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
     }
