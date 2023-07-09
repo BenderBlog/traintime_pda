@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:watermeter/repository/network_session.dart';
 
@@ -50,34 +51,10 @@ class IDSSession extends NetworkSession {
     "execution",
   ];
 
-  Future<bool> isLoggedIn() async {
-    var response =
-        await dio.post("https://ids.xidian.edu.cn/authserver/index.do");
-    developer.log(
-        "isLoggedIn result: ${response.headers[HttpHeaders.locationHeader]!.contains("personalInfo")}",
-        name: "ids isLoggedIn");
-    return response.headers[HttpHeaders.locationHeader]
-            ?.contains("personalInfo") ??
-        false;
-  }
-
-  Future<void> checkAndLogin({
+  Future<Response> checkAndLogin({
     required String target,
   }) async {
     developer.log("Ready to get $target.", name: "ids checkAndLogin");
-    /*
-    bool response = await dio
-        .get("https://ids.xidian.edu.cn/authserver/index.do")
-        .then((value) =>
-            value.headers["location"]?.contains("personalInfo") ?? false);
-
-    if (!response) {
-      login(
-        username: getString(Preference.idsAccount),
-        password: getString(Preference.idsPassword),
-      );
-    }
-    */
 
     var data = await dio.get(
       "https://ids.xidian.edu.cn/authserver/login",
@@ -95,7 +72,7 @@ class IDSSession extends NetworkSession {
         developer.log("Received: $location.", name: "ids checkAndLogin");
         data = await dio.get(location);
       }
-      return;
+      return data;
     } else {
       throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
     }

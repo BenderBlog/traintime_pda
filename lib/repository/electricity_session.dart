@@ -16,14 +16,14 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
-import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 var electricityInfo = "".obs;
 
 Future<void> update() async {
   try {
-    electricityInfo.value = "正在获取";
+    electricityInfo.value = "正在获取电量";
     await ElectricitySession().updateInformation();
   } on NotSchoolNetworkException {
     electricityInfo.value = "目前不是校园网";
@@ -32,7 +32,7 @@ Future<void> update() async {
       "Network error: $e",
       name: "ElectricSession",
     );
-    electricityInfo.value = "网络故障";
+    electricityInfo.value = "电量网络故障";
   } on NotFoundException {
     electricityInfo.value = "未找到电表数据";
   } catch (e) {
@@ -40,7 +40,7 @@ Future<void> update() async {
       "Unknown error: $e",
       name: "ElectricSession",
     );
-    electricityInfo.value = "程序故障";
+    electricityInfo.value = "电量程序故障";
   }
 }
 
@@ -157,7 +157,7 @@ class ElectricitySession extends NetworkSession {
     //by ZCWzy
     for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
-        electricityInfo.value = "${dataArray[i][0]!} 度";
+        electricityInfo.value = "${dataArray[i][0]!}度";
         developer.log(
           electricityInfo.value,
           name: "ElectricSession",

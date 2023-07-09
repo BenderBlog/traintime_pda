@@ -16,7 +16,6 @@ import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class EhallSession extends IDSSession {
-  @override
   Future<bool> isLoggedIn() async {
     var response = await dio.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",

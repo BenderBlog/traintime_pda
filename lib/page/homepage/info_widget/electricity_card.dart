@@ -1,25 +1,34 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
-import 'package:watermeter/repository/electricity_session.dart';
+import 'package:watermeter/repository/electricity_session.dart'
+    as electricity_session;
+import 'package:watermeter/repository/xidian_ids/payment_session.dart'
+    as owe_session;
 
 class ElectricityCard extends StatelessWidget {
   const ElectricityCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    if (electricityInfo.value.isEmpty) {
-      update();
+    if (electricity_session.electricityInfo.value.isEmpty) {
+      electricity_session.update();
+    }
+    if (owe_session.owe.value.isEmpty) {
+      owe_session.update();
     }
     return GestureDetector(
       onTap: () async {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           behavior: SnackBarBehavior.floating,
-          content:
-              Text("电费帐号：${ElectricitySession.electricityAccount()}\n长按可以重新加载"),
+          content: Text(
+              "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n长按可以重新加载，有欠费一般代表水费"),
         ));
       },
-      onLongPress: () async => await update(),
+      onLongPress: () {
+        electricity_session.update();
+        owe_session.update();
+      },
       child: MainPageCard(
         height: 100,
         icon: Icons.electric_meter_rounded,
@@ -29,7 +38,7 @@ class ElectricityCard extends StatelessWidget {
             child: Center(
               child: Obx(
                 () => Text(
-                  electricityInfo.value,
+                  "${electricity_session.electricityInfo.value} ${owe_session.owe.value}",
                   textScaleFactor: 1.15,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
