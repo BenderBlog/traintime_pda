@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
@@ -117,7 +116,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     preference.getBool(preference.Preference.decorated),
                 onToggle: (bool value) {
                   if (value == true &&
-                      preference.getBool(preference.Preference.decoration)) {
+                      !preference.getBool(preference.Preference.decoration)) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text('你先选个图片罢，就在下面'),
                     ));
