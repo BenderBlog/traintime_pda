@@ -8,6 +8,7 @@ import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -66,6 +67,7 @@ class PhoneMainPage extends StatelessWidget {
             ),
             const SportCard(),
             const ElectricityCard(),
+            const SchoolCardInfoCard(),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),

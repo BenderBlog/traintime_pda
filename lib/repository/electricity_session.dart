@@ -163,17 +163,6 @@ class ElectricitySession extends NetworkSession {
           electricityInfo.value,
           name: "ElectricSession",
         );
-        try {
-          developer.log(
-            "try to get card money",
-            name: "ElectricSession",
-          );
-          await SchoolCardSession().init();
-          await SchoolCardSession().getMoney();
-          await SchoolCardSession().getQRCode();
-        } catch (e) {
-          return;
-        }
         return;
       }
     }

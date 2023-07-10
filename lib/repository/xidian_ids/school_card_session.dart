@@ -33,20 +33,11 @@ class SchoolCardSession extends IDSSession {
         .then(
           (value) => BeautifulSoup(value.data),
         );
-    developer
-        .log(response.find('img', id: "qrcode")?.attributes.toString() ?? "");
+    developer.log(
+        response.find('img', id: "qrcode")?.attributes["src"].toString() ?? "");
   }
 
   Future<void> getMoney() async {
-    developer.log(
-      "$virtualCardUrl\n$personalCenter",
-      name: "SchoolCardSessionGetMoney",
-    );
-    developer.log(
-      "https://v8scan.xidian.edu.cn/$personalCenter",
-      name: "SchoolCardSessionGetMoney",
-    );
-
     var response = await dio
         .get(
           "https://v8scan.xidian.edu.cn/$personalCenter",
@@ -62,7 +53,7 @@ class SchoolCardSession extends IDSSession {
     );
   }
 
-  Future<void> init() async {
+  Future<void> initSession() async {
     var response = await dio.get(
       "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
     );
@@ -82,5 +73,6 @@ class SchoolCardSession extends IDSSession {
         personalCenter += element["href"]!;
       }
     }
+    await getMoney();
   }
 }
