@@ -8,8 +8,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/sport/subwindow/punch_record_window.dart';
-import 'package:watermeter/page/sport/subwindow/sport_score_window.dart';
+import 'package:watermeter/page/sport/punch_record_window.dart';
+import 'package:watermeter/page/sport/sport_score_window.dart';
 
 class SportWindow extends StatelessWidget {
   const SportWindow({Key? key}) : super(key: key);

@@ -67,7 +67,7 @@ class PhoneMainPage extends StatelessWidget {
             ),
             const SportCard(),
             const ElectricityCard(),
-            const SchoolCardInfoCard(),
+            SchoolCardInfoCard(),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),
