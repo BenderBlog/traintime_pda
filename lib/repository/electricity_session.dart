@@ -168,7 +168,9 @@ class ElectricitySession extends NetworkSession {
             "try to get card money",
             name: "ElectricSession",
           );
-          SchoolCardSession().loginCard();
+          await SchoolCardSession().init();
+          await SchoolCardSession().getMoney();
+          await SchoolCardSession().getQRCode();
         } catch (e) {
           return;
         }
