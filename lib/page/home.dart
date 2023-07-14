@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/xdu_planet/mainpage.dart';
 import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
 
 class PageInformation {
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   static final _page = [
     const MainPage(),
     const XidianDirWindow(),
-    const Placeholder(),
+    const XDUPlanetPage(),
     const SettingWindow(),
   ];
 

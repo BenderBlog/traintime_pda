@@ -10,6 +10,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+import 'package:watermeter/page/xdu_planet/mainpage.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -216,6 +217,18 @@ class _LoginWindowState extends State<LoginWindow> {
                 onPressed: () {
                   alice.showInspector();
                 },
+              ),
+              TextButton(
+                child: const Text(
+                  'XDU Planet',
+                  style: TextStyle(
+                    color: Color(0xFFA267AC),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const XDUPlanetPage(),
+                )),
               ),
             ],
           )

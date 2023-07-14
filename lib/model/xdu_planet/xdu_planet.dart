@@ -12,10 +12,25 @@ import 'package:json_annotation/json_annotation.dart';
 part 'xdu_planet.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class RepoList {
-  Map<String, String> repos = {};
+class Repo {
+  String name;
+  String url;
 
-  RepoList();
+  Repo({
+    required this.name,
+    required this.url,
+  });
+
+  factory Repo.fromJson(Map<String, dynamic> json) => _$RepoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RepoToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class RepoList {
+  List<Repo> repos;
+
+  RepoList({required this.repos});
 
   factory RepoList.fromJson(Map<String, dynamic> json) =>
       _$RepoListFromJson(json);

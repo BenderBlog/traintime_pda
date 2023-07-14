@@ -6,11 +6,24 @@ part of 'xdu_planet.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-RepoList _$RepoListFromJson(Map<String, dynamic> json) =>
-    RepoList()..repos = Map<String, String>.from(json['repos'] as Map);
+Repo _$RepoFromJson(Map<String, dynamic> json) => Repo(
+      name: json['name'] as String,
+      url: json['url'] as String,
+    );
+
+Map<String, dynamic> _$RepoToJson(Repo instance) => <String, dynamic>{
+      'name': instance.name,
+      'url': instance.url,
+    };
+
+RepoList _$RepoListFromJson(Map<String, dynamic> json) => RepoList(
+      repos: (json['repos'] as List<dynamic>)
+          .map((e) => Repo.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
 
 Map<String, dynamic> _$RepoListToJson(RepoList instance) => <String, dynamic>{
-      'repos': instance.repos,
+      'repos': instance.repos.map((e) => e.toJson()).toList(),
     };
 
 TitleEntry _$TitleEntryFromJson(Map<String, dynamic> json) => TitleEntry(

@@ -20,17 +20,14 @@ class PlanetSession extends NetworkSession {
   }
 
   Future<TitleList> titleList(String author) async {
-    var response = await dio.get(base, data: {
-      "feed": author,
-    }).then((value) => value.data);
+    var response =
+        await dio.get("$base?feed=$author").then((value) => value.data);
     return TitleList.fromJson(response);
   }
 
   Future<Content> content(String author, int page) async {
-    var response = await dio.get(base, data: {
-      "feed": author,
-      "p": page,
-    }).then((value) => value.data);
+    var response =
+        await dio.get("$base?feed=$author&p=$page").then((value) => value.data);
     return Content.fromJson(response);
   }
 }
