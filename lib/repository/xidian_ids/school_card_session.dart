@@ -9,7 +9,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 import 'dart:io';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';

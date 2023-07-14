@@ -55,27 +55,9 @@ class SchoolCardWindow extends StatelessWidget {
             child: DataTable(
               columnSpacing: 40.0,
               columns: const [
-                DataColumn(
-                  label: Center(
-                    child: Text(
-                      '商户名称',
-                    ),
-                  ),
-                ),
-                DataColumn(
-                  label: Center(
-                    child: Text(
-                      '金额',
-                    ),
-                  ),
-                ),
-                DataColumn(
-                  label: Center(
-                    child: Text(
-                      '时间',
-                    ),
-                  ),
-                ),
+                DataColumn(label: Center(child: Text('商户名称'))),
+                DataColumn(label: Center(child: Text('金额'))),
+                DataColumn(label: Center(child: Text('时间'))),
               ],
               rows: [
                 for (var i in c.getPaid)
