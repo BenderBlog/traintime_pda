@@ -12,8 +12,19 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 
-class SchoolCardWindow extends StatelessWidget {
+class SchoolCardWindow extends StatefulWidget {
   const SchoolCardWindow({super.key});
+
+  @override
+  State<SchoolCardWindow> createState() => _SchoolCardWindowState();
+}
+
+class _SchoolCardWindowState extends State<SchoolCardWindow> {
+  @override
+  void initState() {
+    super.initState();
+    Get.put(SchoolCardController()).refreshPaidRecord();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,26 +62,34 @@ class SchoolCardWindow extends StatelessWidget {
           ),
         ),
         body: Obx(
-          () => SingleChildScrollView(
-            child: DataTable(
-              columnSpacing: 40.0,
-              columns: const [
-                DataColumn(label: Center(child: Text('商户名称'))),
-                DataColumn(label: Center(child: Text('金额'))),
-                DataColumn(label: Center(child: Text('时间'))),
-              ],
-              rows: [
-                for (var i in c.getPaid)
-                  DataRow(
-                    cells: <DataCell>[
-                      DataCell(Text(i.place)),
-                      DataCell(Text(i.money)),
-                      DataCell(Text(i.date)),
-                    ],
-                  ),
-              ],
-            ),
-          ),
+          () {
+            if (c.getPaid.isNotEmpty) {
+              return SingleChildScrollView(
+                child: DataTable(
+                  columnSpacing: 40.0,
+                  columns: const [
+                    DataColumn(label: Center(child: Text('商户名称'))),
+                    DataColumn(label: Center(child: Text('金额'))),
+                    DataColumn(label: Center(child: Text('时间'))),
+                  ],
+                  rows: [
+                    for (var i in c.getPaid)
+                      DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text(i.place)),
+                          DataCell(Text(i.money)),
+                          DataCell(Text(i.date)),
+                        ],
+                      ),
+                  ],
+                ),
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
         ),
       ),
     );
