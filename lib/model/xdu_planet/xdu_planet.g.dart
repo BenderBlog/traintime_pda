@@ -32,13 +32,15 @@ Map<String, dynamic> _$RepoListToJson(RepoList instance) => <String, dynamic>{
 
 TitleEntry _$TitleEntryFromJson(Map<String, dynamic> json) => TitleEntry(
       title: json['title'] as String,
-      time: json['time'] as int,
+      time: DateTime.parse(json['time'] as String),
+      url: json['url'] as String,
     );
 
 Map<String, dynamic> _$TitleEntryToJson(TitleEntry instance) =>
     <String, dynamic>{
       'title': instance.title,
-      'time': instance.time,
+      'time': instance.time.toIso8601String(),
+      'url': instance.url,
     };
 
 TitleList _$TitleListFromJson(Map<String, dynamic> json) => TitleList(

@@ -99,7 +99,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => PersonalPage(
                       index: keys[index],
-                      data: data[keys[index]]!,
+                      repo: data[keys[index]]!,
                     ),
                   )),
                 ),
