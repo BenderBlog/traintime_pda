@@ -166,7 +166,7 @@ class ScoreWindow extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () {
-              if (Get.put(ScoreController()).presscount >= 5) {
+              if (Get.put(ScoreController()).presscount >= 4) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text("行吧，不过别自找麻烦，我可不管"),
                 ));

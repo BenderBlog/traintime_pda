@@ -8,22 +8,26 @@ part of 'xdu_planet.dart';
 
 Repo _$RepoFromJson(Map<String, dynamic> json) => Repo(
       name: json['name'] as String,
-      url: json['url'] as String,
+      website: json['website'] as String,
+      feed: json['feed'] as String,
+      favicon: json['favicon'] as String,
     );
 
 Map<String, dynamic> _$RepoToJson(Repo instance) => <String, dynamic>{
       'name': instance.name,
-      'url': instance.url,
+      'website': instance.website,
+      'feed': instance.feed,
+      'favicon': instance.favicon,
     };
 
 RepoList _$RepoListFromJson(Map<String, dynamic> json) => RepoList(
-      repos: (json['repos'] as List<dynamic>)
-          .map((e) => Repo.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      repos: (json['repos'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, Repo.fromJson(e as Map<String, dynamic>)),
+      ),
     );
 
 Map<String, dynamic> _$RepoListToJson(RepoList instance) => <String, dynamic>{
-      'repos': instance.repos.map((e) => e.toJson()).toList(),
+      'repos': instance.repos.map((k, e) => MapEntry(k, e.toJson())),
     };
 
 TitleEntry _$TitleEntryFromJson(Map<String, dynamic> json) => TitleEntry(

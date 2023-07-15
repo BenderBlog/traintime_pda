@@ -55,8 +55,6 @@ class _ContentPageState extends State<ContentPage> {
     A paragraph with <strong>strong</strong>, <em>emphasized</em>
     and <span style="color: red">colored</span> text.
   </p>
-  <!-- anything goes here -->
-
 '''));
             } catch (e, s) {
               return Text("Error: $e, $s");

@@ -14,11 +14,13 @@ import 'package:watermeter/page/xdu_planet/content_page.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class PersonalPage extends StatefulWidget {
-  final String name;
+  final String index;
+  final Repo data;
 
   const PersonalPage({
     super.key,
-    required this.name,
+    required this.index,
+    required this.data,
   });
 
   @override
@@ -31,14 +33,14 @@ class _PersonalPageState extends State<PersonalPage> {
   @override
   void initState() {
     super.initState();
-    titleList = PlanetSession().titleList(widget.name);
+    titleList = PlanetSession().titleList(widget.index);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name),
+        title: Text(widget.data.name),
       ),
       body: FutureBuilder<TitleList>(
         future: titleList,
@@ -54,12 +56,14 @@ class _PersonalPageState extends State<PersonalPage> {
                   subtitle: Text(
                     snapshot.data!.list[index].time.toString(),
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ContentPage(
-                      name: widget.name,
-                      index: index,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ContentPage(
+                        name: widget.index,
+                        index: index,
+                      ),
                     ),
-                  )),
+                  ),
                 ),
               );
             } catch (e, s) {

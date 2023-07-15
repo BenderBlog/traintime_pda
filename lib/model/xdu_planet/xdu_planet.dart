@@ -14,11 +14,15 @@ part 'xdu_planet.g.dart';
 @JsonSerializable(explicitToJson: true)
 class Repo {
   String name;
-  String url;
+  String website;
+  String feed;
+  String favicon;
 
   Repo({
     required this.name,
-    required this.url,
+    required this.website,
+    required this.feed,
+    required this.favicon,
   });
 
   factory Repo.fromJson(Map<String, dynamic> json) => _$RepoFromJson(json);
@@ -28,7 +32,7 @@ class Repo {
 
 @JsonSerializable(explicitToJson: true)
 class RepoList {
-  List<Repo> repos;
+  Map<String, Repo> repos;
 
   RepoList({required this.repos});
 
