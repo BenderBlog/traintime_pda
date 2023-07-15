@@ -16,6 +16,7 @@ import 'package:dio/dio.dart';
 import 'package:watermeter/model/xidian_directory/cafeteria_window_item.dart';
 import 'package:watermeter/model/xidian_directory/shop_information.dart';
 import 'package:watermeter/model/xidian_directory/telephone.dart';
+import 'package:watermeter/repository/network_session.dart';
 
 const String _apiKey = 'ya0UhH6yzo8nKmWyrHfkLEyb';
 const String _xlId = 'qvGPBI8zLfAyNs9yWxBxd0iW-MdYXbMMI';
@@ -37,6 +38,7 @@ Dio get _dio {
     baseUrl: "https://ncov-api.hawa130.com/1.1/classes",
     headers: _head(),
   );
+  toReturn.interceptors.add(alice.getDioInterceptor());
   return toReturn;
 }
 

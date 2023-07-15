@@ -61,6 +61,7 @@ class _DiningHallWindowState extends State<DiningHallWindow>
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "dininghall",
         onPressed: () => setState(() {
           isSearch = !isSearch;
         }),

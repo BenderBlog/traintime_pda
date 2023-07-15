@@ -60,6 +60,7 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow>
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "comprehensive",
         onPressed: () => setState(() {
           isSearch = !isSearch;
         }),

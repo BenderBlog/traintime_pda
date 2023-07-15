@@ -19,33 +19,6 @@ class PageInformation {
   });
 }
 
-List<PageInformation> destinations = [
-  PageInformation(
-    index: 0,
-    name: "主页",
-    icon: Icons.home,
-    iconChoice: Icons.home_outlined,
-  ),
-  PageInformation(
-    index: 1,
-    name: "西电目录",
-    icon: Icons.store,
-    iconChoice: Icons.store_outlined,
-  ),
-  PageInformation(
-    index: 2,
-    name: "XDU Planet",
-    icon: Icons.feed,
-    iconChoice: Icons.feed_outlined,
-  ),
-  PageInformation(
-    index: 3,
-    name: "设置",
-    icon: Icons.settings,
-    iconChoice: Icons.settings_outlined,
-  ),
-];
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -56,6 +29,33 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  static final _destinations = [
+    PageInformation(
+      index: 0,
+      name: "主页",
+      icon: Icons.home,
+      iconChoice: Icons.home_outlined,
+    ),
+    PageInformation(
+      index: 1,
+      name: "西电目录",
+      icon: Icons.store,
+      iconChoice: Icons.store_outlined,
+    ),
+    PageInformation(
+      index: 2,
+      name: "XDU Planet",
+      icon: Icons.feed,
+      iconChoice: Icons.feed_outlined,
+    ),
+    PageInformation(
+      index: 3,
+      name: "设置",
+      icon: Icons.settings,
+      iconChoice: Icons.settings_outlined,
+    ),
+  ];
+
   static final _page = [
     const MainPage(),
     const XidianDirWindow(),
@@ -63,10 +63,26 @@ class _HomePageState extends State<HomePage> {
     const SettingWindow(),
   ];
 
+  late PageController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController();
+  }
+
   Widget _buildPhone() => Scaffold(
-        body: _page[_selectedIndex],
+        body: PageView(
+          controller: _controller,
+          children: _page,
+          onPageChanged: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+        ),
         bottomNavigationBar: NavigationBar(
-          destinations: destinations
+          destinations: _destinations
               .map(
                 (e) => NavigationDestination(
                   icon: _selectedIndex == e.index
@@ -81,6 +97,7 @@ class _HomePageState extends State<HomePage> {
             setState(() {
               _selectedIndex = index;
             });
+            _controller.jumpToPage(_selectedIndex);
           },
         ),
       );
@@ -90,7 +107,7 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             children: [
               NavigationRail(
-                destinations: destinations
+                destinations: _destinations
                     .map(
                       (e) => NavigationRailDestination(
                         icon: _selectedIndex == e.index
@@ -105,11 +122,22 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     _selectedIndex = index;
                   });
+                  _controller.jumpToPage(_selectedIndex);
                 },
                 leading: const Icon(Icons.person),
                 extended: isDesktop(context),
               ),
-              Expanded(child: _page[_selectedIndex]),
+              Expanded(
+                child: PageView(
+                  controller: _controller,
+                  children: _page,
+                  onPageChanged: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                ),
+              ),
             ],
           ),
         ),

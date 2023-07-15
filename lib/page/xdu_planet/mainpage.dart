@@ -108,7 +108,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               return Text("Error: $e");
             }
           } else {
-            return const Text("Loading...");
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),

@@ -13,20 +13,18 @@ import 'package:watermeter/page/xidian_directory/subwindow/comprehensive.dart';
 import 'package:watermeter/page/xidian_directory/subwindow/dininghall.dart';
 import 'package:watermeter/page/xidian_directory/subwindow/telephone.dart';
 
-class XidianDirWindow extends StatelessWidget {
-  const XidianDirWindow({Key? key}) : super(key: key);
+class XidianDirWindow extends StatefulWidget {
+  const XidianDirWindow({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const TabForXDDir();
-  }
+  State<XidianDirWindow> createState() => _XidianDirWindowState();
 }
 
-class TabForXDDir extends StatelessWidget {
-  const TabForXDDir({Key? key}) : super(key: key);
-
+class _XidianDirWindowState extends State<XidianDirWindow>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -49,4 +47,7 @@ class TabForXDDir extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -84,10 +84,10 @@ class _PersonalPageState extends State<PersonalPage> {
                 ),
               );
             } catch (e, s) {
-              return Text("Error: $e, $s");
+              return Center(child: Text("Error: $e, $s"));
             }
           } else {
-            return const Text("Loading...");
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
