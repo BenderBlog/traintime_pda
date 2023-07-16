@@ -63,9 +63,7 @@ class ScoreWindow extends StatelessWidget {
                   disabledElevation: 0.0,
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ScoreChoiceWindow(),
-                      ),
+                      createRoute(ScoreChoiceWindow()),
                     );
                   },
                   child: const Icon(

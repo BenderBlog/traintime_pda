@@ -133,10 +133,10 @@ class ScoreController extends GetxController {
 
   String get unPassed => unPassedSet.isEmpty ? "没有" : unPassedSet.join(",");
 
-  String get bottomInfo => "目前选中科目的学分 ${evalCredit(false).toStringAsFixed(2)}\n"
+  String get bottomInfo =>
+      "目前选中科目 ${getSelectedScoreList.length}  总计学分 ${evalCredit(false).toStringAsFixed(2)}\n"
       "均分 ${evalAvg(false).toStringAsFixed(2)}  "
-      "GPA ${evalAvg(false, isGPA: true).toStringAsFixed(2)}  "
-      "已选择科目 ${getSelectedScoreList.length} ";
+      "GPA ${evalAvg(false, isGPA: true).toStringAsFixed(2)}  ";
 
   void setScoreChoiceState(int index) {
     isSelected[index] = !isSelected[index];
