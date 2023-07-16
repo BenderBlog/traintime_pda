@@ -29,7 +29,7 @@ class ScoreController extends GetxController {
     '物理实验',
   ];
   static final typesIgnore = [
-    '通识教育核心课',
+    '通识教育选修课',
     '集中实践环节',
     '拓展提高',
     '通识教育核心课',
