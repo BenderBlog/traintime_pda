@@ -53,8 +53,7 @@ class ScoreWindow extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "目前选中科目的学分 ${c.evalCredit(false).toStringAsFixed(2)}\n"
-                  "均分 ${c.evalAvg(false).toStringAsFixed(2)} GPA ${c.evalAvg(false, isGPA: true).toStringAsFixed(2)}",
+                  c.bottomInfo,
                   textScaleFactor: 1.2,
                 ),
                 FloatingActionButton(

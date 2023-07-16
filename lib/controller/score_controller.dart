@@ -115,9 +115,11 @@ class ScoreController extends GetxController {
     return whatever;
   }
 
+  List<Score> get getSelectedScoreList => List.from(scoreTable)
+    ..removeWhere((element) => !isSelected[element.mark]);
+
   List<Score> get selectedScoreList {
-    List<Score> whatever = List.from(scoreTable)
-      ..removeWhere((element) => !isSelected[element.mark]);
+    List<Score> whatever = List.from(getSelectedScoreList);
     if (chosenSemesterInScoreChoice != "") {
       whatever.removeWhere(
           (element) => element.year != chosenSemesterInScoreChoice);
@@ -130,6 +132,11 @@ class ScoreController extends GetxController {
   }
 
   String get unPassed => unPassedSet.isEmpty ? "没有" : unPassedSet.join(",");
+
+  String get bottomInfo => "目前选中科目的学分 ${evalCredit(false).toStringAsFixed(2)}\n"
+      "均分 ${evalAvg(false).toStringAsFixed(2)}  "
+      "GPA ${evalAvg(false, isGPA: true).toStringAsFixed(2)}  "
+      "已选择科目 ${getSelectedScoreList.length} ";
 
   void setScoreChoiceState(int index) {
     isSelected[index] = !isSelected[index];
