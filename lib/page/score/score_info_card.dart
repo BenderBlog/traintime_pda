@@ -30,8 +30,7 @@ class ScoreInfoCard extends StatelessWidget {
         onTap: () {
           if (functionActivated) {
             if (c.isSelectMod) {
-              c.isSelected[mark] = !c.isSelected[mark];
-              c.update();
+              c.setScoreChoiceState(mark);
             } else {
               showModalBottomSheet(
                 builder: (((context) {

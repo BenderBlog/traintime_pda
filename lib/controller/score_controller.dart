@@ -60,6 +60,12 @@ class ScoreController extends GetxController {
   /// Empty means all status.
   String chosenStatus = "";
 
+  /// Empty means all semester, especially in score choice window.
+  String chosenSemesterInScoreChoice = "";
+
+  /// Empty means all status, especially in score choice window.
+  String chosenStatusInScoreChoice = "";
+
   /// Exclude these from counting avgs
   /// 1. CET-4 and CET-6
   /// 2. Teacher have not finish uploading scores
@@ -109,11 +115,25 @@ class ScoreController extends GetxController {
     return whatever;
   }
 
-  String get unPassed {
-    if (unPassedSet.isEmpty) {
-      return "没有";
+  List<Score> get selectedScoreList {
+    List<Score> whatever = List.from(scoreTable)
+      ..removeWhere((element) => !isSelected[element.mark]);
+    if (chosenSemesterInScoreChoice != "") {
+      whatever.removeWhere(
+          (element) => element.year != chosenSemesterInScoreChoice);
     }
-    return unPassedSet.join(",");
+    if (chosenStatusInScoreChoice != "") {
+      whatever.removeWhere(
+          (element) => element.status != chosenStatusInScoreChoice);
+    }
+    return whatever;
+  }
+
+  String get unPassed => unPassedSet.isEmpty ? "没有" : unPassedSet.join(",");
+
+  void setScoreChoiceState(int index) {
+    isSelected[index] = !isSelected[index];
+    update();
   }
 
   // ignore: non_constant_identifier_names

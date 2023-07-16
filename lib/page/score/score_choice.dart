@@ -1,10 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/score_controller.dart';
+import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
+import 'package:watermeter/page/widget.dart';
 
 class ScoreChoiceWindow extends StatelessWidget {
-  const ScoreChoiceWindow({super.key});
+  ScoreChoiceWindow({super.key});
+
+  final PreferredSizeWidget dropDownButton = PreferredSize(
+    preferredSize: const Size.fromHeight(40),
+    child: GetBuilder<ScoreController>(
+      builder: (c) => SizedBox(
+        height: 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            DropdownButton(
+              value: c.chosenSemesterInScoreChoice,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+              ),
+              underline: Container(
+                height: 2,
+              ),
+              items: [
+                const DropdownMenuItem(value: "", child: Text("所有学期")),
+                for (var i in c.semester)
+                  DropdownMenuItem(value: i, child: Text(i))
+              ],
+              onChanged: (String? value) {
+                c.chosenSemesterInScoreChoice = value!;
+                c.update();
+              },
+            ),
+            DropdownButton(
+              value: c.chosenStatusInScoreChoice,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+              ),
+              underline: Container(
+                height: 2,
+              ),
+              items: [
+                const DropdownMenuItem(value: "", child: Text("所有类型")),
+                for (var i in c.statuses)
+                  DropdownMenuItem(value: i, child: Text(i))
+              ],
+              onChanged: (String? value) {
+                c.chosenStatusInScoreChoice = value!;
+                c.update();
+              },
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 
   Future<void> scoreInfoDialog(context) => showDialog(
         context: context,
@@ -42,33 +94,29 @@ class ScoreChoiceWindow extends StatelessWidget {
               icon: const Icon(Icons.info),
             ),
           ],
+          bottom: dropDownButton,
         ),
-        body: ListView(
-          children: [
-            for (var i = 0; i < c.isSelected.length; ++i)
-              if (c.isSelected[i] == true)
-                Dismissible(
-                  key: ValueKey<int>(i),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    color: Theme.of(context).colorScheme.background,
-                    alignment: const Alignment(0.95, 0),
-                    child: const Icon(
-                      Icons.cancel,
-                      color: Colors.red,
-                      size: 48,
-                    ),
-                  ),
-                  child: ScoreInfoCard(
-                    mark: i,
-                    functionActivated: false,
-                  ),
-                  onDismissed: (DismissDirection direction) {
-                    c.isSelected[i] = !c.isSelected[i];
-                    c.update();
-                  },
-                ),
-          ],
+        body: dataList<Score, Dismissible>(
+          c.selectedScoreList,
+          (toUse) => Dismissible(
+            key: ValueKey<int>(toUse.mark),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              color: Theme.of(context).colorScheme.background,
+              alignment: const Alignment(0.95, 0),
+              child: const Icon(
+                Icons.cancel,
+                color: Colors.red,
+                size: 48,
+              ),
+            ),
+            child: ScoreInfoCard(
+              mark: toUse.mark,
+              functionActivated: false,
+            ),
+            onDismissed: (DismissDirection direction) =>
+                c.setScoreChoiceState(toUse.mark),
+          ),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
