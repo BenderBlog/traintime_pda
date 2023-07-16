@@ -5,12 +5,12 @@ Copyright 2023 SuperBart
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 */
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:watermeter/page/score/score_info.dart';
+import 'package:flutter/material.dart';
+import 'package:watermeter/page/score/score_choice.dart';
+import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
@@ -29,30 +29,6 @@ class ScoreWindow extends StatelessWidget {
               child: const Text("确定"),
               onPressed: () {
                 Get.put(ScoreController()).addCount();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-
-  Future<void> scoreInfoDialog() => showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('小总结'),
-          content: GetBuilder<ScoreController>(
-            builder: (c) => Text(
-                "所有科目的GPA：${c.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
-                "所有科目的均分：${c.evalAvg(true).toStringAsFixed(2)}\n"
-                "所有科目的学分：${c.evalCredit(true).toStringAsFixed(2)}\n"
-                "未通过科目：${c.unPassed}\n"
-                "公共选修课已经修得学分：${c.notCoreClass}\n"
-                "本程序提供的数据仅供参考，开发者对其准确性不负责"),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("确定"),
-              onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
@@ -87,7 +63,12 @@ class ScoreWindow extends StatelessWidget {
                   focusElevation: 0.0,
                   disabledElevation: 0.0,
                   onPressed: () {
-                    scoreInfoDialog();
+                    //scoreInfoDialog();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ScoreChoiceWindow(),
+                      ),
+                    );
                   },
                   child: const Icon(
                     Icons.panorama_fisheye,
@@ -181,103 +162,15 @@ class ScoreWindow extends StatelessWidget {
         builder: (c) => dataList<ScoreInfoCard, ScoreInfoCard>(
           List.generate(
             c.toShow.length,
-            (index) => ScoreInfoCard(index: index),
+            (index) => ScoreInfoCard(
+              mark: c.toShow[index].mark,
+              functionActivated: true,
+            ),
           ),
           (toUse) => toUse,
         ),
       ),
       bottomNavigationBar: bottomInfo,
-    );
-  }
-}
-
-class ScoreInfoCard extends StatelessWidget {
-  final int index;
-  const ScoreInfoCard({super.key, required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder<ScoreController>(
-      builder: (c) => GestureDetector(
-        onTap: () {
-          if (c.isSelectMod) {
-            c.isSelected[c.toShow[index].mark] =
-                !c.isSelected[c.toShow[index].mark];
-            c.update();
-          } else {
-            showModalBottomSheet(
-              builder: (((context) {
-                return ScoreComposeCard(
-                  score: c.toShow[index],
-                );
-              })),
-              context: context,
-            );
-          }
-        },
-        child: Card(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 5,
-          ),
-          elevation: 0,
-          color: c.isSelectMod && c.isSelected[c.toShow[index].mark]
-              ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
-              : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-          child: Container(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      c.toShow[index].name,
-                      textScaleFactor: 1.1,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Divider(
-                      color: Colors.transparent,
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        TagsBoxes(
-                          text: c.toShow[index].year,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 5),
-                        TagsBoxes(
-                          text: c.toShow[index].status,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                        ),
-                      ],
-                    ),
-                    const Divider(
-                      color: Colors.transparent,
-                      height: 5,
-                    ),
-                    Text(
-                      "学分: ${c.toShow[index].credit}",
-                    ),
-                    Text(
-                      "GPA: ${c.toShow[index].gpa}",
-                    ),
-                    Text(
-                      "成绩：${c.toShow[index].how == 1 || c.toShow[index].how == 2 ? c.toShow[index].level : c.toShow[index].score}",
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

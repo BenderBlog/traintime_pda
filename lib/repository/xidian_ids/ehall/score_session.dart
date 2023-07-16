@@ -206,6 +206,7 @@ class ScoreFile extends EhallSession {
           year: i["XNXQDM"],
           credit: i["XF"],
           status: i["KCXZDM_DISPLAY"],
+          type: i["KCLBDM_DISPLAY"],
           how: int.parse(i["DJCJLXDM"]),
           level: i["DJCJLXDM"] == "01" || i["DJCJLXDM"] == "02"
               ? i["DJCJMC"]

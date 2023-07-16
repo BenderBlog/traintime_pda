@@ -18,6 +18,24 @@ class ScoreController extends GetxController {
   Set<String> unPassedSet = {};
   double notCoreClass = 0.0;
 
+  static final courseIgnore = [
+    '军事',
+    '形势与政策',
+    '创业基础',
+    '新生',
+    '写作与沟通',
+    '学科导论',
+    '心理',
+    '物理实验',
+  ];
+  static final typesIgnore = [
+    '公共任选课',
+    '集中实践环节',
+    '拓展提高',
+    '通识教育核心课',
+    '专业选修课',
+  ];
+
   /// User could see the place only if they pressed easter egg five times.
   int presscount = 0;
   bool allowDetail = false;
@@ -144,7 +162,19 @@ class ScoreController extends GetxController {
     try {
       /// Init scorefile
       scoreTable = await ScoreFile().get();
-      isSelected = List<bool>.generate(scoreTable.length, (int index) => false);
+      isSelected = List<bool>.generate(scoreTable.length, (int index) {
+        for (var i in courseIgnore) {
+          if (scoreTable[index].name.contains(i)) {
+            return false;
+          }
+        }
+        for (var i in typesIgnore) {
+          if (scoreTable[index].type.contains(i)) {
+            return false;
+          }
+        }
+        return true;
+      });
       semester = {for (var i in scoreTable) i.year};
       statuses = {for (var i in scoreTable) i.status};
 
