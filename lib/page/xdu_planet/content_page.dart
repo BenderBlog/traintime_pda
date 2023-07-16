@@ -10,6 +10,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart' hide Content;
+import 'package:flutter_html_table/flutter_html_table.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
@@ -86,7 +87,16 @@ class _ContentPageState extends State<ContentPage> {
             addon = "正在加载...";
           }
           return SingleChildScrollView(
-            child: Html(data: "$title<br><p>$addon</p>"),
+            child: Html(
+              data: "$title<br><p>$addon</p>",
+              onLinkTap: (url, attributes, element) => launchUrlString(
+                url ?? "",
+                mode: LaunchMode.externalApplication,
+              ),
+              extensions: const [
+                TableHtmlExtension(),
+              ],
+            ),
           );
         },
       ),
