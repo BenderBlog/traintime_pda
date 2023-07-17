@@ -18,6 +18,27 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class IDSSession extends NetworkSession {
+  @override
+  Dio get dio => super.dio
+    ..interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          developer.log("Offline status: $offline",
+              name: "OfflineCheckInspector");
+          if (offline) {
+            handler.reject(
+              DioException.requestCancelled(
+                reason: "Offline mode, all ids function unuseable.",
+                requestOptions: options,
+              ),
+            );
+          } else {
+            handler.next(options);
+          }
+        },
+      ),
+    );
+
   /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
   /// Padding part is libxduauth's idea.
   String aesEncrypt(String toEnc, String key) {

@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/page/score/score.dart';
 import 'package:watermeter/controller/score_controller.dart';
+import 'package:watermeter/repository/network_session.dart';
 
 class ScoreCard extends StatelessWidget {
   ScoreCard({super.key});
 
-  final ScoreController c = ScoreController();
+  final ScoreController c = Get.put(ScoreController());
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (c.error == null) {
+        if (offline) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text("脱机模式下，一站式相关功能全部禁止使用"),
+          ));
+        } else if (c.error == null) {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => ScoreWindow()));
         } else if (c.error == "正在加载") {

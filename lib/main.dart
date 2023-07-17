@@ -37,10 +37,22 @@ void main() async {
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
   if (username.isNotEmpty && password.isNotEmpty) {
-    await IDSSession().checkAndLogin(
-      target:
-          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
-    );
+    try {
+      await IDSSession().checkAndLogin(
+        target:
+            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+      );
+    } catch (e, s) {
+      developer.log(
+        "Offline mode activated! Because of the following error: ",
+        name: "Watermeter",
+      );
+      developer.log(
+        "$e\nThe stack of the error is: $s",
+        name: "Watermeter",
+      );
+      offline = true;
+    }
   } else {
     isFirst = true;
   }

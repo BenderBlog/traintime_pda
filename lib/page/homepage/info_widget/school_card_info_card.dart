@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
 import 'package:watermeter/page/schoolcard/school_card_window.dart';
+import 'package:watermeter/repository/network_session.dart';
 
 class SchoolCardInfoCard extends StatelessWidget {
   final SchoolCardController c = Get.put(SchoolCardController());
@@ -13,14 +14,28 @@ class SchoolCardInfoCard extends StatelessWidget {
     return GetBuilder<SchoolCardController>(
       builder: (c) => GestureDetector(
         onTap: () async {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const SchoolCardWindow(),
-            ),
-          );
+          if (offline) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text("脱机模式下，一站式相关功能全部禁止使用"),
+            ));
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const SchoolCardWindow(),
+              ),
+            );
+          }
         },
         onLongPress: () {
-          c.updateMoney();
+          if (offline) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text("脱机模式下，一站式相关功能全部禁止使用"),
+            ));
+          } else {
+            c.updateMoney();
+          }
         },
         child: MainPageCard(
           height: 100,

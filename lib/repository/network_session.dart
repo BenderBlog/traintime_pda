@@ -17,7 +17,10 @@ import 'package:flutter/widgets.dart';
 import 'package:alice/alice.dart';
 
 Alice alice = Alice();
+
 late Directory supportPath;
+
+bool offline = false;
 
 class NetworkSession {
   @protected
