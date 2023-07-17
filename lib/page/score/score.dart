@@ -57,24 +57,40 @@ class ScoreWindow extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FilledButton(
+                      TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).primaryColor,
+                          ),
+                        ),
                         onPressed: () {
                           for (var i in c.toShow) {
                             c.isSelected[i.mark] = true;
                           }
                           c.update();
                         },
-                        child: const Text("全选"),
+                        child: const Text(
+                          "全选",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                       const SizedBox(width: 12),
-                      FilledButton(
+                      TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).primaryColor,
+                          ),
+                        ),
                         onPressed: () {
                           for (var i in c.toShow) {
                             c.isSelected[i.mark] = false;
                           }
                           c.update();
                         },
-                        child: const Text("全不选"),
+                        child: const Text(
+                          "全不选",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       )
                     ],
                   ),
