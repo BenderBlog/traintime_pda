@@ -20,7 +20,7 @@ Alice alice = Alice();
 
 late Directory supportPath;
 
-bool offline = true;
+bool offline = false;
 
 class NetworkSession {
   @protected
