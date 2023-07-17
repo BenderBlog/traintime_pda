@@ -49,30 +49,60 @@ class ScoreWindow extends StatelessWidget {
         builder: (c) => Visibility(
           visible: c.isSelectMod,
           child: BottomAppBar(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  c.bottomInfo,
-                  textScaleFactor: 1.2,
-                ),
-                FloatingActionButton(
-                  elevation: 0.0,
-                  highlightElevation: 0.0,
-                  focusElevation: 0.0,
-                  disabledElevation: 0.0,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      createRoute(ScoreChoiceWindow()),
-                    );
-                  },
-                  child: const Icon(
-                    Icons.panorama_fisheye,
+              height: 134,
+              elevation: 5.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FilledButton(
+                        onPressed: () {
+                          for (var i in c.toShow) {
+                            c.isSelected[i.mark] = true;
+                          }
+                          c.update();
+                        },
+                        child: const Text("全选"),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton(
+                        onPressed: () {
+                          for (var i in c.toShow) {
+                            c.isSelected[i.mark] = false;
+                          }
+                          c.update();
+                        },
+                        child: const Text("全不选"),
+                      )
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        c.bottomInfo,
+                        textScaleFactor: 1.2,
+                      ),
+                      FloatingActionButton(
+                        elevation: 0.0,
+                        highlightElevation: 0.0,
+                        focusElevation: 0.0,
+                        disabledElevation: 0.0,
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            createRoute(ScoreChoiceWindow()),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.panorama_fisheye,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )),
         ),
       );
 
