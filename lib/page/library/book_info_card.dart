@@ -23,57 +23,60 @@ class BookInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
+        horizontal: 12.5,
+        vertical: 9.0,
       ),
       elevation: 0,
       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      child: Column(
-        children: [
-          Text(
-            toUse.bookName,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16.0,
-            ),
-          ),
-          Text(
-            "${toUse.author} ${toUse.publisherHouse}",
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12.0,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: CachedNetworkImage(
-                  imageUrl: LibrarySession.bookCover(toUse.isbn!),
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) =>
-                      Image.asset("assets/Empty-Cover.jpg"),
-                  width: 90,
-                  height: 120,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: [
+            Text(
+              toUse.bookName,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("馆藏量：${toUse.bookNumber}"),
-                  Text("ISBN: ${toUse.isbn}"),
-                  Text("发行时间: ${toUse.publicationDate}"),
-                  Text("索书号: ${toUse.searchCode}"),
-                ],
-              )
-            ],
-          ),
-        ],
+            ),
+            Text(
+              "${toUse.author} ${toUse.publisherHouse}",
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12.0,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: CachedNetworkImage(
+                    imageUrl: LibrarySession.bookCover(toUse.isbn ?? ""),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        Image.asset("assets/Empty-Cover.jpg"),
+                    width: 90,
+                    height: 120,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("馆藏量：${toUse.bookNumber}"),
+                    Text("ISBN: ${toUse.isbn}"),
+                    Text("发行时间: ${toUse.publicationDate}"),
+                    Text("索书号: ${toUse.searchCode}"),
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
