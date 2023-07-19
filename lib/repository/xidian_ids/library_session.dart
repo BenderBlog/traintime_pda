@@ -23,19 +23,95 @@ class LibrarySession extends IDSSession {
   int userId = 0;
   String token = "";
 
-  Future<Uint8List> getBookImage(String isbn) async {
-    developer.log(
-      "Get picture",
-      name: "LibrarySession",
+  /*
+    POST https://zs.xianmaigu.com/xidian_book/api/search/getSearchBookType.html
+    body { "libraryId": 5 }
+
+    {
+      "code": 1,
+      "msg": "",
+      "url": "",
+      "data": [{
+        "type": "wrd",
+        "typeName": "任意词"
+      }, {
+        "type": "wti",
+        "typeName": "题名"
+      }, {
+        "type": "wau",
+        "typeName": "著者"
+      }, {
+        "type": "iss",
+        "typeName": "ISSN"
+      }, {
+        "type": "isb",
+        "typeName": "ISBN"
+      }, {
+        "type": "bar",
+        "typeName": "条码"
+      }, {
+        "type": "cal",
+        "typeName": "索书号"
+      }, {
+        "type": "clc",
+        "typeName": "中图分类号"
+      }, {
+        "type": "wpu",
+        "typeName": "出版社"
+      }, {
+        "type": "wsu",
+        "typeName": "主题词"
+      }],
+      "sysDateTime": 1689748355145
+    }
+  */
+
+  Future<List<BookInfo>> searchBook(String searchWord, int page) async {
+    if (userId == 0 && token == "") {
+      await initSession();
+    }
+    var rawData = await dio.post(
+      "https://zs.xianmaigu.com/xidian_book/api/search/list.html",
+      data: {
+        "libraryId": 5,
+        "searchWord": searchWord,
+        "searchFiled": "wrd",
+        "page": page,
+        "searchLocationStatus": 1,
+      },
+    ).then((value) => value.data["list"]);
+
+    return List<BookInfo>.generate(
+      rawData.length,
+      (index) => BookInfo.fromJson(rawData[index]),
     );
-    return await dio
-        .get(
-          "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn",
-        )
-        .then(
-          (value) => value.data,
-        );
   }
+
+  Future<List<BookLocation>> getBookLocation(BookInfo toUse) async {
+    if (userId == 0 && token == "") {
+      await initSession();
+    }
+    var rawData = await dio.post(
+      "https://zs.xianmaigu.com/xidian_book/api/search/getBookByDocNum.html",
+      data: {
+        "libraryId": 5,
+        "userId": userId,
+        "token": token,
+        "cardNumber": preference.getString(preference.Preference.idsAccount),
+        "docNumber": toUse.docNumber,
+        "base": toUse.base,
+        "searchLocationStatus": 1,
+        "searchCode": toUse.searchCode,
+      },
+    ).then((value) => value.data["data"]);
+
+    return List<BookLocation>.generate(
+      rawData.length,
+      (index) => BookLocation.fromJson(rawData[index]),
+    );
+  }
+
+  /// Get book cover "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn",
 
   Future<List<BorrowData>> getBorrowList() async {
     if (userId == 0 && token == "") {
