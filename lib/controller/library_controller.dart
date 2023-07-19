@@ -7,6 +7,9 @@ class LibraryController extends GetxController {
   String? error;
   List<BorrowData> borrowList = [];
 
+  int get dued => borrowList.where((element) => element.lendDay < 0).length;
+  int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
+
   @override
   void onReady() {
     super.onReady();
