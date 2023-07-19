@@ -13,6 +13,7 @@ WTF did you know, you goddamn power of electricity?
 
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:typed_data';
 
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -21,6 +22,20 @@ import 'package:watermeter/repository/preference.dart' as preference;
 class LibrarySession extends IDSSession {
   int userId = 0;
   String token = "";
+
+  Future<Uint8List> getBookImage(String isbn) async {
+    developer.log(
+      "Get picture",
+      name: "LibrarySession",
+    );
+    return await dio
+        .get(
+          "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn",
+        )
+        .then(
+          (value) => value.data,
+        );
+  }
 
   Future<List<BorrowData>> getBorrowList() async {
     if (userId == 0 && token == "") {
@@ -33,33 +48,39 @@ class LibrarySession extends IDSSession {
         "userId": userId,
         "token": token,
         "cardNumber": preference.getString(preference.Preference.idsAccount),
-        "page": 1,
+        "page": 0,
       },
     ).then((value) => value.data["data"]);
 
     return List<BorrowData>.generate(
-        rawData.length, (index) => BorrowData.fromJson(rawData[index]));
+      rawData.length,
+      (index) => BorrowData.fromJson(rawData[index]),
+    );
   }
 
   Future<void> initSession() async {
-    var response = await checkAndLogin(
-      target: "https://mgce.natapp4.cc/api/index/casLoginDo.html?"
-          "libraryId=5&source=xdbb",
-    );
-    RegExp matchJson = RegExp(r'wx.miniProgram.postMessage(.*);');
-    String result = matchJson
-            .firstMatch(response.data)?[0]!
-            .replaceFirst("wx.miniProgram.postMessage(", "")
-            .replaceFirst("data", "\"data\"")
-            .replaceFirst(");", "") ??
-        "";
+    try {
+      var response = await checkAndLogin(
+        target: "https://mgce.natapp4.cc/api/index/casLoginDo.html?"
+            "libraryId=5&source=xdbb",
+      );
+      RegExp matchJson = RegExp(r'wx.miniProgram.postMessage(.*);');
+      String result = matchJson
+              .firstMatch(response.data)?[0]!
+              .replaceFirst("wx.miniProgram.postMessage(", "")
+              .replaceFirst("data", "\"data\"")
+              .replaceFirst(");", "") ??
+          "";
 
-    developer.log("result is $result", name: "LibrarySession");
+      developer.log("result is $result", name: "LibrarySession");
 
-    var toGet = jsonDecode(result);
+      var toGet = jsonDecode(result);
 
-    userId = toGet["data"]["id"];
-    token = toGet["data"]["token"];
+      userId = toGet["data"]["id"];
+      token = toGet["data"]["token"];
+    } catch (e) {
+      throw NotFetchLibraryException();
+    }
   }
 }
 

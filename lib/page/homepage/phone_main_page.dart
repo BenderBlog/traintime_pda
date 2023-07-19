@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
@@ -17,6 +19,7 @@ class PhoneMainPage extends StatelessWidget {
   final controller = Get.put(ScoreController());
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
+  final libraryController = Get.put(LibraryController());
 
   PhoneMainPage({super.key});
 
@@ -68,6 +71,7 @@ class PhoneMainPage extends StatelessWidget {
             const SportCard(),
             const ElectricityCard(),
             SchoolCardInfoCard(),
+            const LibraryCard(),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),
