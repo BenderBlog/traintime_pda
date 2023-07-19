@@ -40,16 +40,8 @@ class BookInfoCard extends StatelessWidget {
                 fontSize: 16.0,
               ),
             ),
-            Text(
-              "${toUse.author} ${toUse.publisherHouse}",
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12.0,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(2),
@@ -63,16 +55,42 @@ class BookInfoCard extends StatelessWidget {
                     height: 120,
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("馆藏量：${toUse.bookNumber}"),
-                    Text("ISBN: ${toUse.isbn}"),
-                    Text("发行时间: ${toUse.publicationDate}"),
-                    Text("索书号: ${toUse.searchCode}"),
-                  ],
-                )
+                const SizedBox(
+                  width: 10,
+                ),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "作者：${toUse.author}",
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "出版社：${toUse.publisherHouse}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "馆藏量：${toUse.bookNumber}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "ISBN: ${toUse.isbn}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "发行时间: ${toUse.publicationDate}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "索书号: ${toUse.searchCode}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ],

@@ -7,10 +7,12 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class BorrowInfoCard extends StatelessWidget {
   final BorrowData toUse;
@@ -76,26 +78,31 @@ class BorrowInfoCard extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(2),
-                  child: Image.network(
-                    "http://124.90.39.130:18080/xdhyy_book/"
-                    "/api/bookCover/getBookCover.html?isbn=${toUse.isbn}",
+                  child: CachedNetworkImage(
+                    imageUrl: LibrarySession.bookCover(toUse.isbn),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        Image.asset("assets/Empty-Cover.jpg"),
                     width: 90,
                     height: 120,
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("ISBN: ${toUse.isbn}"),
-                    Text("馆藏码: ${toUse.barNumber}"),
-                    Text("索书号: ${toUse.searchCode}"),
-                    Text(
-                        "借阅日期：${Jiffy.parseFromDateTime(toUse.borrowTime).format(pattern: "yyyy-MM-dd")}"),
-                    Text(
-                        "到期日期：${Jiffy.parseFromDateTime(toUse.dueTime).format(pattern: "yyyy-MM-dd")}"),
-                  ],
-                )
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("ISBN: ${toUse.isbn}"),
+                      Text("馆藏码: ${toUse.barNumber}"),
+                      Text("索书号: ${toUse.searchCode}"),
+                      Text(
+                          "借阅日期：${Jiffy.parseFromDateTime(toUse.borrowTime).format(pattern: "yyyy-MM-dd")}"),
+                      Text(
+                          "到期日期：${Jiffy.parseFromDateTime(toUse.dueTime).format(pattern: "yyyy-MM-dd")}"),
+                    ],
+                  ),
+                ),
               ],
             ),
           ],
