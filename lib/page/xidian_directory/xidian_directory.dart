@@ -9,9 +9,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/xidian_directory/subwindow/comprehensive.dart';
-import 'package:watermeter/page/xidian_directory/subwindow/dininghall.dart';
-import 'package:watermeter/page/xidian_directory/subwindow/telephone.dart';
+import 'package:watermeter/page/xidian_directory/comprehensive.dart';
+import 'package:watermeter/page/xidian_directory/dininghall.dart';
+import 'package:watermeter/page/xidian_directory/telephone.dart';
 
 class XidianDirWindow extends StatefulWidget {
   const XidianDirWindow({super.key});

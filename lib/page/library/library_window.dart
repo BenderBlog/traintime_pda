@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
-import 'package:watermeter/page/library/query_book.dart';
+import 'package:watermeter/page/library/query_book_window.dart';
 
 class LibraryWindow extends StatelessWidget {
   final LibraryController c = Get.put(LibraryController());

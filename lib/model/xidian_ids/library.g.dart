@@ -44,15 +44,15 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       bookName: json['bookName'] as String,
       author: json['author'] as String,
       publisherHouse: json['publisherHouse'] as String,
-      price: json['price'] as String,
-      searchCode: json['searchCode'] as String,
+      price: json['price'] as String?,
+      searchCode: json['searchCode'] as String?,
       base_code: json['base_code'] as String?,
-      description: json['description'] as String,
+      description: json['description'] as String?,
       bookItems: json['bookItems'] as String?,
       bookNumber: json['bookNumber'] as int,
       base: json['base'] as String,
-      isbn: json['isbn'] as String,
-      publicationDate: json['publicationDate'] as String,
+      isbn: json['isbn'] as String?,
+      publicationDate: json['publicationDate'] as String?,
     );
 
 Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{

@@ -58,6 +58,7 @@ dependencies:
   calendar_date_picker2: ^0.5.2
   flutter_html: ^3.0.0-beta.2
   flutter_html_table: ^3.0.0-beta.2
+  cached_network_image: ^3.2.3
   get:
 
   flutter:
@@ -102,7 +103,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    # Easter egg for ironic things, long live Futurama!
+    - assets/Empty-Cover.jpg
     - assets/Humpy-Score.jpg
     - assets/Credit.jpg
     - assets/Ray.jpg

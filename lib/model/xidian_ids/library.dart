@@ -74,15 +74,15 @@ class BookInfo {
   final String bookName;
   final String author;
   final String publisherHouse;
-  final String price;
-  final String searchCode;
+  final String? price;
+  final String? searchCode;
   final String? base_code;
-  final String description;
+  final String? description;
   final String? bookItems;
   final int bookNumber;
   final String base;
-  final String isbn;
-  final String publicationDate;
+  final String? isbn;
+  final String? publicationDate;
 
   const BookInfo({
     required this.docNumber,

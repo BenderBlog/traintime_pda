@@ -7,6 +7,11 @@ class LibraryController extends GetxController {
   String? error;
   List<BorrowData> borrowList = [];
 
+  var searchList = <BookInfo>[].obs;
+  var search = "".obs;
+  int page = 1;
+  bool noMore = false;
+
   int get dued => borrowList.where((element) => element.lendDay < 0).length;
   int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
 
@@ -21,4 +26,31 @@ class LibraryController extends GetxController {
     borrowList.addAll(await LibrarySession().getBorrowList());
     update();
   }
+
+  @override
+  void onInit() {
+    /// Monitor its change.
+    ever(search, (value) {
+      searchList.clear();
+      page = 1;
+      noMore = false;
+    });
+    super.onInit();
+  }
+
+  Future<void> searchBook() async {
+    if (!noMore) {
+      List<BookInfo> get =
+          await LibrarySession().searchBook(search.value, page);
+      if (get.isEmpty) {
+        noMore = true;
+      } else {
+        searchList.addAll(get);
+        page++;
+      }
+    }
+  }
+
+  Future<List<BookLocation>> getLocation(BookInfo toUse) =>
+      LibrarySession().getBookLocation(toUse);
 }

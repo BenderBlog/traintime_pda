@@ -13,7 +13,6 @@ WTF did you know, you goddamn power of electricity?
 
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'dart:typed_data';
 
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -79,10 +78,12 @@ class LibrarySession extends IDSSession {
         "page": page,
         "searchLocationStatus": 1,
       },
-    ).then((value) => value.data["list"]);
+    ).then((value) => value.data["data"]["list"]);
+
+    developer.log(rawData.toString());
 
     return List<BookInfo>.generate(
-      rawData.length,
+      rawData.length ?? 0,
       (index) => BookInfo.fromJson(rawData[index]),
     );
   }
@@ -111,7 +112,8 @@ class LibrarySession extends IDSSession {
     );
   }
 
-  /// Get book cover "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn",
+  static String bookCover(String isbn) =>
+      "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn";
 
   Future<List<BorrowData>> getBorrowList() async {
     if (userId == 0 && token == "") {
