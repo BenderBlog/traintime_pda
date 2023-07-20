@@ -136,3 +136,23 @@ Route createRoute(Widget page) {
     },
   );
 }
+
+/// Used with a card inside a card.
+class InfoDetailBox extends StatelessWidget {
+  final Widget child;
+  const InfoDetailBox({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: child,
+      ),
+    );
+  }
+}

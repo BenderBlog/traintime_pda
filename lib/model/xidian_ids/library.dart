@@ -118,7 +118,7 @@ class BookLocation {
   final String state;
   final String bookstatus;
   final int borrowStatus;
-  final String noBorrowingReason;
+  final String? noBorrowingReason;
   final String canHold;
 
   const BookLocation({

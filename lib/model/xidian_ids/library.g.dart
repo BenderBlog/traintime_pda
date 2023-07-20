@@ -82,7 +82,7 @@ BookLocation _$BookLocationFromJson(Map<String, dynamic> json) => BookLocation(
       state: json['state'] as String,
       bookstatus: json['bookstatus'] as String,
       borrowStatus: json['borrowStatus'] as int,
-      noBorrowingReason: json['noBorrowingReason'] as String,
+      noBorrowingReason: json['noBorrowingReason'] as String?,
       canHold: json['canHold'] as String,
     );
 
