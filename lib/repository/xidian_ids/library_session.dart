@@ -22,7 +22,7 @@ class LibrarySession extends IDSSession {
   static int userId = 0;
   static String token = "";
 
-  /*
+  /* Note 1: Search book pattern, no need to implement.
     POST https://zs.xianmaigu.com/xidian_book/api/search/getSearchBookType.html
     body { "libraryId": 5 }
 
@@ -112,8 +112,36 @@ class LibrarySession extends IDSSession {
     );
   }
 
+  /* Note 2: 
+      Scan to borrow book and transfer borrow book will not supported, 
+      since I am not an official app, these function may lead me trouble:-P
+
+      All I want to tell you, is the loanBook.html and borrow.html, that's it.
+      And why Wechat's library app allows to scan the picture?
+  */
+
   static String bookCover(String isbn) =>
       "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn";
+
+  Future<String> renew(BorrowData toUse) async {
+    return await dio.post(
+      "https://zs.xianmaigu.com/xidian_book/api/borrow/renewBook.html",
+      data: {
+        "libraryId": 5,
+        "userId": userId,
+        "token": token,
+        "cardNumber": preference.getString(preference.Preference.idsAccount),
+        "barNumber": toUse.barNumber,
+        "bookName": toUse.bookName,
+        "isbn": toUse.isbn,
+        "libraryCode": toUse.libraryCode,
+        "author": toUse.author,
+        "docNumber": toUse.docNumber,
+      },
+    ).then(
+      (value) => value.data["msg"]?.toString() ?? "遇到错误",
+    );
+  }
 
   Future<List<BorrowData>> getBorrowList() async {
     if (userId == 0 && token == "") {
