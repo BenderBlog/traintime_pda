@@ -2,6 +2,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 
 class QueryBookWindow extends StatefulWidget {
@@ -86,8 +87,15 @@ class _QueryBookWindowState extends State<QueryBookWindow>
           () => c.searchList.isNotEmpty
               ? ListView.builder(
                   controller: _pageController,
-                  itemBuilder: (context, index) =>
-                      BookInfoCard(toUse: c.searchList[index]),
+                  itemBuilder: (context, index) => GestureDetector(
+                    child: BookInfoCard(toUse: c.searchList[index]),
+                    onTap: () => showModalBottomSheet(
+                      context: context,
+                      builder: (context) => BookDetailCard(
+                        toUse: c.searchList[index],
+                      ),
+                    ),
+                  ),
                   itemCount: c.searchList.length,
                 )
               : c.isSearching.value

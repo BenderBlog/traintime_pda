@@ -72,7 +72,7 @@ class BorrowData {
 class BookInfo {
   final String docNumber;
   final String bookName;
-  final String author;
+  final String? author;
   final String publisherHouse;
   final String? price;
   final String? searchCode;

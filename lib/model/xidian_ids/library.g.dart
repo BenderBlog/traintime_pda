@@ -42,7 +42,7 @@ Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
 BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       docNumber: json['docNumber'] as String,
       bookName: json['bookName'] as String,
-      author: json['author'] as String,
+      author: json['author'] as String?,
       publisherHouse: json['publisherHouse'] as String,
       price: json['price'] as String?,
       searchCode: json['searchCode'] as String?,
