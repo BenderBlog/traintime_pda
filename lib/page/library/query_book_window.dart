@@ -83,12 +83,20 @@ class _QueryBookWindowState extends State<QueryBookWindow>
           await c.searchBook();
         },
         child: Obx(
-          () => ListView.builder(
-            controller: _pageController,
-            itemBuilder: (context, index) =>
-                BookInfoCard(toUse: c.searchList[index]),
-            itemCount: c.searchList.length,
-          ),
+          () => c.searchList.isNotEmpty
+              ? ListView.builder(
+                  controller: _pageController,
+                  itemBuilder: (context, index) =>
+                      BookInfoCard(toUse: c.searchList[index]),
+                  itemCount: c.searchList.length,
+                )
+              : c.isSearching.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : c.search.value.isNotEmpty
+                      ? const Center(child: Text("没有结果"))
+                      : const Center(
+                          child: Text("请在上面的搜索框中搜索"),
+                        ),
         ),
       ),
     );

@@ -11,6 +11,7 @@ class LibraryController extends GetxController {
   var search = "".obs;
   int page = 1;
   bool noMore = false;
+  var isSearching = false.obs;
 
   int get dued => borrowList.where((element) => element.lendDay < 0).length;
   int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
@@ -40,6 +41,7 @@ class LibraryController extends GetxController {
 
   Future<void> searchBook() async {
     if (!noMore) {
+      isSearching.value = true;
       List<BookInfo> get =
           await LibrarySession().searchBook(search.value, page);
       if (get.isEmpty) {
@@ -48,6 +50,7 @@ class LibraryController extends GetxController {
         searchList.addAll(get);
         page++;
       }
+      isSearching.value = false;
     }
   }
 
