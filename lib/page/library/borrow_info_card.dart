@@ -10,6 +10,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/transfer_borrow_popout.dart';
 import 'package:watermeter/page/widget.dart';
@@ -111,7 +112,16 @@ class BorrowInfoCard extends StatelessWidget {
               children: [
                 TextButton(
                   child: const Text("续借"),
-                  onPressed: () {},
+                  onPressed: () {
+                    ProgressDialog pd = ProgressDialog(context: context);
+                    pd.show(msg: "正在续借");
+                    LibrarySession().renew(toUse).then((value) {
+                      pd.close();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(value)),
+                      );
+                    });
+                  },
                 ),
                 TextButton(
                   child: const Text("转借"),
