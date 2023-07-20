@@ -11,6 +11,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
+import 'package:watermeter/page/library/transfer_borrow_popout.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
@@ -101,6 +102,24 @@ class BorrowInfoCard extends StatelessWidget {
                       Text(
                           "到期日期：${Jiffy.parseFromDateTime(toUse.dueTime).format(pattern: "yyyy-MM-dd")}"),
                     ],
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  child: const Text("续借"),
+                  onPressed: () {},
+                ),
+                TextButton(
+                  child: const Text("转借"),
+                  onPressed: () => showModalBottomSheet(
+                    builder: (((context) {
+                      return TransferQRCode(data: toUse);
+                    })),
+                    context: context,
                   ),
                 ),
               ],

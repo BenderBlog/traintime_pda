@@ -12,11 +12,11 @@ import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
 
 class BorrowListWindow extends StatelessWidget {
-  final LibraryController c = Get.put(LibraryController());
-  BorrowListWindow({super.key});
+  const BorrowListWindow({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final LibraryController c = Get.put(LibraryController());
     return ListView(
       children: [
         Card(

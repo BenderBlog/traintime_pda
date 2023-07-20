@@ -19,8 +19,8 @@ import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class LibrarySession extends IDSSession {
-  int userId = 0;
-  String token = "";
+  static int userId = 0;
+  static String token = "";
 
   /*
     POST https://zs.xianmaigu.com/xidian_book/api/search/getSearchBookType.html
