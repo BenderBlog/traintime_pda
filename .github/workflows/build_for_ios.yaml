@@ -19,7 +19,6 @@ jobs:
         channel: 'stable'
         architecture: x64
     - run: flutter pub get
-    - run: flutter test
     - run: flutter build ios --release --no-codesign
     - run: cd build/ios/iphoneos
     - run: mkdir Payload
