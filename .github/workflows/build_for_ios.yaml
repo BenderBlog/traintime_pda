@@ -17,12 +17,12 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
+        cache: true
         architecture: x64
     - run: flutter pub get
     - run: flutter build ios --release --no-codesign
     - run: cd build/ios/iphoneos
-    - run: mkdir Payload
-    - run: mv Runner.app Payload/
+    - run: mkdir Payload && mv Runner.app Payload/
     
     - uses: montudor/action-zip@v1
       with:
