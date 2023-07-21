@@ -31,11 +31,11 @@ jobs:
     needs: build_run_file
     runs-on: ubuntu-latest
     steps:
+    - run: mkdir Payload
     - uses: actions/upload-artifact@v3
       with:
         name: run-file
-        path: /
-    - run: mkdir Payload && mv Runner.app Payload/
+        path: Payload/
     - uses: montudor/action-zip@v1
       with:
         args: zip -qq -r Payload.zip Payload
