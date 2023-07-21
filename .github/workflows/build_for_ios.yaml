@@ -10,15 +10,30 @@ on:
       - main
 
 jobs:
- deploy_ios:
-    name: Build this project for ios without codesign
+  build:
     runs-on: macos-latest
     steps:
-      - name: Checkout code from ref
-        uses: actions/checkout@v2
-      - name: Run Flutter tasks
-        uses: subosito/flutter-action@v1
-        with:
-            channel: 'stable'
-      - run: flutter pub get
-      - run: flutter build ios --release --no-codesign
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        architecture: x64
+    - run: flutter pub get
+    - run: flutter test
+    - run: flutter build ios --release --no-codesign
+    - run: cd build/ios/iphoneos
+    - run: mkdir Payload
+    - run: mv Runner.app Payload/
+    
+    - uses: montudor/action-zip@v1
+      with:
+        args: zip -qq -r Payload.zip Payload
+
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Traintime-PDA.ipa
+        path: /Users/runner/work/watermeter/watermeter/build/ios/iphoneos/Payload.zip
+        if-no-files-found: error
+
+
