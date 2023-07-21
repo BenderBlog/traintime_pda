@@ -42,7 +42,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: Traintime-PDA.ipa
-        path: /Users/runner/work/watermeter/watermeter/build/ios/iphoneos/Payload.zip
+        path: Payload.zip
         if-no-files-found: error
 
 
