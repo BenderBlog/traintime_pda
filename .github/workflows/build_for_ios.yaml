@@ -38,10 +38,10 @@ jobs:
         path: Payload/
     - uses: montudor/action-zip@v1
       with:
-        args: zip -qq -r Payload.zip Payload
+        args: zip -qq -r org.superbart.watermeter.ipa Payload
     - uses: actions/upload-artifact@v3
       with:
-        name: Traintime-PDA.ipa
+        name: org.superbart.watermeter.ipa
         path: Payload.zip
         if-no-files-found: error
 
