@@ -89,7 +89,7 @@ class _QueryBookWindowState extends State<QueryBookWindow>
                   controller: _pageController,
                   itemBuilder: (context, index) => GestureDetector(
                     child: BookInfoCard(toUse: c.searchList[index]),
-                    onTap: () => showModalBottomSheet(
+                    onTap: () => showBottomSheet(
                       context: context,
                       builder: (context) => BookDetailCard(
                         toUse: c.searchList[index],

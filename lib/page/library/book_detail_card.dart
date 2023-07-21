@@ -5,12 +5,26 @@ import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
-class BookDetailCard extends StatelessWidget {
+class BookDetailCard extends StatefulWidget {
   final BookInfo toUse;
+
   const BookDetailCard({
     super.key,
     required this.toUse,
   });
+
+  @override
+  State<BookDetailCard> createState() => _BookDetailCardState();
+}
+
+class _BookDetailCardState extends State<BookDetailCard> {
+  late Future<List<BookLocation>> future;
+
+  @override
+  void initState() {
+    super.initState();
+    future = LibrarySession().getBookLocation(widget.toUse);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +52,13 @@ class BookDetailCard extends StatelessWidget {
             child: ListView(
               shrinkWrap: true,
               children: [
+                Text(
+                  widget.toUse.bookName,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -46,25 +67,18 @@ class BookDetailCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            toUse.bookName,
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+                            "作者：${widget.toUse.author}\n"
+                            "出版社：${widget.toUse.publisherHouse}\n"
+                            "ISBN: ${widget.toUse.isbn}\n"
+                            "发行时间: ${widget.toUse.publicationDate}\n"
+                            "索书号: ${widget.toUse.searchCode}",
                           ),
-                          const Divider(color: Colors.transparent),
-                          Text(
-                            "作者：${toUse.author}\n"
-                            "出版社：${toUse.publisherHouse}\n"
-                            "ISBN: ${toUse.isbn}\n"
-                            "发行时间: ${toUse.publicationDate} 索书号: ${toUse.searchCode}",
-                          ),
-                          const Divider(color: Colors.transparent),
                         ],
                       ),
                     ),
                     CachedNetworkImage(
-                      imageUrl: LibrarySession.bookCover(toUse.isbn ?? ""),
+                      imageUrl:
+                          LibrarySession.bookCover(widget.toUse.isbn ?? ""),
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
                       errorWidget: (context, url, error) =>
@@ -74,11 +88,11 @@ class BookDetailCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Text(toUse.description ?? "这本书没有提供描述"),
+                Text(widget.toUse.description ?? "这本书没有提供描述"),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: FutureBuilder(
-                    future: LibrarySession().getBookLocation(toUse),
+                    future: future,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const InfoDetailBox(

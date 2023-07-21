@@ -32,7 +32,7 @@ class ScoreInfoCard extends StatelessWidget {
             if (c.isSelectMod) {
               c.setScoreChoiceState(mark);
             } else {
-              showModalBottomSheet(
+              showBottomSheet(
                 builder: (((context) {
                   return ScoreComposeCard(
                     score: c.scoreTable[mark],

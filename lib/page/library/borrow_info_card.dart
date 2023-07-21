@@ -125,7 +125,7 @@ class BorrowInfoCard extends StatelessWidget {
                 ),
                 TextButton(
                   child: const Text("转借"),
-                  onPressed: () => showModalBottomSheet(
+                  onPressed: () => showBottomSheet(
                     builder: (((context) {
                       return TransferQRCode(data: toUse);
                     })),
