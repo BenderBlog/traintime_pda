@@ -75,31 +75,30 @@ class BookDetailCard extends StatelessWidget {
                   ],
                 ),
                 Text(toUse.description ?? "这本书没有提供描述"),
-                const Divider(color: Colors.transparent),
-                const SizedBox(
-                  height: 10,
-                ),
-                FutureBuilder(
-                  future: LibrarySession().getBookLocation(toUse),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const InfoDetailBox(
-                          child: Center(child: Text("正在获取")));
-                    } else if (snapshot.hasError) {
-                      return const InfoDetailBox(
-                          child: Center(child: Text("获取信息出错")));
-                    } else {
-                      return Column(
-                        children: List.generate(
-                          snapshot.data!.length,
-                          (index) => BookPlaceCard(
-                            toUse: snapshot.data![index],
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: FutureBuilder(
+                    future: LibrarySession().getBookLocation(toUse),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const InfoDetailBox(
+                            child: Center(child: Text("正在获取")));
+                      } else if (snapshot.hasError) {
+                        return const InfoDetailBox(
+                            child: Center(child: Text("获取信息出错")));
+                      } else {
+                        return Column(
+                          children: List.generate(
+                            snapshot.data!.length,
+                            (index) => BookPlaceCard(
+                              toUse: snapshot.data![index],
+                            ),
                           ),
-                        ),
-                      );
-                    }
-                  },
-                )
+                        );
+                      }
+                    },
+                  ),
+                ),
               ],
             ),
           ),

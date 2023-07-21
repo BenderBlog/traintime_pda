@@ -73,7 +73,7 @@ Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{
 
 BookLocation _$BookLocationFromJson(Map<String, dynamic> json) => BookLocation(
       barCode: json['barCode'] as String,
-      recKey: json['recKey'] as String,
+      recKey: json['recKey'] as String?,
       libraryCode: json['libraryCode'] as String,
       branch_library_code: json['branch_library_code'] as String,
       bookAddressCode: json['bookAddressCode'] as String,

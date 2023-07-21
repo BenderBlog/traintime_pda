@@ -24,9 +24,9 @@ class BookPlaceCard extends StatelessWidget {
                 TagsBoxes(
                   text: toUse.borrowStatus == 0
                       ? "在架"
-                      : toUse.noBorrowingReason == null
+                      : toUse.noBorrowingReason != null
                           ? "不在架"
-                          : "已结出",
+                          : "已借出",
                   backgroundColor:
                       toUse.borrowStatus == 0 ? Colors.green : Colors.red,
                 ),

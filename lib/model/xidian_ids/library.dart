@@ -109,7 +109,7 @@ class BookInfo {
 @JsonSerializable()
 class BookLocation {
   final String barCode;
-  final String recKey;
+  final String? recKey;
   final String libraryCode;
   final String branch_library_code;
   final String bookAddressCode;
