@@ -38,11 +38,11 @@ jobs:
         path: Payload/
     - uses: montudor/action-zip@v1
       with:
-        args: zip -qq -r org.superbart.watermeter.ipa Payload
+        args: zip -qq -r watermeter.ipa Payload
     - uses: actions/upload-artifact@v3
       with:
-        name: org.superbart.watermeter.ipa
-        path: Payload.zip
+        name: watermeter.ipa
+        path: watermeter.ipa
         if-no-files-found: error
 
 
