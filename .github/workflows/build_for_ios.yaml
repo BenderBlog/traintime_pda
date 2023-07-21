@@ -1,0 +1,24 @@
+name: build for iOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+ deploy_ios:
+    name: Build this project for ios without codesign
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code from ref
+        uses: actions/checkout@v2
+      - name: Run Flutter tasks
+        uses: subosito/flutter-action@v1
+        with:
+            channel: 'stable'
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
