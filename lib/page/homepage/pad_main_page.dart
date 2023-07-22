@@ -3,11 +3,11 @@ import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/score_controller.dart';
-import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
+import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
 import 'package:watermeter/page/homepage/info_widget/score_card.dart';
-import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PadMainPage extends StatelessWidget {
@@ -60,14 +60,14 @@ class PadMainPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.20 < 200
                 ? 200
                 : MediaQuery.of(context).size.width * 0.20,
-            child: Column(
+            child: const Column(
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 100,
                   child: ElectricityCard(),
                 ),
                 ScoreCard(),
-                const ExamCard(),
+                ExamCard(),
               ],
             ),
           )
