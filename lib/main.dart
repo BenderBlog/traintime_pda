@@ -11,6 +11,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/controller/school_card_controller.dart';
+import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/network_session.dart' as repo_general;
 import 'package:watermeter/repository/network_session.dart';
@@ -53,6 +58,11 @@ void main() async {
       );
       offline = true;
     }
+    Get.put(ScoreController());
+    Get.put(ClassTableController());
+    Get.put(ExamController());
+    Get.put(LibraryController());
+    Get.put(SchoolCardController());
   } else {
     isFirst = true;
   }

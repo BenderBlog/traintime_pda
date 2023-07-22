@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
-import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
-import 'package:watermeter/page/homepage/info_widget/score_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PadMainPage extends StatelessWidget {
-  final classTableController = Get.put(ClassTableController());
-  final examController = Get.put(ExamController());
-  final scoreController = Get.put(ScoreController());
-
-  PadMainPage({super.key});
+  const PadMainPage({super.key});
 
   final inBetweenCardHeight = 135.0;
 

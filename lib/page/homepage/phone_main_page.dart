@@ -2,26 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/library_controller.dart';
-import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
-import 'package:watermeter/page/homepage/info_widget/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
 import 'package:watermeter/page/homepage/info_widget/library_card.dart';
-import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
-import 'package:watermeter/page/homepage/info_widget/score_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {
-  final controller = Get.put(ScoreController());
-  final classTableController = Get.put(ClassTableController());
-  final examController = Get.put(ExamController());
-  final libraryController = Get.put(LibraryController());
-
-  PhoneMainPage({super.key});
+  const PhoneMainPage({super.key});
 
   final classCardHeight = 135.0;
 

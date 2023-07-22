@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/small_function_card.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class ExamCard extends StatelessWidget {
@@ -34,36 +35,10 @@ class ExamCard extends StatelessWidget {
             ));
           }
         },
-        child: Card(
-          elevation: 0,
-          color: Theme.of(context).colorScheme.primaryContainer,
-          child: const Padding(
-            padding: EdgeInsets.all(10),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Icon(
-                    Icons.calendar_month,
-                    size: 48,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "考试查询",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Text(
-                        "上天保佑时间",
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+        child: const SmallFunctionCard(
+          icon: Icons.calendar_month,
+          name: "考试查询",
+          description: "上天保佑时间",
         ),
       ),
     );

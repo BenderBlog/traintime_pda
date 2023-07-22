@@ -73,7 +73,7 @@ class SportSession {
       toReturn.situation = "无密码信息";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
-      toReturn.situation = "登录失败";
+      toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e) {
       developer.log("未获取学期值：$e", name: "GetPunchSession");
       toReturn.situation = "未获取学期值";
@@ -129,7 +129,7 @@ class SportSession {
       toReturn.situation = "无密码信息";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
-      toReturn.situation = "登录失败";
+      toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e) {
       developer.log("未获取学期值：$e", name: "GetPunchSession");
       toReturn.situation = "未获取学期值";
@@ -150,7 +150,7 @@ class SportSession {
     return Encrypter(RSA(publicKey: publicKey)).encrypt(toEnc).base64;
   }
 
-  var userId = '';
+  static var userId = '';
 
   final baseURL = 'http://xd.5itsn.com/app/';
 
@@ -227,22 +227,32 @@ awb4B45zUwIDAQAB
       developer.log("已经登录成功", name: "SportSession");
       return;
     }
-    var response = await require(
-      subWebsite: "/h5/login",
-      body: {
-        "uname": preference.getString(preference.Preference.idsAccount),
-        "pwd": rsaEncrypt(
-          preference.getString(preference.Preference.sportPassword),
-          rsaKey,
-        ),
-        "openid": ""
-      },
-    );
-    if (response["returnCode"] != "200" && response["returnCode"] != 200) {
-      throw LoginFailedException(msg: response["returnMsg"]);
-    } else {
-      userId = response["data"]["id"].toString();
-      commonHeader["token"] = response["data"]["token"];
+
+    late Map<String, dynamic> response;
+
+    try {
+      response = await require(
+        subWebsite: "/h5/login",
+        body: {
+          "uname": preference.getString(preference.Preference.idsAccount),
+          "pwd": rsaEncrypt(
+            preference.getString(preference.Preference.sportPassword),
+            rsaKey,
+          ),
+          "openid": ""
+        },
+      );
+      if (response["returnCode"] != "200" && response["returnCode"] != 200) {
+        throw LoginFailedException(msg: response["returnMsg"]);
+      } else {
+        userId = response["data"]["id"].toString();
+        commonHeader["token"] = response["data"]["token"];
+      }
+    } on DioException catch (e) {
+      if (e.message?.contains("404") ?? false) {
+        throw const LoginFailedException(msg: "系统维护");
+      }
+      rethrow;
     }
   }
 
