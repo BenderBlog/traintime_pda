@@ -93,10 +93,10 @@ class PhoneMainPage extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 2,
                 childAspectRatio: MediaQuery.of(context).size.width / 160,
-                children: [
+                children: const [
                   SchoolCardInfoCard(),
                   ScoreCard(),
-                  const ExamCard(),
+                  ExamCard(),
                 ],
               ),
             ),
