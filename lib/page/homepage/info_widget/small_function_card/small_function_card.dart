@@ -23,9 +23,17 @@ class SmallFunctionCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(
-                icon,
-                size: 48,
+              ClipOval(
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  color: Colors.white,
+                  child: Icon(
+                    icon,
+                    size: 36,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,

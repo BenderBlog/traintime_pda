@@ -41,7 +41,7 @@ class ScoreCard extends StatelessWidget {
           }
         },
         child: const SmallFunctionCard(
-          icon: Icons.score,
+          icon: Icons.score_outlined,
           name: "成绩查询",
           description: "可计算平均分",
         ),

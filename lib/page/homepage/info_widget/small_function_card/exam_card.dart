@@ -36,7 +36,7 @@ class ExamCard extends StatelessWidget {
           }
         },
         child: const SmallFunctionCard(
-          icon: Icons.calendar_month,
+          icon: Icons.view_timeline_outlined,
           name: "考试查询",
           description: "上天保佑时间",
         ),

@@ -37,7 +37,7 @@ class SchoolCardInfoCard extends StatelessWidget {
           }
         },
         child: const SmallFunctionCard(
-          icon: Icons.currency_yuan,
+          icon: Icons.money_rounded,
           name: "流水查询",
           description: "食堂哪个好吃",
         ),
