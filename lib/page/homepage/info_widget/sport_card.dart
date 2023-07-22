@@ -30,6 +30,7 @@ class SportCard extends StatelessWidget {
         },
         onLongPress: SportSession().getPunch,
         child: MainPageCard(
+          isLong: true,
           icon: Icons.run_circle,
           text: "体育信息",
           height: punchData.value.all.isNotEmpty ? 200 : 100,
@@ -38,7 +39,9 @@ class SportCard extends StatelessWidget {
               child: Center(
                 child: Text(
                   punchData.value.situation ??
-                      "有效次数 ${punchData.value.valid} 总共次数 ${punchData.value.allTime} 成绩 ${punchData.value.score}",
+                      "有效次数 ${punchData.value.valid}"
+                          "总共次数 ${punchData.value.allTime}"
+                          "成绩 ${punchData.value.score}",
                   textScaleFactor: 1.15,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,

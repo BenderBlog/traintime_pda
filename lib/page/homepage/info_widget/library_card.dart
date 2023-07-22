@@ -37,21 +37,34 @@ class LibraryCard extends StatelessWidget {
           }
         },
         child: MainPageCard(
-          height: 100,
+          isLong: false,
           icon: Icons.local_library,
           text: "图书馆信息",
           children: [
-            Expanded(
-              child: Center(
-                child: Text(
-                  "目前借书：${c.borrowList.length}",
-                  textScaleFactor: 1.15,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
+                children: [
+                  TextSpan(
+                    text: "${c.borrowList.length}",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 28,
+                    ),
+                  ),
+                  TextSpan(
+                    text: " 本在借",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
               ),
             ),
+            Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍"),
           ],
         ),
       ),

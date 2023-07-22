@@ -22,7 +22,9 @@ class ElectricityCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text(
-              "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n长按可以重新加载，有欠费一般代表水费"),
+            "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
+            "长按可以重新加载，有欠费一般代表水费",
+          ),
         ));
       },
       onLongPress: () {
@@ -30,23 +32,48 @@ class ElectricityCard extends StatelessWidget {
         owe_session.update();
       },
       child: MainPageCard(
-        height: 100,
+        isLong: false,
         icon: Icons.electric_meter_rounded,
         text: "电量信息",
         children: [
-          Expanded(
-            child: Center(
-              child: Obx(
-                () => Text(
-                  "${electricity_session.electricityInfo.value} ${owe_session.owe.value}",
-                  textScaleFactor: 1.15,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+          Obx(
+            () => RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
+                children: !electricity_session.isNotice.value
+                    ? [
+                        TextSpan(
+                          text: electricity_session.electricityInfo.value,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 28,
+                          ),
+                        ),
+                        TextSpan(
+                          text: " 度电",
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ]
+                    : [
+                        TextSpan(
+                          text: electricity_session.electricityInfo.value,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
               ),
             ),
           ),
+          Obx(() => Text(owe_session.owe.value)),
         ],
       ),
     );

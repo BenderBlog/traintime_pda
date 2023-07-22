@@ -32,6 +32,7 @@ class ClassTableCard extends StatelessWidget {
           }
         },
         child: MainPageCard(
+          isLong: true,
           height: 135,
           icon: Icons.access_time_filled,
           text: c.isGet == true

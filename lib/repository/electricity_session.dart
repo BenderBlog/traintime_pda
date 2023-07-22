@@ -19,12 +19,15 @@ import 'dart:developer' as developer;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
+var isNotice = true.obs;
 var electricityInfo = "".obs;
 
 Future<void> update() async {
   try {
+    isNotice.value = true;
     electricityInfo.value = "正在获取电量";
     await ElectricitySession().updateInformation();
+    isNotice.value = false;
   } on NotSchoolNetworkException {
     electricityInfo.value = "目前不是校园网";
   } on DioException catch (e) {
@@ -157,7 +160,7 @@ class ElectricitySession extends NetworkSession {
     //by ZCWzy
     for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
-        electricityInfo.value = "${dataArray[i][0]!}度";
+        electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
         developer.log(
           electricityInfo.value,
           name: "ElectricSession",

@@ -38,7 +38,7 @@ class SchoolCardInfoCard extends StatelessWidget {
           }
         },
         child: MainPageCard(
-          height: 100,
+          isLong: false,
           icon: Icons.credit_card,
           text: "校园卡信息",
           children: [

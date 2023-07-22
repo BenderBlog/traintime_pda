@@ -54,7 +54,7 @@ class NetworkSession {
     Dio dio = Dio()
       ..options.connectTimeout = const Duration(milliseconds: 2000);
     await dio
-        .get("http://w.xidian.edu.cn")
+        .get("http://linux.xidian.edu.cn")
         .then((value) => isInSchool = true)
         .onError((error, stackTrace) => isInSchool = false);
     return isInSchool;

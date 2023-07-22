@@ -69,9 +69,21 @@ class PhoneMainPage extends StatelessWidget {
               ],
             ),
             const SportCard(),
-            const ElectricityCard(),
-            SchoolCardInfoCard(),
-            const LibraryCard(),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.025),
+              child: GridView.count(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                childAspectRatio: MediaQuery.of(context).size.width / 260,
+                children: const [
+                  ElectricityCard(),
+                  LibraryCard(),
+                ],
+              ),
+            ),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),
@@ -82,6 +94,7 @@ class PhoneMainPage extends StatelessWidget {
                 crossAxisCount: 2,
                 childAspectRatio: MediaQuery.of(context).size.width / 160,
                 children: [
+                  SchoolCardInfoCard(),
                   ScoreCard(),
                   const ExamCard(),
                 ],

@@ -82,7 +82,10 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: alice.getNavigatorKey(),
         title: 'WaterMeter Pre-Alpha',
         theme: c.apptheme,
-        home: widget.isFirst ? const LoginWindow() : const HomePage(),
+        home: DefaultTextStyle.merge(
+          style: const TextStyle(textBaseline: TextBaseline.ideographic),
+          child: widget.isFirst ? const LoginWindow() : const HomePage(),
+        ),
       ),
     );
   }
