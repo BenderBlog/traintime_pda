@@ -18,6 +18,6 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isPhone(context) ? PhoneMainPage() : PadMainPage();
+    return isPhone(context) ? const PhoneMainPage() : const PadMainPage();
   }
 }

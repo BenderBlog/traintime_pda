@@ -32,9 +32,12 @@ class ClassTableController extends GetxController {
     update();
   }
 
+  bool get isNotVacation =>
+      currentWeek >= 0 && currentWeek < classTableData.semesterLength;
+
   void updateCurrent() {
     // Get the current time.
-    if (currentWeek >= 0 && currentWeek < classTableData.semesterLength) {
+    if (isNotVacation) {
       developer.log("Get the current class", name: "ClassTableController");
       DateTime now = DateTime.now();
       if ((now.hour >= 8 && now.hour < 20) ||
