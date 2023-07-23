@@ -458,9 +458,9 @@ class PageState extends State<ClassTableWindow> {
                     (status) => Colors.transparent,
                   ),
                 ),
-                onPressed: () => showModalBottomSheet(
+                onPressed: () => showDialog(
                   builder: (((context) {
-                    return _buttomInformation(conflict);
+                    return Center(child: _buttomInformation(conflict));
                   })),
                   context: context,
                 ),
@@ -648,49 +648,30 @@ class PageState extends State<ClassTableWindow> {
             ),
           );
 
-      Widget middlePart() => isHorizontal()
-          ? Row(
-              children: [
-                customListTile(
-                  Icons.person,
-                  toShow.teacher ?? "老师未定",
-                ),
-                const SizedBox(width: 10),
-                customListTile(
-                  Icons.room,
-                  timeArrangement.classroom ?? "地点未定",
-                ),
-                const SizedBox(width: 10),
-                customListTile(
-                  Icons.access_time_filled_outlined,
-                  "${weekList[timeArrangement.day - 1]}"
-                  "${timeArrangement.start}-${timeArrangement.stop}节课 "
-                  "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
-                ),
-              ],
-            )
-          : Column(
-              children: [
-                customListTile(
-                  Icons.person,
-                  toShow.teacher ?? "老师未定",
-                ),
-                customListTile(
-                  Icons.room,
-                  timeArrangement.classroom ?? "地点未定",
-                ),
-                customListTile(
-                  Icons.access_time_filled_outlined,
-                  "${weekList[timeArrangement.day - 1]}"
-                  "${timeArrangement.start}-${timeArrangement.stop}节课 "
-                  "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
-                ),
-              ],
-            );
+      Widget middlePart() => Column(
+            children: [
+              customListTile(
+                Icons.person,
+                toShow.teacher ?? "老师未定",
+              ),
+              customListTile(
+                Icons.room,
+                timeArrangement.classroom ?? "地点未定",
+              ),
+              customListTile(
+                Icons.access_time_filled_outlined,
+                "${weekList[timeArrangement.day - 1]}"
+                "${timeArrangement.start}-${timeArrangement.stop}节课 "
+                "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
+              ),
+            ],
+          );
 
-      // Don;t know why I need to add a goddame builder.
-      return LayoutBuilder(
-        builder: (context, constraints) => Card(
+      return ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 360.0,
+        ),
+        child: Card(
           margin: const EdgeInsets.symmetric(
             horizontal: 15,
             vertical: 10,
@@ -704,7 +685,7 @@ class PageState extends State<ClassTableWindow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${toShow.name}${isHorizontal() ? " " : "\n"}${toShow.code} | ${toShow.number} 班",
+                  "${toShow.name}\n${toShow.code} | ${toShow.number} 班",
                   style: TextStyle(
                     color: infoColor.shade900,
                     fontSize: 18,
@@ -715,19 +696,21 @@ class PageState extends State<ClassTableWindow> {
                 middlePart(),
                 Container(
                   margin: const EdgeInsets.only(top: 7),
-                  child: GridView.extent(
+                  child: GridView.count(
                     shrinkWrap: true,
                     mainAxisSpacing: 5,
                     crossAxisSpacing: 5,
-                    maxCrossAxisExtent: 30,
-                    children:
-                        List.generate(timeArrangement.weekList.length, (index) {
-                      bool isOccupied = true;
-                      if (timeArrangement.weekList[index] == "0") {
-                        isOccupied = false;
-                      }
-                      return weekDoc(index + 1, isOccupied);
-                    }),
+                    crossAxisCount: 10,
+                    children: List.generate(
+                      timeArrangement.weekList.length,
+                      (index) {
+                        bool isOccupied = true;
+                        if (timeArrangement.weekList[index] == "0") {
+                          isOccupied = false;
+                        }
+                        return weekDoc(index + 1, isOccupied);
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -748,27 +731,8 @@ class PageState extends State<ClassTableWindow> {
     );
 
     return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: 20,
-          child: Container(
-            width: 50,
-            margin: const EdgeInsets.only(top: 7, bottom: 7),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView(
-            physics: const ClampingScrollPhysics(),
-            shrinkWrap: true,
-            children: toShow,
-          ),
-        )
-      ],
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: toShow,
     );
   }
 }
