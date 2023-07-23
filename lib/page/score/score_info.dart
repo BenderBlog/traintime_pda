@@ -203,155 +203,136 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 15,
-      ),
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: SizedBox(
-                  height: 20,
-                  child: Container(
-                    width: 50,
-                    margin: const EdgeInsets.only(top: 7, bottom: 7),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-              Card(
-                elevation: 0,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                child: GetBuilder<ScoreController>(
-                  builder: (c) => FutureBuilder<Compose>(
-                    future: compose,
-                    builder: (context, snapshot) {
-                      late Widget info;
-                      if (snapshot.hasData) {
-                        if (snapshot.data == null ||
-                            snapshot.data!.score.isEmpty) {
-                          info = const InfoDetailBox(
-                              child: Center(child: Text("未提供详情信息")));
-                        } else {
-                          info = InfoDetailBox(
-                            child: Table(
-                              children: [
-                                for (var i in snapshot.data!.score)
-                                  TableRow(
-                                    children: <Widget>[
-                                      TableCell(
-                                        child: Text(i.content),
-                                      ),
-                                      TableCell(
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Text(i.ratio),
-                                        ),
-                                      ),
-                                      TableCell(
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Text(i.score),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                          );
-                        }
-                      } else if (snapshot.hasError) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              child: GetBuilder<ScoreController>(
+                builder: (c) => FutureBuilder<Compose>(
+                  future: compose,
+                  builder: (context, snapshot) {
+                    late Widget info;
+                    if (snapshot.hasData) {
+                      if (snapshot.data == null ||
+                          snapshot.data!.score.isEmpty) {
                         info = const InfoDetailBox(
-                            child: Center(child: Text("未获取详情信息")));
+                            child: Center(child: Text("未提供详情信息")));
                       } else {
-                        info = const InfoDetailBox(
-                            child: Center(child: Text("正在获取")));
-                      }
-                      return Container(
-                        padding: const EdgeInsets.all(15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              alignment: WrapAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  widget.score.name,
-                                  textScaleFactor: 1.1,
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                                const Divider(
-                                  color: Colors.transparent,
-                                  height: 5,
-                                ),
-                                Row(
-                                  children: [
-                                    TagsBoxes(
-                                      text: widget.score.year,
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.primary,
+                        info = InfoDetailBox(
+                          child: Table(
+                            children: [
+                              for (var i in snapshot.data!.score)
+                                TableRow(
+                                  children: <Widget>[
+                                    TableCell(
+                                      child: Text(i.content),
                                     ),
-                                    const SizedBox(width: 5),
-                                    TagsBoxes(
-                                      text: widget.score.status,
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.primary,
+                                    TableCell(
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(i.ratio),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(i.score),
+                                      ),
                                     ),
                                   ],
                                 ),
-                                const Divider(
-                                  color: Colors.transparent,
-                                  height: 5,
+                            ],
+                          ),
+                        );
+                      }
+                    } else if (snapshot.hasError) {
+                      info = const InfoDetailBox(
+                          child: Center(child: Text("未获取详情信息")));
+                    } else {
+                      info = const InfoDetailBox(
+                          child: Center(child: Text("正在获取")));
+                    }
+                    return Container(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                widget.score.name,
+                                textScaleFactor: 1.1,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
-                                Text(
-                                  "学分: ${widget.score.credit}",
-                                ),
-                                Text(
-                                  "GPA: ${widget.score.gpa}",
-                                ),
-                                Text(
-                                  "成绩：${widget.score.how == 1 || widget.score.how == 2 ? "${widget.score.level}(${widget.score.score})" : widget.score.score}",
-                                ),
-                                Card(
-                                  elevation: 0,
-                                  child: info,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                              ),
+                              const Divider(
+                                color: Colors.transparent,
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  TagsBoxes(
+                                    text: widget.score.year,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  TagsBoxes(
+                                    text: widget.score.status,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ],
+                              ),
+                              const Divider(
+                                color: Colors.transparent,
+                                height: 5,
+                              ),
+                              Text(
+                                "学分: ${widget.score.credit}",
+                              ),
+                              Text(
+                                "GPA: ${widget.score.gpa}",
+                              ),
+                              Text(
+                                "成绩：${widget.score.how == 1 || widget.score.how == 2 ? "${widget.score.level}(${widget.score.score})" : widget.score.score}",
+                              ),
+                              Card(
+                                elevation: 0,
+                                child: info,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-              if (Get.put(ScoreController()).allowDetail)
-                scoreInfo(true, context),
-              if (Get.put(ScoreController()).allowDetail)
-                scoreInfo(false, context),
-            ],
-          ),
-          Watermark(
-            rowCount: 3,
-            columnCount: 10,
-            text:
-                "${preference.getString(preference.Preference.idsAccount)} ${preference.getString(preference.Preference.name)}\n仅个人参考 他用无效",
-            textStyle: const TextStyle(
-              color: Color(0x48000000),
-              fontSize: 10,
             ),
+            if (Get.put(ScoreController()).allowDetail)
+              scoreInfo(true, context),
+            if (Get.put(ScoreController()).allowDetail)
+              scoreInfo(false, context),
+          ],
+        ),
+        /*
+        Watermark(
+          rowCount: 3,
+          columnCount: 10,
+          text:
+              "${preference.getString(preference.Preference.idsAccount)} ${preference.getString(preference.Preference.name)}\n仅个人参考 他用无效",
+          textStyle: const TextStyle(
+            color: Color(0x48000000),
+            fontSize: 10,
           ),
-        ],
-      ),
+        ),*/
+      ],
     );
   }
 }

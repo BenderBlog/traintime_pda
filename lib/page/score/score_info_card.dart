@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/both_side_sheet.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/score/score_info.dart';
 import 'package:watermeter/controller/score_controller.dart';
@@ -32,13 +33,19 @@ class ScoreInfoCard extends StatelessWidget {
             if (c.isSelectMod) {
               c.setScoreChoiceState(mark);
             } else {
-              showBottomSheet(
-                builder: (((context) {
-                  return ScoreComposeCard(
-                    score: c.scoreTable[mark],
-                  );
-                })),
+              /*showBottomSheet(
                 context: context,
+                builder: (context) => ScoreComposeCard(
+                  score: c.scoreTable[mark],
+                ),
+              );*/
+
+              BothSideSheet.show(
+                context: context,
+                title: "成绩详情",
+                child: ScoreComposeCard(
+                  score: c.scoreTable[mark],
+                ),
               );
             }
           }
