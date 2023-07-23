@@ -203,9 +203,22 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
 
   @override
   Widget build(BuildContext context) {
+    var watermark = Watermark(
+      rowCount: 3,
+      columnCount: 10,
+      text:
+          "${preference.getString(preference.Preference.idsAccount)} ${preference.getString(preference.Preference.name)}\n仅个人参考 他用无效",
+      textStyle: const TextStyle(
+        color: Color(0x48000000),
+        fontSize: 10,
+      ),
+    );
+
     return Stack(
       children: [
-        Column(
+        watermark,
+        ListView(
+          shrinkWrap: true,
           children: [
             Card(
               elevation: 0,
@@ -321,17 +334,6 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
               scoreInfo(false, context),
           ],
         ),
-        /*
-        Watermark(
-          rowCount: 3,
-          columnCount: 10,
-          text:
-              "${preference.getString(preference.Preference.idsAccount)} ${preference.getString(preference.Preference.name)}\n仅个人参考 他用无效",
-          textStyle: const TextStyle(
-            color: Color(0x48000000),
-            fontSize: 10,
-          ),
-        ),*/
       ],
     );
   }

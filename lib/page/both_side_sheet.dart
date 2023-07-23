@@ -103,13 +103,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
             ),
           ),
         )
-      : AppBar(
-          title: Text(widget.title),
-          leading: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back),
-          ),
-        );
+      : Text(widget.title);
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +126,13 @@ class _BothSideSheetState extends State<BothSideSheet> {
               horizontal: isPhone(context) ? 15 : 10,
               vertical: isPhone(context) ? 0 : 10,
             ),
-            child: Column(
-              children: [
-                onTop,
-                widget.child,
-              ],
+            child: Scaffold(
+              appBar: AppBar(
+                automaticallyImplyLeading: !isPhone(context),
+                toolbarHeight: isPhone(context) ? 20 : kToolbarHeight,
+                title: onTop,
+              ),
+              body: widget.child,
             ),
           ),
         ),
