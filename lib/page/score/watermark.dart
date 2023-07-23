@@ -18,37 +18,30 @@ class Watermark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: Column(
+      child: ListView(
         children: _createColumnWidgets(),
       ),
     );
   }
 
-  List<Widget> _createColumnWidgets() {
-    List<Widget> list = [];
-    for (var i = 0; i < columnCount; i++) {
-      final widget = Expanded(
-          child: Row(
-        children: _createRowWidgets(),
-      ));
-      list.add(widget);
-    }
-    return list;
-  }
+  List<Widget> _createColumnWidgets() => List<Widget>.generate(
+        columnCount,
+        (index) => Transform.rotate(
+          angle: -pi / 20,
+          child: Expanded(
+            child: Row(
+              children: _createRowWidgets(),
+            ),
+          ),
+        ),
+      );
 
-  List<Widget> _createRowWidgets() {
-    List<Widget> list = [];
-    for (var i = 0; i < rowCount; i++) {
-      final widget = Expanded(
-        child: Center(
-          child: Transform.rotate(
-            angle: -pi / 10,
+  List<Widget> _createRowWidgets() => List<Widget>.generate(
+        rowCount,
+        (index) => Expanded(
+          child: Center(
             child: Text(text, style: textStyle),
           ),
         ),
       );
-      list.add(widget);
-    }
-    return list;
-  }
 }
