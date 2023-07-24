@@ -2,8 +2,10 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/page/both_side_sheet.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
+import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 
 class QueryBookWindow extends StatefulWidget {
   const QueryBookWindow({super.key});
@@ -85,18 +87,23 @@ class _QueryBookWindowState extends State<QueryBookWindow>
         },
         child: Obx(
           () => c.searchList.isNotEmpty
-              ? ListView.builder(
+              ? GridView.builder(
                   controller: _pageController,
                   itemBuilder: (context, index) => GestureDetector(
                     child: BookInfoCard(toUse: c.searchList[index]),
-                    onTap: () => showBottomSheet(
+                    onTap: () => BothSideSheet.show(
                       context: context,
-                      builder: (context) => BookDetailCard(
+                      title: "书籍详细信息",
+                      child: BookDetailCard(
                         toUse: c.searchList[index],
                       ),
                     ),
                   ),
                   itemCount: c.searchList.length,
+                  gridDelegate: SliverGridDelegateWithFixedHeight(
+                    height: 200,
+                    maxCrossAxisExtent: 360,
+                  ),
                 )
               : c.isSearching.value
                   ? const Center(child: CircularProgressIndicator())

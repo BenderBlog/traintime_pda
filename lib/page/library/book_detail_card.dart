@@ -32,88 +32,67 @@ class _BookDetailCardState extends State<BookDetailCard> {
       padding: const EdgeInsets.symmetric(
         horizontal: 15,
       ),
-      child: Column(
+      child: ListView(
+        shrinkWrap: true,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: SizedBox(
-              height: 20,
-              child: Container(
-                width: 50,
-                margin: const EdgeInsets.only(top: 7, bottom: 7),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey,
-                ),
-              ),
+          Text(
+            widget.toUse.bookName,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          Flexible(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Text(
-                  widget.toUse.bookName,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "作者：${widget.toUse.author}\n"
-                            "出版社：${widget.toUse.publisherHouse}\n"
-                            "ISBN: ${widget.toUse.isbn}\n"
-                            "发行时间: ${widget.toUse.publicationDate}\n"
-                            "索书号: ${widget.toUse.searchCode}",
-                          ),
-                        ],
-                      ),
-                    ),
-                    CachedNetworkImage(
-                      imageUrl:
-                          LibrarySession.bookCover(widget.toUse.isbn ?? ""),
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          Image.asset("assets/Empty-Cover.jpg"),
-                      width: 90,
-                      height: 120,
+                    Text(
+                      "作者：${widget.toUse.author}\n"
+                      "出版社：${widget.toUse.publisherHouse}\n"
+                      "ISBN: ${widget.toUse.isbn}\n"
+                      "发行时间: ${widget.toUse.publicationDate}\n"
+                      "索书号: ${widget.toUse.searchCode}",
                     ),
                   ],
                 ),
-                Text(widget.toUse.description ?? "这本书没有提供描述"),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: FutureBuilder(
-                    future: future,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const InfoDetailBox(
-                            child: Center(child: Text("正在获取")));
-                      } else if (snapshot.hasError) {
-                        return const InfoDetailBox(
-                            child: Center(child: Text("获取信息出错")));
-                      } else {
-                        return Column(
-                          children: List.generate(
-                            snapshot.data!.length,
-                            (index) => BookPlaceCard(
-                              toUse: snapshot.data![index],
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ],
+              ),
+              CachedNetworkImage(
+                imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) =>
+                    Image.asset("assets/Empty-Cover.jpg"),
+                width: 90,
+                height: 120,
+              ),
+            ],
+          ),
+          Text(widget.toUse.description ?? "这本书没有提供描述"),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: FutureBuilder(
+              future: future,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const InfoDetailBox(
+                      child: Center(child: Text("正在获取")));
+                } else if (snapshot.hasError) {
+                  return const InfoDetailBox(
+                      child: Center(child: Text("获取信息出错")));
+                } else {
+                  return Column(
+                    children: List.generate(
+                      snapshot.data!.length,
+                      (index) => BookPlaceCard(
+                        toUse: snapshot.data![index],
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ],

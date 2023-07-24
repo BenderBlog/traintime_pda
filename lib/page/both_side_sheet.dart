@@ -62,8 +62,8 @@ class _BothSideSheetState extends State<BothSideSheet> {
 
   double get width => isPhone(context)
       ? MediaQuery.of(context).size.width
-      : MediaQuery.of(context).size.width * 0.4 < 320
-          ? 320
+      : MediaQuery.of(context).size.width * 0.4 < 360
+          ? 360
           : MediaQuery.of(context).size.width * 0.4;
 
   Widget get onTop => isPhone(context)
@@ -73,7 +73,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
               heightForVertical = MediaQuery.of(context).size.height -
                   details.globalPosition.dy;
               if (heightForVertical <
-                  MediaQuery.of(context).size.height * 0.3) {
+                  MediaQuery.of(context).size.height * 0.4) {
                 Navigator.pop(context);
               }
             });

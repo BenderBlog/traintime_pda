@@ -80,8 +80,6 @@ class LibrarySession extends IDSSession {
       },
     ).then((value) => value.data["data"]["list"]);
 
-    developer.log(rawData.toString());
-
     return List<BookInfo>.generate(
       rawData.length ?? 0,
       (index) => BookInfo.fromJson(rawData[index]),
