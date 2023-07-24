@@ -96,26 +96,31 @@ class ScoreChoiceWindow extends StatelessWidget {
           ],
           bottom: dropDownButton,
         ),
-        body: dataList<Score, Dismissible>(
-          c.selectedScoreList,
-          (toUse) => Dismissible(
-            key: ValueKey<int>(toUse.mark),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              color: Theme.of(context).colorScheme.background,
-              alignment: const Alignment(0.95, 0),
-              child: const Icon(
-                Icons.cancel,
-                color: Colors.red,
-                size: 48,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: dataList<Score, Dismissible>(
+              c.selectedScoreList,
+              (toUse) => Dismissible(
+                key: ValueKey<int>(toUse.mark),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Theme.of(context).colorScheme.background,
+                  alignment: const Alignment(0.95, 0),
+                  child: const Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                    size: 48,
+                  ),
+                ),
+                child: ScoreInfoCard(
+                  mark: toUse.mark,
+                  functionActivated: false,
+                ),
+                onDismissed: (DismissDirection direction) =>
+                    c.setScoreChoiceState(toUse.mark),
               ),
             ),
-            child: ScoreInfoCard(
-              mark: toUse.mark,
-              functionActivated: false,
-            ),
-            onDismissed: (DismissDirection direction) =>
-                c.setScoreChoiceState(toUse.mark),
           ),
         ),
         bottomNavigationBar: BottomAppBar(

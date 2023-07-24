@@ -38,11 +38,12 @@ class ScoreWindow extends StatelessWidget {
 
   final Widget selectModeButton = GetBuilder<ScoreController>(
     builder: (c) => IconButton(
-        icon: const Icon(Icons.calculate),
-        onPressed: () {
-          c.isSelectMod = !c.isSelectMod;
-          c.update();
-        }),
+      icon: const Icon(Icons.calculate),
+      onPressed: () {
+        c.isSelectMod = !c.isSelectMod;
+        c.update();
+      },
+    ),
   );
 
   Widget get bottomInfo => GetBuilder<ScoreController>(
@@ -201,15 +202,16 @@ class ScoreWindow extends StatelessWidget {
         bottom: dropDownButton,
       ),
       body: GetBuilder<ScoreController>(
-        builder: (c) => dataList<ScoreInfoCard, ScoreInfoCard>(
-          List.generate(
+        builder: (c) => fixHeightGrid(
+          height: 120,
+          maxCrossAxisExtent: 360,
+          children: List.generate(
             c.toShow.length,
             (index) => ScoreInfoCard(
               mark: c.toShow[index].mark,
               functionActivated: true,
             ),
           ),
-          (toUse) => toUse,
         ),
       ),
       bottomNavigationBar: bottomInfo,

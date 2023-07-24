@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 
 /// Check the width
 bool isPhone(context) => MediaQuery.of(context).size.width < 480;
@@ -63,6 +64,19 @@ Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init,
         horizontal: 12.5,
         vertical: 9.0,
       ),
+    );
+
+Widget fixHeightGrid({
+  required double height,
+  required double maxCrossAxisExtent,
+  required List<Widget> children,
+}) =>
+    GridView(
+      gridDelegate: SliverGridDelegateWithFixedHeight(
+        height: height,
+        maxCrossAxisExtent: maxCrossAxisExtent,
+      ),
+      children: children,
     );
 
 /// Colors for the class information card.

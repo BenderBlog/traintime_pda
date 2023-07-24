@@ -210,7 +210,7 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
 
   var watermark = Watermark(
     rowCount: 3,
-    columnCount: 8,
+    columnCount: 12,
     text: "${preference.getString(preference.Preference.idsAccount)} "
         "${preference.getString(preference.Preference.name)} \n"
         "仅个人参考 他用无效 ",
@@ -236,7 +236,6 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
                   future: compose,
                   builder: (context, snapshot) {
                     late Widget info;
-
                     if (snapshot.hasData) {
                       if (snapshot.data == null ||
                           snapshot.data!.score.isEmpty) {
