@@ -92,6 +92,22 @@ class ScoreWindow extends StatelessWidget {
                           "全不选",
                           style: TextStyle(color: Colors.white),
                         ),
+                      ),
+                      const SizedBox(width: 12),
+                      TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        onPressed: () {
+                          c.resetChoice();
+                          c.update();
+                        },
+                        child: const Text(
+                          "重置选择",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       )
                     ],
                   ),

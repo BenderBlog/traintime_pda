@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/score_controller.dart';
-import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
-import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 import 'package:watermeter/page/widget.dart';
 
 class ScoreChoiceWindow extends StatelessWidget {
-  final _scrollController = ScrollController();
-  final _gridViewKey = GlobalKey();
-
   ScoreChoiceWindow({super.key});
 
   final PreferredSizeWidget dropDownButton = PreferredSize(

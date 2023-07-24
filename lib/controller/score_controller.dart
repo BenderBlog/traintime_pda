@@ -184,60 +184,32 @@ class ScoreController extends GetxController {
     update();
   }
 
+  void resetChoice() {
+    isSelected = List<bool>.generate(scoreTable.length, (int index) {
+      for (var i in courseIgnore) {
+        if (scoreTable[index].name.contains(i)) {
+          return false;
+        }
+      }
+      for (var i in typesIgnore) {
+        if (scoreTable[index].type.contains(i)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
   Future<void> get({String? semesterStr}) async {
     isGet = false;
     error = "正在加载";
     try {
       /// Init scorefile
       scoreTable = await ScoreFile().get();
-      isSelected = List<bool>.generate(scoreTable.length, (int index) {
-        for (var i in courseIgnore) {
-          if (scoreTable[index].name.contains(i)) {
-            return false;
-          }
-        }
-        for (var i in typesIgnore) {
-          if (scoreTable[index].type.contains(i)) {
-            return false;
-          }
-        }
-        return true;
-      });
+      resetChoice();
       semester = {for (var i in scoreTable) i.year};
       statuses = {for (var i in scoreTable) i.status};
 
-      for (var i in scoreTable) {
-        /// The score has not uploaded completely
-        if (i.isPassed == "-1") {
-          i.name += notFinish;
-          continue;
-        }
-
-        /// Passed notCoreClass credit. Meet graduate requirement.
-        if (i.status == notCoreClassType && i.isPassed == '1') {
-          notCoreClass += i.credit;
-        }
-
-        /// When think about the unpassed classes,
-        /// we do not consider the not core class.
-        if (i.isPassed != '1' &&
-            i.isPassed != "-1" &&
-            i.status != notCoreClassType &&
-            !unPassedSet.contains(i.name)) {
-          unPassedSet.add(i.name);
-          continue;
-        }
-
-        /// Whatever score is, if not passed in the first time, count as 60.
-        /// Please take a note of it.
-        if (unPassedSet.contains(i.name)) {
-          if (i.isPassed == '1') {
-            i.score = 60;
-            unPassedSet.remove(i.name);
-          }
-          i.name += notFirstTime;
-        }
-      }
       isGet = true;
       error = null;
       chosenSemester = semester.last;
