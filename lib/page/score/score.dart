@@ -209,7 +209,6 @@ class ScoreWindow extends StatelessWidget {
             c.toShow.length,
             (index) => ScoreInfoCard(
               mark: c.toShow[index].mark,
-              functionActivated: true,
             ),
           ),
         ),

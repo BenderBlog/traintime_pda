@@ -66,19 +66,6 @@ class _HomePageState extends State<HomePage> {
 
   late PageController _controller;
   late PageView _pageView;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print("didChange");
-  }
-
-  @override
-  void didUpdateWidget(covariant HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    print("${_controller.page}didUpdate");
-  }
-
   @override
   void initState() {
     super.initState();

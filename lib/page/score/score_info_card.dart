@@ -14,49 +14,35 @@ import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/score/score_info.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
-class ScoreInfoCard extends StatelessWidget {
+class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class
   final int mark;
-  final bool functionActivated;
+  // Is in score choice window
+  final bool isScoreChoice;
   const ScoreInfoCard({
     super.key,
     required this.mark,
-    required this.functionActivated,
+    this.isScoreChoice = false,
   });
 
   @override
+  State<ScoreInfoCard> createState() => _ScoreInfoCardState();
+}
+
+class _ScoreInfoCardState extends State<ScoreInfoCard> {
+  bool _isVisible = true;
+  Duration get _duration => Duration(milliseconds: _isVisible ? 0 : 150);
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<ScoreController>(
-      builder: (c) => GestureDetector(
-        onTap: () {
-          if (functionActivated) {
-            if (c.isSelectMod) {
-              c.setScoreChoiceState(mark);
-            } else {
-              /*showBottomSheet(
-                context: context,
-                builder: (context) => ScoreComposeCard(
-                  score: c.scoreTable[mark],
-                ),
-              );*/
-
-              BothSideSheet.show(
-                context: context,
-                title: "成绩详情",
-                child: ScoreComposeCard(
-                  score: c.scoreTable[mark],
-                ),
-              );
-            }
-          }
-        },
-        child: Card(
+      builder: (c) {
+        Widget infoCard = Card(
           margin: const EdgeInsets.symmetric(
             horizontal: 10,
             vertical: 5,
           ),
           elevation: 0,
-          color: functionActivated && c.isSelectMod && c.isSelected[mark]
+          color: c.isSelectMod && c.isSelected[widget.mark]
               ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
               : Theme.of(context).colorScheme.primary.withOpacity(0.1),
           child: Container(
@@ -68,7 +54,7 @@ class ScoreInfoCard extends StatelessWidget {
                   alignment: WrapAlignment.spaceBetween,
                   children: [
                     Text(
-                      c.scoreTable[mark].name,
+                      c.scoreTable[widget.mark].name,
                       textScaleFactor: 1.1,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
@@ -81,19 +67,19 @@ class ScoreInfoCard extends StatelessWidget {
                     Row(
                       children: [
                         TagsBoxes(
-                          text: c.scoreTable[mark].year,
+                          text: c.scoreTable[widget.mark].year,
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 5),
                         TagsBoxes(
-                          text: c.scoreTable[mark].status,
+                          text: c.scoreTable[widget.mark].status,
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 5),
                         TagsBoxes(
-                          text: c.scoreTable[mark].type,
+                          text: c.scoreTable[widget.mark].type,
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
@@ -104,21 +90,54 @@ class ScoreInfoCard extends StatelessWidget {
                       height: 5,
                     ),
                     Text(
-                      "学分: ${c.scoreTable[mark].credit}",
+                      "学分: ${c.scoreTable[widget.mark].credit}",
                     ),
                     Text(
-                      "GPA: ${c.scoreTable[mark].gpa}",
+                      "GPA: ${c.scoreTable[widget.mark].gpa}",
                     ),
                     Text(
-                      "成绩：${c.scoreTable[mark].how == 1 || c.scoreTable[mark].how == 2 ? c.scoreTable[mark].level : c.scoreTable[mark].score}",
+                      "成绩：${c.scoreTable[widget.mark].how == 1 || c.scoreTable[widget.mark].how == 2 ? c.scoreTable[widget.mark].level : c.scoreTable[widget.mark].score}",
                     ),
                   ],
                 ),
               ],
             ),
           ),
-        ),
-      ),
+        );
+        return GestureDetector(
+          onTap: () {
+            if (c.isSelectMod) {
+              /// Animation
+              if (c.isSelected[widget.mark] == true && widget.isScoreChoice) {
+                setState(() {
+                  _isVisible = false;
+                });
+                Future.delayed(_duration).then((value) {
+                  c.setScoreChoiceState(widget.mark);
+                  setState(() {
+                    _isVisible = true;
+                  });
+                });
+              } else {
+                c.setScoreChoiceState(widget.mark);
+              }
+            } else {
+              BothSideSheet.show(
+                context: context,
+                title: "成绩详情",
+                child: ScoreComposeCard(
+                  score: c.scoreTable[widget.mark],
+                ),
+              );
+            }
+          },
+          child: AnimatedOpacity(
+            opacity: _isVisible ? 1.0 : 0.0,
+            duration: _duration,
+            child: infoCard,
+          ),
+        );
+      },
     );
   }
 }

@@ -61,6 +61,7 @@ dependencies:
   cached_network_image: ^3.2.3
   qr_flutter: ^4.1.0
   data_table_2: ^2.5.1
+  flutter_reorderable_grid_view: ^5.0.0-dev.6
   get:
 
   flutter:

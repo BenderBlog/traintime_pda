@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
+import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 import 'package:watermeter/page/widget.dart';
 
 class ScoreChoiceWindow extends StatelessWidget {
+  final _scrollController = ScrollController();
+  final _gridViewKey = GlobalKey();
+
   ScoreChoiceWindow({super.key});
 
   final PreferredSizeWidget dropDownButton = PreferredSize(
@@ -96,30 +101,14 @@ class ScoreChoiceWindow extends StatelessWidget {
           ],
           bottom: dropDownButton,
         ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: dataList<Score, Dismissible>(
-              c.selectedScoreList,
-              (toUse) => Dismissible(
-                key: ValueKey<int>(toUse.mark),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  color: Theme.of(context).colorScheme.background,
-                  alignment: const Alignment(0.95, 0),
-                  child: const Icon(
-                    Icons.cancel,
-                    color: Colors.red,
-                    size: 48,
-                  ),
-                ),
-                child: ScoreInfoCard(
-                  mark: toUse.mark,
-                  functionActivated: false,
-                ),
-                onDismissed: (DismissDirection direction) =>
-                    c.setScoreChoiceState(toUse.mark),
-              ),
+        body: fixHeightGrid(
+          height: 120,
+          maxCrossAxisExtent: 360,
+          children: List.generate(
+            c.selectedScoreList.length,
+            (index) => ScoreInfoCard(
+              mark: c.selectedScoreList[index].mark,
+              isScoreChoice: true,
             ),
           ),
         ),
