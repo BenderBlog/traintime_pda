@@ -297,6 +297,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.3.2"
+  data_table_2:
+    dependency: "direct main"
+    description:
+      name: data_table_2
+      sha256: "012b88d7deef906b5cc0acd706b33a799feb78554207f61332e3b269f2c845d1"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.5.5"
   dbus:
     dependency: transitive
     description:
