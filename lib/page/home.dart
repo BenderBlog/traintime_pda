@@ -65,11 +65,33 @@ class _HomePageState extends State<HomePage> {
   ];
 
   late PageController _controller;
+  late PageView _pageView;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("didChange");
+  }
+
+  @override
+  void didUpdateWidget(covariant HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print("${_controller.page}didUpdate");
+  }
 
   @override
   void initState() {
     super.initState();
     _controller = PageController();
+    _pageView = PageView(
+      controller: _controller,
+      children: _page,
+      onPageChanged: (int index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+    );
 
     if (offline) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -94,42 +116,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _buildPhone() => Scaffold(
-        body: PageView(
-          controller: _controller,
-          children: _page,
-          onPageChanged: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-        ),
-        bottomNavigationBar: NavigationBar(
-          destinations: _destinations
-              .map(
-                (e) => NavigationDestination(
-                  icon: _selectedIndex == e.index
-                      ? Icon(e.icon)
-                      : Icon(e.iconChoice),
-                  label: e.name,
-                ),
-              )
-              .toList(),
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-            _controller.jumpToPage(_selectedIndex);
-          },
-        ),
-      );
-
-  Widget _buildPad() => Scaffold(
-        body: SafeArea(
-          child: Row(
-            children: [
-              NavigationRail(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Row(
+          children: [
+            Visibility(
+              visible: !isPhone(context),
+              child: NavigationRail(
+                elevation: 20,
                 destinations: _destinations
                     .map(
                       (e) => NavigationRailDestination(
@@ -150,24 +146,34 @@ class _HomePageState extends State<HomePage> {
                 leading: const Icon(Icons.person),
                 extended: isDesktop(context),
               ),
-              Expanded(
-                child: PageView(
-                  controller: _controller,
-                  children: _page,
-                  onPageChanged: (int index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: _pageView,
+            ),
+          ],
         ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return isPhone(context) ? _buildPhone() : _buildPad();
+      ),
+      bottomNavigationBar: isPhone(context)
+          ? NavigationBar(
+              destinations: _destinations
+                  .map(
+                    (e) => NavigationDestination(
+                      icon: _selectedIndex == e.index
+                          ? Icon(e.icon)
+                          : Icon(e.iconChoice),
+                      label: e.name,
+                    ),
+                  )
+                  .toList(),
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+                _controller.jumpToPage(_selectedIndex);
+              },
+            )
+          : null,
+    );
   }
 }
