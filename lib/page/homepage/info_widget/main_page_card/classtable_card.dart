@@ -68,7 +68,7 @@ class ClassTableCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                             Text(
-                              "寻找什么呢，我也不知道",
+                              "请享受空闲时光",
                               style: TextStyle(
                                 fontSize: 15,
                                 color: Theme.of(context)

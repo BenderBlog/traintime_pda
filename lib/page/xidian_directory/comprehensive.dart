@@ -177,7 +177,8 @@ class ShopCard extends StatelessWidget {
         ),
       ),
       child: Card(
-        elevation: 2,
+        elevation: 0,
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         child: Container(
           padding: const EdgeInsets.all(12),
           child: Column(

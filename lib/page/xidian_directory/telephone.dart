@@ -49,6 +49,8 @@ class DepartmentWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      elevation: 0,
       child: Container(
         padding: const EdgeInsets.all(12.5),
         child: Column(
