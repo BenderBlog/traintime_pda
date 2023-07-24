@@ -5,57 +5,77 @@ import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/widget.dart';
 
 class ScoreChoiceWindow extends StatelessWidget {
-  ScoreChoiceWindow({super.key});
+  const ScoreChoiceWindow({super.key});
 
-  final PreferredSizeWidget dropDownButton = PreferredSize(
-    preferredSize: const Size.fromHeight(40),
-    child: GetBuilder<ScoreController>(
-      builder: (c) => SizedBox(
-        height: 40,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            DropdownButton(
-              value: c.chosenSemesterInScoreChoice,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-              ),
-              underline: Container(
-                height: 2,
-              ),
-              items: [
-                const DropdownMenuItem(value: "", child: Text("所有学期")),
-                for (var i in c.semester)
-                  DropdownMenuItem(value: i, child: Text(i))
+  PreferredSizeWidget dropDownButton(context) => PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: GetBuilder<ScoreController>(
+          builder: (c) => SizedBox(
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                DropdownButton(
+                  focusColor: Theme.of(context).appBarTheme.backgroundColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(30)),
+                  value: c.chosenSemesterInScoreChoice,
+                  style: const TextStyle(color: Colors.black),
+                  underline: Container(color: Colors.transparent),
+                  onChanged: (String? value) {
+                    c.chosenSemesterInScoreChoice = value!;
+                    c.update();
+                  },
+                  items: [
+                    const DropdownMenuItem(
+                      value: "",
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text("所有学期"),
+                      ),
+                    ),
+                    for (var i in c.semester)
+                      DropdownMenuItem(
+                        value: i,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(i),
+                        ),
+                      ),
+                  ],
+                ),
+                DropdownButton(
+                  focusColor: Theme.of(context).appBarTheme.backgroundColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(30)),
+                  value: c.chosenStatusInScoreChoice,
+                  style: const TextStyle(color: Colors.black),
+                  underline: Container(color: Colors.transparent),
+                  items: [
+                    const DropdownMenuItem(
+                      value: "",
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text("所有类型"),
+                      ),
+                    ),
+                    for (var i in c.statuses)
+                      DropdownMenuItem(
+                        value: i,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(i),
+                        ),
+                      ),
+                  ],
+                  onChanged: (String? value) {
+                    c.chosenStatusInScoreChoice = value!;
+                    c.update();
+                  },
+                ),
               ],
-              onChanged: (String? value) {
-                c.chosenSemesterInScoreChoice = value!;
-                c.update();
-              },
             ),
-            DropdownButton(
-              value: c.chosenStatusInScoreChoice,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-              ),
-              underline: Container(
-                height: 2,
-              ),
-              items: [
-                const DropdownMenuItem(value: "", child: Text("所有类型")),
-                for (var i in c.statuses)
-                  DropdownMenuItem(value: i, child: Text(i))
-              ],
-              onChanged: (String? value) {
-                c.chosenStatusInScoreChoice = value!;
-                c.update();
-              },
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   Future<void> scoreInfoDialog(context) => showDialog(
         context: context,
@@ -93,7 +113,7 @@ class ScoreChoiceWindow extends StatelessWidget {
               icon: const Icon(Icons.info),
             ),
           ],
-          bottom: dropDownButton,
+          bottom: dropDownButton(context),
         ),
         body: fixHeightGrid(
           height: 120,

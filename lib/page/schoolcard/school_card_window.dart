@@ -69,16 +69,21 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
           () {
             if (c.error.value.isNotEmpty) {
               return Center(
-                  child: Column(
-                children: [
-                  Text(c.error.value),
-                  FilledButton.icon(
-                    onPressed: c.refreshPaidRecord,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text("重新加载"),
-                  )
-                ],
-              ));
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(c.error.value),
+                    FilledButton.icon(
+                      onPressed: () async {
+                        await c.relogin();
+                        await c.refreshPaidRecord();
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("重新加载"),
+                    )
+                  ],
+                ),
+              );
             } else if (c.isGet.value) {
               var topRow = const [
                 DataColumn(label: Center(child: Text('商户名称'))),

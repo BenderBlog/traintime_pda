@@ -64,6 +64,8 @@ class SchoolCardController extends GetxController {
     update();
   }
 
+  Future<void> relogin() async => await session.initSession();
+
   Future<void> updateMoney() async {
     money.value = await session.getMoney();
   }

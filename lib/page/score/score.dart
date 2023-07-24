@@ -139,55 +139,78 @@ class ScoreWindow extends StatelessWidget {
         ),
       );
 
-  final PreferredSizeWidget dropDownButton = PreferredSize(
-    preferredSize: const Size.fromHeight(40),
-    child: GetBuilder<ScoreController>(
-      builder: (c) => SizedBox(
-        height: 40,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            DropdownButton(
-              value: c.chosenSemester,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
+  PreferredSizeWidget dropDownButton(context) => PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: GetBuilder<ScoreController>(
+          builder: (c) => SizedBox(
+            height: 40,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  DropdownButton(
+                    focusColor: Theme.of(context).appBarTheme.backgroundColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                    value: c.chosenSemester,
+                    style: const TextStyle(color: Colors.black),
+                    underline: Container(color: Colors.transparent),
+                    onChanged: (String? value) {
+                      c.chosenSemester = value!;
+                      c.update();
+                    },
+                    items: [
+                      const DropdownMenuItem(
+                        value: "",
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text("所有学期"),
+                        ),
+                      ),
+                      for (var i in c.semester)
+                        DropdownMenuItem(
+                          value: i,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(i),
+                          ),
+                        ),
+                    ],
+                  ),
+                  DropdownButton(
+                    focusColor: Theme.of(context).appBarTheme.backgroundColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                    value: c.chosenStatus,
+                    style: const TextStyle(color: Colors.black),
+                    underline: Container(color: Colors.transparent),
+                    items: [
+                      const DropdownMenuItem(
+                        value: "",
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text("所有类型"),
+                        ),
+                      ),
+                      for (var i in c.statuses)
+                        DropdownMenuItem(
+                          value: i,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(i),
+                          ),
+                        ),
+                    ],
+                    onChanged: (String? value) {
+                      c.chosenStatus = value!;
+                      c.update();
+                    },
+                  ),
+                ],
               ),
-              underline: Container(
-                height: 2,
-              ),
-              items: [
-                const DropdownMenuItem(value: "", child: Text("所有学期")),
-                for (var i in c.semester)
-                  DropdownMenuItem(value: i, child: Text(i))
-              ],
-              onChanged: (String? value) {
-                c.chosenSemester = value!;
-                c.update();
-              },
             ),
-            DropdownButton(
-              value: c.chosenStatus,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-              ),
-              underline: Container(
-                height: 2,
-              ),
-              items: [
-                const DropdownMenuItem(value: "", child: Text("所有类型")),
-                for (var i in c.statuses)
-                  DropdownMenuItem(value: i, child: Text(i))
-              ],
-              onChanged: (String? value) {
-                c.chosenStatus = value!;
-                c.update();
-              },
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +238,7 @@ class ScoreWindow extends StatelessWidget {
             },
           ),
         ],
-        bottom: dropDownButton,
+        bottom: dropDownButton(context),
       ),
       body: GetBuilder<ScoreController>(
         builder: (c) => fixHeightGrid(

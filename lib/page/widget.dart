@@ -66,6 +66,7 @@ Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init,
       ),
     );
 
+/// A grid with fixHeight
 Widget fixHeightGrid({
   required double height,
   required double maxCrossAxisExtent,
