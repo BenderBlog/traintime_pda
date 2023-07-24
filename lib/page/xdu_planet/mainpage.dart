@@ -8,6 +8,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
@@ -81,16 +82,15 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
             try {
               Map<String, Repo> data = snapshot.data!.repos;
               List<String> keys = data.keys.toList();
-              Widget icon(int index) => data[keys[index]]!.favicon == ""
-                  ? const Icon(
-                      Icons.rss_feed,
-                      size: 32,
-                    )
-                  : Image.network(
-                      data[keys[index]]!.favicon,
-                      width: 32,
-                      height: 32,
-                    );
+              Widget icon(int index) => CachedNetworkImage(
+                    imageUrl: data[keys[index]]!.favicon,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.rss_feed),
+                    width: 32,
+                    height: 32,
+                  );
               return ListView.builder(
                 itemCount: data.length,
                 itemBuilder: (context, index) => ListTile(

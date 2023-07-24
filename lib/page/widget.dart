@@ -35,7 +35,7 @@ class TagsBoxes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+      padding: const EdgeInsets.fromLTRB(4, 2, 4, 4),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
@@ -72,6 +72,7 @@ Widget fixHeightGrid({
   required List<Widget> children,
 }) =>
     GridView(
+      shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedHeight(
         height: height,
         maxCrossAxisExtent: maxCrossAxisExtent,
@@ -122,10 +123,10 @@ Widget informationWithIcon(IconData icon, String text, context) => Row(
       children: [
         Icon(
           icon,
-          size: 14,
+          size: 18,
           color: Theme.of(context).colorScheme.tertiary,
         ),
-        const SizedBox(width: 5),
+        const SizedBox(width: 4),
         Expanded(
           child: Text(text),
         ),

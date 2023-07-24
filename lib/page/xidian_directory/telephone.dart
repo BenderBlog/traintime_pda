@@ -12,26 +12,25 @@ class TeleBookWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return dataList<TeleyInformation, DepartmentWindow>(
-        list, (a) => DepartmentWindow(a));
+        list, (a) => DepartmentWindow(toUse: a));
   }
 }
 
 /// Each entry of the telephone book is shown in a card,
 /// which stored in an information class called [TeleyInformation].
 class DepartmentWindow extends StatelessWidget {
-  late final TeleyInformation toUse;
+  final TeleyInformation toUse;
   final List<Widget> mainCourse = [];
 
-  DepartmentWindow(TeleyInformation toUse, {Key? key}) : super(key: key) {
-    mainCourse.addAll(
-      [
-        Text(
-          toUse.title,
-          textScaleFactor: 1.25,
-          textAlign: TextAlign.left,
-        ),
-      ],
-    );
+  DepartmentWindow({Key? key, required this.toUse}) : super(key: key) {
+    mainCourse.addAll([
+      Text(
+        toUse.title,
+        textAlign: TextAlign.left,
+        textScaleFactor: 1.4,
+      ),
+      const Divider(),
+    ]);
 
     if (toUse.isNorth == true) {
       mainCourse.add(const SizedBox(height: 5));
@@ -77,33 +76,42 @@ class InsideWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          isSouth ? "南校区" : "北校区",
-          textAlign: TextAlign.left,
-          textScaleFactor: 1.00,
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 237, 242, 247),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Wrap(
+          children: [
+            Text(
+              isSouth ? "南校区" : "北校区",
+              textAlign: TextAlign.left,
+              textScaleFactor: 1.00,
+            ),
+            if (address != null)
+              Row(
+                children: [
+                  const SizedBox(width: 10),
+                  const Icon(Icons.house),
+                  const SizedBox(width: 5),
+                  Text(address!)
+                ],
+              ),
+            if (phone != null) const Spacer(),
+            if (phone != null)
+              Row(
+                children: [
+                  const SizedBox(width: 10),
+                  const Icon(Icons.phone),
+                  const SizedBox(width: 5),
+                  Text(phone!)
+                ],
+              )
+          ],
         ),
-        if (address != null)
-          Row(
-            children: [
-              const SizedBox(width: 10),
-              const Icon(Icons.house),
-              const SizedBox(width: 5),
-              Text(address!)
-            ],
-          ),
-        if (phone != null)
-          Row(
-            children: [
-              const SizedBox(width: 10),
-              const Icon(Icons.phone),
-              const SizedBox(width: 5),
-              Text(phone!)
-            ],
-          )
-      ],
+      ),
     );
   }
 }

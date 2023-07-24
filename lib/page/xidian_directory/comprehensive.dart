@@ -41,81 +41,87 @@ class _ComprehensiveWindowState extends State<ComprehensiveWindow>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async => _get(true),
-        child: FutureBuilder<ShopInformationEntity>(
-          future: data,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                return Center(child: Text("坏事: ${snapshot.error}"));
-              } else {
-                return dataList<ShopInformationResults, ShopCard>(
-                    snapshot.data.results, (toUse) => ShopCard(toUse: toUse));
-              }
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "comprehensive",
-        onPressed: () => setState(() {
-          isSearch = !isSearch;
-        }),
-        elevation: 5,
-        child: const Icon(Icons.search),
-      ),
-      bottomSheet: isSearch
-          ? BottomAppBar(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: TextField(
-                        controller: text,
-                        decoration: const InputDecoration(
-                          hintText: "在此搜索",
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                        onChanged: (String text) {
-                          setState(() {
-                            _get(false);
-                          });
-                        },
-                      ),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: TextField(
+                    controller: text,
+                    decoration: const InputDecoration(
+                      hintText: "在此搜索",
+                      prefixIcon: Icon(Icons.search),
                     ),
+                    onChanged: (String text) {
+                      setState(() {
+                        _get(false);
+                      });
+                    },
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: DropdownButton(
-                      value: categoryToSent,
-                      icon: const Icon(
-                        Icons.keyboard_arrow_down,
-                      ),
-                      underline: Container(
-                        height: 2,
-                      ),
-                      items: [
-                        for (var i in categories)
-                          DropdownMenuItem(value: i, child: Text(i))
-                      ],
-                      onChanged: (String? value) {
-                        setState(
-                          () {
-                            categoryToSent = value!;
-                            _get(false);
-                          },
-                        );
-                      },
-                    ),
-                  )
-                ],
+                ),
               ),
-            )
-          : null,
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: DropdownButton(
+                  value: categoryToSent,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                  ),
+                  underline: Container(
+                    height: 2,
+                  ),
+                  items: [
+                    for (var i in categories)
+                      DropdownMenuItem(value: i, child: Text(i))
+                  ],
+                  onChanged: (String? value) {
+                    setState(
+                      () {
+                        categoryToSent = value!;
+                        _get(false);
+                      },
+                    );
+                  },
+                ),
+              )
+            ],
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async => _get(true),
+              child: FutureBuilder<ShopInformationEntity>(
+                future: data,
+                builder: (BuildContext context,
+                    AsyncSnapshot<ShopInformationEntity> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text("坏事: ${snapshot.error}"));
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: fixHeightGrid(
+                          height: 108,
+                          maxCrossAxisExtent: 324,
+                          children: List.generate(
+                            snapshot.data?.results.length ?? 0,
+                            (index) => ShopCard(
+                              toUse: snapshot.data!.results[index],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -156,70 +162,80 @@ class ShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      toUse.name,
-                      textScaleFactor: 1.1,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    TagsBoxes(
-                      text: toUse.status ? "开放" : "关闭",
-                      backgroundColor: toUse.status ? Colors.green : Colors.red,
-                    ),
-                  ],
-                ),
-                const Divider(
-                  color: Colors.transparent,
-                  height: 2.5,
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      _iconForTarget(),
-                      size: 14,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                    const SizedBox(width: 5),
-                    Wrap(
-                      spacing: 5,
-                      children: [
-                        for (var i in toUse.tags) TagsBoxes(text: i),
-                      ],
-                    ),
-                  ],
-                ),
-                const Divider(
-                  color: Colors.transparent,
-                  height: 2.5,
-                ),
-                informationWithIcon(
-                  Icons.description,
-                  toUse.description ?? "没有描述",
-                  context,
-                ),
-                informationWithIcon(
-                  Icons.update,
-                  toUse.updatedAt.toLocal().toString().substring(0, 19),
-                  context,
-                ),
-              ],
+    return GestureDetector(
+      onTap: () => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(toUse.name),
+          content: Text(toUse.description ?? "没有描述"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("知道了"),
             ),
           ],
+        ),
+      ),
+      child: Card(
+        elevation: 2,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        toUse.name,
+                        textScaleFactor: 1.1,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      TagsBoxes(
+                        text: toUse.status ? "开放" : "关闭",
+                        backgroundColor:
+                            toUse.status ? Colors.green : Colors.red,
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    color: Colors.transparent,
+                    height: 2.5,
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        _iconForTarget(),
+                        size: 18,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                      const SizedBox(width: 5),
+                      Wrap(
+                        spacing: 5,
+                        children: [
+                          for (var i in toUse.tags) TagsBoxes(text: i),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    color: Colors.transparent,
+                    height: 2.5,
+                  ),
+                  informationWithIcon(
+                    Icons.update,
+                    toUse.updatedAt.toLocal().toString().substring(0, 19),
+                    context,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
