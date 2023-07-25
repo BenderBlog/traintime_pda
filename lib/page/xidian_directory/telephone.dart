@@ -12,8 +12,15 @@ class TeleBookWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return dataList<TeleyInformation, DepartmentWindow>(
-        list, (a) => DepartmentWindow(toUse: a));
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 660),
+        child: dataList<TeleyInformation, DepartmentWindow>(
+          list,
+          (a) => DepartmentWindow(toUse: a),
+        ),
+      ),
+    );
   }
 }
 
