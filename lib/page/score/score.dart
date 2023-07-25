@@ -245,13 +245,16 @@ class ScoreWindow extends StatelessWidget {
         bottom: dropDownButton(context),
       ),
       body: GetBuilder<ScoreController>(
-        builder: (c) => fixHeightGrid(
-          height: 120,
-          maxCrossAxisExtent: 360,
-          children: List.generate(
-            c.toShow.length,
-            (index) => ScoreInfoCard(
-              mark: c.toShow[index].mark,
+        builder: (c) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: fixHeightGrid(
+            height: 120,
+            maxCrossAxisExtent: 360,
+            children: List.generate(
+              c.toShow.length,
+              (index) => ScoreInfoCard(
+                mark: c.toShow[index].mark,
+              ),
             ),
           ),
         ),

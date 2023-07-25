@@ -115,14 +115,17 @@ class ScoreChoiceWindow extends StatelessWidget {
           ],
           bottom: dropDownButton(context),
         ),
-        body: fixHeightGrid(
-          height: 120,
-          maxCrossAxisExtent: 360,
-          children: List.generate(
-            c.selectedScoreList.length,
-            (index) => ScoreInfoCard(
-              mark: c.selectedScoreList[index].mark,
-              isScoreChoice: true,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: fixHeightGrid(
+            height: 120,
+            maxCrossAxisExtent: 360,
+            children: List.generate(
+              c.selectedScoreList.length,
+              (index) => ScoreInfoCard(
+                mark: c.selectedScoreList[index].mark,
+                isScoreChoice: true,
+              ),
             ),
           ),
         ),
