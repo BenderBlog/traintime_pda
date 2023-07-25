@@ -1,3 +1,7 @@
+import 'package:jiffy/jiffy.dart';
+
+RegExp timeRegExp = RegExp(r'[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}');
+
 class Subject {
   String subject;
   String type;
@@ -12,6 +16,8 @@ class Subject {
   String toString() {
     return "$subject $type $teacher $time $place $seat\n";
   }
+
+  Jiffy get startTime => Jiffy.parse(timeRegExp.firstMatch(time)![0]!);
 
   Subject({
     required this.subject,

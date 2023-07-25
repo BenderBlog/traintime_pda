@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/page/exam/exam.dart';
+import 'package:watermeter/page/exam/exam_info_window.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/small_function_card.dart';
 import 'package:watermeter/repository/network_session.dart';
 

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:developer' as developer;
+import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ehall/exam_session.dart';
@@ -13,6 +14,23 @@ class ExamController extends GetxController {
   late List<Subject> subjects;
   late List<ToBeArranged> toBeArranged;
   int dropdownValue = 0;
+  Jiffy now = Jiffy.now();
+
+  List<Subject> get isFinished {
+    List<Subject> isFinished = List.from(subjects);
+    isFinished.removeWhere(
+      (element) => element.startTime.isAfter(now),
+    );
+    return isFinished;
+  }
+
+  List<Subject> get isNotFinished {
+    List<Subject> isNotFinished = List.from(subjects);
+    isNotFinished.removeWhere(
+      (element) => element.startTime.isSameOrBefore(now),
+    );
+    return isNotFinished;
+  }
 
   @override
   void onInit() {
@@ -31,6 +49,7 @@ class ExamController extends GetxController {
     isGet = false;
     error = null;
     try {
+      now = Jiffy.now();
       var qResult = await ExamFile().get(semester: semesterStr);
       int grade = int.parse(
           "20${preference.getString(preference.Preference.idsAccount).substring(0, 2)}");

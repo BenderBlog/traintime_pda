@@ -12,6 +12,9 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/page/exam/exam_info_card.dart';
+import 'package:watermeter/page/exam/exam_title.dart';
+import 'package:watermeter/page/exam/timeline_widget.dart';
 import 'package:watermeter/page/widget.dart';
 
 class ExamInfoWindow extends StatefulWidget {
@@ -81,17 +84,37 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
         ),
         body: c.isGet == true
             ? c.subjects.isNotEmpty
-                ? dataList<InfoCard, InfoCard>(
-                    List.generate(
-                      c.subjects.length,
-                      (index) => InfoCard(toUse: c.subjects[index]),
-                    ),
-                    (toUse) => toUse,
+                ? TimelineWidget(
+                    isTitle: const [true, false, true, false],
+                    children: [
+                      const ExamTitle(title: "未完成考试"),
+                      c.isNotFinished.isNotEmpty
+                          ? Column(
+                              children: List.generate(
+                                c.isNotFinished.length,
+                                (index) => ExamInfoCard(
+                                  toUse: c.isNotFinished[index],
+                                ),
+                              ),
+                            )
+                          : const ExamInfoCard(title: "所有考试全部完成"),
+                      const ExamTitle(title: "已完成考试"),
+                      c.isFinished.isNotEmpty
+                          ? Column(
+                              children: List.generate(
+                                c.isFinished.length,
+                                (index) => ExamInfoCard(
+                                  toUse: c.isFinished[index],
+                                ),
+                              ),
+                            )
+                          : const ExamInfoCard(title: "一门还没考呢"),
+                    ],
                   )
                 : const Center(child: Text("没有考试安排"))
             : c.error != null
                 ? Center(child: Text(c.error.toString()))
-                : const Center(child: Text("正在加载")),
+                : const Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -121,71 +144,6 @@ class NoArrangedInfo extends StatelessWidget {
           ),
         ),
         (toUse) => toUse,
-      ),
-    );
-  }
-}
-
-class InfoCard extends StatelessWidget {
-  final Subject toUse;
-
-  const InfoCard({super.key, required this.toUse});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
-      ),
-      elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                Text(
-                  toUse.subject,
-                  textScaleFactor: 1.1,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                TagsBoxes(
-                  text: toUse.type,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                ),
-                const Divider(
-                  color: Colors.transparent,
-                  height: 5,
-                ),
-                informationWithIcon(
-                    Icons.access_time_filled_rounded, toUse.time, context),
-                informationWithIcon(
-                    Icons.person, toUse.teacher ?? "未知老师", context),
-                Flex(
-                  direction: Axis.horizontal,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child:
-                          informationWithIcon(Icons.room, toUse.place, context),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: informationWithIcon(
-                          Icons.chair, toUse.seat.toString(), context),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
