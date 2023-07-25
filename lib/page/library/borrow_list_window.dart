@@ -52,15 +52,17 @@ class BorrowListWindow extends StatelessWidget {
             ),
           ),
         ),
-        GridView(
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedHeight(
-            height: 256,
-            maxCrossAxisExtent: 320,
-          ),
-          children: List<Widget>.generate(
-            c.borrowList.length,
-            (index) => BorrowInfoCard(toUse: c.borrowList[index]),
+        Expanded(
+          child: GridView(
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithFixedHeight(
+              height: 256,
+              maxCrossAxisExtent: 320,
+            ),
+            children: List<Widget>.generate(
+              c.borrowList.length,
+              (index) => BorrowInfoCard(toUse: c.borrowList[index]),
+            ),
           ),
         ),
       ],

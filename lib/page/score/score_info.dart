@@ -211,9 +211,8 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
   var watermark = Watermark(
     rowCount: 3,
     columnCount: 12,
-    text: "${preference.getString(preference.Preference.idsAccount)} "
-        "${preference.getString(preference.Preference.name)} \n"
-        "仅个人参考 他用无效 ",
+    text: "${preference.getString(preference.Preference.idsAccount)}\n"
+        "${preference.getString(preference.Preference.name)} 仅个人参考",
     textStyle: const TextStyle(
       color: Color(0x48000000),
       fontSize: 12,
