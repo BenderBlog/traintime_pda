@@ -55,7 +55,7 @@ class BorrowListWindow extends StatelessWidget {
         GridView(
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedHeight(
-            height: 236,
+            height: 256,
             maxCrossAxisExtent: 320,
           ),
           children: List<Widget>.generate(

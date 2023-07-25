@@ -17,6 +17,7 @@ class BothSideSheet extends StatefulWidget {
     required String title,
   }) =>
       showGeneralDialog(
+        barrierDismissible: true,
         context: context,
         pageBuilder: (context, animation1, animation2) {
           return BothSideSheet(
@@ -24,7 +25,6 @@ class BothSideSheet extends StatefulWidget {
             child: child,
           );
         },
-        barrierDismissible: true,
         barrierLabel: title,
         transitionBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
@@ -78,9 +78,10 @@ class _BothSideSheetState extends State<BothSideSheet> {
               }
             });
           },
-          child: SizedBox(
+          child: Container(
             height: 30,
             width: double.infinity,
+            color: Theme.of(context).colorScheme.surface,
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [
@@ -103,37 +104,53 @@ class _BothSideSheetState extends State<BothSideSheet> {
             ),
           ),
         )
-      : Text(widget.title);
+      : Container(
+          height: kToolbarHeight,
+          width: double.infinity,
+          color: Theme.of(context).colorScheme.surface,
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back),
+              ),
+              Text(
+                widget.title,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ],
+          ),
+        );
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment:
           isPhone(context) ? Alignment.bottomCenter : Alignment.centerRight,
-      child: Material(
-        elevation: 15,
-        color: Colors.transparent,
-        borderRadius: radius(context),
-        child: Container(
-          width: width,
-          height: isPhone(context) ? heightForVertical : double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: radius(context),
+      child: Container(
+        width: width,
+        height: isPhone(context) ? heightForVertical : double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: radius(context),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isPhone(context) ? 15 : 10,
+            vertical: isPhone(context) ? 0 : 10,
           ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: isPhone(context) ? 15 : 10,
-              vertical: isPhone(context) ? 0 : 10,
-            ),
-            child: Scaffold(
-              appBar: AppBar(
-                automaticallyImplyLeading: !isPhone(context),
-                toolbarHeight: isPhone(context) ? 20 : kToolbarHeight,
-                title: onTop,
-              ),
-              body: widget.child,
-            ),
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: isPhone(context)
+                ? PreferredSize(
+                    preferredSize: const Size.fromHeight(20),
+                    child: onTop,
+                  )
+                : PreferredSize(
+                    preferredSize: const Size.fromHeight(kToolbarHeight),
+                    child: onTop,
+                  ),
+            body: widget.child,
           ),
         ),
       ),

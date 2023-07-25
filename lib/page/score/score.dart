@@ -54,7 +54,7 @@ class ScoreWindow extends StatelessWidget {
         builder: (c) => Visibility(
           visible: c.isSelectMod,
           child: BottomAppBar(
-              height: 120,
+              height: 136,
               elevation: 5.0,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

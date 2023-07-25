@@ -106,39 +106,38 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Row(
-          children: [
-            Visibility(
-              visible: !isPhone(context),
-              child: NavigationRail(
-                elevation: 20,
-                destinations: _destinations
-                    .map(
-                      (e) => NavigationRailDestination(
-                        icon: _selectedIndex == e.index
-                            ? Icon(e.icon)
-                            : Icon(e.iconChoice),
-                        label: Text(e.name),
-                      ),
-                    )
-                    .toList(),
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (int index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                  _controller.jumpToPage(_selectedIndex);
-                },
-                leading: const Icon(Icons.person),
-                extended: isDesktop(context),
-              ),
+      extendBodyBehindAppBar: true,
+      body: Row(
+        children: [
+          Visibility(
+            visible: !isPhone(context),
+            child: NavigationRail(
+              elevation: 20,
+              destinations: _destinations
+                  .map(
+                    (e) => NavigationRailDestination(
+                      icon: _selectedIndex == e.index
+                          ? Icon(e.icon)
+                          : Icon(e.iconChoice),
+                      label: Text(e.name),
+                    ),
+                  )
+                  .toList(),
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+                _controller.jumpToPage(_selectedIndex);
+              },
+              leading: const Icon(Icons.person),
+              extended: isDesktop(context),
             ),
-            Expanded(
-              child: _pageView,
-            ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: _pageView,
+          ),
+        ],
       ),
       bottomNavigationBar: isPhone(context)
           ? NavigationBar(
