@@ -29,7 +29,12 @@ class ExamController extends GetxController {
     isNotFinished.removeWhere(
       (element) => element.startTime.isSameOrBefore(now),
     );
-    return isNotFinished;
+    return isNotFinished
+      ..sort(
+        (a, b) =>
+            a.startTime.microsecondsSinceEpoch -
+            b.startTime.microsecondsSinceEpoch,
+      );
   }
 
   @override

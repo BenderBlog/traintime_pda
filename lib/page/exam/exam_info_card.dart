@@ -68,6 +68,7 @@ class ExamInfoCard extends StatelessWidget {
             : Text(
                 title!,
                 textScaleFactor: 1.1,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                 ),

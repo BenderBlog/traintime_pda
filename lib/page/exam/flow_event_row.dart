@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/widget.dart';
 
 @immutable
 class FlowEventRow extends StatelessWidget {
@@ -16,11 +17,15 @@ class FlowEventRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+      ),
       child: Row(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22.0 - circleRadius),
+            padding: EdgeInsets.symmetric(
+              horizontal: isPhone(context) ? 8 : 20 - circleRadius,
+            ),
             child: Container(
               width: circleRadius * 2,
               height: circleRadius * 2,
@@ -33,10 +38,7 @@ class FlowEventRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 0, right: 15),
-              child: child,
-            ),
+            child: child,
           ),
         ],
       ),

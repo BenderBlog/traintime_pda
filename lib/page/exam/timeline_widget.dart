@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/exam/flow_event_row.dart';
+import 'package:watermeter/page/widget.dart';
 
 class TimelineWidget extends StatelessWidget {
   final List<bool> isTitle;
@@ -19,11 +20,11 @@ class TimelineWidget extends StatelessWidget {
           alignment: AlignmentDirectional.center,
           fit: StackFit.loose,
           children: <Widget>[
-            const Positioned(
-              left: 20,
+            Positioned(
+              left: isPhone(context) ? 14 : 20,
               top: 16,
               bottom: 16,
-              child: VerticalDivider(
+              child: const VerticalDivider(
                 width: 1,
               ),
             ),
@@ -36,8 +37,8 @@ class TimelineWidget extends StatelessWidget {
                   isTitle: isTitle[index],
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
+                      horizontal: 8,
+                      vertical: 4,
                     ),
                     child: children[index],
                   ),
