@@ -9,8 +9,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart' hide Content;
-import 'package:flutter_html_table/flutter_html_table.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
@@ -69,34 +69,60 @@ class _ContentPageState extends State<ContentPage> {
 <i>by: ${widget.authorName}</i></br>
 <i>at: ${widget.time}</i>
 ''';
-          String addon = "";
+          late Widget addon;
           if (snapshot.connectionState == ConnectionState.done) {
             try {
-              addon = snapshot.data?.content ??
-                  '''
+              addon = HtmlWidget(
+                snapshot.data?.content ??
+                    '''
   <h3>遇到错误</h3>
   <p>
     A paragraph with <strong>strong</strong>, <em>emphasized</em>
     and <span style="color: red">colored</span> text.
   </p>
-''';
+''',
+                onTapUrl: (url) => launchUrl(
+                  Uri.parse(url),
+                  mode: LaunchMode.externalApplication,
+                ),
+                renderMode: RenderMode.listView,
+              );
             } catch (e, s) {
-              addon = "加载遇到错误: $e, $s";
+              addon = HtmlWidget(
+                "加载遇到错误: $e, $s",
+                onTapUrl: (url) => launchUrl(
+                  Uri.parse(url),
+                  mode: LaunchMode.externalApplication,
+                ),
+                renderMode: RenderMode.listView,
+              );
             }
           } else {
-            addon = "正在加载...";
+            addon = const Center(child: CircularProgressIndicator());
           }
-          return SingleChildScrollView(
-            child: Html(
-              data: "$title<br><p>$addon</p>",
-              onLinkTap: (url, attributes, element) => launchUrlString(
-                url ?? "",
-                mode: LaunchMode.externalApplication,
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                  bottom: 8,
+                ),
+                child: HtmlWidget(
+                  title,
+                ),
               ),
-              extensions: const [
-                TableHtmlExtension(),
-              ],
-            ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 8,
+                    right: 8,
+                    bottom: 8,
+                  ),
+                  child: addon,
+                ),
+              ),
+            ],
           );
         },
       ),

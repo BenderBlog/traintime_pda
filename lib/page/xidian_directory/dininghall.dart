@@ -198,10 +198,11 @@ class CafeteriaCard extends StatelessWidget {
               const Divider(height: 28.0),
               GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedHeight(
-                    maxCrossAxisExtent: 375,
-                    height: 60,
-                    mainAxisSpacing: 15.0,
-                    crossAxisSpacing: 15.0),
+                  maxCrossAxisExtent: 375,
+                  height: 60,
+                  mainAxisSpacing: 15.0,
+                  crossAxisSpacing: 15.0,
+                ),
                 itemCount: toUse.items.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) =>
@@ -219,43 +220,36 @@ class ItemBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 237, 242, 247),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: Text(
-                toUse.commit == null
-                    ? toUse.name
-                    : "${toUse.name}\n${toUse.commit!}",
-                overflow: TextOverflow.ellipsis,
+    return InfoDetailBox(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              toUse.commit == null
+                  ? toUse.name
+                  : "${toUse.name}\n${toUse.commit!}",
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                decoration: !toUse.status
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Text(
+                "${toUse.price.join(" 或 ")} 元每${toUse.unit}",
                 style: TextStyle(
                   decoration: !toUse.status
                       ? TextDecoration.lineThrough
                       : TextDecoration.none,
                 ),
               ),
-            ),
-            Row(
-              children: [
-                Text(
-                  "${toUse.price.join(" 或 ")} 元每${toUse.unit}",
-                  style: TextStyle(
-                    decoration: !toUse.status
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

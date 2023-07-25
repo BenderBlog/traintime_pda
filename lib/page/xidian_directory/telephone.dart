@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/model/xidian_directory/telephone.dart';
 import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
@@ -23,26 +24,20 @@ class DepartmentWindow extends StatelessWidget {
   final List<Widget> mainCourse = [];
 
   DepartmentWindow({Key? key, required this.toUse}) : super(key: key) {
-    mainCourse.addAll([
-      Text(
-        toUse.title,
-        textAlign: TextAlign.left,
-        textScaleFactor: 1.4,
-      ),
-      const Divider(),
-    ]);
-
     if (toUse.isNorth == true) {
-      mainCourse.add(const SizedBox(height: 5));
       mainCourse.add(InsideWindow(
         address: toUse.northAddress,
         phone: toUse.northTeley,
       ));
     }
     if (toUse.isSouth == true) {
-      mainCourse.add(const SizedBox(height: 5));
-      mainCourse.add(InsideWindow(
-          address: toUse.southAddress, phone: toUse.southTeley, isSouth: true));
+      mainCourse.add(
+        InsideWindow(
+          address: toUse.southAddress,
+          phone: toUse.southTeley,
+          isSouth: true,
+        ),
+      );
     }
   }
 
@@ -55,7 +50,25 @@ class DepartmentWindow extends StatelessWidget {
         padding: const EdgeInsets.all(12.5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: mainCourse,
+          children: [
+            Text(
+              toUse.title,
+              textAlign: TextAlign.left,
+              textScaleFactor: 1.4,
+            ),
+            const Divider(),
+            GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedHeight(
+                maxCrossAxisExtent: 375,
+                height: 84,
+                mainAxisSpacing: 15.0,
+                crossAxisSpacing: 15.0,
+              ),
+              itemCount: mainCourse.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) => mainCourse[index],
+            ),
+          ],
         ),
       ),
     );
@@ -69,50 +82,49 @@ class InsideWindow extends StatelessWidget {
   final String? phone;
   final bool isSouth;
 
-  const InsideWindow(
-      {Key? key,
-      required this.address,
-      required this.phone,
-      this.isSouth = false})
-      : super(key: key);
+  const InsideWindow({
+    Key? key,
+    required this.address,
+    required this.phone,
+    this.isSouth = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 237, 242, 247),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Wrap(
-          children: [
-            Text(
-              isSouth ? "南校区" : "北校区",
-              textAlign: TextAlign.left,
-              textScaleFactor: 1.00,
+    return InfoDetailBox(
+      child: Column(
+        children: [
+          Text(
+            isSouth ? "南校区" : "北校区",
+            textAlign: TextAlign.left,
+            textScaleFactor: 1.00,
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (address != null)
+                  Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      const Icon(Icons.house),
+                      const SizedBox(width: 5),
+                      Text(address!)
+                    ],
+                  ),
+                if (phone != null)
+                  Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      const Icon(Icons.phone),
+                      const SizedBox(width: 5),
+                      Text(phone!)
+                    ],
+                  )
+              ],
             ),
-            if (address != null)
-              Row(
-                children: [
-                  const SizedBox(width: 10),
-                  const Icon(Icons.house),
-                  const SizedBox(width: 5),
-                  Text(address!)
-                ],
-              ),
-            if (phone != null) const Spacer(),
-            if (phone != null)
-              Row(
-                children: [
-                  const SizedBox(width: 10),
-                  const Icon(Icons.phone),
-                  const SizedBox(width: 5),
-                  Text(phone!)
-                ],
-              )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

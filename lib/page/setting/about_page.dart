@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
@@ -134,14 +134,12 @@ class AboutPage extends StatelessWidget {
                   vertical: 16,
                   horizontal: 8,
                 ),
-                child: Html(
-                  data: license,
-                  onLinkTap: (url, _, __) {
-                    launchUrl(
-                      Uri.parse(url!),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  },
+                child: HtmlWidget(
+                  license,
+                  onTapUrl: (url) => launchUrl(
+                    Uri.parse(url),
+                    mode: LaunchMode.externalApplication,
+                  ),
                 ),
               ),
             ],

@@ -23,7 +23,11 @@ class ScoreWindow extends StatelessWidget {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("和人家比不如和自己比"),
-          content: Image.asset("assets/Humpy-Score.jpg"),
+          content: Image.asset(
+            "assets/Humpy-Score.jpg",
+            width: 640,
+            height: 480,
+          ),
           actions: [
             TextButton(
               child: const Text("确定"),
@@ -50,7 +54,7 @@ class ScoreWindow extends StatelessWidget {
         builder: (c) => Visibility(
           visible: c.isSelectMod,
           child: BottomAppBar(
-              height: 134,
+              height: 120,
               elevation: 5.0,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +129,7 @@ class ScoreWindow extends StatelessWidget {
                         disabledElevation: 0.0,
                         onPressed: () {
                           Navigator.of(context).push(
-                            createRoute(ScoreChoiceWindow()),
+                            createRoute(const ScoreChoiceWindow()),
                           );
                         },
                         child: const Icon(

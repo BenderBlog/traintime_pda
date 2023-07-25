@@ -48,7 +48,7 @@ class ElectricityCard extends StatelessWidget {
                           text: electricity_session.electricityInfo.value,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
-                            fontSize: 28,
+                            fontSize: 24,
                           ),
                         ),
                         TextSpan(
