@@ -58,11 +58,6 @@ void main() async {
       );
       offline = true;
     }
-    Get.put(ScoreController());
-    Get.put(ClassTableController());
-    Get.put(ExamController());
-    Get.put(LibraryController());
-    Get.put(SchoolCardController());
   } else {
     isFirst = true;
   }
