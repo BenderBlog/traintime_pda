@@ -454,19 +454,19 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "7.0.0+1"
-  flutter_localization:
-    dependency: "direct main"
-    description:
-      name: flutter_localization
-      sha256: b2b0fe87f4608f5a3e78ed570d5f85ba9f55c746a6aca4981c0ea4bb894d5d00
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.1.13"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_native_splash:
+    dependency: "direct main"
+    description:
+      name: flutter_native_splash
+      sha256: ba45d8cfbd778478a74696b012f33ffb6b1760c9bc531b21e2964444a4870dae
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.3.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

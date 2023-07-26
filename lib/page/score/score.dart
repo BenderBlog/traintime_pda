@@ -25,8 +25,6 @@ class ScoreWindow extends StatelessWidget {
           title: const Text("和人家比不如和自己比"),
           content: Image.asset(
             "assets/Humpy-Score.jpg",
-            width: 640,
-            height: 480,
           ),
           actions: [
             TextButton(
