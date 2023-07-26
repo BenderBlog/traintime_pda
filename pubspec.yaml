@@ -67,7 +67,6 @@ flutter_launcher_icons:
 flutter_native_splash:
   color: "#ffffff"
   branding: "assets/icon.png"
-  ios_content_mode: scaleAspectFill
 
 flutter:
   uses-material-design: true
