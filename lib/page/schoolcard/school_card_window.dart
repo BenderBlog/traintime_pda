@@ -86,11 +86,27 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
               );
             } else if (c.isGet.value) {
               var topRow = const [
-                DataColumn(label: Center(child: Text('商户名称'))),
-                DataColumn(label: Center(child: Text('金额'))),
-                DataColumn(label: Center(child: Text('时间'))),
+                DataColumn2(
+                  size: ColumnSize.S,
+                  label: Center(
+                    child: Text('商户名称'),
+                  ),
+                ),
+                DataColumn2(
+                  size: ColumnSize.S,
+                  label: Center(
+                    child: Text('金额'),
+                  ),
+                ),
+                DataColumn2(
+                  size: ColumnSize.L,
+                  label: Center(
+                    child: Text('时间'),
+                  ),
+                ),
               ];
               return PaginatedDataTable2(
+                columnSpacing: 0,
                 columns: topRow,
                 source: RecordData(data: c.getPaid),
               );
