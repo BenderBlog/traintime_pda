@@ -190,8 +190,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   /// Clean Classtable cache.
                   Directory appDocDir =
                       await getApplicationDocumentsDirectory();
-                  Directory destination =
-                      Directory("${appDocDir.path}/org.superbart.watermeter");
+                  Directory destination = Directory(
+                      "${appDocDir.path}/io.github.benderblog.traintime_pda");
                   if (!destination.existsSync()) {
                     await destination.create();
                   }

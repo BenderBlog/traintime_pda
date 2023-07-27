@@ -52,7 +52,7 @@
 				<string>Editor</string>
 				<key>CFBundleURLName</key>
 				<!-- You can find it on /ios/project.pbxproj - 'PRODUCT_BUNDLE_IDENTIFIER' -->
-				<string>org.superbart.watermeter</string>
+				<string>io.github.benderblog.traintime_pda</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
 					<!-- Your app title -->
