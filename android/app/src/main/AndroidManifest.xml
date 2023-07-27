@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.superbart.watermeter">
+          package="io.github.benderblog.traintime_pda">
     <application
             android:label="Traintime PDA"
             android:name="${applicationName}"

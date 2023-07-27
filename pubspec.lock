@@ -177,6 +177,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.5.2"
+  change_app_package_name:
+    dependency: "direct dev"
+    description:
+      name: change_app_package_name
+      sha256: f9ebaf68a4b5a68c581492579bb68273c523ef325fbf9ce2f1b57fb136ad023b
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
   characters:
     dependency: transitive
     description:

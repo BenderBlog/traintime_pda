@@ -45,7 +45,7 @@ class _LoginWindowState extends State<LoginWindow> {
             radius: 60.0,
           ),
           const SizedBox(height: 15.0),
-          const Text('请登录 Watermeter',
+          const Text('请登录 Traintime PDA',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 26,
