@@ -1,9 +1,7 @@
-# watermeter 水表
+# Traintime PDA
 
 主页和下载地址：[https://legacy.superbart.xyz/xdyou.html](https://legacy.superbart.xyz/xdyou.html)
 赞助地址：[http://afdian.net/a/benderblog](http://afdian.net/a/benderblog)
-
-(watermeter 是核心代号，项目最终成品将会是 Traintime PDA，或者是 XDYou)
 
 西电同志们的又一个校内信息助手。
 
