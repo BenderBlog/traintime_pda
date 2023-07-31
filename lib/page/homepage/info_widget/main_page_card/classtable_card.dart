@@ -17,8 +17,10 @@ class ClassTableCard extends StatelessWidget {
             if (c.isGet == true) {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => LayoutBuilder(
-                    builder: (p0, p1) => ClassTableWindow(constraints: p1),
+                  builder: (context) => ClassTableWindow(
+                    classTableData: c.classTableData,
+                    currentWeek: c.currentWeek,
+                    pretendLayout: c.pretendLayout,
                   ),
                 ),
               );
