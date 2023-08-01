@@ -23,7 +23,7 @@ limitations under the License.
 /// These are some constant used in the class table.
 
 /// The width of the button.
-const weekButtonWidth = 75.0;
+const weekButtonWidth = 74.0;
 
 /// The horizontal padding of the button.
 const weekButtonHorizontalPadding = 2.0;
@@ -32,10 +32,10 @@ const weekButtonHorizontalPadding = 2.0;
 const changePageTime = 200;
 
 /// The width ratio for the week column.
-const double leftRow = 32.5;
+const double leftRow = 24;
 
 /// The height of the top row.
-const topRowHeightBig = 95.0;
+const topRowHeightBig = 96.0;
 const topRowHeightSmall = 50.0;
 
 /// The height of the middle row.
