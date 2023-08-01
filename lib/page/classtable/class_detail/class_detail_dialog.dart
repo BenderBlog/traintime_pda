@@ -1,7 +1,30 @@
+/*
+Copyright 2023 SuperBart
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+Additionaly, for this file,
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
+/// A dialog/card shows the class detail / time arrangement.
 class ClassDetailDialog extends StatelessWidget {
   final ClassDetail classDetail;
   final TimeArrangement timeArrangement;
@@ -15,6 +38,7 @@ class ClassDetailDialog extends StatelessWidget {
     required this.currentWeek,
   });
 
+  /// A listTile contains icon and string.
   Widget customListTile(IconData icon, String str) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -29,7 +53,7 @@ class ClassDetailDialog extends StatelessWidget {
             str,
             style: TextStyle(
               color: infoColor.shade900,
-              fontSize: 15,
+              fontSize: 16,
             ),
           ),
         ],
@@ -58,6 +82,8 @@ class ClassDetailDialog extends StatelessWidget {
     );
   }
 
+  /// A doc shows the week info of the class, whether the class /
+  /// time arrangement occurs in this week.
   Widget weekDoc({required int index}) {
     bool isOccupied = true;
     if (timeArrangement.weekList[index] == "0") {
@@ -68,7 +94,7 @@ class ClassDetailDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: isOccupied ? infoColor.shade200 : null,
           borderRadius: const BorderRadius.all(Radius.circular(100.0)),
-          border: index - 1 == currentWeek
+          border: index == currentWeek
               ? Border.all(width: 2, color: infoColor)
               : null,
         ),
@@ -94,11 +120,10 @@ class ClassDetailDialog extends StatelessWidget {
       ),
       child: Card(
         margin: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 10,
+          horizontal: 4,
+          vertical: 4,
         ),
         elevation: 0,
-        // color: Theme.of(context).colorScheme.surfaceVariant,
         color: infoColor.shade100,
         child: Container(
           padding: const EdgeInsets.all(15),
@@ -115,13 +140,15 @@ class ClassDetailDialog extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               middlePart(),
-              Container(
-                margin: const EdgeInsets.only(top: 7),
-                child: GridView.count(
+
+              /// These gridview can show when this arrangment occurs in weeks.
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: GridView.extent(
                   shrinkWrap: true,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  crossAxisCount: 10,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  maxCrossAxisExtent: 30,
                   children: List.generate(
                     timeArrangement.weekList.length,
                     (index) => weekDoc(index: index),

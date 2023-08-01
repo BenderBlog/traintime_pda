@@ -158,6 +158,8 @@ class _HomePageState extends State<HomePage> {
                 });
                 _controller.jumpToPage(_selectedIndex);
               },
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
             )
           : null,
     );
