@@ -37,7 +37,6 @@ class ClassTableState extends InheritedWidget {
     } else {
       toShowChoiceWeek = currentWeek;
     }
-    print("CurrentWeek is ${currentWeek} ${toShowChoiceWeek}");
     controllers = ClassTableWidgetState(choiceWeek: toShowChoiceWeek);
   }
 
@@ -59,7 +58,7 @@ class ClassTableWidgetState extends ChangeNotifier {
 
   void changeTopRow(int index) => rowControl.animateTo(
         (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
-        curve: Curves.linear,
+        curve: Curves.easeInOut,
         duration: const Duration(milliseconds: changePageTime ~/ 1.5),
       );
 
