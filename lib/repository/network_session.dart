@@ -23,7 +23,7 @@ late Directory supportPath;
 bool offline = false;
 
 class NetworkSession {
-  @protected
+  //@protected
   final PersistCookieJar cookieJar = PersistCookieJar(
     persistSession: true,
     storage: FileStorage("${supportPath.path}/cookie/general"),
