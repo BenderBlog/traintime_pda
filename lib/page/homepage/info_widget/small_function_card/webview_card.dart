@@ -1,11 +1,6 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/small_function_card.dart';
 import 'package:watermeter/page/webview/webview.dart';
-import 'package:watermeter/repository/network_session.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewCard extends StatelessWidget {
   const WebViewCard({super.key});
@@ -17,15 +12,16 @@ class WebViewCard extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => MyWebView(
-              domain: "http://ids.xidian.edu.cn/authserver/",
+              cookieDomainList: const ["http://ids.xidian.edu.cn/authserver/"],
+              domain: "https://payment.xidian.edu.cn/MNetWorkUI/showPublic",
             ),
           ),
         );
       },
       child: const SmallFunctionCard(
-        icon: Icons.web_asset,
-        name: "WebView",
-        description: "Test",
+        icon: Icons.payment,
+        name: "缴费平台",
+        description: "你电费交了吗",
       ),
     );
   }

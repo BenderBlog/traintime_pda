@@ -1,45 +1,18 @@
-import 'dart:developer';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:watermeter/repository/network_session.dart';
 
-const htmlString = '''
-<!DOCTYPE html>
-<head>
-<title>webview demo | IAM17</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, 
-  maximum-scale=1.0, user-scalable=no,viewport-fit=cover" />
-<style>
-*{
-  margin:0;
-  padding:0;
-}
-body{
-   background:#BBDFFC;  
-   display:flex;
-   justify-content:center;
-   align-items:center;
-   height:100px;
-   color:#C45F84;
-   font-size:20px;
-}
-</style>
-</head>
-<html>
-<body>
-<div >大家好，我是 17</div>
-</body>
-</html>
-''';
-
 class MyWebView extends StatefulWidget {
   final String domain;
-  const MyWebView({
+  final List<String> cookieDomain;
+  MyWebView({
     super.key,
     required this.domain,
-  });
+    List<String>? cookieDomainList,
+  }) : cookieDomain = cookieDomainList ?? [];
 
   @override
   State<MyWebView> createState() => _MyWebViewState();
@@ -52,6 +25,7 @@ class _MyWebViewState extends State<MyWebView> {
 
   @override
   void initState() {
+    webViewCookieManager = WebViewCookieManager();
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
@@ -60,32 +34,37 @@ class _MyWebViewState extends State<MyWebView> {
 
   @override
   void didChangeDependencies() async {
-    List<Cookie> cookies = await NetworkSession().cookieJar.loadForRequest(
-          Uri.parse("http://ids.xidian.edu.cn/authserver"),
+    List<String> toIterate = List.from(widget.cookieDomain)..add(widget.domain);
+    for (var i in toIterate) {
+      List<Cookie> cookies =
+          await NetworkSession().cookieJar.loadForRequest(Uri.parse(i));
+
+      for (var element in cookies) {
+        developer.log(
+          "webview: ${element.name} = ${element.value} ${widget.domain}${element.domain ?? ""}",
+          name: "MyWebView",
         );
 
-    for (var element in cookies) {
-      log("webview: ${element.name} = ${element.value} ${element.domain} ${element.secure}");
-    }
-    webViewCookieManager = WebViewCookieManager();
-
-    for (var element in cookies) {
-      webViewCookieManager.setCookie(
-        WebViewCookie(
-          name: element.name,
-          value: element.value,
-          domain: widget.domain,
-        ),
-      );
+        for (var element in cookies) {
+          webViewCookieManager.setCookie(
+            WebViewCookie(
+              name: element.name,
+              value: element.value,
+              domain: "${widget.domain}${element.domain ?? ""}",
+            ),
+          );
+        }
+      }
     }
 
     if (mounted) {
       controller.loadRequest(
-        Uri.parse(
-          "https://payment.xidian.edu.cn/MNetWorkUI/showPublic",
-        ),
+        Uri.parse(widget.domain),
       );
-      log("showld log page");
+      developer.log(
+        "showld log page ${widget.domain}",
+        name: "MyWebView",
+      );
       super.didChangeDependencies();
     }
   }
