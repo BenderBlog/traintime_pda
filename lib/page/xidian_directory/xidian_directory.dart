@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/page/xidian_directory/comprehensive.dart';
 import 'package:watermeter/page/xidian_directory/dininghall.dart';
 import 'package:watermeter/page/xidian_directory/telephone.dart';
@@ -29,13 +30,22 @@ class _XidianDirWindowState extends State<XidianDirWindow>
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const TabBar(
+          title: const Text("西电目录"),
+          bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.store_mall_directory)),
               Tab(icon: Icon(Icons.restaurant)),
               Tab(icon: Icon(Icons.phone)),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.info),
+              onPressed: () => launchUrl(
+                Uri.parse('https://ncov.hawa130.com/about'),
+              ),
+            ),
+          ],
         ),
         body: const TabBarView(
           children: [

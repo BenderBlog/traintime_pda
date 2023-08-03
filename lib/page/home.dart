@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/page/xdu_planet/mainpage.dart';
+import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -46,8 +46,8 @@ class _HomePageState extends State<HomePage> {
     PageInformation(
       index: 2,
       name: "XDU Planet",
-      icon: Icons.feed,
-      iconChoice: Icons.feed_outlined,
+      icon: Icons.rss_feed,
+      iconChoice: Icons.rss_feed_outlined,
     ),
     PageInformation(
       index: 3,

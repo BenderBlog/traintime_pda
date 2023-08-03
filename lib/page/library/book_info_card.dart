@@ -47,8 +47,6 @@ class BookInfoCard extends StatelessWidget {
                   padding: const EdgeInsets.all(2),
                   child: CachedNetworkImage(
                     imageUrl: LibrarySession.bookCover(toUse.isbn ?? ""),
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
                         Image.asset("assets/Empty-Cover.jpg"),
                     width: 90,

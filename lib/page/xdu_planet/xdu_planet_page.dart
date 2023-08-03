@@ -84,8 +84,6 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               List<String> keys = data.keys.toList();
               Widget icon(int index) => CachedNetworkImage(
                     imageUrl: data[keys[index]]!.favicon,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.rss_feed),
                     width: 32,

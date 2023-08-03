@@ -49,7 +49,7 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       base_code: json['base_code'] as String?,
       description: json['description'] as String?,
       bookItems: json['bookItems'] as String?,
-      bookNumber: json['bookNumber'] as int,
+      bookNumber: json['bookNumber'] as int?,
       base: json['base'] as String,
       isbn: json['isbn'] as String?,
       publicationDate: json['publicationDate'] as String?,

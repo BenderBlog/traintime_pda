@@ -61,8 +61,6 @@ class _BookDetailCardState extends State<BookDetailCard> {
               ),
               CachedNetworkImage(
                 imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
                 errorWidget: (context, url, error) =>
                     Image.asset("assets/Empty-Cover.jpg"),
                 width: 90,

@@ -24,6 +24,12 @@ enum ToolBoxAddresses {
     description: "找个地方打牌",
     iconData: Icons.book_online,
   ),
+  mail(
+    name: "学校邮箱",
+    url: "https://mail.stu.xidian.edu.cn/coremail/xphone/",
+    description: "白嫖还顺利吗",
+    iconData: Icons.mail,
+  ),
   mobileEntry(
     name: "手机门户",
     url: "https://xxcapp.xidian.edu.cn/site/xidianPage/home",

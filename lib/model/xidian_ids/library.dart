@@ -79,7 +79,7 @@ class BookInfo {
   final String? base_code;
   final String? description;
   final String? bookItems;
-  final int bookNumber;
+  final int? bookNumber;
   final String base;
   final String? isbn;
   final String? publicationDate;
