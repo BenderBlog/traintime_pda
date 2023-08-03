@@ -32,7 +32,7 @@ jobs:
         name: Upload for the next job
         with:
           name: Runner.app
-          path: /Users/runner/work/traintime_pda/traintime_pda/build/ios/iphoneos/Runner.app.
+          path: /Users/runner/work/traintime_pda/build/ios/iphoneos/Runner.app.
 
   generate_ipa:
     needs: build_run_file
