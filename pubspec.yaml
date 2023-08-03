@@ -47,7 +47,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_localizations:
     sdk: flutter
-  intl: any
+  intl:
   webview_flutter: ^4.2.2
 
 dev_dependencies:

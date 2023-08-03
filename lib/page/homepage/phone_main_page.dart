@@ -7,10 +7,10 @@ import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_c
 import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/repair_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/webview_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {
@@ -90,7 +90,7 @@ class PhoneMainPage extends StatelessWidget {
                   SchoolCardInfoCard(),
                   ScoreCard(),
                   ExamCard(),
-                  WebViewCard(),
+                  ToolCard(),
                 ],
               ),
             ),

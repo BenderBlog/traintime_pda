@@ -4,24 +4,26 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
-class MyWebView extends StatefulWidget {
+class WebView extends StatefulWidget {
   final String domain;
+  final String name;
   final List<String> cookieDomain;
-  MyWebView({
+  WebView({
     super.key,
+    required this.name,
     required this.domain,
     List<String>? cookieDomainList,
   }) : cookieDomain = cookieDomainList ?? [];
 
   @override
-  State<MyWebView> createState() => _MyWebViewState();
+  State<WebView> createState() => _WebViewState();
 }
 
-class _MyWebViewState extends State<MyWebView> {
-  late final WebViewCookieManager webViewCookieManager;
+class _WebViewState extends State<WebView> {
   late final WebViewController controller;
-  double height = 0;
+  late final WebViewCookieManager webViewCookieManager;
 
   @override
   void initState() {
@@ -73,7 +75,18 @@ class _MyWebViewState extends State<MyWebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Webview"),
+        title: Text(widget.name),
+        actions: [
+          IconButton(
+            onPressed: () {
+              launchUrlString(
+                widget.domain,
+                mode: LaunchMode.externalApplication,
+              );
+            },
+            icon: const Icon(Icons.link),
+          ),
+        ],
       ),
       body: WebViewWidget(
         controller: controller,
