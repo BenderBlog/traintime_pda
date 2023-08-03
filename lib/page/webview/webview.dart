@@ -22,6 +22,7 @@ class WebView extends StatefulWidget {
 }
 
 class _WebViewState extends State<WebView> {
+  var loadingPercentage = 0;
   late final WebViewController controller;
   late final WebViewCookieManager webViewCookieManager;
 
@@ -29,7 +30,22 @@ class _WebViewState extends State<WebView> {
   void initState() {
     webViewCookieManager = WebViewCookieManager();
     controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageStarted: (url) {
+          setState(() {
+            loadingPercentage = 0;
+          });
+        },
+        onProgress: (progress) {
+          loadingPercentage = progress;
+        },
+        onPageFinished: (url) {
+          setState(() {
+            loadingPercentage = 100;
+          });
+        },
+      ));
 
     super.initState();
   }
@@ -73,23 +89,47 @@ class _WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.name),
-        actions: [
-          IconButton(
+    return WillPopScope(
+      onWillPop: () async {
+        if (await controller.canGoBack()) {
+          await controller.goBack();
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.name),
+          leading: IconButton(
             onPressed: () {
-              launchUrlString(
-                widget.domain,
-                mode: LaunchMode.externalApplication,
-              );
+              Navigator.pop(context);
             },
-            icon: const Icon(Icons.link),
+            icon: const Icon(Icons.arrow_back),
           ),
-        ],
-      ),
-      body: WebViewWidget(
-        controller: controller,
+          actions: [
+            IconButton(
+              onPressed: () {
+                launchUrlString(
+                  widget.domain,
+                  mode: LaunchMode.externalApplication,
+                );
+              },
+              icon: const Icon(Icons.link),
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            WebViewWidget(
+              controller: controller,
+            ),
+            if (loadingPercentage < 100)
+              LinearProgressIndicator(
+                value: loadingPercentage / 100.0,
+              ),
+          ],
+        ),
       ),
     );
   }
