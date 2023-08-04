@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp> {
           Locale('zh', ''),
         ],
         navigatorKey: alice.getNavigatorKey(),
-        title: 'WaterMeter Pre-Alpha',
+        title: 'Traintime PDA',
         theme: c.apptheme,
         home: DefaultTextStyle.merge(
           style: const TextStyle(textBaseline: TextBaseline.ideographic),

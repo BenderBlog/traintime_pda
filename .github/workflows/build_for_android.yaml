@@ -9,6 +9,9 @@ on:
     branches:
       - main
 
+env:
+  PROPERTIES_PATH: "./android/key.properties"
+
 jobs:
   build_apk:
     runs-on: ubuntu-latest
@@ -25,12 +28,21 @@ jobs:
         run: |
           flutter pub get
 
+      - name: Signing APK
+        run: |
+          echo keyPassword=\${{ secrets.SIGNING_PASSWORD }} > ${{env.PROPERTIES_PATH}}
+          echo storePassword=\${{ secrets.SIGNING_PASSWORD }} >> ${{env.PROPERTIES_PATH}}
+          echo keyAlias=\${{ secrets.SIGNING_ALIAS }} >> ${{env.PROPERTIES_PATH}}
+          echo storeFile=key.jks >> ${{env.PROPERTIES_PATH}}
+          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > android/app/key.jks
+
       - name: Build APK
         run: |
           flutter build apk --release
+          md5sum build/app/outputs/flutter-apk/app-release.apk
 
       - uses: actions/upload-artifact@v3
         name: Upload apk
         with:
           name: app-release.apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ./build/app/outputs/flutter-apk/app-release.apk
