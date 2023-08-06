@@ -17,15 +17,22 @@ class LibraryController extends GetxController {
   int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
 
   @override
-  void onReady() {
+  void onReady() async {
     super.onReady();
-    LibrarySession().initSession();
-    getBorrowList();
+    isGet = false;
+    await LibrarySession().initSession();
+    await getBorrowList();
   }
 
-  void getBorrowList() async {
-    borrowList.addAll(await LibrarySession().getBorrowList());
-    update();
+  Future<void> getBorrowList() async {
+    try {
+      borrowList.addAll(await LibrarySession().getBorrowList());
+      isGet = true;
+      error = null;
+      update();
+    } catch (e) {
+      error = e.toString();
+    }
   }
 
   @override

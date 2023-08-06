@@ -40,32 +40,56 @@ class LibraryCard extends StatelessWidget {
           isLong: false,
           icon: Icons.local_library,
           text: "图书馆信息",
-          children: [
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-                children: [
-                  TextSpan(
-                    text: "${c.borrowList.length}",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24,
+          children: c.isGet
+              ? [
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: "${c.borrowList.length}",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 24,
+                          ),
+                        ),
+                        TextSpan(
+                          text: " 本在借",
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  TextSpan(
-                    text: " 本在借",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontSize: 18,
+                  Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍"),
+                ]
+              : [
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: c.error == null ? "正在获取" : "发生错误",
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  Text(c.error?.substring(0, 10) ?? "请稍候"),
                 ],
-              ),
-            ),
-            Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍"),
-          ],
         ),
       ),
     );
