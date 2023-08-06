@@ -44,7 +44,7 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile(
-                title: const Text('Traintime PDA 0.1.0'),
+                title: const Text('Traintime PDA 0.1.1+1'),
                 onPressed: (context) => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const AboutPage(),
