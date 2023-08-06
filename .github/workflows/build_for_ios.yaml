@@ -3,7 +3,7 @@ name: Unofficial build for iOS
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - 'v[0-9]+.[0-9]+.[0-9]+\+[0-9]+'
 
 jobs:
   build_run_file:
