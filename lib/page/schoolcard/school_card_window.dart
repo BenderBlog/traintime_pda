@@ -35,35 +35,36 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         appBar: AppBar(
           title: const Text("校园卡流水信息"),
           bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: TextButton(
-                  child: Text(
-                      "选择日期：从 ${Jiffy.parseFromDateTime(c.timeRange[0]!).format(pattern: "yyyy-MM-dd")} "
-                      "到 ${Jiffy.parseFromDateTime(c.timeRange[1]!).format(pattern: "yyyy-MM-dd")}"),
-                  onPressed: () async {
-                    await showCalendarDatePicker2Dialog(
-                      context: context,
-                      config: CalendarDatePicker2WithActionButtonsConfig(
-                        calendarType: CalendarDatePicker2Type.range,
-                        selectedDayHighlightColor:
-                            Theme.of(context).colorScheme.primary,
-                      ),
-                      dialogSize: const Size(325, 400),
-                      value: c.timeRange,
-                      borderRadius: BorderRadius.circular(15),
-                    ).then((value) {
-                      if (value?.length == 2) {
-                        if (value?[0] != null && value?[1] != null) {
-                          c.timeRange = value!;
-                          c.refreshPaidRecord();
-                        }
+            preferredSize: const Size.fromHeight(40),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: TextButton(
+                child: Text(
+                    "选择日期：从 ${Jiffy.parseFromDateTime(c.timeRange[0]!).format(pattern: "yyyy-MM-dd")} "
+                    "到 ${Jiffy.parseFromDateTime(c.timeRange[1]!).format(pattern: "yyyy-MM-dd")}"),
+                onPressed: () async {
+                  await showCalendarDatePicker2Dialog(
+                    context: context,
+                    config: CalendarDatePicker2WithActionButtonsConfig(
+                      calendarType: CalendarDatePicker2Type.range,
+                      selectedDayHighlightColor:
+                          Theme.of(context).colorScheme.primary,
+                    ),
+                    dialogSize: const Size(325, 400),
+                    value: c.timeRange,
+                    borderRadius: BorderRadius.circular(15),
+                  ).then((value) {
+                    if (value?.length == 2) {
+                      if (value?[0] != null && value?[1] != null) {
+                        c.timeRange = value!;
+                        c.refreshPaidRecord();
                       }
-                    });
-                  },
-                ),
-              )),
+                    }
+                  });
+                },
+              ),
+            ),
+          ),
         ),
         body: Obx(
           () {

@@ -6,6 +6,7 @@ import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/empty_classroom_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/repair_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/school_card_info_card.dart';
@@ -90,6 +91,7 @@ class PhoneMainPage extends StatelessWidget {
                   SchoolCardInfoCard(),
                   ScoreCard(),
                   ExamCard(),
+                  EmptyClassroomCard(),
                   ToolCard(),
                 ],
               ),

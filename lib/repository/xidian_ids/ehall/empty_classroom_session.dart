@@ -59,6 +59,7 @@ class EmptyClassroomSession extends EhallSession {
     return toReturn;
   }
 
+  /*
   Future<Map<String, String>> getType() async {
     Map<String, String> toReturn = {};
     var data = await dio.post(
@@ -72,6 +73,7 @@ class EmptyClassroomSession extends EhallSession {
     }
     return toReturn;
   }
+  */
 
   /// The function of search the buildings inside buildingCode.
   /// params:
@@ -85,17 +87,16 @@ class EmptyClassroomSession extends EhallSession {
     required String semesterRange,
     required String semesterPart,
     required String searchParameter,
-    required int page,
   }) async {
     String dateData = await dio.post(
       "$baseUrl/rqzhzcjc.do",
       data: {
         "RQ": date,
         "XN": semesterRange,
-        "XQ": page,
+        "XQ": semesterPart,
       },
     ).then(
-      (value) => value.data["datas"]["rqzhzcjc"]["ZC"],
+      (value) => value.data["datas"]["rqzhzcjc"]["ZC"].toString(),
     );
 
     List<EmptyClassroomData> toReturn = [];
@@ -103,7 +104,7 @@ class EmptyClassroomSession extends EhallSession {
     await dio.post("$baseUrl/cxjsqk.do", data: {
       "XNXQDM": "$semesterRange-$semesterPart",
       "ZC": dateData,
-      "XQ": page,
+      "XQ": semesterPart,
       "querySetting": jsonEncode([
         buildingSetting(buildingCode),
         if (searchParameter.isNotEmpty) classroomSetting(searchParameter),
@@ -115,12 +116,13 @@ class EmptyClassroomSession extends EhallSession {
       for (var i in value.data["datas"]["cxjsqk"]["rows"]) {
         toReturn.add(
           EmptyClassroomData(
-            name: i["JASMC"],
-            isEmpty1To2: i["JC1"].toString().contains("1_"),
-            isEmpty3To4: i["JC3"].toString().contains("1_"),
-            isEmpty5To6: i["JC5"].toString().contains("1_"),
-            isEmpty7To8: i["JC7"].toString().contains("1_"),
-            isEmpty9To10: i["JC9"].toString().contains("1_"),
+            name:
+                i["JASMC"].toString().replaceAll('(', "\n").replaceAll(')', ""),
+            isEmpty1To2: !i["JC1"].toString().contains("1_"),
+            isEmpty3To4: !i["JC3"].toString().contains("1_"),
+            isEmpty5To6: !i["JC5"].toString().contains("1_"),
+            isEmpty7To8: !i["JC7"].toString().contains("1_"),
+            isEmpty9To10: !i["JC9"].toString().contains("1_"),
           ),
         );
       }
