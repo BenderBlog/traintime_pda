@@ -18,6 +18,11 @@ class LibraryCard extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               content: Text("脱机模式下，一站式相关功能全部禁止使用"),
             ));
+          } else if (c.error != null) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text("获取图书馆信息发生故障，长按该卡片获取更新"),
+            ));
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -36,60 +41,68 @@ class LibraryCard extends StatelessWidget {
             c.getBorrowList();
           }
         },
-        child: MainPageCard(
-          isLong: false,
-          icon: Icons.local_library,
-          text: "图书馆信息",
-          children: c.isGet
-              ? [
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "${c.borrowList.length}",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 24,
-                          ),
-                        ),
-                        TextSpan(
-                          text: " 本在借",
+        child: Obx(
+          () {
+            return MainPageCard(
+              isLong: false,
+              icon: Icons.local_library,
+              text: "图书馆信息",
+              children: c.isGet.value
+                  ? [
+                      RichText(
+                        text: TextSpan(
                           style: TextStyle(
                             color: Theme.of(context)
                                 .colorScheme
                                 .onPrimaryContainer,
-                            fontSize: 18,
                           ),
+                          children: [
+                            TextSpan(
+                              text: "${c.borrowList.length}",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 24,
+                              ),
+                            ),
+                            TextSpan(
+                              text: " 本在借",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍"),
-                ]
-              : [
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
-                      children: [
-                        TextSpan(
-                          text: c.error == null ? "正在获取" : "发生错误",
+                      Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍"),
+                    ]
+                  : [
+                      RichText(
+                        text: TextSpan(
                           style: TextStyle(
                             color: Theme.of(context)
                                 .colorScheme
                                 .onPrimaryContainer,
-                            fontSize: 18,
                           ),
+                          children: [
+                            TextSpan(
+                              text: c.error.value ? "发生错误" : "正在获取",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Text(c.error?.substring(0, 10) ?? "请稍候"),
-                ],
+                      ),
+                      Text(c.error.value ? "目前无法获取信息" : "请稍候"),
+                    ],
+            );
+          },
         ),
       ),
     );

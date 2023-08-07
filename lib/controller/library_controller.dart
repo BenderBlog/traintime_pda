@@ -3,8 +3,8 @@ import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class LibraryController extends GetxController {
-  bool isGet = false;
-  String? error;
+  RxBool isGet = false.obs;
+  RxBool error = false.obs;
   List<BorrowData> borrowList = [];
 
   var searchList = <BookInfo>[].obs;
@@ -19,19 +19,23 @@ class LibraryController extends GetxController {
   @override
   void onReady() async {
     super.onReady();
-    isGet = false;
+    isGet.value = false;
     await LibrarySession().initSession();
     await getBorrowList();
   }
 
   Future<void> getBorrowList() async {
     try {
+      if (error.value) {
+        error.value = false;
+        await LibrarySession().initSession();
+      }
       borrowList.addAll(await LibrarySession().getBorrowList());
-      isGet = true;
-      error = null;
+      isGet.value = true;
+      error.value = false;
       update();
     } catch (e) {
-      error = e.toString();
+      error.value = true;
     }
   }
 
