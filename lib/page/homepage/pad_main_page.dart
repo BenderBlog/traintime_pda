@@ -16,7 +16,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 class PadMainPage extends StatelessWidget {
   const PadMainPage({super.key});
 
-  final inBetweenCardHeight = 135.0;
+  final inBetweenCardHeight = 136.0;
 
   @override
   Widget build(BuildContext context) {

@@ -27,7 +27,7 @@ class EmptyClassroomCard extends StatelessWidget {
           }
         },
         child: const SmallFunctionCard(
-          icon: Icons.room,
+          icon: Icons.apartment,
           name: "空闲教室",
           description: "找个地方自习",
         ),
