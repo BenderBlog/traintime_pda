@@ -12,6 +12,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/xdu_planet/person_page.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
@@ -103,7 +104,13 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                 ),
               );
             } catch (e) {
-              return Text("Error: $e");
+              return ReloadWidget(
+                function: () {
+                  setState(() {
+                    repoList = PlanetSession().repoList();
+                  });
+                },
+              );
             }
           } else {
             return const Center(child: CircularProgressIndicator());

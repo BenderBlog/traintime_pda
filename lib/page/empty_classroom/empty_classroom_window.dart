@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/empty_classroom_controller.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
+import 'package:watermeter/page/widget.dart';
 
 class EmptyClassroomWindow extends StatefulWidget {
   const EmptyClassroomWindow({super.key});
@@ -142,20 +143,8 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
           if (c.isLoad.value) {
             return const Center(child: CircularProgressIndicator());
           } else if (c.isError.value) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Ouch! 发生错误啦",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  FilledButton(
-                    onPressed: () => c.updateData(),
-                    child: const Text("点我刷新"),
-                  ),
-                ],
-              ),
+            return ReloadWidget(
+              function: () => c.updateData(),
             );
           } else {
             return DataTable2(

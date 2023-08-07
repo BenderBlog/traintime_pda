@@ -18,7 +18,7 @@ class LibraryCard extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               content: Text("脱机模式下，一站式相关功能全部禁止使用"),
             ));
-          } else if (c.error != null) {
+          } else if (c.error.value) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               behavior: SnackBarBehavior.floating,
               content: Text("获取图书馆信息发生故障，长按该卡片获取更新"),

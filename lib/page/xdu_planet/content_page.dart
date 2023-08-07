@@ -13,6 +13,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class ContentPage extends StatefulWidget {
@@ -77,24 +78,19 @@ class _ContentPageState extends State<ContentPage> {
                     '''
   <h3>遇到错误</h3>
   <p>
-    A paragraph with <strong>strong</strong>, <em>emphasized</em>
-    and <span style="color: red">colored</span> text.
+    很有可能是你没用接上互联网。
   </p>
 ''',
-                onTapUrl: (url) => launchUrl(
-                  Uri.parse(url),
-                  mode: LaunchMode.externalApplication,
-                ),
                 renderMode: RenderMode.listView,
               );
-            } catch (e, s) {
-              addon = HtmlWidget(
-                "加载遇到错误: $e, $s",
-                onTapUrl: (url) => launchUrl(
-                  Uri.parse(url),
-                  mode: LaunchMode.externalApplication,
-                ),
-                renderMode: RenderMode.listView,
+            } catch (e) {
+              addon = ReloadWidget(
+                function: () {
+                  setState(() {
+                    content =
+                        PlanetSession().content(widget.feed, widget.index);
+                  });
+                },
               );
             }
           } else {

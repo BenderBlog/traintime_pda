@@ -13,6 +13,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
+import 'package:watermeter/page/widget.dart';
 
 class SchoolCardWindow extends StatefulWidget {
   const SchoolCardWindow({super.key});
@@ -69,21 +70,11 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         body: Obx(
           () {
             if (c.error.value.isNotEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(c.error.value),
-                    FilledButton.icon(
-                      onPressed: () async {
-                        await c.relogin();
-                        await c.refreshPaidRecord();
-                      },
-                      icon: const Icon(Icons.refresh),
-                      label: const Text("重新加载"),
-                    )
-                  ],
-                ),
+              return ReloadWidget(
+                function: () async {
+                  await c.relogin();
+                  await c.refreshPaidRecord();
+                },
               );
             } else if (c.isGet.value) {
               var topRow = const [

@@ -172,3 +172,28 @@ class InfoDetailBox extends StatelessWidget {
     );
   }
 }
+
+/// A reload widget/page
+class ReloadWidget extends StatelessWidget {
+  final void Function() function;
+  const ReloadWidget({super.key, required this.function});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            "Ouch! 发生错误啦",
+            style: TextStyle(fontSize: 16),
+          ),
+          FilledButton(
+            onPressed: function,
+            child: const Text("点我刷新"),
+          ),
+        ],
+      ),
+    );
+  }
+}

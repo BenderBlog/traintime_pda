@@ -12,6 +12,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/xdu_planet/content_page.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
@@ -83,8 +84,14 @@ class _PersonalPageState extends State<PersonalPage> {
                   ),
                 ),
               );
-            } catch (e, s) {
-              return Center(child: Text("Error: $e, $s"));
+            } catch (e) {
+              return ReloadWidget(
+                function: () {
+                  setState(() {
+                    titleList = PlanetSession().titleList(widget.index);
+                  });
+                },
+              );
             }
           } else {
             return const Center(child: CircularProgressIndicator());
