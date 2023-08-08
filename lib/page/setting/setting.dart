@@ -44,7 +44,9 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile(
-                title: const Text('Traintime PDA 0.1.1+1'),
+                title: Text("关于 ${preference.packageInfo.appName}"),
+                value: Text(
+                    '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
                 onPressed: (context) => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const AboutPage(),

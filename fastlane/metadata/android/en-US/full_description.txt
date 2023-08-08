@@ -7,6 +7,7 @@
  - View the exam schedule by semester.
  - View the due time of the borrowed books and query the books in the library.
  - View the bill you spent in the cafeteria.
+ - Empty classroom check.
  - Other tools such as call for repairing, school email, etc.
  - Xidian Directory: Check the school's service quickly.
  - XDU Planet: Look around the blogs of your schoolmates.

@@ -10,6 +10,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
@@ -33,6 +34,7 @@ void main() async {
   // Loading cookiejar.
   repo_general.supportPath = await getApplicationSupportDirectory();
   preference.prefs = await SharedPreferences.getInstance();
+  preference.packageInfo = await PackageInfo.fromPlatform();
   // Have user registered?
   bool isFirst = false;
   String username = preference.getString(preference.Preference.idsAccount);
