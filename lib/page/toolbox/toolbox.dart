@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/toolbox/toolbox_addresses.dart';
-import 'package:watermeter/page/webview/webview.dart';
+import 'package:watermeter/page/toolbox/webview.dart';
 
 class ToolBox extends StatelessWidget {
   const ToolBox({super.key});

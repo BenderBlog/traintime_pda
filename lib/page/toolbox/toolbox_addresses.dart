@@ -15,7 +15,7 @@ enum ToolBoxAddresses {
         "redirect_uri%3Dhttp%253A%252F%252Frepair.xidian.edu.cn%252F"
         "appsys%252FxidianCasLogin%252FoauthLogin%26response_type%3D"
         "code%26state%3Dhome%26client_name%3DCasOAuthClient",
-    description: "水管别再爆了",
+    description: "不要漏水断网",
     iconData: Icons.home_repair_service,
   ),
   reserve(
@@ -35,6 +35,12 @@ enum ToolBoxAddresses {
     url: "https://xxcapp.xidian.edu.cn/site/xidianPage/home",
     description: "请假专用门户",
     iconData: Icons.apartment,
+  ),
+  network(
+    name: "校园网查询",
+    url: "https://zfw.xidian.edu.cn",
+    description: "希望永不收费",
+    iconData: Icons.signal_wifi_statusbar_4_bar,
   ),
   ruisiEntry(
     name: "睿思导航",
