@@ -89,10 +89,13 @@ class PaymentSession extends IDSSession {
         },
       ).then((value) {
         var decodeData = jsonDecode(value.data);
-        if (int.parse(decodeData["dueTotal"]) > 0) {
+        if (decodeData["returncode"] == "ERROR" &&
+            decodeData["returnmsg"] == "电费厂家返回xml消息体异常") {
+          owe.value = "目前无需清缴欠费";
+        } else if (int.parse(decodeData["dueTotal"]) > 0) {
           owe.value = "待清缴${decodeData["dueTotal"]}元欠费";
         } else {
-          owe.value = "目前无需清缴欠费";
+          owe.value = "目前欠款无法查询";
         }
       });
     } catch (e) {
