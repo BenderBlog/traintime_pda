@@ -1,0 +1,13 @@
+name: Setup Flutter
+description: setup shared Flutter environment for common use.
+
+runs:
+  using: "composite"
+  steps:
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: 3.10.6
+
+    - run: flutter pub get
+      shell: bash

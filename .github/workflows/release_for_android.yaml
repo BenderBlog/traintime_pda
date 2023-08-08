@@ -15,12 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - uses: ./.github/actions/setup_jdk
+      - name: Install JDK
+        uses: ./.github/actions/setup_jdk
 
       - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
+        uses: ./.github/actions/setup_flutter
 
       - name: Prepare Flutter Dependencies
         run: |
