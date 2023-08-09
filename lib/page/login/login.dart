@@ -38,10 +38,10 @@ class _LoginWindowState extends State<LoginWindow> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          /// Temporary symbol of watermeter.
-          const CircleAvatar(
-            backgroundImage: AssetImage("assets/icon.png"),
-            radius: 60.0,
+          Image.asset(
+            "assets/icon.png",
+            width: 120,
+            height: 120,
           ),
           const SizedBox(height: 15.0),
           const Text('请登录 Traintime PDA',
