@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 var owe = "".obs;
@@ -42,6 +43,9 @@ class PaymentSession extends IDSSession {
   RegExp getTransfer =
       RegExp(r'"http://payment.xidian.edu.cn/NetWorkUI/(.*?)"');
   Future<void> getOwe() async {
+    try {
+      await CreativeServiceSession().initSession();
+    } catch (e) {}
     try {
       /// Get electricity password
       String password = preference.getString(
