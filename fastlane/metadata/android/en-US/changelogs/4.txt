@@ -1,0 +1,3 @@
+ - F-Droid upload: split the abi per package.
+ - Remove Xidian Directory, replaced with contact book.
+ - Add a shortcut on request of somebody.
