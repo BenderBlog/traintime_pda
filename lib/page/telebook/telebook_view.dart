@@ -1,8 +1,12 @@
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/model/xidian_directory/telephone.dart';
-import 'package:watermeter/repository/xidian_directory/xidian_directory_session.dart';
+import 'package:watermeter/model/telephone.dart';
+import 'package:watermeter/repository/telephone.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 var list = getTelephoneData();
 
@@ -12,13 +16,13 @@ class TeleBookWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 660),
-        child: dataList<TeleyInformation, DepartmentWindow>(
-          list,
-          (a) => DepartmentWindow(toUse: a),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("电话本"),
+      ),
+      body: dataList<TeleyInformation, DepartmentWindow>(
+        list,
+        (a) => DepartmentWindow(toUse: a),
       ),
     );
   }
@@ -65,6 +69,7 @@ class DepartmentWindow extends StatelessWidget {
             ),
             const Divider(),
             GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedHeight(
                 maxCrossAxisExtent: 375,
                 height: 84,
@@ -98,40 +103,47 @@ class InsideWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InfoDetailBox(
-      child: Column(
-        children: [
-          Text(
-            isSouth ? "南校区" : "北校区",
-            textAlign: TextAlign.left,
-            textScaleFactor: 1.00,
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (address != null)
-                  Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.house),
-                      const SizedBox(width: 5),
-                      Text(address!)
-                    ],
-                  ),
-                if (phone != null)
-                  Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.phone),
-                      const SizedBox(width: 5),
-                      Text(phone!)
-                    ],
-                  )
-              ],
+    return GestureDetector(
+      onTap: () {
+        if (phone != null) {
+          launchUrlString("tel:$phone");
+        }
+      },
+      child: InfoDetailBox(
+        child: Column(
+          children: [
+            Text(
+              isSouth ? "南校区" : "北校区",
+              textAlign: TextAlign.left,
+              textScaleFactor: 1.00,
             ),
-          ),
-        ],
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (address != null)
+                    Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        const Icon(Icons.house),
+                        const SizedBox(width: 5),
+                        Text(address!)
+                      ],
+                    ),
+                  if (phone != null)
+                    Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        const Icon(Icons.phone),
+                        const SizedBox(width: 5),
+                        Text(phone!)
+                      ],
+                    )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

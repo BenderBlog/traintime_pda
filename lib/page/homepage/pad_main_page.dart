@@ -6,7 +6,8 @@ import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_
 import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/empty_classroom_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/repair_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/telebook_card.dart';
+import 'package:watermeter/page/homepage/info_widget/small_function_card/toolbox_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
@@ -70,6 +71,7 @@ class PadMainPage extends StatelessWidget {
                 SchoolCardInfoCard(),
                 EmptyClassroomCard(),
                 ToolCard(),
+                TeleBookCard(),
               ],
             ),
           )

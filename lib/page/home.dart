@@ -3,7 +3,6 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
-import 'package:watermeter/page/xidian_directory/xidian_directory.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class PageInformation {
@@ -39,18 +38,12 @@ class _HomePageState extends State<HomePage> {
     ),
     PageInformation(
       index: 1,
-      name: "西电目录",
-      icon: Icons.store,
-      iconChoice: Icons.store_outlined,
-    ),
-    PageInformation(
-      index: 2,
       name: "XDU Planet",
       icon: Icons.rss_feed,
       iconChoice: Icons.rss_feed_outlined,
     ),
     PageInformation(
-      index: 3,
+      index: 2,
       name: "设置",
       icon: Icons.settings,
       iconChoice: Icons.settings_outlined,
@@ -59,7 +52,6 @@ class _HomePageState extends State<HomePage> {
 
   static final _page = [
     const MainPage(),
-    const XidianDirWindow(),
     const XDUPlanetPage(),
     const SettingWindow(),
   ];

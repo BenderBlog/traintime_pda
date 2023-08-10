@@ -42,6 +42,13 @@ enum ToolBoxAddresses {
     description: "希望永不收费",
     iconData: Icons.signal_wifi_statusbar_4_bar,
   ),
+  creative(
+    name: "创新学院",
+    url: "https://ids.xidian.edu.cn/authserver/login?service="
+        "https%3A%2F%2Fscjspt.xidian.edu.cn%2Flogin%2Fids",
+    description: "创意需要队友",
+    iconData: Icons.lightbulb,
+  ),
   ruisiEntry(
     name: "睿思导航",
     url: "https://nav.xdruisi.com/",
