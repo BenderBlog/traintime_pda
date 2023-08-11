@@ -43,9 +43,8 @@ class PaymentSession extends IDSSession {
   RegExp getTransfer =
       RegExp(r'"http://payment.xidian.edu.cn/NetWorkUI/(.*?)"');
   Future<void> getOwe() async {
-    try {
-      await CreativeServiceSession().initSession();
-    } catch (e) {}
+    var a = await CreativeServiceSession().getJob();
+    developer.log(a.toString(), name: "CreativeTest");
     try {
       /// Get electricity password
       String password = preference.getString(
