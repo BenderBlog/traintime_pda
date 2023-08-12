@@ -75,38 +75,36 @@ class _WeekChoiceRowState extends State<WeekChoiceRow> {
           AutoSizeText(
             "第${index + 1}周",
             style: TextStyle(
-                fontWeight: index == classTableState.currentWeek
-                    ? FontWeight.bold
-                    : FontWeight.normal),
+              fontWeight: index == classTableState.currentWeek
+                  ? FontWeight.bold
+                  : FontWeight.normal,
+            ),
             maxLines: 1,
-            textScaleFactor: 0.9,
             group: AutoSizeGroup(),
           ),
 
           /// These code are used to render the overview of the week,
           /// as long as the height of the page is over 500.
           if (MediaQuery.sizeOf(context).height >= 500)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                7.5,
-                1.0,
-                7.5,
-                3.0,
-              ),
-              child: GridView.count(
-                shrinkWrap: true,
-                crossAxisCount: 5,
-                mainAxisSpacing: 2,
-                crossAxisSpacing: 2,
-                children: [
-                  for (int i = 0; i < 10; i += 2)
-                    for (int day = 0; day < 5; ++day)
-                      dot(
-                        isOccupied: !classTableState.pretendLayout[index][day]
-                                [i]
-                            .contains(-1),
-                      )
-                ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(6,4,6,2,),
+                child: GridView.count(
+                  shrinkWrap: true,
+                  crossAxisCount: 5,
+                  mainAxisSpacing: 2,
+                  crossAxisSpacing: 2,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    for (int i = 0; i < 10; i += 2)
+                      for (int day = 0; day < 5; ++day)
+                        dot(
+                          isOccupied: !classTableState.pretendLayout[index][day]
+                                  [i]
+                              .contains(-1),
+                        )
+                  ],
+                ),
               ),
             ),
         ],
@@ -122,9 +120,10 @@ class _WeekChoiceRowState extends State<WeekChoiceRow> {
       child: Container(
         padding: const EdgeInsets.only(
           top: 2,
-          bottom: 5,
+          bottom: 4,
         ),
         child: ListView.builder(
+          physics: const ClampingScrollPhysics(),
           controller: classTableState.controllers.rowControl,
           scrollDirection: Axis.horizontal,
           itemCount: classTableState.semesterLength,

@@ -69,6 +69,7 @@ class ClassTableState extends InheritedWidget {
     required this.classDetail,
     required this.pretendLayout,
     required this.currentWeek,
+    required BuildContext context,
   }) {
     late int toShowChoiceWeek;
     if (currentWeek < 0) {
@@ -78,7 +79,7 @@ class ClassTableState extends InheritedWidget {
     } else {
       toShowChoiceWeek = currentWeek;
     }
-    controllers = ClassTableWidgetState(choiceWeek: toShowChoiceWeek);
+    controllers = ClassTableWidgetState(choiceWeek: toShowChoiceWeek, totalWeek: semesterLength,);
   }
 
   static ClassTableState? of(BuildContext context) {
@@ -102,6 +103,9 @@ class ClassTableWidgetState extends ChangeNotifier {
   /// Current showing week.
   late int chosenWeek;
 
+  /// From the length of the semester.
+  final int totalWeek;
+
   /// A lock of the week choice row.
   ///
   /// When locked, choiceWeek cannot be changed.
@@ -115,6 +119,7 @@ class ClassTableWidgetState extends ChangeNotifier {
 
   ClassTableWidgetState({
     required int choiceWeek,
+    required this.totalWeek,
   }) {
     chosenWeek = choiceWeek;
     pageControl = PageController(
@@ -126,6 +131,8 @@ class ClassTableWidgetState extends ChangeNotifier {
     /// is the width of the week choose button.
     rowControl = ScrollController(
       initialScrollOffset:
+        totalWeek - chosenWeek < 5 ? (weekButtonWidth + 2 * weekButtonHorizontalPadding) * (totalWeek - 5)
+        :
           (weekButtonWidth + 2 * weekButtonHorizontalPadding) * chosenWeek,
     );
   }
