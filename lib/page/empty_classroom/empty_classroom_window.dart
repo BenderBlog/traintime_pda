@@ -31,23 +31,27 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   void chooseBuilding() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          content: ListView.builder(
-            itemCount: c.places.length,
-            itemBuilder: (context, index) {
-              return RadioListTile<EmptyClassroomPlace>(
-                title: Text(c.places[index].name),
-                value: c.places[index],
-                groupValue: c.chosen.value,
-                onChanged: (EmptyClassroomPlace? value) {
-                  if (value != null) {
-                    setState(() {
-                      c.chosen.value = value;
-                    });
-                  }
-                  Navigator.pop(context);
+          content: SingleChildScrollView(
+            child: Column(
+              children: List.generate(
+                c.places.length,
+                (index) {
+                  return RadioListTile<EmptyClassroomPlace>(
+                    title: Text(c.places[index].name),
+                    value: c.places[index],
+                    groupValue: c.chosen.value,
+                    onChanged: (EmptyClassroomPlace? value) {
+                      if (value != null) {
+                        setState(() {
+                          c.chosen.value = value;
+                        });
+                      }
+                      Navigator.pop(context);
+                    },
+                  );
                 },
-              );
-            },
+              ),
+            ),
           ),
         ),
       );
