@@ -12,8 +12,9 @@ class CreativeJobView extends StatefulWidget {
 }
 
 class _CreativeJobViewState extends State<CreativeJobView> {
-  TextEditingController text =
-      TextEditingController.fromValue(const TextEditingValue(text: ""));
+  TextEditingController text = TextEditingController.fromValue(
+    const TextEditingValue(text: ""),
+  );
   bool isSearch = false;
   late Future<List<Job>> data;
 
@@ -71,8 +72,11 @@ class _CreativeJobViewState extends State<CreativeJobView> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    onChanged: (String text) {
-                      setState(() {});
+                    onSubmitted: (String text) {
+                      setState(() {
+                        data = CreativeServiceSession().getJob(
+                            searchParameter: query..addAll(search(text)));
+                      });
                     },
                   ),
                 ),
@@ -93,17 +97,12 @@ class _CreativeJobViewState extends State<CreativeJobView> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => data = CreativeServiceSession().getJob(
-                searchParameter: query
-                  ..addAll(
-                    {
+                  searchParameter: query
+                    ..addAll({
                       "where": [
-                        {
-                          "tags": [],
-                        }
-                      ],
-                    },
-                  ),
-              ),
+                        {"tags": []}
+                      ]
+                    })),
               child: FutureBuilder<List<Job>>(
                 future: data,
                 builder:
@@ -112,60 +111,65 @@ class _CreativeJobViewState extends State<CreativeJobView> {
                     if (snapshot.hasError) {
                       return Center(child: Text("坏事: ${snapshot.error}"));
                     } else {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: ListView.separated(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Wrap(
-                              alignment: WrapAlignment.spaceBetween,
-                              children: [
-                                Text(snapshot.data![index].name),
-                                TagsBoxes(
-                                  text: snapshot.data![index].skill,
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                ),
-                              ],
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 2.0),
-                                Wrap(
-                                  spacing: 8.0,
-                                  children: List.generate(
-                                    snapshot.data![index].tags.length,
-                                    (i) => TagsBoxes(
-                                      text: snapshot.data![index].tags[i],
-                                      backgroundColor: Colors.grey.shade300,
-                                      textColor: Colors.black,
+                      if ((snapshot.data?.length ?? 0) > 0) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: ListView.separated(
+                            itemCount: snapshot.data?.length ?? 0,
+                            itemBuilder: (context, index) => ListTile(
+                              title: Wrap(
+                                alignment: WrapAlignment.spaceBetween,
+                                children: [
+                                  Text(snapshot.data![index].name),
+                                  TagsBoxes(
+                                    text: snapshot.data![index].skill,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ],
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 2.0),
+                                  Wrap(
+                                    spacing: 8.0,
+                                    children: List.generate(
+                                      snapshot.data![index].tags.length,
+                                      (i) => TagsBoxes(
+                                        text: snapshot.data![index].tags[i],
+                                        backgroundColor: Colors.grey.shade300,
+                                        textColor: Colors.black,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Wrap(
-                                  spacing: 4.0,
-                                  children: [
-                                    Text(
-                                      "招募 ${snapshot.data![index].exceptNumber} 人 · ",
-                                    ),
-                                    Text(
-                                      "${snapshot.data![index].project.name} · ",
-                                    ),
-                                    Text(
-                                      "截止日期 ${Jiffy.parseFromDateTime(snapshot.data![index].endTime).format(pattern: "yyyy 年 MM 月 dd 日")}",
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                  const SizedBox(height: 4),
+                                  Wrap(
+                                    spacing: 4.0,
+                                    children: [
+                                      Text(
+                                        "招募 ${snapshot.data![index].exceptNumber} 人 · ",
+                                      ),
+                                      Text(
+                                        "${snapshot.data![index].project.name} · ",
+                                      ),
+                                      Text(
+                                        "截止日期 ${Jiffy.parseFromDateTime(snapshot.data![index].endTime).format(pattern: "yyyy 年 MM 月 dd 日")}",
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              onTap: () {},
                             ),
-                            onTap: () {},
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    const Divider(height: 0),
                           ),
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(height: 0),
-                        ),
-                      );
+                        );
+                      } else {
+                        return const Center(child: Text("没有查到结果"));
+                      }
                     }
                   } else {
                     return const Center(child: CircularProgressIndicator());
