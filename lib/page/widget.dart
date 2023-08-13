@@ -25,25 +25,25 @@ class TagsBoxes extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
 
-  const TagsBoxes(
-      {Key? key,
-      required this.text,
-      this.backgroundColor = Colors.blue,
-      this.textColor = Colors.white})
-      : super(key: key);
+  const TagsBoxes({
+    Key? key,
+    required this.text,
+    this.backgroundColor = Colors.blue,
+    this.textColor = Colors.white,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(4, 2, 4, 4),
+      padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
       ),
       child: Text(
         text,
-        style: TextStyle(color: textColor),
         textScaleFactor: 0.9,
+        style: TextStyle(color: textColor),
       ),
     );
   }

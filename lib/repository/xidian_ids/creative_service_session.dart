@@ -49,7 +49,7 @@ class CreativeServiceSession extends IDSSession {
     }
   }
 
-  Future<List<Job>> getJob() async {
+  Future<List<Job>> getJob({required Map searchParameter}) async {
     if (authorization.isEmpty) {
       await initSession();
     }
@@ -57,11 +57,7 @@ class CreativeServiceSession extends IDSSession {
     var data = await dio
         .post(
           "$url/api/v1/job/query",
-          data: {
-            "where": [{}],
-            "order": "created_at desc",
-            "size": 20
-          },
+          data: searchParameter,
           options: Options(
             contentType: ContentType.json.toString(),
             headers: {
@@ -78,10 +74,7 @@ class CreativeServiceSession extends IDSSession {
     } else {
       return List<Job>.generate(
         data["total"],
-        (index) {
-          developer.log(data["data"][index].toString(), name: "CreateSession");
-          return Job.fromJson(data["data"][index]);
-        } ,
+        (index) => Job.fromJson(data["data"][index]),
       );
     }
   }

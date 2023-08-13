@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/toolbox/toolbox_addresses.dart';
 import 'package:watermeter/page/toolbox/webview.dart';
 
+import 'creative_job.dart';
+
 class ToolBox extends StatelessWidget {
   const ToolBox({super.key});
 
@@ -20,6 +22,11 @@ class ToolBox extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
+                builder: (context) => const CreativeJobView(),
+              ),
+            );/*
+            Navigator.of(context).push(
+              MaterialPageRoute(
                 builder: (context) => WebView(
                   name: ToolBoxAddresses.values[index].name,
                   cookieDomainList: const [
@@ -29,6 +36,7 @@ class ToolBox extends StatelessWidget {
                 ),
               ),
             );
+            */
           },
         ),
         separatorBuilder: (BuildContext context, int index) =>

@@ -14,12 +14,12 @@ class ExamInfoCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,
-        vertical: 5,
+        vertical: 6,
       ),
       elevation: 0,
       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Container(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(14),
         child: toUse != null
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
