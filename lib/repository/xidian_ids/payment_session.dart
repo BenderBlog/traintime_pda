@@ -14,7 +14,6 @@ import 'package:get/get.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 var owe = "".obs;

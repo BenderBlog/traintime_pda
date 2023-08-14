@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
+import 'package:watermeter/page/both_side_sheet.dart';
+import 'package:watermeter/page/toolbox/creative_job_choice.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 
@@ -15,7 +17,6 @@ class _CreativeJobViewState extends State<CreativeJobView> {
   TextEditingController text = TextEditingController.fromValue(
     const TextEditingValue(text: ""),
   );
-  bool isSearch = false;
   late Future<List<Job>> data;
 
   List<String> get categories => skill.keys.toList();
@@ -26,83 +27,109 @@ class _CreativeJobViewState extends State<CreativeJobView> {
     "size": 20,
   };
 
-  Map search(String searchParameter) => {
-        "fuzzyOr": [
-          {"name": searchParameter},
-          {"description": searchParameter},
-          {"reward": searchParameter}
+  (String, List<String>)? searchTags;
+  String searchParameter = "";
+
+  Future<void> search() async {
+    /// where, or, fuzzyWhere, fuzzyOr
+    Map query = {
+      "order": "created_at desc",
+      "size": 20,
+    };
+
+    if (searchParameter.isNotEmpty) {
+      query.addAll(
+        {
+          "fuzzyOr": [
+            {"name": searchParameter},
+            {"description": searchParameter},
+            {"reward": searchParameter}
+          ],
+        },
+      );
+    }
+
+    query.addAll(
+      {
+        "where": [
+          {
+            if (searchTags != null && searchTags!.$1.isNotEmpty)
+              "skill": searchTags?.$1,
+            "tags": searchTags?.$2 ?? [],
+          }
         ],
-      };
+      },
+    );
+
+    data = CreativeServiceSession().getJob(
+      searchParameter: query,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    data = CreativeServiceSession().getJob(
-        searchParameter: query
-          ..addAll({
-            "where": [
-              {"tags": []}
-            ],
-          }));
+    search();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("双创竞赛需求中心"),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: TextField(
-                    controller: text,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      fillColor: Colors.grey.withOpacity(0.2),
-                      filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      hintText: "搜索需求",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                        borderSide: BorderSide.none,
-                      ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: TextField(
+                  controller: text,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    fillColor: Colors.grey.withOpacity(0.2),
+                    filled: true,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    hintText: "搜索需求",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                      borderSide: BorderSide.none,
                     ),
-                    onSubmitted: (String text) {
-                      setState(() {
-                        data = CreativeServiceSession().getJob(
-                            searchParameter: query..addAll(search(text)));
-                      });
-                    },
                   ),
+                  onSubmitted: (String text) {
+                    setState(() {
+                      searchParameter = text;
+                      search();
+                    });
+                  },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text("职位类型"),
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: TextButton(
+                onPressed: () async {
+                  searchTags = await BothSideSheet.show<(String, List<String>)>(
+                    context: context,
+                    child: CategoryChoiceView(
+                      data: searchTags ?? ("", []),
+                    ),
+                    title: "选择种类",
+                  );
+                  setState(() {
+                    search();
+                  });
+                },
+                child: const Text("职位类型"),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       body: Column(
         children: [
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => data = CreativeServiceSession().getJob(
-                  searchParameter: query
-                    ..addAll({
-                      "where": [
-                        {"tags": []}
-                      ]
-                    })),
+              onRefresh: search,
               child: FutureBuilder<List<Job>>(
                 future: data,
                 builder:
@@ -181,5 +208,14 @@ class _CreativeJobViewState extends State<CreativeJobView> {
         ],
       ),
     );
+  }
+}
+
+class CategoryChoicePopUp extends StatelessWidget {
+  const CategoryChoicePopUp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

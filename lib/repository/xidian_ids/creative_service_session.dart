@@ -35,7 +35,7 @@ class CreativeServiceSession extends IDSSession {
       );
 
       developer.log(
-        "Received: \n${isLogin}\n",
+        "Received: $isLogin",
         name: "CreativeServiceSession",
       );
 

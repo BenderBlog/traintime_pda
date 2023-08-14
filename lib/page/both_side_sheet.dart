@@ -11,12 +11,12 @@ class BothSideSheet extends StatefulWidget {
     required this.title,
   });
 
-  static void show({
+  static Future<T?> show<T>({
     required BuildContext context,
     required Widget child,
     required String title,
   }) =>
-      showGeneralDialog(
+      showGeneralDialog<T>(
         barrierDismissible: true,
         context: context,
         pageBuilder: (context, animation1, animation2) {
