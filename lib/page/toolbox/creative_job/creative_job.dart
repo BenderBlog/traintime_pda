@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/page/both_side_sheet.dart';
-import 'package:watermeter/page/toolbox/creative_job_choice.dart';
+import 'package:watermeter/page/toolbox/creative_job/creative_job_choice.dart';
+import 'package:watermeter/page/toolbox/creative_job/creative_job_description.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 
@@ -143,52 +144,8 @@ class _CreativeJobViewState extends State<CreativeJobView> {
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: ListView.separated(
                             itemCount: snapshot.data?.length ?? 0,
-                            itemBuilder: (context, index) => ListTile(
-                              title: Wrap(
-                                alignment: WrapAlignment.spaceBetween,
-                                children: [
-                                  Text(snapshot.data![index].name),
-                                  TagsBoxes(
-                                    text: snapshot.data![index].skill,
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 2.0),
-                                  Wrap(
-                                    spacing: 8.0,
-                                    children: List.generate(
-                                      snapshot.data![index].tags.length,
-                                      (i) => TagsBoxes(
-                                        text: snapshot.data![index].tags[i],
-                                        backgroundColor: Colors.grey.shade300,
-                                        textColor: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Wrap(
-                                    spacing: 4.0,
-                                    children: [
-                                      Text(
-                                        "招募 ${snapshot.data![index].exceptNumber} 人 · ",
-                                      ),
-                                      Text(
-                                        "${snapshot.data![index].project.name} · ",
-                                      ),
-                                      Text(
-                                        "截止日期 ${Jiffy.parseFromDateTime(snapshot.data![index].endTime).format(pattern: "yyyy 年 MM 月 dd 日")}",
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              onTap: () {},
-                            ),
+                            itemBuilder: (context, index) =>
+                                CreativeJobListTile(job: snapshot.data![index]),
                             separatorBuilder:
                                 (BuildContext context, int index) =>
                                     const Divider(height: 0),
@@ -211,11 +168,63 @@ class _CreativeJobViewState extends State<CreativeJobView> {
   }
 }
 
-class CategoryChoicePopUp extends StatelessWidget {
-  const CategoryChoicePopUp({super.key});
+class CreativeJobListTile extends StatelessWidget {
+  final Job job;
+  const CreativeJobListTile({
+    super.key,
+    required this.job,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return ListTile(
+      title: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          Text(job.name),
+          TagsBoxes(
+            text: job.skill,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        ],
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 2.0),
+          Wrap(
+            spacing: 8.0,
+            children: List.generate(
+              job.tags.length,
+              (i) => TagsBoxes(
+                text: job.tags[i],
+                backgroundColor: Colors.grey.shade300,
+                textColor: Colors.black,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 4.0,
+            children: [
+              Text(
+                "招募 ${job.exceptNumber} 人 · ",
+              ),
+              Text(
+                "${job.project.name} · ",
+              ),
+              Text(
+                "截止日期 ${Jiffy.parseFromDateTime(job.endTime).format(pattern: "yyyy 年 MM 月 dd 日")}",
+              ),
+            ],
+          ),
+        ],
+      ),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CreativeJobDescription(job: job),
+        ),
+      ),
+    );
   }
 }

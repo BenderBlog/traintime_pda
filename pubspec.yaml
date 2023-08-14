@@ -50,6 +50,7 @@ dependencies:
   intl:
   webview_flutter: ^4.2.2
   package_info_plus: ^4.1.0
+  flutter_markdown: ^0.6.17+1
 
 dev_dependencies:
   flutter_test:
