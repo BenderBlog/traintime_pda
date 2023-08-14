@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
+import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
@@ -38,9 +39,9 @@ class _HomePageState extends State<HomePage> {
     ),
     PageInformation(
       index: 1,
-      name: "XDU Planet",
-      icon: Icons.rss_feed,
-      iconChoice: Icons.rss_feed_outlined,
+      name: "小工具",
+      icon: Icons.assistant,
+      iconChoice: Icons.assistant_outlined,
     ),
     PageInformation(
       index: 2,
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
 
   static final _page = [
     const MainPage(),
-    const XDUPlanetPage(),
+    const ToolBoxView(),
     const SettingWindow(),
   ];
 
