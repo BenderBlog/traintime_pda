@@ -3,7 +3,6 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class PageInformation {
