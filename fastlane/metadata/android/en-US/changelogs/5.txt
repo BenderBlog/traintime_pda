@@ -1,0 +1,10 @@
+Major change since v0.1.0.
+
+1. FDroid onboard.
+2. Remove Xidian Dir, replaced with school contact.
+3. Creative and commercialization project query.
+4. Lots of WebView function.
+5. Empty classroom query.
+6. A little tool subwindow.
+
+Details：https://superbart.xyz/p/traintime-pda-v0.2.0-release-note.html

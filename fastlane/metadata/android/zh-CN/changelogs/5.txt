@@ -1,0 +1,10 @@
+自 v0.1.0 版本以来的主要变化。
+
+1. FDroid 上架。
+2. 移除西电目录，用电话本代替。
+3. 应请求添加双创需求大厅。
+4. 添加很多利用 WebView 的小功能。
+5. 空闲教室功能。
+6. 提取很多使用不多的功能到小工具分页。
+
+详情可以看：https://superbart.xyz/p/traintime-pda-v0.2.0-release-note.html

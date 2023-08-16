@@ -9,7 +9,7 @@
  - View the bill you spent in the cafeteria.
  - Empty classroom check.
  - Other tools such as call for repairing, school email, etc.
- - Xidian Directory: Check the school's service quickly.
+ - Shuangchuang (Innovation and Entrepreneurship) project query.
  - XDU Planet: Look around the blogs of your schoolmates.
 
 Also, this is a software with better privacy, cross-platform Flutter SDK, and not serious developer.
