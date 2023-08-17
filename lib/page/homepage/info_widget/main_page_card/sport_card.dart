@@ -39,8 +39,8 @@ class SportCard extends StatelessWidget {
               child: Center(
                 child: Text(
                   punchData.value.situation ??
-                      "有效次数 ${punchData.value.valid}"
-                          "总共次数 ${punchData.value.allTime}"
+                      "有效次数 ${punchData.value.valid}\t"
+                          "总共次数 ${punchData.value.allTime}\t"
                           "成绩 ${punchData.value.score}",
                   textScaleFactor: 1.15,
                   style: TextStyle(
