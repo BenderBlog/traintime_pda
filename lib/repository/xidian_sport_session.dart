@@ -40,13 +40,11 @@ class SportSession {
       if (userId == "") {
         await login();
       }
-      /*
       var getStore = await require(
         subWebsite: "stuTermPunchRecord/findList",
         body: {'userId': userId},
       );
       toReturn.score = getStore["data"][0]["score"];
-      */
       var response = await require(
         subWebsite: "stuPunchRecord/findPager",
         body: {
@@ -95,7 +93,7 @@ class SportSession {
     developer.log("开始获取打卡信息", name: "GetPunchSession");
     SportScore toReturn = SportScore();
     try {
-      if (userId == "") {
+      if (userId.isEmpty || token.isEmpty) {
         await login();
       }
       var response = await require(
@@ -154,6 +152,8 @@ class SportSession {
 
   static var userId = '';
 
+  static var token = '';
+
   final baseURL = 'http://xd.5itsn.com/app/';
 
   final rsaKey = """-----BEGIN PUBLIC KEY-----
@@ -174,6 +174,11 @@ awb4B45zUwIDAQAB
     'type': '0',
   };
 
+  Map<String, String> get header => commonHeader
+    ..addAll({
+      "token": token,
+    });
+
   final commonSignParams = {
     'appId': '3685bc028aaf4e64ad6b5d2349d24ba8',
     'appSecret': 'e8167ef026cbc5e456ab837d9d6d9254'
@@ -190,7 +195,7 @@ awb4B45zUwIDAQAB
   }
 
   Map<String, dynamic> _getHead(Map<String, dynamic> payload) {
-    Map<String, dynamic> toReturn = commonHeader;
+    Map<String, dynamic> toReturn = header;
     toReturn["timestamp"] = DateTime.now().millisecondsSinceEpoch.toString();
     Map<String, dynamic> forSign = payload;
     forSign["timestamp"] = toReturn["timestamp"];
@@ -214,7 +219,6 @@ awb4B45zUwIDAQAB
     required Map<String, dynamic> body,
     bool isForce = false,
   }) async {
-    body.addAll(commonSignParams);
     var response = await _dio.post(subWebsite,
         data: body, options: Options(headers: _getHead(body)));
     return response.data;
@@ -225,7 +229,7 @@ awb4B45zUwIDAQAB
         preference.getString(preference.Preference.sportPassword).isEmpty) {
       throw NoPasswordException();
     }
-    if (userId != "") {
+    if (userId.isNotEmpty && token.isNotEmpty) {
       developer.log("已经登录成功", name: "SportSession");
       return;
     }
@@ -248,7 +252,7 @@ awb4B45zUwIDAQAB
         throw LoginFailedException(msg: response["returnMsg"]);
       } else {
         userId = response["data"]["id"].toString();
-        commonHeader["token"] = response["data"]["token"];
+        token = response["data"]["token"];
       }
     } on DioException catch (e) {
       if (e.message?.contains("404") ?? false) {
