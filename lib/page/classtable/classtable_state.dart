@@ -78,7 +78,6 @@ class ClassTableState extends InheritedWidget {
     controllers = ClassTableWidgetState(
       chosenWeek: toShowChoiceWeek,
     );
-    log("Chosen Week is ${controllers.chosenWeek}");
   }
 
   static ClassTableState? of(BuildContext context) {

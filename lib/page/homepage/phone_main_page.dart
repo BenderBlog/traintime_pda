@@ -25,7 +25,13 @@ class PhoneMainPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: GetBuilder<ClassTableController>(
           builder: (c) => Text(
-            c.isNotVacation ? "第 ${c.currentWeek + 1} 周" : "假期中",
+            c.isGet
+                ? c.isNotVacation
+                    ? "第 ${c.currentWeek + 1} 周"
+                    : "假期中"
+                : c.error != null
+                    ? "加载错误"
+                    : "正在加载",
             style: const TextStyle(color: Colors.white),
           ),
         ),

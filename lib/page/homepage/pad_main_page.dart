@@ -22,8 +22,15 @@ class PadMainPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: GetBuilder<ClassTableController>(
-          builder: (c) =>
-              Text(c.isNotVacation ? "第 ${c.currentWeek + 1} 周" : "假期中"),
+          builder: (c) => Text(
+            c.isGet
+                ? c.isNotVacation
+                    ? "第 ${c.currentWeek + 1} 周"
+                    : "假期中"
+                : c.error != null
+                    ? "加载错误"
+                    : "正在加载",
+          ),
         ),
         actions: [
           IconButton(

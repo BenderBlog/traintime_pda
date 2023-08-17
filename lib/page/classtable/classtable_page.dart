@@ -73,7 +73,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
   @override
   void didChangeDependencies() {
     classTableState = ClassTableState.of(context)!;
-    log("Classtable state inited, ${classTableState.currentWeek}");
     pageControl = PageController(
       initialPage: classTableState.controllers.chosenWeek,
       keepPage: true,
