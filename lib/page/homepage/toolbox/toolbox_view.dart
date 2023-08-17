@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/small_function_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_addresses.dart';
 import 'package:watermeter/page/homepage/toolbox/webview.dart';
@@ -6,6 +7,7 @@ import 'package:watermeter/page/creative_job/creative_job.dart';
 import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 import 'package:watermeter/page/telebook/telebook_view.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
+import 'dart:io';
 
 class ToolBoxView extends StatelessWidget {
   const ToolBoxView({super.key});
@@ -77,17 +79,21 @@ class ToolBoxView extends StatelessWidget {
             } else {
               return GestureDetector(
                 onTap: () async {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => WebView(
-                        name: ToolBoxAddresses.values[index - 3].name,
-                        cookieDomainList: const [
-                          "http://ids.xidian.edu.cn/authserver/"
-                        ],
-                        domain: ToolBoxAddresses.values[index - 3].url,
+                  if (!Platform.isAndroid) {
+                    launchUrlString(ToolBoxAddresses.values[index - 3].url);
+                  } else {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => WebView(
+                          name: ToolBoxAddresses.values[index - 3].name,
+                          cookieDomainList: const [
+                            "http://ids.xidian.edu.cn/authserver/"
+                          ],
+                          domain: ToolBoxAddresses.values[index - 3].url,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 },
                 child: SmallFunctionCard(
                   icon: ToolBoxAddresses.values[index - 3].iconData,
