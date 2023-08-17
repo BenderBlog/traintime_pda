@@ -5,6 +5,7 @@ import 'package:watermeter/page/homepage/toolbox/webview.dart';
 import 'package:watermeter/page/creative_job/creative_job.dart';
 import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 import 'package:watermeter/page/telebook/telebook_view.dart';
+import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 
 class ToolBoxView extends StatelessWidget {
   const ToolBoxView({super.key});
@@ -48,7 +49,7 @@ class ToolBoxView extends StatelessWidget {
                 onTap: () async {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const CreativeJobView(),
+                      builder: (context) => const XDUPlanetPage(),
                     ),
                   );
                 },

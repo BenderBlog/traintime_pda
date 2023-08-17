@@ -19,25 +19,6 @@ class ScoreWindow extends StatelessWidget {
 
   late final BuildContext context;
 
-  Future<void> easterEgg() => showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("和人家比不如和自己比"),
-          content: Image.asset(
-            "assets/Humpy-Score.jpg",
-          ),
-          actions: [
-            TextButton(
-              child: const Text("确定"),
-              onPressed: () {
-                Get.put(ScoreController()).addCount();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-
   final Widget selectModeButton = GetBuilder<ScoreController>(
     builder: (c) => IconButton(
       icon: const Icon(Icons.calculate),
@@ -220,25 +201,8 @@ class ScoreWindow extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("成绩查询"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         actions: [
           selectModeButton,
-          IconButton(
-            icon: const Icon(Icons.info),
-            onPressed: () {
-              if (Get.put(ScoreController()).presscount >= 4) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("行吧，不过别自找麻烦，我可不管"),
-                ));
-              }
-              easterEgg();
-            },
-          ),
         ],
         bottom: dropDownButton(context),
       ),

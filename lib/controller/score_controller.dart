@@ -37,20 +37,6 @@ class ScoreController extends GetxController {
     '专业选修课',
   ];
 
-  /// User could see the place only if they pressed easter egg five times.
-  int presscount = 0;
-  bool allowDetail = false;
-
-  void addCount() {
-    if (presscount < 4) {
-      presscount++;
-    } else {
-      if (allowDetail == false) {
-        allowDetail = true;
-      }
-    }
-  }
-
   static const notFinish = "(成绩没登完)";
   static const notCoreClassType = "公共任选";
   static const notFirstTime = "(非初修)";

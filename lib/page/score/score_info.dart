@@ -339,10 +339,8 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
                 ),
               ),
             ),
-            if (Get.put(ScoreController()).allowDetail)
-              scoreInfo(true, context),
-            if (Get.put(ScoreController()).allowDetail)
-              scoreInfo(false, context),
+            scoreInfo(true, context),
+            scoreInfo(false, context),
           ],
         ),
         watermark,
