@@ -50,64 +50,72 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
     super.build(context);
     return Obx(
       () => Scaffold(
-        body: EasyRefresh.builder(
-          controller: _controller,
-          clipBehavior: Clip.none,
-          header: const MaterialHeader(
-            clamping: true,
-            showBezierBackground: false,
-            bezierBackgroundAnimation: false,
-            bezierBackgroundBounce: false,
-            springRebound: false,
-          ),
-          onRefresh: () async {
-            await SportSession().getPunch();
-            _controller.finishRefresh();
-          },
-          childBuilder: (context, physics) {
-            if (punchData.value.situation == null) {
-              if (punchData.value.all.isNotEmpty) {
-                int count = 0;
-                List<RecordCard> toUse = [];
-                for (var i in punchData.value.all) {
-                  if ((isValid && i.state.contains("恭喜你本次打卡成功")) || !isValid) {
-                    toUse.insertAll(0, [RecordCard(mark: count + 1, toUse: i)]);
-                    count++;
-                  }
-                }
-                return dataList<RecordCard, RecordCard>(
-                  toUse,
-                  (toUse) => toUse,
-                  physics: physics,
-                );
-              } else {
-                return ListView(
-                  physics: physics,
-                  children: [
-                    SizedBox(
-                      height: context.height * 0.7,
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.warning),
-                            Text(
-                              "列表为空",
-                              textScaleFactor: 1.5,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+            child: EasyRefresh.builder(
+              controller: _controller,
+              clipBehavior: Clip.none,
+              header: const MaterialHeader(
+                clamping: true,
+                showBezierBackground: false,
+                bezierBackgroundAnimation: false,
+                bezierBackgroundBounce: false,
+                springRebound: false,
+              ),
+              onRefresh: () async {
+                await SportSession().getPunch();
+                _controller.finishRefresh();
+              },
+              childBuilder: (context, physics) {
+                if (punchData.value.situation == null) {
+                  if (punchData.value.all.isNotEmpty) {
+                    int count = 0;
+                    List<RecordCard> toUse = [];
+                    for (var i in punchData.value.all) {
+                      if ((isValid && i.state.contains("恭喜你本次打卡成功")) ||
+                          !isValid) {
+                        toUse.insertAll(
+                            0, [RecordCard(mark: count + 1, toUse: i)]);
+                        count++;
+                      }
+                    }
+                    return dataList<RecordCard, RecordCard>(
+                      toUse,
+                      (toUse) => toUse,
+                      physics: physics,
+                    );
+                  } else {
+                    return ListView(
+                      physics: physics,
+                      children: [
+                        SizedBox(
+                          height: context.height * 0.7,
+                          child: const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.warning),
+                                Text(
+                                  "列表为空",
+                                  textScaleFactor: 1.5,
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-            } else if (punchData.value.situation == "正在加载") {
-              return const Center(child: CircularProgressIndicator());
-            } else {
-              return Center(child: Text("坏事: ${punchData.value.situation}"));
-            }
-          },
+                      ],
+                    );
+                  }
+                } else if (punchData.value.situation == "正在加载") {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  return Center(
+                      child: Text("坏事: ${punchData.value.situation}"));
+                }
+              },
+            ),
+          ),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(

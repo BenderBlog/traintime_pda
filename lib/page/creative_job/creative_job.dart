@@ -140,15 +140,20 @@ class _CreativeJobViewState extends State<CreativeJobView> {
                       return Center(child: Text("坏事: ${snapshot.error}"));
                     } else {
                       if ((snapshot.data?.length ?? 0) > 0) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: ListView.separated(
-                            itemCount: snapshot.data?.length ?? 0,
-                            itemBuilder: (context, index) =>
-                                CreativeJobListTile(job: snapshot.data![index]),
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const Divider(height: 0),
+                        return Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints:
+                                const BoxConstraints(maxWidth: sheetMaxWidth),
+                            child: ListView.separated(
+                              itemCount: snapshot.data?.length ?? 0,
+                              itemBuilder: (context, index) =>
+                                  CreativeJobListTile(
+                                      job: snapshot.data![index]),
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      const Divider(height: 0),
+                            ),
                           ),
                         );
                       } else {

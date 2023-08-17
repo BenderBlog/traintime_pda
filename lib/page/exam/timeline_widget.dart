@@ -13,9 +13,10 @@ class TimelineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Align(
+      alignment: Alignment.topCenter,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 660),
+        constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
         child: Stack(
           alignment: AlignmentDirectional.center,
           fit: StackFit.loose,

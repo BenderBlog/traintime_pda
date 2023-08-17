@@ -8,6 +8,8 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -108,13 +110,22 @@ class _ContentPageState extends State<ContentPage> {
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 8,
-                    right: 8,
-                    bottom: 8,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: sheetMaxWidth - 16,
+                    minWidth: min(
+                      MediaQuery.of(context).size.width,
+                      sheetMaxWidth - 16,
+                    ),
                   ),
-                  child: addon,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 8,
+                      right: 8,
+                      bottom: 8,
+                    ),
+                    child: addon,
+                  ),
                 ),
               ),
             ],

@@ -65,7 +65,8 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
         title: const Text("空闲教室"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(100.0),
-          child: Padding(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Column(
               children: [
@@ -74,7 +75,6 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                     TextButton(
                       style: TextButton.styleFrom(
                         backgroundColor: colorScheme.secondaryContainer,
-                        //padding: const EdgeInsets.all(4),
                       ),
                       onPressed: () async {
                         await showCalendarDatePicker2Dialog(
@@ -151,63 +151,70 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
               function: () => c.updateData(),
             );
           } else {
-            return DataTable2(
-              columnSpacing: 0,
-              horizontalMargin: 6,
-              columns: const [
-                DataColumn2(
-                  label: Center(child: Text('教室')),
-                  size: ColumnSize.L,
-                ),
-                DataColumn2(
-                  label: Center(child: Text('1-2节')),
-                  size: ColumnSize.S,
-                ),
-                DataColumn2(
-                  label: Center(child: Text('3-4节')),
-                  size: ColumnSize.S,
-                ),
-                DataColumn2(
-                  label: Center(child: Text('5-6节')),
-                  size: ColumnSize.S,
-                ),
-                DataColumn2(
-                  label: Center(child: Text('7-8节')),
-                  size: ColumnSize.S,
-                ),
-                DataColumn2(
-                  label: Center(child: Text('9-10节')),
-                  size: ColumnSize.S,
-                ),
-              ],
-              rows: List<DataRow>.generate(
-                c.data.length,
-                (index) => DataRow(
-                  cells: [
-                    DataCell(
-                      Center(
-                        child: Text(
-                          c.data[index].name,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+                child: DataTable2(
+                  headingRowColor:
+                      MaterialStatePropertyAll<Color>(Colors.grey.shade100),
+                  columnSpacing: 0,
+                  horizontalMargin: 6,
+                  columns: const [
+                    DataColumn2(
+                      label: Center(child: Text('教室')),
+                      size: ColumnSize.L,
                     ),
-                    DataCell(
-                      getIcon(c.data[index].isEmpty1To2),
+                    DataColumn2(
+                      label: Center(child: Text('1-2节')),
+                      size: ColumnSize.S,
                     ),
-                    DataCell(
-                      getIcon(c.data[index].isEmpty3To4),
+                    DataColumn2(
+                      label: Center(child: Text('3-4节')),
+                      size: ColumnSize.S,
                     ),
-                    DataCell(
-                      getIcon(c.data[index].isEmpty5To6),
+                    DataColumn2(
+                      label: Center(child: Text('5-6节')),
+                      size: ColumnSize.S,
                     ),
-                    DataCell(
-                      getIcon(c.data[index].isEmpty7To8),
+                    DataColumn2(
+                      label: Center(child: Text('7-8节')),
+                      size: ColumnSize.S,
                     ),
-                    DataCell(
-                      getIcon(c.data[index].isEmpty9To10),
+                    DataColumn2(
+                      label: Center(child: Text('9-10节')),
+                      size: ColumnSize.S,
                     ),
                   ],
+                  rows: List<DataRow>.generate(
+                    c.data.length,
+                    (index) => DataRow(
+                      cells: [
+                        DataCell(
+                          Center(
+                            child: Text(
+                              c.data[index].name,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          getIcon(c.data[index].isEmpty1To2),
+                        ),
+                        DataCell(
+                          getIcon(c.data[index].isEmpty3To4),
+                        ),
+                        DataCell(
+                          getIcon(c.data[index].isEmpty5To6),
+                        ),
+                        DataCell(
+                          getIcon(c.data[index].isEmpty7To8),
+                        ),
+                        DataCell(
+                          getIcon(c.data[index].isEmpty9To10),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             );

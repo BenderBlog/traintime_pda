@@ -76,7 +76,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/Empty-Cover.jpg
-    - assets/Humpy-Score.jpg
     - assets/Credit.jpg
     - assets/Ray.jpg
     - assets/icon.png

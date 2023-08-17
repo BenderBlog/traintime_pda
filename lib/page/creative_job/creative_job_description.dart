@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
@@ -24,35 +26,46 @@ class CreativeJobDescription extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          Text(
-            job.name,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 4.0,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              TagsBoxes(
-                text: job.skill,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: sheetMaxWidth - 16,
+              minWidth: min(
+                MediaQuery.of(context).size.width,
+                sheetMaxWidth - 16,
               ),
-              ...List.generate(
-                job.tags.length,
-                (i) => TagsBoxes(
-                  text: job.tags[i],
-                  backgroundColor: Colors.grey.shade300,
-                  textColor: Colors.black,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  job.name,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          MarkdownBody(data: '''
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    TagsBoxes(
+                      text: job.skill,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    ...List.generate(
+                      job.tags.length,
+                      (i) => TagsBoxes(
+                        text: job.tags[i],
+                        backgroundColor: Colors.grey.shade300,
+                        textColor: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                MarkdownBody(data: '''
 
 招募 ${job.exceptNumber} 人 · ${job.project.name}
 
@@ -72,7 +85,10 @@ ${job.reward}
 
 ${job.progress.isEmpty ? "提供者没有提供进度" : job.progress}
 '''),
-        ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

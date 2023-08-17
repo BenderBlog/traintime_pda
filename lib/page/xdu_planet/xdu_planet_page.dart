@@ -8,6 +8,8 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -90,17 +92,28 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     width: 32,
                     height: 32,
                   );
-              return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) => ListTile(
-                  leading: icon(index),
-                  title: Text(data[keys[index]]!.name),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => PersonalPage(
-                      index: keys[index],
-                      repo: data[keys[index]]!,
+              return Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: sheetMaxWidth - 16,
+                    minWidth: min(
+                      MediaQuery.of(context).size.width,
+                      sheetMaxWidth - 16,
                     ),
-                  )),
+                  ),
+                  child: ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) => ListTile(
+                      leading: icon(index),
+                      title: Text(data[keys[index]]!.name),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PersonalPage(
+                          index: keys[index],
+                          repo: data[keys[index]]!,
+                        ),
+                      )),
+                    ),
+                  ),
                 ),
               );
             } catch (e) {

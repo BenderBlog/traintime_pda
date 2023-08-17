@@ -50,55 +50,60 @@ class _SportScoreWindowState extends State<SportScoreWindow>
       SportSession().getScore();
     }
     super.build(context);
-    return EasyRefresh.builder(
-      controller: _controller,
-      clipBehavior: Clip.none,
-      header: const MaterialHeader(
-        clamping: true,
-        showBezierBackground: false,
-        bezierBackgroundAnimation: false,
-        bezierBackgroundBounce: false,
-        springRebound: false,
-      ),
-      onRefresh: () async {
-        await SportSession().getScore();
-        _controller.finishRefresh();
-      },
-      refreshOnStart: true,
-      childBuilder: (context, physics) => Obx(() {
-        if (sportScore.value.situation == null &&
-            sportScore.value.detail.isNotEmpty) {
-          List things = [
-            Card(
-              elevation: 0,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("目前四年总分 ${sportScore.value.total}"),
-                    Text(sportScore.value.detail
-                        .substring(0, sportScore.value.detail.indexOf("\\"))),
-                  ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+        child: EasyRefresh.builder(
+          controller: _controller,
+          clipBehavior: Clip.none,
+          header: const MaterialHeader(
+            clamping: true,
+            showBezierBackground: false,
+            bezierBackgroundAnimation: false,
+            bezierBackgroundBounce: false,
+            springRebound: false,
+          ),
+          onRefresh: () async {
+            await SportSession().getScore();
+            _controller.finishRefresh();
+          },
+          refreshOnStart: true,
+          childBuilder: (context, physics) => Obx(() {
+            if (sportScore.value.situation == null &&
+                sportScore.value.detail.isNotEmpty) {
+              List things = [
+                Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("目前四年总分 ${sportScore.value.total}"),
+                        Text(sportScore.value.detail.substring(
+                            0, sportScore.value.detail.indexOf("\\"))),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ];
-          things.addAll(List.generate(sportScore.value.list.length,
-                  (index) => ScoreCard(toUse: sportScore.value.list[index]))
-              .reversed);
-          return dataList<dynamic, Widget>(
-            things,
-            (toUse) => toUse,
-            physics: physics,
-          );
-        } else if (sportScore.value.situation == "正在获取") {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return Center(child: Text("坏事: ${sportScore.value.situation}"));
-        }
-      }),
+              ];
+              things.addAll(List.generate(sportScore.value.list.length,
+                      (index) => ScoreCard(toUse: sportScore.value.list[index]))
+                  .reversed);
+              return dataList<dynamic, Widget>(
+                things,
+                (toUse) => toUse,
+                physics: physics,
+              );
+            } else if (sportScore.value.situation == "正在获取") {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return Center(child: Text("坏事: ${sportScore.value.situation}"));
+            }
+          }),
+        ),
+      ),
     );
   }
 }

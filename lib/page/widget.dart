@@ -5,7 +5,6 @@ Copyright 2023 SuperBart
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 */
 
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 /// Check the width
 bool isPhone(context) => MediaQuery.of(context).size.width < 480;
 bool isDesktop(context) => MediaQuery.of(context).size.width > 840;
+const double sheetMaxWidth = 600;
 
 /// Something related to the box.
 const double widthOfSquare = 30.0;

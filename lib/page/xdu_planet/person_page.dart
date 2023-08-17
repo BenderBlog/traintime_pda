@@ -8,6 +8,8 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import 'dart:math';
+
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -60,25 +62,36 @@ class _PersonalPageState extends State<PersonalPage> {
           if (snapshot.connectionState == ConnectionState.done) {
             try {
               var data = snapshot.data!;
-              return ListView.builder(
-                itemCount: data.list.length,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text(
-                    data.list[index].title,
+              return Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: sheetMaxWidth - 16,
+                    minWidth: min(
+                      MediaQuery.of(context).size.width,
+                      sheetMaxWidth - 16,
+                    ),
                   ),
-                  subtitle: Text(
-                    "发布于：${Jiffy.parseFromDateTime(data.list[index].time).format(pattern: "yyyy年MM月dd日")}",
-                  ),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ContentPage(
-                        feed: widget.index,
-                        index: index,
-                        authorName: widget.repo.name,
-                        title: data.list[index].title,
-                        time: Jiffy.parseFromDateTime(data.list[index].time)
-                            .format(pattern: "yyyy年MM月dd日"),
-                        link: data.list[index].url,
+                  child: ListView.builder(
+                    itemCount: data.list.length,
+                    itemBuilder: (context, index) => ListTile(
+                      title: Text(
+                        data.list[index].title,
+                      ),
+                      subtitle: Text(
+                        "发布于：${Jiffy.parseFromDateTime(data.list[index].time).format(pattern: "yyyy年MM月dd日")}",
+                      ),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ContentPage(
+                            feed: widget.index,
+                            index: index,
+                            authorName: widget.repo.name,
+                            title: data.list[index].title,
+                            time: Jiffy.parseFromDateTime(data.list[index].time)
+                                .format(pattern: "yyyy年MM月dd日"),
+                            link: data.list[index].url,
+                          ),
+                        ),
                       ),
                     ),
                   ),

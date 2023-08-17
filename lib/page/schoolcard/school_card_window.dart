@@ -77,30 +77,53 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                 },
               );
             } else if (c.isGet.value) {
-              var topRow = const [
-                DataColumn2(
-                  size: ColumnSize.S,
-                  label: Center(
-                    child: Text('商户名称'),
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+                  child: DataTable2(
+                    headingRowColor:
+                        MaterialStatePropertyAll<Color>(Colors.grey.shade100),
+                    columnSpacing: 0,
+                    horizontalMargin: 6,
+                    columns: const [
+                      DataColumn2(
+                        size: ColumnSize.S,
+                        label: Center(
+                          child: Text('商户名称'),
+                        ),
+                      ),
+                      DataColumn2(
+                        size: ColumnSize.S,
+                        label: Center(
+                          child: Text('金额'),
+                        ),
+                      ),
+                      DataColumn2(
+                        size: ColumnSize.L,
+                        label: Center(
+                          child: Text('时间'),
+                        ),
+                      ),
+                    ],
+                    rows: List<DataRow>.generate(
+                      c.getPaid.length,
+                      (index) => DataRow(
+                        cells: [
+                          DataCell(
+                            Center(
+                              child: Text(
+                                c.getPaid[index].place,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                          DataCell(Center(child: Text(c.getPaid[index].money))),
+                          DataCell(Center(child: Text(c.getPaid[index].date))),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                DataColumn2(
-                  size: ColumnSize.S,
-                  label: Center(
-                    child: Text('金额'),
-                  ),
-                ),
-                DataColumn2(
-                  size: ColumnSize.L,
-                  label: Center(
-                    child: Text('时间'),
-                  ),
-                ),
-              ];
-              return PaginatedDataTable2(
-                columnSpacing: 0,
-                columns: topRow,
-                source: RecordData(data: c.getPaid),
               );
             } else {
               return const Center(
