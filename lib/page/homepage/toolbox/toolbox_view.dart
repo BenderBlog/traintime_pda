@@ -21,7 +21,6 @@ class ToolBoxView extends StatelessWidget {
       body: GridView(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedHeight(
           maxCrossAxisExtent: 160,
           height: 84,
