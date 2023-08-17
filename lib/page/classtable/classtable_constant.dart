@@ -51,3 +51,5 @@ List<String> weekList = [
   '周六',
   '周日',
 ];
+
+String pageTitle = "我的课表";

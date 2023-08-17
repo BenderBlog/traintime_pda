@@ -20,9 +20,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
 
 /// The controllers and shared datas of the class table.
 class ClassTableState extends InheritedWidget {
@@ -54,11 +55,6 @@ class ClassTableState extends InheritedWidget {
   /// The changeable data of the state.
   late final ClassTableWidgetState controllers;
 
-  /// Refrence [ClassTableWidgetState.isTopRowLocked]
-  bool get isTopRowLocked => controllers.isTopRowLocked;
-  set isTopRowLocked(bool status) =>
-      status ? controllers.lockTopRow() : controllers.unlockTopRow();
-
   ClassTableState({
     super.key,
     required super.child,
@@ -79,7 +75,10 @@ class ClassTableState extends InheritedWidget {
     } else {
       toShowChoiceWeek = currentWeek;
     }
-    controllers = ClassTableWidgetState(choiceWeek: toShowChoiceWeek, totalWeek: semesterLength,);
+    controllers = ClassTableWidgetState(
+      chosenWeek: toShowChoiceWeek,
+    );
+    log("Chosen Week is ${controllers.chosenWeek}");
   }
 
   static ClassTableState? of(BuildContext context) {
@@ -94,54 +93,10 @@ class ClassTableState extends InheritedWidget {
 
 /// The changeable data of the class table state.
 class ClassTableWidgetState extends ChangeNotifier {
-  /// Week choice row controller.
-  late ScrollController rowControl;
-
-  /// Classtable pageView controller.
-  late PageController pageControl;
-
   /// Current showing week.
-  late int chosenWeek;
-
-  /// From the length of the semester.
-  final int totalWeek;
-
-  /// A lock of the week choice row.
-  ///
-  /// When locked, choiceWeek cannot be changed.
-  bool isTopRowLocked = false;
-
-  void changeTopRow(int index) => rowControl.animateTo(
-        (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
-        curve: Curves.easeInOut,
-        duration: const Duration(milliseconds: changePageTime ~/ 1.5),
-      );
+  int chosenWeek;
 
   ClassTableWidgetState({
-    required int choiceWeek,
-    required this.totalWeek,
-  }) {
-    chosenWeek = choiceWeek;
-    pageControl = PageController(
-      initialPage: chosenWeek,
-      keepPage: true,
-    );
-
-    /// (weekButtonWidth + 2 * weekButtonHorizontalPadding)
-    /// is the width of the week choose button.
-    rowControl = ScrollController(
-      initialScrollOffset:
-        totalWeek - chosenWeek < 5 ? (weekButtonWidth + 2 * weekButtonHorizontalPadding) * (totalWeek - 5)
-        :
-          (weekButtonWidth + 2 * weekButtonHorizontalPadding) * chosenWeek,
-    );
-  }
-
-  void lockTopRow() => isTopRowLocked = true;
-
-  /// When top row unlocked, notify the week choice row to refresh the state.
-  void unlockTopRow() {
-    isTopRowLocked = false;
-    notifyListeners();
-  }
+    required this.chosenWeek,
+  });
 }
