@@ -64,6 +64,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
+  image_path_ios: "assets/Icon-App-iTunes.png"
   remove_alpha_ios: true
   image_path: "assets/icon.png"
   min_sdk_android: 21
@@ -75,6 +76,7 @@ flutter_native_splash:
 flutter:
   uses-material-design: true
   assets:
+    - assets/Icon-App-iTunes.png
     - assets/Empty-Cover.jpg
     - assets/Credit.jpg
     - assets/Ray.jpg

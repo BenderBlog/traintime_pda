@@ -42,6 +42,8 @@ Tools • Dart 3.0.6 • DevTools 2.23.1
 
 注意：要编译此项目，Dart 编译器必须在 3.0 以上。
 
+还有，本代码附带 XDYou 的图标，该图标仅作为标识 iOS 授权者编译版本而使用。
+
 ## 感谢名单
 
 ![](https://raw.githubusercontent.com/BenderBlog/watermeter/main/assets/Credit.jpg)

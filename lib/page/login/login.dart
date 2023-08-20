@@ -7,6 +7,8 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
@@ -38,14 +40,27 @@ class _LoginWindowState extends State<LoginWindow> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            "assets/icon.png",
-            width: 120,
-            height: 120,
-          ),
-          const SizedBox(height: 15.0),
-          const Text('请登录 Traintime PDA',
-              style: TextStyle(
+          if (Platform.isIOS || Platform.isMacOS)
+            ClipRRect(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(29),
+              ),
+              child: Image.asset(
+                "assets/Icon-App-iTunes.png",
+                width: 120,
+                height: 120,
+              ),
+            )
+          else
+            Image.asset(
+              "assets/icon.png",
+              width: 120,
+              height: 120,
+            ),
+          const SizedBox(height: 16.0),
+          Text(
+              '请登录 ${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"}',
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 26,
               )),
@@ -107,9 +122,8 @@ class _LoginWindowState extends State<LoginWindow> {
           const SizedBox(height: 20.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA267AC),
+            child: FilledButton(
+              style: FilledButton.styleFrom(
                 padding: const EdgeInsets.all(20.0),
                 minimumSize: const Size(double.infinity, 60),
                 shape: RoundedRectangleBorder(
@@ -118,9 +132,9 @@ class _LoginWindowState extends State<LoginWindow> {
               child: const Text(
                 "登录",
                 style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0,
+                ),
               ),
               onPressed: () async {
                 if (_idsAccountController.text.length == 11 &&
@@ -191,7 +205,6 @@ class _LoginWindowState extends State<LoginWindow> {
                 child: const Text(
                   '清除登录缓存',
                   style: TextStyle(
-                    color: Color(0xFFA267AC),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -209,7 +222,6 @@ class _LoginWindowState extends State<LoginWindow> {
                 child: const Text(
                   '查看网络交互',
                   style: TextStyle(
-                    color: Color(0xFFA267AC),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -221,7 +233,6 @@ class _LoginWindowState extends State<LoginWindow> {
                 child: const Text(
                   'XDU Planet',
                   style: TextStyle(
-                    color: Color(0xFFA267AC),
                     fontWeight: FontWeight.bold,
                   ),
                 ),

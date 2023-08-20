@@ -49,7 +49,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
                 onPressed: (context) => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const AboutPage(),
+                    builder: (context) => AboutPage(),
                   ),
                 ),
               ),

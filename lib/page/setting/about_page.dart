@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io' show Platform;
 
 class AboutPage extends StatelessWidget {
-  static const license = '''
-        <h1 style="text-align: center">Traintime PDA 软件最终用户许可协议</h1>
+  final String license = '''
+        <h1 style="text-align: center">${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} 软件最终用户许可协议</h1>
         <p style="text-align: center"><i>BenderBlog Rodriguez, 2023-08-10</i></p>
 
         <h2>一、定义</h2>
             <ol>
-            <li>本软件产物：指 Traintime PDA ，他也可以被称为 Watermeter 。</li>
+            <li>本软件产物：指 ${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} ，他也可以被称为 ${Platform.isIOS || Platform.isMacOS ? "Traintime PDA" : "XDYou"} 。</li>
             <li>代码：指生成本软件的来源，地址列于附件二。</li>
             <li>编译：指从代码生成本软件的步骤。</li>
             <li>授权者：指本软件的作者(或作者团体)。</li>
@@ -47,7 +48,7 @@ class AboutPage extends StatelessWidget {
             本软件所涉及的服务中，除 XDU Planet 是授权者以服务器-客户端单向信息传递方式提供外，其他服务均与授权者无关。   
 ''';
 
-  const AboutPage({super.key});
+  AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
