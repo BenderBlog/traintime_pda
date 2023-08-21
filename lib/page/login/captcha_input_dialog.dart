@@ -35,14 +35,13 @@ class CaptchaInputDialog extends StatelessWidget {
             autofocus: true,
             style: const TextStyle(fontSize: 20),
             controller: _captchaController,
-            keyboardType: TextInputType.number,
             decoration: InputDecoration(
               hintText: "输入验证码",
               fillColor: Colors.grey.withOpacity(0.4),
               filled: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(24),
                 borderSide: BorderSide.none,
               ),
             ),
