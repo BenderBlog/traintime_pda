@@ -1,6 +1,8 @@
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
@@ -16,6 +18,9 @@ class PadMainPage extends StatelessWidget {
   const PadMainPage({super.key});
 
   final inBetweenCardHeight = 136.0;
+
+  double width(context) => MediaQuery.sizeOf(context).width;
+  double height(context) => MediaQuery.sizeOf(context).height;
 
   @override
   Widget build(BuildContext context) {
@@ -45,39 +50,51 @@ class PadMainPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Row(
+      body: ListView(
         children: [
-          Expanded(
-            child: ListView(
-              children: [
-                SizedBox(
-                  height: inBetweenCardHeight,
-                  child: const ClassTableCard(),
-                ),
-                Obx(
-                  () => SizedBox(
-                    height: punchData.value.all.isNotEmpty ? 200 : 100,
-                    child: const SportCard(),
-                  ),
-                ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.025,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 140),
+              child: const ClassTableCard(),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.025),
+            child: GridView.count(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 4,
+              childAspectRatio:
+                  width(context) > height(context) ? 7 / 4 : 3 / 2,
+              children: const [
+                SportCard(),
+                ElectricityCard(),
+                LibraryCard(),
               ],
             ),
           ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.20 < 200
-                ? 200
-                : MediaQuery.of(context).size.width * 0.20,
-            child: ListView(
+          Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.025),
+            child: GridView.count(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 4,
+              childAspectRatio: width(context) > height(context) ? 5 / 2 : 2,
               children: const [
-                ElectricityCard(),
-                LibraryCard(),
+                SchoolCardInfoCard(),
                 ScoreCard(),
                 ExamCard(),
-                SchoolCardInfoCard(),
                 EmptyClassroomCard(),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

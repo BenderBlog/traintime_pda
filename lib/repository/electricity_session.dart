@@ -29,7 +29,7 @@ Future<void> update() async {
     await ElectricitySession().updateInformation();
     isNotice.value = false;
   } on NotSchoolNetworkException {
-    electricityInfo.value = "目前不是校园网";
+    electricityInfo.value = "目前非校园网";
   } on DioException catch (e) {
     developer.log(
       "Network error: $e",

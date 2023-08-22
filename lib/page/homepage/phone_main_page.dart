@@ -16,7 +16,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 class PhoneMainPage extends StatelessWidget {
   const PhoneMainPage({super.key});
 
-  final classCardHeight = 135.0;
+  final classCardHeight = 140.0;
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +64,17 @@ class PhoneMainPage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-                const ClassTableCard(),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.025,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: classCardHeight),
+                    child: const ClassTableCard(),
+                  ),
+                ),
               ],
             ),
-            const SportCard(),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),
@@ -78,6 +85,7 @@ class PhoneMainPage extends StatelessWidget {
                 crossAxisCount: 2,
                 childAspectRatio: MediaQuery.of(context).size.width / 260,
                 children: const [
+                  SportCard(),
                   ElectricityCard(),
                   LibraryCard(),
                 ],

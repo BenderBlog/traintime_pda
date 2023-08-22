@@ -69,6 +69,7 @@ class SportSession {
       toReturn.all.sort((a, b) => a.time.diff(b.time).toInt());
       toReturn.allTime++;
       toReturn.valid++;
+      punchData.value.situation = null;
     } on NoPasswordException {
       toReturn.situation = "无密码信息";
     } on LoginFailedException catch (e) {

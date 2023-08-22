@@ -32,46 +32,54 @@ class ElectricityCard extends StatelessWidget {
         owe_session.update();
       },
       child: MainPageCard(
-        isLong: false,
         icon: Icons.electric_meter_rounded,
         text: "电量信息",
         children: [
           Obx(
-            () => RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+            () => Expanded(
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                    children: !electricity_session.isNotice.value
+                        ? [
+                            TextSpan(
+                              text: electricity_session.electricityInfo.value,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 24,
+                              ),
+                            ),
+                            TextSpan(
+                              text: " 度电",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ]
+                        : [
+                            TextSpan(
+                              text: electricity_session.electricityInfo.value,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                  ),
                 ),
-                children: !electricity_session.isNotice.value
-                    ? [
-                        TextSpan(
-                          text: electricity_session.electricityInfo.value,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 24,
-                          ),
-                        ),
-                        TextSpan(
-                          text: " 度电",
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ]
-                    : [
-                        TextSpan(
-                          text: electricity_session.electricityInfo.value,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
               ),
             ),
+          ),
+          const Divider(
+            height: 6.0,
+            color: Colors.transparent,
           ),
           Obx(() => Text(owe_session.owe.value)),
         ],

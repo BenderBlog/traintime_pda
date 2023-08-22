@@ -11,6 +11,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/repository/electricity_session.dart' as electricity;
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
@@ -18,6 +19,7 @@ import 'dart:developer' as developer;
 void update() {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
+  final libraryController = Get.put(LibraryController());
   // Update Classtable
   developer.log(
     "Updating current class",
@@ -43,4 +45,6 @@ void update() {
     name: "Homepage Update",
   );
   SportSession().getPunch();
+  // Update Library
+  libraryController.onReady();
 }
