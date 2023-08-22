@@ -7,10 +7,9 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+import 'package:watermeter/page/login/app_icon.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -34,37 +33,51 @@ class _LoginWindowState extends State<LoginWindow> {
   /// Can I see the password?
   bool _couldNotView = true;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+  List<Widget> buttons() => [
+        TextButton(
+          child: const Text(
+            '清除登录缓存',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            NetworkSession().clearCookieJar().then(
+                  (value) => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('清理缓存成功'),
+                    ),
+                  ),
+                );
+          },
+        ),
+        TextButton(
+          child: const Text(
+            '查看网络交互',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            alice.showInspector();
+          },
+        ),
+        TextButton(
+          child: const Text(
+            'XDU Planet',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const XDUPlanetPage(),
+          )),
+        ),
+      ];
+
+  Widget contentColumn() => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (Platform.isIOS || Platform.isMacOS)
-            ClipRRect(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(29),
-              ),
-              child: Image.asset(
-                "assets/Icon-App-iTunes.png",
-                width: 120,
-                height: 120,
-              ),
-            )
-          else
-            Image.asset(
-              "assets/icon.png",
-              width: 120,
-              height: 120,
-            ),
-          const SizedBox(height: 16.0),
-          Text(
-              '请登录 ${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 26,
-              )),
-          const SizedBox(height: 40.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: Container(
@@ -87,7 +100,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 8.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: Container(
@@ -119,7 +132,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 8.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: FilledButton(
@@ -139,54 +152,7 @@ class _LoginWindowState extends State<LoginWindow> {
               onPressed: () async {
                 if (_idsAccountController.text.length == 11 &&
                     _idsPasswordController.text.isNotEmpty) {
-                  bool isGood = true;
-                  ProgressDialog pd = ProgressDialog(context: context);
-                  pd.show(
-                    msg: '正在登录学校一站式',
-                    max: 100,
-                    hideValue: true,
-                    completed: Completed(completedMsg: "登录成功"),
-                  );
-                  EhallSession ses = EhallSession();
-                  try {
-                    await ses.login(
-                      username: _idsAccountController.text,
-                      password: _idsPasswordController.text,
-                      onResponse: (int number, String status) =>
-                          pd.update(msg: status, value: number),
-                      getCaptcha: (String cookieStr) {
-                        return showDialog<String>(
-                            context: context,
-                            builder: (context) =>
-                                CaptchaInputDialog(cookie: cookieStr));
-                      },
-                    );
-                    if (!mounted) return;
-                    if (isGood == true) {
-                      preference.setString(
-                        preference.Preference.idsAccount,
-                        _idsAccountController.text,
-                      );
-                      preference.setString(
-                        preference.Preference.idsPassword,
-                        _idsPasswordController.text,
-                      );
-                      await ses.getInformation();
-                      if (mounted) {
-                        if (pd.isOpen()) pd.close();
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                              builder: (context) => const HomePage()),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    isGood = false;
-                    pd.close();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
+                  await login();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -197,52 +163,94 @@ class _LoginWindowState extends State<LoginWindow> {
               },
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 8.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                child: const Text(
-                  '清除登录缓存',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () {
-                  NetworkSession().clearCookieJar().then(
-                        (value) => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('清理缓存成功'),
-                          ),
-                        ),
-                      );
-                },
-              ),
-              TextButton(
-                child: const Text(
-                  '查看网络交互',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () {
-                  alice.showInspector();
-                },
-              ),
-              TextButton(
-                child: const Text(
-                  'XDU Planet',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const XDUPlanetPage(),
-                )),
-              ),
-            ],
-          )
+            children: buttons(),
+          ),
         ],
+      );
+
+  Future<void> login() async {
+    bool isGood = true;
+    ProgressDialog pd = ProgressDialog(context: context);
+    pd.show(
+      msg: '正在登录学校一站式',
+      max: 100,
+      hideValue: true,
+      completed: Completed(completedMsg: "登录成功"),
+    );
+    EhallSession ses = EhallSession();
+    try {
+      await ses.login(
+        username: _idsAccountController.text,
+        password: _idsPasswordController.text,
+        onResponse: (int number, String status) =>
+            pd.update(msg: status, value: number),
+        getCaptcha: (String cookieStr) {
+          return showDialog<String>(
+              context: context,
+              builder: (context) => CaptchaInputDialog(cookie: cookieStr));
+        },
+      );
+      if (!mounted) return;
+      if (isGood == true) {
+        preference.setString(
+          preference.Preference.idsAccount,
+          _idsAccountController.text,
+        );
+        preference.setString(
+          preference.Preference.idsPassword,
+          _idsPasswordController.text,
+        );
+        await ses.getInformation();
+        if (mounted) {
+          if (pd.isOpen()) pd.close();
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
+      }
+    } catch (e) {
+      isGood = false;
+      pd.close();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  double get width => MediaQuery.sizeOf(context).width;
+  double get height => MediaQuery.sizeOf(context).height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isPhone(context) ? 0.0 : width * 0.2,
+          vertical: height * 0.1,
+        ),
+        child: width / height > 1.0
+            ? Row(
+                children: [
+                  const AppIconWidget(),
+                  const SizedBox(
+                    width: 24,
+                  ),
+                  Expanded(
+                    child: contentColumn(),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const AppIconWidget(),
+                  const SizedBox(height: 20.0),
+                  contentColumn(),
+                ],
+              ),
       ),
     );
   }

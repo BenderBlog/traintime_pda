@@ -19,8 +19,9 @@ class CaptchaInputDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     NetworkImage cappic = NetworkImage(
-        "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
-        headers: {"Cookie": cookie});
+      "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
+      headers: {"Cookie": cookie},
+    );
 
     return AlertDialog(
       title: const Text('请输入验证码'),
