@@ -73,6 +73,8 @@ class SchoolCardSession extends IDSSession {
   }
 
   Future<String> getMoney() async {
+    developer.log("Received: $virtualCardUrl.", name: "SchoolCardSession");
+    developer.log("Received: $personalCenter.", name: "SchoolCardSession");
     var response = await dio
         .get("https://v8scan.xidian.edu.cn/$personalCenter")
         .then((value) => BeautifulSoup(value.data));

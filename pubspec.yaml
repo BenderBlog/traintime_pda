@@ -51,6 +51,8 @@ dependencies:
   webview_flutter: ^4.2.2
   package_info_plus: ^4.1.0
   flutter_markdown: ^0.6.17+1
+  flutter_layout_grid: ^2.0.4
+  styled_widget: ^0.4.1
 
 dev_dependencies:
   flutter_test:

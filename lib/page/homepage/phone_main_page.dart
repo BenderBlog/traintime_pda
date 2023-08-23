@@ -8,7 +8,7 @@ import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_
 import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/empty_classroom_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/info_widget/main_page_card/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -88,6 +88,7 @@ class PhoneMainPage extends StatelessWidget {
                   SportCard(),
                   ElectricityCard(),
                   LibraryCard(),
+                  SchoolCardInfoCard(),
                 ],
               ),
             ),
@@ -101,7 +102,6 @@ class PhoneMainPage extends StatelessWidget {
                 crossAxisCount: 2,
                 childAspectRatio: MediaQuery.of(context).size.width / 160,
                 children: const [
-                  SchoolCardInfoCard(),
                   ScoreCard(),
                   ExamCard(),
                   EmptyClassroomCard(),

@@ -128,11 +128,12 @@ class SportCard extends StatelessWidget {
           children: [
             Expanded(
               child: Align(
-                alignment: Alignment.bottomLeft,
+                alignment: Alignment.centerLeft,
                 child: RichText(
                   text: TextSpan(
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontSize: 20,
                     ),
                     children: punchData.value.situation == null
                         ? [
@@ -140,35 +141,20 @@ class SportCard extends StatelessWidget {
                               text: "${punchData.value.valid}",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
-                                fontSize: 24,
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: " 打卡次数",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 18,
-                              ),
                             ),
                           ]
                         : [
                             TextSpan(
                               text: "${punchData.value.situation}",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 20,
-                              ),
                             ),
                           ],
                   ),
                 ),
               ),
-            ),
-            const Divider(
-              height: 6.0,
-              color: Colors.transparent,
             ),
             Text(
                 punchData.value.situation ?? "总共 ${punchData.value.allTime} 次"),

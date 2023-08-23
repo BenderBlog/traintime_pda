@@ -38,11 +38,12 @@ class ElectricityCard extends StatelessWidget {
           Obx(
             () => Expanded(
               child: Align(
-                alignment: Alignment.bottomLeft,
+                alignment: Alignment.centerLeft,
                 child: RichText(
                   text: TextSpan(
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontSize: 20,
                     ),
                     children: !electricity_session.isNotice.value
                         ? [
@@ -50,36 +51,19 @@ class ElectricityCard extends StatelessWidget {
                               text: electricity_session.electricityInfo.value,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
-                                fontSize: 24,
                               ),
                             ),
-                            TextSpan(
-                              text: " 度电",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 18,
-                              ),
-                            ),
+                            const TextSpan(text: " 度电"),
                           ]
                         : [
                             TextSpan(
                               text: electricity_session.electricityInfo.value,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 20,
-                              ),
                             ),
                           ],
                   ),
                 ),
               ),
             ),
-          ),
-          const Divider(
-            height: 6.0,
-            color: Colors.transparent,
           ),
           Obx(() => Text(owe_session.owe.value)),
         ],

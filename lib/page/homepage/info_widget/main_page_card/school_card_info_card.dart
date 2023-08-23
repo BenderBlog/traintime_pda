@@ -1,16 +1,16 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/main_page_card.dart';
-import 'package:watermeter/page/library/library_window.dart';
+import 'package:watermeter/page/schoolcard/school_card_window.dart';
 import 'package:watermeter/repository/network_session.dart';
 
-class LibraryCard extends StatelessWidget {
-  const LibraryCard({super.key});
+class SchoolCardInfoCard extends StatelessWidget {
+  const SchoolCardInfoCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<LibraryController>(
+    return GetBuilder<SchoolCardController>(
       builder: (c) => GestureDetector(
         onTap: () async {
           if (offline) {
@@ -18,22 +18,10 @@ class LibraryCard extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               content: Text("脱机模式下，一站式相关功能全部禁止使用"),
             ));
-          } else if (!c.isGet.value) {
-            if (c.error.value) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("获取图书馆信息发生故障，长按该卡片获取更新"),
-              ));
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("正在获取，请稍后再来看"),
-              ));
-            }
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => LibraryWindow(),
+                builder: (context) => const SchoolCardWindow(),
               ),
             );
           }
@@ -44,13 +32,13 @@ class LibraryCard extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               content: Text("脱机模式下，一站式相关功能全部禁止使用"),
             ));
-          } else if (!(c.isGet.value && !c.error.value)) {
-            c.getBorrowList();
+          } else {
+            c.updateMoney();
           }
         },
         child: MainPageCard(
-          icon: Icons.local_library,
-          text: "图书馆信息",
+          icon: Icons.money_rounded,
+          text: "流水查询",
           children: [
             Obx(
               () => Expanded(
@@ -65,16 +53,16 @@ class LibraryCard extends StatelessWidget {
                       children: c.isGet.value
                           ? [
                               TextSpan(
-                                text: "${c.borrowList.length}",
+                                text: "${c.money}",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
-                              const TextSpan(text: " 本在借"),
+                              const TextSpan(text: " 元余额"),
                             ]
                           : [
                               TextSpan(
-                                text: c.error.value ? "发生错误" : "正在获取",
+                                text: c.error.isNotEmpty ? "发生错误" : "正在获取",
                               ),
                             ],
                     ),
@@ -82,13 +70,13 @@ class LibraryCard extends StatelessWidget {
                 ),
               ),
             ),
-            Obx(() {
-              if (c.isGet.value) {
-                return Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍");
-              } else {
-                return Text(c.error.value ? "目前无法获取信息" : "正在查询信息中");
-              }
-            }),
+            Text(
+              c.isGet.value
+                  ? "点开查询流水"
+                  : c.error.isNotEmpty
+                      ? "目前无法获取信息"
+                      : "正在查询信息中",
+            ),
           ],
         ),
       ),

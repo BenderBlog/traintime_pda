@@ -1,17 +1,17 @@
-import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/empty_classroom_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/info_widget/main_page_card/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
-import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PadMainPage extends StatelessWidget {
@@ -22,20 +22,26 @@ class PadMainPage extends StatelessWidget {
   double width(context) => MediaQuery.sizeOf(context).width;
   double height(context) => MediaQuery.sizeOf(context).height;
 
+  TextStyle textStyle(context) => TextStyle(
+        fontSize: 20,
+        color: Theme.of(context).colorScheme.onPrimaryContainer,
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: GetBuilder<ClassTableController>(
-          builder: (c) => Text(
-            c.isGet
+          builder: (c) {
+            String text = c.isGet
                 ? c.isNotVacation
                     ? "第 ${c.currentWeek + 1} 周"
                     : "假期中"
                 : c.error != null
                     ? "加载错误"
-                    : "正在加载",
-          ),
+                    : "正在加载";
+            return Text(text);
+          },
         ),
         actions: [
           IconButton(
@@ -51,49 +57,59 @@ class PadMainPage extends StatelessWidget {
         ],
       ),
       body: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.025,
+        ),
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.025,
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 140),
-              child: const ClassTableCard(),
-            ),
+          Text(
+            "日程安排",
+            style: textStyle(context),
+          ).padding(
+            left: 16,
+            top: 8,
+            right: 0,
+            bottom: 0,
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.025),
-            child: GridView.count(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
-              childAspectRatio:
-                  width(context) > height(context) ? 7 / 4 : 3 / 2,
-              children: const [
-                SportCard(),
-                ElectricityCard(),
-                LibraryCard(),
-              ],
-            ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 140),
+            child: const ClassTableCard(),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.025),
-            child: GridView.count(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
-              childAspectRatio: width(context) > height(context) ? 5 / 2 : 2,
-              children: const [
-                SchoolCardInfoCard(),
-                ScoreCard(),
-                ExamCard(),
-                EmptyClassroomCard(),
-              ],
-            ),
+          Text(
+            "动态信息",
+            style: textStyle(context),
+          ).padding(
+            left: 16,
+            top: 8,
+            right: 0,
+            bottom: 0,
+          ),
+          LayoutGrid(
+            columnSizes: [1.fr, 1.fr, 1.fr, 1.fr],
+            rowSizes: const [auto],
+            children: const [
+              SportCard(),
+              ElectricityCard(),
+              LibraryCard(),
+              SchoolCardInfoCard(),
+            ],
+          ),
+          Text(
+            "常用工具",
+            style: textStyle(context),
+          ).padding(
+            left: 16,
+            top: 8,
+            right: 0,
+            bottom: 0,
+          ),
+          LayoutGrid(
+            columnSizes: [1.fr, 1.fr, 1.fr, 1.fr],
+            rowSizes: const [auto],
+            children: const [
+              ScoreCard(),
+              ExamCard(),
+              EmptyClassroomCard(),
+            ],
           ),
         ],
       ),
