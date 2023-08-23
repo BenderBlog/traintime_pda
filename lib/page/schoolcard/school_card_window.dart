@@ -51,9 +51,9 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                       selectedDayHighlightColor:
                           Theme.of(context).colorScheme.primary,
                     ),
-                    dialogSize: const Size(325, 400),
+                    dialogSize: const Size(324, 400),
                     value: c.timeRange,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(16),
                   ).then((value) {
                     if (value?.length == 2) {
                       if (value?[0] != null && value?[1] != null) {
@@ -69,14 +69,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         ),
         body: Obx(
           () {
-            if (c.error.value.isNotEmpty) {
-              return ReloadWidget(
-                function: () async {
-                  await c.relogin();
-                  await c.refreshPaidRecord();
-                },
-              );
-            } else if (c.isGet.value) {
+            if (c.isGet.value) {
               return Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
@@ -124,6 +117,13 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                     ),
                   ),
                 ),
+              );
+            } else if (c.error.value.isNotEmpty) {
+              return ReloadWidget(
+                function: () async {
+                  await c.relogin();
+                  await c.refreshPaidRecord();
+                },
               );
             } else {
               return const Center(

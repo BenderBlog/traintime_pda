@@ -30,9 +30,10 @@ class SchoolCardController extends GetxController {
   @override
   void onReady() async {
     try {
-      super.onReady();
+      isGet.value = false;
       await session.initSession();
       await updateMoney();
+      isGet.value = true;
     } on DioException catch (e, s) {
       developer.log(
         "Network exception: ${e.message}\nStack: $s",
@@ -46,19 +47,20 @@ class SchoolCardController extends GetxController {
       );
       error.value = "未知错误，感兴趣的话，请接到电脑 adb 查看日志。";
     }
+    super.onReady();
   }
 
   Future<void> refreshPaidRecord() async {
     try {
-      isGet.value = false;
       error.value = "";
       getPaid.clear();
       getPaid.value = await session.getPaidStatus(
         Jiffy.parseFromDateTime(timeRange[0]!).format(pattern: "yyyy-MM-dd"),
         Jiffy.parseFromDateTime(timeRange[1]!).format(pattern: "yyyy-MM-dd"),
       );
-      isGet.value = true;
-    } catch (e) {
+    } catch (e, s) {
+      developer.log(e.toString());
+      developer.log(s.toString());
       error.value = "凭证过期，重新登录";
     }
     update();
@@ -67,6 +69,8 @@ class SchoolCardController extends GetxController {
   Future<void> relogin() async => await session.initSession();
 
   Future<void> updateMoney() async {
+    isGet.value = false;
     money.value = await session.getMoney();
+    isGet.value = true;
   }
 }

@@ -18,6 +18,16 @@ class SchoolCardInfoCard extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               content: Text("脱机模式下，一站式相关功能全部禁止使用"),
             ));
+          } else if (c.error.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text("遇到错误：${c.error}"),
+            ));
+          } else if (!c.isGet.value) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text("仍然在加载中"),
+            ));
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
