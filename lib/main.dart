@@ -8,6 +8,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -34,14 +36,16 @@ void main() async {
 
   // Disable horizontal screen in phone.
   // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
-  final data = WidgetsBinding
-          .instance.platformDispatcher.views.first.physicalSize.width /
-      WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+  final data = WidgetsBinding.instance.platformDispatcher.views.first;
+
   developer.log(
-    "Shortest size: $data",
+    "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} ${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
     name: "Watermeter",
   );
-  if (data < 480) {
+
+  if (min(data.physicalSize.width, data.physicalSize.height) /
+          data.devicePixelRatio <
+      480) {
     await SystemChrome.setPreferredOrientations(
       [
         DeviceOrientation.portraitUp,
