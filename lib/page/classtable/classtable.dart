@@ -33,12 +33,13 @@ class ClassTableWindow extends StatelessWidget {
   final int currentWeek;
 
   /// Requires:
-  ///   * [classTableData]: the class table data.
+  ///   * [classTableData]: the class table data, but not the startday.
   ///   * [pretendLayout]: a multiplex array which means List[week][day][classindex][classes]
   ///     * week: The week index of the week.
   ///     * day: days in the week
   ///     * classindex: indicate the range of the time when we attending class, normally 0-9
   ///     * classes: the classes in this time, maybe conflicts occurs.
+  ///   * [currentWeek]: decide the week to show.
   const ClassTableWindow({
     super.key,
     required this.classTableData,

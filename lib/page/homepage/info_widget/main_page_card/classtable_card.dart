@@ -15,10 +15,15 @@ class ClassTableCard extends StatelessWidget {
         onTap: () {
           try {
             if (c.isGet == true) {
+              var classtableDataToPush = ClassTableData.from(c.classTableData);
+              classtableDataToPush.termStartDay = c.startDay.toString();
+              print(
+                "${c.classTableData.termStartDay} ${classtableDataToPush.termStartDay}",
+              );
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ClassTableWindow(
-                    classTableData: c.classTableData,
+                    classTableData: classtableDataToPush,
                     currentWeek: c.currentWeek,
                     pretendLayout: c.pretendLayout,
                   ),

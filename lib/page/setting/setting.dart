@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -102,16 +103,6 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             title: const Text('课表相关设置'),
             tiles: <SettingsTile>[
-              SettingsTile.navigation(
-                  title: const Text('课程偏移设置'),
-                  value: Text(
-                      "目前为 ${preference.getInt(preference.Preference.swift)}"),
-                  onPressed: (content) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => ChangeSwiftDialog(),
-                    );
-                  }),
               SettingsTile.switchTile(
                 title: const Text("开启课表背景图"),
                 initialValue:
@@ -152,6 +143,20 @@ class _SettingWindowState extends State<SettingWindow> {
                             const SnackBar(content: Text('你没有选图片捏')));
                       }
                     }
+                  }),
+              SettingsTile.navigation(
+                  title: const Text('课程偏移设置'),
+                  description: const Text('正数错后开学日期，负数提前开学日期'),
+                  value: Text(
+                      "目前为 ${preference.getInt(preference.Preference.swift)}"),
+                  onPressed: (content) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => ChangeSwiftDialog(),
+                    ).then((value) {
+                      Get.put(ClassTableController()).updateCurrent();
+                      setState(() {});
+                    });
                   }),
             ],
           ),

@@ -36,6 +36,20 @@ class ClassTableController extends GetxController {
       currentWeek >= 0 && currentWeek < classTableData.semesterLength;
 
   void updateCurrent() {
+    // Get the start day of the semester. Append offset
+    startDay = DateTime.parse(classTableData.termStartDay).add(
+        Duration(days: 7 * preference.getInt(preference.Preference.swift)));
+
+    // Get the current index.
+    currentWeek =
+        (Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
+            7;
+
+    developer.log(
+      "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
+      name: "ClassTableController",
+    );
+
     // Get the current time.
     if (isNotVacation) {
       developer.log("Get the current class", name: "ClassTableController");
@@ -126,10 +140,6 @@ class ClassTableController extends GetxController {
     error = null;
     try {
       classTableData = await ClassTableFile().get(isForce: isForce);
-      startDay = DateTime.parse(classTableData.termStartDay);
-      currentWeek = (Jiffy.now().dayOfYear -
-              Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-          7;
 
       // Uncomment to see the conflict.
       /*
@@ -154,16 +164,6 @@ class ClassTableController extends GetxController {
           weekList: "1111111111111111111111",
         ),
       ]);*/
-
-      // Get the start day of the semester.
-      startDay = DateTime.parse(classTableData.termStartDay);
-      startDay = startDay.add(
-          Duration(days: 7 * preference.getInt(preference.Preference.swift)));
-
-      // Get the current index.
-      currentWeek = (Jiffy.now().dayOfYear -
-              Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-          7;
 
       // Init the matrix.
       // 1. prepare the structure, a three-deminision array.

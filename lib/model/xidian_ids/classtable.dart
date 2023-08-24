@@ -79,6 +79,16 @@ class ClassTableData {
   List<ClassDetail> notArranged;
   List<TimeArrangement> timeArrangement;
 
+  ClassTableData.from(ClassTableData c)
+      : this(
+          semesterLength: c.semesterLength,
+          semesterCode: c.semesterCode,
+          termStartDay: c.termStartDay,
+          classDetail: c.classDetail,
+          notArranged: c.notArranged,
+          timeArrangement: c.timeArrangement,
+        );
+
   ClassTableData({
     this.semesterLength = 1,
     this.semesterCode = "",

@@ -104,10 +104,15 @@ class _MyAppState extends State<MyApp> {
   ThemeController appTheme = Get.put(ThemeController());
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     if (widget.isFirst) {
-      IDSSession().dio.post("www.xidian.edu.cn");
+      IDSSession().dio.get("https://www.xidian.edu.cn");
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
         localizationsDelegates: const [
