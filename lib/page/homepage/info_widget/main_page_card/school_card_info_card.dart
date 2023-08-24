@@ -18,12 +18,12 @@ class SchoolCardInfoCard extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               content: Text("脱机模式下，一站式相关功能全部禁止使用"),
             ));
-          } else if (c.error.isNotEmpty) {
+          } else if (c.errorPrice.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: Text("遇到错误：${c.error}"),
+              content: Text("遇到错误：${c.errorPrice}"),
             ));
-          } else if (!c.isGet.value) {
+          } else if (!c.isGetPrice.value) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               behavior: SnackBarBehavior.floating,
               content: Text("仍然在加载中"),
@@ -60,7 +60,7 @@ class SchoolCardInfoCard extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontSize: 20,
                       ),
-                      children: c.isGet.value
+                      children: c.isGetPrice.value
                           ? [
                               TextSpan(
                                 text: "${c.money}",
@@ -72,7 +72,7 @@ class SchoolCardInfoCard extends StatelessWidget {
                             ]
                           : [
                               TextSpan(
-                                text: c.error.isNotEmpty ? "发生错误" : "正在获取",
+                                text: c.errorPrice.isNotEmpty ? "发生错误" : "正在获取",
                               ),
                             ],
                     ),
@@ -80,12 +80,14 @@ class SchoolCardInfoCard extends StatelessWidget {
                 ),
               ),
             ),
-            Text(
-              c.isGet.value
-                  ? "点开查询流水"
-                  : c.error.isNotEmpty
-                      ? "目前无法获取信息"
-                      : "正在查询信息中",
+            Obx(
+              () => Text(
+                c.isGetPrice.value
+                    ? "点开查询流水"
+                    : c.errorPrice.isNotEmpty
+                        ? "目前无法获取信息"
+                        : "正在查询信息中",
+              ),
             ),
           ],
         ),

@@ -8,8 +8,10 @@ import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 
 class SchoolCardController extends GetxController {
-  var isGet = false.obs;
-  RxString error = "".obs;
+  var isGetPrice = false.obs;
+  var isGetRecord = false.obs;
+  RxString errorPrice = "".obs;
+  RxString errorRecord = "".obs;
 
   SchoolCardSession session = SchoolCardSession();
   // late Future<Uint8List> qrcode;
@@ -30,38 +32,40 @@ class SchoolCardController extends GetxController {
   @override
   void onReady() async {
     try {
-      isGet.value = false;
+      isGetPrice.value = false;
       await session.initSession();
       await updateMoney();
-      isGet.value = true;
+      isGetPrice.value = true;
     } on DioException catch (e, s) {
       developer.log(
         "Network exception: ${e.message}\nStack: $s",
         name: "ScoreController",
       );
-      error.value = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
+      errorPrice.value = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
       developer.log(
         "Other exception: $e\nStack: $s",
         name: "ScoreController",
       );
-      error.value = "未知错误，感兴趣的话，请接到电脑 adb 查看日志。";
+      errorPrice.value = "未知错误，感兴趣者请查看日志。";
     }
     super.onReady();
   }
 
   Future<void> refreshPaidRecord() async {
     try {
-      error.value = "";
+      errorRecord.value = "";
+      isGetRecord.value = false;
       getPaid.clear();
       getPaid.value = await session.getPaidStatus(
         Jiffy.parseFromDateTime(timeRange[0]!).format(pattern: "yyyy-MM-dd"),
         Jiffy.parseFromDateTime(timeRange[1]!).format(pattern: "yyyy-MM-dd"),
       );
+      isGetRecord.value = true;
     } catch (e, s) {
       developer.log(e.toString());
       developer.log(s.toString());
-      error.value = "凭证过期，重新登录";
+      errorRecord.value = "加载失败，尝试刷新";
     }
     update();
   }
@@ -69,8 +73,9 @@ class SchoolCardController extends GetxController {
   Future<void> relogin() async => await session.initSession();
 
   Future<void> updateMoney() async {
-    isGet.value = false;
+    isGetPrice.value = false;
+    errorPrice.value = "";
     money.value = await session.getMoney();
-    isGet.value = true;
+    isGetPrice.value = true;
   }
 }

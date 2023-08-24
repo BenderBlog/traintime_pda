@@ -69,7 +69,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         ),
         body: Obx(
           () {
-            if (c.isGet.value) {
+            if (c.isGetRecord.value) {
               return Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
@@ -118,7 +118,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                   ),
                 ),
               );
-            } else if (c.error.value.isNotEmpty) {
+            } else if (c.errorRecord.value.isNotEmpty) {
               return ReloadWidget(
                 function: () async {
                   await c.relogin();
