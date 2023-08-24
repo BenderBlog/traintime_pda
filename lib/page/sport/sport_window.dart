@@ -38,8 +38,8 @@ class TabForSport extends StatelessWidget {
           ),
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.edit)),
-              Tab(icon: Icon(Icons.run_circle)),
+              Tab(text: "打卡记录"),
+              Tab(text: "体测记录"),
             ],
           ),
         ),

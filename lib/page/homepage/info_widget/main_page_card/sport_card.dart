@@ -104,9 +104,14 @@ class SportCard extends StatelessWidget {
                   ),
                   SimpleDialogOption(
                     child: TextButton(
-                      onPressed: () => Navigator.of(context).push(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (context) => const SportWindow())),
+                            builder: (context) => const SportWindow(),
+                          ),
+                        );
+                      },
                       child: const Text("查看详情"),
                     ),
                   ),
