@@ -115,7 +115,7 @@ class ToolBoxView extends StatelessWidget {
                             cookieDomainList: const [
                               "http://ids.xidian.edu.cn/authserver/"
                             ],
-                            domain: SchoolAddresses.values[index - 3].url,
+                            domain: SchoolAddresses.values[index].url,
                           ),
                         ),
                       );
@@ -161,7 +161,7 @@ class ToolBoxView extends StatelessWidget {
                                 cookieDomainList: const [
                                   "http://ids.xidian.edu.cn/authserver/"
                                 ],
-                                domain: OtherAddress.values[index - 3].url,
+                                domain: OtherAddress.values[index].url,
                               ),
                             ),
                           );
