@@ -19,13 +19,30 @@ class ElectricityCard extends StatelessWidget {
     }
     return GestureDetector(
       onTap: () async {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
-            "长按可以重新加载，有欠费一般代表水费",
+        showDialog(
+          context: context,
+          builder: (context) => SimpleDialog(
+            title: const Text("水电信息"),
+            children: [
+              SimpleDialogOption(
+                child: Obx(
+                  () => Text(
+                    "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
+                    "电量信息：${electricity_session.electricityInfo.value} 度电\n"
+                    "欠费信息：${owe_session.owe.value}\n"
+                    "长按可以重新加载，有欠费一般代表水费",
+                  ),
+                ),
+              ),
+              SimpleDialogOption(
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("确定"),
+                ),
+              ),
+            ],
           ),
-        ));
+        );
       },
       onLongPress: () {
         electricity_session.update();

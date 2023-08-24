@@ -17,9 +17,6 @@ class ClassTableCard extends StatelessWidget {
             if (c.isGet == true) {
               var classtableDataToPush = ClassTableData.from(c.classTableData);
               classtableDataToPush.termStartDay = c.startDay.toString();
-              print(
-                "${c.classTableData.termStartDay} ${classtableDataToPush.termStartDay}",
-              );
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ClassTableWindow(

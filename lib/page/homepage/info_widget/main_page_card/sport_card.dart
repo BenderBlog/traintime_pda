@@ -27,7 +27,9 @@ class SportCard extends StatelessWidget {
                       elevation: 0,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 8.0),
+                          vertical: 4.0,
+                          horizontal: 8.0,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,7 +113,6 @@ class SportCard extends StatelessWidget {
                 ],
               ),
             );
-            // ;
           } else {
             if (punchData.value.situation == "无密码信息") {
               showDialog(
