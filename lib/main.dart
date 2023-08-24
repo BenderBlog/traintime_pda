@@ -8,6 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -104,6 +105,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isFirst) {
+      IDSSession().dio.post("www.xidian.edu.cn");
+    }
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
         localizationsDelegates: const [
@@ -115,7 +119,7 @@ class _MyAppState extends State<MyApp> {
           Locale('zh', ''),
         ],
         navigatorKey: alice.getNavigatorKey(),
-        title: 'Traintime PDA',
+        title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
         theme: c.apptheme,
         home: DefaultTextStyle.merge(
           style: const TextStyle(textBaseline: TextBaseline.ideographic),
