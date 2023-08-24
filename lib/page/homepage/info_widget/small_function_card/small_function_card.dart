@@ -21,6 +21,7 @@ class SmallFunctionCard extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Center(
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ClipOval(
@@ -35,12 +36,16 @@ class SmallFunctionCard extends StatelessWidget {
                   ),
                 ),
               ),
+              const VerticalDivider(
+                width: 10,
+                color: Colors.transparent,
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   Text(
                     description,

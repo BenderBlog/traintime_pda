@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ToolBoxAddresses {
+enum SchoolAddresses {
   payment(
     name: "缴费系统",
     url: "https://payment.xidian.edu.cn/MNetWorkUI/showPublic",
@@ -24,12 +24,6 @@ enum ToolBoxAddresses {
     description: "找个地方打牌",
     iconData: Icons.book_online,
   ),
-  mail(
-    name: "学校邮箱",
-    url: "https://mail.stu.xidian.edu.cn/coremail/xphone/",
-    description: "白嫖还顺利吗",
-    iconData: Icons.mail,
-  ),
   mobileEntry(
     name: "手机门户",
     url: "https://xxcapp.xidian.edu.cn/site/xidianPage/home",
@@ -41,13 +35,27 @@ enum ToolBoxAddresses {
     url: "https://zfw.xidian.edu.cn",
     description: "希望永不收费",
     iconData: Icons.signal_wifi_statusbar_4_bar,
-  ),
-  creative(
-    name: "创新学院",
-    url: "https://ids.xidian.edu.cn/authserver/login?service="
-        "https%3A%2F%2Fscjspt.xidian.edu.cn%2Flogin%2Fids",
-    description: "创意需要队友",
-    iconData: Icons.lightbulb,
+  );
+
+  final String name;
+  final String url;
+  final String description;
+  final IconData iconData;
+
+  const SchoolAddresses({
+    required this.name,
+    required this.url,
+    required this.description,
+    required this.iconData,
+  });
+}
+
+enum OtherAddress {
+  calculator(
+    name: "物理计算",
+    url: "https://experiment-helper.wizzstudio.com/#/",
+    description: "希望操作顺利",
+    iconData: Icons.calculate,
   ),
   ruisiEntry(
     name: "睿思导航",
@@ -61,7 +69,7 @@ enum ToolBoxAddresses {
   final String description;
   final IconData iconData;
 
-  const ToolBoxAddresses({
+  const OtherAddress({
     required this.name,
     required this.url,
     required this.description,

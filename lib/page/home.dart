@@ -50,12 +50,6 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  static final _page = [
-    const MainPage(),
-    const ToolBoxView(),
-    const SettingWindow(),
-  ];
-
   late PageController _controller;
   late PageView _pageView;
   @override
@@ -64,7 +58,14 @@ class _HomePageState extends State<HomePage> {
     _controller = PageController();
     _pageView = PageView(
       controller: _controller,
-      children: _page,
+      children: [
+        const MainPage(),
+        LayoutBuilder(
+            builder: ((context, constraints) => ToolBoxView(
+                  constraints: constraints,
+                ))),
+        const SettingWindow(),
+      ],
       onPageChanged: (int index) {
         setState(() {
           _selectedIndex = index;
@@ -150,8 +151,6 @@ class _HomePageState extends State<HomePage> {
                 });
                 _controller.jumpToPage(_selectedIndex);
               },
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
             )
           : null,
     );

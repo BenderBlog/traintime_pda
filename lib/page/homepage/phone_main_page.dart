@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -17,6 +18,16 @@ class PhoneMainPage extends StatelessWidget {
   const PhoneMainPage({super.key});
 
   final classCardHeight = 140.0;
+
+  final List<Widget> children = const [
+    SportCard(),
+    ElectricityCard(),
+    LibraryCard(),
+    SchoolCardInfoCard(),
+    ScoreCard(),
+    ExamCard(),
+    EmptyClassroomCard(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -78,34 +89,10 @@ class PhoneMainPage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.025),
-              child: GridView.count(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: MediaQuery.of(context).size.width / 260,
-                children: const [
-                  SportCard(),
-                  ElectricityCard(),
-                  LibraryCard(),
-                  SchoolCardInfoCard(),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025),
-              child: GridView.count(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: MediaQuery.of(context).size.width / 160,
-                children: const [
-                  ScoreCard(),
-                  ExamCard(),
-                  EmptyClassroomCard(),
-                ],
+              child: LayoutGrid(
+                columnSizes: [1.fr, 1.fr],
+                rowSizes: const [auto, auto, auto, auto],
+                children: children,
               ),
             ),
           ],
