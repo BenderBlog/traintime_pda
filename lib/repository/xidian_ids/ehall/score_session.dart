@@ -1,14 +1,10 @@
-/*
-The score window source.
-Copyright 2023 SuperBart
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// The score window source.
+// Thanks xidian-script and libxdauth!
 
-
-Thanks xidian-script and libxdauth!
-*/
+// ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
 import 'dart:developer' as developer;
@@ -21,7 +17,6 @@ class ScoreFile extends EhallSession {
   /// [JXBID] 教学班ID
   /// [XNXQDM] 学年学期代码
   /// This function gets the composement of the score.
-  // ignore: non_constant_identifier_names
   Future<Compose> getDetail(String JXBID, String XNXQDM) async {
     Compose toReturn = Compose();
     var response = await dio.post(
@@ -113,7 +108,6 @@ class ScoreFile extends EhallSession {
   /// [KCH] 学科ID
   /// [XNXQDM] 学年学期代码
   /// This function gets the place of your score in class.
-  // ignore: non_constant_identifier_names
   Future<ScorePlace> getPlaceInGrade(String KCH, String XNXQDM) async {
     return await _getPlace(forPlace: {
       'XH': preference.getString(
@@ -140,7 +134,6 @@ class ScoreFile extends EhallSession {
   /// [JXBID] 教学班ID
   /// [XNXQDM] 学年学期代码
   /// This function gets the place of your score in class.
-  // ignore: non_constant_identifier_names
   Future<ScorePlace> getPlaceInClass(String JXBID, String XNXQDM) async {
     return await _getPlace(forPlace: {
       'XH': preference.getString(

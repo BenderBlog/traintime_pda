@@ -1,4 +1,5 @@
-//import 'dart:typed_data';
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
 
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;

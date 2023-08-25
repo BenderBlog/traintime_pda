@@ -1,3 +1,6 @@
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:styled_widget/styled_widget.dart';

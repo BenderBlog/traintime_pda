@@ -1,3 +1,6 @@
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:jiffy/jiffy.dart';
 
 RegExp timeRegExp = RegExp(r'[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}');

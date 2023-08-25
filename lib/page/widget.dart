@@ -1,11 +1,7 @@
-/*
-Useful weights to simplify watermeter program.
-Copyright 2023 SuperBart
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-*/
+// Useful weights to simplify watermeter programming.
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';

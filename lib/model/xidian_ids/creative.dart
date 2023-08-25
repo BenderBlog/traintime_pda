@@ -1,3 +1,6 @@
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'creative.g.dart';

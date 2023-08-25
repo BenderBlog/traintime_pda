@@ -1,3 +1,8 @@
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
+
+// Score Watermark when showing score detail.
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 

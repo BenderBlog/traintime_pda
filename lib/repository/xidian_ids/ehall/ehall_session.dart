@@ -1,14 +1,8 @@
-/*
-E-hall class, which get lots of useful data here.
-Copyright 2023 SuperBart
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-
-Thanks xidian-script and libxdauth!
-*/
+// E-hall class, which get lots of useful data here.
+// Thanks xidian-script and libxdauth!
 
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;

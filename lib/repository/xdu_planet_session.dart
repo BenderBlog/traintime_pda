@@ -1,13 +1,8 @@
-/*
-XDU Planet API. 
-Copyright (C) 2023 SuperBart
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-I will put my xduplanet.php to my github, which thanks to old computers.
-*/
+// XDU Planet API.
+// I will put my xduplanet.php to my github, which thanks to old computers.
 
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';

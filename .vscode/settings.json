@@ -16,4 +16,7 @@
   "files.associations": {
     "*.arb": "json"
   },
+  "licenser.author": "BenderBlog Rodriguez",
+  "licenser.license": "MPLv2",
+  "licenser.useSPDXLicenseFormat": true,
 }

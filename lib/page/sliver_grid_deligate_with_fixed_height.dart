@@ -1,13 +1,8 @@
-/* 
-Modified version of the SliverGridDelegateWithMaxCrossAxisExtent.
-Used when the height of the children in the GridView is identical.
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
 
-Copyright (C) 2022 SuperBart
-
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*/
+// Modified version of the SliverGridDelegateWithMaxCrossAxisExtent.
+// Used when the height of the children in the GridView is identical.
 
 import 'package:flutter/rendering.dart';
 import 'dart:math' as math;

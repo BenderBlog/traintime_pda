@@ -1,3 +1,6 @@
+// Copyright 2023 BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0 OR MIT
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/widget.dart';
 

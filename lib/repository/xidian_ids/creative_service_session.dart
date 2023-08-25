@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+// Creative School Service Session, related to Jichuang Studio
+
 import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
