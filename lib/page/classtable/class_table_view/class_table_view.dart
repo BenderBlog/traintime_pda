@@ -11,8 +11,11 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 /// THe classtable view, the way the the classtable sheet rendered.
 class ClassTableView extends StatefulWidget {
   final int index;
+  final BoxConstraints constraint;
+
   const ClassTableView({
     super.key,
+    required this.constraint,
     required this.index,
   });
 
@@ -26,15 +29,7 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   /// The height is suitable to show 1-8 class, 9-10 are hidden at the bottom.
   double classTableContentHeight(int count) =>
-      count *
-      (mediaQuerySize.height < 800
-          ? mediaQuerySize.height * 0.85
-          : mediaQuerySize.height -
-              topRowHeightBig -
-              (mediaQuerySize.width / mediaQuerySize.height >= 1.20
-                  ? midRowHeightHorizontal
-                  : midRowHeightVertical)) /
-      10;
+      count * widget.constraint.minHeight / 8;
 
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(int index) {
@@ -111,8 +106,13 @@ class _ClassTableViewState extends State<ClassTableView> {
       children: [
         /// The main class table.
         ClassTableDateRow(
-          firstDay: ClassTableState.of(context)!.startDay.add(
-                Duration(days: widget.index * 7),
+          firstDay: ClassTableState.of(context)!
+              .startDay
+              .add(
+                Duration(days: 7 * ClassTableState.of(context)!.offset),
+              )
+              .add(
+                Duration(days: 7 * widget.index),
               ),
         ),
 

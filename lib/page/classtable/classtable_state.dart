@@ -9,6 +9,9 @@ class ClassTableState extends InheritedWidget {
   /// The length of the semester, the amount of the class table.
   final int semesterLength;
 
+  /// The offset append to start day of the week.
+  late final int offset;
+
   /// The class details.
   final List<ClassDetail> classDetail;
 
@@ -45,7 +48,9 @@ class ClassTableState extends InheritedWidget {
     required this.pretendLayout,
     required this.currentWeek,
     required BuildContext context,
+    int? offset,
   }) {
+    this.offset = offset ?? 0;
     late int toShowChoiceWeek;
     if (currentWeek < 0) {
       toShowChoiceWeek = 0;

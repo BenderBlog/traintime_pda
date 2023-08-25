@@ -12,9 +12,11 @@ class ClassTableWindow extends StatelessWidget {
   final ClassTableData classTableData;
   final List<List<List<List<int>>>> pretendLayout;
   final int currentWeek;
+  final int? offset;
 
   /// Requires:
   ///   * [classTableData]: the class table data, but not the startday.
+  ///   * [offset]: the offset of the start day of the semester set by the user, 0 by default.
   ///   * [pretendLayout]: a multiplex array which means List[week][day][classindex][classes]
   ///     * week: The week index of the week.
   ///     * day: days in the week
@@ -24,6 +26,7 @@ class ClassTableWindow extends StatelessWidget {
   const ClassTableWindow({
     super.key,
     required this.classTableData,
+    required this.offset,
     required this.pretendLayout,
     required this.currentWeek,
   });
@@ -39,6 +42,7 @@ class ClassTableWindow extends StatelessWidget {
       semesterLength: classTableData.semesterLength,
       startDay: Jiffy.parse(classTableData.termStartDay).dateTime,
       context: context,
+      offset: offset,
       child: const ClassTablePage(),
     );
   }

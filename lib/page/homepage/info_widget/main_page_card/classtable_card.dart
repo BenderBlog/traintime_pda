@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/info_widget/main_page_card/main_page_card.dart';
 
 class ClassTableCard extends StatelessWidget {
@@ -18,12 +19,11 @@ class ClassTableCard extends StatelessWidget {
         onTap: () {
           try {
             if (c.isGet == true) {
-              var classtableDataToPush = ClassTableData.from(c.classTableData);
-              classtableDataToPush.termStartDay = c.startDay.toString();
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ClassTableWindow(
-                    classTableData: classtableDataToPush,
+                    offset: preference.getInt(preference.Preference.swift),
+                    classTableData: c.classTableData,
                     currentWeek: c.currentWeek,
                     pretendLayout: c.pretendLayout,
                   ),

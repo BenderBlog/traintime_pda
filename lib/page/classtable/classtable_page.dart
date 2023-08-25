@@ -231,6 +231,11 @@ class _ClassTablePageState extends State<ClassTablePage> {
           }
         },
         itemCount: classTableState.semesterLength,
-        itemBuilder: (context, index) => ClassTableView(index: index),
+        itemBuilder: (context, index) => LayoutBuilder(
+          builder: (context, constraint) => ClassTableView(
+            constraint: constraint,
+            index: index,
+          ),
+        ),
       );
 }
