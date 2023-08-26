@@ -19,7 +19,6 @@ class ScoreController extends GetxController {
   Set<String> semester = {};
   Set<String> statuses = {};
   Set<String> unPassedSet = {};
-  double notCoreClass = 0.0;
 
   static final courseIgnore = [
     '军事',
@@ -127,6 +126,16 @@ class ScoreController extends GetxController {
       "目前选中科目 ${getSelectedScoreList.length}  总计学分 ${evalCredit(false).toStringAsFixed(2)}\n"
       "均分 ${evalAvg(false).toStringAsFixed(2)}  "
       "GPA ${evalAvg(false, isGPA: true).toStringAsFixed(2)}  ";
+
+  double get notCoreClass {
+    double toReturn = 0.0;
+    for (var i in scoreTable) {
+      if (i.status.contains(notCoreClassType) && i.score >= 60) {
+        toReturn += i.credit;
+      }
+    }
+    return toReturn;
+  }
 
   void setScoreChoiceState(int index) {
     isSelected[index] = !isSelected[index];
