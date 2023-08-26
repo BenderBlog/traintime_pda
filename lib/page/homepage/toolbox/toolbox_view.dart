@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/small_function_card.dart';
+import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_addresses.dart';
 import 'package:watermeter/page/homepage/toolbox/webview.dart';
 import 'package:watermeter/page/creative_job/creative_job.dart';

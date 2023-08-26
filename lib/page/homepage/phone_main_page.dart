@@ -7,14 +7,14 @@ import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/clipper.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card/classtable_card.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card/electricity_card.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card/library_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/empty_classroom_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/exam_card.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card/school_card_info_card.dart';
-import 'package:watermeter/page/homepage/info_widget/small_function_card/score_card.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card/sport_card.dart';
+import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/library_card.dart';
+import 'package:watermeter/page/homepage/toolbox/empty_classroom_card.dart';
+import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
+import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/toolbox/score_card.dart';
+import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {
