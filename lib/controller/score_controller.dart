@@ -197,7 +197,7 @@ class ScoreController extends GetxController {
       scoreTable = await ScoreFile().get();
       resetChoice();
       semester = {for (var i in scoreTable) i.year};
-      statuses = {for (var i in scoreTable) i.status};
+      statuses = {for (var i in scoreTable) i.status}..add("");
 
       isGet = true;
       error = null;

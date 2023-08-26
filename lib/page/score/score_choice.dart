@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/score_controller.dart';
+import 'package:watermeter/page/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/widget.dart';
 
@@ -11,68 +12,55 @@ class ScoreChoiceWindow extends StatelessWidget {
   const ScoreChoiceWindow({super.key});
 
   PreferredSizeWidget dropDownButton(context) => PreferredSize(
-        preferredSize: const Size.fromHeight(40),
+        preferredSize: const Size.fromHeight(48.0),
         child: GetBuilder<ScoreController>(
-          builder: (c) => SizedBox(
-            height: 40,
+          builder: (c) => Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                DropdownButton(
-                  focusColor: Theme.of(context).appBarTheme.backgroundColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(30)),
-                  value: c.chosenSemesterInScoreChoice,
-                  style: const TextStyle(color: Colors.black),
-                  underline: Container(color: Colors.transparent),
-                  onChanged: (String? value) {
-                    c.chosenSemesterInScoreChoice = value!;
-                    c.update();
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                  ),
+                  onPressed: () async {
+                    await showDialog<int>(
+                      context: context,
+                      builder: (context) => ColumnChooseDialog(
+                        semesterList: ["所有学期", ...c.semester],
+                      ),
+                    ).then((value) {
+                      c.chosenSemesterInScoreChoice =
+                          ["", ...c.semester].toList()[value!];
+                      c.update();
+                    });
                   },
-                  items: [
-                    const DropdownMenuItem(
-                      value: "",
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text("所有学期"),
-                      ),
-                    ),
-                    for (var i in c.semester)
-                      DropdownMenuItem(
-                        value: i,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(i),
-                        ),
-                      ),
-                  ],
+                  child: Text(
+                    "学期 ${c.chosenSemesterInScoreChoice == "" ? "所有学期" : c.chosenSemesterInScoreChoice}",
+                  ),
                 ),
-                DropdownButton(
-                  focusColor: Theme.of(context).appBarTheme.backgroundColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(30)),
-                  value: c.chosenStatusInScoreChoice,
-                  style: const TextStyle(color: Colors.black),
-                  underline: Container(color: Colors.transparent),
-                  items: [
-                    const DropdownMenuItem(
-                      value: "",
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text("所有类型"),
+                const VerticalDivider(),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                  ),
+                  onPressed: () async {
+                    await showDialog<int>(
+                      context: context,
+                      builder: (context) => ColumnChooseDialog(
+                        semesterList: ["所有类型", ...c.statuses].toList(),
                       ),
-                    ),
-                    for (var i in c.statuses)
-                      DropdownMenuItem(
-                        value: i,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(i),
-                        ),
-                      ),
-                  ],
-                  onChanged: (String? value) {
-                    c.chosenStatusInScoreChoice = value!;
-                    c.update();
+                    ).then((value) {
+                      c.chosenStatusInScoreChoice =
+                          ["", ...c.statuses].toList()[value!];
+                      c.update();
+                    });
                   },
+                  child: Text(
+                    "类型 ${c.chosenStatusInScoreChoice == "" ? "所有类型" : c.chosenStatusInScoreChoice}",
+                  ),
                 ),
               ],
             ),

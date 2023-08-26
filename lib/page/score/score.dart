@@ -5,6 +5,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_choice.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/widget.dart';
@@ -119,73 +120,55 @@ class ScoreWindow extends StatelessWidget {
       );
 
   PreferredSizeWidget dropDownButton(context) => PreferredSize(
-        preferredSize: const Size.fromHeight(40),
+        preferredSize: const Size.fromHeight(48.0),
         child: GetBuilder<ScoreController>(
-          builder: (c) => SizedBox(
-            height: 40,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  DropdownButton(
-                    focusColor: Theme.of(context).appBarTheme.backgroundColor,
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                    value: c.chosenSemester,
-                    style: const TextStyle(color: Colors.black),
-                    underline: Container(color: Colors.transparent),
-                    onChanged: (String? value) {
-                      c.chosenSemester = value!;
-                      c.update();
-                    },
-                    items: [
-                      const DropdownMenuItem(
-                        value: "",
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("所有学期"),
-                        ),
-                      ),
-                      for (var i in c.semester)
-                        DropdownMenuItem(
-                          value: i,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(i),
-                          ),
-                        ),
-                    ],
+          builder: (c) => Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
                   ),
-                  DropdownButton(
-                    focusColor: Theme.of(context).appBarTheme.backgroundColor,
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                    value: c.chosenStatus,
-                    style: const TextStyle(color: Colors.black),
-                    underline: Container(color: Colors.transparent),
-                    items: [
-                      const DropdownMenuItem(
-                        value: "",
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("所有类型"),
-                        ),
+                  onPressed: () async {
+                    await showDialog<int>(
+                      context: context,
+                      builder: (context) => ColumnChooseDialog(
+                        semesterList: ["所有学期", ...c.semester],
                       ),
-                      for (var i in c.statuses)
-                        DropdownMenuItem(
-                          value: i,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(i),
-                          ),
-                        ),
-                    ],
-                    onChanged: (String? value) {
-                      c.chosenStatus = value!;
+                    ).then((value) {
+                      c.chosenSemester = ["", ...c.semester].toList()[value!];
                       c.update();
-                    },
+                    });
+                  },
+                  child: Text(
+                    "学期 ${c.chosenSemester == "" ? "所有学期" : c.chosenSemester}",
                   ),
-                ],
-              ),
+                ),
+                const VerticalDivider(),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                  ),
+                  onPressed: () async {
+                    await showDialog<int>(
+                      context: context,
+                      builder: (context) => ColumnChooseDialog(
+                        semesterList: ["所有类型", ...c.statuses].toList(),
+                      ),
+                    ).then((value) {
+                      c.chosenStatus = ["", ...c.statuses].toList()[value!];
+                      c.update();
+                    });
+                  },
+                  child: Text(
+                    "类型 ${c.chosenStatus == "" ? "所有类型" : c.chosenStatus}",
+                  ),
+                ),
+              ],
             ),
           ),
         ),

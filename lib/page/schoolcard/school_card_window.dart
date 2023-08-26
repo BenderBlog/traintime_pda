@@ -33,10 +33,14 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         appBar: AppBar(
           title: const Text("校园卡流水信息"),
           bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(40),
+            preferredSize: const Size.fromHeight(48.0),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
+                ),
                 child: Text(
                     "选择日期：从 ${Jiffy.parseFromDateTime(c.timeRange[0]!).format(pattern: "yyyy-MM-dd")} "
                     "到 ${Jiffy.parseFromDateTime(c.timeRange[1]!).format(pattern: "yyyy-MM-dd")}"),

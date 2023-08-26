@@ -5,12 +5,12 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/page/column_choose_dialog.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
 import 'package:watermeter/page/exam/exam_title.dart';
+import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/exam/timeline_widget.dart';
-import 'package:watermeter/page/widget.dart';
 
 class ExamInfoWindow extends StatefulWidget {
   const ExamInfoWindow({super.key});
@@ -33,45 +33,37 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
           actions: [
             IconButton(
               icon: const Icon(Icons.more_time),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => NoArrangedInfo(list: c.toBeArranged))),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NoArrangedInfo(list: c.toBeArranged),
+                ),
+              ),
             ),
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48.0),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
-              child: Container(
-                height: 36.0,
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("当前展示的学期："),
-                    DropdownButton(
-                      focusColor: Theme.of(context).appBarTheme.backgroundColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(30)),
-                      value: c.dropdownValue,
-                      style: const TextStyle(color: Colors.black),
-                      underline: Container(color: Colors.transparent),
-                      onChanged: (int? value) {
-                        setState(() {
-                          c.dropdownValue = value!;
-                        });
-                        c.get(semesterStr: c.semesters[c.dropdownValue]);
-                      },
-                      items: List.generate(
-                        c.semesters.length,
-                        (index) => DropdownMenuItem(
-                          value: index,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(c.semesters[index]),
-                          ),
-                        ),
-                      ),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
+                ),
+                onPressed: () async {
+                  await showDialog(
+                    context: context,
+                    builder: (context) => ColumnChooseDialog(
+                      semesterList: c.semesters,
                     ),
-                  ],
+                  ).then((value) {
+                    setState(() {
+                      c.dropdownValue = value!;
+                    });
+                    c.get(semesterStr: c.semesters[c.dropdownValue]);
+                  });
+                },
+                child: Text(
+                  "当前展示的学期 ${c.semesters[c.dropdownValue]}",
                 ),
               ),
             ),
@@ -110,35 +102,6 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
             : c.error != null
                 ? Center(child: Text(c.error.toString()))
                 : const Center(child: CircularProgressIndicator()),
-      ),
-    );
-  }
-}
-
-class NoArrangedInfo extends StatelessWidget {
-  final List<ToBeArranged> list;
-  const NoArrangedInfo({super.key, required this.list});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("目前无安排考试的科目"),
-      ),
-      body: dataList<Card, Card>(
-        List.generate(
-          list.length,
-          (index) => Card(
-            child: ListTile(
-              title: Text(list[index].subject),
-              subtitle: Text(
-                "编号: ${list[index].id}\n"
-                "老师: ${list[index].teacher ?? "没有数据"}",
-              ),
-            ),
-          ),
-        ),
-        (toUse) => toUse,
       ),
     );
   }
