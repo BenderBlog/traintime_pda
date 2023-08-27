@@ -36,7 +36,7 @@ class SmallFunctionCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Card(
         elevation: 0,
-        color: Theme.of(context).colorScheme.primaryContainer,
+        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Center(

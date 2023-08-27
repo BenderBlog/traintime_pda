@@ -8,13 +8,10 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/clipper.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
-import 'package:watermeter/page/homepage/info_widget/library_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/empty_classroom_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/exam_card.dart';
-import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/score_card.dart';
-import 'package:watermeter/page/homepage/info_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/sport_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {

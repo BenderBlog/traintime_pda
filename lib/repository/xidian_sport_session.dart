@@ -64,13 +64,13 @@ class SportSession {
       toReturn.valid++;
       punchData.value.situation = null;
     } on NoPasswordException {
-      toReturn.situation = "无密码信息";
+      toReturn.situation = "没有密码";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
       toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e) {
       developer.log("未获取学期值：$e", name: "GetPunchSession");
-      toReturn.situation = "未获取学期值";
+      toReturn.situation = "查询失败";
     } on DioException catch (e) {
       developer.log("网络故障：$e", name: "GetPunchSession");
       toReturn.situation = "网络故障";
@@ -120,13 +120,13 @@ class SportSession {
         }
       }
     } on NoPasswordException {
-      toReturn.situation = "无密码信息";
+      toReturn.situation = "没有密码";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
       toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e) {
       developer.log("未获取学期值：$e", name: "GetPunchSession");
-      toReturn.situation = "未获取学期值";
+      toReturn.situation = "查询失败";
     } on DioException catch (e) {
       developer.log("网络故障：$e", name: "GetPunchSession");
       toReturn.situation = "网络故障";

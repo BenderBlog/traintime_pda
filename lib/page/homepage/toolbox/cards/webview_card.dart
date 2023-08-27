@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/small_function_card.dart';
+import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
 import 'package:watermeter/page/homepage/toolbox/webview.dart';
 
 class WebViewCard extends StatelessWidget {

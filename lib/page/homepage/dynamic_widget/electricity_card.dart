@@ -3,7 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/repository/electricity_session.dart'
     as electricity_session;
 import 'package:watermeter/repository/xidian_ids/payment_session.dart'
@@ -51,42 +51,40 @@ class ElectricityCard extends StatelessWidget {
         electricity_session.update();
         owe_session.update();
       },
-      child: MainPageCard(
-        icon: Icons.electric_meter_rounded,
-        text: "电量信息",
-        children: [
-          Obx(
-            () => Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontSize: 20,
-                    ),
-                    children: !electricity_session.isNotice.value
-                        ? [
-                            TextSpan(
-                              text: electricity_session.electricityInfo.value,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            const TextSpan(text: " 度电"),
-                          ]
-                        : [
-                            TextSpan(
-                              text: electricity_session.electricityInfo.value,
-                            ),
-                          ],
-                  ),
-                ),
+      child: Obx(
+        () => MainPageCard(
+          isLoad: electricity_session.isLoad,
+          progress: double.parse(electricity_session.isLoad
+                  ? "0"
+                  : electricity_session.electricityInfo.value) /
+              100.0,
+          icon: Icons.electric_meter_outlined,
+          text: "电量信息",
+          infoText: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                fontSize: 20,
               ),
+              children: !electricity_session.isNotice.value
+                  ? [
+                      TextSpan(
+                        text: electricity_session.electricityInfo.value,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const TextSpan(text: " 度"),
+                    ]
+                  : [
+                      TextSpan(
+                        text: electricity_session.electricityInfo.value,
+                      ),
+                    ],
             ),
           ),
-          Obx(() => Text(owe_session.owe.value)),
-        ],
+          bottomText: Text(owe_session.owe.value),
+        ),
       ),
     );
   }

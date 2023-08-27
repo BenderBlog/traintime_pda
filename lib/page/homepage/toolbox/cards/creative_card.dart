@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/creative_job/creative_job.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/small_function_card.dart';
+import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
 
 class CreativeCard extends StatelessWidget {
   const CreativeCard({super.key});

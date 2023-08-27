@@ -14,28 +14,30 @@ import 'package:watermeter/repository/preference.dart' as preference;
 var isNotice = true.obs;
 var electricityInfo = "".obs;
 
+bool get isLoad => electricityInfo.value == "正在获取";
+
 Future<void> update() async {
   try {
     isNotice.value = true;
-    electricityInfo.value = "正在获取电量";
+    electricityInfo.value = "正在获取";
     await ElectricitySession().updateInformation();
     isNotice.value = false;
   } on NotSchoolNetworkException {
-    electricityInfo.value = "目前非校园网";
+    electricityInfo.value = "非校园网";
   } on DioException catch (e) {
     developer.log(
       "Network error: $e",
       name: "ElectricSession",
     );
-    electricityInfo.value = "电量网络故障";
+    electricityInfo.value = "网络故障";
   } on NotFoundException {
-    electricityInfo.value = "未找到电表数据";
+    electricityInfo.value = "未找到数据";
   } catch (e) {
     developer.log(
       "Unknown error: $e",
       name: "ElectricSession",
     );
-    electricityInfo.value = "电量程序故障";
+    electricityInfo.value = "程序故障";
   }
 }
 

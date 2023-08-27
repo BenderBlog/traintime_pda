@@ -4,7 +4,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/schoolcard/school_card_window.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -49,41 +49,35 @@ class SchoolCardInfoCard extends StatelessWidget {
             c.updateMoney();
           }
         },
-        child: MainPageCard(
-          icon: Icons.money_rounded,
-          text: "流水查询",
-          children: [
-            Obx(
-              () => Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontSize: 20,
-                      ),
-                      children: c.isGetPrice.value
-                          ? [
-                              TextSpan(
-                                text: "${c.money}",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              const TextSpan(text: " 元余额"),
-                            ]
-                          : [
-                              TextSpan(
-                                text: c.errorPrice.isNotEmpty ? "发生错误" : "正在获取",
-                              ),
-                            ],
-                    ),
-                  ),
+        child: Obx(
+          () => MainPageCard(
+            isLoad: !(c.isGetPrice.value && c.errorPrice.isEmpty),
+            icon: Icons.money_rounded,
+            text: "流水查询",
+            infoText: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 20,
                 ),
+                children: c.isGetPrice.value
+                    ? [
+                        TextSpan(
+                          text: "${c.money}",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const TextSpan(text: " 元"),
+                      ]
+                    : [
+                        TextSpan(
+                          text: c.errorPrice.isNotEmpty ? "发生错误" : "正在获取",
+                        ),
+                      ],
               ),
             ),
-            Obx(
+            bottomText: Obx(
               () => Text(
                 c.isGetPrice.value
                     ? "点开查询流水"
@@ -92,7 +86,7 @@ class SchoolCardInfoCard extends StatelessWidget {
                         : "正在查询信息中",
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -3,7 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
@@ -132,43 +132,38 @@ class SportCard extends StatelessWidget {
         },
         onLongPress: SportSession().getPunch,
         child: MainPageCard(
-          icon: Icons.run_circle,
+          icon: Icons.run_circle_outlined,
           text: "体育信息",
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontSize: 20,
-                    ),
-                    children: punchData.value.situation == null
-                        ? [
-                            TextSpan(
-                              text: "${punchData.value.valid}",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            const TextSpan(
-                              text: " 打卡次数",
-                            ),
-                          ]
-                        : [
-                            TextSpan(
-                              text: "${punchData.value.situation}",
-                            ),
-                          ],
-                  ),
-                ),
+          isLoad: punchData.value.situation == "正在获取",
+          progress: punchData.value.valid / 50,
+          infoText: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                fontSize: 20,
               ),
+              children: punchData.value.situation == null
+                  ? [
+                      TextSpan(
+                        text: "${punchData.value.valid}",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: " 次",
+                      ),
+                    ]
+                  : [
+                      TextSpan(
+                        text: "${punchData.value.situation}",
+                      ),
+                    ],
             ),
-            Text(
-              punchData.value.situation ?? "总共 ${punchData.value.allTime} 次",
-            ),
-          ],
+          ),
+          bottomText: Text(
+            punchData.value.situation ?? "总共 ${punchData.value.allTime} 次",
+          ),
         ),
       ),
     );

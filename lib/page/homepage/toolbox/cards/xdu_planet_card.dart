@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/small_function_card.dart';
+import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 
 class XDUPlanetCard extends StatelessWidget {

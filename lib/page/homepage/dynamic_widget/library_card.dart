@@ -4,7 +4,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/library_controller.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -51,48 +51,42 @@ class LibraryCard extends StatelessWidget {
             c.getBorrowList();
           }
         },
-        child: MainPageCard(
-          icon: Icons.local_library,
-          text: "图书馆信息",
-          children: [
-            Obx(
-              () => Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontSize: 20,
-                      ),
-                      children: c.isGet.value
-                          ? [
-                              TextSpan(
-                                text: "${c.borrowList.length}",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              const TextSpan(text: " 本在借"),
-                            ]
-                          : [
-                              TextSpan(
-                                text: c.error.value ? "发生错误" : "正在获取",
-                              ),
-                            ],
-                    ),
-                  ),
+        child: Obx(
+          () => MainPageCard(
+            isLoad: !(c.isGet.value && !c.error.value),
+            icon: Icons.local_library_outlined,
+            text: "图书馆信息",
+            infoText: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 20,
                 ),
+                children: c.isGet.value
+                    ? [
+                        TextSpan(
+                          text: "${c.borrowList.length}",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const TextSpan(text: " 本"),
+                      ]
+                    : [
+                        TextSpan(
+                          text: c.error.value ? "发生错误" : "正在获取",
+                        ),
+                      ],
               ),
             ),
-            Obx(() {
+            bottomText: Obx(() {
               if (c.isGet.value) {
                 return Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍");
               } else {
                 return Text(c.error.value ? "目前无法获取信息" : "正在查询信息中");
               }
             }),
-          ],
+          ),
         ),
       ),
     );
