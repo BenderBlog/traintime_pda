@@ -53,11 +53,11 @@ class ElectricityCard extends StatelessWidget {
       },
       child: Obx(
         () => MainPageCard(
-          isLoad: electricity_session.isLoad,
-          progress: double.parse(electricity_session.isLoad
-                  ? "0"
-                  : electricity_session.electricityInfo.value) /
-              100.0,
+          isLoad: electricity_session.isNotice.value,
+          progress: electricity_session.electricityInfo.value
+                  .contains(RegExp(r'[0-9]'))
+              ? double.parse(electricity_session.electricityInfo.value) / 100.0
+              : null,
           icon: Icons.electric_meter_outlined,
           text: "电量信息",
           infoText: RichText(
@@ -66,25 +66,19 @@ class ElectricityCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onPrimaryContainer,
                 fontSize: 20,
               ),
-              children: !electricity_session.isNotice.value
+              children: electricity_session.electricityInfo.value
+                      .contains(RegExp(r'[0-9]'))
                   ? [
                       TextSpan(
-                        text:
-                            electricity_session.electricityInfo.value.substring(
-                          0,
-                          electricity_session.electricityInfo.value.length - 3,
-                        ),
+                        text: double.parse(
+                          electricity_session.electricityInfo.value,
+                        ).truncate().toString(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
-                          fontSize: 22.0,
+                          fontSize: 28,
                         ),
                       ),
-                      const TextSpan(
-                        text: " 度",
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
+                      const TextSpan(text: " 度"),
                     ]
                   : [
                       TextSpan(

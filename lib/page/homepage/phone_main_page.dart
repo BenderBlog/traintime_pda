@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/page/clipper.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
@@ -30,17 +32,27 @@ class PhoneMainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        toolbarHeight: 160,
+        backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         title: GetBuilder<ClassTableController>(
-          builder: (c) => Text(
-            c.isGet
-                ? c.isNotVacation
-                    ? "第 ${c.currentWeek + 1} 周"
-                    : "假期中"
-                : c.error != null
-                    ? "加载错误"
-                    : "正在加载",
-            style: const TextStyle(color: Colors.white),
+          builder: (c) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "早安, Bender",
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                c.isGet
+                    ? c.isNotVacation
+                        ? "第 ${c.currentWeek + 1} 周"
+                        : "假期中"
+                    : c.error != null
+                        ? "加载错误"
+                        : "正在加载",
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
           ),
         ),
       ),
@@ -55,40 +67,39 @@ class PhoneMainPage extends StatelessWidget {
         header: PhoenixHeader(
           skyColor: Theme.of(context).colorScheme.primary,
           position: IndicatorPosition.locator,
-          safeArea: false,
+          safeArea: true,
         ),
         child: ListView(
           children: [
             const HeaderLocator(),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                ClipPath(
-                  clipper: RoundClipper(
-                    height: classCardHeight,
-                  ),
-                  child: Container(
-                    height: classCardHeight,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.025,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: classCardHeight),
-                    child: const ClassTableCard(),
-                  ),
-                ),
-              ],
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.025,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: classCardHeight),
+                child: const ClassTableCard(),
+              ),
+            ),
+            Text(
+              "收藏组件",
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ).padding(
+              left: 20,
+              top: 20,
+              right: 0,
+              bottom: 4,
             ),
             Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025),
+                horizontal: MediaQuery.of(context).size.width * 0.025,
+              ),
               child: LayoutGrid(
                 columnSizes: [1.fr, 1.fr],
-                rowSizes: const [auto, auto, auto, auto],
+                rowSizes: [160.px, 160.px, auto, auto],
                 children: children,
               ),
             ),

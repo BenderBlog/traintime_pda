@@ -68,9 +68,12 @@ class LibraryCard extends StatelessWidget {
                           text: "${c.borrowList.length}",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
+                            fontSize: 28,
                           ),
                         ),
-                        const TextSpan(text: " 本"),
+                        const TextSpan(
+                          text: " 本",
+                        ),
                       ]
                     : [
                         TextSpan(

@@ -14,8 +14,6 @@ import 'package:watermeter/repository/preference.dart' as preference;
 var isNotice = true.obs;
 var electricityInfo = "".obs;
 
-bool get isLoad => electricityInfo.value == "正在获取";
-
 Future<void> update() async {
   try {
     isNotice.value = true;
@@ -24,20 +22,24 @@ Future<void> update() async {
     isNotice.value = false;
   } on NotSchoolNetworkException {
     electricityInfo.value = "非校园网";
+    isNotice.value = false;
   } on DioException catch (e) {
     developer.log(
       "Network error: $e",
       name: "ElectricSession",
     );
     electricityInfo.value = "网络故障";
+    isNotice.value = false;
   } on NotFoundException {
     electricityInfo.value = "未找到数据";
+    isNotice.value = false;
   } catch (e) {
     developer.log(
       "Unknown error: $e",
       name: "ElectricSession",
     );
     electricityInfo.value = "程序故障";
+    isNotice.value = false;
   }
 }
 

@@ -39,7 +39,8 @@ class ClassTableCard extends StatelessWidget {
         },
         child: Card(
           elevation: 0,
-          color: Theme.of(context).colorScheme.primaryContainer,
+          color:
+              Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

@@ -49,26 +49,26 @@ class MainPageCard extends StatelessWidget {
                 )
               ],
             ),
-            const SizedBox(height: 16),
-            Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    icon,
-                    size: 36,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: infoText,
+            Expanded(
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 36,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Center(
+                        child: infoText,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
             if (isLoad || (progress != null && progress! <= 1))
               Column(
                 children: [

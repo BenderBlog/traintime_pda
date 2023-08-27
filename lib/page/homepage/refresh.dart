@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/repository/electricity_session.dart' as electricity;
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
@@ -15,6 +16,8 @@ void update() {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
   final libraryController = Get.put(LibraryController());
+  final schoolCardController = Get.put(SchoolCardController());
+
   // Update Classtable
   developer.log(
     "Updating current class",
@@ -42,4 +45,6 @@ void update() {
   SportSession().getPunch();
   // Update Library
   libraryController.onReady();
+  // Update school card
+  schoolCardController.updateMoney();
 }

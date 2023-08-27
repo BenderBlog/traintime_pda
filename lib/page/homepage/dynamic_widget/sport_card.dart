@@ -147,6 +147,7 @@ class SportCard extends StatelessWidget {
                       TextSpan(
                         text: "${punchData.value.valid}",
                         style: TextStyle(
+                          fontSize: 28,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),

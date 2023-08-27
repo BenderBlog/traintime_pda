@@ -63,17 +63,18 @@ class SchoolCardInfoCard extends StatelessWidget {
                 children: c.isGetPrice.value
                     ? [
                         TextSpan(
-                          text: "${c.money}",
+                          text: double.parse(c.money.value) >= 10
+                              ? double.parse(c.money.value)
+                                  .truncate()
+                                  .toString()
+                              : c.money.value,
                           style: TextStyle(
-                            fontSize: 22,
                             color: Theme.of(context).colorScheme.primary,
+                            fontSize: 28,
                           ),
                         ),
                         const TextSpan(
                           text: " 元",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
                         ),
                       ]
                     : [
