@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_window.dart';
-import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/small_function_card.dart';
 
 class EmptyClassroomCard extends StatelessWidget {
   const EmptyClassroomCard({super.key});
@@ -14,7 +14,7 @@ class EmptyClassroomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ClassTableController>(
-      builder: (c) => GestureDetector(
+      builder: (c) => SmallFunctionCard(
         onTap: () async {
           if (offline) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -29,11 +29,9 @@ class EmptyClassroomCard extends StatelessWidget {
             );
           }
         },
-        child: const SmallFunctionCard(
-          icon: Icons.apartment,
-          name: "空闲教室",
-          description: "找个地方自习",
-        ),
+        icon: Icons.apartment,
+        name: "空闲教室",
+        description: "找个地方自习",
       ),
     );
   }

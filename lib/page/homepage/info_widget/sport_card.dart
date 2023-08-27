@@ -166,7 +166,8 @@ class SportCard extends StatelessWidget {
               ),
             ),
             Text(
-                punchData.value.situation ?? "总共 ${punchData.value.allTime} 次"),
+              punchData.value.situation ?? "总共 ${punchData.value.allTime} 次",
+            ),
           ],
         ),
       ),

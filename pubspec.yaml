@@ -26,7 +26,6 @@ dependencies:
   # Homepage and others
   easy_refresh: ^3.3.0+1
   sn_progress_dialog: ^1.1.3
-  ming_cute_icons: ^0.0.1
   # Others
   url_launcher: ^6.1.6
   jiffy: ^6.1.0

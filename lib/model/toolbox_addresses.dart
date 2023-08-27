@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 
-enum SchoolAddresses {
+enum WebViewAddresses {
   payment(
     name: "缴费系统",
     url: "https://payment.xidian.edu.cn/MNetWorkUI/showPublic",
@@ -37,23 +37,8 @@ enum SchoolAddresses {
     name: "校园网查询",
     url: "https://zfw.xidian.edu.cn",
     description: "希望永不收费",
-    iconData: Icons.signal_wifi_statusbar_4_bar,
-  );
-
-  final String name;
-  final String url;
-  final String description;
-  final IconData iconData;
-
-  const SchoolAddresses({
-    required this.name,
-    required this.url,
-    required this.description,
-    required this.iconData,
-  });
-}
-
-enum OtherAddress {
+    iconData: Icons.wifi_rounded,
+  ),
   calculator(
     name: "物理计算",
     url: "https://experiment-helper.wizzstudio.com/#/",
@@ -72,7 +57,7 @@ enum OtherAddress {
   final String description;
   final IconData iconData;
 
-  const OtherAddress({
+  const WebViewAddresses({
     required this.name,
     required this.url,
     required this.description,

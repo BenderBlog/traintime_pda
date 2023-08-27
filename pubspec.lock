@@ -717,14 +717,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
-  ming_cute_icons:
-    dependency: "direct main"
-    description:
-      name: ming_cute_icons
-      sha256: "4e13b0a58a0c2c7c0191f3439ae9b30bfd4e0980bd4670cd1ade58c7b61f780e"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.0.1"
   octo_image:
     dependency: transitive
     description:
