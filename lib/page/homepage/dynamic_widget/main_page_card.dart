@@ -79,11 +79,11 @@ class MainPageCard extends StatelessWidget {
                       minHeight: 4,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                 ],
               )
             else
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
             DefaultTextStyle.merge(
               style: const TextStyle(
                 fontSize: 12,

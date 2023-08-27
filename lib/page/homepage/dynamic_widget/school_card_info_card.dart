@@ -65,10 +65,16 @@ class SchoolCardInfoCard extends StatelessWidget {
                         TextSpan(
                           text: "${c.money}",
                           style: TextStyle(
+                            fontSize: 22,
                             color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                        const TextSpan(text: " 元"),
+                        const TextSpan(
+                          text: " 元",
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
                       ]
                     : [
                         TextSpan(

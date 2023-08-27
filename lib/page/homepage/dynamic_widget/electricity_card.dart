@@ -69,12 +69,22 @@ class ElectricityCard extends StatelessWidget {
               children: !electricity_session.isNotice.value
                   ? [
                       TextSpan(
-                        text: electricity_session.electricityInfo.value,
+                        text:
+                            electricity_session.electricityInfo.value.substring(
+                          0,
+                          electricity_session.electricityInfo.value.length - 3,
+                        ),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
+                          fontSize: 22.0,
                         ),
                       ),
-                      const TextSpan(text: " 度"),
+                      const TextSpan(
+                        text: " 度",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
                     ]
                   : [
                       TextSpan(
