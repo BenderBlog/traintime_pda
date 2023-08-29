@@ -87,9 +87,9 @@ class PhoneMainPage extends StatelessWidget {
               ),
               child: LayoutGrid(
                 columnSizes: [1.fr],
-                rowSizes: [auto],
-                children: [
-                  const ClassTableCard(),
+                rowSizes: const [auto],
+                children: const [
+                  ClassTableCard(),
                 ],
               ),
             ),

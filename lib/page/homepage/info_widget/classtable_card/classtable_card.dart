@@ -7,6 +7,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_arrangement.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_current.dart';
+import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:styled_widget/styled_widget.dart';
 
@@ -74,9 +75,26 @@ class ClassTableCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            const Flexible(child: ClasstableCurrentColumn()),
-            const Divider(color: Colors.transparent),
-            const ClasstableArrangementColumn(),
+            if (isPhone(context)) ...const [
+              Flexible(child: ClasstableCurrentColumn()),
+              Divider(color: Colors.transparent),
+              ClasstableArrangementColumn(),
+            ] else
+              const Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      flex: 5,
+                      child: ClasstableCurrentColumn(),
+                    ),
+                    VerticalDivider(),
+                    Flexible(
+                      flex: 6,
+                      child: ClasstableArrangementColumn(),
+                    ),
+                  ],
+                ),
+              ),
           ],
         )
             .paddingDirectional(

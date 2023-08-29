@@ -15,9 +15,6 @@ import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/sport_card.dart';
 
-import 'package:watermeter/page/homepage/toolbox/cards/empty_classroom_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/exam_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/score_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PadMainPage extends StatelessWidget {
@@ -76,9 +73,12 @@ class PadMainPage extends StatelessWidget {
             right: 0,
             bottom: 0,
           ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 140),
-            child: const ClassTableCard(),
+          LayoutGrid(
+            columnSizes: [1.fr],
+            rowSizes: const [auto],
+            children: const [
+              ClassTableCard(),
+            ],
           ),
           Text(
             "动态信息",
@@ -91,30 +91,14 @@ class PadMainPage extends StatelessWidget {
           ),
           LayoutGrid(
             columnSizes: [1.fr, 1.fr, 1.fr, 1.fr],
-            rowSizes: const [auto],
+            rowSizes: [
+              160.px,
+            ],
             children: const [
               SportCard(),
               ElectricityCard(),
               LibraryCard(),
               SchoolCardInfoCard(),
-            ],
-          ),
-          Text(
-            "常用工具",
-            style: textStyle(context),
-          ).padding(
-            left: 16,
-            top: 8,
-            right: 0,
-            bottom: 0,
-          ),
-          LayoutGrid(
-            columnSizes: [1.fr, 1.fr, 1.fr, 1.fr],
-            rowSizes: const [auto],
-            children: const [
-              ScoreCard(),
-              ExamCard(),
-              EmptyClassroomCard(),
             ],
           ),
         ],
