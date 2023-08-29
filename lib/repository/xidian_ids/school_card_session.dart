@@ -74,7 +74,7 @@ class SchoolCardSession extends IDSSession {
     var response = await dio
         .get("https://v8scan.xidian.edu.cn/$personalCenter")
         .then((value) => BeautifulSoup(value.data));
-    return response.ul?.children[0].findAll('p')[1].innerHtml ?? "未查询到校园卡余额";
+    return response.ul?.children[0].findAll('p')[1].innerHtml ?? "查询失败";
   }
 
   Future<void> initSession() async {

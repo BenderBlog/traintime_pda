@@ -72,12 +72,15 @@ class SchoolCardInfoCard extends StatelessWidget {
                               : c.money.value,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
-                            fontSize: 28,
+                            fontSize: c.money.value.contains(RegExp(r'[0-9]'))
+                                ? 28
+                                : 20,
                           ),
                         ),
-                        const TextSpan(
-                          text: " 元",
-                        ),
+                        if (c.money.value.contains(RegExp(r'[0-9]')))
+                          const TextSpan(
+                            text: " 元",
+                          ),
                       ]
                     : [
                         TextSpan(
