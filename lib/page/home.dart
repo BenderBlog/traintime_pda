@@ -139,6 +139,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: isPhone(context)
           ? NavigationBar(
+              height: 64,
               destinations: _destinations
                   .map(
                     (e) => NavigationDestination(
@@ -150,6 +151,7 @@ class _HomePageState extends State<HomePage> {
                   )
                   .toList(),
               selectedIndex: _selectedIndex,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
               onDestinationSelected: (int index) {
                 setState(() {
                   _selectedIndex = index;

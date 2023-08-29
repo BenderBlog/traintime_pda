@@ -30,9 +30,9 @@ class PhoneMainPage extends StatelessWidget {
 
   String get _now {
     DateTime now = DateTime.now();
-    if (now.hour >= 5 && now.hour <= 11) {
+    if (now.hour >= 5 && now.hour < 11) {
       return "早安 祝你好运";
-    } else if (now.hour <= 17) {
+    } else if (now.hour >= 11 && now.hour < 17) {
       return "午安 目前如何";
     } else {
       return "晚安 祝你好梦";

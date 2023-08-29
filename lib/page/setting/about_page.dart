@@ -128,7 +128,8 @@ class AboutPage extends StatelessWidget {
                                   child: const Text("Ciallo～(∠・ω< )⌒☆"),
                                   onPressed: () => launchUrl(
                                     Uri.parse(
-                                        "https://www.coolapk.com/feed/45104934"),
+                                      "https://www.coolapk.com/feed/45104934",
+                                    ),
                                     mode: LaunchMode.externalApplication,
                                   ),
                                 ),
