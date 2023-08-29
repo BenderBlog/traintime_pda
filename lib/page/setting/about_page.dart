@@ -121,11 +121,11 @@ class AboutPage extends StatelessWidget {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text("Self-Portrait"),
+                              title: const Text("Self Portrait"),
                               content: Image.asset("assets/Ray.jpg"),
                               actions: <Widget>[
                                 TextButton(
-                                  child: const Text("他写的文章和小说指引"),
+                                  child: const Text("Ciallo～(∠・ω< )⌒☆"),
                                   onPressed: () => launchUrl(
                                     Uri.parse(
                                         "https://www.coolapk.com/feed/45104934"),

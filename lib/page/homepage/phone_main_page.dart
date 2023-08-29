@@ -50,6 +50,7 @@ class PhoneMainPage extends StatelessWidget {
         headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
           SliverAppBar(
             centerTitle: false,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -103,59 +104,63 @@ class PhoneMainPage extends StatelessWidget {
             position: IndicatorPosition.locator,
             safeArea: true,
           ),
-          child: ListView(
-            children: [
-              const HeaderLocator(),
-              Text(
-                "日程安排",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: ListView(
+              children: [
+                const HeaderLocator(),
+                Text(
+                  "日程安排",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ).padding(
+                  left: 20,
+                  top: 10,
+                  right: 0,
+                  bottom: 4,
                 ),
-              ).padding(
-                left: 20,
-                top: 10,
-                right: 0,
-                bottom: 4,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025,
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.025,
+                  ),
+                  child: LayoutGrid(
+                    columnSizes: [1.fr],
+                    rowSizes: const [auto],
+                    children: const [
+                      ClassTableCard(),
+                    ],
+                  ),
                 ),
-                child: LayoutGrid(
-                  columnSizes: [1.fr],
-                  rowSizes: const [auto],
-                  children: const [
-                    ClassTableCard(),
-                  ],
+                Text(
+                  "收藏组件",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ).padding(
+                  left: 20,
+                  top: 20,
+                  right: 0,
+                  bottom: 4,
                 ),
-              ),
-              Text(
-                "收藏组件",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.025,
+                  ),
+                  child: LayoutGrid(
+                    columnSizes: [1.fr, 1.fr],
+                    rowSizes: [160.px, 160.px, auto, auto],
+                    children: children,
+                  ),
                 ),
-              ).padding(
-                left: 20,
-                top: 20,
-                right: 0,
-                bottom: 4,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.025,
-                ),
-                child: LayoutGrid(
-                  columnSizes: [1.fr, 1.fr],
-                  rowSizes: [160.px, 160.px, auto, auto],
-                  children: children,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ).safeArea(),
+      ),
     );
   }
 }
