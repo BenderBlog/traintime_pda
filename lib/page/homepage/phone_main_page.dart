@@ -7,9 +7,8 @@ import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 
-import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
@@ -32,15 +31,14 @@ class PhoneMainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 160,
-        backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        toolbarHeight: 128,
         title: GetBuilder<ClassTableController>(
-          builder: (c) => Row(
+          builder: (c) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 "早安, Bender",
-                style: TextStyle(color: Colors.white),
               ),
               Text(
                 c.isGet
@@ -50,7 +48,6 @@ class PhoneMainPage extends StatelessWidget {
                     : c.error != null
                         ? "加载错误"
                         : "正在加载",
-                style: TextStyle(color: Colors.white),
               ),
             ],
           ),
@@ -65,20 +62,35 @@ class PhoneMainPage extends StatelessWidget {
           update();
         },
         header: PhoenixHeader(
-          skyColor: Theme.of(context).colorScheme.primary,
+          skyColor: Theme.of(context).colorScheme.primaryContainer,
           position: IndicatorPosition.locator,
           safeArea: true,
         ),
         child: ListView(
           children: [
             const HeaderLocator(),
+            Text(
+              "日程安排",
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ).padding(
+              left: 20,
+              top: 10,
+              right: 0,
+              bottom: 4,
+            ),
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.025,
               ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: classCardHeight),
-                child: const ClassTableCard(),
+              child: LayoutGrid(
+                columnSizes: [1.fr],
+                rowSizes: [auto],
+                children: [
+                  const ClassTableCard(),
+                ],
               ),
             ),
             Text(
