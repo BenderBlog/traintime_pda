@@ -173,9 +173,11 @@ class _SettingWindowState extends State<SettingWindow> {
                       ));
                     }
                   } on PathNotFoundException {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('目前没有缓存 Cookie'),
-                    ));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('目前没有缓存 Cookie'),
+                      ));
+                    }
                   }
                 },
               ),

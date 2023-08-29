@@ -210,9 +210,11 @@ class _LoginWindowState extends State<LoginWindow> {
     } catch (e) {
       isGood = false;
       pd.close();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
