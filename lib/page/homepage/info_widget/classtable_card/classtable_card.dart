@@ -63,7 +63,7 @@ class ClassTableCard extends StatelessWidget {
                           ? "课程表"
                           : c.currentData.$3 == true
                               ? "课程表 下一节课是"
-                              : "课程表 正在上"
+                              : "课程表 正在进行"
                       : "课程表",
                   style: TextStyle(
                     fontSize: 16,
@@ -74,21 +74,9 @@ class ClassTableCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            const Expanded(
-              child: Row(
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: ClasstableCurrentColumn(),
-                  ),
-                  VerticalDivider(),
-                  Flexible(
-                    flex: 6,
-                    child: ClasstableArrangementColumn(),
-                  ),
-                ],
-              ),
-            ),
+            const Flexible(child: ClasstableCurrentColumn()),
+            const Divider(color: Colors.transparent),
+            const ClasstableArrangementColumn(),
           ],
         )
             .paddingDirectional(
@@ -96,7 +84,10 @@ class ClassTableCard extends StatelessWidget {
               vertical: 14,
             )
             .decorated(
-              border: Border.all(width: 2),
+              border: Border.all(
+                width: 2,
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
               borderRadius: BorderRadius.circular(16.0),
             )
             .paddingAll(4),

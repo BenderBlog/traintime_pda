@@ -23,12 +23,12 @@ class ClasstableCurrentColumn extends StatelessWidget {
               c.isGet == true
                   ? c.currentData.$1 == null
                       ? "目前没课"
-                      : c.currentData.$1!.name
+                      : c.currentData.$1!.name //"毛泽东思想和中国特色社会主义理论体系概论"
                   : c.error == null
                       ? "正在加载"
                       : "遇到错误",
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 20,
                 color: Theme.of(context).colorScheme.onPrimaryContainer,
               ),
             ),

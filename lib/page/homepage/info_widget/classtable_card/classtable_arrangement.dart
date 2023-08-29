@@ -18,6 +18,14 @@ class ClasstableArrangementColumn extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            "课程安排",
+            style: TextStyle(
+              fontSize: 14,
+              textBaseline: TextBaseline.alphabetic,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+          ).padding(bottom: 8.0),
           if (c.isGet)
             if (c.classSet.$1.isNotEmpty)
               ...List<Widget>.generate(
@@ -48,14 +56,10 @@ class ClasstableArrangementColumn extends StatelessWidget {
                 )
             else
               Text(c.classSet.$2 ? "明天没有课" : "今天课程上完了")
+                  .center()
                   .padding(
-                    left: 16,
-                    right: 8,
+                    horizontal: 8,
                     vertical: 6,
-                  )
-                  .border(
-                    left: 8.0,
-                    color: Colors.grey.shade600,
                   )
                   .backgroundColor(
                     Colors.grey.shade200,
@@ -63,20 +67,13 @@ class ClasstableArrangementColumn extends StatelessWidget {
                   .clipRRect(all: 12)
           else
             Text(c.error == null ? "正在加载" : "遇到错误")
+                .center()
                 .padding(
-                  left: 16,
-                  right: 8,
+                  horizontal: 8,
                   vertical: 6,
                 )
-                .border(
-                  left: 8.0,
-                  color: Theme.of(context).colorScheme.primary,
-                )
                 .backgroundColor(
-                  Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withOpacity(0.4),
+                  Colors.grey.shade200,
                 )
                 .clipRRect(all: 12),
         ],
