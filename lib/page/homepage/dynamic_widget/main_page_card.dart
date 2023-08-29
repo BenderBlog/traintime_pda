@@ -69,7 +69,8 @@ class MainPageCard extends StatelessWidget {
                 ),
               ),
             ),
-            if (isLoad || (progress != null && progress! <= 1))
+            if (isLoad ||
+                (progress != null && progress! >= 0 && progress! <= 1))
               Column(
                 children: [
                   ClipRRect(
@@ -92,7 +93,8 @@ class MainPageCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   bottomText,
-                  if (!isLoad && (progress != null && progress! <= 1))
+                  if (!isLoad &&
+                      (progress != null && progress! >= 0 && progress! <= 1))
                     Text("${progress! * 100} %"),
                 ],
               ),

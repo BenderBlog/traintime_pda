@@ -226,7 +226,7 @@ class ClassTableController extends GetxController {
         (Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
             7;
 
-    updateTime = DateTime.now().add(const Duration(minutes: 40));
+    updateTime = DateTime.now();
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",

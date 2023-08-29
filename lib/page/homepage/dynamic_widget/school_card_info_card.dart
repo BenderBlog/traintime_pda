@@ -63,10 +63,12 @@ class SchoolCardInfoCard extends StatelessWidget {
                 children: c.isGetPrice.value
                     ? [
                         TextSpan(
-                          text: double.parse(c.money.value) >= 10
-                              ? double.parse(c.money.value)
-                                  .truncate()
-                                  .toString()
+                          text: c.money.value.contains(RegExp(r'[0-9]'))
+                              ? double.parse(c.money.value) >= 10
+                                  ? double.parse(c.money.value)
+                                      .truncate()
+                                      .toString()
+                                  : c.money.value
                               : c.money.value,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
