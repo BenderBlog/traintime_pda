@@ -26,6 +26,18 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
     Get.put(SchoolCardController()).refreshPaidRecord();
   }
 
+  String moneySunUp(List<PaidRecord> theRecord) {
+    double sumUp = 0;
+    for (var element in theRecord) {
+      sumUp += double.parse(element.money);
+    }
+    if (sumUp.isLowerThan(0)) {
+      return "支出 ${(sumUp * -1).toStringAsFixed(2)}";
+    } else {
+      return "收入 ${sumUp.toStringAsFixed(2)}";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<SchoolCardController>(
@@ -79,14 +91,14 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                         MaterialStatePropertyAll<Color>(Colors.grey.shade100),
                     columnSpacing: 0,
                     horizontalMargin: 6,
-                    columns: const [
-                      DataColumn2(
+                    columns: [
+                      const DataColumn2(
                         size: ColumnSize.S,
                         label: Center(
                           child: Text('商户名称'),
                         ),
                       ),
-                      DataColumn2(
+                      const DataColumn2(
                         size: ColumnSize.S,
                         label: Center(
                           child: Text('金额'),
@@ -95,7 +107,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                       DataColumn2(
                         size: ColumnSize.L,
                         label: Center(
-                          child: Text('时间'),
+                          child: Text('时间(共${moneySunUp(c.getPaid)} 元)'),
                         ),
                       ),
                     ],
