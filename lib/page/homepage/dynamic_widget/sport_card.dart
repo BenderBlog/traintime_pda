@@ -3,6 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
@@ -47,17 +48,10 @@ class SportCard extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.tertiary,
                                 ),
                                 const SizedBox(width: 5),
-                                Expanded(
-                                  child: Text(
-                                    punchData.value.all.last.time
-                                        .format(pattern: "yyyy-MM-dd HH:mm:ss"),
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  ),
-                                ),
+                                Text(
+                                  punchData.value.all.last.time
+                                      .format(pattern: "yyyy-MM-dd HH:mm:ss"),
+                                ).expanded(),
                               ],
                             ),
                             const SizedBox(height: 2.0),
@@ -72,11 +66,6 @@ class SportCard extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     punchData.value.all.last.machineName,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
                                   ),
                                 ),
                               ],
@@ -93,11 +82,6 @@ class SportCard extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     punchData.value.all.last.state,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
                                   ),
                                 ),
                               ],
@@ -124,7 +108,7 @@ class SportCard extends StatelessWidget {
               ),
             );
           } else {
-            if (punchData.value.situation == "无密码信息") {
+            if (punchData.value.situation == "没有密码") {
               showDialog(
                 context: context,
                 builder: (context) => const SportPasswordDialog(),
@@ -149,9 +133,8 @@ class SportCard extends StatelessWidget {
                   ? [
                       TextSpan(
                         text: "${punchData.value.valid}",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 28,
-                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const TextSpan(

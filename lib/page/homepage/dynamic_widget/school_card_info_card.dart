@@ -59,7 +59,7 @@ class SchoolCardInfoCard extends StatelessWidget {
             infoText: RichText(
               text: TextSpan(
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 20,
                 ),
                 children: c.isGetPrice.value
@@ -73,19 +73,13 @@ class SchoolCardInfoCard extends StatelessWidget {
                                   : c.money.value
                               : c.money.value,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
                             fontSize: c.money.value.contains(RegExp(r'[0-9]'))
                                 ? 28
                                 : 20,
                           ),
                         ),
                         if (c.money.value.contains(RegExp(r'[0-9]')))
-                          TextSpan(
-                            text: " 元",
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
+                          const TextSpan(text: " 元"),
                       ]
                     : [
                         TextSpan(

@@ -76,6 +76,7 @@ class SchoolCardController extends GetxController {
   Future<void> updateMoney() async {
     isGetPrice.value = false;
     errorPrice.value = "";
+    await relogin();
     money.value = await session.getMoney();
     isGetPrice.value = true;
   }

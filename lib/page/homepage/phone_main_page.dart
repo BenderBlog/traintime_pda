@@ -8,9 +8,6 @@ import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-
-import 'package:watermeter/repository/preference.dart' as preference;
-
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';

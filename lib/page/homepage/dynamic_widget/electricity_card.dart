@@ -32,7 +32,8 @@ class ElectricityCard extends StatelessWidget {
                 child: Obx(
                   () => Text(
                     "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
-                    "电量信息：${electricity_session.electricityInfo.value} 度电\n"
+                    "电量信息：${electricity_session.electricityInfo.value}"
+                    "${electricity_session.electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
                     "欠费信息：${owe_session.owe.value}\n"
                     "长按可以重新加载，有欠费一般代表水费",
                   ),
