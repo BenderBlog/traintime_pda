@@ -18,8 +18,6 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
-import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -57,6 +55,7 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
             ],
           ),
+          /*
           SettingsSection(
             title: const Text('颜色设置'),
             tiles: <SettingsTile>[
@@ -72,7 +71,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   }),
             ],
-          ),
+          ),*/
           SettingsSection(
             title: const Text('帐号设置'),
             tiles: <SettingsTile>[

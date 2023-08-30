@@ -80,8 +80,9 @@ class ToolBoxView extends StatelessWidget {
         title: Text(
           "小工具",
           style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         backgroundColor: Theme.of(context).colorScheme.background,
       ),

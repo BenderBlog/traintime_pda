@@ -41,48 +41,51 @@ class SmallFunctionCard extends StatelessWidget {
         ),
         color: Theme.of(context).colorScheme.secondary,
         child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              width: 160,
-              height: 80,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Icon(
-                    icon,
-                    size: 36,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
-                  // const VerticalDivider(
-                  //   width: 3,
-                  //   color: Colors.transparent,
-                  // ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary),
+          padding: const EdgeInsets.all(10),
+          child: SizedBox(
+            width: 160,
+            height: 80,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(
+                  icon,
+                  size: 36,
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+                // const VerticalDivider(
+                //   width: 3,
+                //   color: Colors.transparent,
+                // ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
-                      Text(
-                        description,
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer
-                                .withOpacity(0.6)),
+                    ),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSecondaryContainer
+                            .withOpacity(0.6),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            )),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

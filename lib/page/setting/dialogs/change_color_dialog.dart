@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Change app color pattern.
-
+// Omit from release temporarity.
+/*
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 class ChangeColorDialog extends StatefulWidget {
   const ChangeColorDialog({super.key});
@@ -74,3 +75,4 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
     );
   }
 }
+*/

@@ -3,8 +3,8 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+//import 'package:watermeter/repository/preference.dart' as preference;
+//import 'package:watermeter/themes/color_seed.dart';
 import '../themes/demo_blue.dart';
 
 class ThemeController extends GetxController {
@@ -17,11 +17,15 @@ class ThemeController extends GetxController {
   }
 
   void onUpdate() {
-    apptheme = ThemeData(
-      useMaterial3: true,
-      colorSchemeSeed: ColorSeed
-          .values[preference.getInt(preference.Preference.color)].color,
-    );
+    /*
+    if (preference.getInt(preference.Preference.color) == 0) {
+    } else {
+      apptheme = ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: ColorSeed
+            .values[preference.getInt(preference.Preference.color)].color,
+      );
+    }*/
     apptheme = demo_blue;
     update();
   }

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/both_side_sheet.dart';
 import 'package:watermeter/page/classtable/class_detail/class_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 /// The card in [classSubRow], metioned in [ClassTableView].
 class ClassCard extends StatelessWidget {

@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/classtable/class_detail/class_detail_dialog.dart';
 import 'package:watermeter/page/classtable/class_detail/class_detail_state.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 /// A list of the class info in that period, in case of conflict class.
 class ClassDetailList extends StatelessWidget {

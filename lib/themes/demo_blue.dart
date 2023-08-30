@@ -6,14 +6,15 @@ var demo_blue = ThemeData(
   brightness: Brightness.light,
 
   colorScheme: ColorScheme.fromSeed(
-      seedColor: Color.fromRGBO(49, 78, 122, 1),
-      primary: Color.fromRGBO(49, 78, 122, 1),
-      primaryContainer: Color.fromRGBO(49, 78, 122, 1),
-      onPrimaryContainer: Color.fromRGBO(255, 255, 255, 1),
-      background: Color.fromRGBO(245, 245, 245, 1),
-      secondary: Color.fromRGBO(226, 232, 243, 1),
-      secondaryContainer: Color.fromRGBO(226, 232, 243, 1),
-      onSecondaryContainer: Color.fromRGBO(49, 78, 122, 1)),
+    seedColor: const Color.fromRGBO(49, 78, 122, 1),
+    primary: const Color.fromRGBO(49, 78, 122, 1),
+    primaryContainer: const Color.fromRGBO(49, 78, 122, 1),
+    onPrimaryContainer: const Color.fromRGBO(255, 255, 255, 1),
+    background: const Color.fromRGBO(245, 245, 245, 1),
+    secondary: const Color.fromRGBO(226, 232, 243, 1),
+    secondaryContainer: const Color.fromRGBO(226, 232, 243, 1),
+    onSecondaryContainer: const Color.fromRGBO(49, 78, 122, 1),
+  ),
 
   // primaryColor: Color.fromRGBO(49, 78, 122, 1),
 
