@@ -108,7 +108,20 @@ class ClassTableFile extends EhallSession {
       data: {'XNXQDM': semesterCode},
     ).then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
-      throw Exception("${qResult['extParams']['msg']}在已安排课程");
+      developer.log(qResult['extParams']['msg'], name: "Ehall getClasstable");
+      developer.log(
+        " ${qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
+        name: "Ehall getClasstable",
+      );
+      if (qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")) {
+        developer.log("Classtable not released.", name: "Ehall getClasstable");
+        return ClassTableData(
+          semesterCode: semesterCode,
+          termStartDay: termStartDay,
+        );
+      } else {
+        throw Exception("${qResult['extParams']['msg']}");
+      }
     }
 
     developer.log("Caching...", name: "Ehall getClasstable");

@@ -185,21 +185,24 @@ class _ClassTablePageState extends State<ClassTablePage> {
           : Container(
               decoration: decoration,
               // color: Colors.grey.shade200.withOpacity(0.75),
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.error,
                       size: 100,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 30,
                     ),
-                    Text("这个学期没有课程，不会吧?"),
-                    Text("如果你没选课，快去 xk.xidian.edu.cn！"),
-                    Text("如果你要毕业了，祝你前程似锦。"),
-                    Text("如果你已经毕业，快去关注 SuperBart 哔哩哔哩帐号！"),
+                    Text(
+                      "${ClassTableState.of(context)!.semesterCode} 学期没有课程，不会吧?",
+                    ),
+                    const Text("如果刚选完课，过几天就更新了吧。"),
+                    const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
+                    const Text("如果你要毕业了，祝你前程似锦。"),
+                    const Text("如果你已经毕业，快去关注 SuperBart 哔哩哔哩帐号！"),
                   ],
                 ),
               ),
