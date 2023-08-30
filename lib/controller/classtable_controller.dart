@@ -222,9 +222,10 @@ class ClassTableController extends GetxController {
         Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
     // Get the current index.
-    currentWeek =
-        (Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-            7;
+    int delta =
+        Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear;
+    if (delta < 0) delta = -7;
+    currentWeek = delta ~/ 7;
 
     updateTime = DateTime.now();
 
