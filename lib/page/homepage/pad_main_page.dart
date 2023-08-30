@@ -26,26 +26,31 @@ class PadMainPage extends StatelessWidget {
   double height(context) => MediaQuery.sizeOf(context).height;
 
   TextStyle textStyle(context) => TextStyle(
-        fontSize: 20,
-        color: Theme.of(context).colorScheme.onPrimaryContainer,
+        fontSize: 16,
+        color: Theme.of(context).colorScheme.primary,
+        fontWeight: FontWeight.w700,
       );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GetBuilder<ClassTableController>(
-          builder: (c) {
-            String text = c.isGet
-                ? c.isNotVacation
-                    ? "第 ${c.currentWeek + 1} 周"
-                    : "假期中"
-                : c.error != null
-                    ? "加载错误"
-                    : "正在加载";
-            return Text(text);
-          },
-        ),
+        backgroundColor: Theme.of(context).colorScheme.background,
+        title: GetBuilder<ClassTableController>(builder: (c) {
+          String text = c.isGet
+              ? c.isNotVacation
+                  ? "第 ${c.currentWeek + 1} 周"
+                  : "假期中"
+              : c.error != null
+                  ? "加载错误"
+                  : "正在加载";
+          return Text(
+            text,
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary),
+          );
+        }),
         actions: [
           IconButton(
             onPressed: () {

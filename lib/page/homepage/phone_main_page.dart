@@ -41,6 +41,12 @@ class PhoneMainPage extends StatelessWidget {
     return "晚上好 祝你好梦";
   }
 
+  TextStyle textStyle(context) => TextStyle(
+        fontSize: 16,
+        color: Theme.of(context).colorScheme.primary,
+        fontWeight: FontWeight.w700,
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,10 +123,7 @@ class PhoneMainPage extends StatelessWidget {
                 const HeaderLocator(),
                 Text(
                   "日程",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w700),
+                  style: textStyle(context),
                 ).padding(
                   left: 20,
                   top: 10,
@@ -141,10 +144,7 @@ class PhoneMainPage extends StatelessWidget {
                 ),
                 Text(
                   "动态信息",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w700),
+                  style: textStyle(context),
                 ).padding(
                   left: 20,
                   top: 20,
@@ -162,15 +162,17 @@ class PhoneMainPage extends StatelessWidget {
                       return LayoutGrid(
                         columnSizes: [1.fr, 1.fr],
                         rowSizes: [squareSize.px, squareSize.px, auto, auto],
-                        children: children.map((child) {
-                          return AspectRatio(
-                            aspectRatio: 1, // 设置宽高比为1，即正方形
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: child,
-                            ),
-                          );
-                        }).toList(),
+                        children: children.map(
+                          (child) {
+                            return AspectRatio(
+                              aspectRatio: 1, // 设置宽高比为1，即正方形
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: child,
+                              ),
+                            );
+                          },
+                        ).toList(),
                       );
                     },
                   ),
