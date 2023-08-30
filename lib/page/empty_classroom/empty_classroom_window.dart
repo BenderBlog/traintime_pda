@@ -1,4 +1,4 @@
-// Copyright 2023 BenderBlog Rodriguez.
+// Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';

@@ -1,4 +1,4 @@
-// Copyright 2023 BenderBlog Rodriguez.
+// Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
@@ -74,7 +74,7 @@ class ClassTableCard extends StatelessWidget {
             //     ),
             //   ],
             // ),
-            const SizedBox(height: 4),  
+            const SizedBox(height: 4),
             if (isPhone(context)) ...const [
               Flexible(child: ClasstableCurrentColumn()),
               Divider(color: Colors.transparent),

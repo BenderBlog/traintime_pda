@@ -1,4 +1,4 @@
-// Copyright 2023 BenderBlog Rodriguez.
+// Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:easy_refresh/easy_refresh.dart';

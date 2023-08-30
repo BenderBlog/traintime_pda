@@ -1,4 +1,4 @@
-// Copyright 2023 BenderBlog Rodriguez.
+// Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
 // ignore_for_file: non_constant_identifier_names

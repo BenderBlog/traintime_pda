@@ -1,4 +1,4 @@
-// Copyright 2023 BenderBlog Rodriguez.
+// Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ import 'dart:io' show Platform;
 class AboutPage extends StatelessWidget {
   final String license = '''
         <h1 style="text-align: center">${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} 软件最终用户许可协议</h1>
-        <p style="text-align: center"><i>BenderBlog Rodriguez, 2023-08-10</i></p>
+        <p style="text-align: center"><i>BenderBlog Rodriguez and contributors, 2023-08-10</i></p>
 
         <h2>一、定义</h2>
             <ol>
