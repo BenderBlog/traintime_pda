@@ -69,25 +69,15 @@ class SchoolCardSession extends IDSSession {
   }
 
   Future<String> getMoney() async {
-    developer.log("Received: $virtualCardUrl.", name: "SchoolCardSession");
-    developer.log("Received: $personalCenter.", name: "SchoolCardSession");
-    var response =
-        await dio.get("https://v8scan.xidian.edu.cn/$personalCenter");
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      String location = response.headers[HttpHeaders.locationHeader]![0];
-      developer.log("Received: $location.", name: "SchoolCardSession");
-      response = await dio.get(location);
-    }
-
-    return BeautifulSoup(response.data)
-            .ul
-            ?.children[0]
-            .findAll('p')[1]
-            .innerHtml ??
+    var response = await initSession();
+    return response
+            .find("span", attrs: {"name": "showbalanceid"})
+            ?.innerHtml
+            .substring(4) ??
         "查询失败";
   }
 
-  Future<void> initSession() async {
+  Future<BeautifulSoup> initSession() async {
     var response = await dio.get(
       "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
     );
@@ -112,5 +102,7 @@ class SchoolCardSession extends IDSSession {
         personalCenter += element["href"]!;
       }
     });
+
+    return page;
   }
 }

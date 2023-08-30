@@ -34,7 +34,6 @@ class SchoolCardController extends GetxController {
   void onReady() async {
     try {
       isGetPrice.value = false;
-      await session.initSession();
       await updateMoney();
       isGetPrice.value = true;
     } on DioException catch (e, s) {
@@ -76,7 +75,6 @@ class SchoolCardController extends GetxController {
   Future<void> updateMoney() async {
     isGetPrice.value = false;
     errorPrice.value = "";
-    await relogin();
     money.value = await session.getMoney();
     isGetPrice.value = true;
   }
