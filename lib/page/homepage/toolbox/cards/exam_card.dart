@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_window.dart';
 import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
@@ -38,8 +39,8 @@ class ExamCard extends StatelessWidget {
             ));
           }
         },
-        icon: Icons.view_timeline,
-        name: "考试查询",
+        icon: MingCuteIcons.mgc_calendar_line,
+        name: "考试安排",
         description: "上天保佑时间",
       ),
     );

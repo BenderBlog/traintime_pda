@@ -29,7 +29,8 @@ class ClasstableCurrentColumn extends StatelessWidget {
                       : "遇到错误",
               style: TextStyle(
                 fontSize: 20,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           )),
@@ -40,7 +41,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                       "请享受空闲时光",
                       style: TextStyle(
                         fontSize: 16,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     )
                   : Column(
@@ -49,9 +50,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.person,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 18,
                             ),
                             const SizedBox(width: 2),
@@ -60,9 +59,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                                   ? "老师未知"
                                   : c.currentData.$1!.teacher!,
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
                               ),
                             ),
@@ -72,18 +69,14 @@ class ClasstableCurrentColumn extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.room,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 18,
                             ),
                             const SizedBox(width: 2),
                             Text(
                               c.currentData.$2!.classroom ?? "地点未定",
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
                               ),
                             ),
@@ -93,9 +86,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.access_time_filled_outlined,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 18,
                             ),
                             const SizedBox(width: 2),
@@ -103,9 +94,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                               "${time[(c.currentData.$2!.start - 1) * 2]}-"
                               "${time[(c.currentData.$2!.stop - 1) * 2 + 1]}",
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
                               ),
                             ),
@@ -117,7 +106,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                   c.error == null ? "请耐心等待片刻" : "课表获取失败",
                   style: TextStyle(
                     fontSize: 15,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
         ],

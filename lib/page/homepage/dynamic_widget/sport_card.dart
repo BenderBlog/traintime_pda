@@ -8,6 +8,8 @@ import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 class SportCard extends StatelessWidget {
   const SportCard({super.key});
 
@@ -132,7 +134,8 @@ class SportCard extends StatelessWidget {
         },
         onLongPress: SportSession().getPunch,
         child: MainPageCard(
-          icon: Icons.run_circle_outlined,
+          isBold: true,
+          icon: MingCuteIcons.mgc_run_fill,
           text: "体育信息",
           isLoad: punchData.value.situation == "正在获取",
           progress: punchData.value.valid / 50,

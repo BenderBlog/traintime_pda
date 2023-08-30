@@ -47,6 +47,7 @@ bool getBool(Preference key) {
   if (key.type != 'bool') {
     throw WrongTypeException;
   }
+
   return prefs.getBool(key.key) ?? false;
 }
 

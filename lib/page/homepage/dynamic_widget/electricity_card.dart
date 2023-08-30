@@ -3,6 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/repository/electricity_session.dart'
     as electricity_session;
@@ -58,12 +59,12 @@ class ElectricityCard extends StatelessWidget {
                   .contains(RegExp(r'[0-9]'))
               ? double.parse(electricity_session.electricityInfo.value) / 100.0
               : null,
-          icon: Icons.electric_meter_outlined,
+          icon: MingCuteIcons.mgc_flash_line,
           text: "电量信息",
           infoText: RichText(
             text: TextSpan(
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 20,
               ),
               children: electricity_session.electricityInfo.value

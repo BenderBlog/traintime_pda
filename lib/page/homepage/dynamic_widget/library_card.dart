@@ -3,6 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
@@ -17,20 +18,31 @@ class LibraryCard extends StatelessWidget {
       builder: (c) => GestureDetector(
         onTap: () async {
           if (offline) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: Text("脱机模式下，一站式相关功能全部禁止使用"),
+              content: Text(
+                "脱机模式下，一站式相关功能全部禁止使用",
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
             ));
           } else if (!c.isGet.value) {
             if (c.error.value) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: Text("获取图书馆信息发生故障，长按该卡片获取更新"),
+                content: Text(
+                  "获取图书馆信息发生故障，长按该卡片获取更新",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
               ));
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: Text("正在获取，请稍后再来看"),
+                content: Text(
+                  "正在获取，请稍后再来看",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
               ));
             }
           } else {
@@ -54,8 +66,8 @@ class LibraryCard extends StatelessWidget {
         child: Obx(
           () => MainPageCard(
             isLoad: !(c.isGet.value && !c.error.value),
-            icon: Icons.local_library_outlined,
-            text: "图书馆信息",
+            icon: MingCuteIcons.mgc_book_2_line,
+            text: "图书借阅",
             infoText: RichText(
               text: TextSpan(
                 style: TextStyle(
@@ -71,8 +83,11 @@ class LibraryCard extends StatelessWidget {
                             fontSize: 28,
                           ),
                         ),
-                        const TextSpan(
+                        TextSpan(
                           text: " 本",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                       ]
                     : [
