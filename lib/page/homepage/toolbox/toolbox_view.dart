@@ -58,8 +58,9 @@ class ToolBoxView extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              fontSize: 20,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ).padding(
             left: 16,
@@ -76,11 +77,17 @@ class ToolBoxView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("小工具"),
+        title: Text(
+          "小工具",
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.background,
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.025,
+          horizontal: MediaQuery.of(context).size.width * 0.040,
         ),
         children: [
           ...grid("学习", study),

@@ -49,32 +49,32 @@ class ClassTableCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.access_time_filled,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  c.isGet == true
-                      ? c.currentData.$3 == null
-                          ? "课程表"
-                          : c.currentData.$3 == true
-                              ? "课程表 下一节课是"
-                              : "课程表 正在进行"
-                      : "课程表",
-                  style: TextStyle(
-                    fontSize: 16,
-                    textBaseline: TextBaseline.alphabetic,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+            // Row(
+            //   crossAxisAlignment: CrossAxisAlignment.center,
+            //   children: [
+            //     Icon(
+            //       Icons.access_time_filled,
+            //       color: Theme.of(context).colorScheme.primary,
+            //       size: 16,
+            //     ),
+            //     const SizedBox(width: 8),
+            //     Text(
+            //       c.isGet == true
+            //           ? c.currentData.$3 == null
+            //               ? "课程表"
+            //               : c.currentData.$3 == true
+            //                   ? "课程表 下一节课是"
+            //                   : "课程表 正在进行"
+            //           : "课程表",
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         textBaseline: TextBaseline.alphabetic,
+            //         color: Theme.of(context).colorScheme.primary,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            const SizedBox(height: 4),  
             if (isPhone(context)) ...const [
               Flexible(child: ClasstableCurrentColumn()),
               Divider(color: Colors.transparent),
@@ -103,10 +103,10 @@ class ClassTableCard extends StatelessWidget {
             )
             .decorated(
               border: Border.all(
-                width: 2,
-                color: Theme.of(context).colorScheme.primaryContainer,
+                width: 3,
+                color: Theme.of(context).colorScheme.primary,
               ),
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(26),
             )
             .paddingAll(4),
       ),

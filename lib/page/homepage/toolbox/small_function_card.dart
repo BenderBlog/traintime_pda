@@ -36,47 +36,53 @@ class SmallFunctionCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Card(
         elevation: 0,
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ClipOval(
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    color: Colors.white,
-                    child: Icon(
-                      icon,
-                      size: 36,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                ),
-                const VerticalDivider(
-                  width: 10,
-                  color: Colors.transparent,
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      description,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16), // 这里调整圆角的大小
         ),
+        color: Theme.of(context).colorScheme.secondary,
+        child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Container(
+              width: 160,
+              height: 80,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Icon(
+                    icon,
+                    size: 36,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                  // const VerticalDivider(
+                  //   width: 3,
+                  //   color: Colors.transparent,
+                  // ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                      Text(
+                        description,
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer
+                                .withOpacity(0.6)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )),
       ),
     );
   }

@@ -44,7 +44,7 @@ class ClasstableArrangementColumn extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               textBaseline: TextBaseline.alphabetic,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ).padding(bottom: 8.0),
           if (c.isGet)

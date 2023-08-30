@@ -54,6 +54,7 @@ dependencies:
   flutter_markdown: ^0.6.17+1
   flutter_layout_grid: ^2.0.4
   styled_widget: ^0.4.1
+  ming_cute_icons: ^0.0.1
 
 dev_dependencies:
   flutter_test:

@@ -10,21 +10,41 @@ class MainPageCard extends StatelessWidget {
   final double? progress;
   final Widget infoText;
   final Widget bottomText;
-  const MainPageCard({
-    super.key,
-    required this.icon,
-    required this.text,
-    required this.infoText,
-    required this.bottomText,
-    required this.isLoad,
-    this.progress,
-  });
+  final bool? isBold;
+  const MainPageCard(
+      {super.key,
+      required this.icon,
+      required this.text,
+      required this.infoText,
+      required this.bottomText,
+      required this.isLoad,
+      this.progress,
+      this.isBold});
 
   @override
   Widget build(BuildContext context) {
+    final colorPrimary = isBold == true
+        ? Theme.of(context).colorScheme.primaryContainer
+        : Theme.of(context).colorScheme.secondaryContainer;
+
+    final colorOnPrimary = isBold == true
+        ? Theme.of(context).colorScheme.onPrimaryContainer
+        : Theme.of(context).colorScheme.onSecondaryContainer;
+
+    final colorLineProgressBG = isBold == true
+        ? Theme.of(context).colorScheme.background.withOpacity(0.1)
+        : Theme.of(context).colorScheme.primary.withOpacity(0.1);
+
+    final colorLineProgress = isBold == true
+        ? Theme.of(context).colorScheme.onPrimaryContainer
+        : Theme.of(context).colorScheme.onSecondaryContainer;
+
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22), // 这里调整圆角的大小
+      ),
       elevation: 0,
-      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
+      color: colorPrimary,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -37,14 +57,14 @@ class MainPageCard extends StatelessWidget {
                 Text(
                   text,
                   style: TextStyle(
-                    fontSize: 16,
-                    textBaseline: TextBaseline.alphabetic,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                      fontSize: 16,
+                      textBaseline: TextBaseline.alphabetic,
+                      color: colorOnPrimary,
+                      fontWeight: FontWeight.w700),
                 ),
                 Icon(
                   Icons.more_vert,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  color: colorOnPrimary,
                   size: 16,
                 )
               ],
@@ -57,8 +77,8 @@ class MainPageCard extends StatelessWidget {
                   children: [
                     Icon(
                       icon,
-                      size: 36,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      size: 52,
+                      color: colorOnPrimary,
                     ),
                     Expanded(
                       child: Center(
@@ -74,20 +94,23 @@ class MainPageCard extends StatelessWidget {
               Column(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
                       value: isLoad ? null : progress,
-                      minHeight: 4,
+                      backgroundColor: colorLineProgressBG,
+                      color: colorLineProgress,
+                      minHeight: 6,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                 ],
               )
             else
               const SizedBox(height: 8),
             DefaultTextStyle.merge(
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
+                color: colorOnPrimary,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

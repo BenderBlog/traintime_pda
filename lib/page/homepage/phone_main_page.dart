@@ -9,6 +9,8 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 
+import 'package:watermeter/repository/preference.dart' as preference;
+
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
@@ -31,11 +33,11 @@ class PhoneMainPage extends StatelessWidget {
   String get _now {
     DateTime now = DateTime.now();
     if (now.hour >= 5 && now.hour < 11) {
-      return "早安 祝你好运";
+      return "早上好 " + preference.getString(preference.Preference.name);
     } else if (now.hour >= 11 && now.hour < 17) {
-      return "午安 目前如何";
+      return "中午好 " + preference.getString(preference.Preference.name);
     } else {
-      return "晚安 祝你好梦";
+      return "晚上好 " + preference.getString(preference.Preference.name);
     }
   }
 
@@ -50,7 +52,7 @@ class PhoneMainPage extends StatelessWidget {
         headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
           SliverAppBar(
             centerTitle: false,
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            backgroundColor: Theme.of(context).colorScheme.background,
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -67,7 +69,7 @@ class PhoneMainPage extends StatelessWidget {
                     Text(
                       _now,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -80,9 +82,12 @@ class PhoneMainPage extends StatelessWidget {
                           : c.error != null
                               ? "加载错误"
                               : "正在加载",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.black54,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -95,7 +100,7 @@ class PhoneMainPage extends StatelessWidget {
           onRefresh: () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: Text("请稍候，正在刷新信息"),
+              content: Text("加载中..."),
             ));
             update();
           },
@@ -111,11 +116,11 @@ class PhoneMainPage extends StatelessWidget {
               children: [
                 const HeaderLocator(),
                 Text(
-                  "日程安排",
+                  "日程",
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w700),
                 ).padding(
                   left: 20,
                   top: 10,
@@ -124,7 +129,7 @@ class PhoneMainPage extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.025,
+                    horizontal: MediaQuery.of(context).size.width * 0.030,
                   ),
                   child: LayoutGrid(
                     columnSizes: [1.fr],
@@ -135,11 +140,11 @@ class PhoneMainPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "收藏组件",
+                  "动态信息",
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w700),
                 ).padding(
                   left: 20,
                   top: 20,
@@ -148,12 +153,26 @@ class PhoneMainPage extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.025,
+                    horizontal: MediaQuery.of(context).size.width * 0.040,
                   ),
-                  child: LayoutGrid(
-                    columnSizes: [1.fr, 1.fr],
-                    rowSizes: [160.px, 160.px, auto, auto],
-                    children: children,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      double squareSize =
+                          constraints.maxWidth * 0.5; // 正方形的大小为父容器宽度的一半
+                      return LayoutGrid(
+                        columnSizes: [1.fr, 1.fr],
+                        rowSizes: [squareSize.px, squareSize.px, auto, auto],
+                        children: children.map((child) {
+                          return AspectRatio(
+                            aspectRatio: 1, // 设置宽高比为1，即正方形
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: child,
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
                   ),
                 ),
               ],

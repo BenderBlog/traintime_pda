@@ -8,6 +8,8 @@ import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/schoolcard/school_card_window.dart';
 import 'package:watermeter/repository/network_session.dart';
 
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 class SchoolCardInfoCard extends StatelessWidget {
   const SchoolCardInfoCard({super.key});
 
@@ -52,7 +54,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         child: Obx(
           () => MainPageCard(
             isLoad: !(c.isGetPrice.value && c.errorPrice.isEmpty),
-            icon: Icons.money_rounded,
+            icon: MingCuteIcons.mgc_wallet_4_line,
             text: "流水查询",
             infoText: RichText(
               text: TextSpan(
@@ -78,8 +80,11 @@ class SchoolCardInfoCard extends StatelessWidget {
                           ),
                         ),
                         if (c.money.value.contains(RegExp(r'[0-9]')))
-                          const TextSpan(
+                          TextSpan(
                             text: " 元",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                       ]
                     : [

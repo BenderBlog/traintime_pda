@@ -10,6 +10,8 @@ import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 class PageInformation {
   final int index;
   final String name;
@@ -38,20 +40,20 @@ class _HomePageState extends State<HomePage> {
     PageInformation(
       index: 0,
       name: "主页",
-      icon: Icons.home,
-      iconChoice: Icons.home_outlined,
+      icon: MingCuteIcons.mgc_home_3_line,
+      iconChoice: MingCuteIcons.mgc_home_3_fill,
     ),
     PageInformation(
       index: 1,
       name: "小工具",
-      icon: Icons.assistant,
-      iconChoice: Icons.assistant_outlined,
+      icon: MingCuteIcons.mgc_compass_line,
+      iconChoice: MingCuteIcons.mgc_compass_fill,
     ),
     PageInformation(
       index: 2,
       name: "设置",
-      icon: Icons.settings,
-      iconChoice: Icons.settings_outlined,
+      icon: MingCuteIcons.mgc_user_2_line,
+      iconChoice: MingCuteIcons.mgc_user_2_fill,
     ),
   ];
 
@@ -139,13 +141,15 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: isPhone(context)
           ? NavigationBar(
+              backgroundColor: Theme.of(context).colorScheme.background,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               height: 64,
               destinations: _destinations
                   .map(
                     (e) => NavigationDestination(
                       icon: _selectedIndex == e.index
-                          ? Icon(e.icon)
-                          : Icon(e.iconChoice),
+                          ? Icon(e.iconChoice)
+                          : Icon(e.icon),
                       label: e.name,
                     ),
                   )
