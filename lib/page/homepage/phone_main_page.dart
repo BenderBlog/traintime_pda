@@ -29,6 +29,7 @@ class PhoneMainPage extends StatelessWidget {
 
   String get _now {
     DateTime now = DateTime.now();
+
     if (now.hour >= 5 && now.hour < 9) return "早上好 准备出发";
 
     if (now.hour >= 9 && now.hour < 11) return "上午好 祝万事如意";
@@ -51,7 +52,7 @@ class PhoneMainPage extends StatelessWidget {
         headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
           SliverAppBar(
             centerTitle: false,
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -68,7 +69,7 @@ class PhoneMainPage extends StatelessWidget {
                     Text(
                       _now,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -104,7 +105,7 @@ class PhoneMainPage extends StatelessWidget {
             update();
           },
           header: PhoenixHeader(
-            skyColor: Theme.of(context).colorScheme.primaryContainer,
+            skyColor: Theme.of(context).colorScheme.secondaryContainer,
             position: IndicatorPosition.locator,
             safeArea: true,
           ),

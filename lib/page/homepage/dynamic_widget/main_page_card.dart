@@ -57,10 +57,11 @@ class MainPageCard extends StatelessWidget {
                 Text(
                   text,
                   style: TextStyle(
-                      fontSize: 16,
-                      textBaseline: TextBaseline.alphabetic,
-                      color: colorOnPrimary,
-                      fontWeight: FontWeight.w700),
+                    fontSize: 16,
+                    textBaseline: TextBaseline.alphabetic,
+                    color: colorOnPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 Icon(
                   Icons.more_vert,
