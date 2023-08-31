@@ -27,8 +27,8 @@ class ThemeController extends GetxController {
             .values[preference.getInt(preference.Preference.color)].color,
       );
     }*/
-    apptheme = demo_blue_dark; // 测试暗色主题
-    appthemeDark = demo_blue_dark;
+    apptheme = demo_blue;
+    appthemeDark = demo_blue_dark; // 暗色主题
     update();
   }
 }

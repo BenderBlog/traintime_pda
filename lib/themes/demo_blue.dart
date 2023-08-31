@@ -29,7 +29,7 @@ final demo_blue = ThemeData(
   //   bodyMedium: TextStyle(fontSize: 14, fontFamily: 'Hind'),
 );
 
-var demo_blue_dark = ThemeData(
+final demo_blue_dark = ThemeData(
   // Define the default brightness and colors.
   useMaterial3: true,
   brightness: Brightness.dark,
@@ -37,7 +37,7 @@ var demo_blue_dark = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     brightness: Brightness.dark,
     seedColor: const Color.fromRGBO(17, 40, 64, 1), // Darker base color
-    primary: Color.fromARGB(252, 250, 243, 240),
+    primary: const Color.fromARGB(252, 250, 243, 240),
     primaryContainer: const Color.fromRGBO(17, 40, 64, 1),
     onPrimaryContainer: const Color.fromRGBO(255, 255, 255, 1),
     background: const Color.fromRGBO(20, 20, 20, 1), // Dark background

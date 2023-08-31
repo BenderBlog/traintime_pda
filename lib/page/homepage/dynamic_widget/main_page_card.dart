@@ -97,7 +97,6 @@ class MainPageCard extends StatelessWidget {
             ),
             if (isLoad ||
                 (progress != null && progress! >= 0 && progress! <= 1))
-              // if (1 == 1) 测试进度条 !!!
               Column(
                 children: [
                   ClipRRect(
