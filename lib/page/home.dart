@@ -112,6 +112,8 @@ class _HomePageState extends State<HomePage> {
           Visibility(
             visible: !isPhone(context),
             child: NavigationRail(
+              backgroundColor: Theme.of(context).colorScheme.background,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               elevation: 1,
               destinations: _destinations
                   .map(
