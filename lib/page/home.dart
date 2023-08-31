@@ -3,6 +3,8 @@
 
 // Main page of this program.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
@@ -112,7 +114,7 @@ class _HomePageState extends State<HomePage> {
           Visibility(
             visible: !isPhone(context),
             child: NavigationRail(
-              elevation: 20,
+              elevation: 1,
               destinations: _destinations
                   .map(
                     (e) => NavigationRailDestination(
@@ -123,6 +125,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )
                   .toList(),
+              labelType: NavigationRailLabelType.all,
               selectedIndex: _selectedIndex,
               onDestinationSelected: (int index) {
                 setState(() {
@@ -130,8 +133,6 @@ class _HomePageState extends State<HomePage> {
                 });
                 _controller.jumpToPage(_selectedIndex);
               },
-              leading: const Icon(Icons.person),
-              extended: isDesktop(context),
             ),
           ),
           Expanded(
