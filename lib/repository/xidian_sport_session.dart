@@ -30,19 +30,34 @@ class SportSession {
     punchData.value.situation = "正在获取";
     PunchDataList toReturn = PunchDataList();
     try {
-      if (userId == "") {
-        await login();
+      // Map<String, dynamic> body = {};
+      /*
+      if (userId != "") {
+        var getStore = await require(
+          subWebsite: "stuTermPunchRecord/findList",
+          body: {'userId': userId},
+        );
+        toReturn.score = getStore["data"][0]["score"];
+        body.addAll({
+          'userNum': preference.getString(preference.Preference.idsAccount),
+          'sysTermId': await getTermID(),
+          'pageSize': 999,
+          'pageIndex': 1
+        });
+      } else {
+        body.addAll({
+          'userNum': preference.getString(preference.Preference.idsAccount),
+          'sysTermId': await getTermID(),
+          'pageSize': 999,
+          'pageIndex': 1
+        });
       }
-      var getStore = await require(
-        subWebsite: "stuTermPunchRecord/findList",
-        body: {'userId': userId},
-      );
-      toReturn.score = getStore["data"][0]["score"];
+      */
       var response = await require(
         subWebsite: "stuPunchRecord/findPager",
         body: {
           'userNum': preference.getString(preference.Preference.idsAccount),
-          'sysTermId': await getTermID(),
+          'sysTermId': 13, //await getTermID(),
           'pageSize': 999,
           'pageIndex': 1
         },
@@ -84,7 +99,7 @@ class SportSession {
 
   Future<void> getScore() async {
     sportScore.value.situation = "正在获取";
-    developer.log("开始获取打卡信息", name: "GetPunchSession");
+    developer.log("开始获取成绩信息", name: "GetPunchSession");
     SportScore toReturn = SportScore();
     try {
       if (userId.isEmpty || token.isEmpty) {
@@ -100,10 +115,11 @@ class SportSession {
           toReturn.detail = i["gradeType"];
         } else {
           SportScoreOfYear toAdd = SportScoreOfYear(
-              year: i["year"],
-              totalScore: i["totalScore"],
-              rank: i["rank"],
-              gradeType: i["gradeType"]);
+            year: i["year"],
+            totalScore: i["totalScore"],
+            rank: i["rank"],
+            gradeType: i["gradeType"],
+          );
           var anotherResponse = await require(
             subWebsite: "measure/getStuScoreDetail",
             body: {"meaScoreId": i["meaScoreId"]},
@@ -178,7 +194,7 @@ awb4B45zUwIDAQAB
     'appSecret': 'e8167ef026cbc5e456ab837d9d6d9254'
   };
 
-  String getSign(Map<String, dynamic> params) {
+  String _getSign(Map<String, dynamic> params) {
     var toCalculate = '';
     // Map in dart is not sorted by keys:-O
     for (var i in params.keys.toList()..sort()) {
@@ -193,7 +209,7 @@ awb4B45zUwIDAQAB
     toReturn["timestamp"] = DateTime.now().millisecondsSinceEpoch.toString();
     Map<String, dynamic> forSign = payload;
     forSign["timestamp"] = toReturn["timestamp"];
-    toReturn['sign'] = getSign(forSign);
+    toReturn['sign'] = _getSign(forSign);
     return toReturn;
   }
 
@@ -262,6 +278,7 @@ awb4B45zUwIDAQAB
       'userId': userId,
     });
     if (response["returnCode"] == "200") {
+      print(response["data"][0]["sysTermId"].toString());
       return response["data"][0]["sysTermId"].toString();
     } else {
       throw SemesterFailedException(msg: response["returnMsg"]);

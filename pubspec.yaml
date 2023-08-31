@@ -26,6 +26,7 @@ dependencies:
   # Homepage and others
   easy_refresh: ^3.3.0+1
   sn_progress_dialog: ^1.1.3
+  fluttertoast: ^8.2.2
   extended_nested_scroll_view: ^6.1.2
   # Others
   url_launcher: ^6.1.6
