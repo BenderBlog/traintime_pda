@@ -43,7 +43,7 @@ class LibraryCard extends StatelessWidget {
         },
         child: Obx(
           () => MainPageCard(
-            isLoad: !(c.isGet.value && !c.error.value),
+            isLoad: !(c.isGet.value && !c.error.value) && !offline,
             icon: MingCuteIcons.mgc_book_2_line,
             text: "图书借阅",
             infoText: RichText(

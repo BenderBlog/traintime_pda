@@ -3,8 +3,6 @@
 
 // Main page of this program.
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';

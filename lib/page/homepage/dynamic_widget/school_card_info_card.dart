@@ -42,7 +42,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         },
         child: Obx(
           () => MainPageCard(
-            isLoad: !(c.isGetPrice.value && c.errorPrice.isEmpty),
+            isLoad: !(c.isGetPrice.value && c.errorPrice.isEmpty) && !offline,
             icon: MingCuteIcons.mgc_wallet_4_line,
             text: "流水查询",
             infoText: RichText(
