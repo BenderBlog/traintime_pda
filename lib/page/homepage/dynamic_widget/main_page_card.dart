@@ -32,7 +32,12 @@ class MainPageCard extends StatelessWidget {
         : Theme.of(context).colorScheme.onSecondaryContainer;
 
     final colorLineProgressBG = isBold == true
-        ? Theme.of(context).colorScheme.background.withOpacity(0.1)
+        ? Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context)
+                .colorScheme
+                .background
+                .withOpacity(0.9) // 深色模式进度条特判
+            : Theme.of(context).colorScheme.background.withOpacity(0.1)
         : Theme.of(context).colorScheme.primary.withOpacity(0.1);
 
     final colorLineProgress = isBold == true
@@ -92,6 +97,7 @@ class MainPageCard extends StatelessWidget {
             ),
             if (isLoad ||
                 (progress != null && progress! >= 0 && progress! <= 1))
+              // if (1 == 1) 测试进度条 !!!
               Column(
                 children: [
                   ClipRRect(

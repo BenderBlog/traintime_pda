@@ -112,13 +112,15 @@ class _HomePageState extends State<HomePage> {
           Visibility(
             visible: !isPhone(context),
             child: NavigationRail(
+              backgroundColor: Theme.of(context).colorScheme.background,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               elevation: 20,
               destinations: _destinations
                   .map(
                     (e) => NavigationRailDestination(
                       icon: _selectedIndex == e.index
-                          ? Icon(e.icon)
-                          : Icon(e.iconChoice),
+                          ? Icon(e.iconChoice)
+                          : Icon(e.icon),
                       label: Text(e.name),
                     ),
                   )

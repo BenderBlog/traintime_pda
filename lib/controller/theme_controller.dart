@@ -9,6 +9,7 @@ import '../themes/demo_blue.dart';
 
 class ThemeController extends GetxController {
   late ThemeData apptheme;
+  late ThemeData appthemeDark;
 
   @override
   void onInit() {
@@ -26,7 +27,8 @@ class ThemeController extends GetxController {
             .values[preference.getInt(preference.Preference.color)].color,
       );
     }*/
-    apptheme = demo_blue;
+    apptheme = demo_blue_dark; // 测试暗色主题
+    appthemeDark = demo_blue_dark;
     update();
   }
 }
