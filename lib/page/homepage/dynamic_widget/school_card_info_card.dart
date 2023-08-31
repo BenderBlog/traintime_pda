@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
@@ -19,20 +20,11 @@ class SchoolCardInfoCard extends StatelessWidget {
       builder: (c) => GestureDetector(
         onTap: () async {
           if (offline) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text("脱机模式下，一站式相关功能全部禁止使用"),
-            ));
+            Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else if (c.errorPrice.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text("遇到错误：${c.errorPrice}"),
-            ));
+            Fluttertoast.showToast(msg: "遇到错误：${c.errorPrice}");
           } else if (!c.isGetPrice.value) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text("仍然在加载中"),
-            ));
+            Fluttertoast.showToast(msg: "正在获取信息，请稍后再来看");
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -43,10 +35,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         },
         onLongPress: () {
           if (offline) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text("脱机模式下，一站式相关功能全部禁止使用"),
-            ));
+            Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else {
             c.updateMoney();
           }

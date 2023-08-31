@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
@@ -32,18 +33,10 @@ class ClassTableCard extends StatelessWidget {
                 ),
               );
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(c.error ?? "正在获取课表"),
-                ),
-              );
+              Fluttertoast.showToast(msg: "正在获取课表");
             }
           } on String catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("遇到错误：${e.substring(0, 150)}"),
-              ),
-            );
+            Fluttertoast.showToast(msg: "遇到错误：${e.substring(0, 150)}");
           }
         },
         child: Column(

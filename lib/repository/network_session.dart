@@ -40,7 +40,8 @@ class NetworkSession {
       )
         ..interceptors.add(CookieManager(cookieJar))
         ..interceptors.add(alice.getDioInterceptor())
-        ..options.connectTimeout = const Duration(seconds: 30)
+        ..options.connectTimeout = const Duration(seconds: 5)
+        ..options.receiveTimeout = const Duration(seconds: 10)
         ..options.followRedirects = false
         ..options.validateStatus =
             (status) => status != null && status >= 200 && status < 400;

@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -104,9 +105,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 onToggle: (bool value) {
                   if (value == true &&
                       !preference.getBool(preference.Preference.decoration)) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('你先选个图片罢，就在下面'),
-                    ));
+                    Fluttertoast.showToast(msg: '你先选个图片罢，就在下面');
                   } else {
                     setState(() {
                       preference.setBool(
@@ -127,14 +126,10 @@ class _SettingWindowState extends State<SettingWindow> {
                         preference.setBool(
                             preference.Preference.decoration, true);
                         if (mounted) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text('设定成功'),
-                          ));
+                          Fluttertoast.showToast(msg: '设定成功');
                         }
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('你没有选图片捏')));
+                        Fluttertoast.showToast(msg: '你没有选图片捏');
                       }
                     }
                   }),
@@ -167,15 +162,11 @@ class _SettingWindowState extends State<SettingWindow> {
                   try {
                     await NetworkSession().clearCookieJar();
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Cookie 已被清除'),
-                      ));
+                      Fluttertoast.showToast(msg: 'Cookie 已被清除');
                     }
                   } on PathNotFoundException {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('目前没有缓存 Cookie'),
-                      ));
+                      Fluttertoast.showToast(msg: '目前没有缓存 Cookie');
                     }
                   }
                 },
