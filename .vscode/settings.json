@@ -19,4 +19,5 @@
   "licenser.author": "BenderBlog Rodriguez and contributors",
   "licenser.license": "MPLv2",
   "licenser.useSPDXLicenseFormat": true,
+  "cmake.sourceDirectory": "/home/br/Codes/Flutter/traintime_pda/linux",
 }

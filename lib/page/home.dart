@@ -119,8 +119,8 @@ class _HomePageState extends State<HomePage> {
                   .map(
                     (e) => NavigationRailDestination(
                       icon: _selectedIndex == e.index
-                          ? Icon(e.icon)
-                          : Icon(e.iconChoice),
+                          ? Icon(e.iconChoice)
+                          : Icon(e.icon),
                       label: Text(e.name),
                     ),
                   )

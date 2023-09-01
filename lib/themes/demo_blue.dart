@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-var demo_blue = ThemeData(
+final demo_blue = ThemeData(
   // Define the default brightness and colors.
   useMaterial3: true,
   brightness: Brightness.light,
@@ -27,4 +27,23 @@ var demo_blue = ThemeData(
   //   displayLarge: TextStyle(fontSize: 72, fontWeight: FontWeight.bold),
   //   titleLarge: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),
   //   bodyMedium: TextStyle(fontSize: 14, fontFamily: 'Hind'),
+);
+
+final demo_blue_dark = ThemeData(
+  // Define the default brightness and colors.
+  useMaterial3: true,
+  brightness: Brightness.dark,
+
+  colorScheme: ColorScheme.fromSeed(
+    brightness: Brightness.dark,
+    seedColor: const Color.fromRGBO(17, 40, 64, 1), // Darker base color
+    primary: const Color.fromARGB(252, 250, 243, 240),
+    primaryContainer: const Color.fromRGBO(17, 40, 64, 1),
+    onPrimaryContainer: const Color.fromRGBO(255, 255, 255, 1),
+    background: const Color.fromRGBO(20, 20, 20, 1), // Dark background
+    secondary:
+        const Color.fromRGBO(30, 30, 30, 1), // Slightly lighter secondary
+    secondaryContainer: const Color.fromRGBO(30, 30, 30, 1),
+    onSecondaryContainer: const Color.fromRGBO(255, 255, 255, 1),
+  ),
 );

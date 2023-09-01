@@ -121,6 +121,7 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: alice.getNavigatorKey(),
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
         theme: c.apptheme,
+        darkTheme: c.appthemeDark,
         home: DefaultTextStyle.merge(
           style: const TextStyle(textBaseline: TextBaseline.ideographic),
           child: widget.isFirst ? const LoginWindow() : const HomePage(),
