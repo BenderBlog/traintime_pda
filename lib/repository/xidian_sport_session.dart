@@ -278,7 +278,6 @@ awb4B45zUwIDAQAB
       'userId': userId,
     });
     if (response["returnCode"] == "200") {
-      print(response["data"][0]["sysTermId"].toString());
       return response["data"][0]["sysTermId"].toString();
     } else {
       throw SemesterFailedException(msg: response["returnMsg"]);
