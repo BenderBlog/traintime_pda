@@ -1,15 +1,15 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-//import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:get/get.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/themes/demo_blue.dart';
 //import 'package:watermeter/themes/color_seed.dart';
-import '../themes/demo_blue.dart';
+//import 'package:watermeter/themes/demo_blue.dart';
 
 class ThemeController extends GetxController {
-  late ThemeData apptheme;
-  late ThemeData appthemeDark;
+  late ThemeMode colorState;
 
   @override
   void onInit() {
@@ -27,8 +27,8 @@ class ThemeController extends GetxController {
             .values[preference.getInt(preference.Preference.color)].color,
       );
     }*/
-    apptheme = demo_blue;
-    appthemeDark = demo_blue_dark; // 暗色主题
+    colorState =
+        demoBlueModeMap[preference.getInt(preference.Preference.brightness)]!;
     update();
   }
 }

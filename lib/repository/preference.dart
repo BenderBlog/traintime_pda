@@ -24,6 +24,7 @@ enum Preference {
   decoration(key: "decoration", type: "bool"), // 背景图是否设置
   swift(key: "swift", type: "int"), // 周次偏移
   color(key: "color", type: "int"), // 颜色索引
+  brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
   currentStartDay(key: "currentStartDay", type: "String"); // 当前学期编码
 

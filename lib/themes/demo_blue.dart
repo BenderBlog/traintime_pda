@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 
-final demo_blue = ThemeData(
-  // Define the default brightness and colors.
+const demoBlueModeName = [
+  "跟随系统",
+  "白天模式",
+  "黑夜模式",
+];
+
+const demoBlueModeMap = {
+  0: ThemeMode.system,
+  1: ThemeMode.light,
+  2: ThemeMode.dark,
+};
+
+final demoBlue = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-
   colorScheme: ColorScheme.fromSeed(
     seedColor: const Color.fromRGBO(49, 78, 122, 1),
     primary: const Color.fromRGBO(49, 78, 122, 1),
@@ -15,25 +25,11 @@ final demo_blue = ThemeData(
     secondaryContainer: const Color.fromRGBO(226, 232, 243, 1),
     onSecondaryContainer: const Color.fromRGBO(49, 78, 122, 1),
   ),
-
-  // primaryColor: Color.fromRGBO(49, 78, 122, 1),
-
-  // Define the default font family.
-  // fontFamily: 'Georgia',
-
-  // Define the default `TextTheme`. Use this to specify the default
-  // text styling for headlines, titles, bodies of text, and more.
-  // textTheme: const TextTheme(
-  //   displayLarge: TextStyle(fontSize: 72, fontWeight: FontWeight.bold),
-  //   titleLarge: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),
-  //   bodyMedium: TextStyle(fontSize: 14, fontFamily: 'Hind'),
 );
 
-final demo_blue_dark = ThemeData(
-  // Define the default brightness and colors.
+final demoBlueDark = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
-
   colorScheme: ColorScheme.fromSeed(
     brightness: Brightness.dark,
     seedColor: const Color.fromRGBO(17, 40, 64, 1), // Darker base color

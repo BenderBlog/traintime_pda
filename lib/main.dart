@@ -21,6 +21,7 @@ import 'package:watermeter/page/login/login.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/themes/demo_blue.dart';
 
 void main() async {
   developer.log(
@@ -120,8 +121,9 @@ class _MyAppState extends State<MyApp> {
         ],
         navigatorKey: alice.getNavigatorKey(),
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
-        theme: c.apptheme,
-        darkTheme: c.appthemeDark,
+        theme: demoBlue,
+        darkTheme: demoBlueDark,
+        themeMode: c.colorState,
         home: DefaultTextStyle.merge(
           style: const TextStyle(textBaseline: TextBaseline.ideographic),
           child: widget.isFirst ? const LoginWindow() : const HomePage(),

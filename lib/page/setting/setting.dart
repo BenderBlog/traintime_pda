@@ -15,11 +15,13 @@ import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
+import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({Key? key}) : super(key: key);
@@ -56,23 +58,39 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
             ],
           ),
-          /*
+          // SettingsSection(
+          //   title: const Text('颜色设置'),
+          //   tiles: <SettingsTile>[
+          //     SettingsTile.navigation(
+          //         title: const Text('设置程序主题色'),
+          //         value: Text(ColorSeed
+          //             .values[preference.getInt(preference.Preference.color)]
+          //             .label),
+          //         onPressed: (content) {
+          //           showDialog(
+          //             context: context,
+          //             builder: (context) => const ChangeColorDialog(),
+          //           );
+          //         }),
+          //   ],
+          // ),
           SettingsSection(
-            title: const Text('颜色设置'),
+            title: const Text('主题设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                  title: const Text('设置程序主题色'),
-                  value: Text(ColorSeed
-                      .values[preference.getInt(preference.Preference.color)]
-                      .label),
+                  title: const Text('设置深浅色'),
+                  value: Text(
+                    demoBlueModeName[
+                        preference.getInt(preference.Preference.brightness)],
+                  ),
                   onPressed: (content) {
                     showDialog(
                       context: context,
-                      builder: (context) => const ChangeColorDialog(),
+                      builder: (context) => const ChangeBrightnessDialog(),
                     );
                   }),
             ],
-          ),*/
+          ),
           SettingsSection(
             title: const Text('帐号设置'),
             tiles: <SettingsTile>[
