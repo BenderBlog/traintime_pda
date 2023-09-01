@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -14,6 +15,7 @@ import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 
 import 'package:watermeter/page/homepage/refresh.dart';
 
@@ -54,10 +56,10 @@ class PadMainPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text("请稍候，正在刷新信息"),
-              ));
+              Fluttertoast.showToast(
+                msg: "请稍候，正在刷新信息",
+                timeInSecForIosWeb: 1,
+              );
               update();
             },
             icon: const Icon(Icons.refresh),
@@ -70,7 +72,7 @@ class PadMainPage extends StatelessWidget {
         ),
         children: [
           Text(
-            "日程安排",
+            "日程安排和通知",
             style: textStyle(context),
           ).padding(
             left: 16,
@@ -80,8 +82,9 @@ class PadMainPage extends StatelessWidget {
           ),
           LayoutGrid(
             columnSizes: [1.fr],
-            rowSizes: const [auto],
+            rowSizes: const [auto, auto],
             children: const [
+              NoticeCard(),
               ClassTableCard(),
             ],
           ),

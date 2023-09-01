@@ -38,6 +38,9 @@ PODS:
     - Flutter
   - flutter_native_splash (0.0.1):
     - Flutter
+  - fluttertoast (0.0.2):
+    - Flutter
+    - Toast
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
@@ -66,6 +69,7 @@ PODS:
     - Flutter
     - FMDB (>= 2.7.5)
   - SwiftyGif (5.4.4)
+  - Toast (4.0.0)
   - url_launcher_ios (0.0.1):
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
@@ -76,6 +80,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - open_filex (from `.symlinks/plugins/open_filex/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -95,6 +100,7 @@ SPEC REPOS:
     - FMDB
     - SDWebImage
     - SwiftyGif
+    - Toast
 
 EXTERNAL SOURCES:
   file_picker:
@@ -105,6 +111,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
   open_filex:
     :path: ".symlinks/plugins/open_filex/ios"
   package_info_plus:
@@ -135,6 +143,7 @@ SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
+  fluttertoast: fafc4fa4d01a6a9e4f772ecd190ffa525e9e2d9c
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   open_filex: 6e26e659846ec990262224a12ef1c528bb4edbe4
   package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
@@ -147,6 +156,7 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
   webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
 

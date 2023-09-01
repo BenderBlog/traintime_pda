@@ -70,11 +70,16 @@ class SchoolCardSession extends IDSSession {
 
   Future<String> getMoney() async {
     var response = await initSession();
-    return response
-            .find("span", attrs: {"name": "showbalanceid"})
-            ?.innerHtml
-            .substring(4) ??
-        "查询失败";
+    String text =
+        response.find("span", attrs: {"name": "showbalanceid"})?.innerHtml ??
+            "查询失败";
+    if (text.contains(RegExp(r'[0-9]'))) {
+      return text.substring(4);
+    } else if (text.contains("查询失败")) {
+      return "查询失败";
+    } else {
+      return "0.00";
+    }
   }
 
   Future<BeautifulSoup> initSession() async {

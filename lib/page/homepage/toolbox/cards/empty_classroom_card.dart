@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -18,10 +19,7 @@ class EmptyClassroomCard extends StatelessWidget {
       builder: (c) => SmallFunctionCard(
         onTap: () async {
           if (offline) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text("脱机模式下，一站式相关功能全部禁止使用"),
-            ));
+            Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(

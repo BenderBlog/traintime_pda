@@ -40,14 +40,15 @@ class NetworkSession {
       )
         ..interceptors.add(CookieManager(cookieJar))
         ..interceptors.add(alice.getDioInterceptor())
+        ..options.connectTimeout = const Duration(seconds: 5)
+        ..options.receiveTimeout = const Duration(seconds: 10)
         ..options.followRedirects = false
         ..options.validateStatus =
             (status) => status != null && status >= 200 && status < 400;
 
   static Future<bool> isInSchool() async {
     bool isInSchool = false;
-    Dio dio = Dio()
-      ..options.connectTimeout = const Duration(milliseconds: 2000);
+    Dio dio = Dio()..options.connectTimeout = const Duration(seconds: 5);
     await dio
         .get("http://linux.xidian.edu.cn")
         .then((value) => isInSchool = true)

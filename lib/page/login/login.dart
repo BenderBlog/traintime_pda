@@ -4,6 +4,7 @@
 // Login window of the program.
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/page/login/app_icon.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
@@ -39,11 +40,7 @@ class _LoginWindowState extends State<LoginWindow> {
           ),
           onPressed: () {
             NetworkSession().clearCookieJar().then(
-                  (value) => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('清理缓存成功'),
-                    ),
-                  ),
+                  (value) => Fluttertoast.showToast(msg: '清理缓存成功'),
                 );
           },
         ),
@@ -150,11 +147,7 @@ class _LoginWindowState extends State<LoginWindow> {
                     _idsPasswordController.text.isNotEmpty) {
                   await login();
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('用户名或密码不符合要求，学号必须 11 位且密码非空'),
-                    ),
-                  );
+                  Fluttertoast.showToast(msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
                 }
               },
             ),
@@ -211,9 +204,7 @@ class _LoginWindowState extends State<LoginWindow> {
       isGood = false;
       pd.close();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        Fluttertoast.showToast(msg: e.toString());
       }
     }
   }

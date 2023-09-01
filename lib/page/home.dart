@@ -80,9 +80,9 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    if (offline) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showDialog(
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (offline) {
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text("统一认证服务离线模式开启"),
@@ -99,8 +99,8 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         );
-      });
-    }
+      }
+    });
   }
 
   @override
@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
             child: NavigationRail(
               backgroundColor: Theme.of(context).colorScheme.background,
               indicatorColor: Theme.of(context).colorScheme.secondary,
-              elevation: 20,
+              elevation: 1,
               destinations: _destinations
                   .map(
                     (e) => NavigationRailDestination(
@@ -125,6 +125,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )
                   .toList(),
+              labelType: NavigationRailLabelType.all,
               selectedIndex: _selectedIndex,
               onDestinationSelected: (int index) {
                 setState(() {
@@ -132,8 +133,6 @@ class _HomePageState extends State<HomePage> {
                 });
                 _controller.jumpToPage(_selectedIndex);
               },
-              leading: const Icon(Icons.person),
-              extended: isDesktop(context),
             ),
           ),
           Expanded(
