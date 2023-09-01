@@ -14,6 +14,7 @@ import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/sport_card.dart';
+import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 
 class PhoneMainPage extends StatelessWidget {
@@ -123,7 +124,7 @@ class PhoneMainPage extends StatelessWidget {
               children: [
                 const HeaderLocator(),
                 Text(
-                  "日程",
+                  "日程安排和通知",
                   style: textStyle(context),
                 ).padding(
                   left: 20,
@@ -137,8 +138,9 @@ class PhoneMainPage extends StatelessWidget {
                   ),
                   child: LayoutGrid(
                     columnSizes: [1.fr],
-                    rowSizes: const [auto],
+                    rowSizes: const [auto, auto],
                     children: const [
+                      NoticeCard(),
                       ClassTableCard(),
                     ],
                   ),

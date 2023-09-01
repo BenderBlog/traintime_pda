@@ -100,25 +100,6 @@ class _HomePageState extends State<HomePage> {
           ),
         );
       }
-      if (mounted) {
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("（测试信息）推荐两个群聊"),
-            content: const Text(
-              "不是广告，放心。这两个群都不是商业性质的。\n"
-              "要聊最新数码，欢迎加入西电酷安 3.0 群\n"
-              "要想膜拜大佬，欢迎加入西电微软俱乐部\n",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("确定"),
-              ),
-            ],
-          ),
-        );
-      }
     });
   }
 
