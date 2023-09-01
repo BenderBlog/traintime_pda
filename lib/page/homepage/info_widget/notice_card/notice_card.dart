@@ -5,13 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:styled_widget/styled_widget.dart';
 
 class NoticeCard extends StatelessWidget {

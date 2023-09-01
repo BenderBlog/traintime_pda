@@ -22,7 +22,10 @@ class WebViewCard extends StatelessWidget {
       data: data,
       onTap: () async {
         if (!Platform.isAndroid) {
-          launchUrlString(data.url);
+          launchUrlString(
+            data.url,
+            mode: LaunchMode.externalApplication,
+          );
         } else {
           Navigator.of(context).push(
             MaterialPageRoute(
