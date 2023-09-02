@@ -14,7 +14,7 @@ class BorrowListWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = MediaQuery.sizeOf(context).width ~/ 376;
+    int crossItems = MediaQuery.sizeOf(context).width ~/ 360;
 
     int rowItem(int length) {
       int rowItem = length ~/ crossItems;

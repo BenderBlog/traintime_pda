@@ -226,7 +226,9 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.expand,
       children: [
+        watermark,
         ListView(
           shrinkWrap: true,
           children: [
@@ -346,7 +348,6 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
             scoreInfo(false, context),
           ],
         ),
-        watermark,
       ],
     );
   }

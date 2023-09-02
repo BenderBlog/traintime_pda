@@ -12,11 +12,14 @@ import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
-class ScoreWindow extends StatelessWidget {
-  ScoreWindow({super.key});
+class ScoreWindow extends StatefulWidget {
+  const ScoreWindow({super.key});
 
-  late final BuildContext context;
+  @override
+  State<ScoreWindow> createState() => _ScoreWindowState();
+}
 
+class _ScoreWindowState extends State<ScoreWindow> {
   final Widget selectModeButton = GetBuilder<ScoreController>(
     builder: (c) => IconButton(
       icon: const Icon(Icons.calculate),
@@ -177,8 +180,6 @@ class ScoreWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
-
     int crossItems = MediaQuery.sizeOf(context).width ~/ 360;
 
     int rowItem(int length) {

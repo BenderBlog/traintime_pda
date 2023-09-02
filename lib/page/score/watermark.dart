@@ -33,10 +33,9 @@ class Watermark extends StatelessWidget {
         columnCount,
         (index) => Transform.rotate(
           angle: -pi / 20,
-          child: Expanded(
-            child: Row(
-              children: _createRowWidgets(),
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: _createRowWidgets(),
           ),
         ),
       );
