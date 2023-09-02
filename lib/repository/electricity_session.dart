@@ -49,8 +49,7 @@ class ElectricitySession extends NetworkSession {
   /// The way to get the electricity number.
   /// Refrence here: https://see.xidian.edu.cn/html/news/9179.html
   static String electricityAccount() {
-    RegExp numsExp = RegExp(r"[0-9]+");
-    List<RegExpMatch> nums = numsExp
+    List<RegExpMatch> nums = RegExp(r"[0-9]+")
         .allMatches(preference.getString(preference.Preference.dorm))
         .toList();
     // 校区，默认南校区
@@ -141,11 +140,6 @@ class ElectricitySession extends NetworkSession {
         .get("$base/searchWap/webFrm/met.aspx")
         .then((value) => value.data);
 
-    developer.log(
-      page,
-      name: "ElectricSession",
-    );
-
     //int building = int.parse(account.substring(1, 4));
     RegExp name = RegExp(r"表名称：.*");
     RegExp data = RegExp(r"剩余量：.*");
@@ -153,14 +147,18 @@ class ElectricitySession extends NetworkSession {
     List<RegExpMatch> nameArray = name.allMatches(page).toList();
     List<RegExpMatch> dataArray = data.allMatches(page).toList();
 
-    //by ZCWzy
-    for (int i = nameArray.length - 1; i >= 0; --i) {
-      if (nameArray[i][0]!.contains("电表")) {
-        electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
-        developer.log(
-          electricityInfo.value,
-          name: "ElectricSession",
-        );
+    List<RegExpMatch> nums = RegExp(r"[0-9]+")
+        .allMatches(preference.getString(preference.Preference.dorm))
+        .toList();
+
+    int building = int.parse(nums[0][0]!.toString());
+    for (int i = 0; i < nameArray.length; ++i) {
+      if ((building >= 1 && building <= 4 && nameArray[i][0]!.contains("派诺")) ||
+          (building >= 5 &&
+              building <= 10 &&
+              nameArray[i][0]!.contains("科德")) ||
+          (building >= 11 && nameArray[i][0]!.contains("电表"))) {
+        electricityInfo.value = dataArray[i][0]!.substring(4);
         return;
       }
     }
