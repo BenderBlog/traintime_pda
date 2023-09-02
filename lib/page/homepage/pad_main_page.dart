@@ -97,17 +97,20 @@ class PadMainPage extends StatelessWidget {
             right: 0,
             bottom: 0,
           ),
-          LayoutGrid(
-            columnSizes: [1.fr, 1.fr, 1.fr, 1.fr],
-            rowSizes: [
-              160.px,
-            ],
-            children: const [
-              SportCard(),
-              ElectricityCard(),
-              LibraryCard(),
-              SchoolCardInfoCard(),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: LayoutGrid(
+              columnSizes: repeat(4, [180.px]),
+              rowSizes: [
+                180.px,
+              ],
+              children: const [
+                SportCard(),
+                ElectricityCard(),
+                LibraryCard(),
+                SchoolCardInfoCard(),
+              ],
+            ),
           ),
         ],
       ),
