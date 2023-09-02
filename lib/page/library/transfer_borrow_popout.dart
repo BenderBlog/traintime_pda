@@ -27,8 +27,8 @@ class TransferQRCode extends StatelessWidget {
               "id": LibrarySession.userId,
               "cardNumber":
                   preference.getString(preference.Preference.idsAccount),
-              "barCode": data.barNumber.toString(),
-              "bookName": data.bookName.toString(),
+              "barCode": data.barcode.toString(),
+              "bookName": data.title.toString(),
               "author": data.author.toString(),
             }).toString(),
             version: QrVersions.auto,

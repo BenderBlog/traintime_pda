@@ -6,7 +6,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/transfer_borrow_popout.dart';
@@ -41,7 +40,7 @@ class BorrowInfoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        toUse.bookName,
+                        toUse.title,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -49,7 +48,7 @@ class BorrowInfoCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "${toUse.author} ${toUse.publishingHouse}",
+                        "${toUse.author} ${toUse.publisher}",
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 12.0,
@@ -93,12 +92,9 @@ class BorrowInfoCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text("ISBN: ${toUse.isbn}"),
-                      Text("馆藏码: ${toUse.barNumber}"),
-                      Text("索书号: ${toUse.searchCode}"),
-                      Text(
-                          "借阅日期：${Jiffy.parseFromDateTime(toUse.borrowTime).format(pattern: "yyyy-MM-dd")}"),
-                      Text(
-                          "到期日期：${Jiffy.parseFromDateTime(toUse.dueTime).format(pattern: "yyyy-MM-dd")}"),
+                      Text("馆藏码: ${toUse.barcode}"),
+                      Text("借阅日期：${toUse.loanDate}"),
+                      Text("到期日期：${toUse.normReturnDate}"),
                     ],
                   ),
                 ),

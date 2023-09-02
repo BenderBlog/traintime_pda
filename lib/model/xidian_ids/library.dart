@@ -9,52 +9,31 @@ part 'library.g.dart';
 
 @JsonSerializable()
 class BorrowData {
-  final String bookName;
-  final String libraryCode;
+  final String title;
   final String author;
-  final String publishingHouse;
+  final String publisher;
   final String isbn;
-  final String docNumber;
+  final String itemLibCode;
   final int lendDay;
-  final String loan_date;
-  final String loan_time;
-  final String searchCode;
-  final String due_date;
-  final String due_time;
-  final String barNumber;
+  final String loanDate;
+  final String renewDate;
+  final String normReturnDate;
+  final String loanType;
+  final String barcode;
 
   const BorrowData({
-    required this.bookName,
-    required this.libraryCode,
+    required this.title,
     required this.author,
-    required this.publishingHouse,
+    required this.publisher,
     required this.isbn,
-    required this.docNumber,
+    required this.itemLibCode,
     required this.lendDay,
-    required this.loan_date,
-    required this.loan_time,
-    required this.searchCode,
-    required this.due_date,
-    required this.due_time,
-    required this.barNumber,
+    required this.loanDate,
+    required this.renewDate,
+    required this.normReturnDate,
+    required this.loanType,
+    required this.barcode,
   });
-
-  DateTime get borrowTime => DateTime(
-        int.parse(loan_date.substring(0, 4)),
-        int.parse(loan_date.substring(4, 6)),
-        int.parse(loan_date.substring(6, 8)),
-        int.parse(loan_time.split(":").first),
-        int.parse(loan_time.split(":").last),
-      );
-
-  DateTime get dueTime => DateTime(
-        int.parse(due_date.substring(0, 4)),
-        int.parse(due_date.substring(4, 6)),
-        int.parse(due_date.substring(6, 8)),
-        int.parse(due_time.split(":").first),
-        int.parse(due_time.split(":").last),
-        59,
-      );
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);

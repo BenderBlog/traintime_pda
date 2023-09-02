@@ -12,6 +12,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 
 class LibrarySession extends IDSSession {
   static int userId = 0;
+  static String userBarcode = "";
   static String token = "";
 
   /* Note 1: Search book pattern, no need to implement.
@@ -121,12 +122,10 @@ class LibrarySession extends IDSSession {
         "userId": userId,
         "token": token,
         "cardNumber": preference.getString(preference.Preference.idsAccount),
-        "barNumber": toUse.barNumber,
-        "bookName": toUse.bookName,
+        "barNumber": toUse.barcode,
+        "bookName": toUse.title,
         "isbn": toUse.isbn,
-        "libraryCode": toUse.libraryCode,
         "author": toUse.author,
-        "docNumber": toUse.docNumber,
       },
     ).then(
       (value) => value.data["msg"]?.toString() ?? "遇到错误",
@@ -137,14 +136,32 @@ class LibrarySession extends IDSSession {
     if (userId == 0 && token == "") {
       await initSession();
     }
+    if (userBarcode == "") {
+      userBarcode = await dio.post(
+        "https://zs.xianmaigu.com/xidian_book/api/borrow/getUserInfo",
+        data: {
+          "libraryId": 5,
+          "userId": userId,
+          "token": token,
+          "cardNumber": preference.getString(preference.Preference.idsAccount),
+        },
+      ).then(
+        (value) {
+          if (value.data["code"] != 1) {
+            throw NotFetchLibraryException(message: value.data["msg"]);
+          }
+          return value.data["data"]["userBarcode"];
+        },
+      );
+    }
     var rawData = await dio.post(
       "https://zs.xianmaigu.com/xidian_book/api/borrow/getBorrowList.html",
       data: {
         "libraryId": 5,
         "userId": userId,
         "token": token,
-        "cardNumber": preference.getString(preference.Preference.idsAccount),
-        "page": 0,
+        "cardNumber": userBarcode,
+        "page": 1,
       },
     ).then((value) => value.data["data"]);
 
@@ -180,4 +197,7 @@ class LibrarySession extends IDSSession {
   }
 }
 
-class NotFetchLibraryException implements Exception {}
+class NotFetchLibraryException implements Exception {
+  final String message;
+  NotFetchLibraryException({this.message = "发生错误"});
+}

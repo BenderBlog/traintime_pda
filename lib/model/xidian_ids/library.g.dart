@@ -7,36 +7,32 @@ part of 'library.dart';
 // **************************************************************************
 
 BorrowData _$BorrowDataFromJson(Map<String, dynamic> json) => BorrowData(
-      bookName: json['bookName'] as String,
-      libraryCode: json['libraryCode'] as String,
+      title: json['title'] as String,
       author: json['author'] as String,
-      publishingHouse: json['publishingHouse'] as String,
+      publisher: json['publisher'] as String,
       isbn: json['isbn'] as String,
-      docNumber: json['docNumber'] as String,
+      itemLibCode: json['itemLibCode'] as String,
       lendDay: json['lendDay'] as int,
-      loan_date: json['loan_date'] as String,
-      loan_time: json['loan_time'] as String,
-      searchCode: json['searchCode'] as String,
-      due_date: json['due_date'] as String,
-      due_time: json['due_time'] as String,
-      barNumber: json['barNumber'] as String,
+      loanDate: json['loanDate'] as String,
+      renewDate: json['renewDate'] as String,
+      normReturnDate: json['normReturnDate'] as String,
+      loanType: json['loanType'] as String,
+      barcode: json['barcode'] as String,
     );
 
 Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
     <String, dynamic>{
-      'bookName': instance.bookName,
-      'libraryCode': instance.libraryCode,
+      'title': instance.title,
       'author': instance.author,
-      'publishingHouse': instance.publishingHouse,
+      'publisher': instance.publisher,
       'isbn': instance.isbn,
-      'docNumber': instance.docNumber,
+      'itemLibCode': instance.itemLibCode,
       'lendDay': instance.lendDay,
-      'loan_date': instance.loan_date,
-      'loan_time': instance.loan_time,
-      'searchCode': instance.searchCode,
-      'due_date': instance.due_date,
-      'due_time': instance.due_time,
-      'barNumber': instance.barNumber,
+      'loanDate': instance.loanDate,
+      'renewDate': instance.renewDate,
+      'normReturnDate': instance.normReturnDate,
+      'loanType': instance.loanType,
+      'barCode': instance.barcode,
     };
 
 BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
