@@ -30,13 +30,6 @@ class _BookDetailCardState extends State<BookDetailCard> {
       child: ListView(
         shrinkWrap: true,
         children: [
-          Text(
-            widget.toUse.bookName,
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -45,11 +38,18 @@ class _BookDetailCardState extends State<BookDetailCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "作者：${widget.toUse.author}\n"
-                      "出版社：${widget.toUse.publisherHouse}\n"
-                      "ISBN: ${widget.toUse.isbn}\n"
-                      "发行时间: ${widget.toUse.publisherHouse}\n"
-                      "索书号: ${widget.toUse.searchCode}",
+                      widget.toUse.bookName,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const Divider(color: Colors.transparent),
+                    Text(
+                      "作者：${widget.toUse.author ?? "没有提供"}\n"
+                      "ISBN：${widget.toUse.isbn ?? "没有提供"}\n"
+                      "索书号: ${widget.toUse.searchCode ?? "没有提供"}\n"
+                      "描述：${widget.toUse.description ?? "没有提供"}",
                     ),
                   ],
                 ),
@@ -63,10 +63,10 @@ class _BookDetailCardState extends State<BookDetailCard> {
               ),
             ],
           ),
-          Text(widget.toUse.description ?? "这本书没有提供描述"),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (widget.toUse.items != null)
                   ...List.generate(
@@ -77,7 +77,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                   ),
                 if (widget.toUse.eitems != null)
                   ...List.generate(
-                    widget.toUse.items!.length,
+                    widget.toUse.eitems!.length,
                     (index) => EBookPlaceCard(
                       toUse: widget.toUse.eitems![index],
                     ),

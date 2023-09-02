@@ -3,15 +3,16 @@
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/both_side_sheet.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
-import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 
 class QueryBookWindow extends StatefulWidget {
-  const QueryBookWindow({super.key});
+  final BoxConstraints constraints;
+  const QueryBookWindow({super.key, required this.constraints});
 
   @override
   State<QueryBookWindow> createState() => _QueryBookWindowState();
@@ -21,16 +22,24 @@ class _QueryBookWindowState extends State<QueryBookWindow>
     with AutomaticKeepAliveClientMixin {
   final LibraryController c = Get.put(LibraryController());
 
+  int get crossItems => widget.constraints.minWidth ~/ 360;
+
+  int rowItem(int length) {
+    int rowItem = length ~/ crossItems;
+    if (crossItems * rowItem < length) {
+      rowItem += 1;
+    }
+    return rowItem;
+  }
+
   @override
   bool get wantKeepAlive => true;
 
-  late final PageController _pageController;
   late EasyRefreshController _controller;
   late TextEditingController text;
 
   @override
   void initState() {
-    _pageController = PageController();
     _controller = EasyRefreshController(
       controlFinishRefresh: true,
       controlFinishLoad: true,
@@ -43,7 +52,6 @@ class _QueryBookWindowState extends State<QueryBookWindow>
 
   @override
   void dispose() {
-    _pageController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -90,22 +98,23 @@ class _QueryBookWindowState extends State<QueryBookWindow>
         },
         child: Obx(
           () => c.searchList.isNotEmpty
-              ? GridView.builder(
-                  controller: _pageController,
-                  itemBuilder: (context, index) => GestureDetector(
-                    child: BookInfoCard(toUse: c.searchList[index]),
-                    onTap: () => BothSideSheet.show(
-                      context: context,
-                      title: "书籍详细信息",
-                      child: BookDetailCard(
-                        toUse: c.searchList[index],
+              ? SingleChildScrollView(
+                  child: LayoutGrid(
+                    columnSizes: repeat(crossItems, [1.fr]),
+                    rowSizes: repeat(rowItem(c.searchList.length), [auto]),
+                    children: List<Widget>.generate(
+                      c.searchList.length,
+                      (index) => GestureDetector(
+                        child: BookInfoCard(toUse: c.searchList[index]),
+                        onTap: () => BothSideSheet.show(
+                          context: context,
+                          title: "书籍详细信息",
+                          child: BookDetailCard(
+                            toUse: c.searchList[index],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  itemCount: c.searchList.length,
-                  gridDelegate: SliverGridDelegateWithFixedHeight(
-                    height: 200,
-                    maxCrossAxisExtent: 360,
                   ),
                 )
               : c.isSearching.value

@@ -49,10 +49,14 @@ class LibraryWindow extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            BorrowListWindow(),
-            QueryBookWindow(),
+            const BorrowListWindow(),
+            LayoutBuilder(
+              builder: (context, constraints) => QueryBookWindow(
+                constraints: constraints,
+              ),
+            ),
           ],
         ),
       ),

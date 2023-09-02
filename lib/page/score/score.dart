@@ -3,6 +3,7 @@
 
 // Score Window
 
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/column_choose_dialog.dart';
@@ -177,6 +178,17 @@ class ScoreWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     this.context = context;
+
+    int crossItems = MediaQuery.sizeOf(context).width ~/ 360;
+
+    int rowItem(int length) {
+      int rowItem = length ~/ crossItems;
+      if (crossItems * rowItem < length) {
+        rowItem += 1;
+      }
+      return rowItem;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("成绩查询"),
@@ -188,13 +200,21 @@ class ScoreWindow extends StatelessWidget {
       body: GetBuilder<ScoreController>(
         builder: (c) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: fixHeightGrid(
-            height: 120,
-            maxCrossAxisExtent: 360,
-            children: List.generate(
-              c.toShow.length,
-              (index) => ScoreInfoCard(
-                mark: c.toShow[index].mark,
+          child: SingleChildScrollView(
+            child: LayoutGrid(
+              columnSizes: repeat(
+                crossItems,
+                [auto],
+              ),
+              rowSizes: repeat(
+                rowItem(c.selectedScoreList.length),
+                [auto],
+              ),
+              children: List<Widget>.generate(
+                c.toShow.length,
+                (index) => ScoreInfoCard(
+                  mark: c.toShow[index].mark,
+                ),
               ),
             ),
           ),

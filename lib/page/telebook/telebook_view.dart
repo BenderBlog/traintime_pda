@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/model/telephone.dart';
 import 'package:watermeter/repository/telephone.dart';
@@ -54,6 +54,16 @@ class DepartmentWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int crossItems = MediaQuery.sizeOf(context).width ~/ 376;
+
+    int rowItem(int length) {
+      int rowItem = length ~/ crossItems;
+      if (crossItems * rowItem < length) {
+        rowItem += 1;
+      }
+      return rowItem;
+    }
+
     return Card(
       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       elevation: 0,
@@ -68,17 +78,21 @@ class DepartmentWindow extends StatelessWidget {
               textScaleFactor: 1.4,
             ),
             const Divider(),
-            GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedHeight(
-                maxCrossAxisExtent: 375,
-                height: 84,
-                mainAxisSpacing: 15.0,
-                crossAxisSpacing: 15.0,
+            LayoutGrid(
+              columnSizes: repeat(
+                crossItems,
+                [auto],
               ),
-              itemCount: mainCourse.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) => mainCourse[index],
+              rowSizes: repeat(
+                rowItem(mainCourse.length),
+                [auto],
+              ),
+              columnGap: 10,
+              rowGap: 10,
+              children: List<Widget>.generate(
+                mainCourse.length,
+                (index) => mainCourse[index],
+              ),
             ),
           ],
         ),

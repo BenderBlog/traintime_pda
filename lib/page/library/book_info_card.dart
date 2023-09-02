@@ -19,8 +19,8 @@ class BookInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(
-        horizontal: 12.5,
-        vertical: 9.0,
+        horizontal: 12,
+        vertical: 9,
       ),
       elevation: 0,
       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),

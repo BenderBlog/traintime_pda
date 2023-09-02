@@ -3,17 +3,27 @@
 
 // Borrow list, shows the user's borrowlist.
 
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
-import 'package:watermeter/page/sliver_grid_deligate_with_fixed_height.dart';
 
 class BorrowListWindow extends StatelessWidget {
   const BorrowListWindow({super.key});
 
   @override
   Widget build(BuildContext context) {
+    int crossItems = MediaQuery.sizeOf(context).width ~/ 376;
+
+    int rowItem(int length) {
+      int rowItem = length ~/ crossItems;
+      if (crossItems * rowItem < length) {
+        rowItem += 1;
+      }
+      return rowItem;
+    }
+
     final LibraryController c = Get.put(LibraryController());
     return Column(
       children: [
@@ -22,7 +32,7 @@ class BorrowListWindow extends StatelessWidget {
           child: Card(
             margin: const EdgeInsets.symmetric(
               horizontal: 10,
-              vertical: 5,
+              vertical: 6,
             ),
             elevation: 0,
             color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
@@ -49,12 +59,15 @@ class BorrowListWindow extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(
-          child: GridView(
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedHeight(
-              height: 256,
-              maxCrossAxisExtent: 320,
+        SingleChildScrollView(
+          child: LayoutGrid(
+            columnSizes: repeat(
+              crossItems,
+              [auto],
+            ),
+            rowSizes: repeat(
+              rowItem(c.borrowList.length),
+              [auto],
             ),
             children: List<Widget>.generate(
               c.borrowList.length,

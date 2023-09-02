@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
-import 'package:watermeter/page/widget.dart';
 
 class ScoreChoiceWindow extends StatelessWidget {
   const ScoreChoiceWindow({super.key});
@@ -94,6 +94,16 @@ class ScoreChoiceWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int crossItems = MediaQuery.sizeOf(context).width ~/ 360;
+
+    int rowItem(int length) {
+      int rowItem = length ~/ crossItems;
+      if (crossItems * rowItem < length) {
+        rowItem += 1;
+      }
+      return rowItem;
+    }
+
     return GetBuilder<ScoreController>(
       builder: (c) => Scaffold(
         appBar: AppBar(
@@ -108,14 +118,22 @@ class ScoreChoiceWindow extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: fixHeightGrid(
-            height: 120,
-            maxCrossAxisExtent: 360,
-            children: List.generate(
-              c.selectedScoreList.length,
-              (index) => ScoreInfoCard(
-                mark: c.selectedScoreList[index].mark,
-                isScoreChoice: true,
+          child: SingleChildScrollView(
+            child: LayoutGrid(
+              columnSizes: repeat(
+                crossItems,
+                [auto],
+              ),
+              rowSizes: repeat(
+                rowItem(c.selectedScoreList.length),
+                [auto],
+              ),
+              children: List<Widget>.generate(
+                c.selectedScoreList.length,
+                (index) => ScoreInfoCard(
+                  mark: c.selectedScoreList[index].mark,
+                  isScoreChoice: true,
+                ),
               ),
             ),
           ),

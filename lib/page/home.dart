@@ -68,9 +68,10 @@ class _HomePageState extends State<HomePage> {
       children: [
         const MainPage(),
         LayoutBuilder(
-            builder: ((context, constraints) => ToolBoxView(
-                  constraints: constraints,
-                ))),
+          builder: (context, constraints) => ToolBoxView(
+            constraints: constraints,
+          ),
+        ),
         const SettingWindow(),
       ],
       onPageChanged: (int index) {
