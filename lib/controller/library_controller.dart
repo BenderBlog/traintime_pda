@@ -67,7 +67,4 @@ class LibraryController extends GetxController {
       isSearching.value = false;
     }
   }
-
-  Future<List<BookLocation>> getLocation(BookInfo toUse) =>
-      LibrarySession().getBookLocation(toUse);
 }

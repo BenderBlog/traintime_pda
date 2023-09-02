@@ -58,28 +58,28 @@ class BookInfoCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "作者：${toUse.author}",
+                        "作者：${toUse.author ?? "没有相关信息"}",
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "出版社：${toUse.publisherHouse}",
+                        "出版社：${toUse.publisherHouse ?? "没有相关信息"}",
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "馆藏量：${toUse.bookNumber}",
+                        "馆藏量：${toUse.items?.length ?? "没有相关信息"}",
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "ISBN: ${toUse.isbn}",
+                        "ISBN: ${toUse.isbn ?? "没有相关信息"}",
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "发行时间: ${toUse.publicationDate}",
+                        "发行时间: ${toUse.publishYear ?? "没有相关信息"}",
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "索书号: ${toUse.searchCode}",
+                        "索书号: ${toUse.searchCode ?? "没有相关信息"}",
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],

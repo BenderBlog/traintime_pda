@@ -18,44 +18,6 @@ class LibrarySession extends IDSSession {
   /* Note 1: Search book pattern, no need to implement.
     POST https://zs.xianmaigu.com/xidian_book/api/search/getSearchBookType.html
     body { "libraryId": 5 }
-
-    {
-      "code": 1,
-      "msg": "",
-      "url": "",
-      "data": [{
-        "type": "wrd",
-        "typeName": "任意词"
-      }, {
-        "type": "wti",
-        "typeName": "题名"
-      }, {
-        "type": "wau",
-        "typeName": "著者"
-      }, {
-        "type": "iss",
-        "typeName": "ISSN"
-      }, {
-        "type": "isb",
-        "typeName": "ISBN"
-      }, {
-        "type": "bar",
-        "typeName": "条码"
-      }, {
-        "type": "cal",
-        "typeName": "索书号"
-      }, {
-        "type": "clc",
-        "typeName": "中图分类号"
-      }, {
-        "type": "wpu",
-        "typeName": "出版社"
-      }, {
-        "type": "wsu",
-        "typeName": "主题词"
-      }],
-      "sysDateTime": 1689748355145
-    }
   */
 
   Future<List<BookInfo>> searchBook(String searchWord, int page) async {
@@ -67,7 +29,7 @@ class LibrarySession extends IDSSession {
       data: {
         "libraryId": 5,
         "searchWord": searchWord,
-        "searchFiled": "wrd",
+        "searchFiled": "title",
         "page": page,
         "searchLocationStatus": 1,
       },
@@ -76,30 +38,6 @@ class LibrarySession extends IDSSession {
     return List<BookInfo>.generate(
       rawData.length ?? 0,
       (index) => BookInfo.fromJson(rawData[index]),
-    );
-  }
-
-  Future<List<BookLocation>> getBookLocation(BookInfo toUse) async {
-    if (userId == 0 && token == "") {
-      await initSession();
-    }
-    var rawData = await dio.post(
-      "https://zs.xianmaigu.com/xidian_book/api/search/getBookByDocNum.html",
-      data: {
-        "libraryId": 5,
-        "userId": userId,
-        "token": token,
-        "cardNumber": preference.getString(preference.Preference.idsAccount),
-        "docNumber": toUse.docNumber,
-        "base": toUse.base,
-        "searchLocationStatus": 1,
-        "searchCode": toUse.searchCode,
-      },
-    ).then((value) => value.data["data"]);
-
-    return List<BookLocation>.generate(
-      rawData.length,
-      (index) => BookLocation.fromJson(rawData[index]),
     );
   }
 
