@@ -137,10 +137,10 @@ class ScoreWindow extends StatelessWidget {
                     await showDialog<int>(
                       context: context,
                       builder: (context) => ColumnChooseDialog(
-                        semesterList: ["所有学期", ...c.semester],
+                        semesterList: c.semester.toList(),
                       ),
                     ).then((value) {
-                      c.chosenSemester = ["", ...c.semester].toList()[value!];
+                      c.chosenSemester = c.semester.toList()[value!];
                       c.update();
                     });
                   },
