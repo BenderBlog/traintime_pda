@@ -63,7 +63,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                 _controller.finishRefresh();
               },
               childBuilder: (context, physics) {
-                if (punchData.value.situation == null) {
+                if (punchData.value.situation.isEmpty) {
                   if (punchData.value.all.isNotEmpty) {
                     int count = 0;
                     List<RecordCard> toUse = [];
@@ -102,7 +102,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                       ],
                     );
                   }
-                } else if (punchData.value.situation == "正在加载") {
+                } else if (punchData.value.situation.contains("正在加载")) {
                   return const Center(child: CircularProgressIndicator());
                 } else {
                   return Center(
@@ -118,7 +118,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "总次数: ${punchData.value.allTime}\n成功次数: ${punchData.value.valid}",
+                "总次数: ${punchData.value.allTime}\n成功次数: ${punchData.value.validTime}",
                 textScaleFactor: 1.2,
               ),
               FloatingActionButton.extended(

@@ -16,13 +16,14 @@ class SportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (punchData.value.situation == null && punchData.value.allTime == -1) {
+    if (punchData.value.situation.isEmpty &&
+        punchData.value.allTime.value == -1) {
       SportSession().getPunch();
     }
     return Obx(
       () => GestureDetector(
         onTap: () async {
-          if (punchData.value.situation == null) {
+          if (punchData.value.situation.isEmpty) {
             showDialog(
               context: context,
               builder: (context) => SimpleDialog(
@@ -108,48 +109,52 @@ class SportCard extends StatelessWidget {
               ),
             );
           } else {
-            if (punchData.value.situation == "没有密码") {
+            if (punchData.value.situation.contains("没有密码")) {
               showDialog(
                 context: context,
                 builder: (context) => const SportPasswordDialog(),
-              );
+              ).then((value) => SportSession().getPunch());
             }
           }
         },
-        onLongPress: SportSession().getPunch,
-        child: MainPageCard(
-          isBold: true,
-          icon: MingCuteIcons.mgc_run_fill,
-          text: "体育信息",
-          isLoad: punchData.value.situation == "正在获取",
-          progress: punchData.value.validTime / 50,
-          infoText: RichText(
-            text: TextSpan(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-                fontSize: 20,
-              ),
-              children: punchData.value.situation == null
-                  ? [
-                      TextSpan(
-                        text: "${punchData.value.validTime}",
-                        style: const TextStyle(
-                          fontSize: 28,
+        onLongPress: () => SportSession().getPunch(),
+        child: Obx(
+          () => MainPageCard(
+            isBold: true,
+            icon: MingCuteIcons.mgc_run_fill,
+            text: "体育信息",
+            isLoad: punchData.value.situation.contains("正在获取"),
+            progress: punchData.value.validTime / 50,
+            infoText: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 20,
+                ),
+                children: punchData.value.situation.isEmpty
+                    ? [
+                        TextSpan(
+                          text: "${punchData.value.validTime}",
+                          style: const TextStyle(
+                            fontSize: 28,
+                          ),
                         ),
-                      ),
-                      const TextSpan(
-                        text: " 次",
-                      ),
-                    ]
-                  : [
-                      TextSpan(
-                        text: "${punchData.value.situation}",
-                      ),
-                    ],
+                        const TextSpan(
+                          text: " 次",
+                        ),
+                      ]
+                    : [
+                        TextSpan(
+                          text: "${punchData.value.situation}",
+                        ),
+                      ],
+              ),
             ),
-          ),
-          bottomText: Text(
-            punchData.value.situation ?? "总共 ${punchData.value.allTime} 次",
+            bottomText: Text(
+              punchData.value.situation.isEmpty
+                  ? "总共 ${punchData.value.allTime} 次"
+                  : punchData.value.situation.value,
+            ),
           ),
         ),
       ),

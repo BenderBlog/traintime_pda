@@ -27,10 +27,8 @@ class SportSession {
   );
 
   Future<void> getPunch() async {
-    punchData.value.situation = "正在获取";
-    PunchDataList toReturn = PunchDataList();
+    punchData.value.reset();
     try {
-      // Map<String, dynamic> body = {};
       /*
       if (userId != "") {
         var getStore = await require(
@@ -63,15 +61,15 @@ class SportSession {
         },
       ).then((response) {
         for (var i in response["data"]) {
-          toReturn.all.add(PunchData(
+          punchData.value.all.add(PunchData(
             i["machineName"],
             i["weekNum"],
             Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
             i["state"],
           ));
         }
-        toReturn.all.sort((a, b) => a.time.diff(b.time).toInt());
-        toReturn.allTime = toReturn.all.length;
+        punchData.value.all.sort((a, b) => a.time.diff(b.time).toInt());
+        punchData.value.allTime.value = punchData.value.all.length;
       });
 
       await require(
@@ -84,34 +82,32 @@ class SportSession {
         },
       ).then((response) {
         for (var i in response["data"]) {
-          toReturn.valid.add(PunchData(
+          punchData.value.valid.add(PunchData(
             i["machineName"],
             i["weekNum"],
             Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
             i["state"],
           ));
         }
-        toReturn.valid.sort((a, b) => a.time.diff(b.time).toInt());
-        toReturn.validTime = toReturn.valid.length;
+        punchData.value.valid.sort((a, b) => a.time.diff(b.time).toInt());
+        punchData.value.validTime.value = punchData.value.valid.length;
       });
 
-      punchData.value.situation = null;
+      punchData.value.situation.value = "";
     } on NoPasswordException {
-      toReturn.situation = "没有密码";
+      punchData.value.situation.value = "没有密码";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
-      toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
+      punchData.value.situation.value = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e) {
       developer.log("未获取学期值：$e", name: "GetPunchSession");
-      toReturn.situation = "查询失败";
+      punchData.value.situation.value = "查询失败";
     } on DioException catch (e) {
       developer.log("网络故障：$e", name: "GetPunchSession");
-      toReturn.situation = "网络故障";
+      punchData.value.situation.value = "网络故障";
     } catch (e) {
       developer.log("未知故障：$e", name: "GetPunchSession");
-      toReturn.situation = "未知故障";
-    } finally {
-      punchData.value = toReturn;
+      punchData.value.situation.value = "未知故障";
     }
   }
 
