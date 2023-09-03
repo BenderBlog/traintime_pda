@@ -35,7 +35,7 @@ class FlowEventRow extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isTitle
-                    ? Theme.of(context).primaryColor
+                    ? Theme.of(context).colorScheme.primary
                     : Colors.transparent,
               ),
             ),
