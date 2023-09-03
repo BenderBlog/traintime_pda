@@ -35,7 +35,7 @@ class BorrowListWindow extends StatelessWidget {
               vertical: 6,
             ),
             elevation: 0,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.secondary,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               child: Column(

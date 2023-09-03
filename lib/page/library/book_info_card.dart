@@ -23,7 +23,7 @@ class BookInfoCard extends StatelessWidget {
         vertical: 9,
       ),
       elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.secondary,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
