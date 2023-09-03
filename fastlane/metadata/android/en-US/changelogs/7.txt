@@ -1,0 +1,5 @@
+1. Night mode fix.
+2. Library fix.
+3. Horizontal and pad page, as well as new homepage.
+4. Electricity fix.
+5. Other minor page.
