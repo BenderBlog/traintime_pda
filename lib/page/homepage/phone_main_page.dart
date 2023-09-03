@@ -67,7 +67,7 @@ class PhoneMainPage extends StatelessWidget {
               centerTitle: false,
               titlePadding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.sizeOf(context).width * 0.05,
-                vertical: 16,
+                vertical: 10,
               ),
               title: GetBuilder<ClassTableController>(
                 builder: (c) => Column(
@@ -77,7 +77,7 @@ class PhoneMainPage extends StatelessWidget {
                     Text(
                       _now,
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
                       ),

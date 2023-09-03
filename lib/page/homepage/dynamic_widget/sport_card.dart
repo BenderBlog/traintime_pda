@@ -118,43 +118,41 @@ class SportCard extends StatelessWidget {
           }
         },
         onLongPress: () => SportSession().getPunch(),
-        child: Obx(
-          () => MainPageCard(
-            isBold: true,
-            icon: MingCuteIcons.mgc_run_fill,
-            text: "体育信息",
-            isLoad: punchData.value.situation.contains("正在获取"),
-            progress: punchData.value.validTime / 50,
-            infoText: RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  fontSize: 20,
-                ),
-                children: punchData.value.situation.isEmpty
-                    ? [
-                        TextSpan(
-                          text: "${punchData.value.validTime}",
-                          style: const TextStyle(
-                            fontSize: 28,
-                          ),
-                        ),
-                        const TextSpan(
-                          text: " 次",
-                        ),
-                      ]
-                    : [
-                        TextSpan(
-                          text: "${punchData.value.situation}",
-                        ),
-                      ],
+        child: MainPageCard(
+          isBold: true,
+          icon: MingCuteIcons.mgc_run_fill,
+          text: "体育信息",
+          isLoad: punchData.value.situation.contains("正在获取"),
+          progress: punchData.value.validTime / 50,
+          infoText: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                fontSize: 20,
               ),
+              children: punchData.value.situation.isEmpty
+                  ? [
+                      TextSpan(
+                        text: "${punchData.value.validTime}",
+                        style: const TextStyle(
+                          fontSize: 28,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: " 次",
+                      ),
+                    ]
+                  : [
+                      TextSpan(
+                        text: "${punchData.value.situation}",
+                      ),
+                    ],
             ),
-            bottomText: Text(
-              punchData.value.situation.isEmpty
-                  ? "总共 ${punchData.value.allTime} 次"
-                  : punchData.value.situation.value,
-            ),
+          ),
+          bottomText: Text(
+            punchData.value.situation.isEmpty
+                ? "总共 ${punchData.value.allTime} 次"
+                : punchData.value.situation.value,
           ),
         ),
       ),
