@@ -69,7 +69,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
               List things = [
                 Card(
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.secondary,
                   child: Container(
                     padding: const EdgeInsets.all(15),
                     child: Column(
@@ -115,7 +115,7 @@ class ScoreCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.secondary,
       child: Container(
         padding: const EdgeInsets.all(20),
         child: Column(

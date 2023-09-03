@@ -177,7 +177,7 @@ class RecordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.secondary,
       child: Container(
         padding: const EdgeInsets.all(15),
         child: Wrap(
@@ -185,7 +185,6 @@ class RecordCard extends StatelessWidget {
           children: [
             TagsBoxes(
               text: "第 $mark 条",
-              backgroundColor: Theme.of(context).primaryColor,
             ),
             situation(),
             const Divider(
