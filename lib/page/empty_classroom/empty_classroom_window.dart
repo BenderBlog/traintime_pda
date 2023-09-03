@@ -155,8 +155,6 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
                 child: DataTable2(
-                  headingRowColor:
-                      MaterialStatePropertyAll<Color>(Colors.grey.shade100),
                   columnSpacing: 0,
                   horizontalMargin: 6,
                   columns: const [
