@@ -33,6 +33,7 @@ class LibraryController extends GetxController {
         error.value = false;
         await LibrarySession().initSession();
       }
+      borrowList.clear();
       borrowList.addAll(await LibrarySession().getBorrowList());
       isGet.value = true;
       error.value = false;
