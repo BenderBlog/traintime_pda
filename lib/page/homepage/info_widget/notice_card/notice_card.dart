@@ -68,11 +68,8 @@ class NoticeCard extends StatelessWidget {
               vertical: 14,
             )
             .decorated(
-              border: Border.all(
-                width: 3,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              borderRadius: BorderRadius.circular(26),
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(12),
             )
             .paddingAll(4),
       ),

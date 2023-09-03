@@ -124,7 +124,7 @@ class MainPageCard extends StatelessWidget {
                   bottomText,
                   if (!isLoad &&
                       (progress != null && progress! >= 0 && progress! <= 1))
-                    Text("${progress! * 100} %"),
+                    Text("${(progress! * 100).toInt()}%"),
                 ],
               ),
             ),
