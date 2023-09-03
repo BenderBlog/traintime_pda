@@ -20,7 +20,8 @@ class PunchData {
 class PunchDataList {
   String? situation;
   int allTime = -1;
-  int valid = -1;
+  int validTime = -1;
   double score = -1;
   List<PunchData> all = [];
+  List<PunchData> valid = [];
 }

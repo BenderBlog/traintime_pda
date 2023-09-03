@@ -53,7 +53,7 @@ class SportSession {
         });
       }
       */
-      var response = await require(
+      await require(
         subWebsite: "stuPunchRecord/findPager",
         body: {
           'userNum': preference.getString(preference.Preference.idsAccount),
@@ -61,22 +61,40 @@ class SportSession {
           'pageSize': 999,
           'pageIndex': 1
         },
-      );
-      for (var i in response["data"]) {
-        toReturn.allTime++;
-        if (i["state"].toString().contains("恭喜你本次打卡成功")) {
-          toReturn.valid++;
+      ).then((response) {
+        for (var i in response["data"]) {
+          toReturn.all.add(PunchData(
+            i["machineName"],
+            i["weekNum"],
+            Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
+            i["state"],
+          ));
         }
-        toReturn.all.add(PunchData(
-          i["machineName"],
-          i["weekNum"],
-          Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
-          i["state"],
-        ));
-      }
-      toReturn.all.sort((a, b) => a.time.diff(b.time).toInt());
-      toReturn.allTime++;
-      toReturn.valid++;
+        toReturn.all.sort((a, b) => a.time.diff(b.time).toInt());
+        toReturn.allTime = toReturn.all.length;
+      });
+
+      await require(
+        subWebsite: "stuPunchRecord/findPagerOk",
+        body: {
+          'userNum': preference.getString(preference.Preference.idsAccount),
+          'sysTermId': 13, //await getTermID(),
+          'pageSize': 999,
+          'pageIndex': 1
+        },
+      ).then((response) {
+        for (var i in response["data"]) {
+          toReturn.valid.add(PunchData(
+            i["machineName"],
+            i["weekNum"],
+            Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
+            i["state"],
+          ));
+        }
+        toReturn.valid.sort((a, b) => a.time.diff(b.time).toInt());
+        toReturn.validTime = toReturn.valid.length;
+      });
+
       punchData.value.situation = null;
     } on NoPasswordException {
       toReturn.situation = "没有密码";

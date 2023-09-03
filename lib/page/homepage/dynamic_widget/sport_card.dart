@@ -122,7 +122,7 @@ class SportCard extends StatelessWidget {
           icon: MingCuteIcons.mgc_run_fill,
           text: "体育信息",
           isLoad: punchData.value.situation == "正在获取",
-          progress: punchData.value.valid / 50,
+          progress: punchData.value.validTime / 50,
           infoText: RichText(
             text: TextSpan(
               style: TextStyle(
@@ -132,7 +132,7 @@ class SportCard extends StatelessWidget {
               children: punchData.value.situation == null
                   ? [
                       TextSpan(
-                        text: "${punchData.value.valid}",
+                        text: "${punchData.value.validTime}",
                         style: const TextStyle(
                           fontSize: 28,
                         ),

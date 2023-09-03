@@ -20,8 +20,8 @@ class ScoreCard extends StatelessWidget {
           if (offline) {
             Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else if (c.error == null) {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => ScoreWindow()));
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ScoreWindow()));
           } else if (c.error == "正在加载") {
             Fluttertoast.showToast(msg: "请稍候，正在获取成绩信息");
           } else {

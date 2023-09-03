@@ -106,7 +106,8 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                   return const Center(child: CircularProgressIndicator());
                 } else {
                   return Center(
-                      child: Text("坏事: ${punchData.value.situation}"));
+                    child: Text("坏事: ${punchData.value.situation}"),
+                  );
                 }
               },
             ),
