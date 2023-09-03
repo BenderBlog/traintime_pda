@@ -15,14 +15,19 @@ class ClasstableArrangementColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget noticeBox(String text) {
-      Widget textWidget = Text(text)
+      Widget textWidget = Text(
+        text,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      )
           .center()
           .padding(
             horizontal: 8,
             vertical: 6,
           )
           .backgroundColor(
-            Colors.grey.shade200,
+            Theme.of(context).colorScheme.secondary,
           )
           .clipRRect(all: 12)
           .center();
@@ -60,7 +65,7 @@ class ClasstableArrangementColumn extends StatelessWidget {
               noticeBox(
                   "${c.classSet.$2 ? "明天一共" : "今天还剩"}${c.classSet.$1.length}节课"),
             ] else
-              noticeBox(c.classSet.$2 ? "明天没有课" : "今天课程上完了")
+              noticeBox(c.classSet.$2 ? "明天没有课" : "已无课程安排")
           else
             noticeBox(c.error == null ? "正在加载" : "遇到错误"),
         ],
