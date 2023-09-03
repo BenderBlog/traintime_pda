@@ -38,7 +38,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
           elevation: 0,
           color: c.isSelectMod && c.isSelected[widget.mark]
               ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
-              : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              : Theme.of(context).colorScheme.secondary,
           child: Container(
             padding: const EdgeInsets.all(15),
             child: Column(

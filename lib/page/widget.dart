@@ -17,14 +17,14 @@ const double roundRadius = 10;
 /// Use it to show the small items.
 class TagsBoxes extends StatelessWidget {
   final String text;
-  final Color backgroundColor;
-  final Color textColor;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const TagsBoxes({
     Key? key,
     required this.text,
-    this.backgroundColor = Colors.blue,
-    this.textColor = Colors.white,
+    this.backgroundColor,
+    this.textColor,
   }) : super(key: key);
 
   @override
@@ -32,13 +32,18 @@ class TagsBoxes extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor ?? Theme.of(context).colorScheme.primary,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
       ),
       child: Text(
         text,
         textScaleFactor: 0.9,
-        style: TextStyle(color: textColor),
+        style: TextStyle(
+          color: textColor ??
+              (Theme.of(context).brightness == Brightness.light
+                  ? Colors.white
+                  : Colors.black),
+        ),
       ),
     );
   }
