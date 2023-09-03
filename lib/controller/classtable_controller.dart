@@ -209,7 +209,7 @@ class ClassTableController extends GetxController {
 
   @override
   void onReady() async {
-    await updateClassTable();
+    await updateClassTable(isForce: true);
     update();
   }
 
