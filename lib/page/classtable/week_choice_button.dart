@@ -34,7 +34,7 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
     double opacity = isOccupied ? 1 : 0.25;
     return ClipOval(
       child: Container(
-        color: Theme.of(context).primaryColor.withOpacity(opacity),
+        color: Theme.of(context).colorScheme.primary.withOpacity(opacity),
       ),
     );
   }
