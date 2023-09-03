@@ -34,9 +34,9 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('修改电费帐号密码'),
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 20,
-        color: Colors.black,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
       content: TextField(
         autofocus: true,

@@ -21,29 +21,27 @@ class _ChangeBrightnessDialogState extends State<ChangeBrightnessDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('颜色设置'),
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 20,
-        color: Colors.black,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
       content: SingleChildScrollView(
         child: Column(
-          children: [
-            const Divider(),
-            for (int i = 0; i < demoBlueModeName.length; ++i)
-              RadioListTile<int>(
-                title: Text(demoBlueModeName[i]),
-                value: i,
-                groupValue: preference.getInt(preference.Preference.brightness),
-                onChanged: (int? value) {
-                  setState(() {
-                    preference.setInt(preference.Preference.brightness, value!);
-                    ThemeController toChange = Get.put(ThemeController());
-                    toChange.onUpdate();
-                  });
-                },
-              ),
-            const Divider(),
-          ],
+          children: List<Widget>.generate(
+            demoBlueModeName.length,
+            (index) => RadioListTile<int>(
+              title: Text(demoBlueModeName[index]),
+              value: index,
+              groupValue: preference.getInt(preference.Preference.brightness),
+              onChanged: (int? value) {
+                setState(() {
+                  preference.setInt(preference.Preference.brightness, value!);
+                  ThemeController toChange = Get.put(ThemeController());
+                  toChange.onUpdate();
+                });
+              },
+            ),
+          ),
         ),
       ),
       actions: <Widget>[

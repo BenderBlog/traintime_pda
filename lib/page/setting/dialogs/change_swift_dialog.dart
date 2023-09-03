@@ -28,9 +28,9 @@ class ChangeSwiftDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('课程偏移设置'),
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 20,
-        color: Colors.black,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
       content: TextField(
         autofocus: true,
