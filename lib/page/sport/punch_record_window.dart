@@ -90,10 +90,12 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.warning),
+                                Icon(
+                                  Icons.warning_rounded,
+                                  size: 64,
+                                ),
                                 Text(
-                                  "列表为空",
-                                  textScaleFactor: 1.5,
+                                  "列表为空，快去打卡吧()",
                                 ),
                               ],
                             ),
