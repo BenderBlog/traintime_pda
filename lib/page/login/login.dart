@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/page/login/app_icon.dart';
+import 'package:watermeter/page/telebook/telebook_view.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -85,7 +86,6 @@ class _LoginWindowState extends State<LoginWindow> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: TextField(
-                  autofocus: true,
                   controller: _idsAccountController,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -159,8 +159,7 @@ class _LoginWindowState extends State<LoginWindow> {
             ),
           ),
           const SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
             children: buttons(),
           ),
         ],

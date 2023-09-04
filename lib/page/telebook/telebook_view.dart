@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:watermeter/page/widget.dart';
@@ -54,7 +56,7 @@ class DepartmentWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = MediaQuery.sizeOf(context).width ~/ 376;
+    int crossItems = max(MediaQuery.sizeOf(context).width ~/ 376, 1);
 
     int rowItem(int length) {
       int rowItem = length ~/ crossItems;

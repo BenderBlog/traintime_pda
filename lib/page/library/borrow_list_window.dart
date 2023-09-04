@@ -3,6 +3,8 @@
 
 // Borrow list, shows the user's borrowlist.
 
+import 'dart:math';
+
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,7 @@ class BorrowListWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = MediaQuery.sizeOf(context).width ~/ 360;
+    int crossItems = max(MediaQuery.sizeOf(context).width ~/ 360, 1);
 
     int rowItem(int length) {
       int rowItem = length ~/ crossItems;
