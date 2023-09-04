@@ -41,52 +41,60 @@ class SportCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.punch_clock,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  punchData.value.all.last.time
-                                      .format(pattern: "yyyy-MM-dd HH:mm:ss"),
-                                ).expanded(),
-                              ],
-                            ),
-                            const SizedBox(height: 2.0),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.place,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Text(
-                                    punchData.value.all.last.machineName,
+                            if (punchData.value.all.isNotEmpty) ...[
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.punch_clock,
+                                    size: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 2.0),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.error_outlined,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Text(
-                                    punchData.value.all.last.state,
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    punchData.value.all.last.time
+                                        .format(pattern: "yyyy-MM-dd HH:mm:ss"),
+                                  ).expanded(),
+                                ],
+                              ),
+                              const SizedBox(height: 2.0),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.place,
+                                    size: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
                                   ),
-                                ),
-                              ],
-                            ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      punchData.value.all.last.machineName,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2.0),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.error_outlined,
+                                    size: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      punchData.value.all.last.state,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ] else
+                              const SimpleDialogOption(
+                                child: Text("目前没有记录，快去打卡吧()"),
+                              )
                           ],
                         ),
                       ),
