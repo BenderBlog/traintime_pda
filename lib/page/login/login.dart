@@ -3,6 +3,8 @@
 
 // Login window of the program.
 
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -14,6 +16,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/widget.dart';
 import 'package:watermeter/page/login/captcha_input_dialog.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({Key? key}) : super(key: key);
@@ -75,7 +78,7 @@ class _LoginWindowState extends State<LoginWindow> {
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 border: Border.all(color: Colors.black12),
                 borderRadius: BorderRadius.circular(roundRadius),
               ),
@@ -88,6 +91,7 @@ class _LoginWindowState extends State<LoginWindow> {
                     border: InputBorder.none,
                     floatingLabelBehavior: FloatingLabelBehavior.never,
                     hintText: "学号",
+                    fillColor: Color(0xfff1f1f1),
                   ),
                 ),
               ),
@@ -98,7 +102,7 @@ class _LoginWindowState extends State<LoginWindow> {
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 border: Border.all(color: Colors.black12),
                 borderRadius: BorderRadius.circular(roundRadius),
               ),
@@ -130,10 +134,12 @@ class _LoginWindowState extends State<LoginWindow> {
             padding: const EdgeInsets.symmetric(horizontal: widthOfSquare),
             child: FilledButton(
               style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.all(20.0),
                 minimumSize: const Size(double.infinity, 60),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(roundRadius)),
+                  borderRadius: BorderRadius.circular(roundRadius),
+                ),
               ),
               child: const Text(
                 "登录",
@@ -178,8 +184,9 @@ class _LoginWindowState extends State<LoginWindow> {
             pd.update(msg: status, value: number),
         getCaptcha: (String cookieStr) {
           return showDialog<String>(
-              context: context,
-              builder: (context) => CaptchaInputDialog(cookie: cookieStr));
+            context: context,
+            builder: (context) => CaptchaInputDialog(cookie: cookieStr),
+          );
         },
       );
       if (!mounted) return;
@@ -204,7 +211,14 @@ class _LoginWindowState extends State<LoginWindow> {
       isGood = false;
       pd.close();
       if (mounted) {
-        Fluttertoast.showToast(msg: e.toString());
+        if (e is PasswordWrongException) {
+          Fluttertoast.showToast(msg: "输入账号或密码错误");
+        } else {
+          developer.log("Login failed: $e", name: "Login");
+          Fluttertoast.showToast(
+            msg: "登录遇到错误，请清除登录缓存。\n${e.toString().substring(20)}",
+          );
+        }
       }
     }
   }

@@ -183,25 +183,33 @@ class IDSSession extends NetworkSession {
     if (onResponse != null) {
       onResponse(50, "准备登录");
     }
-    var data = await dio.post(
-      "https://ids.xidian.edu.cn/authserver/login",
-      data: head,
-    );
-    if (data.statusCode == 401) {
-      throw PasswordWrongException();
-    } else if (data.statusCode == 301 || data.statusCode == 302) {
-      /// Post login progress.
-      if (onResponse != null) {
-        onResponse(80, "登录后处理");
+    try {
+      var data = await dio.post(
+        "https://ids.xidian.edu.cn/authserver/login",
+        data: head,
+      );
+      if (data.statusCode == 301 || data.statusCode == 302) {
+        /// Post login progress.
+        if (onResponse != null) {
+          onResponse(80, "登录后处理");
+        }
+        while (data.headers[HttpHeaders.locationHeader] != null) {
+          String location = data.headers[HttpHeaders.locationHeader]![0];
+          developer.log("Received: $location.", name: "ids login");
+          data = await dio.get(location);
+        }
+        return data;
+      } else {
+        throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
       }
-      while (data.headers[HttpHeaders.locationHeader] != null) {
-        String location = data.headers[HttpHeaders.locationHeader]![0];
-        developer.log("Received: $location.", name: "ids login");
-        data = await dio.get(location);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw PasswordWrongException();
+      } else {
+        rethrow;
       }
-      return data;
-    } else {
-      throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
+    } catch (e) {
+      rethrow;
     }
   }
 }
