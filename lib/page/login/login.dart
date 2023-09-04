@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/page/login/app_icon.dart';
-import 'package:watermeter/page/telebook/telebook_view.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/network_session.dart';
