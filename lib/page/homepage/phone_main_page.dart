@@ -123,8 +123,10 @@ class PhoneMainPage extends StatelessWidget {
             child: ListView(
               children: [
                 const HeaderLocator(),
+                const NoticeCard()
+                    .padding(left: 20, right: 20, top: 4), // 通知信息置顶
                 Text(
-                  "日程安排和通知",
+                  "日程",
                   style: textStyle(context),
                 ).padding(
                   left: 20,
@@ -140,7 +142,7 @@ class PhoneMainPage extends StatelessWidget {
                     columnSizes: [1.fr],
                     rowSizes: const [auto, auto],
                     children: const [
-                      NoticeCard(),
+                      // NoticeCard(),
                       ClassTableCard(),
                     ],
                   ),

@@ -44,7 +44,7 @@ class SchoolCardInfoCard extends StatelessWidget {
           () => MainPageCard(
             isLoad: !(c.isGetPrice.value && c.errorPrice.isEmpty) && !offline,
             icon: MingCuteIcons.mgc_wallet_4_line,
-            text: "流水查询",
+            text: "流水",
             infoText: RichText(
               text: TextSpan(
                 style: TextStyle(
@@ -80,7 +80,7 @@ class SchoolCardInfoCard extends StatelessWidget {
             bottomText: Obx(
               () => Text(
                 c.isGetPrice.value
-                    ? "点开查询流水"
+                    ? "查询一卡通流水"
                     : c.errorPrice.isNotEmpty
                         ? "目前无法获取信息"
                         : "正在查询信息中",

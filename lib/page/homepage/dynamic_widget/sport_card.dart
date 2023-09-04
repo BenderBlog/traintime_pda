@@ -121,7 +121,7 @@ class SportCard extends StatelessWidget {
         child: MainPageCard(
           isBold: true,
           icon: MingCuteIcons.mgc_run_fill,
-          text: "体育信息",
+          text: "体育打卡",
           isLoad: punchData.value.situation.contains("正在获取"),
           progress: punchData.value.validTime / 50,
           infoText: RichText(
@@ -151,7 +151,7 @@ class SportCard extends StatelessWidget {
           ),
           bottomText: Text(
             punchData.value.situation.isEmpty
-                ? "总共 ${punchData.value.allTime} 次"
+                ? "总计 ${punchData.value.allTime} 次"
                 : punchData.value.situation.value,
           ),
         ),
