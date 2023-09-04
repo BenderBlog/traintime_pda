@@ -28,7 +28,7 @@ class ClassCard extends StatelessWidget {
 
         /// A empty card used to occupy the place which have no class.
         const Padding(
-            padding: EdgeInsets.all(1.5),
+            padding: EdgeInsets.all(2),
 
             /// Easter egg, usless you read the code,
             /// or reverse engineering...
@@ -37,7 +37,7 @@ class ClassCard extends StatelessWidget {
                 "BOCCHI RULES!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 12,
                   color: Colors.transparent,
                   letterSpacing: 1,
                 ),
@@ -72,11 +72,11 @@ class ClassCard extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(1.5),
+              padding: const EdgeInsets.all(2),
               child: Center(
                 child: Text(
                   "${classTableState.classDetail[classTableState.timeArrangement[index].index].name}\n"
-                  "${classTableState.timeArrangement[index].classroom}",
+                  "${classTableState.timeArrangement[index].classroom ?? "未知教室"}",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
@@ -113,7 +113,7 @@ class ClassCard extends StatelessWidget {
                 : const EdgeInsets.fromLTRB(2, 2, 2, 8),
             child: ClipRRect(
               // Inner
-              borderRadius: BorderRadius.circular(8.5),
+              borderRadius: BorderRadius.circular(8),
               child: Container(
                 color: index == -1
                     ? const Color(0x00000000)

@@ -34,23 +34,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
   late ClassTableState classTableState;
 
   @override
-  void initState() {
-    /// Init the background.
-    File image = File("${supportPath.path}/decoration.jpg");
-    decoration = BoxDecoration(
-      image: (preference.getBool(preference.Preference.decorated) &&
-              image.existsSync())
-          ? DecorationImage(
-              image: FileImage(image),
-              fit: BoxFit.cover,
-            )
-          : null,
-    );
-
-    super.initState();
-  }
-
-  @override
   void didChangeDependencies() {
     classTableState = ClassTableState.of(context)!;
     pageControl = PageController(
@@ -65,6 +48,20 @@ class _ClassTablePageState extends State<ClassTablePage> {
       viewportFraction: (weekButtonWidth + 2 * weekButtonHorizontalPadding) /
           MediaQuery.sizeOf(context).width,
       keepPage: true,
+    );
+
+    /// Init the background.
+    File image = File("${supportPath.path}/decoration.jpg");
+    decoration = BoxDecoration(
+      image: (preference.getBool(preference.Preference.decorated) &&
+              image.existsSync())
+          ? DecorationImage(
+              image: FileImage(image),
+              fit: BoxFit.cover,
+              opacity:
+                  Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
+            )
+          : null,
     );
 
     super.didChangeDependencies();
