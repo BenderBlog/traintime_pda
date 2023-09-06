@@ -1,5 +1,1 @@
-Emergency Fix
-1. Occaisonally dead on score window.
-2. Erase last state when login failed.
-
-0.3.0 means a new beginning.
+Other fix
