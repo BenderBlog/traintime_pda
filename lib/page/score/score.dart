@@ -210,7 +210,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                 [auto],
               ),
               rowSizes: repeat(
-                rowItem(c.selectedScoreList.length),
+                rowItem(c.toShow.length),
                 [auto],
               ),
               children: List<Widget>.generate(
