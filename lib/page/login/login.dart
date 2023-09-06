@@ -174,6 +174,14 @@ class _LoginWindowState extends State<LoginWindow> {
       completed: Completed(completedMsg: "登录成功"),
     );
     EhallSession ses = EhallSession();
+
+    try {
+      await ses.clearCookieJar();
+      developer.log("已经清除上次登录状态", name: "Login");
+    } on Exception {
+      developer.log("没有登录状态", name: "Login");
+    }
+
     try {
       await ses.login(
         username: _idsAccountController.text,
