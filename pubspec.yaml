@@ -21,6 +21,7 @@ dependencies:
   json_annotation: ^4.8.0
   # Deal with html
   beautiful_soup_dart: ^0.3.0
+  charset_converter: ^2.1.1
   # Setting
   settings_ui: ^2.0.2
   # Homepage and others
