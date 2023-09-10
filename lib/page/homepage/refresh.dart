@@ -9,6 +9,7 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/repository/electricity_session.dart' as electricity;
+//import 'package:watermeter/repository/xidian_ids/experiment_session.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
 
@@ -47,4 +48,7 @@ void update() {
   libraryController.onReady();
   // Update school card
   schoolCardController.updateMoney();
+  // Get physics exp data
+  // var data = ExperimentSession();
+  // data.login().then((value) async => await data.getData());
 }
