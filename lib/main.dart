@@ -13,6 +13,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/network_session.dart' as repo_general;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -55,6 +56,9 @@ void main() async {
   repo_general.supportPath = await getApplicationSupportDirectory();
   preference.prefs = await SharedPreferences.getInstance();
   preference.packageInfo = await PackageInfo.fromPlatform();
+
+  // Get message of the app.
+  MessageSession().checkMessage();
 
   // Have user registered?
   bool isFirst = false;

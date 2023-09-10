@@ -28,7 +28,7 @@ NoticeMessage _$NoticeMessageFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       message: json['message'] as String,
       isLink: json['isLink'] as String,
-      github: json['github'] as String,
+      type: json['type'] as String,
     );
 
 Map<String, dynamic> _$NoticeMessageToJson(NoticeMessage instance) =>
@@ -36,5 +36,5 @@ Map<String, dynamic> _$NoticeMessageToJson(NoticeMessage instance) =>
       'title': instance.title,
       'message': instance.message,
       'isLink': instance.isLink,
-      'github': instance.github,
+      'type': instance.type,
     };

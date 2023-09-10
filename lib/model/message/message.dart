@@ -52,13 +52,13 @@ class NoticeMessage {
   final String title;
   final String message;
   final String isLink;
-  final String github;
+  final String type;
 
   NoticeMessage({
     required this.title,
     required this.message,
     required this.isLink,
-    required this.github,
+    required this.type,
   });
 
   factory NoticeMessage.fromJson(Map<String, dynamic> json) =>

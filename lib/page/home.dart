@@ -8,6 +8,7 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -80,6 +81,8 @@ class _HomePageState extends State<HomePage> {
         });
       },
     );
+
+    MessageSession().checkMessage();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (offline) {
