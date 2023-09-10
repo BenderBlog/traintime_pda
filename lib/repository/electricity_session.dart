@@ -147,10 +147,10 @@ class ElectricitySession extends NetworkSession {
     List<RegExpMatch> nameArray = name.allMatches(page).toList();
     List<RegExpMatch> dataArray = data.allMatches(page).toList();
 
+    /* 
     List<RegExpMatch> nums = RegExp(r"[0-9]+")
-        .allMatches(preference.getString(preference.Preference.dorm))
-        .toList();
-
+      .allMatches(preference.getString(preference.Preference.dorm))
+      .toList();
     int building = int.parse(nums[0][0]!.toString());
     for (int i = 0; i < nameArray.length; ++i) {
       if ((building >= 1 && building <= 4 && nameArray[i][0]!.contains("派诺")) ||
@@ -159,6 +159,18 @@ class ElectricitySession extends NetworkSession {
               nameArray[i][0]!.contains("科德")) ||
           (building >= 11 && nameArray[i][0]!.contains("电表"))) {
         electricityInfo.value = dataArray[i][0]!.substring(4);
+        return;
+      }
+    }
+    */
+    /// by ZCWzy
+    for (int i = nameArray.length - 1; i >= 0; --i) {
+      if (nameArray[i][0]!.contains("电表")) {
+        electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
+        developer.log(
+          electricityInfo.value,
+          name: "ElectricSession",
+        );
         return;
       }
     }
