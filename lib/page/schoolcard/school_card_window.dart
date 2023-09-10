@@ -68,7 +68,12 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                     value: c.timeRange,
                     borderRadius: BorderRadius.circular(16),
                   ).then((value) {
-                    if (value?.length == 2) {
+                    if (value?.length == 1) {
+                      if (value?[0] != null) {
+                        c.timeRange = [value?[0], value?[0]];
+                        c.refreshPaidRecord();
+                      }
+                    } else if (value?.length == 2) {
                       if (value?[0] != null && value?[1] != null) {
                         c.timeRange = value!;
                         c.refreshPaidRecord();
