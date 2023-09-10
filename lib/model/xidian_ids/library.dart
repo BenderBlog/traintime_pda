@@ -16,7 +16,7 @@ class BorrowData {
   final String itemLibCode;
   final int lendDay;
   final String loanDate;
-  final String renewDate;
+  final String? renewDate;
   final String normReturnDate;
   final String loanType;
   final String barcode;
@@ -29,7 +29,7 @@ class BorrowData {
     required this.itemLibCode,
     required this.lendDay,
     required this.loanDate,
-    required this.renewDate,
+    this.renewDate,
     required this.normReturnDate,
     required this.loanType,
     required this.barcode,

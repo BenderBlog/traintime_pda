@@ -14,7 +14,7 @@ BorrowData _$BorrowDataFromJson(Map<String, dynamic> json) => BorrowData(
       itemLibCode: json['itemLibCode'] as String,
       lendDay: json['lendDay'] as int,
       loanDate: json['loanDate'] as String,
-      renewDate: json['renewDate'] as String,
+      renewDate: json['renewDate'] as String?,
       normReturnDate: json['normReturnDate'] as String,
       loanType: json['loanType'] as String,
       barcode: json['barcode'] as String,

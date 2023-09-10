@@ -24,7 +24,7 @@ class BorrowInfoCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,
-        vertical: 5,
+        vertical: 6,
       ),
       elevation: 0,
       color: Theme.of(context).colorScheme.secondary,
@@ -95,6 +95,8 @@ class BorrowInfoCard extends StatelessWidget {
                       Text("馆藏码: ${toUse.barcode}"),
                       Text("借阅日期：${toUse.loanDate}"),
                       Text("到期日期：${toUse.normReturnDate}"),
+                      if (toUse.renewDate != null)
+                        Text("续借日期：${toUse.renewDate}"),
                     ],
                   ),
                 ),

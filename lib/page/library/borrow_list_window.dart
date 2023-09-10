@@ -8,6 +8,7 @@ import 'dart:math';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
 
@@ -61,22 +62,24 @@ class BorrowListWindow extends StatelessWidget {
             ),
           ),
         ),
-        SingleChildScrollView(
-          child: LayoutGrid(
-            columnSizes: repeat(
-              crossItems,
-              [auto],
+        ListView(
+          children: [
+            LayoutGrid(
+              columnSizes: repeat(
+                crossItems,
+                [auto],
+              ),
+              rowSizes: repeat(
+                rowItem(c.borrowList.length),
+                [auto],
+              ),
+              children: List<Widget>.generate(
+                c.borrowList.length,
+                (index) => BorrowInfoCard(toUse: c.borrowList[index]),
+              ),
             ),
-            rowSizes: repeat(
-              rowItem(c.borrowList.length),
-              [auto],
-            ),
-            children: List<Widget>.generate(
-              c.borrowList.length,
-              (index) => BorrowInfoCard(toUse: c.borrowList[index]),
-            ),
-          ),
-        ),
+          ],
+        ).expanded(),
       ],
     );
   }
