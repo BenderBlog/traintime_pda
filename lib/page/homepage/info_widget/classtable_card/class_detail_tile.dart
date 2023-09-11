@@ -42,7 +42,9 @@ class ClassDetailTile extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         )
         .backgroundColor(
-          Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
+          Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
+              : Theme.of(context).colorScheme.onPrimary,
         )
         .clipRRect(all: 12)
         .padding(bottom: 8);
