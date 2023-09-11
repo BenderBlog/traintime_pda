@@ -4,13 +4,18 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/controller/message_observer.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/message/message.dart';
 
 class MessageSession extends NetworkSession {
+  @override
+  Dio get dio => Dio()..interceptors.add(alice.getDioInterceptor());
+
   final url = "https://legacy.superbart.xyz/traintime_pda_backend";
+
   Future<UpdateMessage> checkUpdate() async {
     return await dio.get("$url/version.json").then(
           (value) => UpdateMessage.fromJson(value.data),
