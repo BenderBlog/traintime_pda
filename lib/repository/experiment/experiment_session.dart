@@ -3,76 +3,32 @@
 /*
 // import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'dart:developer' as developer;
-import 'dart:typed_data';
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:charset_converter/charset_converter.dart';
+import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:watermeter/repository/network_session.dart';
-
-class ExperimentSessoionTransformer extends BackgroundTransformer {
-  @override
-  Future<String> transformRequest(RequestOptions options) async {
-    developer.log("Encoding...", name: "GBKTransformer");
-    String type = await CharsetConverter.availableCharsets().then((value) =>
-        value
-            .firstWhere((element) => element.contains(RegExp(r'gb18030|GBK'))));
-
-    /// Encode the headers, in case cookies contains Chinese Charactor
-    for (var i in options.queryParameters.keys) {
-      List<String> decoded = [];
-      for (var j in options.queryParameters[i]!) {
-        var encode = await CharsetConverter.encode(type, j);
-        decoded.add(await CharsetConverter.decode(type, encode));
-      }
-      options.queryParameters[i] = decoded;
-    }
-
-    /// Data no need to encode, maybe.
-    developer.log("Encoded queryParameters", name: "GBKTransformer");
-
-    return super.transformRequest(options);
-  }
-
-  @override
-  Future transformResponse(
-      RequestOptions options, ResponseBody responseBody) async {
-    developer.log("Decoding...", name: "GBKTransformer");
-
-    /// Decode the headers, in case cookies contains Chinese Charactor
-    for (var i in responseBody.headers.keys) {
-      if (i.contains('cookie')) {
-        developer.log(
-          "Decoding $i = ${responseBody.headers[i]!}...",
-          name: "ExperimentSessoionTransformer",
-        );
-        int index = responseBody.headers[i]!.lastIndexWhere((element) => element.contains('PhyEws_StuName'));
-        responseBody.headers[i]![index] = "PhyEws_StuName";
-        for (var j in ) {
-          if (j.contains("")) {
-            var encode = await CharsetConverter.encode(utf, j);
-            decoded.add(await CharsetConverter.decode(iso, encode));
-          }
-          break;
-        }
-        developer.log("Decoding $i = $decoded", name: "GBKTransformer");
-        responseBody.headers[i] = decoded;
-      }
-    }
-
-    /// TODO: Decode more
-    developer.log("Decoded", name: "GBKTransformer");
-    return super.transformResponse(options, responseBody);
-  }
-}
+import 'package:watermeter/repository/experiment/experiment_cookie_manager.dart';
 
 class ExperimentSession extends NetworkSession {
   @override
-  Dio get dio => super.dio..transformer = ExperimentSessoionTransformer();
-  // ..options.requestEncoder = (request, options) {};
+  Dio get dio => Dio()
+    ..httpClientAdapter = NativeAdapter()
+    ..interceptors.add(alice.getDioInterceptor())
+    //..interceptors.add(ExperimentCookieManager(CookieJar()))
+    ..options.followRedirects = false
+    ..options.validateStatus =
+        (status) => status != null && status >= 200 && status < 400;
 
   Future<void> login() async {
     if (await NetworkSession.isInSchool() == false) {
       throw NotSchoolNetworkException;
     }
+
+    developer.log(
+      "get login in experiment_session",
+      name: "ExperimentSession",
+    );
     var loginResponse = await dio.post(
       'http://wlsy.xidian.edu.cn/PhyEws/default.aspx',
       data: '__EVENTTARGET=&__EVENTARGUMENT=&'
@@ -93,18 +49,27 @@ class ExperimentSession extends NetworkSession {
         contentType: Headers.formUrlEncodedContentType,
       ),
     );
-    print(loginResponse.data);
+    developer.log(
+      loginResponse.data,
+      name: "ExperimentSession",
+    );
     if (loginResponse.statusCode != 302) {
       throw LoginFailedException();
     } else {
-      print(
-          "http://wlsy.xidian.edu.cn/${loginResponse.headers["Location"]![0]}");
-      dio
+      String gbk = await CharsetConverter.availableCharsets().then(
+          (value) => value.firstWhere((element) => element.contains("18030")));
+      developer.log(
+        "${loginResponse.headers["Location"]![0]} using $gbk",
+        name: "ExperimentSession",
+      );
+      var d = await dio
           .get(
-              "http://wlsy.xidian.edu.cn/${loginResponse.headers["Location"]![0]}")
+            "http://wlsy.xidian.edu.cn/${loginResponse.headers["Location"]![0]}",
+          )
           .then(
-            (value) => print(value.data),
+            (value) async => value.data,
           );
+      developer.log(d.toString());
     }
   }
 

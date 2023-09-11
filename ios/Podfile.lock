@@ -1,6 +1,8 @@
 PODS:
   - charset_converter (0.0.1):
     - Flutter
+  - cupertino_http (0.0.1):
+    - Flutter
   - DKImagePickerController/Core (4.3.4):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
@@ -79,6 +81,7 @@ PODS:
 
 DEPENDENCIES:
   - charset_converter (from `.symlinks/plugins/charset_converter/ios`)
+  - cupertino_http (from `.symlinks/plugins/cupertino_http/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
@@ -108,6 +111,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   charset_converter:
     :path: ".symlinks/plugins/charset_converter/ios"
+  cupertino_http:
+    :path: ".symlinks/plugins/cupertino_http/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
@@ -143,6 +148,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   charset_converter: 215c7b04932ec2b9ba43be96a9bc34afed3e5322
+  cupertino_http: 5f8b1161107fe6c8d94a0c618735a033d93fa7db
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: ce3938a0df3cc1ef404671531facef740d03f920
