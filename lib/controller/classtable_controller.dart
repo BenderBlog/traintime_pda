@@ -167,19 +167,9 @@ class ClassTableController extends GetxController {
     int week = currentWeek;
     bool isTomorrow = false;
 
-    if (updateTime.hour >= 19 && updateTime.minute > 00) {
-      weekday += 1;
-      isTomorrow = true;
-    }
-
-    if (weekday >= 7) {
-      weekday = 0;
-      week += 1;
-    }
-
     developer.log(
-      "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
-      name: "ClassTableController",
+      "Before weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow",
+      name: "ClassTableControllerClassSet",
     );
 
     if (week >= classTableData.semesterLength || week < 0) {
@@ -189,13 +179,35 @@ class ClassTableController extends GetxController {
       int i = timeIndex ~/ 2 + 1;
       developer.log(
         "currentindex: $i.",
-        name: "ClassTableController",
+        name: "ClassTableControllerClassSet",
       );
 
       for (i; i < 10; ++i) {
         classes.addAll(pretendLayout[week][weekday][i]);
       }
       classes.remove(-1);
+
+      if (classes.isEmpty) {
+        if (updateTime.hour >= 19 && updateTime.minute > 00) {
+          weekday += 1;
+          isTomorrow = true;
+        }
+
+        if (weekday >= 7) {
+          weekday = 0;
+          week += 1;
+        }
+
+        developer.log(
+          "After weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
+          name: "ClassTableControllerClassSet",
+        );
+
+        for (i = 0; i < 10; ++i) {
+          classes.addAll(pretendLayout[week][weekday][i]);
+        }
+        classes.remove(-1);
+      }
 
       return (
         List<TimeArrangement>.generate(
@@ -227,7 +239,10 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    updateTime = DateTime.now();
+    updateTime = DateTime.now().add(Duration(
+      hours: 9,
+      minutes: 30,
+    ));
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",

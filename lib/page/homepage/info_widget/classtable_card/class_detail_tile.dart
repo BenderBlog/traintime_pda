@@ -24,11 +24,17 @@ class ClassDetailTile extends StatelessWidget {
       children: [
         Text(
           name,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         Text(
           "$place ${isTomorrow ? "明日" : ""}$time",
-          style: const TextStyle(fontSize: 12),
+          style: TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
       ],
     )
@@ -42,9 +48,7 @@ class ClassDetailTile extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         )
         .backgroundColor(
-          Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
-              : Theme.of(context).colorScheme.onPrimary,
+          Theme.of(context).colorScheme.secondary,
         )
         .clipRRect(all: 12)
         .padding(bottom: 8);
