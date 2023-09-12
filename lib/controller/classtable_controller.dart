@@ -221,7 +221,7 @@ class ClassTableController extends GetxController {
 
   @override
   void onReady() async {
-    await updateClassTable(isForce: true);
+    await updateClassTable();
     update();
   }
 
@@ -239,10 +239,7 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    updateTime = DateTime.now().add(Duration(
-      hours: 9,
-      minutes: 30,
-    ));
+    updateTime = DateTime.now();
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",

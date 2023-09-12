@@ -166,7 +166,7 @@ class ClassTableFile extends EhallSession {
 
     if (isExist &&
         isForce == false &&
-        DateTime.now().difference(file.lastModifiedSync()).inDays <= 3) {
+        DateTime.now().difference(file.lastModifiedSync()).inDays <= 2) {
       return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
     } else {
       try {

@@ -36,7 +36,8 @@ class _SettingWindowState extends State<SettingWindow> {
     return SafeArea(
       child: SettingsList(
         lightTheme: SettingsThemeData(
-            settingsListBackground: Theme.of(context).colorScheme.background),
+          settingsListBackground: Theme.of(context).colorScheme.background,
+        ),
         sections: [
           SettingsSection(
             tiles: <SettingsTile>[
@@ -133,24 +134,30 @@ class _SettingWindowState extends State<SettingWindow> {
                 },
               ),
               SettingsTile.navigation(
-                  title: const Text('课表背景图选择'),
-                  onPressed: (content) async {
-                    FilePickerResult? result = await FilePicker.platform
-                        .pickFiles(type: FileType.image);
-                    if (mounted) {
-                      if (result != null) {
-                        File(result.files.single.path!)
-                            .copySync("${supportPath.path}/decoration.jpg");
-                        preference.setBool(
-                            preference.Preference.decoration, true);
-                        if (mounted) {
-                          Fluttertoast.showToast(msg: '设定成功');
-                        }
-                      } else {
-                        Fluttertoast.showToast(msg: '你没有选图片捏');
+                title: const Text('课表背景图选择'),
+                onPressed: (content) async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(type: FileType.image);
+                  if (mounted) {
+                    if (result != null) {
+                      File(result.files.single.path!)
+                          .copySync("${supportPath.path}/decoration.jpg");
+                      preference.setBool(
+                          preference.Preference.decoration, true);
+                      if (mounted) {
+                        Fluttertoast.showToast(msg: '设定成功');
                       }
+                    } else {
+                      Fluttertoast.showToast(msg: '你没有选图片捏');
                     }
-                  }),
+                  }
+                },
+              ),
+              SettingsTile(
+                title: const Text("强制刷新课表"),
+                onPressed: (context) => Get.put(ClassTableController())
+                    .updateClassTable(isForce: true),
+              ),
               SettingsTile.navigation(
                   title: const Text('课程偏移设置'),
                   description: const Text('正数错后开学日期，负数提前开学日期'),
