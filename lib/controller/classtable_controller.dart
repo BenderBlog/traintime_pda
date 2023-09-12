@@ -33,7 +33,7 @@ class ClassTableController extends GetxController {
     int index = -2;
     developer.log(
       "Current time is $updateTime, ${Jiffy.parse(time[0], pattern: "hh:mm").format()}",
-      name: "ClassTableController",
+      name: "ClassTableControllerTimeIndex",
     );
 
     // Deal with the current time.
@@ -53,7 +53,7 @@ class ClassTableController extends GetxController {
 
     developer.log(
       "Current index is $index, which is ${time[index < 0 ? 0 : index]}",
-      name: "ClassTableController",
+      name: "ClassTableControllerTimeIndex",
     );
 
     return index;
@@ -80,7 +80,7 @@ class ClassTableController extends GetxController {
       if (currentTime < beginTime) {
         developer.log(
           "Current time is before ${time.first}",
-          name: "ClassTableController",
+          name: "ClassTableControllerCurrentData",
         );
         isNext = true;
         currentDataIndex =
@@ -88,7 +88,7 @@ class ClassTableController extends GetxController {
       } else if (currentTime > endTime) {
         developer.log(
           "Current time is after ${time.last}",
-          name: "ClassTableController",
+          name: "ClassTableControllerCurrentData",
         );
         // Actually first -1 to fit the index.
         // But I mean tomorrow, so +1. And -1+1=0
@@ -109,11 +109,11 @@ class ClassTableController extends GetxController {
         int index = timeIndex;
         developer.log(
           "Get the current class $index",
-          name: "ClassTableController",
+          name: "ClassTableControllerCurrentData",
         );
         developer.log(
           "Current time is after ${time[index]} $index",
-          name: "ClassTableController",
+          name: "ClassTableControllerCurrentData",
         );
 
         // If in the class, the current class.
@@ -124,21 +124,25 @@ class ClassTableController extends GetxController {
         if (index % 2 == 0) {
           developer.log(
             "In class.",
-            name: "ClassTableController",
+            name: "ClassTableControllerCurrentData",
           );
           if (currentDataIndex != -1) {
             isNext = false;
           }
         } else {
-          developer.log(
-            "Not in class, seek the next class...",
-            name: "ClassTableController",
-          );
           // See the next class.
           int nextIndex = pretendLayout[currentWeek][updateTime.weekday - 1]
               [(index + 1) ~/ 2][0];
+          developer.log(
+            "Not in class, seek the next class index is $nextIndex",
+            name: "ClassTableControllerCurrentData",
+          );
+          // If in supper/lunch
+          if ([7, 15].contains(index)) {
+            currentDataIndex = nextIndex;
+          }
           // If really have class.
-          if (nextIndex != -1) {
+          else if (nextIndex != -1) {
             if (currentDataIndex != nextIndex) {
               isNext = true;
             } else {
@@ -148,6 +152,11 @@ class ClassTableController extends GetxController {
           }
         }
       }
+
+      developer.log(
+        "Final data is $currentDataIndex",
+        name: "ClassTableControllerCurrentData",
+      );
 
       // If no class, "have class" and "next class" notice is useless
       if (currentDataIndex == -1) {
@@ -168,7 +177,11 @@ class ClassTableController extends GetxController {
     bool isTomorrow = false;
 
     developer.log(
-      "Before weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow",
+      "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
+      name: "ClassTableControllerClassSet",
+    );
+    developer.log(
+      "${updateTime.hour}:${updateTime.minute}",
       name: "ClassTableControllerClassSet",
     );
 
@@ -187,11 +200,16 @@ class ClassTableController extends GetxController {
       }
       classes.remove(-1);
 
-      if (classes.isEmpty) {
-        if (updateTime.hour >= 19 && updateTime.minute > 00) {
-          weekday += 1;
-          isTomorrow = true;
-        }
+      /// Parse isTomorrow
+      if (classes.isEmpty && updateTime.hour >= 19 && updateTime.minute >= 00 ||
+          updateTime.hour >= 20 && updateTime.minute >= 35) {
+        developer.log(
+          "Need tomorrow data.",
+          name: "ClassTableControllerClassSet",
+        );
+
+        weekday += 1;
+        isTomorrow = true;
 
         if (weekday >= 7) {
           weekday = 0;
@@ -199,14 +217,20 @@ class ClassTableController extends GetxController {
         }
 
         developer.log(
-          "After weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
+          "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
           name: "ClassTableControllerClassSet",
         );
 
-        for (i = 0; i < 10; ++i) {
-          classes.addAll(pretendLayout[week][weekday][i]);
+        if (week <= classTableData.semesterLength) {
+          for (i = 0; i < 10; ++i) {
+            classes.addAll(pretendLayout[week][weekday][i]);
+          }
+          classes.remove(-1);
+          developer.log(
+            "$classes",
+            name: "ClassTableControllerClassSet",
+          );
         }
-        classes.remove(-1);
       }
 
       return (
@@ -239,7 +263,7 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    updateTime = DateTime.now();
+    updateTime = DateTime.now().add(Duration(hours: -4));
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
