@@ -31,7 +31,7 @@ Future<void> update() async {
     electricityInfo.value = "网络故障";
     isNotice.value = false;
   } on NotFoundException {
-    electricityInfo.value = "未找到数据";
+    electricityInfo.value = "查询失败";
     isNotice.value = false;
   } catch (e) {
     developer.log(
