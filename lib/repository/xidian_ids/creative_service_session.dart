@@ -75,7 +75,7 @@ class CreativeServiceSession extends IDSSession {
       throw NotFetchJobException(msg: data["message"]);
     } else {
       return List<Job>.generate(
-        data["total"] ?? 0,
+        data["data"].length ?? 0,
         (index) => Job.fromJson(data["data"][index]),
       );
     }

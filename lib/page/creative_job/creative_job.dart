@@ -1,7 +1,11 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:developer' as developer;
+
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/page/both_side_sheet.dart';
@@ -25,20 +29,36 @@ class _CreativeJobViewState extends State<CreativeJobView> {
 
   List<String> get categories => skill.keys.toList();
 
-  /// where, or, fuzzyWhere, fuzzyOr
-  Map query = {
-    "order": "created_at desc",
-    "size": 20,
-  };
+  int page = 0;
+  bool isEnd = false;
+
+  RxList<Job> jobs = <Job>[].obs;
+  RxBool isSearching = false.obs;
 
   (String, List<String>)? searchTags;
   String searchParameter = "";
 
-  Future<void> search() async {
+  Future<void> search({required bool isChanged}) async {
+    developer.log(
+      isChanged.toString(),
+      name: "CreativeJob",
+    );
+    if (isChanged) {
+      jobs.clear();
+      page = 0;
+      isEnd = false;
+    } else if (isEnd) {
+      return;
+    }
+    isSearching.value = true;
+
+    page += 1;
+
     /// where, or, fuzzyWhere, fuzzyOr
     Map query = {
       "order": "created_at desc",
-      "size": 20,
+      "size": 10,
+      "page": page,
     };
 
     if (searchParameter.isNotEmpty) {
@@ -65,15 +85,27 @@ class _CreativeJobViewState extends State<CreativeJobView> {
       },
     );
 
-    data = CreativeServiceSession().getJob(
+    developer.log(
+      query.toString(),
+      name: "CreativeJob",
+    );
+
+    List<Job> getData = await CreativeServiceSession().getJob(
       searchParameter: query,
     );
+    if (getData.isNotEmpty) {
+      jobs.addAll(getData);
+    } else {
+      isEnd = true;
+    }
+
+    isSearching.value = false;
   }
 
   @override
   void initState() {
     super.initState();
-    search();
+    search(isChanged: false);
   }
 
   @override
@@ -102,7 +134,7 @@ class _CreativeJobViewState extends State<CreativeJobView> {
                   onSubmitted: (String text) {
                     setState(() {
                       searchParameter = text;
-                      search();
+                      search(isChanged: true);
                     });
                   },
                 ),
@@ -119,9 +151,11 @@ class _CreativeJobViewState extends State<CreativeJobView> {
                     ),
                     title: "选择种类",
                   );
-                  setState(() {
-                    search();
-                  });
+                  if (mounted) {
+                    setState(() {
+                      search(isChanged: true);
+                    });
+                  }
                 },
                 child: const Text("职位类型"),
               ),
@@ -129,48 +163,36 @@ class _CreativeJobViewState extends State<CreativeJobView> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: search,
-              child: FutureBuilder<List<Job>>(
-                future: data,
-                builder:
-                    (BuildContext context, AsyncSnapshot<List<Job>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text("坏事: ${snapshot.error}"));
-                    } else {
-                      if ((snapshot.data?.length ?? 0) > 0) {
-                        return Align(
-                          alignment: Alignment.topCenter,
-                          child: ConstrainedBox(
-                            constraints:
-                                const BoxConstraints(maxWidth: sheetMaxWidth),
-                            child: ListView.separated(
-                              itemCount: snapshot.data?.length ?? 0,
-                              itemBuilder: (context, index) =>
-                                  CreativeJobListTile(
-                                      job: snapshot.data![index]),
-                              separatorBuilder:
-                                  (BuildContext context, int index) =>
-                                      const Divider(height: 0),
-                            ),
-                          ),
-                        );
-                      } else {
-                        return const Center(child: Text("没有查到结果"));
-                      }
-                    }
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
+      body: EasyRefresh(
+        footer: ClassicFooter(
+          dragText: '上拉请求更多'.tr,
+          readyText: '正在加载......'.tr,
+          processingText: '正在加载......'.tr,
+          processedText: '请求成功'.tr,
+          noMoreText: '数据没有更多'.tr,
+          failedText: '数据获取失败更多'.tr,
+          infiniteOffset: null,
+        ),
+        onLoad: () async {
+          await search(isChanged: false);
+        },
+        child: Obx(
+          () => jobs.isNotEmpty
+              ? ListView.separated(
+                  itemCount: jobs.length,
+                  itemBuilder: (context, index) =>
+                      CreativeJobListTile(job: jobs[index]),
+                  separatorBuilder: (BuildContext context, int index) =>
+                      const Divider(height: 0),
+                )
+              : isSearching.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : jobs.isNotEmpty
+                      ? const Center(child: Text("没有结果"))
+                      : const Center(
+                          child: Text("请在上面的搜索框中搜索"),
+                        ),
+        ),
       ),
     );
   }
