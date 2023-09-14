@@ -274,14 +274,7 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    updateTime = DateTime(
-      2023,
-      9,
-      13,
-      21,
-      00,
-      00,
-    );
+    updateTime = DateTime.now();
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",

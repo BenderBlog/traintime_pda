@@ -207,10 +207,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   } on Exception {}
 
                   /// Clean Classtable cache.
-                  Directory appDocDir =
-                      await getApplicationDocumentsDirectory();
-                  Directory destination = Directory(
-                      "${appDocDir.path}/io.github.benderblog.traintime_pda");
+                  Directory destination =
+                      await getApplicationSupportDirectory();
                   if (!destination.existsSync()) {
                     await destination.create();
                   }
