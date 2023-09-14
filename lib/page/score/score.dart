@@ -142,10 +142,10 @@ class _ScoreWindowState extends State<ScoreWindow> {
                     await showDialog<int>(
                       context: context,
                       builder: (context) => ColumnChooseDialog(
-                        semesterList: c.semester.toList(),
+                        semesterList: ["所有学期", ...c.semester].toList(),
                       ),
                     ).then((value) {
-                      c.chosenSemester = c.semester.toList()[value!];
+                      c.chosenSemester = ["", ...c.semester].toList()[value!];
                       c.update();
                     });
                   },
