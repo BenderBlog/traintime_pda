@@ -12,7 +12,6 @@ dependencies:
   crypto: ^3.0.2
   encrypt: ^5.0.1
   alice: ^0.3.3
-  native_dio_adapter: ^1.0.0+2
   # Stroage Cache
   shared_preferences: ^2.0.15
   dio_cookie_manager: ^3.0.0
