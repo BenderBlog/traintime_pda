@@ -201,8 +201,9 @@ class ClassTableController extends GetxController {
       classes.remove(-1);
 
       /// Parse isTomorrow
-      if (classes.isEmpty && updateTime.hour >= 19 && updateTime.minute >= 00 ||
-          updateTime.hour >= 20 && updateTime.minute >= 35) {
+      if (classes.isEmpty &&
+              updateTime.hour * 60 + updateTime.minute >= 19 * 60 ||
+          updateTime.hour * 60 + updateTime.minute >= 20 * 60 + 35) {
         developer.log(
           "Need tomorrow data.",
           name: "ClassTableControllerClassSet",
@@ -221,9 +222,19 @@ class ClassTableController extends GetxController {
           name: "ClassTableControllerClassSet",
         );
 
+        classes.clear();
+
         if (week <= classTableData.semesterLength) {
+          developer.log(
+            "adding ${pretendLayout[week][weekday]}",
+            name: "ClassTableControllerClassSet",
+          );
           for (i = 0; i < 10; ++i) {
             classes.addAll(pretendLayout[week][weekday][i]);
+            developer.log(
+              "$classes",
+              name: "ClassTableControllerClassSet",
+            );
           }
           classes.remove(-1);
           developer.log(
@@ -263,7 +274,14 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    updateTime = DateTime.now();
+    updateTime = DateTime(
+      2023,
+      9,
+      13,
+      21,
+      00,
+      00,
+    );
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
