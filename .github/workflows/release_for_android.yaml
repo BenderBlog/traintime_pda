@@ -28,7 +28,7 @@ jobs:
 
       - name: Prepare Flutter Dependencies
         run: |
-          flutter pub get
+          .flutter/bin/flutter pub get
 
       - name: Signing APK
         run: |
