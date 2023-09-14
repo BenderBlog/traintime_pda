@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk-headless
-          update-java-alternatives -a 
+          sudo update-java-alternatives -a 
 
       - name: Install Flutter
         run: |
