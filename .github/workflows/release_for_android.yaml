@@ -28,6 +28,7 @@ jobs:
 
       - name: Prepare Flutter Dependencies
         run: |
+          .flutter/bin/flutter config --no-analytics
           .flutter/bin/flutter pub get
 
       - name: Signing APK
@@ -37,14 +38,6 @@ jobs:
           echo keyAlias=\${{ secrets.SIGNING_ALIAS }} >> ${{env.PROPERTIES_PATH}}
           echo storeFile=key.jks >> ${{env.PROPERTIES_PATH}}
           echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > android/app/key.jks
-
-      - name: Build APPBUNDLE
-        run: .flutter/bin/flutter build appbundle --release
-
-      - name: Build FAT-APK
-        run: |
-          .flutter/bin/flutter build apk --release
-          md5sum build/app/outputs/flutter-apk/app-release.apk
 
       - name: Build APK
         run: .flutter/bin/flutter build apk --split-per-abi
