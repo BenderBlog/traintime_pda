@@ -7,6 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/creative_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/empty_classroom_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/exam_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/score_card.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/telebook_card.dart';
@@ -24,6 +25,7 @@ class ToolBoxView extends StatelessWidget {
     ScoreCard(),
     ExamCard(),
     EmptyClassroomCard(),
+    ExperimentCard(),
     WebViewCard(data: WebViewAddresses.calculator),
   ];
 

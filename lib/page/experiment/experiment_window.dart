@@ -1,0 +1,52 @@
+// Copyright 2023 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
+
+import 'package:flutter/material.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/page/experiment/experiment_info_card.dart';
+import 'package:watermeter/repository/experiment/experiment_session.dart';
+
+class ExperimentWindow extends StatefulWidget {
+  const ExperimentWindow({super.key});
+
+  @override
+  State<ExperimentWindow> createState() => _ExperimentWindowState();
+}
+
+class _ExperimentWindowState extends State<ExperimentWindow> {
+  late Future<List<ExperimentData>> data;
+
+  @override
+  void initState() {
+    super.initState();
+    data = ExperimentSession().getData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("物理实验")),
+      body: FutureBuilder<List<ExperimentData>>(
+        future: data,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data?.length ?? 0,
+              itemBuilder: (context, index) => ExperimentInfoCard(
+                data: snapshot.data![index],
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(snapshot.error.toString()),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
+  }
+}

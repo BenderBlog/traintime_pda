@@ -1,12 +1,12 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-// import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:watermeter/repository/experiment/experiment_dio_transfer.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/repository/experiment/experiment_dio_transfer.dart';
 
 class ExperimentSession extends NetworkSession {
   @override
@@ -17,7 +17,7 @@ class ExperimentSession extends NetworkSession {
     ..options.validateStatus =
         (status) => status != null && status >= 200 && status < 400;
 
-  Future<void> getData() async {
+  Future<List<ExperimentData>> getData() async {
     if (await NetworkSession.isInSchool() == false) {
       throw NotSchoolNetworkException;
     }
@@ -73,7 +73,7 @@ class ExperimentSession extends NetworkSession {
         cookieStr,
         name: "ExperimentSession",
       );
-      var d = await dio
+      var data = await dio
           .get("http://wlsy.xidian.edu.cn/PhyEws/student/select.aspx",
               options: Options(
                 headers: {
@@ -81,10 +81,32 @@ class ExperimentSession extends NetworkSession {
                   HttpHeaders.hostHeader: "wlsy.xidian.edu.cn",
                 },
               ))
-          .then((value) => value.data);
-      developer.log(
-        d.toString(),
-        name: "ExperimentSession",
+          .then(
+            (value) => value.data,
+          );
+      RegExp regExp = RegExp(
+        r'<td class="forumRow" height="25"><span>(?<id>[0-9]{1,2})</span></td>'
+        r'<td class="forumRow" height="25"><a class="linkSmallBold" target="_new">(?<name>((?!《物理实验》)(?!下载).*?)（[0-9]学时）)</a></td>'
+        r'<td class="forumRow" align="center" height="25"><span>(?<week>[0-9]{1,2})</span></td>'
+        r'<td class="forumRow" height="25"><span>(?<time>星期(.*)([0-2][0-9]:[0-5][0-9])～([0-2][0-9]:[0-5][0-9]))</span></td>'
+        r'<td class="forumRow" height="25"><span>(?<date>([0-9]{1,2}/[0-9]{1,2}/[0-9]{4}))</span></td>'
+        r'<td class="forumRow" align="center" height="25"><span>(?<place>([A-F]([0-999]{3,3})))</span></td>'
+        r'<td class="forumRow" height="25"><a class="linkSmallBold" target="_new">大学物理实验</a></td>'
+        r'<td class="forumRow" height="25"><span>(?<score>(.*))</span></td><td class="forumRow" height="25"><span></span></td>'
+        r'<td class="forumRow" height="25"><span>(?<note>([0-9]{1,3}页))</span></td>',
+      );
+
+      var expInfo = regExp.allMatches(data).toList();
+      return List<ExperimentData>.generate(
+        expInfo.length,
+        (index) => ExperimentData(
+          name: expInfo[index].namedGroup('name')!,
+          score: expInfo[index].namedGroup('score')!,
+          classroom: expInfo[index].namedGroup('place')!,
+          date: expInfo[index].namedGroup('date')!,
+          timeStr: expInfo[index].namedGroup('time')!,
+          reference: expInfo[index].namedGroup("note")!,
+        ),
       );
     }
   }
