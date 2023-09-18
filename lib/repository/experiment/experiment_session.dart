@@ -1,26 +1,23 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
-/*
+
 // import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'dart:developer' as developer;
-import 'package:cookie_jar/cookie_jar.dart';
+import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:charset_converter/charset_converter.dart';
-import 'package:native_dio_adapter/native_dio_adapter.dart';
+import 'package:watermeter/repository/experiment/experiment_dio_transfer.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/experiment/experiment_cookie_manager.dart';
 
 class ExperimentSession extends NetworkSession {
   @override
   Dio get dio => Dio()
-    ..httpClientAdapter = NativeAdapter()
     ..interceptors.add(alice.getDioInterceptor())
-    //..interceptors.add(ExperimentCookieManager(CookieJar()))
+    ..transformer = ExperimentDioTransformer()
     ..options.followRedirects = false
     ..options.validateStatus =
         (status) => status != null && status >= 200 && status < 400;
 
-  Future<void> login() async {
+  Future<void> getData() async {
     if (await NetworkSession.isInSchool() == false) {
       throw NotSchoolNetworkException;
     }
@@ -56,41 +53,39 @@ class ExperimentSession extends NetworkSession {
     if (loginResponse.statusCode != 302) {
       throw LoginFailedException();
     } else {
-      String gbk = await CharsetConverter.availableCharsets().then(
-          (value) => value.firstWhere((element) => element.contains("18030")));
+      String cookieStr = "";
+      for (String i
+          in loginResponse.headers[HttpHeaders.setCookieHeader] ?? []) {
+        developer.log(
+          i,
+          name: "ExperimentSession",
+        );
+        if (i.contains("PhyEws_StuName")) {
+          /// This guy find out the secret.
+          cookieStr += "PhyEws_StuName=waterfloatinggenderly; ";
+        } else if (i.contains('HttpOnly')) {
+          continue;
+        } else {
+          cookieStr += '${i.split(';')[0]}; ';
+        }
+      }
       developer.log(
-        "${loginResponse.headers["Location"]![0]} using $gbk",
+        cookieStr,
         name: "ExperimentSession",
       );
       var d = await dio
-          .get(
-            "http://wlsy.xidian.edu.cn/${loginResponse.headers["Location"]![0]}",
-          )
-          .then(
-            (value) async => value.data,
-          );
-      developer.log(d.toString());
-    }
-  }
-
-  Future<void> getData() async {
-    if (await NetworkSession.isInSchool() == false) {
-      throw NotSchoolNetworkException;
-    }
-    var loginResponse = await dio
-        .get(
-          'http://wlsy.xidian.edu.cn/PhyEws/student/select.aspx',
-        )
-        .then((value) => value.data.toString());
-    RegExp regExp = RegExp(
-      r'<td class="forumRow" height="25"><a class="linkSmallBold"(.*?)target="_new">((?!《物理实验》)(?!下载).*?)（[0-9]学时）</a></td>'
-      r'<td class="forumRow" align="center" height="25"><span>[0-9]{1,2}</span></td>'
-      r'<td class="forumRow" height="25"><span>星期(.*?)((([01][0-9]|2[0-3]):[0-5][0-9])\-(([01][0-9]|2[0-3]):[0-5][0-9]))</span></td>'
-      r'<td class="forumRow" height="25"><span>([0-9]{1,2}/[0-9]{1,2}/[0-9]{4})</span></td>'
-      r'<td class="forumRow" align="center" height="25"><span>([A-F]([0-999]{3,3}))</span></td>',
-    );
-    for (var exp in regExp.allMatches(loginResponse)) {
-      print(exp);
+          .get("http://wlsy.xidian.edu.cn/PhyEws/student/select.aspx",
+              options: Options(
+                headers: {
+                  HttpHeaders.cookieHeader: cookieStr,
+                  HttpHeaders.hostHeader: "wlsy.xidian.edu.cn",
+                },
+              ))
+          .then((value) => value.data);
+      developer.log(
+        d.toString(),
+        name: "ExperimentSession",
+      );
     }
   }
 }
@@ -98,4 +93,3 @@ class ExperimentSession extends NetworkSession {
 class LoginFailedException implements Exception {}
 
 class ExperimentClosedException implements Exception {}
-*/

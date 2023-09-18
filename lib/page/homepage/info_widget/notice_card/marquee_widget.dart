@@ -48,7 +48,7 @@ class _MarqueeWidgetState extends State<MarqueeWidget> {
   @override
   Widget build(BuildContext context) {
     return PageView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
       controller: _controller,
       itemBuilder: (buildContext, index) {
