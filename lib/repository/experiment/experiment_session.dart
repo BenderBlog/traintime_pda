@@ -4,6 +4,7 @@
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/experiment/experiment_dio_transfer.dart';
@@ -21,6 +22,11 @@ class ExperimentSession extends NetworkSession {
     if (await NetworkSession.isInSchool() == false) {
       throw NotSchoolNetworkException;
     }
+    if (preference
+        .getString(preference.Preference.experimentPassword)
+        .isEmpty) {
+      throw NoExperimentPasswordException;
+    }
 
     developer.log(
       "get login in experiment_session",
@@ -37,8 +43,8 @@ class ExperimentSession extends NetworkSession {
           '8Vv4WhRVIIhZlyYNJO%2BySrDKOhP%2B%2FYMNbVIh74hA2r'
           'CYnBBSTsX9SjxiYNNk%2B5kglM%2B6pGIq22Oi5mNu6u6eC2W'
           'EBfKAmATKwSpsOL%2FPNcRyi9l8Dnp6JamksyAzjhW4%3D&'
-          'login1%24StuLoginID=22009200481&'
-          'login1%24StuPassword=wlsyRunMea_02&'
+          'login1%24StuLoginID=${preference.getString(preference.Preference.idsAccount)}&'
+          'login1%24StuPassword=${preference.getString(preference.Preference.experimentPassword)}&'
           'login1%24UserRole=Student&'
           'login1%24btnLogin.x=28&'
           'login1%24btnLogin.y=14',
@@ -113,5 +119,7 @@ class ExperimentSession extends NetworkSession {
 }
 
 class LoginFailedException implements Exception {}
+
+class NoExperimentPasswordException implements Exception {}
 
 class ExperimentClosedException implements Exception {}

@@ -37,8 +37,24 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
               ),
             );
           } else if (snapshot.hasError) {
+            String errmsg = "";
+            if (snapshot.error
+                .toString()
+                .contains("NoExperimentPasswordException")) {
+              errmsg += "请去设置里设置密码";
+            } else if (snapshot.error
+                .toString()
+                .contains("LoginFailedException")) {
+              errmsg += "登录失败了";
+            } else if (snapshot.error
+                .toString()
+                .contains("NotSchoolNetworkException")) {
+              errmsg += "非校园网无法使用";
+            } else {
+              errmsg += snapshot.error.toString();
+            }
             return Center(
-              child: Text(snapshot.error.toString()),
+              child: Text(errmsg),
             );
           } else {
             return const Center(
