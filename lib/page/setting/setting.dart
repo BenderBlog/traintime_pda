@@ -16,6 +16,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
@@ -101,6 +102,14 @@ class _SettingWindowState extends State<SettingWindow> {
                     showDialog(
                       context: context,
                       builder: (context) => const SportPasswordDialog(),
+                    );
+                  }),
+              SettingsTile.navigation(
+                  title: const Text('物理实验系统密码'),
+                  onPressed: (content) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const ExperimentPasswordDialog(),
                     );
                   }),
               SettingsTile.navigation(
