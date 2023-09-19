@@ -29,32 +29,18 @@ class SportSession {
   Future<void> getPunch() async {
     punchData.value.reset();
     try {
-      /*
-      if (userId != "") {
-        var getStore = await require(
-          subWebsite: "stuTermPunchRecord/findList",
-          body: {'userId': userId},
-        );
-        toReturn.score = getStore["data"][0]["score"];
-        body.addAll({
-          'userNum': preference.getString(preference.Preference.idsAccount),
-          'sysTermId': await getTermID(),
-          'pageSize': 999,
-          'pageIndex': 1
-        });
-      } else {
-        body.addAll({
-          'userNum': preference.getString(preference.Preference.idsAccount),
-          'sysTermId': await getTermID(),
-          'pageSize': 999,
-          'pageIndex': 1
-        });
-      }
-      */
+      await login();
+
+      var getStore = await require(
+        subWebsite: "stuTermPunchRecord/findList",
+        body: {'userId': userId},
+      );
+      punchData.value.score.value = getStore["data"][0]["score"];
+      //String termId = await getTermID();
+
       await require(
         subWebsite: "stuPunchRecord/findPager",
         body: {
-          'userNum': preference.getString(preference.Preference.idsAccount),
           'sysTermId': 13, //await getTermID(),
           'pageSize': 999,
           'pageIndex': 1
@@ -75,7 +61,6 @@ class SportSession {
       await require(
         subWebsite: "stuPunchRecord/findPagerOk",
         body: {
-          'userNum': preference.getString(preference.Preference.idsAccount),
           'sysTermId': 13, //await getTermID(),
           'pageSize': 999,
           'pageIndex': 1
@@ -178,7 +163,7 @@ class SportSession {
 
   static var token = '';
 
-  final baseURL = 'http://xd.5itsn.com/app/';
+  final baseURL = 'http://tybjxgl.xidian.edu.cn/app/';
 
   final rsaKey = """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4l
