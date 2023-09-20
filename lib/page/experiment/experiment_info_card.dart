@@ -49,7 +49,6 @@ class ExperimentInfoCard extends StatelessWidget {
                   "${data.date} ${data.timeStr}",
                   context,
                 ),
-                //informationWithIcon(Icons.person, toUse!.teacher ?? "未知老师", context),
                 Flex(
                   direction: Axis.horizontal,
                   children: [
@@ -58,6 +57,14 @@ class ExperimentInfoCard extends StatelessWidget {
                       child: informationWithIcon(
                         Icons.room,
                         data.classroom,
+                        context,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: informationWithIcon(
+                        Icons.person,
+                        data.teacher,
                         context,
                       ),
                     ),

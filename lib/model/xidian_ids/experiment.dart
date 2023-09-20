@@ -8,7 +8,7 @@ class ExperimentData {
   final String date;
   // final String week;
   final String timeStr;
-  // final String teacher;
+  final String teacher;
   final String reference;
 
   const ExperimentData({
@@ -18,7 +18,7 @@ class ExperimentData {
     required this.date,
     //required this.week,
     required this.timeStr,
-    //required this.teacher,
+    required this.teacher,
     required this.reference,
   });
 }
