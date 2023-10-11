@@ -1,9 +1,11 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -22,6 +24,7 @@ class ExperimentSession extends NetworkSession {
   static Map<String, String> selectInfo = {};
   String cookieStr = "";
 
+  /// This function is used to fetch the teacher for the experiment class.
   Future<String> teacher({
     required String time,
     required String subject,
@@ -116,112 +119,147 @@ class ExperimentSession extends NetworkSession {
   }
 
   Future<List<ExperimentData>> getData() async {
-    if (await NetworkSession.isInSchool() == false) {
-      throw NotSchoolNetworkException;
+    Directory appDocDir = await getApplicationSupportDirectory();
+    if (!await appDocDir.exists()) {
+      await appDocDir.create();
     }
-    if (preference
-        .getString(preference.Preference.experimentPassword)
-        .isEmpty) {
-      throw NoExperimentPasswordException;
-    }
+    developer.log("Path at ${appDocDir.path}.", name: "ExperimentSession");
+    var file = File("${appDocDir.path}/Experiment.json");
+    bool isExist = file.existsSync();
+    developer.log("File exist: $isExist.", name: "ExperimentSession");
+    try {
+      if (await NetworkSession.isInSchool() == false) {
+        throw NotSchoolNetworkException;
+      }
+      if (preference
+          .getString(preference.Preference.experimentPassword)
+          .isEmpty) {
+        throw NoExperimentPasswordException;
+      }
 
-    developer.log(
-      "get login in experiment_session",
-      name: "ExperimentSession",
-    );
-    var loginResponse = await dio.post(
-      'http://wlsy.xidian.edu.cn/PhyEws/default.aspx',
-      data: '__EVENTTARGET=&__EVENTARGUMENT=&'
-          '__VIEWSTATE=%2FwEPDwUKMTEzNzM0MjM0OWQYAQUeX19D'
-          'b250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFD2xvZ2luMSRidG5Mb2dpbkOuzGVaztce4Ict7jsIJ0F5pUDb%2BsmSbCCrNVSBlPML&'
-          '__VIEWSTATEGENERATOR=EE008CD9&'
-          '__EVENTVALIDATION=%2FwEdAAcKecdPGDB%2BfW8Tyghx'
-          '7AeSpOzeiNZ7aaEg5p6LqSa9cODI2bZwNtRxUKPkisVLf8l'
-          '8Vv4WhRVIIhZlyYNJO%2BySrDKOhP%2B%2FYMNbVIh74hA2r'
-          'CYnBBSTsX9SjxiYNNk%2B5kglM%2B6pGIq22Oi5mNu6u6eC2W'
-          'EBfKAmATKwSpsOL%2FPNcRyi9l8Dnp6JamksyAzjhW4%3D&'
-          'login1%24StuLoginID=${preference.getString(preference.Preference.idsAccount)}&'
-          'login1%24StuPassword=${preference.getString(preference.Preference.experimentPassword)}&'
-          'login1%24UserRole=Student&'
-          'login1%24btnLogin.x=28&'
-          'login1%24btnLogin.y=14',
-    );
-    developer.log(
-      loginResponse.data,
-      name: "ExperimentSession",
-    );
-
-    if (loginResponse.statusCode != 302) {
-      throw LoginFailedException();
-    }
-
-    cookieStr = "";
-
-    for (String i in loginResponse.headers[HttpHeaders.setCookieHeader] ?? []) {
       developer.log(
-        i,
+        "Get login in experiment_session",
         name: "ExperimentSession",
       );
-      if (i.contains("PhyEws_StuName")) {
-        /// This guy find out the secret.
-        cookieStr += "PhyEws_StuName=waterfloatinggenderly; ";
-      } else if (i.contains('HttpOnly')) {
-        continue;
+
+      var loginResponse = await dio.post(
+        'http://wlsy.xidian.edu.cn/PhyEws/default.aspx',
+        data: '__EVENTTARGET=&__EVENTARGUMENT=&'
+            '__VIEWSTATE=%2FwEPDwUKMTEzNzM0MjM0OWQYAQUeX19D'
+            'b250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFD2xvZ2luMSRidG5Mb2dpbkOuzGVaztce4Ict7jsIJ0F5pUDb%2BsmSbCCrNVSBlPML&'
+            '__VIEWSTATEGENERATOR=EE008CD9&'
+            '__EVENTVALIDATION=%2FwEdAAcKecdPGDB%2BfW8Tyghx'
+            '7AeSpOzeiNZ7aaEg5p6LqSa9cODI2bZwNtRxUKPkisVLf8l'
+            '8Vv4WhRVIIhZlyYNJO%2BySrDKOhP%2B%2FYMNbVIh74hA2r'
+            'CYnBBSTsX9SjxiYNNk%2B5kglM%2B6pGIq22Oi5mNu6u6eC2W'
+            'EBfKAmATKwSpsOL%2FPNcRyi9l8Dnp6JamksyAzjhW4%3D&'
+            'login1%24StuLoginID=${preference.getString(preference.Preference.idsAccount)}&'
+            'login1%24StuPassword=${preference.getString(preference.Preference.experimentPassword)}&'
+            'login1%24UserRole=Student&'
+            'login1%24btnLogin.x=28&'
+            'login1%24btnLogin.y=14',
+      );
+
+      if (loginResponse.statusCode != 302) {
+        throw LoginFailedException();
+      }
+
+      cookieStr = "";
+
+      developer.log(
+        "Start fetching data",
+        name: "ExperimentSession",
+      );
+
+      for (String i
+          in loginResponse.headers[HttpHeaders.setCookieHeader] ?? []) {
+        developer.log(
+          i,
+          name: "ExperimentSession",
+        );
+        if (i.contains("PhyEws_StuName")) {
+          /// This guy find out the secret.
+          cookieStr += "PhyEws_StuName=waterfloatinggenderly; ";
+        } else if (i.contains('HttpOnly')) {
+          continue;
+        } else {
+          cookieStr += '${i.split(';')[0]}; ';
+        }
+      }
+      developer.log(
+        cookieStr,
+        name: "ExperimentSession",
+      );
+
+      var data = await dio
+          .get(
+            "http://wlsy.xidian.edu.cn/PhyEws/student/select.aspx",
+            options: Options(
+              headers: {
+                HttpHeaders.cookieHeader: cookieStr,
+                HttpHeaders.hostHeader: "wlsy.xidian.edu.cn",
+              },
+            ),
+          )
+          .then(
+            (value) => value.data,
+          );
+
+      RegExp regExp = RegExp(
+        r'<td class="forumRow" height="25"><span>(?<id>[0-9]{1,2})</span></td>'
+        r'<td class="forumRow" height="25"><a class="linkSmallBold" target="_new">(?<name>((?!《物理实验》)(?!下载).*?)（[0-9]学时）)</a></td>'
+        r'<td class="forumRow" align="center" height="25"><span>(?<week>[0-9]{1,2})</span></td>'
+        r'<td class="forumRow" height="25"><span>(?<time>星期(.*)([0-2][0-9]:[0-5][0-9])～([0-2][0-9]:[0-5][0-9]))</span></td>'
+        r'<td class="forumRow" height="25"><span>(?<date>([0-9]{1,2}/[0-9]{1,2}/[0-9]{4}))</span></td>'
+        r'<td class="forumRow" align="center" height="25"><span>(?<place>([A-F]([0-999]{3,3})))</span></td>'
+        r'<td class="forumRow" height="25"><a class="linkSmallBold" target="_new">大学物理实验</a></td>'
+        r'<td class="forumRow" height="25"><span>(?<score>(.*))</span></td><td class="forumRow" height="25"><span></span></td>'
+        r'<td class="forumRow" height="25"><span>(?<note>([0-9]{1,3}页))</span></td>',
+      );
+
+      var expInfo = regExp.allMatches(data).toList();
+      List<ExperimentData> toReturn = [];
+      for (var i in expInfo) {
+        toReturn.add(
+          ExperimentData(
+            name: i.namedGroup('name')!.replaceAll('（3学时）', ''),
+            score: i.namedGroup('score')!,
+            classroom: i.namedGroup('place')!,
+            date: i.namedGroup('date')!,
+            timeStr: i.namedGroup('time')!,
+            reference: i.namedGroup("note")!,
+            teacher: await teacher(
+              time: i.namedGroup('time')!,
+              subject: i.namedGroup('name')!.replaceAll('（3学时）', ''),
+            ),
+          ),
+        );
+      }
+
+      developer.log(
+        "Evaluating cache.",
+        name: "ExperimentSession",
+      );
+      if (isExist) {
+        developer.log(
+          "Refreshing cache.",
+          name: "ExperimentSession",
+        );
+        file.deleteSync();
+      }
+      file.writeAsStringSync(jsonEncode(toReturn));
+      return toReturn;
+    } catch (e) {
+      if (isExist) {
+        developer.log(
+          "Using cache for offline mode.",
+          name: "ExperimentSession",
+        );
+        return jsonDecode(file.readAsStringSync());
       } else {
-        cookieStr += '${i.split(';')[0]}; ';
+        rethrow;
       }
     }
-    developer.log(
-      cookieStr,
-      name: "ExperimentSession",
-    );
-
-    var data = await dio
-        .get(
-          "http://wlsy.xidian.edu.cn/PhyEws/student/select.aspx",
-          options: Options(
-            headers: {
-              HttpHeaders.cookieHeader: cookieStr,
-              HttpHeaders.hostHeader: "wlsy.xidian.edu.cn",
-            },
-          ),
-        )
-        .then(
-          (value) => value.data,
-        );
-
-    RegExp regExp = RegExp(
-      r'<td class="forumRow" height="25"><span>(?<id>[0-9]{1,2})</span></td>'
-      r'<td class="forumRow" height="25"><a class="linkSmallBold" target="_new">(?<name>((?!《物理实验》)(?!下载).*?)（[0-9]学时）)</a></td>'
-      r'<td class="forumRow" align="center" height="25"><span>(?<week>[0-9]{1,2})</span></td>'
-      r'<td class="forumRow" height="25"><span>(?<time>星期(.*)([0-2][0-9]:[0-5][0-9])～([0-2][0-9]:[0-5][0-9]))</span></td>'
-      r'<td class="forumRow" height="25"><span>(?<date>([0-9]{1,2}/[0-9]{1,2}/[0-9]{4}))</span></td>'
-      r'<td class="forumRow" align="center" height="25"><span>(?<place>([A-F]([0-999]{3,3})))</span></td>'
-      r'<td class="forumRow" height="25"><a class="linkSmallBold" target="_new">大学物理实验</a></td>'
-      r'<td class="forumRow" height="25"><span>(?<score>(.*))</span></td><td class="forumRow" height="25"><span></span></td>'
-      r'<td class="forumRow" height="25"><span>(?<note>([0-9]{1,3}页))</span></td>',
-    );
-
-    var expInfo = regExp.allMatches(data).toList();
-    List<ExperimentData> toReturn = [];
-    for (var i in expInfo) {
-      toReturn.add(
-        ExperimentData(
-          name: i.namedGroup('name')!.replaceAll('（3学时）', ''),
-          score: i.namedGroup('score')!,
-          classroom: i.namedGroup('place')!,
-          date: i.namedGroup('date')!,
-          timeStr: i.namedGroup('time')!,
-          reference: i.namedGroup("note")!,
-          teacher: await teacher(
-            time: i.namedGroup('time')!,
-            subject: i.namedGroup('name')!.replaceAll('（3学时）', ''),
-          ),
-        ),
-      );
-    }
-
-    return toReturn;
   }
 }
 
