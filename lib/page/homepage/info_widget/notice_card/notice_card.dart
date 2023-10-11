@@ -50,9 +50,9 @@ class NoticeCard extends StatelessWidget {
           )
           .decorated(
             color: Theme.of(context).colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: isDesktop(context) ? BorderRadius.circular(12) : null,
           )
-          .paddingAll(4),
+          .paddingAll(isDesktop(context) ? 4 : 0),
     );
   }
 }

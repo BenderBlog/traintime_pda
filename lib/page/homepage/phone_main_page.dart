@@ -123,8 +123,7 @@ class PhoneMainPage extends StatelessWidget {
             child: ListView(
               children: [
                 const HeaderLocator(),
-                const NoticeCard()
-                    .padding(left: 20, right: 20, top: 4), // 通知信息置顶
+                const NoticeCard(),
                 Text(
                   "日程",
                   style: textStyle(context),
