@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
-import 'package:watermeter/page/experiment/experiment_info_card.dart';
+import 'package:watermeter/page/experiment/experiment_listview.dart';
 import 'package:watermeter/repository/experiment/experiment_session.dart';
 
 class ExperimentWindow extends StatefulWidget {
@@ -30,12 +30,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
         future: data,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data?.length ?? 0,
-              itemBuilder: (context, index) => ExperimentInfoCard(
-                data: snapshot.data![index],
-              ),
-            );
+            return ExperimentListView(data: snapshot.data!);
           } else if (snapshot.hasError) {
             String errmsg = "";
             if (snapshot.error

@@ -3,10 +3,10 @@
 
 import 'package:flutter/material.dart';
 
-class ExamTitle extends StatelessWidget {
+class TimelineTitle extends StatelessWidget {
   final String title;
 
-  const ExamTitle({
+  const TimelineTitle({
     super.key,
     required this.title,
   });

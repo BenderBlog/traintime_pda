@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/exam/flow_event_row.dart';
+import 'package:watermeter/page/public_widget/timeline_widget/flow_event_row.dart';
 import 'package:watermeter/page/widget.dart';
 
 class TimelineWidget extends StatelessWidget {

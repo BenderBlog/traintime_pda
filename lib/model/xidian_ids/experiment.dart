@@ -27,6 +27,27 @@ class ExperimentData {
     required this.reference,
   });
 
+  List<DateTime> get time {
+    /// Return is month/day/year, hope not change...
+    List<int> dateNums = List<int>.generate(
+      date.split('/').length,
+      (index) => int.parse(date.split('/')[index]),
+    );
+
+    /// And the time arrangement too.
+    if (timeStr.contains("15")) {
+      return [
+        DateTime(dateNums[2], dateNums[0], dateNums[1], 15, 55, 00),
+        DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 10, 00),
+      ]; // Afternoon 15:55～18:10
+    } else {
+      return [
+        DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 30, 00),
+        DateTime(dateNums[2], dateNums[0], dateNums[1], 20, 45, 00),
+      ]; // Evening 18:30～20:45
+    }
+  }
+
   factory ExperimentData.fromJson(Map<String, dynamic> json) =>
       _$ExperimentDataFromJson(json);
 

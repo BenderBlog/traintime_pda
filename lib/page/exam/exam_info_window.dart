@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/column_choose_dialog.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
-import 'package:watermeter/page/exam/exam_title.dart';
+import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
-import 'package:watermeter/page/exam/timeline_widget.dart';
+import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 
 class ExamInfoWindow extends StatefulWidget {
   const ExamInfoWindow({super.key});
@@ -74,7 +74,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                 ? TimelineWidget(
                     isTitle: const [true, false, true, false],
                     children: [
-                      const ExamTitle(title: "未完成考试"),
+                      const TimelineTitle(title: "未完成考试"),
                       c.isNotFinished.isNotEmpty
                           ? Column(
                               children: List.generate(
@@ -85,7 +85,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                               ),
                             )
                           : const ExamInfoCard(title: "所有考试全部完成"),
-                      const ExamTitle(title: "已完成考试"),
+                      const TimelineTitle(title: "已完成考试"),
                       c.isFinished.isNotEmpty
                           ? Column(
                               children: List.generate(
