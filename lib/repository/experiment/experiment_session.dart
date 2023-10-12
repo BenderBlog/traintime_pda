@@ -131,6 +131,7 @@ class ExperimentSession extends NetworkSession {
       if (await NetworkSession.isInSchool() == false) {
         throw NotSchoolNetworkException;
       }
+
       if (preference
           .getString(preference.Preference.experimentPassword)
           .isEmpty) {
@@ -237,7 +238,7 @@ class ExperimentSession extends NetworkSession {
       }
 
       developer.log(
-        "Evaluating cache.",
+        "Evaluating cache. ${jsonEncode(toReturn)}",
         name: "ExperimentSession",
       );
       if (isExist) {
@@ -247,6 +248,7 @@ class ExperimentSession extends NetworkSession {
         );
         file.deleteSync();
       }
+
       file.writeAsStringSync(jsonEncode(toReturn));
       return toReturn;
     } catch (e) {
@@ -255,7 +257,11 @@ class ExperimentSession extends NetworkSession {
           "Using cache for offline mode.",
           name: "ExperimentSession",
         );
-        return jsonDecode(file.readAsStringSync());
+        List<dynamic> data = jsonDecode(file.readAsStringSync());
+        return List<ExperimentData>.generate(
+          data.length,
+          (index) => ExperimentData.fromJson(data[index]),
+        );
       } else {
         rethrow;
       }
