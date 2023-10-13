@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/empty_classroom_controller.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class EmptyClassroomWindow extends StatefulWidget {
   const EmptyClassroomWindow({super.key});

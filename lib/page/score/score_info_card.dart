@@ -3,8 +3,8 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/both_side_sheet.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_info.dart';
 import 'package:watermeter/controller/score_controller.dart';
 

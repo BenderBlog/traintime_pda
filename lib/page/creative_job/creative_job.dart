@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
-import 'package:watermeter/page/both_side_sheet.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/creative_job/creative_job_choice.dart';
 import 'package:watermeter/page/creative_job/creative_job_description.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 
 class CreativeJobView extends StatefulWidget {

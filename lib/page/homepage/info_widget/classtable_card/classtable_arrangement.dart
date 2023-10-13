@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/class_detail_tile.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class ClasstableArrangementColumn extends StatelessWidget {
   const ClasstableArrangementColumn({super.key});

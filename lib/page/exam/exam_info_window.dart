@@ -6,7 +6,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/page/column_choose_dialog.dart';
+import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
@@ -53,7 +53,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                   await showDialog(
                     context: context,
                     builder: (context) => ColumnChooseDialog(
-                      semesterList: c.semesters,
+                      chooseList: c.semesters,
                     ),
                   ).then((value) {
                     setState(() {

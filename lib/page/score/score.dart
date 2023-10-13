@@ -8,10 +8,10 @@ import 'dart:math';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/column_choose_dialog.dart';
+import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_choice.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
 class ScoreWindow extends StatefulWidget {
@@ -142,7 +142,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                     await showDialog<int>(
                       context: context,
                       builder: (context) => ColumnChooseDialog(
-                        semesterList: ["所有学期", ...c.semester].toList(),
+                        chooseList: ["所有学期", ...c.semester].toList(),
                       ),
                     ).then((value) {
                       c.chosenSemester = ["", ...c.semester].toList()[value!];
@@ -163,7 +163,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                     await showDialog<int>(
                       context: context,
                       builder: (context) => ColumnChooseDialog(
-                        semesterList: ["所有类型", ...c.statuses].toList(),
+                        chooseList: ["所有类型", ...c.statuses].toList(),
                       ),
                     ).then((value) {
                       c.chosenStatus = ["", ...c.statuses].toList()[value!];

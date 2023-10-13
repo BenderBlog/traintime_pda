@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/both_side_sheet.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/classtable/class_detail/class_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/themes/color_seed.dart';

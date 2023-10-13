@@ -9,7 +9,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/xdu_planet/content_page.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 

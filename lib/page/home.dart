@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/setting/setting.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 

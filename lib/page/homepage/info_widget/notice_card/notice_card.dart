@@ -11,7 +11,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/message_observer.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/marquee_widget.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_list.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class NoticeCard extends StatelessWidget {
   const NoticeCard({super.key});

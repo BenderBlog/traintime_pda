@@ -3,12 +3,13 @@
 
 import 'package:flutter/material.dart';
 
+/// ColumnChooseDialog is a dialog with a [chooseList] to select, return the index in the [chooseList].
 class ColumnChooseDialog extends StatefulWidget {
-  final List<String> semesterList;
+  final List<String> chooseList;
 
   const ColumnChooseDialog({
     super.key,
-    required this.semesterList,
+    required this.chooseList,
   });
 
   @override
@@ -21,14 +22,14 @@ class _ColumnChooseDialogState extends State<ColumnChooseDialog> {
     return SimpleDialog(
       title: const Text('选择学期'),
       children: List.generate(
-        widget.semesterList.length,
+        widget.chooseList.length,
         (index) => SimpleDialogOption(
           onPressed: () => Navigator.of(context).pop<int>(
             index,
           ),
           child: ListTile(
             title: Text(
-              widget.semesterList[index],
+              widget.chooseList[index],
             ),
           ),
         ),

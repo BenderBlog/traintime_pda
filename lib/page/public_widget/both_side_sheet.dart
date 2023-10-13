@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR MIT
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class BothSideSheet extends StatefulWidget {
   final Widget child;

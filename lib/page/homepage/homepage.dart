@@ -11,7 +11,7 @@ import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/homepage/pad_main_page.dart';
 import 'package:watermeter/page/homepage/phone_main_page.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});

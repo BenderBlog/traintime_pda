@@ -14,7 +14,7 @@ import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/login/captcha_input_dialog.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 

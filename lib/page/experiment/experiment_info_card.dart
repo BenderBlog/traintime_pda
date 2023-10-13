@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class ExperimentInfoCard extends StatelessWidget {
   final ExperimentData? data;

@@ -10,7 +10,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class SchoolCardWindow extends StatefulWidget {
   const SchoolCardWindow({super.key});

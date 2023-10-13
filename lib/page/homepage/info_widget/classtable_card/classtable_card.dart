@@ -8,7 +8,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_arrangement.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_current.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:styled_widget/styled_widget.dart';
 

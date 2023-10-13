@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/flow_event_row.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class TimelineWidget extends StatelessWidget {
   final List<bool> isTitle;

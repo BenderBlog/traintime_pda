@@ -5,7 +5,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/widget.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
