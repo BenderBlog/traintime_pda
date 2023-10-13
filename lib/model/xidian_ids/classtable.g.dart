@@ -76,3 +76,40 @@ Map<String, dynamic> _$ClassTableDataToJson(ClassTableData instance) =>
       'timeArrangement':
           instance.timeArrangement.map((e) => e.toJson()).toList(),
     };
+
+ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
+      type: $enumDecode(_$ChangeTypeEnumMap, json['type']),
+      classCode: json['classCode'] as String,
+      classNumber: json['classNumber'] as String,
+      className: json['className'] as String,
+      originalAffectedWeeks: json['originalAffectedWeeks'] as String,
+      newAffectedWeeks: json['newAffectedWeeks'] as String,
+      originalTeacher: json['originalTeacher'] as String?,
+      newTeacher: json['newTeacher'] as String?,
+      originalClassRange: (json['originalClassRange'] as List<dynamic>)
+          .map((e) => e as int)
+          .toList(),
+      newClassRange: (json['newClassRange'] as List<dynamic>)
+          .map((e) => e as int)
+          .toList(),
+    );
+
+Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
+    <String, dynamic>{
+      'type': _$ChangeTypeEnumMap[instance.type]!,
+      'classCode': instance.classCode,
+      'classNumber': instance.classNumber,
+      'className': instance.className,
+      'originalAffectedWeeks': instance.originalAffectedWeeks,
+      'newAffectedWeeks': instance.newAffectedWeeks,
+      'originalTeacher': instance.originalTeacher,
+      'newTeacher': instance.newTeacher,
+      'originalClassRange': instance.originalClassRange,
+      'newClassRange': instance.newClassRange,
+    };
+
+const _$ChangeTypeEnumMap = {
+  ChangeType.change: 'change',
+  ChangeType.stop: 'stop',
+  ChangeType.patch: 'patch',
+};

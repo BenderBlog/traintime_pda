@@ -124,7 +124,7 @@ class ClassTableFile extends EhallSession {
       }
     }
 
-    developer.log("Caching...", name: "Ehall getClasstable");
+    developer.log("Preliminary storage...", name: "Ehall getClasstable");
     qResult["semesterCode"] = semesterCode;
     qResult["termStartDay"] = termStartDay;
 
@@ -135,6 +135,59 @@ class ClassTableFile extends EhallSession {
 
     developer.log(notOnTable.toString(), name: "Ehall getClasstable");
     qResult["notArranged"] = notOnTable["rows"];
+
+    ClassTableData preliminaryData = simplifyData(qResult);
+
+    /// Deal with the class change.
+    developer.log("Deal with the class change...", name: "Ehall getClasstable");
+
+    qResult = await dio.post(
+      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xsdkkc.do',
+      data: {
+        'XNXQDM': semesterCode,
+        //'SKZC': "6",
+        '*order': "-SQSJ",
+      },
+    ).then((value) => value.data['datas']['xsdkkc']);
+    if (qResult['extParams']['code'] != 1) {
+      developer.log(qResult['extParams']['msg'], name: "Ehall getClasstable");
+    }
+
+    // ignore: non_constant_identifier_names
+    ChangeType type(String TKLXDM) {
+      if (TKLXDM == '01') {
+        return ChangeType.change; //调课
+      } else if (TKLXDM == '02') {
+        return ChangeType.stop; //停课
+      } else {
+        return ChangeType.patch; //补课
+      }
+    }
+
+    if (int.parse(qResult["totalSize"].toString()) > 0) {
+      for (var i in qResult["rows"]) {
+        preliminaryData.classChanges.add(
+          ClassChange(
+            type: type(i["TKLXDM"]),
+            classCode: i["KCH"],
+            classNumber: i["KXH"],
+            className: i["KCM"],
+            originalAffectedWeeks: i["SKZC"],
+            newAffectedWeeks: i["XSKZC"],
+            originalTeacher: i["YSKJS"],
+            newTeacher: i["XSKJS"],
+            originalClassRange: [
+              int.parse(i["KSJS"].toString()),
+              int.parse(i["JSJC"].toString()),
+            ],
+            newClassRange: [
+              int.parse(i["XKSJS"].toString()),
+              int.parse(i["XJSJC"].toString()),
+            ],
+          ),
+        );
+      }
+    }
 
     return simplifyData(qResult);
   }

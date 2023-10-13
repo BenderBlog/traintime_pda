@@ -71,6 +71,7 @@ class ClassTableData {
   List<ClassDetail> classDetail;
   List<ClassDetail> notArranged;
   List<TimeArrangement> timeArrangement;
+  List<ClassChange> classChanges;
 
   ClassTableData.from(ClassTableData c)
       : this(
@@ -80,6 +81,7 @@ class ClassTableData {
           classDetail: c.classDetail,
           notArranged: c.notArranged,
           timeArrangement: c.timeArrangement,
+          classChanges: c.classChanges,
         );
 
   ClassTableData({
@@ -89,14 +91,72 @@ class ClassTableData {
     List<ClassDetail>? classDetail,
     List<ClassDetail>? notArranged,
     List<TimeArrangement>? timeArrangement,
+    List<ClassChange>? classChanges,
   })  : classDetail = classDetail ?? [],
         notArranged = notArranged ?? [],
-        timeArrangement = timeArrangement ?? [];
+        timeArrangement = timeArrangement ?? [],
+        classChanges = classChanges ?? [];
 
   factory ClassTableData.fromJson(Map<String, dynamic> json) =>
       _$ClassTableDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$ClassTableDataToJson(this);
+}
+
+enum ChangeType {
+  change, // 调课
+  stop, // 停课
+  patch, // 补课
+}
+
+@JsonSerializable(explicitToJson: true)
+class ClassChange {
+  final ChangeType type;
+
+  /// KCH 课程号
+  final String classCode;
+
+  /// KXH 班级号
+  final String classNumber;
+
+  /// KCM 课程名
+  final String className;
+
+  /// SKZC 原周次信息
+  final String originalAffectedWeeks;
+
+  /// XSKZC 新周次信息
+  final String newAffectedWeeks;
+
+  /// YSKJS 原先的老师
+  final String? originalTeacher;
+
+  /// XSKJS 新换的老师
+  final String? newTeacher;
+
+  /// KSJS-JSJC 原先的课次信息
+  final List<int> originalClassRange;
+
+  /// XKSJS-XJSJC 新的课次信息
+  final List<int> newClassRange;
+
+  ClassChange({
+    required this.type,
+    required this.classCode,
+    required this.classNumber,
+    required this.className,
+    required this.originalAffectedWeeks,
+    required this.newAffectedWeeks,
+    required this.originalTeacher,
+    required this.newTeacher,
+    required this.originalClassRange,
+    required this.newClassRange,
+  });
+
+  factory ClassChange.fromJson(Map<String, dynamic> json) =>
+      _$ClassChangeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassChangeToJson(this);
 }
 
 // Time arrangements.
