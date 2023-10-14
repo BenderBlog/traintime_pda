@@ -99,6 +99,13 @@ class ClassTableFile extends EhallSession {
       );
     }
 
+    semesterCode = '2020-2021-2';
+
+    termStartDay = await dio.post(
+      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+      data: {'XN': '2020-2021', 'XQ': '2'},
+    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
+
     developer.log(
         "Will get $semesterCode which start at $termStartDay, fetching...",
         name: "Ehall getClasstable");
@@ -168,28 +175,100 @@ class ClassTableFile extends EhallSession {
       for (var i in qResult["rows"]) {
         preliminaryData.classChanges.add(
           ClassChange(
-            type: type(i["TKLXDM"]),
-            classCode: i["KCH"],
-            classNumber: i["KXH"],
-            className: i["KCM"],
-            originalAffectedWeeks: i["SKZC"],
-            newAffectedWeeks: i["XSKZC"],
-            originalTeacher: i["YSKJS"],
-            newTeacher: i["XSKJS"],
-            originalClassRange: [
-              int.parse(i["KSJS"].toString()),
-              int.parse(i["JSJC"].toString()),
-            ],
-            newClassRange: [
-              int.parse(i["XKSJS"].toString()),
-              int.parse(i["XJSJC"].toString()),
-            ],
-          ),
+              type: type(i["TKLXDM"]),
+              classCode: i["KCH"],
+              classNumber: i["KXH"],
+              className: i["KCM"],
+              originalAffectedWeeks: i["SKZC"],
+              newAffectedWeeks: i["XSKZC"],
+              originalTeacher: i["YSKJS"]?.replaceAll(RegExp(r'(/|[0-9])'), ''),
+              newTeacher: i["XSKJS"]?.replaceAll(RegExp(r'(/|[0-9])'), ''),
+              originalClassRange: [
+                int.parse(i["KSJC"]?.toString() ?? "-1"),
+                int.parse(i["JSJC"]?.toString() ?? "-1"),
+              ],
+              newClassRange: [
+                int.parse(i["XKCJC"]?.toString() ?? "-1"),
+                int.parse(i["XJSJC"]?.toString() ?? "-1"),
+              ],
+              originalWeek: i["SKXQ"],
+              newWeek: i["XSKXQ"]),
         );
       }
     }
 
-    return simplifyData(qResult);
+    print(preliminaryData.classChanges.toString());
+
+    for (var e in preliminaryData.classChanges) {
+      e.originalTeacher;
+      e.newTeacher;
+
+      int indexClassDetail = preliminaryData.classDetail.indexWhere(
+        (element) =>
+            element.code == e.classCode && element.teacher == e.originalTeacher,
+      );
+
+      int indexOriginalTimeArrangement =
+          preliminaryData.timeArrangement.indexWhere(
+        (element) =>
+            element.index == indexClassDetail &&
+            element.day == e.originalWeek && // TODO: Maybe bug here.
+            element.start == e.originalClassRange[0] &&
+            element.stop == e.originalClassRange[1],
+      );
+
+      if (e.type == ChangeType.change) {
+        /// If teacher changed. Create a new teacher entry.
+        int? indexNewClassDetail;
+
+        if (e.originalTeacher != e.newTeacher &&
+            e.newTeacher != null &&
+            e.originalTeacher != null) {
+          var newClass = ClassDetail.from(
+            preliminaryData.classDetail[indexClassDetail],
+          );
+          newClass.teacher = e.newTeacher;
+          preliminaryData.classDetail.add(newClass);
+          indexNewClassDetail = preliminaryData.classDetail.length - 1;
+        }
+
+        /// Seek for the change entry. Delete the classes moved away.
+        for (int i in e.originalAffectedWeeksList) {
+          preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList
+              .replaceRange(i, i + 1, '0');
+        }
+
+        /// Add classes.
+        preliminaryData.timeArrangement.add(
+          TimeArrangement(
+            index: indexNewClassDetail ?? indexClassDetail,
+            weekList: e.newAffectedWeeks!,
+            day: e.newWeek!,
+            start: e.newClassRange[0],
+            stop: e.newClassRange[1],
+          ),
+        );
+      } else if (e.type == ChangeType.patch) {
+        /// Add classes.
+        preliminaryData.timeArrangement.add(
+          TimeArrangement(
+            index: indexClassDetail,
+            weekList: e.newAffectedWeeks!,
+            day: e.newWeek!,
+            start: e.newClassRange[0],
+            stop: e.newClassRange[1],
+          ),
+        );
+      } else {
+        /// stop，停课
+        for (int i in e.originalAffectedWeeksList) {
+          preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList
+              .replaceRange(i, i + 1, '0');
+        }
+      }
+    }
+
+    return preliminaryData;
   }
 
   Future<ClassTableData> get({

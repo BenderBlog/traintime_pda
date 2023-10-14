@@ -64,6 +64,9 @@ ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
       timeArrangement: (json['timeArrangement'] as List<dynamic>?)
           ?.map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
           .toList(),
+      classChanges: (json['classChanges'] as List<dynamic>?)
+          ?.map((e) => ClassChange.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$ClassTableDataToJson(ClassTableData instance) =>
@@ -75,6 +78,7 @@ Map<String, dynamic> _$ClassTableDataToJson(ClassTableData instance) =>
       'notArranged': instance.notArranged.map((e) => e.toJson()).toList(),
       'timeArrangement':
           instance.timeArrangement.map((e) => e.toJson()).toList(),
+      'classChanges': instance.classChanges.map((e) => e.toJson()).toList(),
     };
 
 ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
@@ -83,7 +87,7 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       classNumber: json['classNumber'] as String,
       className: json['className'] as String,
       originalAffectedWeeks: json['originalAffectedWeeks'] as String,
-      newAffectedWeeks: json['newAffectedWeeks'] as String,
+      newAffectedWeeks: json['newAffectedWeeks'] as String?,
       originalTeacher: json['originalTeacher'] as String?,
       newTeacher: json['newTeacher'] as String?,
       originalClassRange: (json['originalClassRange'] as List<dynamic>)
@@ -92,6 +96,8 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       newClassRange: (json['newClassRange'] as List<dynamic>)
           .map((e) => e as int)
           .toList(),
+      originalWeek: json['originalWeek'] as int,
+      newWeek: json['newWeek'] as int?,
     );
 
 Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
@@ -106,6 +112,8 @@ Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
       'newTeacher': instance.newTeacher,
       'originalClassRange': instance.originalClassRange,
       'newClassRange': instance.newClassRange,
+      'originalWeek': instance.originalWeek,
+      'newWeek': instance.newWeek,
     };
 
 const _$ChangeTypeEnumMap = {

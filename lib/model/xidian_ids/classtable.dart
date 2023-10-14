@@ -19,6 +19,14 @@ class ClassDetail {
     this.number,
   });
 
+  ClassDetail.from(ClassDetail e)
+      : this(
+          name: e.name,
+          teacher: e.teacher,
+          code: e.code,
+          number: e.number,
+        );
+
   factory ClassDetail.fromJson(Map<String, dynamic> json) =>
       _$ClassDetailFromJson(json);
 
@@ -122,11 +130,11 @@ class ClassChange {
   /// KCM 课程名
   final String className;
 
-  /// SKZC 原周次信息
+  /// 来自 SKZC 原周次信息
   final String originalAffectedWeeks;
 
-  /// XSKZC 新周次信息
-  final String newAffectedWeeks;
+  /// 来自 XSKZC 新周次信息，可能是空
+  final String? newAffectedWeeks;
 
   /// YSKJS 原先的老师
   final String? originalTeacher;
@@ -140,6 +148,12 @@ class ClassChange {
   /// XKSJS-XJSJC 新的课次信息
   final List<int> newClassRange;
 
+  /// SKXQ 原先的星期
+  final int originalWeek;
+
+  /// XSKXQ 现在的星期
+  final int? newWeek;
+
   ClassChange({
     required this.type,
     required this.classCode,
@@ -151,7 +165,25 @@ class ClassChange {
     required this.newTeacher,
     required this.originalClassRange,
     required this.newClassRange,
+    required this.originalWeek,
+    required this.newWeek,
   });
+
+  List<int> get originalAffectedWeeksList {
+    List<int> toReturn = [];
+    for (int i = 0; i < originalAffectedWeeks.length; ++i) {
+      if (originalAffectedWeeks[i] == '1') toReturn.add(i);
+    }
+    return toReturn;
+  }
+
+  List<int> get newAffectedWeeksList {
+    List<int> toReturn = [];
+    for (int i = 0; i < (newAffectedWeeks?.length ?? 0); ++i) {
+      if (newAffectedWeeks![i] == '1') toReturn.add(i);
+    }
+    return toReturn;
+  }
 
   factory ClassChange.fromJson(Map<String, dynamic> json) =>
       _$ClassChangeFromJson(json);
