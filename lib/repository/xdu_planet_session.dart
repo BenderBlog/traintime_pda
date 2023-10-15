@@ -8,7 +8,10 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 
 class PlanetSession extends NetworkSession {
-  static const base = "https://server.superbart.xyz/xduplanet.php";
+  //static const base = "https://server.superbart.xyz/xduplanet.php";
+  static const base = "https://xdlinux.github.io/planet";
+
+  /*
   Future<RepoList> repoList() async {
     var response = await dio.get(base).then((value) => value.data);
     return RepoList.fromJson(response);
@@ -24,5 +27,12 @@ class PlanetSession extends NetworkSession {
     var response =
         await dio.get("$base?feed=$author&p=$page").then((value) => value.data);
     return Content.fromJson(response);
+  }
+  */
+
+  Future<XDUPlanetDatabase> repoList() async {
+    return await dio
+        .get("$base/index.json")
+        .then((value) => XDUPlanetDatabase.fromJson(value.data));
   }
 }

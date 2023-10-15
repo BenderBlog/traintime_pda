@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Content page of XDU Planet.
-
+/*
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -130,3 +130,4 @@ class _ContentPageState extends State<ContentPage> {
     );
   }
 }
+*/

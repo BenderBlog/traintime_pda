@@ -10,17 +10,19 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/xdu_planet/content_page.dart';
-import 'package:watermeter/repository/xdu_planet_session.dart';
+//import 'package:watermeter/page/xdu_planet/content_page.dart';
+//import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class PersonalPage extends StatefulWidget {
-  final String index;
-  final Repo repo;
+  final Person person;
+  //final String index;
+  //final Repo repo;
 
   const PersonalPage({
     super.key,
-    required this.index,
-    required this.repo,
+    required this.person,
+    //required this.index,
+    //required this.repo,
   });
 
   @override
@@ -28,30 +30,58 @@ class PersonalPage extends StatefulWidget {
 }
 
 class _PersonalPageState extends State<PersonalPage> {
+  /*
   late Future<TitleList> titleList;
-
   @override
   void initState() {
     super.initState();
     titleList = PlanetSession().titleList(widget.index);
   }
+  */
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.repo.name),
+        title: Text(widget.person.name),
         actions: [
           IconButton(
             icon: const Icon(Icons.link),
             onPressed: () => launchUrlString(
-              widget.repo.website,
+              widget.person.uri,
               mode: LaunchMode.externalApplication,
             ),
           ),
         ],
       ),
-      body: FutureBuilder<TitleList>(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: sheetMaxWidth - 16,
+            minWidth: min(
+              MediaQuery.of(context).size.width,
+              sheetMaxWidth - 16,
+            ),
+          ),
+          child: ListView.builder(
+            itemCount: widget.person.article.length,
+            itemBuilder: (context, index) => ListTile(
+              title: Text(
+                widget.person.article[index].title,
+              ),
+              subtitle: Text(
+                "发布于：${Jiffy.parseFromDateTime(widget.person.article[index].time).format(pattern: "yyyy年MM月dd日")}",
+              ),
+              onTap: () => launchUrlString(
+                widget.person.article[index].url,
+                mode: LaunchMode.externalApplication,
+              ),
+            ),
+          ),
+        ),
+      ),
+      /*
+      FutureBuilder<TitleList>(
         future: titleList,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
@@ -106,6 +136,7 @@ class _PersonalPageState extends State<PersonalPage> {
           }
         },
       ),
+      */
     );
   }
 }

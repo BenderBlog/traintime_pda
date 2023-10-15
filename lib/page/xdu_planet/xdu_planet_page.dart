@@ -5,7 +5,7 @@
 
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
@@ -22,7 +22,7 @@ class XDUPlanetPage extends StatefulWidget {
 
 class _XDUPlanetPageState extends State<XDUPlanetPage>
     with AutomaticKeepAliveClientMixin {
-  late Future<RepoList> repoList;
+  late Future<XDUPlanetDatabase> repoList;
 
   @override
   bool get wantKeepAlive => true;
@@ -73,13 +73,14 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
           )
         ],
       ),
-      body: FutureBuilder<RepoList>(
+      body: FutureBuilder<XDUPlanetDatabase>(
         future: repoList,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             try {
-              Map<String, Repo> data = snapshot.data!.repos;
-              List<String> keys = data.keys.toList();
+              // Map<String, Repo> data = snapshot.data!.repos;
+              // List<String> keys = data.keys.toList();
+              /*
               Widget icon(int index) => CachedNetworkImage(
                     imageUrl: data[keys[index]]!.favicon,
                     errorWidget: (context, url, error) =>
@@ -87,6 +88,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     width: 32,
                     height: 32,
                   );
+              */
               return Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
@@ -97,14 +99,16 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     ),
                   ),
                   child: ListView.builder(
-                    itemCount: data.length,
+                    itemCount: snapshot.data?.author.length ?? 0,
                     itemBuilder: (context, index) => ListTile(
-                      leading: icon(index),
-                      title: Text(data[keys[index]]!.name),
+                      //leading: icon(index),
+                      title: Text(snapshot.data!.author[index].name),
+                      subtitle: Text(snapshot.data!.author[index].description),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => PersonalPage(
-                          index: keys[index],
-                          repo: data[keys[index]]!,
+                          person: snapshot.data!.author[index],
+                          //index: keys[index],
+                          //repo: data[keys[index]]!,
                         ),
                       )),
                     ),
