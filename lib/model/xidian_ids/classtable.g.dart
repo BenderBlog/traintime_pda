@@ -98,6 +98,8 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
           .toList(),
       originalWeek: json['originalWeek'] as int,
       newWeek: json['newWeek'] as int?,
+      originalClassroom: json['originalClassroom'] as String?,
+      newClassroom: json['newClassroom'] as String?,
     );
 
 Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
@@ -114,6 +116,8 @@ Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
       'newClassRange': instance.newClassRange,
       'originalWeek': instance.originalWeek,
       'newWeek': instance.newWeek,
+      'originalClassroom': instance.originalClassroom,
+      'newClassroom': instance.newClassroom,
     };
 
 const _$ChangeTypeEnumMap = {

@@ -154,6 +154,12 @@ class ClassChange {
   /// XSKXQ 现在的星期
   final int? newWeek;
 
+  /// JASMC 旧教室
+  final String? originalClassroom;
+
+  /// XJASMC 新教室
+  final String? newClassroom;
+
   ClassChange({
     required this.type,
     required this.classCode,
@@ -167,6 +173,8 @@ class ClassChange {
     required this.newClassRange,
     required this.originalWeek,
     required this.newWeek,
+    required this.originalClassroom,
+    required this.newClassroom,
   });
 
   List<int> get originalAffectedWeeksList {
