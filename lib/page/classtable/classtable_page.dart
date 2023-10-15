@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/classtable/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -143,18 +144,43 @@ class _ClassTablePageState extends State<ClassTablePage> {
         ),
         actions: [
           if (haveClass)
-            IconButton(
-              icon: const Icon(Icons.cancel_schedule_send),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) {
-                      return NotArrangedClassList(
-                        notArranged: classTableState.notArranged,
-                      );
-                    },
-                  ),
-                );
+            PopupMenuButton<String>(
+              itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                const PopupMenuItem<String>(
+                  value: 'A',
+                  child: Text("未安排课程"),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'B',
+                  child: Text("课程安排调整"),
+                ),
+              ],
+              onSelected: (String action) {
+                // 点击选项的时候
+                switch (action) {
+                  case 'A':
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return NotArrangedClassList(
+                            notArranged: classTableState.notArranged,
+                          );
+                        },
+                      ),
+                    );
+                    break;
+                  case 'B':
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return ClassChangeList(
+                            classChanges: classTableState.classChange,
+                          );
+                        },
+                      ),
+                    );
+                    break;
+                }
               },
             ),
         ],

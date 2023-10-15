@@ -137,10 +137,10 @@ class ClassChange {
   final String? newAffectedWeeks;
 
   /// YSKJS 原先的老师
-  final String? originalTeacher;
+  final String originalTeacher;
 
   /// XSKJS 新换的老师
-  final String? newTeacher;
+  final String newTeacher;
 
   /// KSJS-JSJC 原先的课次信息
   final List<int> originalClassRange;
@@ -191,6 +191,19 @@ class ClassChange {
       if (newAffectedWeeks![i] == '1') toReturn.add(i);
     }
     return toReturn;
+  }
+
+  bool get isTeacherChanged => originalTeacher != newTeacher;
+
+  String get chagneTypeString {
+    switch (type) {
+      case ChangeType.change:
+        return "调课";
+      case ChangeType.patch:
+        return "补课";
+      case ChangeType.stop:
+        return "停课";
+    }
   }
 
   factory ClassChange.fromJson(Map<String, dynamic> json) =>

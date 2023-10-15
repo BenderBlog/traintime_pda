@@ -98,14 +98,6 @@ class ClassTableFile extends EhallSession {
         termStartDay,
       );
     }
-
-    semesterCode = '2020-2021-2';
-
-    termStartDay = await dio.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-      data: {'XN': '2020-2021', 'XQ': '2'},
-    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-
     developer.log(
         "Will get $semesterCode which start at $termStartDay, fetching...",
         name: "Ehall getClasstable");
@@ -218,7 +210,7 @@ class ClassTableFile extends EhallSession {
       for (int i = 0; i < preliminaryData.timeArrangement.length; ++i) {
         var element = preliminaryData.timeArrangement[i];
         if (element.index == indexClassDetail &&
-            element.day == e.originalWeek && // TODO: Maybe bug here.
+            element.day == e.originalWeek &&
             element.start == e.originalClassRange[0] &&
             element.stop == e.originalClassRange[1]) {
           indexOriginalTimeArrangementList.add(i);
@@ -238,9 +230,7 @@ class ClassTableFile extends EhallSession {
         /// If teacher changed. Create a new teacher entry.
         int? indexNewClassDetail;
 
-        if (e.originalTeacher != e.newTeacher &&
-            e.newTeacher != null &&
-            e.originalTeacher != null) {
+        if (e.isTeacherChanged) {
           var newClass = ClassDetail.from(
             preliminaryData.classDetail[indexClassDetail],
           );

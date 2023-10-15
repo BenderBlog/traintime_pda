@@ -42,6 +42,7 @@ class ClassTableWindow extends StatelessWidget {
       semesterLength: classTableData.semesterLength,
       startDay: Jiffy.parse(classTableData.termStartDay).dateTime,
       semesterCode: classTableData.semesterCode,
+      classChange: classTableData.classChanges,
       context: context,
       offset: offset,
       child: const ClassTablePage(),

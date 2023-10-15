@@ -24,6 +24,9 @@ class ClassTableState extends InheritedWidget {
   /// The time arrangements of the class details, use with [classDetail].
   final List<TimeArrangement> timeArrangement;
 
+  // The class change data.
+  final List<ClassChange> classChange;
+
   /// Multiplex array which means List[week][day][classindex][classes]
   ///   * week: The week index of the week.
   ///   * day: days in the week
@@ -51,6 +54,7 @@ class ClassTableState extends InheritedWidget {
     required this.pretendLayout,
     required this.currentWeek,
     required this.semesterCode,
+    required this.classChange,
     required BuildContext context,
     int? offset,
   }) {

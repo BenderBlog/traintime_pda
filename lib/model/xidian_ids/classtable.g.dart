@@ -88,8 +88,8 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       className: json['className'] as String,
       originalAffectedWeeks: json['originalAffectedWeeks'] as String,
       newAffectedWeeks: json['newAffectedWeeks'] as String?,
-      originalTeacher: json['originalTeacher'] as String?,
-      newTeacher: json['newTeacher'] as String?,
+      originalTeacher: json['originalTeacher'] as String,
+      newTeacher: json['newTeacher'] as String,
       originalClassRange: (json['originalClassRange'] as List<dynamic>)
           .map((e) => e as int)
           .toList(),
