@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/xdu_planet/content_page.dart';
 //import 'package:watermeter/page/xdu_planet/content_page.dart';
 //import 'package:watermeter/repository/xdu_planet_session.dart';
 
@@ -72,9 +73,13 @@ class _PersonalPageState extends State<PersonalPage> {
               subtitle: Text(
                 "发布于：${Jiffy.parseFromDateTime(widget.person.article[index].time).format(pattern: "yyyy年MM月dd日")}",
               ),
-              onTap: () => launchUrlString(
-                widget.person.article[index].url,
-                mode: LaunchMode.externalApplication,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ContentPage(
+                    article: widget.person.article[index],
+                    author: widget.person.name,
+                  ),
+                ),
               ),
             ),
           ),

@@ -2,32 +2,25 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Content page of XDU Planet.
-/*
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class ContentPage extends StatefulWidget {
-  final String feed;
-  final int index;
-  final String authorName;
-  final String title;
-  final String time;
-  final String link;
+  final Article article;
+  final String author;
 
   const ContentPage({
     super.key,
-    required this.feed,
-    required this.index,
-    required this.authorName,
-    required this.title,
-    required this.time,
-    required this.link,
+    required this.article,
+    required this.author,
   });
 
   @override
@@ -35,42 +28,42 @@ class ContentPage extends StatefulWidget {
 }
 
 class _ContentPageState extends State<ContentPage> {
-  late Future<Content> content;
+  late Future<String> content;
 
   @override
   void initState() {
     super.initState();
-    content = PlanetSession().content(widget.feed, widget.index);
+    content = PlanetSession().content(widget.article.content);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.article.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.link),
             onPressed: () => launchUrlString(
-              widget.link,
+              widget.article.url,
               mode: LaunchMode.externalApplication,
             ),
           ),
         ],
       ),
-      body: FutureBuilder<Content>(
+      body: FutureBuilder<String>(
         future: content,
         builder: (context, snapshot) {
           String title = '''
-<h2>${widget.title}</h2>
-<i>by: ${widget.authorName}</i></br>
-<i>at: ${widget.time}</i>
+<h2>${widget.article.title}</h2>
+<i>by: ${widget.author}</i></br>
+<i>at: ${Jiffy.parseFromDateTime(widget.article.time).format(pattern: "yyyy年MM月dd日")}</i>
 ''';
           late Widget addon;
           if (snapshot.connectionState == ConnectionState.done) {
             try {
               addon = HtmlWidget(
-                snapshot.data?.content ??
+                snapshot.data ??
                     '''
   <h3>遇到错误</h3>
   <p>
@@ -83,8 +76,7 @@ class _ContentPageState extends State<ContentPage> {
               addon = ReloadWidget(
                 function: () {
                   setState(() {
-                    content =
-                        PlanetSession().content(widget.feed, widget.index);
+                    content = PlanetSession().content(widget.article.content);
                   });
                 },
               );
@@ -130,4 +122,3 @@ class _ContentPageState extends State<ContentPage> {
     );
   }
 }
-*/

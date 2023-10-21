@@ -94,7 +94,7 @@ class Content {
 class Article {
   final String title;
   final DateTime time;
-  final String content; // Not implemented on upsteam.
+  final String content;
   final String url;
 
   Article({

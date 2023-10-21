@@ -22,13 +22,11 @@ class PlanetSession extends NetworkSession {
         await dio.get("$base?feed=$author").then((value) => value.data);
     return TitleList.fromJson(response);
   }
-
-  Future<Content> content(String author, int page) async {
-    var response =
-        await dio.get("$base?feed=$author&p=$page").then((value) => value.data);
-    return Content.fromJson(response);
-  }
   */
+
+  Future<String> content(String dbPath) async {
+    return await dio.get("$base/$dbPath").then((value) => value.data);
+  }
 
   Future<XDUPlanetDatabase> repoList() async {
     return await dio
