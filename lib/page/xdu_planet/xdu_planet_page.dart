@@ -103,7 +103,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     itemBuilder: (context, index) => ListTile(
                       //leading: icon(index),
                       title: Text(snapshot.data!.author[index].name),
-                      subtitle: Text(snapshot.data!.author[index].description),
+                      //subtitle: Text(snapshot.data!.author[index].description),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => PersonalPage(
                           person: snapshot.data!.author[index],
