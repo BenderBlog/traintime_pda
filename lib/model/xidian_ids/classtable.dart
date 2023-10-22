@@ -19,13 +19,12 @@ class ClassDetail {
     this.number,
   });
 
-  ClassDetail.from(ClassDetail e)
-      : this(
-          name: e.name,
-          teacher: e.teacher,
-          code: e.code,
-          number: e.number,
-        );
+  factory ClassDetail.from(ClassDetail e) => ClassDetail(
+        name: e.name,
+        teacher: e.teacher,
+        code: e.code,
+        number: e.number,
+      );
 
   factory ClassDetail.fromJson(Map<String, dynamic> json) =>
       _$ClassDetailFromJson(json);

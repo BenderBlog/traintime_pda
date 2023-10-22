@@ -280,7 +280,7 @@ class ClassTableFile extends EhallSession {
             day: e.newWeek!,
             start: e.newClassRange[0],
             stop: e.newClassRange[1],
-            classroom: e.newAffectedWeeks ?? e.originalClassroom,
+            classroom: e.newClassroom ?? e.originalClassroom,
           ),
         );
       } else if (e.type == ChangeType.patch) {
