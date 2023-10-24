@@ -8,6 +8,7 @@ import 'dart:io' show Platform;
 
 class AboutPage extends StatelessWidget {
   final String license = '''
+        <h1 style="text-align: center">Happy 1024 Programmer Day!</h1>
         <h1 style="text-align: center">${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} 软件最终用户许可协议</h1>
         <p style="text-align: center"><i>BenderBlog Rodriguez and contributors, 2023-08-10</i></p>
 

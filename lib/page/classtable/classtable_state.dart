@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 /// The controllers and shared datas of the class table.
@@ -42,6 +43,33 @@ class ClassTableState extends InheritedWidget {
 
   /// The changeable data of the state.
   late final ClassTableWidgetState controllers;
+
+  /// Generate icalendar file string. Currently testing.
+  String get iCalenderStr {
+    String toReturn = "BEGIN:VCALENDAR\n";
+    for (var i in timeArrangement) {
+      String summary =
+          "SUMMARY:${classDetail[i.index].name}@${i.classroom ?? "待定"}\n";
+      String description =
+          "DESCRIPTION:课程名称：${classDetail[i.index].name}; 上课地点：${i.classroom ?? "待定"}\n";
+      for (int j = 0; j < i.weekList.length; ++j) {
+        if (i.weekList[j] == '0') {
+          continue;
+        }
+        Jiffy day =
+            Jiffy.parseFromDateTime(startDay).add(weeks: j, days: i.day - 1);
+        String vevent = "BEGIN:VEVENT\n$summary";
+        List<String> startTime = time[(i.start - 1) * 2].split(":");
+        List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
+        vevent +=
+            "DTSTART:${day.add(hours: int.parse(startTime[0]), minutes: int.parse(startTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
+        vevent +=
+            "DTEND:${day.add(hours: int.parse(stopTime[0]), minutes: int.parse(stopTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
+        toReturn += "$vevent${description}END:VEVENT\n";
+      }
+    }
+    return "${toReturn}END:VCALENDAR";
+  }
 
   ClassTableState({
     super.key,

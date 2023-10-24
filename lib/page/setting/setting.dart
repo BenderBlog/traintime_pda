@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
@@ -208,6 +209,9 @@ class _SettingWindowState extends State<SettingWindow> {
               SettingsTile.navigation(
                 title: const Text('退出登录并重启应用'),
                 onPressed: (context) async {
+                  ProgressDialog pd = ProgressDialog(context: context);
+                  pd.show(msg: '正在退出登录');
+
                   /// Clean Cookie
                   try {
                     await NetworkSession().clearCookieJar();
@@ -235,6 +239,7 @@ class _SettingWindowState extends State<SettingWindow> {
 
                   /// Restart app
                   if (mounted) {
+                    pd.close();
                     Restart.restartApp();
                   }
                 },

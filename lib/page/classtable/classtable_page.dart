@@ -3,7 +3,10 @@
 
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/page/classtable/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -12,6 +15,7 @@ import 'package:watermeter/page/classtable/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/week_choice_button.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'dart:developer' as developer;
 
 class ClassTablePage extends StatefulWidget {
   const ClassTablePage({super.key});
@@ -148,14 +152,18 @@ class _ClassTablePageState extends State<ClassTablePage> {
               itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
                 const PopupMenuItem<String>(
                   value: 'A',
-                  child: Text("未安排课程"),
+                  child: Text("查看未安排课程信息"),
                 ),
                 const PopupMenuItem<String>(
                   value: 'B',
-                  child: Text("课程安排调整"),
+                  child: Text("查看课程安排调整信息"),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'C',
+                  child: Text("生成日历文件"),
                 ),
               ],
-              onSelected: (String action) {
+              onSelected: (String action) async {
                 // 点击选项的时候
                 switch (action) {
                   case 'A':
@@ -179,6 +187,38 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         },
                       ),
                     );
+                    break;
+                  case 'C':
+                    try {
+                      String? result =
+                          await FilePicker.platform.getDirectoryPath(
+                        dialogTitle: "保存日历文件到哪里呢",
+                      ); //
+                      if (result != null) {
+                        String now = Jiffy.now().format(
+                          pattern: "yyyyMMddTHHmmss",
+                        );
+                        String semester = classTableState.semesterCode;
+                        File file =
+                            File("$result/classtable-$now-$semester.ics");
+                        developer.log("File exists? ${file.existsSync()}");
+                        if (!(await file.exists())) {
+                          file = await file.create();
+                        }
+
+                        file = await file.writeAsString(
+                          classTableState.iCalenderStr,
+                        );
+                        developer.log(
+                            "$file ${file.lengthSync()} ${classTableState.iCalenderStr.length}");
+                        Fluttertoast.showToast(msg: "应该保存成功");
+                      } else {
+                        Fluttertoast.showToast(msg: "没选择目录，保存取消");
+                      }
+                    } on FileSystemException {
+                      Fluttertoast.showToast(msg: "文件创建失败，保存取消");
+                    }
+
                     break;
                 }
               },
