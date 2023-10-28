@@ -1,27 +1,62 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'classtable.g.dart';
 
 @JsonSerializable(explicitToJson: true)
+class NotArrangementClassDetail {
+  String name; // 名称
+  String? code; // 课程序号
+  String? number; // 班级序号
+  String? teacher; // 老师
+
+  NotArrangementClassDetail({
+    required this.name,
+    this.code,
+    this.number,
+    this.teacher,
+  });
+
+  factory NotArrangementClassDetail.from(NotArrangementClassDetail e) =>
+      NotArrangementClassDetail(
+        name: e.name,
+        code: e.code,
+        number: e.number,
+        teacher: e.teacher,
+      );
+
+  factory NotArrangementClassDetail.fromJson(Map<String, dynamic> json) =>
+      _$NotArrangementClassDetailFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NotArrangementClassDetailToJson(this);
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ClassDetail &&
+      other.runtimeType == runtimeType &&
+      name == other.name;
+}
+
+@JsonSerializable(explicitToJson: true)
 class ClassDetail {
   String name; // 名称
-  String? teacher; // 老师
   String? code; // 课程序号
   String? number; // 班级序号
 
   ClassDetail({
     required this.name,
-    this.teacher,
     this.code,
     this.number,
   });
 
   factory ClassDetail.from(ClassDetail e) => ClassDetail(
         name: e.name,
-        teacher: e.teacher,
         code: e.code,
         number: e.number,
       );
@@ -47,6 +82,7 @@ class TimeArrangement {
   // 返回的是 0 和 1 组成的数组，0 代表这周没课程，1 代表这周有课
   @JsonKey(name: 'week_list')
   String weekList; // 上课周次
+  String? teacher; // 老师
   int day; // 星期几上课
   int start; // 上课开始
   int stop; // 上课结束
@@ -64,6 +100,7 @@ class TimeArrangement {
     required this.index,
     required this.weekList,
     this.classroom,
+    this.teacher,
     required this.day,
     required this.start,
     required this.stop,
@@ -76,7 +113,7 @@ class ClassTableData {
   String semesterCode;
   String termStartDay;
   List<ClassDetail> classDetail;
-  List<ClassDetail> notArranged;
+  List<NotArrangementClassDetail> notArranged;
   List<TimeArrangement> timeArrangement;
   List<ClassChange> classChanges;
 
@@ -96,7 +133,7 @@ class ClassTableData {
     this.semesterCode = "",
     this.termStartDay = "",
     List<ClassDetail>? classDetail,
-    List<ClassDetail>? notArranged,
+    List<NotArrangementClassDetail>? notArranged,
     List<TimeArrangement>? timeArrangement,
     List<ClassChange>? classChanges,
   })  : classDetail = classDetail ?? [],
@@ -136,10 +173,10 @@ class ClassChange {
   final String? newAffectedWeeks;
 
   /// YSKJS 原先的老师
-  final String originalTeacher;
+  final String? originalTeacherData;
 
   /// XSKJS 新换的老师
-  final String newTeacher;
+  final String? newTeacherData;
 
   /// KSJS-JSJC 原先的课次信息
   final List<int> originalClassRange;
@@ -166,8 +203,8 @@ class ClassChange {
     required this.className,
     required this.originalAffectedWeeks,
     required this.newAffectedWeeks,
-    required this.originalTeacher,
-    required this.newTeacher,
+    required this.originalTeacherData,
+    required this.newTeacherData,
     required this.originalClassRange,
     required this.newClassRange,
     required this.originalWeek,
@@ -192,7 +229,25 @@ class ClassChange {
     return toReturn;
   }
 
-  bool get isTeacherChanged => originalTeacher != newTeacher;
+  String? get originalTeacher =>
+      originalTeacherData?.replaceAll(RegExp(r'(/|[0-9])'), '');
+
+  String? get newTeacher =>
+      newTeacherData?.replaceAll(RegExp(r'(/|[0-9])'), '');
+
+  bool get isTeacherChanged {
+    List<String> originalTeacherCode =
+        originalTeacherData?.replaceAll(' ', '').split(RegExp(r',|/')) ?? [];
+    originalTeacherCode
+        .retainWhere((element) => element.contains(RegExp(r'([0-9])')));
+
+    List<String> newTeacherCode =
+        newTeacherData?.replaceAll(' ', '').split(RegExp(r',|/')) ?? [];
+    newTeacherCode
+        .retainWhere((element) => element.contains(RegExp(r'([0-9])')));
+
+    return !listEquals(originalTeacherCode, newTeacherCode);
+  }
 
   String get chagneTypeString {
     switch (type) {

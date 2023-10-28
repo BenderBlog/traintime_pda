@@ -47,7 +47,7 @@ class ClassDetailDialog extends StatelessWidget {
       children: [
         customListTile(
           Icons.person,
-          classDetail.teacher ?? "老师未定",
+          timeArrangement.teacher ?? "老师未定",
         ),
         customListTile(
           Icons.room,

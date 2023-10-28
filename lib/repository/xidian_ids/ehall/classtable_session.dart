@@ -26,7 +26,6 @@ class ClassTableFile extends EhallSession {
     for (var i in qResult["rows"]) {
       var toDeal = ClassDetail(
         name: i["KCM"],
-        teacher: i["SKJS"],
         code: i["KCH"],
         number: i["KXH"],
       );
@@ -37,6 +36,7 @@ class ClassTableFile extends EhallSession {
         TimeArrangement(
           index: toReturn.classDetail.indexOf(toDeal),
           start: int.parse(i["KSJC"]),
+          teacher: i["SKJS"],
           stop: int.parse(i["JSJC"]),
           day: int.parse(i["SKXQ"]),
           weekList: i["SKZC"].toString(),
@@ -50,11 +50,11 @@ class ClassTableFile extends EhallSession {
 
     // Deal with the not arranged data.
     for (var i in qResult["notArranged"]) {
-      toReturn.notArranged.add(ClassDetail(
+      toReturn.notArranged.add(NotArrangementClassDetail(
         name: i["KCM"],
-        teacher: i["SKJS"],
         code: i["KCH"],
         number: i["KXH"],
+        teacher: i["SKJS"],
       ));
     }
 
@@ -173,8 +173,8 @@ class ClassTableFile extends EhallSession {
             className: i["KCM"],
             originalAffectedWeeks: i["SKZC"],
             newAffectedWeeks: i["XSKZC"],
-            originalTeacher: i["YSKJS"]?.replaceAll(RegExp(r'(/|[0-9])'), ''),
-            newTeacher: i["XSKJS"]?.replaceAll(RegExp(r'(/|[0-9])'), ''),
+            originalTeacherData: i["YSKJS"],
+            newTeacherData: i["XSKJS"],
             originalClassRange: [
               int.parse(i["KSJC"]?.toString() ?? "-1"),
               int.parse(i["JSJC"]?.toString() ?? "-1"),
@@ -196,26 +196,40 @@ class ClassTableFile extends EhallSession {
       "Dealing class change with ${preliminaryData.classChanges.length} info(s).",
       name: "Ehall getClasstable",
     );
-    for (var e in preliminaryData.classChanges) {
-      int indexClassDetail = preliminaryData.classDetail.indexWhere(
-        (element) =>
-            element.code == e.classCode && element.teacher == e.originalTeacher,
-      );
-      developer.log(
-        "Class change related to class detail index $indexClassDetail.",
-        name: "Ehall getClasstable",
-      );
 
-      List<int> indexOriginalTimeArrangementList = [];
-      for (int i = 0; i < preliminaryData.timeArrangement.length; ++i) {
-        var element = preliminaryData.timeArrangement[i];
-        if (element.index == indexClassDetail &&
-            element.day == e.originalWeek &&
-            element.start == e.originalClassRange[0] &&
-            element.stop == e.originalClassRange[1]) {
-          indexOriginalTimeArrangementList.add(i);
+    for (var e in preliminaryData.classChanges) {
+      /// First, search for the classes.
+      /// Due to the unstability of the api, a list is introduced.
+      List<int> indexClassDetailList = [];
+      for (int i = 0; i < preliminaryData.classDetail.length; ++i) {
+        if (preliminaryData.classDetail[i].code == e.classCode) {
+          indexClassDetailList.add(i);
         }
       }
+
+      /// Second, find the all time arrangement related to the class.
+      developer.log(
+        "Class change related to class detail index $indexClassDetailList.",
+        name: "Ehall getClasstable",
+      );
+      List<int> indexOriginalTimeArrangementList = [];
+      for (var currentClassIndex in indexClassDetailList) {
+        for (int i = 0; i < preliminaryData.timeArrangement.length; ++i) {
+          if (preliminaryData.timeArrangement[i].index == currentClassIndex &&
+              preliminaryData.timeArrangement[i].day == e.originalWeek &&
+              preliminaryData.timeArrangement[i].start ==
+                  e.originalClassRange[0] &&
+              preliminaryData.timeArrangement[i].stop ==
+                  e.originalClassRange[1]) {
+            indexOriginalTimeArrangementList.add(i);
+          }
+        }
+      }
+
+      /// Give a value to the
+      int timeArrangementIndex = indexOriginalTimeArrangementList.first;
+
+      /// Third, search for the time arrangements, seek for the truth.
       developer.log(
         "Class change related to time arrangement index $indexOriginalTimeArrangementList",
         name: "Ehall getClasstable",
@@ -226,23 +240,10 @@ class ClassTableFile extends EhallSession {
           "Class change.",
           name: "Ehall getClasstable",
         );
-
-        /// If teacher changed. Create a new teacher entry.
-        int? indexNewClassDetail;
-
-        if (e.isTeacherChanged) {
-          var newClass = ClassDetail.from(
-            preliminaryData.classDetail[indexClassDetail],
-          );
-          newClass.teacher = e.newTeacher;
-          preliminaryData.classDetail.add(newClass);
-          indexNewClassDetail = preliminaryData.classDetail.length - 1;
-        }
         developer.log(
-          "Teacher changed? ${indexNewClassDetail != null}.",
+          "Teacher changed? ${e.isTeacherChanged}.",
           name: "Ehall getClasstable",
         );
-
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
           /// Seek for the change entry. Delete the classes moved away.
@@ -264,23 +265,31 @@ class ClassTableFile extends EhallSession {
                   preliminaryData
                       .timeArrangement[indexOriginalTimeArrangement].weekList
                       .replaceRange(i, i + 1, '0');
+              timeArrangementIndex = preliminaryData
+                  .timeArrangement[indexOriginalTimeArrangement].index;
             }
           }
           developer.log(
-            "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
+            "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}. ",
             name: "Ehall getClasstable",
           );
         }
 
+        developer.log(
+          "New week: ${e.newAffectedWeeks} day: ${e.newWeek} startToStop: ${e.newClassRange} timeArrangementIndex: $timeArrangementIndex.",
+          name: "Ehall getClasstable",
+        );
+
         /// Add classes.
         preliminaryData.timeArrangement.add(
           TimeArrangement(
-            index: indexNewClassDetail ?? indexClassDetail,
+            index: timeArrangementIndex,
             weekList: e.newAffectedWeeks!,
             day: e.newWeek!,
             start: e.newClassRange[0],
             stop: e.newClassRange[1],
             classroom: e.newClassroom ?? e.originalClassroom,
+            teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
           ),
         );
       } else if (e.type == ChangeType.patch) {
@@ -292,11 +301,13 @@ class ClassTableFile extends EhallSession {
         /// Add classes.
         preliminaryData.timeArrangement.add(
           TimeArrangement(
-            index: indexClassDetail,
+            index: timeArrangementIndex,
             weekList: e.newAffectedWeeks!,
             day: e.newWeek!,
             start: e.newClassRange[0],
             stop: e.newClassRange[1],
+            classroom: e.newClassroom ?? e.originalClassroom,
+            teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
           ),
         );
       } else {

@@ -55,9 +55,9 @@ class ClasstableCurrentColumn extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              c.currentData.$1!.teacher == null
+                              c.currentData.$2!.teacher == null
                                   ? "老师未知"
-                                  : c.currentData.$1!.teacher!,
+                                  : c.currentData.$2!.teacher!,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,

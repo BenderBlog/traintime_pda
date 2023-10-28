@@ -30,9 +30,9 @@ class ClassChangeList extends StatelessWidget {
 
             String teacherChange = "";
             if (toShow.isTeacherChanged &&
-                classChanges[index].newTeacher.isNotEmpty) {
+                classChanges[index].newTeacher != null) {
               teacherChange +=
-                  "从${classChanges[index].originalTeacher.isEmpty ? "没有信息" : classChanges[index].originalTeacher}"
+                  "从${classChanges[index].originalTeacher ?? "没有信息"}"
                   "变为${classChanges[index].newTeacher}";
             } else {
               teacherChange += "没有改变";

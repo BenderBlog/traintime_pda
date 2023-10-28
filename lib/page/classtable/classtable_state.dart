@@ -20,7 +20,7 @@ class ClassTableState extends InheritedWidget {
   final List<ClassDetail> classDetail;
 
   /// The classes without time arrangements.
-  final List<ClassDetail> notArranged;
+  final List<NotArrangementClassDetail> notArranged;
 
   /// The time arrangements of the class details, use with [classDetail].
   final List<TimeArrangement> timeArrangement;

@@ -11,7 +11,7 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class NotArrangedClassList extends StatelessWidget {
   /// A list of [ClassDetail] which do not have the time arrangement.
-  final List<ClassDetail> notArranged;
+  final List<NotArrangementClassDetail> notArranged;
   const NotArrangedClassList({
     super.key,
     required this.notArranged,

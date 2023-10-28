@@ -6,9 +6,26 @@ part of 'classtable.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+NotArrangementClassDetail _$NotArrangementClassDetailFromJson(
+        Map<String, dynamic> json) =>
+    NotArrangementClassDetail(
+      name: json['name'] as String,
+      code: json['code'] as String?,
+      number: json['number'] as String?,
+      teacher: json['teacher'] as String?,
+    );
+
+Map<String, dynamic> _$NotArrangementClassDetailToJson(
+        NotArrangementClassDetail instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'code': instance.code,
+      'number': instance.number,
+      'teacher': instance.teacher,
+    };
+
 ClassDetail _$ClassDetailFromJson(Map<String, dynamic> json) => ClassDetail(
       name: json['name'] as String,
-      teacher: json['teacher'] as String?,
       code: json['code'] as String?,
       number: json['number'] as String?,
     );
@@ -16,7 +33,6 @@ ClassDetail _$ClassDetailFromJson(Map<String, dynamic> json) => ClassDetail(
 Map<String, dynamic> _$ClassDetailToJson(ClassDetail instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'teacher': instance.teacher,
       'code': instance.code,
       'number': instance.number,
     };
@@ -26,6 +42,7 @@ TimeArrangement _$TimeArrangementFromJson(Map<String, dynamic> json) =>
       index: json['index'] as int,
       weekList: json['week_list'] as String,
       classroom: json['classroom'] as String?,
+      teacher: json['teacher'] as String?,
       day: json['day'] as int,
       start: json['start'] as int,
       stop: json['stop'] as int,
@@ -35,6 +52,7 @@ Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) {
   final val = <String, dynamic>{
     'index': instance.index,
     'week_list': instance.weekList,
+    'teacher': instance.teacher,
     'day': instance.day,
     'start': instance.start,
     'stop': instance.stop,
@@ -59,7 +77,8 @@ ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
           ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       notArranged: (json['notArranged'] as List<dynamic>?)
-          ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
+          ?.map((e) =>
+              NotArrangementClassDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       timeArrangement: (json['timeArrangement'] as List<dynamic>?)
           ?.map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
@@ -88,8 +107,8 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       className: json['className'] as String,
       originalAffectedWeeks: json['originalAffectedWeeks'] as String,
       newAffectedWeeks: json['newAffectedWeeks'] as String?,
-      originalTeacher: json['originalTeacher'] as String,
-      newTeacher: json['newTeacher'] as String,
+      originalTeacherData: json['originalTeacherData'] as String?,
+      newTeacherData: json['newTeacherData'] as String?,
       originalClassRange: (json['originalClassRange'] as List<dynamic>)
           .map((e) => e as int)
           .toList(),
@@ -110,8 +129,8 @@ Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
       'className': instance.className,
       'originalAffectedWeeks': instance.originalAffectedWeeks,
       'newAffectedWeeks': instance.newAffectedWeeks,
-      'originalTeacher': instance.originalTeacher,
-      'newTeacher': instance.newTeacher,
+      'originalTeacherData': instance.originalTeacherData,
+      'newTeacherData': instance.newTeacherData,
       'originalClassRange': instance.originalClassRange,
       'newClassRange': instance.newClassRange,
       'originalWeek': instance.originalWeek,
