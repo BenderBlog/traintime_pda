@@ -158,7 +158,7 @@ SPEC CHECKSUMS:
   restart_app: 806659942bf932f6ce51c5372f91ce5e81c8c14a
   SDWebImage: d47d81bea8a77187896b620dc79c3c528e8906b9
   sensors_plus: bda64198ccc7d3ccbb49e6ae17d92f67687bee20
-  share_plus: 599aa54e4ea31d4b4c0e9c911bcc26c55e791028
+  share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f

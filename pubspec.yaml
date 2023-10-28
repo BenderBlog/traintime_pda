@@ -19,6 +19,7 @@ dependencies:
   path_provider: ^2.0.11
   file_picker: ^5.2.5
   json_annotation: ^4.8.0
+  share_plus: ^7.2.1
   # Deal with html
   beautiful_soup_dart: ^0.3.0
   charset_converter: ^2.1.1

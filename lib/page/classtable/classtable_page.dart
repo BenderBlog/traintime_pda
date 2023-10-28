@@ -16,6 +16,7 @@ import 'package:watermeter/page/classtable/week_choice_button.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'dart:developer' as developer;
+import 'package:share_plus/share_plus.dart';
 
 class ClassTablePage extends StatefulWidget {
   const ClassTablePage({super.key});
@@ -190,33 +191,16 @@ class _ClassTablePageState extends State<ClassTablePage> {
                     break;
                   case 'C':
                     try {
-                      String? result =
-                          await FilePicker.platform.getDirectoryPath(
-                        dialogTitle: "保存日历文件到哪里呢",
-                      );
-                      if (result == null) {
-                        Fluttertoast.showToast(msg: "没选择目录，保存取消");
-                        return;
-                      }
-                      await Fluttertoast.showToast(msg: "理论保存地址：$result");
-                      /*
                       String now = Jiffy.now().format(
                         pattern: "yyyyMMddTHHmmss",
                       );
                       String semester = classTableState.semesterCode;
-                      File file = File("$result/classtable-$now-$semester.ics");
-                      developer.log("File exists? ${file.existsSync()}");
-                      if (!(await file.exists())) {
-                        file = await file.create();
-                      }
 
-                      file = await file.writeAsString(
+                      Share.share(
                         classTableState.iCalenderStr,
+                        subject: 'classtable-$now-$semester.ics',
                       );
-                      developer.log(
-                          "$file ${file.lengthSync()} ${classTableState.iCalenderStr.length}");
                       Fluttertoast.showToast(msg: "应该保存成功");
-                      */
                     } on FileSystemException {
                       Fluttertoast.showToast(msg: "文件创建失败，保存取消");
                     }
