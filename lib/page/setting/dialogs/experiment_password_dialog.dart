@@ -70,7 +70,7 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
         TextButton(
           child: const Text('取消'),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop<bool>(context, false);
           },
         ),
         TextButton(
@@ -81,7 +81,7 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
                 user_perference.Preference.experimentPassword,
                 _experimentPasswordController.text,
               );
-              Navigator.of(context).pop();
+              Navigator.of(context).pop<bool>(true);
             } else {
               Fluttertoast.showToast(msg: "输入空白!");
             }

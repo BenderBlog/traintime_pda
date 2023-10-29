@@ -62,24 +62,27 @@ class BorrowListWindow extends StatelessWidget {
             ),
           ),
         ),
-        ListView(
-          children: [
-            LayoutGrid(
-              columnSizes: repeat(
-                crossItems,
-                [auto],
+        if (c.borrowList.isNotEmpty)
+          ListView(
+            children: [
+              LayoutGrid(
+                columnSizes: repeat(
+                  crossItems,
+                  [auto],
+                ),
+                rowSizes: repeat(
+                  rowItem(c.borrowList.length),
+                  [auto],
+                ),
+                children: List<Widget>.generate(
+                  c.borrowList.length,
+                  (index) => BorrowInfoCard(toUse: c.borrowList[index]),
+                ),
               ),
-              rowSizes: repeat(
-                rowItem(c.borrowList.length),
-                [auto],
-              ),
-              children: List<Widget>.generate(
-                c.borrowList.length,
-                (index) => BorrowInfoCard(toUse: c.borrowList[index]),
-              ),
-            ),
-          ],
-        ).expanded(),
+            ],
+          ).expanded()
+        else
+          const Text("你一本书都没有借").center().expanded(),
       ],
     );
   }

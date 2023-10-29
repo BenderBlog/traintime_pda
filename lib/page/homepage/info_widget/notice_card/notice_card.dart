@@ -37,7 +37,12 @@ class NoticeCard extends StatelessWidget {
                   children: [
                     TagsBoxes(text: messages[index].type),
                     const SizedBox(width: 8),
-                    Text(messages[index].title),
+                    Text(
+                      messages[index].title,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                   ],
                 ),
               )
