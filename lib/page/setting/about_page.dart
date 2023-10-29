@@ -8,7 +8,7 @@ import 'dart:io' show Platform;
 
 class AboutPage extends StatelessWidget {
   final String license = '''
-        <h1 style="text-align: center">Happy 1024 Programmer Day!</h1>
+        <p style="text-align: center">This version is programmed temporarily by others mentioned in the bottom, 'cause Bender lost his floppy disk. </p>
         <h1 style="text-align: center">${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} 软件最终用户许可协议</h1>
         <p style="text-align: center"><i>BenderBlog Rodriguez and contributors, 2023-08-10</i></p>
 
@@ -50,6 +50,7 @@ class AboutPage extends StatelessWidget {
             请参阅：<a href="https://github.com/BenderBlog/traintime_pda/">https://github.com/BenderBlog/traintime_pda/</a>
         <h2>附件二： 本程序服务声明</h2>
             本软件所涉及的服务中，除 XDU Planet 是授权者以服务器-客户端单向信息传递方式提供外，其他服务均与授权者无关。   
+        <p style="text-align: center">Smiley to khailiji~</p>
 ''';
 
   AboutPage({super.key});
