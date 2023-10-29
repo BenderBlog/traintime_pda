@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/page/classtable/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -15,7 +14,6 @@ import 'package:watermeter/page/classtable/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/week_choice_button.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'dart:developer' as developer;
 import 'package:share_plus/share_plus.dart';
 
 class ClassTablePage extends StatefulWidget {
@@ -195,11 +193,18 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         pattern: "yyyyMMddTHHmmss",
                       );
                       String semester = classTableState.semesterCode;
-
-                      Share.share(
-                        classTableState.iCalenderStr,
-                        subject: 'classtable-$now-$semester.ics',
+                      String tempPath = await getTemporaryDirectory()
+                          .then((value) => value.path);
+                      File file = File(
+                        "$tempPath/classtable-$now-$semester.ics",
                       );
+                      if (!(await file.exists())) {
+                        await file.create();
+                      }
+                      await file.writeAsString(classTableState.iCalenderStr);
+                      await Share.shareXFiles(
+                          [XFile("$tempPath/classtable-$now-$semester.ics")]);
+                      await file.delete();
                       Fluttertoast.showToast(msg: "应该保存成功");
                     } on FileSystemException {
                       Fluttertoast.showToast(msg: "文件创建失败，保存取消");
