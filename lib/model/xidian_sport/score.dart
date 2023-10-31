@@ -22,6 +22,7 @@ class SportScoreOfYear {
   String totalScore;
   String rank;
   String gradeType;
+  String moreinfo = "";
   List<SportItems> details = [];
 
   SportScoreOfYear({

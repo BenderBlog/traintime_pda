@@ -123,14 +123,22 @@ class SportSession {
             subWebsite: "measure/getStuScoreDetail",
             body: {"meaScoreId": i["meaScoreId"]},
           );
-          for (var i in anotherResponse["data"]) {
-            toAdd.details.add(SportItems(
-                examName: i["examName"],
-                examunit: i["examunit"],
-                actualScore: i["actualScore"] ?? "0",
-                score: i["score"] ?? 0.0,
-                rank: i["rank"] ?? "不及格"));
+          if (anotherResponse["returnCode"] != "201") {
+            toAdd.moreinfo += anotherResponse["returnMsg"].toString();
+          } else {
+            for (var i in anotherResponse["data"]) {
+              toAdd.details.add(
+                SportItems(
+                  examName: i["examName"],
+                  examunit: i["examunit"],
+                  actualScore: i["actualScore"] ?? "0",
+                  score: i["score"] ?? 0.0,
+                  rank: i["rank"] ?? "不及格",
+                ),
+              );
+            }
           }
+
           toReturn.list.add(toAdd);
         }
       }
