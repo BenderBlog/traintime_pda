@@ -154,60 +154,65 @@ class ScoreCard extends StatelessWidget {
               ),
             ),
             const Divider(height: 15),
-            DecoratedBox(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.25),
-                    1: FlexColumnWidth(0.75),
-                    2: FlexColumnWidth(0.75),
-                    3: FlexColumnWidth(1),
-                  },
-                  children: [
-                    for (var i in toUse.details)
-                      TableRow(
-                        children: [
-                          Text(
-                            i.examName,
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            i.actualScore,
-                            style: const TextStyle(fontFeatures: [
-                              FontFeature.tabularFigures(),
-                            ]),
-                            textAlign: TextAlign.end,
-                          ),
-                          Text(
-                            " ${unitToShow(i.examunit)}",
-                            textAlign: TextAlign.start,
-                          ),
-                          Text(
-                            "${i.score} 分",
-                            style: const TextStyle(fontFeatures: [
-                              FontFeature.tabularFigures(),
-                            ]),
-                            textAlign: TextAlign.end,
-                          ),
-                          Text(
-                            i.rank,
-                            style: TextStyle(
-                              color: i.rank.contains("不")
-                                  ? Colors.red
-                                  : Colors.green,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                  ],
+            if (toUse.details.isNotEmpty)
+              DecoratedBox(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-              ),
-            ),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: Table(
+                    columnWidths: const {
+                      0: FlexColumnWidth(1.25),
+                      1: FlexColumnWidth(0.75),
+                      2: FlexColumnWidth(0.75),
+                      //3: FlexColumnWidth(1),
+                    },
+                    children: [
+                      for (var i in toUse.details)
+                        TableRow(
+                          children: [
+                            Text(
+                              i.examName,
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              i.actualScore,
+                              style: const TextStyle(fontFeatures: [
+                                FontFeature.tabularFigures(),
+                              ]),
+                              textAlign: TextAlign.end,
+                            ),
+                            Text(
+                              " ${unitToShow(i.examunit)}",
+                              textAlign: TextAlign.start,
+                            ),
+                            Text(
+                              "${i.score} 分",
+                              style: const TextStyle(fontFeatures: [
+                                FontFeature.tabularFigures(),
+                              ]),
+                              textAlign: TextAlign.end,
+                            ),
+                            /*
+                            Text(
+                              i.rank,
+                              style: TextStyle(
+                                color: i.rank.contains("不")
+                                    ? Colors.red
+                                    : Colors.green,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            */
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Center(child: Text(toUse.moreinfo)),
           ],
         ),
       ),

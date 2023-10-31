@@ -123,7 +123,7 @@ class SportSession {
             subWebsite: "measure/getStuScoreDetail",
             body: {"meaScoreId": i["meaScoreId"]},
           );
-          if (anotherResponse["returnCode"] != "201") {
+          if (anotherResponse["returnCode"] != "200") {
             toAdd.moreinfo += anotherResponse["returnMsg"].toString();
           } else {
             for (var i in anotherResponse["data"]) {
