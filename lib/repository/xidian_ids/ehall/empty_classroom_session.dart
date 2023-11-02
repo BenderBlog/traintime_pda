@@ -83,7 +83,7 @@ class EmptyClassroomSession extends EhallSession {
     required String semesterPart,
     required String searchParameter,
   }) async {
-    String dateData = await dio.post(
+    (String, String) dateData = await dio.post(
       "$baseUrl/rqzhzcjc.do",
       data: {
         "RQ": date,
@@ -91,15 +91,18 @@ class EmptyClassroomSession extends EhallSession {
         "XQ": semesterPart,
       },
     ).then(
-      (value) => value.data["datas"]["rqzhzcjc"]["ZC"].toString(),
+      (value) => (
+        value.data["datas"]["rqzhzcjc"]["ZC"].toString(),
+        value.data["datas"]["rqzhzcjc"]["XQJ"].toString()
+      ),
     );
 
     List<EmptyClassroomData> toReturn = [];
 
     await dio.post("$baseUrl/cxjsqk.do", data: {
       "XNXQDM": "$semesterRange-$semesterPart",
-      "ZC": dateData,
-      "XQ": semesterPart,
+      "ZC": dateData.$1,
+      "XQ": dateData.$2,
       "querySetting": jsonEncode([
         buildingSetting(buildingCode),
         if (searchParameter.isNotEmpty) classroomSetting(searchParameter),
