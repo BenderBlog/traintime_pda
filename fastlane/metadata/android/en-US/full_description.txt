@@ -8,6 +8,7 @@
  - View the due time of the borrowed books and query the books in the library.
  - View the bill you spent in the cafeteria.
  - Empty classroom check.
+ - Physics experiment schedule check and output to iCalendar.
  - Other tools such as call for repairing, school email, etc.
  - Shuangchuang (Innovation and Entrepreneurship) project query.
  - XDU Planet: Look around the blogs of your schoolmates.
