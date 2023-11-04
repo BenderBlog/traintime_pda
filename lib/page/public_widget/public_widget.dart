@@ -10,10 +10,6 @@ bool isPhone(context) => MediaQuery.of(context).size.width < 480;
 bool isDesktop(context) => MediaQuery.of(context).size.width > 840;
 const double sheetMaxWidth = 600;
 
-/// Something related to the box.
-const double widthOfSquare = 30.0;
-const double roundRadius = 10;
-
 /// Use it to show the small items.
 class TagsBoxes extends StatelessWidget {
   final String text;

@@ -9,11 +9,8 @@ class AppIconWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (Platform.isIOS || Platform.isMacOS)
-          ClipRRect(
+    return (Platform.isIOS || Platform.isMacOS)
+        ? ClipRRect(
             borderRadius: const BorderRadius.all(
               Radius.circular(29),
             ),
@@ -23,20 +20,10 @@ class AppIconWidget extends StatelessWidget {
               height: 120,
             ),
           )
-        else
-          Image.asset(
+        : Image.asset(
             "assets/icon.png",
             width: 120,
             height: 120,
-          ),
-        const SizedBox(height: 16.0),
-        Text(
-            '请登录 ${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"}',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 26,
-            )),
-      ],
-    );
+          );
   }
 }
