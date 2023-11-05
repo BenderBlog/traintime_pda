@@ -19,6 +19,7 @@ class PunchData {
 }
 
 class PunchDataList {
+  RxBool isLoad = true.obs;
   RxString situation = "".obs;
   RxInt allTime = (-1).obs;
   RxInt validTime = (-1).obs;
@@ -27,6 +28,7 @@ class PunchDataList {
   RxList<PunchData> valid = <PunchData>[].obs;
 
   void reset() {
+    isLoad.value = true;
     situation = "正在获取".obs;
     allTime = (-1).obs;
     validTime = (-1).obs;

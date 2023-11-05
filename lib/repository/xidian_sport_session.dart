@@ -38,6 +38,8 @@ class SportSession {
       punchData.value.score.value = getStore["data"][0]["score"];
       //String termId = await getTermID();
 
+      developer.log("准备获取打卡信息", name: "SportSession");
+
       await require(
         subWebsite: "stuPunchRecord/findPager",
         body: {
@@ -57,6 +59,8 @@ class SportSession {
         punchData.value.all.sort((a, b) => a.time.diff(b.time).toInt());
         punchData.value.allTime.value = punchData.value.all.length;
       });
+
+      developer.log("准备获取打卡成功信息", name: "SportSession");
 
       await require(
         subWebsite: "stuPunchRecord/findPagerOk",
@@ -93,6 +97,8 @@ class SportSession {
     } catch (e) {
       developer.log("未知故障：$e", name: "GetPunchSession");
       punchData.value.situation.value = "未知故障";
+    } finally {
+      punchData.value.isLoad.value = false;
     }
   }
 
@@ -112,7 +118,6 @@ class SportSession {
         if (i.keys.contains("graduationStatus")) {
           toReturn.total = i["totalScore"];
           toReturn.detail = i["gradeType"];
-          toReturn.rank = i["rank"];
         } else {
           SportScoreOfYear toAdd = SportScoreOfYear(
             year: i["year"],
