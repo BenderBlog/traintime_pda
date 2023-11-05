@@ -112,6 +112,7 @@ class SportSession {
         if (i.keys.contains("graduationStatus")) {
           toReturn.total = i["totalScore"];
           toReturn.detail = i["gradeType"];
+          toReturn.rank = i["rank"];
         } else {
           SportScoreOfYear toAdd = SportScoreOfYear(
             year: i["year"],

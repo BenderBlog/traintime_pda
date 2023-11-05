@@ -181,7 +181,7 @@ class RecordCard extends StatelessWidget {
       elevation: 0,
       color: Theme.of(context).colorScheme.secondary,
       child: Container(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(14),
         child: Wrap(
           alignment: WrapAlignment.spaceBetween,
           children: [

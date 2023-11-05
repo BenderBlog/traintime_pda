@@ -36,6 +36,7 @@ class SportScoreOfYear {
 class SportScore {
   String? situation;
   String total = "0.0";
+  String rank = "";
   String detail = "";
   List<SportScoreOfYear> list = [];
 }
