@@ -28,23 +28,19 @@ class ElectricityCard extends StatelessWidget {
           builder: (context) => SimpleDialog(
             title: const Text("水电信息"),
             children: [
-              SimpleDialogOption(
-                child: Obx(
-                  () => Text(
-                    "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
-                    "电量信息：${electricity_session.electricityInfo.value}"
-                    "${electricity_session.electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
-                    "欠费信息：${owe_session.owe.value}\n"
-                    "长按可以重新加载，有欠费一般代表水费",
-                  ),
+              Obx(
+                () => Text(
+                  "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
+                  "电量信息：${electricity_session.electricityInfo.value}"
+                  "${electricity_session.electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
+                  "欠费信息：${owe_session.owe.value}\n"
+                  "长按可以重新加载，有欠费一般代表水费",
                 ),
-              ),
-              SimpleDialogOption(
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("确定"),
-                ),
-              ),
+              ).paddingSymmetric(horizontal: 24),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("确定"),
+              ).paddingSymmetric(horizontal: 24),
             ],
           ),
         );

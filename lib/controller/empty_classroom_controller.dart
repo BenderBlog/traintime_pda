@@ -8,12 +8,12 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ehall/empty_classroom_session.dart';
 
 class EmptyClassroomController extends GetxController {
-  late List<EmptyClassroomPlace> places;
+  List<EmptyClassroomPlace> places = [];
   EmptyClassroomSession session = EmptyClassroomSession();
   String semesterCode =
       preference.getString(preference.Preference.currentSemester);
 
-  RxBool isLoad = false.obs;
+  RxBool isLoad = true.obs;
   RxBool isError = false.obs;
   RxList<EmptyClassroomData> data = <EmptyClassroomData>[].obs;
 
@@ -23,8 +23,7 @@ class EmptyClassroomController extends GetxController {
 
   @override
   void onReady() async {
-    super.onReady();
-    places = await session.getBuildingList();
+    places.addAll(await session.getBuildingList());
     chosen = places.first.obs;
     updateData();
 
@@ -36,6 +35,7 @@ class EmptyClassroomController extends GetxController {
     ever(time, (value) {
       updateData();
     });
+    super.onReady();
   }
 
   void updateData() async {

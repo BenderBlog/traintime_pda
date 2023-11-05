@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/empty_classroom_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
@@ -23,7 +22,6 @@ class MainPage extends StatelessWidget {
     Get.put(ExamController());
     Get.put(LibraryController());
     Get.put(SchoolCardController());
-    Get.put(EmptyClassroomController());
     return isPhone(context) ? const PhoneMainPage() : const PadMainPage();
   }
 }

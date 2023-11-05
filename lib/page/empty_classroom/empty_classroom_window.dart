@@ -19,7 +19,19 @@ class EmptyClassroomWindow extends StatefulWidget {
 
 class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   final TextEditingController text = TextEditingController();
-  EmptyClassroomController c = Get.find<EmptyClassroomController>();
+  late EmptyClassroomController c;
+
+  @override
+  void initState() {
+    c = Get.put(EmptyClassroomController());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    Get.delete<EmptyClassroomController>();
+    super.dispose();
+  }
 
   Widget getIcon(bool isTransparent) => Center(
         child: Icon(
@@ -60,164 +72,166 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   Widget build(BuildContext context) {
     text.text = c.searchParameter.value;
     var colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("空闲教室"),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100.0),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: colorScheme.secondaryContainer,
-                      ),
-                      onPressed: () async {
-                        await showCalendarDatePicker2Dialog(
-                          context: context,
-                          config: CalendarDatePicker2WithActionButtonsConfig(
-                            calendarType: CalendarDatePicker2Type.single,
-                            selectedDayHighlightColor: colorScheme.primary,
-                          ),
-                          dialogSize: const Size(325, 400),
-                          value: [c.time.value],
-                          borderRadius: BorderRadius.circular(15),
-                        ).then((value) {
-                          if (value?.length == 1 && value?[0] != null) {
-                            setState(() {
-                              c.time.value = value![0]!;
-                            });
-                          }
-                        });
-                      },
-                      child: Text(
-                        "日期 ${Jiffy.parseFromDateTime(c.time.value).format(pattern: "yyyy-MM-dd")}",
-                      ),
-                    ),
-                    const VerticalDivider(
-                      color: Colors.transparent,
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: colorScheme.secondaryContainer,
-                      ),
-                      onPressed: () => chooseBuilding(),
-                      child: Text(
-                        "教学楼 ${c.chosen.value.name}",
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                  ),
-                  child: TextField(
-                    controller: text,
-                    autofocus: false,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      fillColor: Colors.grey.withOpacity(0.2),
-                      filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      hintText: "教室名称或者教室代码",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onSubmitted: (String text) {
-                      c.searchParameter.value = text;
-                      c.updateData();
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      body: Obx(
-        () {
-          if (c.isLoad.value) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (c.isError.value) {
-            return ReloadWidget(
-              function: () => c.updateData(),
-            );
-          } else {
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
-                child: DataTable2(
-                  columnSpacing: 0,
-                  horizontalMargin: 6,
-                  columns: const [
-                    DataColumn2(
-                      label: Center(child: Text('教室')),
-                      size: ColumnSize.L,
-                    ),
-                    DataColumn2(
-                      label: Center(child: Text('1-2节')),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn2(
-                      label: Center(child: Text('3-4节')),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn2(
-                      label: Center(child: Text('5-6节')),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn2(
-                      label: Center(child: Text('7-8节')),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn2(
-                      label: Center(child: Text('9-10节')),
-                      size: ColumnSize.S,
-                    ),
-                  ],
-                  rows: List<DataRow>.generate(
-                    c.data.length,
-                    (index) => DataRow(
-                      cells: [
-                        DataCell(
-                          Center(
-                            child: Text(
-                              c.data[index].name,
-                              textAlign: TextAlign.center,
+    return Obx(
+      () => Scaffold(
+        appBar: AppBar(
+          title: const Text("空闲教室"),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(c.places.isNotEmpty ? 100.0 : 0),
+            child: c.places.isNotEmpty
+                ? Container(
+                    constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: colorScheme.secondaryContainer,
+                              ),
+                              onPressed: () async {
+                                await showCalendarDatePicker2Dialog(
+                                  context: context,
+                                  config:
+                                      CalendarDatePicker2WithActionButtonsConfig(
+                                    calendarType:
+                                        CalendarDatePicker2Type.single,
+                                    selectedDayHighlightColor:
+                                        colorScheme.primary,
+                                  ),
+                                  dialogSize: const Size(325, 400),
+                                  value: [c.time.value],
+                                  borderRadius: BorderRadius.circular(15),
+                                ).then((value) {
+                                  if (value?.length == 1 && value?[0] != null) {
+                                    setState(() {
+                                      c.time.value = value![0]!;
+                                    });
+                                  }
+                                });
+                              },
+                              child: Text(
+                                "日期 ${Jiffy.parseFromDateTime(c.time.value).format(pattern: "yyyy-MM-dd")}",
+                              ),
                             ),
+                            const VerticalDivider(
+                              color: Colors.transparent,
+                            ),
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: colorScheme.secondaryContainer,
+                              ),
+                              onPressed: () => chooseBuilding(),
+                              child: Text(
+                                "教学楼 ${c.chosen.value.name}",
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
                           ),
-                        ),
-                        DataCell(
-                          getIcon(c.data[index].isEmpty1To2),
-                        ),
-                        DataCell(
-                          getIcon(c.data[index].isEmpty3To4),
-                        ),
-                        DataCell(
-                          getIcon(c.data[index].isEmpty5To6),
-                        ),
-                        DataCell(
-                          getIcon(c.data[index].isEmpty7To8),
-                        ),
-                        DataCell(
-                          getIcon(c.data[index].isEmpty9To10),
+                          child: TextField(
+                            controller: text,
+                            autofocus: false,
+                            decoration: InputDecoration(
+                              isDense: true,
+                              fillColor: Colors.grey.withOpacity(0.2),
+                              filled: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              hintText: "教室名称或者教室代码",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            onSubmitted: (String text) {
+                              c.searchParameter.value = text;
+                              c.updateData();
+                            },
+                          ),
                         ),
                       ],
                     ),
+                  )
+                : Container(),
+          ),
+        ),
+        body: c.isLoad.value
+            ? const Center(child: CircularProgressIndicator())
+            : c.isError.value
+                ? ReloadWidget(
+                    function: () => c.updateData(),
+                  )
+                : Center(
+                    child: ConstrainedBox(
+                      constraints:
+                          const BoxConstraints(maxWidth: sheetMaxWidth),
+                      child: DataTable2(
+                        columnSpacing: 0,
+                        horizontalMargin: 6,
+                        columns: const [
+                          DataColumn2(
+                            label: Center(child: Text('教室')),
+                            size: ColumnSize.L,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('1-2节')),
+                            size: ColumnSize.S,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('3-4节')),
+                            size: ColumnSize.S,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('5-6节')),
+                            size: ColumnSize.S,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('7-8节')),
+                            size: ColumnSize.S,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('9-10节')),
+                            size: ColumnSize.S,
+                          ),
+                        ],
+                        rows: List<DataRow>.generate(
+                          c.data.length,
+                          (index) => DataRow(
+                            cells: [
+                              DataCell(
+                                Center(
+                                  child: Text(
+                                    c.data[index].name,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                getIcon(c.data[index].isEmpty1To2),
+                              ),
+                              DataCell(
+                                getIcon(c.data[index].isEmpty3To4),
+                              ),
+                              DataCell(
+                                getIcon(c.data[index].isEmpty5To6),
+                              ),
+                              DataCell(
+                                getIcon(c.data[index].isEmpty7To8),
+                              ),
+                              DataCell(
+                                getIcon(c.data[index].isEmpty9To10),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          }
-        },
       ),
     );
   }
