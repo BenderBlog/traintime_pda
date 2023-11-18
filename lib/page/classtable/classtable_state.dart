@@ -2,49 +2,60 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 /// The controllers and shared datas of the class table.
 class ClassTableState extends InheritedWidget {
+  final ClassTableController classTableController = Get.find();
+
   /// The length of the semester, the amount of the class table.
-  final int semesterLength;
+  int get semesterLength => classTableController.classTableData.semesterLength;
 
   /// The semester code.
-  final String semesterCode;
+  String get semesterCode => classTableController.classTableData.semesterCode;
 
   /// The offset append to start day of the week.
-  late final int offset;
+  final int offset = preference.getInt(preference.Preference.swift);
 
   /// The class details.
-  final List<ClassDetail> classDetail;
+  List<ClassDetail> get classDetail =>
+      classTableController.classTableData.classDetail;
 
   /// The classes without time arrangements.
-  final List<NotArrangementClassDetail> notArranged;
+  List<NotArrangementClassDetail> get notArranged =>
+      classTableController.classTableData.notArranged;
 
   /// The time arrangements of the class details, use with [classDetail].
-  final List<TimeArrangement> timeArrangement;
+  List<TimeArrangement> get timeArrangement =>
+      classTableController.classTableData.timeArrangement;
 
   // The class change data.
-  final List<ClassChange> classChange;
+  List<ClassChange> get classChange =>
+      classTableController.classTableData.classChanges;
 
   /// Multiplex array which means List[week][day][classindex][classes]
   ///   * week: The week index of the week.
   ///   * day: days in the week
   ///   * classindex: indicate the range of the time when we attending class, normally 0-9
   ///   * classes: the classes in this time, maybe conflicts occurs.
-  final List<List<List<List<int>>>> pretendLayout;
+  List<List<List<List<int>>>> get pretendLayout =>
+      classTableController.pretendLayout;
 
   /// The day the semester start, used to calculate the first day of the week.
-  final DateTime startDay;
+  DateTime get startDay =>
+      Jiffy.parse(classTableController.classTableData.termStartDay).dateTime;
 
   /// The currentWeek.
-  final int currentWeek;
+  int get currentWeek => classTableController.currentWeek;
 
   /// The changeable data of the state.
   late final ClassTableWidgetState controllers;
 
-  /// Generate icalendar file string. Currently testing.
+  /// Generate icalendar file string.
   String get iCalenderStr {
     String toReturn = "BEGIN:VCALENDAR\n";
     for (var i in timeArrangement) {
@@ -74,19 +85,8 @@ class ClassTableState extends InheritedWidget {
   ClassTableState({
     super.key,
     required super.child,
-    required this.semesterLength,
-    required this.startDay,
-    required this.notArranged,
-    required this.timeArrangement,
-    required this.classDetail,
-    required this.pretendLayout,
-    required this.currentWeek,
-    required this.semesterCode,
-    required this.classChange,
     required BuildContext context,
-    int? offset,
   }) {
-    this.offset = offset ?? 0;
     late int toShowChoiceWeek;
     if (currentWeek < 0) {
       toShowChoiceWeek = 0;
