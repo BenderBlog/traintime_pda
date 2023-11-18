@@ -15,6 +15,9 @@ class ClassTableController extends GetxController {
   // Classtable Data
   ClassTableData classTableData = ClassTableData();
 
+  // TODO: Add experiment and exam info here.
+  // TODO: Add user-add classes.
+
   // The start day of the semester.
   var startDay = DateTime.parse("2022-01-22");
 
