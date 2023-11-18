@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -159,6 +160,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 ),
                 const PopupMenuItem<String>(
                   value: 'C',
+                  child: Text("添加课程信息"),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'D',
                   child: Text("生成日历文件"),
                 ),
               ],
@@ -188,6 +193,15 @@ class _ClassTablePageState extends State<ClassTablePage> {
                     );
                     break;
                   case 'C':
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return const ClassAddWindow();
+                        },
+                      ),
+                    );
+                    break;
+                  case 'D':
                     try {
                       String now = Jiffy.now().format(
                         pattern: "yyyyMMddTHHmmss",
@@ -209,7 +223,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
                     } on FileSystemException {
                       Fluttertoast.showToast(msg: "文件创建失败，保存取消");
                     }
-
                     break;
                 }
               },
