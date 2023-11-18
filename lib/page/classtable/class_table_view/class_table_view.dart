@@ -3,6 +3,7 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -79,13 +80,30 @@ class _ClassTableViewState extends State<ClassTableView> {
           width: leftRow,
           height: classTableContentHeight(1),
           child: Center(
-            child: AutoSizeText(
-              "${index + 1}",
+            child: AutoSizeText.rich(
+              TextSpan(children: [
+                TextSpan(
+                  text: "${index + 1}\n",
+                  style: const TextStyle(fontSize: 14),
+                ),
+                TextSpan(
+                  text: "${time[index * 2]}\n",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                TextSpan(
+                  text: time[index * 2 + 1],
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ]),
               group: AutoSizeGroup(),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.black,
-              ),
+              minFontSize: 6,
             ),
           ),
         ),
