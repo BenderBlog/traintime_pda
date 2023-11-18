@@ -126,6 +126,7 @@ class ClassDetailDialog extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: GridView.extent(
+                  physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   mainAxisSpacing: 4,
                   crossAxisSpacing: 4,
