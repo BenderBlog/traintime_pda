@@ -196,7 +196,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context) {
-                          return const ClassAddWindow();
+                          return ClassAddWindow();
                         },
                       ),
                     );

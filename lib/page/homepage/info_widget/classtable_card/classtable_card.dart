@@ -23,7 +23,7 @@ class ClassTableCard extends StatelessWidget {
             if (c.isGet == true) {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ClassTableWindow(),
+                  builder: (context) => const ClassTableWindow(),
                 ),
               );
             } else {
