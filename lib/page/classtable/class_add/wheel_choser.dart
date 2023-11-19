@@ -23,7 +23,7 @@ class PageChoose<T> extends StatelessWidget {
 
   final PageController pagecontroller = PageController(
     viewportFraction: 1 / 3,
-    initialPage: 1,
+    initialPage: 0,
   );
 
   PageChoose({
