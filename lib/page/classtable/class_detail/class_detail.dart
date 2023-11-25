@@ -6,14 +6,16 @@ import 'package:watermeter/model/xidian_ids/classtable.dart' as model;
 import 'package:watermeter/page/classtable/class_detail/class_detail_list.dart';
 import 'package:watermeter/page/classtable/class_detail/class_detail_state.dart';
 
-/// The class info popup of the period. This is an entry.
-class ClassDetailPopUp extends StatelessWidget {
+/// The class info of the period. This is an entry.
+class ClassDetail extends StatelessWidget {
   final int currentWeek;
-  final List<(model.ClassDetail, model.TimeArrangement)> information;
-  const ClassDetailPopUp({
+  final List<model.TimeArrangement> information;
+  final List<model.ClassDetail> classDetail;
+  const ClassDetail({
     super.key,
     required this.currentWeek,
     required this.information,
+    required this.classDetail,
   });
 
   @override
@@ -21,6 +23,7 @@ class ClassDetailPopUp extends StatelessWidget {
     return ClassDetailState(
       currentWeek: currentWeek,
       information: information,
+      classDetail: classDetail,
       child: const ClassDetailList(),
     );
   }

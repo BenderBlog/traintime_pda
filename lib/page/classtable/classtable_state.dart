@@ -42,7 +42,7 @@ class ClassTableState extends InheritedWidget {
   ///   * day: days in the week
   ///   * classindex: indicate the range of the time when we attending class, normally 0-9
   ///   * classes: the classes in this time, maybe conflicts occurs.
-  List<List<List<List<(Source, int)>>>> get pretendLayout =>
+  List<List<List<List<int>>>> get pretendLayout =>
       classTableController.pretendLayout;
 
   /// The day the semester start, used to calculate the first day of the week.

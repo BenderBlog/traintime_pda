@@ -3,7 +3,6 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
@@ -41,12 +40,12 @@ class _ClassTableViewState extends State<ClassTableView> {
       /// Choice the day and render it!
       for (int i = 0; i < 10; ++i) {
         /// Places in the onTable array.
-        (Source, int) places =
+        int places =
             classTableState.pretendLayout[widget.index][index - 1][i].first;
 
         /// The length to render.
         int count = 1;
-        Set<(Source, int)> conflict =
+        Set<int> conflict =
             classTableState.pretendLayout[widget.index][index - 1][i].toSet();
 
         /// Decide the length to render. i limit the end.
@@ -62,7 +61,7 @@ class _ClassTableViewState extends State<ClassTableView> {
         }
 
         /// Do not include empty spaces...
-        conflict.remove((Source.empty, -1));
+        conflict.remove(-1);
 
         /// Generate the row.
         thisRow.add(ClassCard(
