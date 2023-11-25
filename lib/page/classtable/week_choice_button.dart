@@ -3,6 +3,7 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -79,7 +80,9 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
                         dot(
                           isOccupied: !classTableState.pretendLayout[index][day]
                                   [i]
-                              .contains(-1),
+                              .contains(
+                            (Source.empty, -1),
+                          ),
                         )
                   ],
                 ),

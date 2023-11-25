@@ -7,14 +7,12 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 /// This is the shared data in the [ClassDetail].
 class ClassDetailState extends InheritedWidget {
   final int currentWeek;
-  final List<TimeArrangement> information;
-  final List<ClassDetail> classDetail;
+  final List<(ClassDetail, TimeArrangement)> information;
 
   const ClassDetailState({
     super.key,
     required this.currentWeek,
     required this.information,
-    required this.classDetail,
     required super.child,
   });
 

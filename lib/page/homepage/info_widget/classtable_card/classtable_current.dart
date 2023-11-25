@@ -11,19 +11,20 @@ class ClasstableCurrentColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ClassTableController>(
-      builder: (c) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-              child: Align(
+    ClassTableController c = Get.find();
+    print(c.currentData);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
               c.isGet == true
-                  ? c.currentData.$1 == null
+                  ? c.currentData.$1.isEmpty
                       ? "目前没课"
-                      : c.currentData.$1!.name //"毛泽东思想和中国特色社会主义理论体系概论"
+                      : c.currentData.$1.first.$1.name //"毛泽东思想和中国特色社会主义理论体系概论"
                   : c.error == null
                       ? "正在加载"
                       : "遇到错误",
@@ -33,84 +34,82 @@ class ClasstableCurrentColumn extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
-          )),
-          const SizedBox(height: 8.0),
-          c.isGet == true
-              ? c.currentData.$1 == null
-                  ? Text(
-                      "请享受空闲时光",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        c.isGet == true
+            ? c.currentData.$1.isEmpty
+                ? Text(
+                    "请享受空闲时光",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  )
+                : Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            c.currentData.$1.first.$2.teacher ?? "老师未知",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                  : Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.person,
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.room,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            c.currentData.$1.first.$2.classroom ?? "地点未定",
+                            style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
-                              size: 18,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              c.currentData.$2!.teacher == null
-                                  ? "老师未知"
-                                  : c.currentData.$2!.teacher!,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.room,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_filled_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            "${time[(c.currentData.$1.first.$2.start - 1) * 2]}-"
+                            "${time[(c.currentData.$1.first.$2.stop - 1) * 2 + 1]}",
+                            style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
-                              size: 18,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              c.currentData.$2!.classroom ?? "地点未定",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time_filled_outlined,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              "${time[(c.currentData.$2!.start - 1) * 2]}-"
-                              "${time[(c.currentData.$2!.stop - 1) * 2 + 1]}",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-              : Text(
-                  c.error == null ? "请耐心等待片刻" : "课表获取失败",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+            : Text(
+                c.error == null ? "请耐心等待片刻" : "课表获取失败",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-        ],
-      ),
+              ),
+      ],
     );
   }
 }

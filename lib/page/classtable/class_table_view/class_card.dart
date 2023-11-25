@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/classtable/class_detail/class_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -9,8 +10,8 @@ import 'package:watermeter/themes/color_seed.dart';
 
 /// The card in [classSubRow], metioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
-  final int index;
-  final Set<int> conflict;
+  final (Source, int) index;
+  final Set<(Source, int)> conflict;
   final double height;
   const ClassCard({
     super.key,
@@ -23,7 +24,8 @@ class ClassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     ClassTableState classTableState = ClassTableState.of(context)!;
 
-    Widget inside = index == -1
+    // (ClassDetail,TimeArrangement)
+    Widget inside = index.$1 == Source.empty
         ?
 
         /// A empty card used to occupy the place which have no class.
@@ -55,13 +57,12 @@ class ClassCard extends StatelessWidget {
             ),
             onPressed: () {
               /// The way to show the class info of the period.
-              Widget toShow = ClassDetail(
-                classDetail:
-                    List.from(ClassTableState.of(context)!.classDetail),
+              Widget toShow = ClassDetailPopUp(
                 information: List.generate(
                   conflict.length,
-                  (index) => ClassTableState.of(context)!
-                      .timeArrangement[conflict.elementAt(index)],
+                  (i) => classTableState.classTableController.fetchClassData(
+                    conflict.elementAt(i),
+                  ),
                 ),
                 currentWeek: ClassTableState.of(context)!.currentWeek,
               );
@@ -75,15 +76,17 @@ class ClassCard extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: Center(
                 child: Text(
-                  "${classTableState.classDetail[classTableState.timeArrangement[index].index].name}\n"
-                  "${classTableState.timeArrangement[index].classroom ?? "未知教室"}",
+                  "${classTableState.classTableController.fetchClassData(index).$1.name}\n"
+                  "${classTableState.classTableController.fetchClassData(index).$2.classroom ?? "未知教室"}",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: index != -1
-                        ? colorList[
-                                classTableState.timeArrangement[index].index %
-                                    colorList.length]
+                    color: index.$1 != Source.empty
+                        ? colorList[classTableState.classTableController
+                                    .fetchClassData(index)
+                                    .$2
+                                    .index %
+                                colorList.length]
                             .shade900
                         : Colors.white,
                   ),
@@ -102,9 +105,12 @@ class ClassCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: Container(
             // Border
-            color: index == -1
+            color: index.$1 == Source.empty
                 ? const Color(0x00000000)
-                : colorList[classTableState.timeArrangement[index].index %
+                : colorList[classTableState.classTableController
+                            .fetchClassData(index)
+                            .$2
+                            .index %
                         colorList.length]
                     .shade300
                     .withOpacity(0.8),
@@ -115,9 +121,12 @@ class ClassCard extends StatelessWidget {
               // Inner
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                color: index == -1
+                color: index.$1 == Source.empty
                     ? const Color(0x00000000)
-                    : colorList[classTableState.timeArrangement[index].index %
+                    : colorList[classTableState.classTableController
+                                .fetchClassData(index)
+                                .$2
+                                .index %
                             colorList.length]
                         .shade100
                         .withOpacity(0.7),

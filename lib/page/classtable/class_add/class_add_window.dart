@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/wheel_choser.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
@@ -83,6 +84,28 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 chosenWeek.length,
                 (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
               )));
+              controller.userDefinedData.classDetail.add(
+                ClassDetail(name: classNameController.text),
+              );
+              controller.userDefinedData.timeArrangement.add(
+                TimeArrangement(
+                  index: controller.userDefinedData.classDetail.length - 1,
+                  teacher: teacherNameController.text.isNotEmpty
+                      ? teacherNameController.text
+                      : null,
+                  classroom: teacherNameController.text.isNotEmpty
+                      ? teacherNameController.text
+                      : null,
+                  weekList: String.fromCharCodes(List.generate(
+                    chosenWeek.length,
+                    (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
+                  )),
+                  day: week,
+                  start: start,
+                  stop: stop,
+                ),
+              );
+              controller.updateClassTable();
             },
             child: const Text("保存"),
           ),
