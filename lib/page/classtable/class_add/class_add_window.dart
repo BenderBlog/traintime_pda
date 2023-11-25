@@ -19,13 +19,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   final ClassTableController controller = Get.find();
 
   late List<bool> chosenWeek;
-  late TextEditingController classNameController;
-  late TextEditingController teacherNameController;
-  late TextEditingController classRoomController;
-
-  int week = 0;
-  int start = 0;
-  int stop = 0;
 
   final double inputFieldVerticalPadding = 4;
 
@@ -38,9 +31,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       controller.classTableData.semesterLength,
       (index) => false,
     );
-    classNameController = TextEditingController();
-    teacherNameController = TextEditingController();
-    classRoomController = TextEditingController();
   }
 
   InputDecoration get inputDecoration => InputDecoration(
@@ -74,16 +64,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         title: const Text("添加课程"),
         actions: [
           TextButton(
-            onPressed: () {
-              print(classNameController.text);
-              print(teacherNameController.text);
-              print(classRoomController.text);
-              print("$week $start $stop");
-              print(String.fromCharCodes(List.generate(
-                chosenWeek.length,
-                (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
-              )));
-            },
+            onPressed: () {},
             child: const Text("保存"),
           ),
         ],
@@ -93,7 +74,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
           Column(
             children: [
               TextField(
-                controller: classNameController,
                 decoration: inputDecoration.copyWith(
                   icon: Icon(
                     Icons.calendar_month,
@@ -103,7 +83,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 ),
               ).padding(vertical: inputFieldVerticalPadding),
               TextField(
-                controller: teacherNameController,
                 decoration: inputDecoration.copyWith(
                   icon: Icon(
                     Icons.person,
@@ -113,7 +92,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 ),
               ).padding(vertical: inputFieldVerticalPadding),
               TextField(
-                controller: classRoomController,
                 decoration: inputDecoration.copyWith(
                   icon: Icon(
                     Icons.place,
@@ -186,24 +164,20 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
               Row(
                 children: [
                   PageChoose(
-                    changeBookIdCallBack: (choiceWeek) {
-                      setState(() {
-                        week = choiceWeek;
-                      });
+                    changeBookIdCallBack: (pageNum2) {
+                      setState(() {});
                     },
                     options: List.generate(
                       weekList.length,
                       (index) => PageChooseOptions(
-                        data: index,
+                        data: weekList[index],
                         hint: weekList[index],
                       ),
                     ),
                   ).flexible(),
                   PageChoose(
-                    changeBookIdCallBack: (choiceWeek) {
-                      setState(() {
-                        start = choiceWeek;
-                      });
+                    changeBookIdCallBack: (pageNum2) {
+                      setState(() {});
                     },
                     options: List.generate(
                       10,
@@ -214,10 +188,8 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     ),
                   ).flexible(),
                   PageChoose(
-                    changeBookIdCallBack: (choiceStop) {
-                      setState(() {
-                        stop = choiceStop;
-                      });
+                    changeBookIdCallBack: (pageNum2) {
+                      setState(() {});
                     },
                     options: List.generate(
                       10,
