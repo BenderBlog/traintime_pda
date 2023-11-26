@@ -77,14 +77,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         actions: [
           TextButton(
             onPressed: () async {
-              print(classNameController.text);
-              print(teacherNameController.text);
-              print(classRoomController.text);
-              print("$week $start $stop");
-              print(String.fromCharCodes(List.generate(
-                chosenWeek.length,
-                (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
-              )));
               if (classNameController.text.isEmpty) {
                 Fluttertoast.showToast(
                   msg: "必须输入课程名",
@@ -223,7 +215,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   PageChoose(
                     changeBookIdCallBack: (choiceWeek) {
                       setState(() {
-                        print(choiceWeek + 1);
                         week = choiceWeek + 1;
                       });
                     },

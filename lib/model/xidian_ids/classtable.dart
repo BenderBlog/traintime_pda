@@ -131,13 +131,10 @@ class ClassTableData {
   /// Only allowed to be used with classDetail
   ClassDetail getClassDetail(int index) {
     TimeArrangement t = timeArrangement[index];
-    print(index);
     switch (t.source) {
       case Source.school:
-        print(classDetail[t.index].name);
         return classDetail[t.index];
       case Source.user:
-        print(userDefinedDetail[t.index].name);
         return userDefinedDetail[t.index];
       case Source.exam:
       case Source.experiment:

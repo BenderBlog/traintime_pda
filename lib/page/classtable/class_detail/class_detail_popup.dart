@@ -18,7 +18,6 @@ class ClassDetailPopUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("list: ${information[0].$1.name}");
     return ClassDetailState(
       currentWeek: currentWeek,
       information: information,

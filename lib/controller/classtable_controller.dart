@@ -176,7 +176,7 @@ class ClassTableController extends GetxController {
   }
 
   // Today or tomorrow class
-  (List<TimeArrangement>, bool) get classSet {
+  (List<int>, bool) get classSet {
     int weekday = updateTime.weekday - 1;
     int week = currentWeek;
     bool isTomorrow = false;
@@ -203,6 +203,7 @@ class ClassTableController extends GetxController {
       for (i; i < 10; ++i) {
         classes.addAll(pretendLayout[week][weekday][i]);
       }
+
       classes.remove(-1);
 
       /// Parse isTomorrow
@@ -231,17 +232,19 @@ class ClassTableController extends GetxController {
 
         if (week <= classTableData.semesterLength) {
           developer.log(
-            "adding ${pretendLayout[week][weekday]}",
+            "adding  ${pretendLayout[week][weekday]}",
             name: "ClassTableControllerClassSet",
           );
           for (i = 0; i < 10; ++i) {
             classes.addAll(pretendLayout[week][weekday][i]);
+
             developer.log(
-              "$classes",
+              "now tomorrow: $classes",
               name: "ClassTableControllerClassSet",
             );
           }
           classes.remove(-1);
+
           developer.log(
             "$classes",
             name: "ClassTableControllerClassSet",
@@ -249,13 +252,7 @@ class ClassTableController extends GetxController {
         }
       }
 
-      return (
-        List<TimeArrangement>.generate(
-          classes.toList().length,
-          (index) => classTableData.timeArrangement[classes.toList()[index]],
-        ),
-        isTomorrow
-      );
+      return (classes.toList(), isTomorrow);
     }
   }
 
@@ -353,7 +350,6 @@ class ClassTableController extends GetxController {
 
           // 2.c Arrange the layout. Solve the conflex.
           for (var i in thisDay) {
-            print("${i.day} ${i.start} ${i.stop}");
             for (int j = i.start - 1; j <= i.stop - 1; ++j) {
               pretendLayout[week][day][j]
                   .add(classTableData.timeArrangement.indexOf(i));
@@ -374,7 +370,6 @@ class ClassTableController extends GetxController {
       update();
     } catch (e, s) {
       error = e.toString() + s.toString();
-      print(error);
       rethrow;
     }
   }

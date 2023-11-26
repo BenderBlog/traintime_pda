@@ -85,8 +85,6 @@ class ClassTableFile extends EhallSession {
     UserDefinedClassData storedData =
         UserDefinedClassData.fromJson(jsonDecode(file.readAsStringSync()));
 
-    print(storedData);
-
     return (storedData, file);
   }
 
