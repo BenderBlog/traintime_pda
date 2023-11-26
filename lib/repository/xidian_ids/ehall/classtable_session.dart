@@ -34,6 +34,7 @@ class ClassTableFile extends EhallSession {
       }
       toReturn.timeArrangement.add(
         TimeArrangement(
+          source: Source.school,
           index: toReturn.classDetail.indexOf(toDeal),
           start: int.parse(i["KSJC"]),
           teacher: i["SKJS"],
@@ -283,6 +284,7 @@ class ClassTableFile extends EhallSession {
         /// Add classes.
         preliminaryData.timeArrangement.add(
           TimeArrangement(
+            source: Source.school,
             index: timeArrangementIndex,
             weekList: e.newAffectedWeeks!,
             day: e.newWeek!,
@@ -301,6 +303,7 @@ class ClassTableFile extends EhallSession {
         /// Add classes.
         preliminaryData.timeArrangement.add(
           TimeArrangement(
+            source: Source.school,
             index: timeArrangementIndex,
             weekList: e.newAffectedWeeks!,
             day: e.newWeek!,

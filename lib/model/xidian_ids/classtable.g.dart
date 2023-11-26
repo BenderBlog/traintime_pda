@@ -39,6 +39,7 @@ Map<String, dynamic> _$ClassDetailToJson(ClassDetail instance) =>
 
 TimeArrangement _$TimeArrangementFromJson(Map<String, dynamic> json) =>
     TimeArrangement(
+      source: $enumDecode(_$SourceEnumMap, json['source']),
       index: json['index'] as int,
       weekList: json['week_list'] as String,
       classroom: json['classroom'] as String?,
@@ -56,6 +57,7 @@ Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) {
     'day': instance.day,
     'start': instance.start,
     'stop': instance.stop,
+    'source': _$SourceEnumMap[instance.source]!,
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -68,12 +70,23 @@ Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) {
   return val;
 }
 
+const _$SourceEnumMap = {
+  Source.empty: 'empty',
+  Source.school: 'school',
+  Source.experiment: 'experiment',
+  Source.exam: 'exam',
+  Source.user: 'user',
+};
+
 ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
     ClassTableData(
       semesterLength: json['semesterLength'] as int? ?? 1,
       semesterCode: json['semesterCode'] as String? ?? "",
       termStartDay: json['termStartDay'] as String? ?? "",
       classDetail: (json['classDetail'] as List<dynamic>?)
+          ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      userDefinedDetail: (json['userDefinedDetail'] as List<dynamic>?)
           ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       notArranged: (json['notArranged'] as List<dynamic>?)
@@ -94,6 +107,8 @@ Map<String, dynamic> _$ClassTableDataToJson(ClassTableData instance) =>
       'semesterCode': instance.semesterCode,
       'termStartDay': instance.termStartDay,
       'classDetail': instance.classDetail.map((e) => e.toJson()).toList(),
+      'userDefinedDetail':
+          instance.userDefinedDetail.map((e) => e.toJson()).toList(),
       'notArranged': instance.notArranged.map((e) => e.toJson()).toList(),
       'timeArrangement':
           instance.timeArrangement.map((e) => e.toJson()).toList(),

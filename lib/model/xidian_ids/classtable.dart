@@ -6,6 +6,14 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classtable.g.dart';
 
+enum Source {
+  empty,
+  school,
+  experiment,
+  exam,
+  user,
+}
+
 @JsonSerializable(explicitToJson: true)
 class NotArrangementClassDetail {
   String name; // 名称
@@ -86,6 +94,7 @@ class TimeArrangement {
   int day; // 星期几上课
   int start; // 上课开始
   int stop; // 上课结束
+  Source source; // 数据来源
   @JsonKey(includeIfNull: false)
   String? classroom; // 上课教室
 
@@ -97,6 +106,7 @@ class TimeArrangement {
   Map<String, dynamic> toJson() => _$TimeArrangementToJson(this);
 
   TimeArrangement({
+    required this.source,
     required this.index,
     required this.weekList,
     this.classroom,
@@ -104,7 +114,7 @@ class TimeArrangement {
     required this.day,
     required this.start,
     required this.stop,
-  });
+  }) : assert(source != Source.empty && index >= 0);
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -113,9 +123,25 @@ class ClassTableData {
   String semesterCode;
   String termStartDay;
   List<ClassDetail> classDetail;
+  List<ClassDetail> userDefinedDetail;
   List<NotArrangementClassDetail> notArranged;
   List<TimeArrangement> timeArrangement;
   List<ClassChange> classChanges;
+
+  /// Only allowed to be used with classDetail
+
+  ClassDetail getClassDetail(TimeArrangement timeArrangement) {
+    switch (timeArrangement.source) {
+      case Source.school:
+        return classDetail[timeArrangement.index];
+      case Source.user:
+        return userDefinedDetail[timeArrangement.index];
+      case Source.exam:
+      case Source.experiment:
+      case Source.empty:
+        throw NotImplementedException();
+    }
+  }
 
   ClassTableData.from(ClassTableData c)
       : this(
@@ -133,10 +159,12 @@ class ClassTableData {
     this.semesterCode = "",
     this.termStartDay = "",
     List<ClassDetail>? classDetail,
+    List<ClassDetail>? userDefinedDetail,
     List<NotArrangementClassDetail>? notArranged,
     List<TimeArrangement>? timeArrangement,
     List<ClassChange>? classChanges,
   })  : classDetail = classDetail ?? [],
+        userDefinedDetail = userDefinedDetail ?? [],
         notArranged = notArranged ?? [],
         timeArrangement = timeArrangement ?? [],
         classChanges = classChanges ?? [];
@@ -146,6 +174,8 @@ class ClassTableData {
 
   Map<String, dynamic> toJson() => _$ClassTableDataToJson(this);
 }
+
+class NotImplementedException implements Exception {}
 
 enum ChangeType {
   change, // 调课
