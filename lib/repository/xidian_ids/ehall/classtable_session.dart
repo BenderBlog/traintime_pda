@@ -14,6 +14,9 @@ import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
 /// 课程表 4770397878132218
 class ClassTableFile extends EhallSession {
+  static const schoolClassName = "ClassTable.json";
+  static const userDefinedClassName = "UserClass.json";
+
   ClassTableData simplifyData(Map<String, dynamic> qResult) {
     ClassTableData toReturn = ClassTableData();
 
@@ -62,6 +65,44 @@ class ClassTableFile extends EhallSession {
     return toReturn;
   }
 
+  Future<(UserDefinedClassData, File)> getUserDefinedData() async {
+    Directory appDocDir = await getApplicationSupportDirectory();
+    if (!await appDocDir.exists()) {
+      await appDocDir.create();
+    }
+    developer.log(
+      "Path at ${appDocDir.path}.",
+      name: "Ehall saveUserDefinedData",
+    );
+    var file = File("${appDocDir.path}/$userDefinedClassName");
+    bool isExist = file.existsSync();
+    developer.log("File exist: $isExist.", name: "Ehall saveUserDefinedData");
+
+    if (!isExist) {
+      file.writeAsStringSync(jsonEncode(UserDefinedClassData.empty()));
+    }
+
+    UserDefinedClassData storedData =
+        UserDefinedClassData.fromJson(jsonDecode(file.readAsStringSync()));
+
+    print(storedData);
+
+    return (storedData, file);
+  }
+
+  Future<void> saveUserDefinedData(
+    ClassDetail classDetail,
+    TimeArrangement timeArrangement,
+  ) async {
+    (UserDefinedClassData, File) data = await getUserDefinedData();
+
+    data.$1.userDefinedDetail.add(classDetail);
+    timeArrangement.index = data.$1.userDefinedDetail.length - 1;
+    data.$1.timeArrangement.add(timeArrangement);
+
+    data.$2.writeAsStringSync(jsonEncode(data.$1.toJson()));
+  }
+
   Future<ClassTableData> getFromWeb() async {
     Map<String, dynamic> qResult = {};
     developer.log("Login the system.", name: "Ehall getClasstable");
@@ -98,6 +139,18 @@ class ClassTableFile extends EhallSession {
         preference.Preference.currentStartDay,
         termStartDay,
       );
+
+      /// New semenster, user defined class is useless.
+      Directory appDocDir = await getApplicationSupportDirectory();
+      if (!await appDocDir.exists()) {
+        await appDocDir.create();
+      }
+      developer.log(
+        "Path at ${appDocDir.path}.",
+        name: "Ehall saveUserDefinedData",
+      );
+      var userClassFile = File("${appDocDir.path}/$userDefinedClassName");
+      if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
     developer.log(
         "Will get $semesterCode which start at $termStartDay, fetching...",
@@ -365,7 +418,7 @@ class ClassTableFile extends EhallSession {
       await appDocDir.create();
     }
     developer.log("Path at ${appDocDir.path}.", name: "Ehall getClasstable");
-    var file = File("${appDocDir.path}/ClassTable.json");
+    var file = File("${appDocDir.path}/$schoolClassName");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "Ehall getClasstable");
 
@@ -380,11 +433,19 @@ class ClassTableFile extends EhallSession {
     if (isExist &&
         isForce == false &&
         DateTime.now().difference(file.lastModifiedSync()).inDays <= 2) {
-      return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
+      ClassTableData data =
+          ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
+      var userClass = await getUserDefinedData();
+      data.userDefinedDetail = userClass.$1.userDefinedDetail;
+      data.timeArrangement.addAll(userClass.$1.timeArrangement);
+      return data;
     } else {
       try {
         var toUse = await getFromWeb();
         file.writeAsStringSync(jsonEncode(toUse.toJson()));
+        var userClass = await getUserDefinedData();
+        toUse.userDefinedDetail = userClass.$1.userDefinedDetail;
+        toUse.timeArrangement.addAll(userClass.$1.timeArrangement);
         return toUse;
       } catch (e) {
         if (isExist) {

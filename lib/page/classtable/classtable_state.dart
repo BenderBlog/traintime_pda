@@ -55,6 +55,10 @@ class ClassTableState extends InheritedWidget {
   /// The changeable data of the state.
   late final ClassTableWidgetState controllers;
 
+  /// Get class detail by prividing index of timearrangement
+  ClassDetail getClassDetail(int index) =>
+      classTableController.classTableData.getClassDetail(index);
+
   /// Generate icalendar file string.
   String get iCalenderStr {
     String toReturn = "BEGIN:VCALENDAR\n";

@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
-import 'package:watermeter/page/classtable/class_detail/class_detail.dart';
+import 'package:watermeter/page/classtable/class_detail/class_detail_popup.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -55,19 +55,19 @@ class ClassCard extends StatelessWidget {
             ),
             onPressed: () {
               /// The way to show the class info of the period.
-              Widget toShow = ClassDetail(
-                classDetail:
-                    List.from(ClassTableState.of(context)!.classDetail),
-                information: List.generate(
-                  conflict.length,
-                  (index) => ClassTableState.of(context)!
-                      .timeArrangement[conflict.elementAt(index)],
-                ),
-                currentWeek: ClassTableState.of(context)!.currentWeek,
-              );
               BothSideSheet.show(
                 title: "课程信息",
-                child: toShow,
+                child: ClassDetailPopUp(
+                  information: List.generate(
+                    conflict.length,
+                    (index) => (
+                      classTableState.getClassDetail(conflict.elementAt(index)),
+                      classTableState
+                          .timeArrangement[conflict.elementAt(index)],
+                    ),
+                  ),
+                  currentWeek: classTableState.currentWeek,
+                ),
                 context: context,
               );
             },
@@ -75,7 +75,7 @@ class ClassCard extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: Center(
                 child: Text(
-                  "${classTableState.classDetail[classTableState.timeArrangement[index].index].name}\n"
+                  "${classTableState.getClassDetail(index).name}\n"
                   "${classTableState.timeArrangement[index].classroom ?? "未知教室"}",
                   textAlign: TextAlign.center,
                   style: TextStyle(

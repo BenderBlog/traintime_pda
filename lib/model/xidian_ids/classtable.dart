@@ -114,7 +114,7 @@ class TimeArrangement {
     required this.day,
     required this.start,
     required this.stop,
-  }) : assert(source != Source.empty && index >= 0);
+  });
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -129,13 +129,16 @@ class ClassTableData {
   List<ClassChange> classChanges;
 
   /// Only allowed to be used with classDetail
-
-  ClassDetail getClassDetail(TimeArrangement timeArrangement) {
-    switch (timeArrangement.source) {
+  ClassDetail getClassDetail(int index) {
+    TimeArrangement t = timeArrangement[index];
+    print(index);
+    switch (t.source) {
       case Source.school:
-        return classDetail[timeArrangement.index];
+        print(classDetail[t.index].name);
+        return classDetail[t.index];
       case Source.user:
-        return userDefinedDetail[timeArrangement.index];
+        print(userDefinedDetail[t.index].name);
+        return userDefinedDetail[t.index];
       case Source.exam:
       case Source.experiment:
       case Source.empty:
@@ -294,6 +297,25 @@ class ClassChange {
       _$ClassChangeFromJson(json);
 
   Map<String, dynamic> toJson() => _$ClassChangeToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class UserDefinedClassData {
+  List<ClassDetail> userDefinedDetail;
+  List<TimeArrangement> timeArrangement;
+
+  UserDefinedClassData({
+    required this.userDefinedDetail,
+    required this.timeArrangement,
+  });
+
+  factory UserDefinedClassData.fromJson(Map<String, dynamic> json) =>
+      _$UserDefinedClassDataFromJson(json);
+
+  factory UserDefinedClassData.empty() =>
+      UserDefinedClassData(userDefinedDetail: [], timeArrangement: []);
+
+  Map<String, dynamic> toJson() => _$UserDefinedClassDataToJson(this);
 }
 
 // Time arrangements.

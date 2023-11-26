@@ -112,7 +112,8 @@ class ClassDetailDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${classDetail.name}\n${classDetail.code} | ${classDetail.number} 班",
+                "${classDetail.name}"
+                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${classDetail.number} 班" : ""}",
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,

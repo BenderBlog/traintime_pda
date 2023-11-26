@@ -159,3 +159,23 @@ const _$ChangeTypeEnumMap = {
   ChangeType.stop: 'stop',
   ChangeType.patch: 'patch',
 };
+
+UserDefinedClassData _$UserDefinedClassDataFromJson(
+        Map<String, dynamic> json) =>
+    UserDefinedClassData(
+      userDefinedDetail: (json['userDefinedDetail'] as List<dynamic>)
+          .map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      timeArrangement: (json['timeArrangement'] as List<dynamic>)
+          .map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$UserDefinedClassDataToJson(
+        UserDefinedClassData instance) =>
+    <String, dynamic>{
+      'userDefinedDetail':
+          instance.userDefinedDetail.map((e) => e.toJson()).toList(),
+      'timeArrangement':
+          instance.timeArrangement.map((e) => e.toJson()).toList(),
+    };

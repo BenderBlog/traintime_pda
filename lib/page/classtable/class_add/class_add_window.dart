@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/wheel_choser.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
@@ -19,6 +21,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   final ClassTableController controller = Get.find();
 
   late List<bool> chosenWeek;
+  late TextEditingController classNameController;
+  late TextEditingController teacherNameController;
+  late TextEditingController classRoomController;
+
+  int week = 0;
+  int start = 1;
+  int stop = 1;
 
   final double inputFieldVerticalPadding = 4;
 
@@ -31,6 +40,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       controller.classTableData.semesterLength,
       (index) => false,
     );
+    classNameController = TextEditingController();
+    teacherNameController = TextEditingController();
+    classRoomController = TextEditingController();
   }
 
   InputDecoration get inputDecoration => InputDecoration(
@@ -64,7 +76,49 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         title: const Text("添加课程"),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              print(classNameController.text);
+              print(teacherNameController.text);
+              print(classRoomController.text);
+              print("$week $start $stop");
+              print(String.fromCharCodes(List.generate(
+                chosenWeek.length,
+                (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
+              )));
+              if (classNameController.text.isEmpty) {
+                Fluttertoast.showToast(
+                  msg: "必须输入课程名",
+                );
+              } else if ((week > 0 && week <= 7) && (start <= stop)) {
+                controller
+                    .addUserDefinedClass(
+                        ClassDetail(name: classNameController.text),
+                        TimeArrangement(
+                          source: Source.user,
+                          index: -1,
+                          teacher: teacherNameController.text.isNotEmpty
+                              ? teacherNameController.text
+                              : null,
+                          classroom: classRoomController.text.isNotEmpty
+                              ? classRoomController.text
+                              : null,
+                          weekList: String.fromCharCodes(List.generate(
+                            chosenWeek.length,
+                            (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
+                          )),
+                          day: week,
+                          start: start,
+                          stop: stop,
+                        ))
+                    .then(
+                      (value) => Navigator.of(context).pop(),
+                    );
+              } else {
+                Fluttertoast.showToast(
+                  msg: "输入的时间不对",
+                );
+              }
+            },
             child: const Text("保存"),
           ),
         ],
@@ -74,6 +128,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
           Column(
             children: [
               TextField(
+                controller: classNameController,
                 decoration: inputDecoration.copyWith(
                   icon: Icon(
                     Icons.calendar_month,
@@ -83,6 +138,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 ),
               ).padding(vertical: inputFieldVerticalPadding),
               TextField(
+                controller: teacherNameController,
                 decoration: inputDecoration.copyWith(
                   icon: Icon(
                     Icons.person,
@@ -92,6 +148,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 ),
               ).padding(vertical: inputFieldVerticalPadding),
               TextField(
+                controller: classRoomController,
                 decoration: inputDecoration.copyWith(
                   icon: Icon(
                     Icons.place,
@@ -164,20 +221,25 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
               Row(
                 children: [
                   PageChoose(
-                    changeBookIdCallBack: (pageNum2) {
-                      setState(() {});
+                    changeBookIdCallBack: (choiceWeek) {
+                      setState(() {
+                        print(choiceWeek + 1);
+                        week = choiceWeek + 1;
+                      });
                     },
                     options: List.generate(
                       weekList.length,
                       (index) => PageChooseOptions(
-                        data: weekList[index],
+                        data: index,
                         hint: weekList[index],
                       ),
                     ),
                   ).flexible(),
                   PageChoose(
-                    changeBookIdCallBack: (pageNum2) {
-                      setState(() {});
+                    changeBookIdCallBack: (choiceWeek) {
+                      setState(() {
+                        start = choiceWeek;
+                      });
                     },
                     options: List.generate(
                       10,
@@ -188,8 +250,10 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     ),
                   ).flexible(),
                   PageChoose(
-                    changeBookIdCallBack: (pageNum2) {
-                      setState(() {});
+                    changeBookIdCallBack: (choiceStop) {
+                      setState(() {
+                        stop = choiceStop;
+                      });
                     },
                     options: List.generate(
                       10,

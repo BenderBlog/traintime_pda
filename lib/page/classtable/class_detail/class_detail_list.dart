@@ -18,10 +18,9 @@ class ClassDetailList extends StatelessWidget {
       children: List.generate(
         classDetailState.information.length,
         (i) => ClassDetailDialog(
-          classDetail: classDetailState
-              .classDetail[classDetailState.information[i].index],
-          timeArrangement: classDetailState.information[i],
-          infoColor: colorList[classDetailState.information[i].index],
+          classDetail: classDetailState.information[i].$1,
+          timeArrangement: classDetailState.information[i].$2,
+          infoColor: colorList[classDetailState.information[i].$2.index],
           currentWeek: classDetailState.currentWeek,
         ),
       ),

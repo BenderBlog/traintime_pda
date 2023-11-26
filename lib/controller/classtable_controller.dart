@@ -16,7 +16,6 @@ class ClassTableController extends GetxController {
   ClassTableData classTableData = ClassTableData();
 
   // TODO: Add experiment and exam info here.
-  // TODO: Add user-add classes.
 
   // The start day of the semester.
   var startDay = DateTime.parse("2022-01-22");
@@ -29,6 +28,9 @@ class ClassTableController extends GetxController {
 
   // Current Information
   DateTime updateTime = DateTime.now();
+
+  // Get ClassDetail name info
+  ClassDetail getClassDetail(int index) => classTableData.getClassDetail(index);
 
   // The time index.
   int get timeIndex {
@@ -257,14 +259,22 @@ class ClassTableController extends GetxController {
     }
   }
 
+  bool get isNotVacation =>
+      currentWeek >= 0 && currentWeek < classTableData.semesterLength;
+
   @override
   void onReady() async {
     await updateClassTable();
     update();
   }
 
-  bool get isNotVacation =>
-      currentWeek >= 0 && currentWeek < classTableData.semesterLength;
+  Future<void> addUserDefinedClass(
+    ClassDetail classDetail,
+    TimeArrangement timeArrangement,
+  ) async {
+    await ClassTableFile().saveUserDefinedData(classDetail, timeArrangement);
+    await updateClassTable(isForce: false);
+  }
 
   void updateCurrent() {
     // Get the start day of the semester. Append offset
@@ -343,6 +353,7 @@ class ClassTableController extends GetxController {
 
           // 2.c Arrange the layout. Solve the conflex.
           for (var i in thisDay) {
+            print("${i.day} ${i.start} ${i.stop}");
             for (int j = i.start - 1; j <= i.stop - 1; ++j) {
               pretendLayout[week][day][j]
                   .add(classTableData.timeArrangement.indexOf(i));
@@ -363,6 +374,7 @@ class ClassTableController extends GetxController {
       update();
     } catch (e, s) {
       error = e.toString() + s.toString();
+      print(error);
       rethrow;
     }
   }
