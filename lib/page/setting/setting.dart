@@ -165,24 +165,45 @@ class _SettingWindowState extends State<SettingWindow> {
                 },
               ),
               SettingsTile(
+                title: const Text("清除所有用户添加课程"),
+                onPressed: (context) async {
+                  Directory destination =
+                      await getApplicationSupportDirectory();
+                  if (!destination.existsSync()) {
+                    await destination.create();
+                  }
+
+                  var file = File(
+                    "${destination.path}/${ClassTableFile.userDefinedClassName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  Get.find<ClassTableController>().updateClassTable();
+                  Fluttertoast.showToast(msg: "已经清除完毕");
+                },
+              ),
+              SettingsTile(
                 title: const Text("强制刷新课表"),
                 onPressed: (context) => Get.put(ClassTableController())
                     .updateClassTable(isForce: true),
               ),
               SettingsTile.navigation(
-                  title: const Text('课程偏移设置'),
-                  description: const Text('正数错后开学日期，负数提前开学日期'),
-                  value: Text(
-                      "目前为 ${preference.getInt(preference.Preference.swift)}"),
-                  onPressed: (content) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => ChangeSwiftDialog(),
-                    ).then((value) {
-                      Get.put(ClassTableController()).updateCurrent();
-                      setState(() {});
-                    });
-                  }),
+                title: const Text('课程偏移设置'),
+                description: const Text('正数错后开学日期，负数提前开学日期'),
+                value: Text(
+                    "目前为 ${preference.getInt(preference.Preference.swift)}"),
+                onPressed: (content) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ChangeSwiftDialog(),
+                  ).then((value) {
+                    Get.put(ClassTableController()).updateCurrent();
+                    setState(() {});
+                  });
+                },
+              ),
             ],
           ),
           SettingsSection(
@@ -193,12 +214,13 @@ class _SettingWindowState extends State<SettingWindow> {
                 onPressed: (context) => alice.showInspector(),
               ),
               SettingsTile.navigation(
-                title: const Text('清除 Cookie'),
+                title: const Text('清除 Cookie 后重启'),
                 onPressed: (context) async {
                   try {
                     await NetworkSession().clearCookieJar();
                     if (mounted) {
                       Fluttertoast.showToast(msg: 'Cookie 已被清除');
+                      Restart.restartApp();
                     }
                   } on PathNotFoundException {
                     if (mounted) {
@@ -228,6 +250,13 @@ class _SettingWindowState extends State<SettingWindow> {
                   }
                   var file = File(
                     "${destination.path}/${ClassTableFile.schoolClassName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  file = File(
+                    "${destination.path}/${ClassTableFile.userDefinedClassName}",
                   );
                   if (file.existsSync()) {
                     file.deleteSync();
