@@ -114,7 +114,7 @@ class ExamController extends GetxController {
         "Other exception: $e\nStack: $s",
         name: "ScoreController",
       );
-      error = "未知错误，感兴趣的话，请接到电脑 adb 查看日志。";
+      error = "未知错误，请向开发者联系。";
     }
     update();
   }

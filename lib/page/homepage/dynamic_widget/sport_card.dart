@@ -82,7 +82,7 @@ class SportCard extends StatelessWidget {
                         )
                       ] else
                         const SimpleDialogOption(
-                          child: Text("目前没有记录，快去打卡吧()"),
+                          child: Text("目前没有记录，快去打卡吧"),
                         )
                     ],
                   ).paddingAll(8.0).card(elevation: 0).padding(horizontal: 24),

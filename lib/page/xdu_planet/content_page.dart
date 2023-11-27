@@ -67,7 +67,7 @@ class _ContentPageState extends State<ContentPage> {
                     '''
   <h3>遇到错误</h3>
   <p>
-    很有可能是你没用接上互联网。
+    文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。
   </p>
 ''',
                 renderMode: RenderMode.listView,

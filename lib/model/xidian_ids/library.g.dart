@@ -38,7 +38,9 @@ Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
 BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       author: json['author'] as String?,
       subject: json['subject'] as String?,
-      searchCode: json['searchCode'] as String?,
+      searchCode: (json['searchCode'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       isbn: json['isbn'] as String?,
       description: json['description'] as String?,
       bookName: json['bookName'] as String,
@@ -46,7 +48,7 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
           ?.map((e) => EBookItem.fromJson(e as Map<String, dynamic>))
           .toList(),
       barCode: json['barCode'] as String?,
-      bookLibCode: json['bookLibCode'] as String,
+      bookLibCode: json['bookLibCode'] as String?,
       docNumber: json['docNumber'] as int,
       publishYear: json['publishYear'] as String?,
       series: json['series'] as String?,

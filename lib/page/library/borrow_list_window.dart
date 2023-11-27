@@ -82,7 +82,7 @@ class BorrowListWindow extends StatelessWidget {
             ],
           ).expanded()
         else
-          const Text("你一本书都没有借").center().expanded(),
+          const Text("目前没有查询到在借图书").center().expanded(),
       ],
     );
   }

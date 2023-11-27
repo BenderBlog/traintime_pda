@@ -45,13 +45,13 @@ class BorrowData {
 class BookInfo {
   final String? author;
   final String? subject;
-  final String? searchCode;
+  final List<String>? searchCode;
   final String? isbn;
   final String? description;
   final String bookName;
   final List<EBookItem>? eitems;
   final String? barCode;
-  final String bookLibCode;
+  final String? bookLibCode;
   final int docNumber;
   final String? publishYear;
   final String? series;
@@ -70,7 +70,7 @@ class BookInfo {
     required this.bookName,
     this.eitems,
     this.barCode,
-    required this.bookLibCode,
+    this.bookLibCode,
     required this.docNumber,
     this.publishYear,
     this.series,

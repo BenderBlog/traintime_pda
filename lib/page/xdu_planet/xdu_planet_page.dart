@@ -46,23 +46,13 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               builder: (context) => AlertDialog(
                 title: const Text("XDU Planet 介绍"),
                 content: const Text(
-                  "本服务提供本学校同学的博客访问服务，后端基于小可怜网的代码。\n"
-                  "小可怜网是为了老电脑访问现代讯息而创建的网站，我扩展了代码，加入了 PDA 可以访问的简易 API。\n"
-                  "本服务是为了分享同学之间的学习经验和想法，与服务提供方无关。\n"
-                  "如果你的博客能保证内容健康和一定程度的更新，欢迎加入。若有侵权之嫌，联系开发者处理。",
+                  "本服务提供商是西电开源社区的 Planet 服务，查看我们学校同学们的博客。",
                 ),
                 actions: [
                   TextButton(
-                    child: const Text("小可怜网"),
-                    onPressed: () => launchUrlString(
-                      "https://andyzhk.azurewebsites.net/clie/",
-                      mode: LaunchMode.externalApplication,
-                    ),
-                  ),
-                  TextButton(
                     child: const Text("网页版"),
                     onPressed: () => launchUrlString(
-                      "https://server.superbart.xyz",
+                      "https://xdlinux.github.io/planet/",
                       mode: LaunchMode.externalApplication,
                     ),
                   )

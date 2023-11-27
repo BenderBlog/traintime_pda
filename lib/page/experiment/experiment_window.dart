@@ -86,7 +86,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
             } else if (snapshot.error
                 .toString()
                 .contains("LoginFailedException")) {
-              errmsg += "登录失败了";
+              errmsg += "登录失败";
             } else if (snapshot.error
                 .toString()
                 .contains("NotSchoolNetworkException")) {

@@ -87,7 +87,7 @@ class AboutPage extends StatelessWidget {
                               content: Image.asset("assets/Ray.jpg"),
                               actions: <Widget>[
                                 TextButton(
-                                  child: const Text("Ciallo～(∠・ω< )⌒☆"),
+                                  child: const Text("Ciallo~(∠・ω< )⌒☆"),
                                   onPressed: () => launchUrl(
                                     Uri.parse(
                                       "https://www.coolapk.com/feed/45104934",

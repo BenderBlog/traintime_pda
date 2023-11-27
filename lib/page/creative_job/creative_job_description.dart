@@ -74,7 +74,7 @@ class CreativeJobDescription extends StatelessWidget {
 
 截止 ${Jiffy.parseFromDateTime(job.endTime).format(pattern: "yyyy 年 MM 月 dd 日")}
 
-*兄弟如果感兴趣，请按右上角的按钮在浏览器中打开*
+*如果用户感兴趣，请按右上角的按钮在浏览器中打开*
 
 ## 岗位描述
 
@@ -86,7 +86,7 @@ ${job.reward}
 
 ## 项目进度
 
-${job.progress.isEmpty ? "提供者没有提供进度" : job.progress}
+${job.progress.isEmpty ? "信息" : job.progress}
 '''),
               ],
             ),

@@ -26,7 +26,7 @@ import 'package:watermeter/themes/demo_blue.dart';
 
 void main() async {
   developer.log(
-    "Watermeter, by BenderBlog, with dragon power.",
+    "Watermeter is written by BenderBlog.",
     name: "Watermeter",
   );
   // Make sure the library is initialized.
