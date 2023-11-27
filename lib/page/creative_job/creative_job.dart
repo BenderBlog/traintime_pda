@@ -225,9 +225,9 @@ class CreativeJobListTile extends StatelessWidget {
           Wrap(
             spacing: 8.0,
             children: List.generate(
-              job.tags.length,
+              job.tags?.length ?? 0,
               (i) => TagsBoxes(
-                text: job.tags[i],
+                text: job.tags![i],
                 backgroundColor: Colors.grey.shade300,
                 textColor: Colors.black,
               ),

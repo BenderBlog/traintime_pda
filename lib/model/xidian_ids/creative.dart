@@ -43,7 +43,7 @@ class Project {
 class Job {
   final String name;
   final String skill;
-  final List<String> tags;
+  final List<String>? tags;
   final String progress;
   final String description;
   final String reward;
@@ -60,7 +60,7 @@ class Job {
     required this.name,
     required this.description,
     required this.skill,
-    required this.tags,
+    this.tags,
     required this.progress,
     required this.reward,
     required this.endTime,

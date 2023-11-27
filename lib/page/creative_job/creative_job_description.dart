@@ -58,9 +58,9 @@ class CreativeJobDescription extends StatelessWidget {
                       backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
                     ...List.generate(
-                      job.tags.length,
+                      job.tags?.length ?? 0,
                       (i) => TagsBoxes(
-                        text: job.tags[i],
+                        text: job.tags![i],
                         backgroundColor: Colors.grey.shade300,
                         textColor: Colors.black,
                       ),
@@ -78,15 +78,15 @@ class CreativeJobDescription extends StatelessWidget {
 
 ## 岗位描述
 
-${job.description}
+${job.description.isNotEmpty ? job.description : "没有描述"}
 
 ## 工作回报
 
-${job.reward}
+${job.reward.isNotEmpty ? job.reward : "没有描述"}
 
 ## 项目进度
 
-${job.progress.isEmpty ? "信息" : job.progress}
+${job.progress.isEmpty ? "没有描述" : job.progress}
 '''),
               ],
             ),

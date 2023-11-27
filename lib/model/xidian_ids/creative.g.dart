@@ -42,7 +42,7 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job(
       name: json['name'] as String,
       description: json['description'] as String,
       skill: json['skill'] as String,
-      tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
+      tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
       progress: json['progress'] as String,
       reward: json['reward'] as String,
       endTime: DateTime.parse(json['endTime'] as String),
