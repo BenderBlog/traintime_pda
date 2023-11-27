@@ -9,7 +9,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
@@ -167,14 +166,8 @@ class _SettingWindowState extends State<SettingWindow> {
               SettingsTile(
                 title: const Text("清除所有用户添加课程"),
                 onPressed: (context) async {
-                  Directory destination =
-                      await getApplicationSupportDirectory();
-                  if (!destination.existsSync()) {
-                    await destination.create();
-                  }
-
                   var file = File(
-                    "${destination.path}/${ClassTableFile.userDefinedClassName}",
+                    "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
                   );
                   if (file.existsSync()) {
                     file.deleteSync();
@@ -243,20 +236,15 @@ class _SettingWindowState extends State<SettingWindow> {
                   } on Exception {}
 
                   /// Clean Classtable cache.
-                  Directory destination =
-                      await getApplicationSupportDirectory();
-                  if (!destination.existsSync()) {
-                    await destination.create();
-                  }
                   var file = File(
-                    "${destination.path}/${ClassTableFile.schoolClassName}",
+                    "${supportPath.path}/${ClassTableFile.schoolClassName}",
                   );
                   if (file.existsSync()) {
                     file.deleteSync();
                   }
 
                   file = File(
-                    "${destination.path}/${ClassTableFile.userDefinedClassName}",
+                    "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
                   );
                   if (file.existsSync()) {
                     file.deleteSync();

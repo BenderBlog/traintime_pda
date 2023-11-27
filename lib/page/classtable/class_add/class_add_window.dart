@@ -30,6 +30,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   int stop = 1;
 
   final double inputFieldVerticalPadding = 4;
+  final double horizontalPadding = 10;
 
   Color get color => Theme.of(context).colorScheme.primary;
 
@@ -116,6 +117,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         ],
       ),
       body: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+        ),
         children: [
           Column(
             children: [
@@ -157,7 +161,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
               )
               .card(
                 margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
                   vertical: 6,
                 ),
                 elevation: 0,
@@ -172,7 +175,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     color: color,
                     size: 16,
                   ),
-                  const Text("选择上课周次").padding(left: 4),
+                  const Text("选择上课周次")
+                      .textStyle(TextStyle(color: color))
+                      .padding(left: 4),
                 ],
               ),
               const SizedBox(height: 8),
@@ -191,7 +196,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
             ],
           ).padding(all: 12).card(
                 margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
                   vertical: 6,
                 ),
                 elevation: 0,
@@ -206,60 +210,81 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     color: color,
                     size: 16,
                   ),
-                  const Text("选择上课时间").padding(left: 4),
+                  const Text("选择上课时间")
+                      .textStyle(TextStyle(color: color))
+                      .padding(left: 4),
                 ],
               ),
               const SizedBox(height: 8),
-              Row(
+              Column(
                 children: [
-                  PageChoose(
-                    changeBookIdCallBack: (choiceWeek) {
-                      setState(() {
-                        week = choiceWeek + 1;
-                      });
-                    },
-                    options: List.generate(
-                      weekList.length,
-                      (index) => PageChooseOptions(
-                        data: index,
-                        hint: weekList[index],
-                      ),
-                    ),
-                  ).flexible(),
-                  PageChoose(
-                    changeBookIdCallBack: (choiceWeek) {
-                      setState(() {
-                        start = choiceWeek;
-                      });
-                    },
-                    options: List.generate(
-                      10,
-                      (index) => PageChooseOptions(
-                        data: index + 1,
-                        hint: "第 ${index + 1} 节",
-                      ),
-                    ),
-                  ).flexible(),
-                  PageChoose(
-                    changeBookIdCallBack: (choiceStop) {
-                      setState(() {
-                        stop = choiceStop;
-                      });
-                    },
-                    options: List.generate(
-                      10,
-                      (index) => PageChooseOptions(
-                        data: index + 1,
-                        hint: "第 ${index + 1} 节",
-                      ),
-                    ),
-                  ).flexible()
+                  Row(
+                    children: [
+                      const Text("上课周次")
+                          .textStyle(TextStyle(color: color))
+                          .center()
+                          .flexible(),
+                      const Text("上课时间段")
+                          .textStyle(TextStyle(color: color))
+                          .center()
+                          .flexible(),
+                      const Text("下课时间段")
+                          .textStyle(TextStyle(color: color))
+                          .center()
+                          .flexible(),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      PageChoose(
+                        changeBookIdCallBack: (choiceWeek) {
+                          setState(() {
+                            week = choiceWeek + 1;
+                          });
+                        },
+                        options: List.generate(
+                          weekList.length,
+                          (index) => PageChooseOptions(
+                            data: index,
+                            hint: weekList[index],
+                          ),
+                        ),
+                      ).flexible(),
+                      PageChoose(
+                        changeBookIdCallBack: (choiceWeek) {
+                          setState(() {
+                            start = choiceWeek;
+                          });
+                        },
+                        options: List.generate(
+                          10,
+                          (index) => PageChooseOptions(
+                            data: index + 1,
+                            hint: "第 ${index + 1} 节",
+                          ),
+                        ),
+                      ).flexible(),
+                      PageChoose(
+                        changeBookIdCallBack: (choiceStop) {
+                          setState(() {
+                            stop = choiceStop;
+                          });
+                        },
+                        options: List.generate(
+                          10,
+                          (index) => PageChooseOptions(
+                            data: index + 1,
+                            hint: "第 ${index + 1} 节",
+                          ),
+                        ),
+                      ).flexible()
+                    ],
+                  ),
                 ],
               ),
             ],
           ).padding(all: 12).card(
                 margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
                   vertical: 6,
                 ),
                 elevation: 0,

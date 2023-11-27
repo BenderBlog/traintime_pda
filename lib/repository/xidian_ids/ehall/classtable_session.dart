@@ -7,7 +7,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:path_provider/path_provider.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
@@ -65,16 +65,8 @@ class ClassTableFile extends EhallSession {
     return toReturn;
   }
 
-  Future<(UserDefinedClassData, File)> getUserDefinedData() async {
-    Directory appDocDir = await getApplicationSupportDirectory();
-    if (!await appDocDir.exists()) {
-      await appDocDir.create();
-    }
-    developer.log(
-      "Path at ${appDocDir.path}.",
-      name: "Ehall saveUserDefinedData",
-    );
-    var file = File("${appDocDir.path}/$userDefinedClassName");
+  (UserDefinedClassData, File) getUserDefinedData() {
+    var file = File("${supportPath.path}/$userDefinedClassName");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "Ehall saveUserDefinedData");
 
@@ -88,11 +80,24 @@ class ClassTableFile extends EhallSession {
     return (storedData, file);
   }
 
-  Future<void> saveUserDefinedData(
+  void deleteUserDefinedData(int index) async {
+    (UserDefinedClassData, File) data = getUserDefinedData();
+
+    data.$1.timeArrangement.removeAt(index);
+    data.$1.userDefinedDetail.removeAt(index);
+
+    for (int i = index; i < data.$1.timeArrangement.length; ++i) {
+      data.$1.timeArrangement[i].index = 1;
+    }
+
+    data.$2.writeAsStringSync(jsonEncode(data.$1.toJson()));
+  }
+
+  void saveUserDefinedData(
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    (UserDefinedClassData, File) data = await getUserDefinedData();
+    (UserDefinedClassData, File) data = getUserDefinedData();
 
     data.$1.userDefinedDetail.add(classDetail);
     timeArrangement.index = data.$1.userDefinedDetail.length - 1;
@@ -139,15 +144,7 @@ class ClassTableFile extends EhallSession {
       );
 
       /// New semenster, user defined class is useless.
-      Directory appDocDir = await getApplicationSupportDirectory();
-      if (!await appDocDir.exists()) {
-        await appDocDir.create();
-      }
-      developer.log(
-        "Path at ${appDocDir.path}.",
-        name: "Ehall saveUserDefinedData",
-      );
-      var userClassFile = File("${appDocDir.path}/$userDefinedClassName");
+      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
       if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
     developer.log(
@@ -411,12 +408,8 @@ class ClassTableFile extends EhallSession {
 
     developer.log("Start fetching the classtable.",
         name: "Ehall getClasstable");
-    Directory appDocDir = await getApplicationSupportDirectory();
-    if (!await appDocDir.exists()) {
-      await appDocDir.create();
-    }
-    developer.log("Path at ${appDocDir.path}.", name: "Ehall getClasstable");
-    var file = File("${appDocDir.path}/$schoolClassName");
+    developer.log("Path at ${supportPath.path}.", name: "Ehall getClasstable");
+    var file = File("${supportPath.path}/$schoolClassName");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "Ehall getClasstable");
 
@@ -433,7 +426,7 @@ class ClassTableFile extends EhallSession {
         DateTime.now().difference(file.lastModifiedSync()).inDays <= 2) {
       ClassTableData data =
           ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
-      var userClass = await getUserDefinedData();
+      var userClass = getUserDefinedData();
       data.userDefinedDetail = userClass.$1.userDefinedDetail;
       data.timeArrangement.addAll(userClass.$1.timeArrangement);
       return data;
@@ -441,7 +434,7 @@ class ClassTableFile extends EhallSession {
       try {
         var toUse = await getFromWeb();
         file.writeAsStringSync(jsonEncode(toUse.toJson()));
-        var userClass = await getUserDefinedData();
+        var userClass = getUserDefinedData();
         toUse.userDefinedDetail = userClass.$1.userDefinedDetail;
         toUse.timeArrangement.addAll(userClass.$1.timeArrangement);
         return toUse;

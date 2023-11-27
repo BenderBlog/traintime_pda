@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -119,12 +118,8 @@ class ExperimentSession extends NetworkSession {
   }
 
   Future<List<ExperimentData>> getData() async {
-    Directory appDocDir = await getApplicationSupportDirectory();
-    if (!await appDocDir.exists()) {
-      await appDocDir.create();
-    }
-    developer.log("Path at ${appDocDir.path}.", name: "ExperimentSession");
-    var file = File("${appDocDir.path}/Experiment.json");
+    developer.log("Path at ${supportPath.path}.", name: "ExperimentSession");
+    var file = File("${supportPath.path}/Experiment.json");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "ExperimentSession");
     try {

@@ -36,6 +36,10 @@ class ClassTableController extends GetxController {
   // Get ClassDetail name info
   ClassDetail getClassDetail(int index) => classTableData.getClassDetail(index);
 
+  // Get all user-add classes
+  UserDefinedClassData get userDefinedClassData =>
+      ClassTableFile().getUserDefinedData().$1;
+
   // The time index.
   int get timeIndex {
     // Default set to -2 as not in class.
@@ -273,7 +277,7 @@ class ClassTableController extends GetxController {
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    await ClassTableFile().saveUserDefinedData(classDetail, timeArrangement);
+    ClassTableFile().saveUserDefinedData(classDetail, timeArrangement);
     await updateClassTable(isForce: false);
   }
 
@@ -301,30 +305,6 @@ class ClassTableController extends GetxController {
     error = null;
     try {
       classTableData = await ClassTableFile().get(isForce: isForce);
-
-      // Uncomment to see the conflict.
-      /*
-      classDetail.add(ClassDetail(
-        name: "测试连课",
-        teacher: "SPRT",
-        place: "Flutter",
-      ));
-      timeArrangement.addAll([
-        TimeArrangement(
-          index: classDetail.length - 1,
-          start: 9,
-          stop: 10,
-          day: 1,
-          weekList: "1111111111111111111111",
-        ),
-        TimeArrangement(
-          index: classDetail.length - 1,
-          start: 4,
-          stop: 8,
-          day: 3,
-          weekList: "1111111111111111111111",
-        ),
-      ]);*/
 
       // Init the matrix.
       // 1. prepare the structure, a three-deminision array.
