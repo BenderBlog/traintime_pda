@@ -118,7 +118,7 @@ class ExperimentListView extends StatelessWidget {
                 ),
               )
             : const TimelineTitle(
-                title: "快去做实验去吧",
+                title: "目前没有已经完成的实验",
               ),
       ],
     );

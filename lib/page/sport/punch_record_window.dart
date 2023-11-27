@@ -95,7 +95,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                                   size: 64,
                                 ),
                                 Text(
-                                  "列表为空，快去打卡吧()",
+                                  "目前没有记录",
                                 ),
                               ],
                             ),
