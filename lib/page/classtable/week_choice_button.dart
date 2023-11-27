@@ -3,6 +3,7 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -60,28 +61,30 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
           /// as long as the height of the page is over 500.
           if (MediaQuery.sizeOf(context).height >= 500)
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  6,
-                  4,
-                  6,
-                  2,
-                ),
-                child: GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 5,
-                  mainAxisSpacing: 2,
-                  crossAxisSpacing: 2,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    for (int i = 0; i < 10; i += 2)
-                      for (int day = 0; day < 5; ++day)
-                        dot(
-                          isOccupied: !classTableState.pretendLayout[index][day]
-                                  [i]
-                              .contains(-1),
-                        )
-                  ],
+              child: Obx(
+                () => Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    6,
+                    4,
+                    6,
+                    2,
+                  ),
+                  child: GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 2,
+                    crossAxisSpacing: 2,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      for (int i = 0; i < 10; i += 2)
+                        for (int day = 0; day < 5; ++day)
+                          dot(
+                            isOccupied: !classTableState.pretendLayout[index]
+                                    [day][i]
+                                .contains(-1),
+                          )
+                    ],
+                  ),
                 ),
               ),
             ),

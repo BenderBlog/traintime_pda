@@ -3,6 +3,7 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
@@ -136,24 +137,28 @@ class _ClassTableViewState extends State<ClassTableView> {
 
         /// The rest of the table.
         Expanded(
-          child: SingleChildScrollView(
-            child: Row(
-              children: List.generate(
-                8,
-                (i) => Container(
-                  color: i == 0 ? Colors.grey.shade200.withOpacity(0.75) : null,
-                  child: SizedBox(
-                    width:
-                        i > 0 ? (mediaQuerySize.width - leftRow) / 7 : leftRow,
-                    child: Column(
-                      children: classSubRow(i),
+          child: Obx(
+            () => SingleChildScrollView(
+              child: Row(
+                children: List.generate(
+                  8,
+                  (i) => Container(
+                    color:
+                        i == 0 ? Colors.grey.shade200.withOpacity(0.75) : null,
+                    child: SizedBox(
+                      width: i > 0
+                          ? (mediaQuerySize.width - leftRow) / 7
+                          : leftRow,
+                      child: Column(
+                        children: classSubRow(i),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }

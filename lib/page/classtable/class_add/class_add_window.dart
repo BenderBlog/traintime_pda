@@ -25,7 +25,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   late TextEditingController teacherNameController;
   late TextEditingController classRoomController;
 
-  int week = 0;
+  int week = 1;
   int start = 1;
   int stop = 1;
 

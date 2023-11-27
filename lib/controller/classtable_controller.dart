@@ -21,7 +21,11 @@ class ClassTableController extends GetxController {
   var startDay = DateTime.parse("2022-01-22");
 
   // A list as an index of the classtable items.
-  late List<List<List<List<int>>>> pretendLayout;
+  RxList<List<List<List<int>>>> pretendLayout = List.generate(
+    1,
+    (week) =>
+        List.generate(7, (day) => List.generate(10, (classes) => <int>[])),
+  ).obs;
 
   // Mark the current week.
   int currentWeek = 0;
@@ -325,7 +329,7 @@ class ClassTableController extends GetxController {
       // Init the matrix.
       // 1. prepare the structure, a three-deminision array.
       //    for week-day~class array
-      pretendLayout = List.generate(
+      pretendLayout.value = List.generate(
         classTableData.semesterLength,
         (week) => List.generate(7, (day) => List.generate(10, (classes) => [])),
       );
