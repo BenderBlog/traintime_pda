@@ -34,7 +34,7 @@ class ClassChangeList extends StatelessWidget {
                   classChanges[index].newTeacher != null) {
                 teacherChange +=
                     "从${classChanges[index].originalTeacher ?? "没有信息"}"
-                    "变为${classChanges[index].newTeacher}";
+                    "变为${classChanges[index].originalNewTeacher}";
               } else {
                 teacherChange += "没有改变";
               }

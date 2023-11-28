@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
@@ -18,50 +19,6 @@ class ClassDetailDialog extends StatelessWidget {
     required this.infoColor,
     required this.currentWeek,
   });
-
-  /// A listTile contains icon and string.
-  Widget customListTile(IconData icon, String str) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: infoColor.shade900,
-          ),
-          const SizedBox(width: 10),
-          Text(
-            str,
-            style: TextStyle(
-              color: infoColor.shade900,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget middlePart() {
-    return Column(
-      children: [
-        customListTile(
-          Icons.person,
-          timeArrangement.teacher ?? "老师未定",
-        ),
-        customListTile(
-          Icons.room,
-          timeArrangement.classroom ?? "地点未定",
-        ),
-        customListTile(
-          Icons.access_time_filled_outlined,
-          "${weekList[timeArrangement.day - 1]}"
-          "${timeArrangement.start}-${timeArrangement.stop}节课 "
-          "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
-        ),
-      ],
-    );
-  }
 
   /// A doc shows the week info of the class, whether the class /
   /// time arrangement occurs in this week.
@@ -121,7 +78,23 @@ class ClassDetailDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
-              middlePart(),
+              CustomListTile(
+                icon: Icons.person,
+                str: timeArrangement.teacher ?? "老师未定",
+                infoColor: infoColor,
+              ),
+              CustomListTile(
+                icon: Icons.room,
+                str: timeArrangement.classroom ?? "地点未定",
+                infoColor: infoColor,
+              ),
+              CustomListTile(
+                icon: Icons.access_time_filled_outlined,
+                str: "${weekList[timeArrangement.day - 1]}"
+                    "${timeArrangement.start}-${timeArrangement.stop}节课 "
+                    "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
+                infoColor: infoColor,
+              ),
 
               /// These gridview can show when this arrangment occurs in weeks.
               Padding(
@@ -143,5 +116,40 @@ class ClassDetailDialog extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class CustomListTile extends StatelessWidget {
+  final IconData icon;
+  final String str;
+  final MaterialColor infoColor;
+
+  const CustomListTile({
+    super.key,
+    required this.icon,
+    required this.str,
+    required this.infoColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: infoColor.shade900,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            str,
+            style: TextStyle(
+              color: infoColor.shade900,
+              fontSize: 16,
+            ),
+          ),
+        )
+      ],
+    ).padding(vertical: 4);
   }
 }

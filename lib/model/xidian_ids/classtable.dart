@@ -265,16 +265,28 @@ class ClassChange {
   String? get newTeacher =>
       newTeacherData?.replaceAll(RegExp(r'(/|[0-9])'), '');
 
+  String? get originalNewTeacher => newTeacherData;
+
   bool get isTeacherChanged {
-    List<String> originalTeacherCode =
+    List<String> originalTeacherCodeStr =
         originalTeacherData?.replaceAll(' ', '').split(RegExp(r',|/')) ?? [];
-    originalTeacherCode
+    originalTeacherCodeStr
         .retainWhere((element) => element.contains(RegExp(r'([0-9])')));
 
-    List<String> newTeacherCode =
+    List<int> originalTeacherCode = List<int>.generate(
+      originalTeacherCodeStr.length,
+      (index) => int.parse(originalTeacherCodeStr[index]),
+    )..sort();
+
+    List<String> newTeacherCodeStr =
         newTeacherData?.replaceAll(' ', '').split(RegExp(r',|/')) ?? [];
-    newTeacherCode
+    newTeacherCodeStr
         .retainWhere((element) => element.contains(RegExp(r'([0-9])')));
+
+    List<int> newTeacherCode = List<int>.generate(
+      newTeacherCodeStr.length,
+      (index) => int.parse(newTeacherCodeStr[index]),
+    )..sort();
 
     return !listEquals(originalTeacherCode, newTeacherCode);
   }
