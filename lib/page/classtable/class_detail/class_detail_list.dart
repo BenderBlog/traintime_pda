@@ -20,7 +20,8 @@ class ClassDetailList extends StatelessWidget {
         (i) => ClassDetailDialog(
           classDetail: classDetailState.information[i].$1,
           timeArrangement: classDetailState.information[i].$2,
-          infoColor: colorList[classDetailState.information[i].$2.index],
+          infoColor: colorList[
+              classDetailState.information[i].$2.index % colorList.length],
           currentWeek: classDetailState.currentWeek,
         ),
       ),
