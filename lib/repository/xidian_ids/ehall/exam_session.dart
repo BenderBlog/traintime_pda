@@ -15,13 +15,13 @@ class ExamFile extends EhallSession {
     Map<String, dynamic> qResult = {};
 
     var firstPost = await useApp("4768687067472349");
-    await dio.get(firstPost);
+    await dioEhall.get(firstPost);
 
     /// Get semester information.
     /// Hard to use, I would rather do it by myself.
     /// Nope, I need to choose~
     developer.log("Seek for the semesters", name: "getExam");
-    var whatever = await dio.post(
+    var whatever = await dioEhall.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/xnxqcx.do",
       data: {"*order": "-PX,-DM"},
     );
@@ -33,7 +33,7 @@ class ExamFile extends EhallSession {
     developer.log(
         "My exam arrangemet ${semester ?? qResult["semester"][0]["DM"]}",
         name: "getExam");
-    var data = await dio.post(
+    var data = await dioEhall.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/wdksap.do",
       queryParameters: {
         "XNXQDM": semester ?? qResult["semester"][0]["DM"],
@@ -46,7 +46,7 @@ class ExamFile extends EhallSession {
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)
     /// If failed, it is more likely that no exam has arranged.
     developer.log("Seek for the not arranged.", name: "getExam");
-    data = await dio.post(
+    data = await dioEhall.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/studentWdksapApp/modules/wdksap/cxyxkwapkwdkc.do",
       queryParameters: {"XNXQDM": semester ?? qResult["semester"][0]["DM"]},
     ).then((value) => value.data["datas"]["cxyxkwapkwdkc"]);

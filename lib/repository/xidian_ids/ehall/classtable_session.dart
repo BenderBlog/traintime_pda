@@ -111,13 +111,13 @@ class ClassTableFile extends EhallSession {
     developer.log("Login the system.", name: "Ehall getClasstable");
     String get = await useApp("4770397878132218");
     developer.log(get, name: "Ehall getClasstable");
-    await dio.post(
+    await dioEhall.post(
       get,
     );
 
     developer.log("Fetch the semester information.",
         name: "Ehall getClasstable");
-    String semesterCode = await dio
+    String semesterCode = await dioEhall
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
@@ -132,7 +132,7 @@ class ClassTableFile extends EhallSession {
 
     developer.log("Fetch the day the semester begin.",
         name: "Ehall getClasstable");
-    String termStartDay = await dio.post(
+    String termStartDay = await dioEhall.post(
       'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
       data: {
         'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
@@ -154,7 +154,7 @@ class ClassTableFile extends EhallSession {
         "Will get $semesterCode which start at $termStartDay, fetching...",
         name: "Ehall getClasstable");
 
-    qResult = await dio.post(
+    qResult = await dioEhall.post(
       'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
       data: {
         'XNXQDM': semesterCode,
@@ -182,7 +182,7 @@ class ClassTableFile extends EhallSession {
     qResult["semesterCode"] = semesterCode;
     qResult["termStartDay"] = termStartDay;
 
-    var notOnTable = await dio.post(
+    var notOnTable = await dioEhall.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
       data: {
         'XNXQDM': semesterCode,
@@ -198,7 +198,7 @@ class ClassTableFile extends EhallSession {
     /// Deal with the class change.
     developer.log("Deal with the class change...", name: "Ehall getClasstable");
 
-    qResult = await dio.post(
+    qResult = await dioEhall.post(
       'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xsdkkc.do',
       data: {
         'XNXQDM': semesterCode,

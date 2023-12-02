@@ -25,10 +25,10 @@ class EhallSession extends IDSSession {
         "application/x-www-form-urlencoded; charset=UTF-8",
   };
 
-  Dio get dio => super.dio..options = BaseOptions(headers: refererHeader);
+  Dio get dioEhall => super.dio..options = BaseOptions(headers: refererHeader);
 
   Future<bool> isLoggedIn() async {
-    var response = await dio.get(
+    var response = await dioEhall.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
     developer.log("Ehall isLoggedin: ${response.data["hasLogin"]}",
@@ -46,7 +46,7 @@ class EhallSession extends IDSSession {
       );
     }
     developer.log("Try to use the $appID.", name: "Ehall useApp");
-    var value = await dio.get(
+    var value = await dioEhall.get(
       "https://ehall.xidian.edu.cn/appShow",
       queryParameters: {'appId': appID},
       options: Options(
@@ -67,12 +67,12 @@ class EhallSession extends IDSSession {
     developer.log("Ready to get the user information.",
         name: "Ehall getInformation");
     var firstPost = await useApp("4618295887225301");
-    await dio.get(firstPost).then((value) => value.data);
+    await dioEhall.get(firstPost).then((value) => value.data);
 
     /// Get information here. resultCode==00000 is successful.
     developer.log("Getting the user information.",
         name: "Ehall getInformation");
-    var detailed = await dio.post(
+    var detailed = await dioEhall.post(
       "https://ehall.xidian.edu.cn/xsfw/sys/xszsapp/commoncall/callQuery/xsjbxxcx-MINE-QUERY.do",
       data: {
         "requestParams":
@@ -116,7 +116,7 @@ class EhallSession extends IDSSession {
     developer.log("Get the semester information.",
         name: "Ehall getInformation");
     String get = await useApp("4770397878132218");
-    await dio.post(get);
+    await dioEhall.post(get);
     String semesterCode = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
@@ -129,7 +129,7 @@ class EhallSession extends IDSSession {
 
     developer.log("Get the day the semester begin.",
         name: "Ehall getInformation");
-    String termStartDay = await dio.post(
+    String termStartDay = await dioEhall.post(
       'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
       data: {
         'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',

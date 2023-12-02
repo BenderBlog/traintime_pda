@@ -44,8 +44,8 @@ class EmptyClassroomSession extends EhallSession {
     List<EmptyClassroomPlace> toReturn = [];
     developer.log("Ready to login the system.", name: "Ehall emptyClassroom");
     var firstPost = await useApp("4768402106681759");
-    await dio.get(firstPost);
-    var data = await dio.post("$baseUrl/jxlcx.do", data: {
+    await dioEhall.get(firstPost);
+    var data = await dioEhall.post("$baseUrl/jxlcx.do", data: {
       "*order": "+XXXQDM,+PX,+JXLDM",
     }).then((value) => value.data["datas"]["jxlcx"]["rows"]);
     for (var i in data) {
@@ -57,7 +57,7 @@ class EmptyClassroomSession extends EhallSession {
   /*
   Future<Map<String, String>> getType() async {
     Map<String, String> toReturn = {};
-    var data = await dio.post(
+    var data = await dioEhall.post(
       "$baseUrl/ggzdpx.do",
       data: {"dicCode": '9955766', "order": '+DM'},
     ).then(
@@ -83,7 +83,7 @@ class EmptyClassroomSession extends EhallSession {
     required String semesterPart,
     required String searchParameter,
   }) async {
-    (String, String) dateData = await dio.post(
+    (String, String) dateData = await dioEhall.post(
       "$baseUrl/rqzhzcjc.do",
       data: {
         "RQ": date,
@@ -99,7 +99,7 @@ class EmptyClassroomSession extends EhallSession {
 
     List<EmptyClassroomData> toReturn = [];
 
-    await dio.post("$baseUrl/cxjsqk.do", data: {
+    await dioEhall.post("$baseUrl/cxjsqk.do", data: {
       "XNXQDM": "$semesterRange-$semesterPart",
       "ZC": dateData.$1,
       "XQ": dateData.$2,

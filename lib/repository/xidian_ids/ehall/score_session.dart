@@ -19,7 +19,7 @@ class ScoreFile extends EhallSession {
   /// This function gets the composement of the score.
   Future<Compose> getDetail(String JXBID, String XNXQDM) async {
     Compose toReturn = Compose();
-    var response = await dio.post(
+    var response = await dioEhall.post(
         "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
         data: {
           "JXBID": JXBID,
@@ -66,7 +66,7 @@ class ScoreFile extends EhallSession {
     ScorePlace data = ScorePlace();
 
     /// Place in the grade.
-    await dio
+    await dioEhall
         .post(
             "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbxspmcx.do",
             data: forPlace)
@@ -78,7 +78,7 @@ class ScoreFile extends EhallSession {
     });
 
     /// Highest, lowest, average score of the grade.
-    await dio
+    await dioEhall
         .post(
             "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjtjcx.do",
             data: forScoreRanking)
@@ -91,7 +91,7 @@ class ScoreFile extends EhallSession {
     });
 
     /// Distribution of the score.
-    await dio
+    await dioEhall
         .post(
             "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/jxbcjfbcx.do",
             data: forScoreDistribution)
@@ -173,10 +173,10 @@ class ScoreFile extends EhallSession {
     developer.log("Ready to login the system.", name: "Ehall getScore");
     var firstPost = await useApp("4768574631264620");
     developer.log(firstPost, name: "score_session");
-    await dio.get(firstPost);
+    await dioEhall.get(firstPost);
 
     developer.log("Getting the score data.", name: "Ehall getScore");
-    var getData = await dio.post(
+    var getData = await dioEhall.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
       data: {
         "*json": 1,
