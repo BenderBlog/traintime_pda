@@ -156,7 +156,10 @@ class ClassTableFile extends EhallSession {
 
     qResult = await dio.post(
       'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
-      data: {'XNXQDM': semesterCode},
+      data: {
+        'XNXQDM': semesterCode,
+        'XH': preference.getString(preference.Preference.idsAccount),
+      },
     ).then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
       developer.log(qResult['extParams']['msg'], name: "Ehall getClasstable");
@@ -181,7 +184,10 @@ class ClassTableFile extends EhallSession {
 
     var notOnTable = await dio.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
-      data: {'XNXQDM': semesterCode},
+      data: {
+        'XNXQDM': semesterCode,
+        'XH': preference.getString(preference.Preference.idsAccount),
+      },
     ).then((value) => value.data['datas']['cxxsllsywpk']);
 
     developer.log(notOnTable.toString(), name: "Ehall getClasstable");

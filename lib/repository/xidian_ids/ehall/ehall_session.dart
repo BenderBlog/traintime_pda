@@ -21,9 +21,10 @@ class EhallSession extends IDSSession {
         'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
     HttpHeaders.acceptEncodingHeader: 'identity',
     HttpHeaders.connectionHeader: 'Keep-Alive',
+    HttpHeaders.contentTypeHeader:
+        "application/x-www-form-urlencoded; charset=UTF-8",
   };
 
-  @override
   Dio get dio => super.dio..options = BaseOptions(headers: refererHeader);
 
   Future<bool> isLoggedIn() async {
