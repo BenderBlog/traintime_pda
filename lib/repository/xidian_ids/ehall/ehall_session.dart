@@ -4,12 +4,28 @@
 // E-hall class, which get lots of useful data here.
 // Thanks xidian-script and libxdauth!
 
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class EhallSession extends IDSSession {
+  Map<String, String> refererHeader = {
+    HttpHeaders.refererHeader: "http://ehall.xidian.edu.cn/new/index_xd.html",
+    HttpHeaders.hostHeader: "ehall.xidian.edu.cn",
+    HttpHeaders.acceptHeader:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    HttpHeaders.acceptLanguageHeader:
+        'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    HttpHeaders.acceptEncodingHeader: 'identity',
+    HttpHeaders.connectionHeader: 'Keep-Alive',
+  };
+
+  @override
+  Dio get dio => super.dio..options = BaseOptions(headers: refererHeader);
+
   Future<bool> isLoggedIn() async {
     var response = await dio.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
@@ -36,10 +52,6 @@ class EhallSession extends IDSSession {
         followRedirects: false,
         validateStatus: (status) {
           return status! < 500;
-        },
-        headers: {
-          "Accept": "text/html,application/xhtml+xml,application/xml;"
-              "q=0.9,image/webp,image/apng,*/*;q=0.8",
         },
       ),
     );

@@ -110,7 +110,10 @@ class ClassTableFile extends EhallSession {
     Map<String, dynamic> qResult = {};
     developer.log("Login the system.", name: "Ehall getClasstable");
     String get = await useApp("4770397878132218");
-    await dio.post(get);
+    developer.log(get, name: "Ehall getClasstable");
+    await dio.post(
+      get,
+    );
 
     developer.log("Fetch the semester information.",
         name: "Ehall getClasstable");

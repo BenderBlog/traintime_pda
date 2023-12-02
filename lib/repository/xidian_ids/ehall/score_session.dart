@@ -172,6 +172,7 @@ class ScoreFile extends EhallSession {
 
     developer.log("Ready to login the system.", name: "Ehall getScore");
     var firstPost = await useApp("4768574631264620");
+    developer.log(firstPost, name: "score_session");
     await dio.get(firstPost);
 
     developer.log("Getting the score data.", name: "Ehall getScore");
