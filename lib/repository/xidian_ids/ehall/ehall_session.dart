@@ -12,6 +12,7 @@ import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class EhallSession extends IDSSession {
+  /// This header shall only be used in the ehall related stuff...
   Map<String, String> refererHeader = {
     HttpHeaders.refererHeader: "http://ehall.xidian.edu.cn/new/index_xd.html",
     HttpHeaders.hostHeader: "ehall.xidian.edu.cn",
@@ -40,10 +41,16 @@ class EhallSession extends IDSSession {
     developer.log("Ready to use the app $appID.", name: "Ehall useApp");
     developer.log("Try to login.", name: "Ehall useApp");
     if (!await isLoggedIn()) {
-      await super.checkAndLogin(
+      String location = await super.checkAndLogin(
         target:
             "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
       );
+      var response = await dio.get(location);
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids login");
+        response = await dioEhall.get(location);
+      }
     }
     developer.log("Try to use the $appID.", name: "Ehall useApp");
     var value = await dioEhall.get(
@@ -117,7 +124,7 @@ class EhallSession extends IDSSession {
         name: "Ehall getInformation");
     String get = await useApp("4770397878132218");
     await dioEhall.post(get);
-    String semesterCode = await dio
+    String semesterCode = await dioEhall
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )

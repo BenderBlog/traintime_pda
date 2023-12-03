@@ -5,6 +5,7 @@
 
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -111,10 +112,18 @@ class LibrarySession extends IDSSession {
 
   Future<void> initSession() async {
     try {
-      var response = await checkAndLogin(
+      String location = await checkAndLogin(
         target: "https://mgce.natapp4.cc/api/index/casLoginDo.html?"
             "libraryId=5&source=xdbb",
       );
+      var response = await dio.get(location);
+
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids login");
+        response = await dio.get(location);
+      }
+
       RegExp matchJson = RegExp(r'wx.miniProgram.postMessage(.*);');
       String result = matchJson
               .firstMatch(response.data)?[0]!

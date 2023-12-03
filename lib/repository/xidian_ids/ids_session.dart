@@ -69,7 +69,7 @@ class IDSSession extends NetworkSession {
     "execution",
   ];
 
-  Future<Response> checkAndLogin({
+  Future<String> checkAndLogin({
     required String target,
   }) async {
     developer.log("Ready to get $target.", name: "ids checkAndLogin");
@@ -83,13 +83,13 @@ class IDSSession extends NetworkSession {
     if (data.statusCode == 401) {
       throw PasswordWrongException();
     } else if (data.statusCode == 301 || data.statusCode == 302) {
-      /// Post login progress.
-      while (data.headers[HttpHeaders.locationHeader] != null) {
-        String location = data.headers[HttpHeaders.locationHeader]![0];
-        developer.log("Received: $location.", name: "ids checkAndLogin");
-        data = await dio.get(location);
-      }
-      return data;
+      /// Post login progress, due to something wrong, return the location here...
+      // while (data.headers[HttpHeaders.locationHeader] != null) {
+      return data.headers[HttpHeaders.locationHeader]![0];
+      //  developer.log("Received: $location.", name: "ids checkAndLogin");
+      //  data = await dio.get(location);
+      // }
+      // return data;
     } else {
       return await login(
         username: preference.getString(preference.Preference.idsAccount),
@@ -98,7 +98,7 @@ class IDSSession extends NetworkSession {
     }
   }
 
-  Future<Response> login({
+  Future<String> login({
     required String username,
     required String password,
     Future<String?> Function(String)? getCaptcha,
@@ -193,12 +193,12 @@ class IDSSession extends NetworkSession {
         if (onResponse != null) {
           onResponse(80, "登录后处理");
         }
-        while (data.headers[HttpHeaders.locationHeader] != null) {
-          String location = data.headers[HttpHeaders.locationHeader]![0];
-          developer.log("Received: $location.", name: "ids login");
-          data = await dio.get(location);
-        }
-        return data;
+        //while (data.headers[HttpHeaders.locationHeader] != null) {
+        return data.headers[HttpHeaders.locationHeader]![0];
+        //  developer.log("Received: $location.", name: "ids login");
+        // data = await dio.get(location);
+        //}
+        ///return data;
       } else {
         throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
       }

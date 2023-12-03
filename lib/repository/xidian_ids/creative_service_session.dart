@@ -15,9 +15,15 @@ class CreativeServiceSession extends IDSSession {
 
   Future<void> initSession() async {
     try {
-      var response = await checkAndLogin(
+      String location = await checkAndLogin(
         target: "$url/login/ids",
       );
+      var response = await dio.get(location);
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids login");
+        response = await dio.get(location);
+      }
       String urlReceived = "${response.realUri}";
       String ticket = RegExp(r'ST\S+').firstMatch(urlReceived)![0]!;
       developer.log("Received: $ticket.", name: "CreativeServiceSession");

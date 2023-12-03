@@ -4,6 +4,7 @@
 // Get payment, specifically your owe.
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:developer' as developer;
@@ -50,9 +51,16 @@ class PaymentSession extends IDSSession {
         password = "123456";
       }
 
-      var nextStop = await checkAndLogin(
+      String location = await checkAndLogin(
         target: "http://payment.xidian.edu.cn/pages/caslogin.jsp",
-      ).then((value) => getTransfer.firstMatch(value.data));
+      );
+      var response = await dio.get(location);
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids login");
+        response = await dio.get(location);
+      }
+      var nextStop = getTransfer.firstMatch(response.data);
 
       developer.log("getTransfer: ${nextStop![0]!}", name: "PaymentSession");
 
