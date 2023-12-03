@@ -167,7 +167,7 @@ class _LoginWindowState extends State<LoginWindow> {
     }
 
     try {
-      await ses.login(
+      await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
         onResponse: (int number, String status) =>

@@ -37,6 +37,29 @@ class EhallSession extends IDSSession {
     return response.data["hasLogin"];
   }
 
+  Future<void> loginEhall({
+    required String username,
+    required String password,
+    required Future<String?> Function(String) getCaptcha,
+    required void Function(int, String) onResponse,
+  }) async {
+    String location = await super.login(
+      target:
+          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+      username: username,
+      password: password,
+      getCaptcha: getCaptcha,
+      onResponse: onResponse,
+    );
+    var response = await dio.get(location);
+    while (response.headers[HttpHeaders.locationHeader] != null) {
+      location = response.headers[HttpHeaders.locationHeader]![0];
+      developer.log("Received: $location.", name: "ids login");
+      response = await dioEhall.get(location);
+    }
+    return;
+  }
+
   Future<String> useApp(String appID) async {
     developer.log("Ready to use the app $appID.", name: "Ehall useApp");
     developer.log("Try to login.", name: "Ehall useApp");

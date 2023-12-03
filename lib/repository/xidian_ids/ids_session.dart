@@ -94,6 +94,7 @@ class IDSSession extends NetworkSession {
       return await login(
         username: preference.getString(preference.Preference.idsAccount),
         password: preference.getString(preference.Preference.idsPassword),
+        target: target,
       );
     }
   }
@@ -104,6 +105,7 @@ class IDSSession extends NetworkSession {
     Future<String?> Function(String)? getCaptcha,
     bool forceReLogin = false,
     void Function(int, String)? onResponse,
+    String? target,
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
@@ -111,7 +113,14 @@ class IDSSession extends NetworkSession {
       developer.log("Ready to get the login webpage.", name: "ids login");
     }
     var response = await dio
-        .get("https://ids.xidian.edu.cn/authserver/login")
+        .get(
+          "https://ids.xidian.edu.cn/authserver/login",
+          queryParameters: target != null
+              ? {
+                  'service': target,
+                }
+              : null,
+        )
         .then((value) => value.data);
 
     /// Start getting data from webpage.
