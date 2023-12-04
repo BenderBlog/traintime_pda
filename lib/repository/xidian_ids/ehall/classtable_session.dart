@@ -223,6 +223,7 @@ class ClassTableFile extends EhallSession {
 
     if (int.parse(qResult["totalSize"].toString()) > 0) {
       for (var i in qResult["rows"]) {
+        print("class is ${i["KCM"]}");
         preliminaryData.classChanges.add(
           ClassChange(
             type: type(i["TKLXDM"]),
@@ -284,9 +285,6 @@ class ClassTableFile extends EhallSession {
         }
       }
 
-      /// Give a value to the
-      int timeArrangementIndex = indexOriginalTimeArrangementList.first;
-
       /// Third, search for the time arrangements, seek for the truth.
       developer.log(
         "Class change related to time arrangement index $indexOriginalTimeArrangementList",
@@ -294,6 +292,9 @@ class ClassTableFile extends EhallSession {
       );
 
       if (e.type == ChangeType.change) {
+        /// Give a value to the
+        int timeArrangementIndex = indexOriginalTimeArrangementList.first;
+
         developer.log(
           "Class change.",
           name: "Ehall getClasstable",
@@ -361,7 +362,7 @@ class ClassTableFile extends EhallSession {
         preliminaryData.timeArrangement.add(
           TimeArrangement(
             source: Source.school,
-            index: timeArrangementIndex,
+            index: indexClassDetailList.first,
             weekList: e.newAffectedWeeks!,
             day: e.newWeek!,
             start: e.newClassRange[0],

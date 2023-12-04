@@ -88,7 +88,7 @@ class ClassChangeList extends StatelessWidget {
                 break;
               case ChangeType.patch:
                 classChange +=
-                    "补课信息，从第$originalAffectedWeeksStr周星期${chineseWeekChar(toShow.originalWeek)}的${toShow.originalClassRange[0]}-${toShow.originalClassRange[1]}节，${toShow.originalClassroom}补课";
+                    "补课信息，从第$newAffectedWeeksListStr周星期${chineseWeekChar(toShow.newWeek)}的${toShow.newClassRange[0]}-${toShow.newClassRange[1]}节，${toShow.newClassroom}补课";
                 break;
               case ChangeType.stop:
                 classChange +=
@@ -101,7 +101,7 @@ class ClassChangeList extends StatelessWidget {
               subtitle: Text(
                 "编号: ${classChanges[index].classCode} | ${classChanges[index].classNumber} 班\n"
                 "安排变更：$classChange"
-                "${classChanges[index].type != ChangeType.stop ? "\n老师变更: $teacherChange" : ""}",
+                "${classChanges[index].type == ChangeType.change ? "\n老师变更: $teacherChange" : ""}",
               ),
             );
           }),

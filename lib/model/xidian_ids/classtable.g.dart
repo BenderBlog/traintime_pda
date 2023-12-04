@@ -120,7 +120,7 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       classCode: json['classCode'] as String,
       classNumber: json['classNumber'] as String,
       className: json['className'] as String,
-      originalAffectedWeeks: json['originalAffectedWeeks'] as String,
+      originalAffectedWeeks: json['originalAffectedWeeks'] as String?,
       newAffectedWeeks: json['newAffectedWeeks'] as String?,
       originalTeacherData: json['originalTeacherData'] as String?,
       newTeacherData: json['newTeacherData'] as String?,
@@ -130,7 +130,7 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       newClassRange: (json['newClassRange'] as List<dynamic>)
           .map((e) => e as int)
           .toList(),
-      originalWeek: json['originalWeek'] as int,
+      originalWeek: json['originalWeek'] as int?,
       newWeek: json['newWeek'] as int?,
       originalClassroom: json['originalClassroom'] as String?,
       newClassroom: json['newClassroom'] as String?,

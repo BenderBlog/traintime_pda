@@ -196,8 +196,8 @@ class ClassChange {
   /// KCM 课程名
   final String className;
 
-  /// 来自 SKZC 原周次信息
-  final String originalAffectedWeeks;
+  /// 来自 SKZC 原周次信息，可能是空
+  final String? originalAffectedWeeks;
 
   /// 来自 XSKZC 新周次信息，可能是空
   final String? newAffectedWeeks;
@@ -215,7 +215,7 @@ class ClassChange {
   final List<int> newClassRange;
 
   /// SKXQ 原先的星期
-  final int originalWeek;
+  final int? originalWeek;
 
   /// XSKXQ 现在的星期
   final int? newWeek;
@@ -244,9 +244,12 @@ class ClassChange {
   });
 
   List<int> get originalAffectedWeeksList {
+    if (originalAffectedWeeks == null) {
+      return [];
+    }
     List<int> toReturn = [];
-    for (int i = 0; i < originalAffectedWeeks.length; ++i) {
-      if (originalAffectedWeeks[i] == '1') toReturn.add(i);
+    for (int i = 0; i < originalAffectedWeeks!.length; ++i) {
+      if (originalAffectedWeeks![i] == '1') toReturn.add(i);
     }
     return toReturn;
   }
