@@ -223,7 +223,6 @@ class ClassTableFile extends EhallSession {
 
     if (int.parse(qResult["totalSize"].toString()) > 0) {
       for (var i in qResult["rows"]) {
-        print("class is ${i["KCM"]}");
         preliminaryData.classChanges.add(
           ClassChange(
             type: type(i["TKLXDM"]),
@@ -423,7 +422,8 @@ class ClassTableFile extends EhallSession {
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "Ehall getClasstable");
     if (isExist) {
-      developer.log("Last Modified Day ${file.lastModifiedSync()}",
+      developer.log(
+          "Last Modified Day ${file.lastModifiedSync().difference(DateTime(2023, 12, 7, 0, 0, 0)).inDays}",
           name: "Ehall getClasstable");
     }
 
