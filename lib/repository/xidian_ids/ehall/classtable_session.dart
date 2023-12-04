@@ -421,18 +421,33 @@ class ClassTableFile extends EhallSession {
     var file = File("${supportPath.path}/$schoolClassName");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "Ehall getClasstable");
+    if (isExist) {
+      developer.log("Last Modified Day ${file.lastModifiedSync()}",
+          name: "Ehall getClasstable");
+    }
 
     developer.log(
         isExist &&
                 isForce == false &&
-                DateTime.now().difference(file.lastModifiedSync()).inDays <= 3
+                DateTime.now().difference(file.lastModifiedSync()).inDays <=
+                    2 &&
+                file
+                        .lastModifiedSync()
+                        .difference(DateTime(2023, 12, 7, 0, 0, 0))
+                        .inDays >=
+                    0
             ? "Cache"
             : "Fetch from internet.",
         name: "Ehall getClasstable");
 
     if (isExist &&
         isForce == false &&
-        DateTime.now().difference(file.lastModifiedSync()).inDays <= 2) {
+        DateTime.now().difference(file.lastModifiedSync()).inDays <= 2 &&
+        file
+                .lastModifiedSync()
+                .difference(DateTime(2023, 12, 7, 0, 0, 0))
+                .inDays >=
+            0) {
       ClassTableData data =
           ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
       var userClass = getUserDefinedData();
