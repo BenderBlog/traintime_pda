@@ -1,7 +1,10 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
@@ -16,6 +19,12 @@ class AboutPage extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 660),
           child: ListView(
             children: [
+              Text(
+                "${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} v0.4.2 \n"
+                "Universe Discover Edition",
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18),
+              ).center(),
               Image.asset(
                 "assets/Credit.jpg",
                 fit: BoxFit.fitWidth,
