@@ -41,6 +41,7 @@ class EhallSession extends IDSSession {
     required String username,
     required String password,
     required Future<String?> Function(String) getCaptcha,
+    required Future<void> Function(String) sliderCaptcha,
     required void Function(int, String) onResponse,
   }) async {
     String location = await super.login(
@@ -49,6 +50,7 @@ class EhallSession extends IDSSession {
       username: username,
       password: password,
       getCaptcha: getCaptcha,
+      sliderCaptcha: sliderCaptcha,
       onResponse: onResponse,
     );
     var response = await dio.get(location);

@@ -11,6 +11,8 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/login/app_icon.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/page/login/slider_dialog.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
@@ -172,10 +174,17 @@ class _LoginWindowState extends State<LoginWindow> {
         password: _idsPasswordController.text,
         onResponse: (int number, String status) =>
             pd.update(msg: status, value: number),
+        sliderCaptcha: (String cookieStr) {
+          return Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CaptchaWidget(cookie: cookieStr),
+            ),
+          );
+        },
         getCaptcha: (String cookieStr) {
           return showDialog<String>(
             context: context,
-            builder: (context) => CaptchaInputDialog(cookie: cookieStr),
+            builder: (context) => CaptchaWidget(cookie: cookieStr),
           );
         },
       );

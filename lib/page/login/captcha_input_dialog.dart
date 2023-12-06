@@ -26,6 +26,8 @@ class CaptchaInputDialog extends StatelessWidget {
         color: Colors.black,
       ),
       content: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image(image: cappic),
           TextField(
