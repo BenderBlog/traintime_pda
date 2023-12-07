@@ -12,12 +12,10 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/login/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/page/login/slider_dialog.dart';
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/login/captcha_input_dialog.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 

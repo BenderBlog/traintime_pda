@@ -10,7 +10,6 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class SliderCaptchaClientProvider {
