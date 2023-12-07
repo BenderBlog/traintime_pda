@@ -10,6 +10,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class SliderCaptchaClientProvider {
@@ -43,6 +44,14 @@ class SliderCaptchaClientProvider {
   ///Y coordinate of the puzzle piece.
   final double coordinatesY;
 
+  late double puzzleWidth = 280;
+
+  late double pieceWidth = 44;
+
+  late double puzzleHeight = 155;
+
+  late double pieceHeight = 155;
+
   /// Provides Image information from the original base64 data
   SliderCaptchaClientProvider(
       this.puzzleBase64, this.pieceBase64, this.coordinatesY) {
@@ -56,14 +65,15 @@ class SliderCaptchaClientProvider {
     pieceSize = await _getSize(pieceUnit8List);
     puzzleImage = Image.memory(
       puzzleUnit8List,
-      height: 155,
-      width: 280,
-      fit: BoxFit.fill,
+      height: puzzleHeight,
+      width: puzzleWidth,
+      fit: BoxFit.fitWidth,
     );
     pieceImage = Image.memory(
       pieceUnit8List,
-      width: 42,
-      height: 155,
+      width: pieceWidth,
+      height: pieceHeight,
+      fit: BoxFit.fitWidth,
     );
     return true;
   }
@@ -95,11 +105,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
   /// 滑块的当前位置。
   double _sliderValue = 0.0;
 
-  /// 小部件的总宽度。
-  late double width;
-
   /// 滑到哪里了
-  final _offsetValue = 10;
+  final _offsetValue = 0;
 
   @override
   void initState() {
@@ -132,7 +139,6 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
 
   @override
   Widget build(BuildContext context) {
-    width = 280;
     return Scaffold(
       appBar: AppBar(
         title: const Text("服务器认证服务"),
@@ -147,8 +153,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
               children: [
                 // 堆叠三层，背景图、裁剪的拼图
                 SizedBox(
-                  width: 280,
-                  height: 155,
+                  width: snapshot.data!.puzzleWidth,
+                  height: snapshot.data!.puzzleHeight,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -156,7 +162,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                       snapshot.data!.puzzleImage!,
                       // 拼图层
                       Positioned(
-                        left: _sliderValue * width - _offsetValue,
+                        left: _sliderValue * snapshot.data!.puzzleWidth -
+                            _offsetValue,
                         child: snapshot.data!.pieceImage!,
                       ),
                     ],
@@ -177,27 +184,33 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                     onChanged: (value) {
                       setState(() {
                         _sliderValue = value;
-                        print(_sliderValue);
+                        print(_sliderValue * snapshot.data!.puzzleWidth);
                       });
                     },
                     onChangeEnd: (value) async {
                       /// Can you verify captcha at here
                       bool result = await dio
                           .post(
-                            "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
-                            data: "canvasLength=280&"
-                                "moveLength=${(_sliderValue * 280).toInt()}",
-                            options: Options(
-                              headers: {
-                                "Cookie": widget.cookie,
-                                HttpHeaders.contentTypeHeader:
-                                    "application/x-www-form-urlencoded;charset=utf-8",
-                                HttpHeaders.accessControlAllowOriginHeader:
-                                    "https://ids.xidian.edu.cn",
-                              },
-                            ),
-                          )
-                          .then((value) => value.data["errorCode"] == 1);
+                        "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
+                        data: "canvasLength=${(snapshot.data!.puzzleWidth)}&"
+                            "moveLength=${(_sliderValue * snapshot.data!.puzzleWidth).toInt()}",
+                        options: Options(
+                          headers: {
+                            "Cookie": widget.cookie,
+                            HttpHeaders.contentTypeHeader:
+                                "application/x-www-form-urlencoded;charset=utf-8",
+                            HttpHeaders.accessControlAllowOriginHeader:
+                                "https://ids.xidian.edu.cn",
+                          },
+                        ),
+                      )
+                          .then((value) {
+                        print((_sliderValue * snapshot.data!.puzzleWidth)
+                            .toInt()
+                            .toString());
+                        print(value.data.toString());
+                        return value.data["errorCode"] == 1;
+                      });
                       if (mounted) {
                         result
                             ? Navigator.of(context).pop()
@@ -207,10 +220,6 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                       }
                     },
                   ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 20),
-                  child: Text("滑验证码时候不要覆盖上所有的缺口，靠左些留大约四分之一会更好"),
                 )
               ],
             );
