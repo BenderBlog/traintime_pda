@@ -209,7 +209,7 @@ class _LoginWindowState extends State<LoginWindow> {
       pd.close();
       if (mounted) {
         if (e is PasswordWrongException) {
-          Fluttertoast.showToast(msg: "输入账号或密码错误");
+          Fluttertoast.showToast(msg: e.msg);
         } else {
           developer.log("Login failed: $e", name: "Login");
           Fluttertoast.showToast(

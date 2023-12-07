@@ -99,7 +99,13 @@ class IDSSession extends NetworkSession {
     );
     developer.log("Received: $data.", name: "ids checkAndLogin");
     if (data.statusCode == 401) {
-      throw PasswordWrongException();
+      var page = BeautifulSoup(data.data);
+      var form = page.findAll("span", attrs: {
+        "id": "showErrorTip",
+      })[0];
+      throw PasswordWrongException(
+        msg: form.children[0].string,
+      );
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress, due to something wrong, return the location here...
       // while (data.headers[HttpHeaders.locationHeader] != null) {
@@ -226,7 +232,13 @@ class IDSSession extends NetworkSession {
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw PasswordWrongException();
+        var page = BeautifulSoup(e.response!.data);
+        var form = page.findAll("span", attrs: {
+          "id": "showErrorTip",
+        })[0];
+        throw PasswordWrongException(
+          msg: form.children[0].string,
+        );
       } else {
         rethrow;
       }
@@ -238,7 +250,12 @@ class IDSSession extends NetworkSession {
 
 class NeedCaptchaException implements Exception {}
 
-class PasswordWrongException implements Exception {}
+class PasswordWrongException implements Exception {
+  final String msg;
+  const PasswordWrongException({required this.msg});
+  @override
+  String toString() => msg;
+}
 
 class LoginFailedException implements Exception {
   final String msg;

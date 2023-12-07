@@ -183,7 +183,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                     onChanged: (value) {
                       setState(() {
                         _sliderValue = value;
-                        print(_sliderValue * snapshot.data!.puzzleWidth);
+                        //print(_sliderValue * snapshot.data!.puzzleWidth);
                       });
                     },
                     onChangeEnd: (value) async {
@@ -204,10 +204,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                         ),
                       )
                           .then((value) {
-                        print((_sliderValue * snapshot.data!.puzzleWidth)
-                            .toInt()
-                            .toString());
-                        print(value.data.toString());
+                        //print((_sliderValue * snapshot.data!.puzzleWidth).toInt().toString());
+                        //print(value.data.toString());
                         return value.data["errorCode"] == 1;
                       });
                       if (mounted) {
