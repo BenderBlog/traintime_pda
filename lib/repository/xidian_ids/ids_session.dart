@@ -14,22 +14,6 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class IDSSession extends NetworkSession {
-  Map<String, String> loginHeader(String referer) => {
-        HttpHeaders.refererHeader: referer,
-        HttpHeaders.hostHeader: "ids.xidian.edu.cn",
-        HttpHeaders.acceptHeader:
-            "application/json, text/javascript, */*; q=0.01",
-        HttpHeaders.acceptLanguageHeader:
-            'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-        HttpHeaders.acceptEncodingHeader: 'gzip, deflate, br',
-        HttpHeaders.connectionHeader: 'Keep-Alive',
-        HttpHeaders.contentTypeHeader:
-            "application/x-www-form-urlencoded; charset=UTF-8",
-      };
-
-  Dio dioIds(String referer) =>
-      dio..options = BaseOptions(headers: loginHeader(referer));
-
   @override
   Dio get dio => super.dio
     ..interceptors.add(
@@ -89,9 +73,7 @@ class IDSSession extends NetworkSession {
     required String target,
   }) async {
     developer.log("Ready to get $target.", name: "ids checkAndLogin");
-    var data = await dioIds(
-      "https://ids.xidian.edu.cn/authserver/login?service=$target",
-    ).get(
+    var data = await dio.get(
       "https://ids.xidian.edu.cn/authserver/login",
       queryParameters: {
         'service': target,
@@ -139,9 +121,7 @@ class IDSSession extends NetworkSession {
       onResponse(10, "准备获取登录网页");
       developer.log("Ready to get the login webpage.", name: "ids login");
     }
-    var response = await dioIds(
-      "$target",
-    )
+    var response = await dio
         .get(
           "https://ids.xidian.edu.cn/authserver/login",
           queryParameters: target != null ? {'service': target} : null,
@@ -192,9 +172,7 @@ class IDSSession extends NetworkSession {
       onResponse(45, "滑块验证");
     }
 
-    await dioIds(
-      "$target",
-    ).get(
+    await dio.get(
       "https://ids.xidian.edu.cn/authserver/common/openSliderCaptcha.htl",
       queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
     );
@@ -206,9 +184,7 @@ class IDSSession extends NetworkSession {
       onResponse(50, "准备登录");
     }
     try {
-      var data = await dioIds(
-        "$target",
-      ).post(
+      var data = await dio.post(
         "https://ids.xidian.edu.cn/authserver/login",
         data: head,
         options: Options(
