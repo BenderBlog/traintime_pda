@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -20,8 +21,8 @@ class AboutPage extends StatelessWidget {
           child: ListView(
             children: [
               Text(
-                "${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} v0.4.2 \n"
-                "Universe Discover Edition",
+                "${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} ${preference.packageInfo.version} \n"
+                "Symptom of the Universe Edition",
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 18),
               ).center(),
