@@ -26,7 +26,7 @@ class LibrarySession extends IDSSession {
       await initSession();
     }
     var rawData = await dio.post(
-      "https://zs.xianmaigu.com/xidian_book/api/search/list.html",
+      "https://shuwo.xidian.edu.cn/xidian_book/api/search/list.html",
       data: {
         "libraryId": 5,
         "searchWord": searchWord,
@@ -55,7 +55,7 @@ class LibrarySession extends IDSSession {
 
   Future<String> renew(BorrowData toUse) async {
     return await dio.post(
-      "https://zs.xianmaigu.com/xidian_book/api/borrow/renewBook.html",
+      "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/renewBook.html",
       data: {
         "libraryId": 5,
         "userId": userId,
@@ -77,7 +77,7 @@ class LibrarySession extends IDSSession {
     }
     if (userBarcode == "") {
       userBarcode = await dio.post(
-        "https://zs.xianmaigu.com/xidian_book/api/borrow/getUserInfo",
+        "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getUserInfo",
         data: {
           "libraryId": 5,
           "userId": userId,
@@ -94,7 +94,7 @@ class LibrarySession extends IDSSession {
       );
     }
     var rawData = await dio.post(
-      "https://zs.xianmaigu.com/xidian_book/api/borrow/getBorrowList.html",
+      "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getBorrowList.html",
       data: {
         "libraryId": 5,
         "userId": userId,
