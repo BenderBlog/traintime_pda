@@ -58,7 +58,8 @@ dependencies:
   flutter_layout_grid: ^2.0.4
   styled_widget: ^0.4.1
   ming_cute_icons: ^0.0.1
-  timelines: ^0.1.0
+  timelines:
+    path: ./plugin/timelines
 
 dev_dependencies:
   flutter_test:
