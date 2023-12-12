@@ -7,7 +7,33 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 class ClasstableCurrentColumn extends StatelessWidget {
-  const ClasstableCurrentColumn({super.key});
+  final bool isArrangementMode;
+
+  const ClasstableCurrentColumn({super.key, this.isArrangementMode = false});
+
+  ClassDetail? getClassDetail(ClassTableController c) {
+    if (isArrangementMode) {
+      if (c.classSet.$1.isEmpty) {
+        return null;
+      }
+      return c.getClassDetail(c.classSet.$1.first);
+    }
+    return c.currentData.$1;
+  }
+
+  TimeArrangement? getTimeArrangement(ClassTableController c) {
+    if (isArrangementMode) {
+      if (c.classSet.$1.isEmpty) {
+        return null;
+      }
+      return c.classTableData.timeArrangement[c.classSet.$1.first];
+    }
+    return c.currentData.$2;
+  }
+
+  bool isTomorrow(ClassTableController c) {
+    return isArrangementMode && c.classSet.$2;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +47,8 @@ class ClasstableCurrentColumn extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               c.isGet == true
-                  ? c.currentData.$1 == null
-                      ? "目前没课"
-                      : c.currentData.$1!.name //"毛泽东思想和中国特色社会主义理论体系概论"
+                  ? (getClassDetail(c)?.name ??
+                      (isArrangementMode ? "无课程安排" : "没有正在进行的课程")) // "毛泽东思想和中国特色社会主义理论体系概论"
                   : c.error == null
                       ? "正在加载"
                       : "遇到错误",
@@ -36,15 +61,8 @@ class ClasstableCurrentColumn extends StatelessWidget {
           )),
           const SizedBox(height: 8.0),
           c.isGet == true
-              ? c.currentData.$1 == null
-                  ? Text(
-                      "请享受空闲时光",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    )
-                  : Column(
+              ? getClassDetail(c) != null
+                  ? Column(
                       children: [
                         Row(
                           children: [
@@ -55,9 +73,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              c.currentData.$2!.teacher == null
-                                  ? "老师未知"
-                                  : c.currentData.$2!.teacher!,
+                              getTimeArrangement(c)!.teacher ?? "老师未知",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
@@ -74,7 +90,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              c.currentData.$2!.classroom ?? "地点未定",
+                              getTimeArrangement(c)!.classroom ?? "地点未定",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
@@ -91,8 +107,8 @@ class ClasstableCurrentColumn extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              "${time[(c.currentData.$2!.start - 1) * 2]}-"
-                              "${time[(c.currentData.$2!.stop - 1) * 2 + 1]}",
+                              "${isTomorrow(c) ? "明天" : ""} ${time[(getTimeArrangement(c)!.start - 1) * 2]}-"
+                              "${time[(getTimeArrangement(c)!.stop - 1) * 2 + 1]}",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
@@ -102,6 +118,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                         ),
                       ],
                     )
+                  : const SizedBox(height: 30.0)
               : Text(
                   c.error == null ? "请耐心等待片刻" : "课表获取失败",
                   style: TextStyle(

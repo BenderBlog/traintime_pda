@@ -1,9 +1,11 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:timelines/timelines.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_arrangement.dart';
@@ -16,6 +18,31 @@ class ClassTableCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget withCardStyle(Widget w) {
+      w = w.paddingDirectional(
+        horizontal: 16,
+        vertical: 14,
+      );
+
+      if (isPhone(context)) {
+        w = w
+            .backgroundColor(
+              Theme.of(context).colorScheme.secondary,
+            )
+            .clipRRect(all: 12);
+      } else {
+        w = w.decorated(
+          border: Border.all(
+            width: 3,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          borderRadius: BorderRadius.circular(26),
+        );
+      }
+
+      return w.paddingAll(4);
+    }
+
     return GetBuilder<ClassTableController>(
       builder: (c) => GestureDetector(
         onTap: () {
@@ -33,7 +60,7 @@ class ClassTableCard extends StatelessWidget {
             Fluttertoast.showToast(msg: "遇到错误：${e.substring(0, 150)}");
           }
         },
-        child: Column(
+        child: withCardStyle(Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Row(
@@ -62,11 +89,87 @@ class ClassTableCard extends StatelessWidget {
             //   ],
             // ),
             const SizedBox(height: 4),
-            if (isPhone(context)) ...const [
-              Flexible(child: ClasstableCurrentColumn()),
-              Divider(color: Colors.transparent),
-              ClasstableArrangementColumn(),
-            ] else
+            if (isPhone(context))
+              FixedTimeline.tileBuilder(
+                theme: TimelineThemeData(
+                  nodePosition: 0,
+                ),
+                builder: TimelineTileBuilder(
+                  itemCount: 3,
+                  contentsAlign: ContentsAlign.basic,
+                  contentsBuilder: (context, index) => switch (index) {
+                    0 => const Padding(
+                        padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
+                        child: ClasstableCurrentColumn()),
+                    1 => const Padding(
+                        padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
+                        child:
+                            ClasstableCurrentColumn(isArrangementMode: true)),
+                    _ => Padding(
+                        padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                        child: Text(
+                          "${c.classSet.$2 ? "明天还有 " : "之后还有 "}${max(c.classSet.$1.length - 1, 0)} 节课",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                  },
+                  indicatorBuilder: (context, index) => Indicator.widget(
+                    position: switch (index) {
+                      0 => 0.05, // Current Class
+                      1 => 0.05, // Next Class
+                      _ => 0.50, // More Class
+                    },
+                    child: Icon(switch (index) {
+                      0 => Icons.timelapse_outlined, // Current Class
+                      1 => Icons.schedule_outlined, // Next Class
+                      _ => Icons.more_time_outlined, // More Class
+                    }),
+                  ),
+                  startConnectorBuilder: (context, index) {
+                    if (index == 0) {
+                      return null;
+                    }
+
+                    if (index == 1 && c.classSet.$2) {
+                      // Use dashedLine between today and tomorrow
+                      return Connector.dashedLine(
+                        color: Theme.of(context).colorScheme.primary,
+                        gap: 4,
+                        thickness: 3,
+                      );
+                    }
+
+                    return Connector.solidLine(
+                      color: Theme.of(context).colorScheme.primary,
+                      thickness: 3,
+                    );
+                  },
+                  endConnectorBuilder: (context, index) {
+                    if (index >= 2) {
+                      return null;
+                    }
+
+                    if (index == 0 && c.classSet.$2) {
+                      // Use dashedLine between today and tomorrow
+                      return Connector.dashedLine(
+                        color: Theme.of(context).colorScheme.primary,
+                        gap: 4,
+                        thickness: 3,
+                      );
+                    }
+
+                    return Connector.solidLine(
+                      color: Theme.of(context).colorScheme.primary,
+                      thickness: 3,
+                    );
+                  },
+                ),
+              )
+            else
               const Expanded(
                 child: Row(
                   children: [
@@ -83,19 +186,7 @@ class ClassTableCard extends StatelessWidget {
                 ),
               ),
           ],
-        )
-            .paddingDirectional(
-              horizontal: 16,
-              vertical: 14,
-            )
-            .decorated(
-              border: Border.all(
-                width: 3,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              borderRadius: BorderRadius.circular(26),
-            )
-            .paddingAll(4),
+        )),
       ),
     );
   }
