@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -21,11 +22,19 @@ class AboutPage extends StatelessWidget {
           child: ListView(
             children: [
               Text(
-                "${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} ${preference.packageInfo.version} \n"
-                "Symptom of the Universe Edition",
+                "${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} v${preference.packageInfo.version} \n"
+                "${Platform.isIOS || Platform.isMacOS ? "Iron Man" : "Hanger 18"} Edition",
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 18),
-              ).center(),
+              )
+                  .gestures(
+                    onTap: () => Fluttertoast.showToast(
+                      msg: Platform.isIOS || Platform.isMacOS
+                          ? "Heavy boots of lead fills his victims full of dread, run as fast as they can, IRON MAN LIVES AGAIN!!!"
+                          : "Possibly I have seen to much. Hanger 18, I known too much...",
+                    ),
+                  )
+                  .center(),
               Image.asset(
                 "assets/Credit.jpg",
                 fit: BoxFit.fitWidth,

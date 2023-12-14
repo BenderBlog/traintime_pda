@@ -31,7 +31,7 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   /// The height is suitable to show 1-8 class, 9-10 are hidden at the bottom.
   double classTableContentHeight(int count) =>
-      count * (widget.constraint.minHeight - midRowHeightVertical) / 8;
+      count * (widget.constraint.minHeight - midRowHeightVertical) / 8.5;
 
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(int index) {

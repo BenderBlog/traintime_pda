@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 0.4.3+14
+version: 0.4.5+15
 
 environment:
   sdk: ">=3.0.0"
