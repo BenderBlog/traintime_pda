@@ -88,6 +88,10 @@ class IDSSession extends NetworkSession {
       throw PasswordWrongException(
         msg: form.children[0].string,
       );
+    } else if (data.statusCode == 500) {
+      throw const PasswordWrongException(
+        msg: "状态码 500，疑似学校服务器目前超载。可以查看网络拦截器了解详情。",
+      );
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress, due to something wrong, return the location here...
       // while (data.headers[HttpHeaders.locationHeader] != null) {
@@ -215,7 +219,12 @@ class IDSSession extends NetworkSession {
         throw PasswordWrongException(
           msg: form.children[0].string,
         );
-      } else {
+      } else if (e.response?.statusCode == 500) {
+        throw const PasswordWrongException(
+          msg: "状态码 500，疑似学校服务器目前超载。可以查看网络拦截器了解详情。",
+        );
+      }
+      {
         rethrow;
       }
     } catch (e) {
