@@ -10,6 +10,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class SliderCaptchaClientProvider {
@@ -149,6 +150,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
             return const Center(child: CircularProgressIndicator());
           } else {
             return Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 堆叠三层，背景图、裁剪的拼图
                 SizedBox(
@@ -168,58 +170,61 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                     ],
                   ),
                 ),
-                SliderTheme(
-                  data: SliderThemeData(
-                    thumbColor: Colors.white, // 滑块颜色为白色
-                    activeTrackColor: Colors.green[900], // 激活轨道颜色为深绿色
-                    inactiveTrackColor: Colors.green[900], // 非激活轨道颜色为深绿色
-                    trackHeight: 10.0, // 轨道高度
-                    thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 10.0,
-                    ), // 滑块形状为圆形
+                SizedBox(
+                  width: snapshot.data!.puzzleWidth,
+                  child: SliderTheme(
+                    data: SliderThemeData(
+                      thumbColor: Colors.white, // 滑块颜色为白色
+                      activeTrackColor: Colors.green[900], // 激活轨道颜色为深绿色
+                      inactiveTrackColor: Colors.green[900], // 非激活轨道颜色为深绿色
+                      trackHeight: 10.0, // 轨道高度
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 10.0,
+                      ), // 滑块形状为圆形
+                    ),
+                    child: Slider(
+                      value: _sliderValue,
+                      onChanged: (value) {
+                        setState(() {
+                          _sliderValue = value;
+                          //print(_sliderValue * snapshot.data!.puzzleWidth);
+                        });
+                      },
+                      onChangeEnd: (value) async {
+                        /// Can you verify captcha at here
+                        bool result = await dio
+                            .post(
+                          "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
+                          data: "canvasLength=${(snapshot.data!.puzzleWidth)}&"
+                              "moveLength=${(_sliderValue * snapshot.data!.puzzleWidth).toInt()}",
+                          options: Options(
+                            headers: {
+                              "Cookie": widget.cookie,
+                              HttpHeaders.contentTypeHeader:
+                                  "application/x-www-form-urlencoded;charset=utf-8",
+                              HttpHeaders.accessControlAllowOriginHeader:
+                                  "https://ids.xidian.edu.cn",
+                            },
+                          ),
+                        )
+                            .then((value) {
+                          //print((_sliderValue * snapshot.data!.puzzleWidth).toInt().toString());
+                          //print(value.data.toString());
+                          return value.data["errorCode"] == 1;
+                        });
+                        if (mounted) {
+                          result
+                              ? Navigator.of(context).pop()
+                              : setState(() {
+                                  updateProvider();
+                                });
+                        }
+                      },
+                    ),
                   ),
-                  child: Slider(
-                    value: _sliderValue,
-                    onChanged: (value) {
-                      setState(() {
-                        _sliderValue = value;
-                        //print(_sliderValue * snapshot.data!.puzzleWidth);
-                      });
-                    },
-                    onChangeEnd: (value) async {
-                      /// Can you verify captcha at here
-                      bool result = await dio
-                          .post(
-                        "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
-                        data: "canvasLength=${(snapshot.data!.puzzleWidth)}&"
-                            "moveLength=${(_sliderValue * snapshot.data!.puzzleWidth).toInt()}",
-                        options: Options(
-                          headers: {
-                            "Cookie": widget.cookie,
-                            HttpHeaders.contentTypeHeader:
-                                "application/x-www-form-urlencoded;charset=utf-8",
-                            HttpHeaders.accessControlAllowOriginHeader:
-                                "https://ids.xidian.edu.cn",
-                          },
-                        ),
-                      )
-                          .then((value) {
-                        //print((_sliderValue * snapshot.data!.puzzleWidth).toInt().toString());
-                        //print(value.data.toString());
-                        return value.data["errorCode"] == 1;
-                      });
-                      if (mounted) {
-                        result
-                            ? Navigator.of(context).pop()
-                            : setState(() {
-                                updateProvider();
-                              });
-                      }
-                    },
-                  ),
-                )
+                ),
               ],
-            );
+            ).center();
           }
         },
       ),

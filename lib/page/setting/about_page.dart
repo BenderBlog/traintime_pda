@@ -31,7 +31,7 @@ class AboutPage extends StatelessWidget {
                     onTap: () => Fluttertoast.showToast(
                       msg: Platform.isIOS || Platform.isMacOS
                           ? "Heavy boots of lead fills his victims full of dread, run as fast as they can, IRON MAN LIVES AGAIN!!!"
-                          : "Possibly I have seen to much. Hanger 18, I known too much...",
+                          : "This place can't make scene, possibly I have seen to much. Hanger 18, I known too much...",
                     ),
                   )
                   .center(),
