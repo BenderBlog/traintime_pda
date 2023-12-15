@@ -53,21 +53,19 @@ class ClasstableArrangementColumn extends StatelessWidget {
             ),
           ).padding(bottom: 8.0),
           if (c.isGet)
-            if (c.classSet.$1.isNotEmpty) ...[
+            if (c.nextClassArrangements.$1.isNotEmpty) ...[
               ClassDetailTile(
-                isTomorrow: c.classSet.$2,
-                name: c.getClassDetail(c.classSet.$1.first).name,
+                isTomorrow: c.nextClassArrangements.$2,
+                name: c.classTableData.classDetail[c.nextClassArrangements.$1.first.index].name,
                 time:
-                    '${time[(c.classTableData.timeArrangement[c.classSet.$1.first].start - 1) * 2]}'
-                    '-${time[(c.classTableData.timeArrangement[c.classSet.$1.first].stop - 1) * 2 + 1]}',
-                place: c.classTableData.timeArrangement[c.classSet.$1.first]
-                        .classroom ??
-                    "未定教室",
+                    '${time[(c.nextClassArrangements.$1.first.start - 1) * 2]}'
+                    '-${time[(c.nextClassArrangements.$1.first.stop - 1) * 2 + 1]}',
+                place: c.nextClassArrangements.$1.first.classroom ?? "未定教室",
               ),
               noticeBox(
-                  "${c.classSet.$2 ? "明天一共" : "今天还剩"}${c.classSet.$1.length}节课"),
+                  "${c.nextClassArrangements.$2 ? "明天一共" : "今天还剩"}${c.nextClassArrangements.$1.length}节课"),
             ] else
-              noticeBox(c.classSet.$2 ? "明天没有课" : "已无课程安排")
+              noticeBox(c.nextClassArrangements.$2 ? "明天没有课" : "已无课程安排")
           else
             noticeBox(c.error == null ? "正在加载" : "遇到错误"),
         ],

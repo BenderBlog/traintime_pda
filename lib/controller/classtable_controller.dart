@@ -34,16 +34,17 @@ class ClassTableController extends GetxController {
   DateTime updateTime = DateTime.now();
 
   // Get ClassDetail name info
-  ClassDetail getClassDetail(int index) => classTableData.getClassDetail(index);
+  ClassDetail getClassDetail(int timeArrangementIndex) => classTableData.getClassDetail(timeArrangementIndex);
 
   // Get all user-add classes
   UserDefinedClassData get userDefinedClassData =>
       ClassTableFile().getUserDefinedData().$1;
 
-  // The time index.
+  /// The time index.
+  /// - `-1`: means the time is before 8:30.
+  /// - `time.length-1`: means the time is after 20:35.
+  /// - otherwise, means the time is in range [`time[timeIndex]`, `time[timeIndex+1]`).
   int get timeIndex {
-    // Default set to -2 as not in class.
-    int index = -2;
     developer.log(
       "Current time is $updateTime, ${Jiffy.parse(time[0], pattern: "hh:mm").format()}",
       name: "ClassTableControllerTimeIndex",
@@ -53,6 +54,7 @@ class ClassTableController extends GetxController {
     int currentTime = 60 * updateTime.hour + updateTime.minute;
 
     // Check for all the time.
+    int index = time.length - 1;
     for (int i = 0; i < time.length; ++i) {
       var split = time[i].split(":");
       int toDeal = 60 * int.parse(split[0]) + int.parse(split[1]);
@@ -72,119 +74,64 @@ class ClassTableController extends GetxController {
     return index;
   }
 
-  // The left of the class card, shows the class data about
-  // current class, next class or tomorrow's class.
-  (ClassDetail?, TimeArrangement?, bool?) get currentData {
-    ClassDetail? classToShow;
-    TimeArrangement? timeArrangementToShow;
-    bool? isNext;
+  /// Get the class data about current class.
+  (ClassDetail, TimeArrangement)? get currentData {
+    if (!isNotVacation) {
+      return null;
+    }
 
-    if (isNotVacation) {
-      int currentDataIndex = -1;
-
-      // Deal with the current time.
-      int currentTime = 60 * updateTime.hour + updateTime.minute;
-      var split = time.first.split(":");
-      int beginTime = 60 * int.parse(split[0]) + int.parse(split[1]);
-      split = time.last.split(':');
-      int endTime = 60 * int.parse(split[0]) + int.parse(split[1]);
-
-      // Eval with: before 8:30, between, after 20:35
-      if (currentTime < beginTime) {
-        developer.log(
-          "Current time is before ${time.first}",
-          name: "ClassTableControllerCurrentData",
-        );
-        isNext = true;
-        currentDataIndex =
-            pretendLayout[currentWeek][updateTime.weekday - 1][0][0];
-      } else if (currentTime > endTime) {
-        developer.log(
-          "Current time is after ${time.last}",
-          name: "ClassTableControllerCurrentData",
-        );
-        // Actually first -1 to fit the index.
-        // But I mean tomorrow, so +1. And -1+1=0
-        int weekday = updateTime.weekday;
-        int week = currentWeek;
-
-        if (weekday >= 7) {
-          weekday = 0;
-          week += 1;
-        }
-
-        if (week >= classTableData.semesterLength || week < 0) {
-          // Get the first class of tomorrow, if have...
-          isNext = true;
-          currentDataIndex = pretendLayout[week][weekday][0][0];
-        }
-      } else {
-        int index = timeIndex;
-        developer.log(
-          "Get the current class $index",
-          name: "ClassTableControllerCurrentData",
-        );
-        developer.log(
-          "Current time is after ${time[index]} $index",
-          name: "ClassTableControllerCurrentData",
-        );
-
-        // If in the class, the current class.
-        // Else, the previous class.
-        currentDataIndex =
-            pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
-        // In the class
-        if (index % 2 == 0) {
-          developer.log(
-            "In class.",
-            name: "ClassTableControllerCurrentData",
-          );
-          if (currentDataIndex != -1) {
-            isNext = false;
-          }
-        } else {
-          // See the next class.
-          int nextIndex = pretendLayout[currentWeek][updateTime.weekday - 1]
-              [(index + 1) ~/ 2][0];
-          developer.log(
-            "Not in class, seek the next class index is $nextIndex",
-            name: "ClassTableControllerCurrentData",
-          );
-          // If in supper/lunch
-          if ([7, 15].contains(index)) {
-            currentDataIndex = nextIndex;
-          }
-          // If really have class.
-          else if (nextIndex != -1) {
-            if (currentDataIndex != nextIndex) {
-              isNext = true;
-            } else {
-              isNext = false;
-            }
-            currentDataIndex = nextIndex;
-          }
-        }
-      }
-
+    int index = timeIndex;
+    if (index < 0 || index >= time.length - 1) {
       developer.log(
-        "Final data is $currentDataIndex",
+        "Current time is out of range. The index is $index",
         name: "ClassTableControllerCurrentData",
       );
-
-      // If no class, "have class" and "next class" notice is useless
-      if (currentDataIndex == -1) {
-        isNext = null;
-      } else {
-        timeArrangementToShow =
-            classTableData.timeArrangement[currentDataIndex];
-        classToShow = classTableData.classDetail[timeArrangementToShow.index];
-      }
+      return null;
     }
-    return (classToShow, timeArrangementToShow, isNext);
+
+    developer.log(
+      "Get the current class $index",
+      name: "ClassTableControllerCurrentData",
+    );
+    developer.log(
+      "Current time is after ${time[index]} $index",
+      name: "ClassTableControllerCurrentData",
+    );
+
+    int currentDataIndex =
+        pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+
+    // No class
+    if (currentDataIndex == -1) {
+      developer.log(
+        "No class",
+        name: "ClassTableControllerCurrentData",
+      );
+      return null;
+    }
+
+    // Check the exact time
+    TimeArrangement arrangement =
+        classTableData.timeArrangement[currentDataIndex];
+    if (index < ((arrangement.start - 1) * 2) ||
+        index >= ((arrangement.stop - 1) * 2 + 1)) {
+      developer.log(
+        "Current class has not started or has ended. ${time[index]} not in [${time[(arrangement.start - 1) * 2]}, ${time[(arrangement.stop - 1) * 2 + 1]})",
+        name: "ClassTableControllerCurrentData",
+      );
+      return null;
+    }
+
+    developer.log(
+      "Final data is $currentDataIndex",
+      name: "ClassTableControllerCurrentData",
+    );
+
+    return (classTableData.classDetail[arrangement.index], arrangement);
   }
 
-  // Today or tomorrow class
-  (List<int>, bool) get classSet {
+  /// Get next class arrangements today or tomorrow
+  (List<TimeArrangement>, bool) get nextClassArrangements {
     int weekday = updateTime.weekday - 1;
     int week = currentWeek;
     bool isTomorrow = false;
@@ -201,7 +148,7 @@ class ClassTableController extends GetxController {
     if (week >= classTableData.semesterLength || week < 0) {
       return ([], isTomorrow);
     } else {
-      Set<int> classes = {};
+      Set<int> classArrangementIndices = {};
       int i = timeIndex ~/ 2 + 1;
       developer.log(
         "currentindex: $i.",
@@ -209,13 +156,20 @@ class ClassTableController extends GetxController {
       );
 
       for (i; i < 10; ++i) {
-        classes.addAll(pretendLayout[week][weekday][i]);
+        classArrangementIndices.addAll(pretendLayout[week][weekday][i]);
       }
 
-      classes.remove(-1);
+      classArrangementIndices.remove(-1);
 
-      /// Parse isTomorrow
-      if (classes.isEmpty &&
+      // Remove the current class
+      (ClassDetail, TimeArrangement)? currentClass = currentData;
+      if (currentClass != null) {
+        int idx = classTableData.timeArrangement.indexOf(currentClass.$2);
+        classArrangementIndices.remove(idx);
+      }
+
+      // Parse isTomorrow
+      if (classArrangementIndices.isEmpty &&
               updateTime.hour * 60 + updateTime.minute >= 19 * 60 ||
           updateTime.hour * 60 + updateTime.minute >= 20 * 60 + 35) {
         developer.log(
@@ -236,7 +190,7 @@ class ClassTableController extends GetxController {
           name: "ClassTableControllerClassSet",
         );
 
-        classes.clear();
+        classArrangementIndices.clear();
 
         if (week <= classTableData.semesterLength) {
           developer.log(
@@ -244,23 +198,28 @@ class ClassTableController extends GetxController {
             name: "ClassTableControllerClassSet",
           );
           for (i = 0; i < 10; ++i) {
-            classes.addAll(pretendLayout[week][weekday][i]);
+            classArrangementIndices.addAll(pretendLayout[week][weekday][i]);
 
             developer.log(
-              "now tomorrow: $classes",
+              "now tomorrow: $classArrangementIndices",
               name: "ClassTableControllerClassSet",
             );
           }
-          classes.remove(-1);
+          classArrangementIndices.remove(-1);
 
           developer.log(
-            "$classes",
+            "$classArrangementIndices",
             name: "ClassTableControllerClassSet",
           );
         }
       }
 
-      return (classes.toList(), isTomorrow);
+      return (
+        classArrangementIndices
+            .map((idx) => classTableData.timeArrangement[idx])
+            .toList(),
+        isTomorrow
+      );
     }
   }
 
