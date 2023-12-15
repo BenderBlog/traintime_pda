@@ -98,8 +98,19 @@ class ClassTableController extends GetxController {
       name: "ClassTableControllerCurrentData",
     );
 
-    int currentDataIndex =
-        pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+    int currentDataIndex = -1;
+    try{
+      currentDataIndex = pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+    } catch (e, s) {
+      developer.log(
+        "No class table data, $e",
+        name: "ClassTableControllerCurrentData",
+      );
+      developer.log(
+        "The stacktrace is $s",
+        name: "ClassTableControllerCurrentData",
+      );
+    }
 
     // No class
     if (currentDataIndex == -1) {
