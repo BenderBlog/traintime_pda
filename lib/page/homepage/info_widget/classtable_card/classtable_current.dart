@@ -13,26 +13,24 @@ class ClasstableCurrentColumn extends StatelessWidget {
 
   ClassDetail? getClassDetail(ClassTableController c) {
     if (isArrangementMode) {
-      if (c.classSet.$1.isEmpty) {
-        return null;
-      }
-      return c.getClassDetail(c.classSet.$1.first);
+      List<TimeArrangement> arrangements = c.nextClassArrangements.$1;
+      return arrangements.isEmpty
+          ? null
+          : c.classTableData.classDetail[arrangements.first.index];
     }
-    return c.currentData.$1;
+    return c.currentData?.$1;
   }
 
   TimeArrangement? getTimeArrangement(ClassTableController c) {
     if (isArrangementMode) {
-      if (c.classSet.$1.isEmpty) {
-        return null;
-      }
-      return c.classTableData.timeArrangement[c.classSet.$1.first];
+      List<TimeArrangement> arrangements = c.nextClassArrangements.$1;
+      return arrangements.isEmpty ? null : arrangements.first;
     }
-    return c.currentData.$2;
+    return c.currentData?.$2;
   }
 
   bool isTomorrow(ClassTableController c) {
-    return isArrangementMode && c.classSet.$2;
+    return isArrangementMode && c.nextClassArrangements.$2;
   }
 
   @override
@@ -48,7 +46,9 @@ class ClasstableCurrentColumn extends StatelessWidget {
             child: Text(
               c.isGet == true
                   ? (getClassDetail(c)?.name ??
-                      (isArrangementMode ? "无课程安排" : "没有正在进行的课程")) // "毛泽东思想和中国特色社会主义理论体系概论"
+                      (isArrangementMode
+                          ? "无课程安排"
+                          : "没有正在进行的课程")) // "毛泽东思想和中国特色社会主义理论体系概论"
                   : c.error == null
                       ? "正在加载"
                       : "遇到错误",
@@ -107,7 +107,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              "${isTomorrow(c) ? "明天" : ""} ${time[(getTimeArrangement(c)!.start - 1) * 2]}-"
+                              "${isTomorrow(c) ? "明天 " : ""}${time[(getTimeArrangement(c)!.start - 1) * 2]}-"
                               "${time[(getTimeArrangement(c)!.stop - 1) * 2 + 1]}",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,

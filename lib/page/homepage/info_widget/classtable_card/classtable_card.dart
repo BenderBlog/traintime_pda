@@ -108,7 +108,7 @@ class ClassTableCard extends StatelessWidget {
                     _ => Padding(
                         padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                         child: Text(
-                          "${c.classSet.$2 ? "明天还有 " : "之后还有 "}${max(c.classSet.$1.length - 1, 0)} 节课",
+                          "之后还有 ${max(c.nextClassArrangements.$1.length - 1, 0)} 节课",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -134,7 +134,7 @@ class ClassTableCard extends StatelessWidget {
                       return null;
                     }
 
-                    if (index == 1 && c.classSet.$2) {
+                    if (index == 1 && c.nextClassArrangements.$2) {
                       // Use dashedLine between today and tomorrow
                       return Connector.dashedLine(
                         color: Theme.of(context).colorScheme.primary,
@@ -153,7 +153,7 @@ class ClassTableCard extends StatelessWidget {
                       return null;
                     }
 
-                    if (index == 0 && c.classSet.$2) {
+                    if (index == 0 && c.nextClassArrangements.$2) {
                       // Use dashedLine between today and tomorrow
                       return Connector.dashedLine(
                         color: Theme.of(context).colorScheme.primary,

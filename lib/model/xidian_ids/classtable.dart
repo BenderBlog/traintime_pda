@@ -86,7 +86,8 @@ class ClassDetail {
 
 @JsonSerializable(explicitToJson: true)
 class TimeArrangement {
-  int index; // 课程索引
+  /// 课程索引（注：是 `ClassDetail` 的索引，不是 `TimeArrangement` 的索引）
+  int index;
   // 返回的是 0 和 1 组成的数组，0 代表这周没课程，1 代表这周有课
   @JsonKey(name: 'week_list')
   String weekList; // 上课周次
@@ -129,8 +130,8 @@ class ClassTableData {
   List<ClassChange> classChanges;
 
   /// Only allowed to be used with classDetail
-  ClassDetail getClassDetail(int index) {
-    TimeArrangement t = timeArrangement[index];
+  ClassDetail getClassDetail(int timeArrangementIndex) {
+    TimeArrangement t = timeArrangement[timeArrangementIndex];
     switch (t.source) {
       case Source.school:
         return classDetail[t.index];
