@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -34,8 +35,17 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _selectedIndex = 0;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      updateOnAppResumed();
+    }
+  }
 
   static final _destinations = [
     PageInformation(
@@ -105,6 +115,15 @@ class _HomePageState extends State<HomePage> {
         );
       }
     });
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    super.dispose();
   }
 
   @override

@@ -53,3 +53,15 @@ void update() {
   // Update school card
   schoolCardController.updateMoney();
 }
+
+void updateOnAppResumed() {
+  final classTableController = Get.put(ClassTableController());
+
+  // Update Classtable
+  developer.log(
+    "Updating current class",
+    name: "Homepage Update",
+  );
+  classTableController.updateCurrent();
+  classTableController.update();
+}
