@@ -107,7 +107,7 @@ class ClasstableCurrentColumn extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              "${isTomorrow(c) ? "明天" : ""} ${time[(getTimeArrangement(c)!.start - 1) * 2]}-"
+                              "${isTomorrow(c) ? "明天 " : ""}${time[(getTimeArrangement(c)!.start - 1) * 2]}-"
                               "${time[(getTimeArrangement(c)!.stop - 1) * 2 + 1]}",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
