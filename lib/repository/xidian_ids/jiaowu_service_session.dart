@@ -5,13 +5,16 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class JiaowuServiceSession extends IDSSession {
   Map<String, String> services = {
     "score": "KW.CJCX",
+    "exam": "KW.KSAPCX",
   };
 
   static String authorization = "";
@@ -103,6 +106,64 @@ class JiaowuServiceSession extends IDSSession {
       }
     }
     return toReturn;
+  }
+
+  /// Default fetch the current semester's exam.
+  Future<(List<Subject>, List<ToBeArranged>)> getExam() async {
+    developer.log("Getting the exam data.", name: "Jiaowu getExam");
+    await useService("exam");
+
+    /// Choose the first period...
+    developer.log("Seek for the semesters.", name: "Jiaowu getExam");
+    String semester = await authorizationDio
+        .get("https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/termList")
+        .then((value) {
+      for (var i in value.data["data"]) {
+        if (i["currentFlag"] == true) return i["termCode"];
+      }
+      return preference.getString(preference.Preference.currentSemester);
+    });
+
+    semester = "2022-2023-1";
+
+    /// If failed, it is more likely that no exam has arranged.
+    developer.log("My exam arrangemet $semester", name: "Jiaowu getExam");
+    List<Subject> examData = await authorizationDio
+        .get(
+      "https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/listStuExamPlan"
+      "?termCode=$semester",
+    )
+        .then((value) {
+      var data = value.data["data"];
+      return List<Subject>.generate(
+        data.length,
+        (index) => Subject(
+          subject: data[index]["courseName"],
+          type: data[index]["batchName"],
+          time: data[index]["timeNote"],
+          place: data[index]["classroomName"],
+          seat: int.parse(data[index]["seatNo"]),
+        ),
+      );
+    });
+
+    List<ToBeArranged> toBeArrangedData = await authorizationDio
+        .get(
+      "https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/listStuExamUnPlan"
+      "?termCode=$semester",
+    )
+        .then((value) {
+      var data = value.data["data"];
+      return List<ToBeArranged>.generate(
+        data.length,
+        (index) => ToBeArranged(
+          subject: data[index]["courseName"],
+          id: data[index]["courseNo"],
+        ),
+      );
+    });
+
+    return (examData, toBeArrangedData);
   }
 }
 

@@ -3,7 +3,7 @@
 
 // The exam source.
 // Thanks xidian-script and libxdauth!
-
+/*
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ehall/ehall_session.dart';
 
@@ -55,3 +55,4 @@ class ExamFile extends EhallSession {
     return qResult;
   }
 }
+*/
