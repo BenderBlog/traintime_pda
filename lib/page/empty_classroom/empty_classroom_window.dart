@@ -141,7 +141,9 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                               fillColor: Colors.grey.withOpacity(0.2),
                               filled: true,
                               contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               hintText: "教室名称或者教室代码",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
@@ -150,7 +152,6 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                             ),
                             onSubmitted: (String text) {
                               c.searchParameter.value = text;
-                              c.updateData();
                             },
                           ),
                         ),
