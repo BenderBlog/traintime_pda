@@ -29,9 +29,7 @@ class ScoreCard extends StatelessWidget {
           }
         },
         onLongPress: () {
-          if (c.isGet) {
-            c.get();
-          }
+          c.get();
         },
         icon: Icons.grading_rounded,
         name: "成绩查询",

@@ -1,6 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
-
+/*
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
@@ -30,9 +30,9 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
   @override
   void initState() {
     super.initState();
-    compose = c.getDetail(widget.score.classID, widget.score.year);
-    inClassPlace = c.getPlaceInClass(widget.score.classID, widget.score.year);
-    inGradePlace = c.getPlaceInGrade(widget.score.courseID, widget.score.year);
+    //compose = c.getDetail(widget.score.classID, widget.score.year);
+    //inClassPlace = c.getPlaceInClass(widget.score.classID, widget.score.year);
+    //inGradePlace = c.getPlaceInGrade(widget.score.courseID, widget.score.year);
   }
 
   Widget scoreInfo(bool isInClass, BuildContext context) => Card(
@@ -352,3 +352,4 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
     );
   }
 }
+*/

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/score.dart';
-import 'package:watermeter/repository/xidian_ids/ehall/score_session.dart';
+import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
 
 class ScoreController extends GetxController {
   bool isGet = false;
@@ -29,14 +29,6 @@ class ScoreController extends GetxController {
     '学科导论',
     '心理',
     '物理实验',
-  ];
-
-  static final typesIgnore = [
-    '通识教育选修课',
-    '集中实践环节',
-    '拓展提高',
-    '通识教育核心课',
-    '专业选修课',
   ];
 
   static const notFinish = "(成绩没登完)";
@@ -142,6 +134,7 @@ class ScoreController extends GetxController {
     update();
   }
 
+  /*
   // ignore: non_constant_identifier_names
   Future<Compose> getDetail(String? JXBID, String XNXQDM) async {
     if (JXBID == null) {
@@ -168,6 +161,7 @@ class ScoreController extends GetxController {
       return await ScoreFile().getPlaceInGrade(KCM, XNXQDM);
     }
   }
+  */
 
   @override
   void onInit() {
@@ -189,11 +183,6 @@ class ScoreController extends GetxController {
           return false;
         }
       }
-      for (var i in typesIgnore) {
-        if (scoreTable[index].type.contains(i)) {
-          return false;
-        }
-      }
       return true;
     });
   }
@@ -203,7 +192,7 @@ class ScoreController extends GetxController {
     error = "正在加载";
     try {
       /// Init scorefile
-      scoreTable = await ScoreFile().get();
+      scoreTable = await JiaowuServiceSession().getScore();
       resetChoice();
       semester = {for (var i in scoreTable) i.year};
       statuses = {for (var i in scoreTable) i.status}..add("");

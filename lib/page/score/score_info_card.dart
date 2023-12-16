@@ -3,9 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/score/score_info.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
 class ScoreInfoCard extends StatefulWidget {
@@ -73,7 +71,13 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                         ),
                         const SizedBox(width: 5),
                         TagsBoxes(
-                          text: c.scoreTable[widget.mark].type,
+                          text: c.scoreTable[widget.mark].examType,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 5),
+                        TagsBoxes(
+                          text: c.scoreTable[widget.mark].examProp,
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
@@ -90,7 +94,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                       "GPA: ${c.scoreTable[widget.mark].gpa}",
                     ),
                     Text(
-                      "成绩：${c.scoreTable[widget.mark].how == 1 || c.scoreTable[widget.mark].how == 2 ? c.scoreTable[widget.mark].level : c.scoreTable[widget.mark].score}",
+                      "成绩：${c.scoreTable[widget.mark].scoreStr}",
                     ),
                   ],
                 ),
@@ -115,7 +119,9 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
               } else {
                 c.setScoreChoiceState(widget.mark);
               }
-            } else {
+            }
+            /*
+             else {
               BothSideSheet.show(
                 context: context,
                 title: "成绩详情",
@@ -124,6 +130,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                 ),
               );
             }
+            */
           },
           child: AnimatedOpacity(
             opacity: _isVisible ? 1.0 : 0.0,
