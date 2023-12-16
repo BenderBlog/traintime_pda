@@ -45,22 +45,29 @@ class ExamInfoCard extends StatelessWidget {
                         color: Colors.transparent,
                         height: 5,
                       ),
-                      informationWithIcon(Icons.access_time_filled_rounded,
-                          toUse!.time, context),
                       informationWithIcon(
-                          Icons.person, toUse!.teacher ?? "未知老师", context),
+                        Icons.access_time_filled_rounded,
+                        toUse!.time,
+                        context,
+                      ),
                       Flex(
                         direction: Axis.horizontal,
                         children: [
                           Expanded(
                             flex: 1,
                             child: informationWithIcon(
-                                Icons.room, toUse!.place, context),
+                              Icons.room,
+                              toUse!.place,
+                              context,
+                            ),
                           ),
                           Expanded(
                             flex: 1,
                             child: informationWithIcon(
-                                Icons.chair, toUse!.seat.toString(), context),
+                              Icons.chair,
+                              toUse!.seat.toString(),
+                              context,
+                            ),
                           ),
                         ],
                       ),
