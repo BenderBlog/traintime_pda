@@ -33,9 +33,11 @@ class ScoreChoiceWindow extends StatelessWidget {
                         chooseList: ["所有学期", ...c.semester],
                       ),
                     ).then((value) {
-                      c.chosenSemesterInScoreChoice =
-                          ["", ...c.semester].toList()[value!];
-                      c.update();
+                      if (value != null) {
+                        c.chosenSemesterInScoreChoice =
+                            ["", ...c.semester].toList()[value];
+                        c.update();
+                      }
                     });
                   },
                   child: Text(
@@ -55,9 +57,11 @@ class ScoreChoiceWindow extends StatelessWidget {
                         chooseList: ["所有类型", ...c.statuses].toList(),
                       ),
                     ).then((value) {
-                      c.chosenStatusInScoreChoice =
-                          ["", ...c.statuses].toList()[value!];
-                      c.update();
+                      if (value != null) {
+                        c.chosenStatusInScoreChoice =
+                            ["", ...c.statuses].toList()[value];
+                        c.update();
+                      }
                     });
                   },
                   child: Text(
@@ -120,25 +124,27 @@ class ScoreChoiceWindow extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: SingleChildScrollView(
-            child: LayoutGrid(
-              columnSizes: repeat(
-                crossItems,
-                [auto],
-              ),
-              rowSizes: repeat(
-                rowItem(c.selectedScoreList.length),
-                [auto],
-              ),
-              children: List<Widget>.generate(
-                c.selectedScoreList.length,
-                (index) => ScoreInfoCard(
-                  mark: c.selectedScoreList[index].mark,
-                  isScoreChoice: true,
-                ),
-              ),
-            ),
-          ),
+          child: c.selectedScoreList.isNotEmpty
+              ? SingleChildScrollView(
+                  child: LayoutGrid(
+                    columnSizes: repeat(
+                      crossItems,
+                      [auto],
+                    ),
+                    rowSizes: repeat(
+                      rowItem(c.selectedScoreList.length),
+                      [auto],
+                    ),
+                    children: List<Widget>.generate(
+                      c.selectedScoreList.length,
+                      (index) => ScoreInfoCard(
+                        mark: c.selectedScoreList[index].mark,
+                        isScoreChoice: true,
+                      ),
+                    ),
+                  ),
+                )
+              : const Center(child: Text("没有选择该学期的课程计入均分计算")),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(

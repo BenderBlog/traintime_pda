@@ -22,7 +22,7 @@ import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/xidian_ids/ehall/classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {

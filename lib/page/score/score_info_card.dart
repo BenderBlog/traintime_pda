@@ -3,9 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/score/score_info.dart';
 import 'package:watermeter/controller/score_controller.dart';
 
 class ScoreInfoCard extends StatefulWidget {
@@ -36,7 +34,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
             vertical: 5,
           ),
           elevation: 0,
-          color: c.isSelectMod && c.isSelected[widget.mark]
+          color: c.isSelectMod.value && c.isSelected[widget.mark]
               ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
               : Theme.of(context).colorScheme.secondary,
           child: Container(
@@ -72,8 +70,16 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                               Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 5),
+                        if (c.scoreTable[widget.mark].examType.isNotEmpty)
+                          TagsBoxes(
+                            text: c.scoreTable[widget.mark].examType,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
+                        if (c.scoreTable[widget.mark].examType.isNotEmpty)
+                          const SizedBox(width: 5),
                         TagsBoxes(
-                          text: c.scoreTable[widget.mark].type,
+                          text: c.scoreTable[widget.mark].examProp,
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
@@ -90,7 +96,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                       "GPA: ${c.scoreTable[widget.mark].gpa}",
                     ),
                     Text(
-                      "成绩：${c.scoreTable[widget.mark].how == 1 || c.scoreTable[widget.mark].how == 2 ? c.scoreTable[widget.mark].level : c.scoreTable[widget.mark].score}",
+                      "成绩：${c.scoreTable[widget.mark].scoreStr}",
                     ),
                   ],
                 ),
@@ -100,7 +106,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         );
         return GestureDetector(
           onTap: () {
-            if (c.isSelectMod) {
+            if (c.isSelectMod.value) {
               /// Animation
               if (c.isSelected[widget.mark] == true && widget.isScoreChoice) {
                 setState(() {
@@ -115,14 +121,6 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
               } else {
                 c.setScoreChoiceState(widget.mark);
               }
-            } else {
-              BothSideSheet.show(
-                context: context,
-                title: "成绩详情",
-                child: ScoreComposeCard(
-                  score: c.scoreTable[widget.mark],
-                ),
-              );
             }
           },
           child: AnimatedOpacity(

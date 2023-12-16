@@ -19,12 +19,21 @@ class NoArrangedInfo extends StatelessWidget {
         List.generate(
           list.length,
           (index) => Card(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 6,
+            ),
+            elevation: 0,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             child: ListTile(
-              title: Text(list[index].subject),
-              subtitle: Text(
-                "编号: ${list[index].id}\n"
-                "老师: ${list[index].teacher ?? "没有数据"}",
+              title: Text(
+                list[index].subject,
+                textScaleFactor: 1.1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
+              subtitle: Text("编号: ${list[index].id}"),
             ),
           ),
         ),

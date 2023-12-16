@@ -6,16 +6,17 @@ import 'package:get/get.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/score.dart';
-import 'package:watermeter/repository/xidian_ids/ehall/score_session.dart';
+import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
 
 class ScoreController extends GetxController {
-  bool isGet = false;
+  RxBool isGet = false.obs;
+  RxBool isError = false.obs;
   String? error;
   late String currentSemester;
   late List<Score> scoreTable;
   late List<bool> isSelected;
 
-  bool isSelectMod = false;
+  RxBool isSelectMod = false.obs;
   Set<String> semester = {};
   Set<String> statuses = {};
   Set<String> unPassedSet = {};
@@ -29,19 +30,24 @@ class ScoreController extends GetxController {
     '学科导论',
     '心理',
     '物理实验',
+    '工程概论',
+    '达标测试',
+    '大学生职业发展',
+    '国家英语四级',
+    '劳动教育',
+    '思想政治理论实践课',
+    '就业指导',
   ];
 
-  static final typesIgnore = [
-    '通识教育选修课',
-    '集中实践环节',
-    '拓展提高',
-    '通识教育核心课',
-    '专业选修课',
+  static final statusIgnore = [
+    '学院选修（任选）',
+    '非标',
+    '公共任选',
   ];
 
   static const notFinish = "(成绩没登完)";
-  static const notCoreClassType = "公共任选";
   static const notFirstTime = "(非初修)";
+  static const notCoreClassType = "公共任选";
 
   /// Empty means all semester.
   String chosenSemester = "";
@@ -142,91 +148,63 @@ class ScoreController extends GetxController {
     update();
   }
 
-  // ignore: non_constant_identifier_names
-  Future<Compose> getDetail(String? JXBID, String XNXQDM) async {
-    if (JXBID == null) {
-      return Compose();
-    } else {
-      return await ScoreFile().getDetail(JXBID, XNXQDM);
-    }
-  }
-
-  // ignore: non_constant_identifier_names
-  Future<ScorePlace> getPlaceInClass(String? JXBID, String XNXQDM) async {
-    if (JXBID == null) {
-      return ScorePlace();
-    } else {
-      return await ScoreFile().getPlaceInClass(JXBID, XNXQDM);
-    }
-  }
-
-  // ignore: non_constant_identifier_names
-  Future<ScorePlace> getPlaceInGrade(String? KCM, String XNXQDM) async {
-    if (KCM == null) {
-      return ScorePlace();
-    } else {
-      return await ScoreFile().getPlaceInGrade(KCM, XNXQDM);
-    }
-  }
-
   @override
   void onInit() {
     currentSemester =
         preference.getString(preference.Preference.currentSemester);
+    print(currentSemester);
     super.onInit();
   }
 
   @override
   void onReady() async {
-    get(semesterStr: currentSemester);
+    get();
     update();
   }
 
   void resetChoice() {
     isSelected = List<bool>.generate(scoreTable.length, (int index) {
       for (var i in courseIgnore) {
-        if (scoreTable[index].name.contains(i)) {
-          return false;
-        }
+        if (scoreTable[index].name.contains(i)) return false;
       }
-      for (var i in typesIgnore) {
-        if (scoreTable[index].type.contains(i)) {
-          return false;
-        }
+      for (var i in statusIgnore) {
+        if (scoreTable[index].status.contains(i)) return false;
       }
       return true;
     });
   }
 
-  Future<void> get({String? semesterStr}) async {
-    isGet = false;
-    error = "正在加载";
+  Future<void> get() async {
+    isGet.value = false;
+    isError.value = false;
     try {
       /// Init scorefile
-      scoreTable = await ScoreFile().get();
+      scoreTable = await JiaowuServiceSession().getScore();
       resetChoice();
       semester = {for (var i in scoreTable) i.year};
-      statuses = {for (var i in scoreTable) i.status}..add("");
+      statuses = {for (var i in scoreTable) i.status};
       unPassedSet.addAll({
         for (var i in scoreTable)
           if (i.score < 60) i.name
       });
 
-      isGet = true;
-      error = null;
-      chosenSemester = semester.last;
+      isGet.value = true;
+      chosenSemester = currentSemester;
     } on DioException catch (e, s) {
       developer.log(
         "Network exception: ${e.message}\nStack: $s",
         name: "ScoreController",
       );
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
+      isError.value = true;
     } on GetScoreFailedException catch (e) {
       developer.log("没有获取到成绩：$e", name: "ScoreSession");
       error = "没有获取到成绩：$e";
+      isError.value = true;
     } catch (e) {
       developer.log("未知故障：$e", name: "ScoreSession");
       error = e.toString();
+      isError.value = true;
     }
     update();
   }

@@ -33,10 +33,10 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
     super.dispose();
   }
 
-  Widget getIcon(bool isTransparent) => Center(
+  Widget getIcon(bool isUsed) => Center(
         child: Icon(
           Icons.flag,
-          color: isTransparent ? Colors.transparent : Colors.red,
+          color: isUsed ? Colors.red : Colors.transparent,
         ),
       );
 
@@ -141,7 +141,9 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                               fillColor: Colors.grey.withOpacity(0.2),
                               filled: true,
                               contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               hintText: "教室名称或者教室代码",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
@@ -150,7 +152,6 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                             ),
                             onSubmitted: (String text) {
                               c.searchParameter.value = text;
-                              c.updateData();
                             },
                           ),
                         ),
@@ -212,19 +213,19 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                                 ),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty1To2),
+                                getIcon(c.data[index].isUsed1To2),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty3To4),
+                                getIcon(c.data[index].isUsed3To4),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty5To6),
+                                getIcon(c.data[index].isUsed5To6),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty7To8),
+                                getIcon(c.data[index].isUsed7To8),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty9To10),
+                                getIcon(c.data[index].isUsed9To10),
                               ),
                             ],
                           ),

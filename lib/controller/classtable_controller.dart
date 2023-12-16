@@ -6,7 +6,7 @@ import 'package:jiffy/jiffy.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/xidian_ids/ehall/classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ClassTableController extends GetxController {
   bool isGet = false;
@@ -34,7 +34,8 @@ class ClassTableController extends GetxController {
   DateTime updateTime = DateTime.now();
 
   // Get ClassDetail name info
-  ClassDetail getClassDetail(int timeArrangementIndex) => classTableData.getClassDetail(timeArrangementIndex);
+  ClassDetail getClassDetail(int timeArrangementIndex) =>
+      classTableData.getClassDetail(timeArrangementIndex);
 
   // Get all user-add classes
   UserDefinedClassData get userDefinedClassData =>
@@ -99,8 +100,9 @@ class ClassTableController extends GetxController {
     );
 
     int currentDataIndex = -1;
-    try{
-      currentDataIndex = pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+    try {
+      currentDataIndex =
+          pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
     } catch (e, s) {
       developer.log(
         "No class table data, $e",
