@@ -3,7 +3,7 @@
 
 // The empty classroom query.
 // Thanks xidian-script and libxdauth!
-
+/*
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
@@ -128,3 +128,4 @@ class EmptyClassroomSession extends EhallSession {
     return toReturn;
   }
 }
+*/

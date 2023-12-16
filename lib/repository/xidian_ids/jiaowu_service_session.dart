@@ -1,12 +1,16 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// Super class contains Score, Exam and empty classroom.
+
 import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
+import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
+
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -15,17 +19,14 @@ class JiaowuServiceSession extends IDSSession {
   Map<String, String> services = {
     "score": "KW.CJCX",
     "exam": "KW.KSAPCX",
+    "classroom": "PK.KXJSCX",
   };
 
   static String authorization = "";
-  Dio get authorizationDio => Dio(
-        BaseOptions(
-          headers: {
-            HttpHeaders.authorizationHeader: authorization,
-            //HttpHeaders.cookieHeader: "Authorization=$authorization",
-          },
-        ),
-      )..interceptors.add(alice.getDioInterceptor());
+  Dio get authorizationDio => Dio(BaseOptions(headers: {
+        HttpHeaders.authorizationHeader: authorization,
+      }))
+        ..interceptors.add(alice.getDioInterceptor());
 
   Future<void> getToken() async {
     String location = await checkAndLogin(
@@ -71,6 +72,7 @@ class JiaowuServiceSession extends IDSSession {
     }
   }
 
+  /// All score list.
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
 
@@ -166,6 +168,66 @@ class JiaowuServiceSession extends IDSSession {
     });
 
     return (examData, toBeArrangedData);
+  }
+
+  /// Fetch the buildings for empty classroom.
+  Future<List<EmptyClassroomPlace>> getBuildingList() async {
+    List<EmptyClassroomPlace> toReturn = [];
+    developer.log(
+      "Getting the empty classroom.",
+      name: "Jiaowu getBuildingList",
+    );
+    await useService("exam");
+
+    var data = await authorizationDio
+        .get(
+          "https://ehall.xidian.edu.cn/jwmobile/biz/v410/spareClassroom/listBuilding?"
+          "pageNumber=1&campusNo=all&pageSize=50",
+        )
+        .then((value) => value.data["data"]["rows"]);
+    for (var i in data) {
+      toReturn.add(EmptyClassroomPlace(
+        code: i["buildingNo"],
+        name: i["buildingName"],
+      ));
+    }
+
+    return toReturn;
+  }
+
+  /// The function of search the buildings inside buildingCode.
+  /// params:
+  ///   [buildingCode]: the code defined in [getBuildingList].
+  ///   [date]: A date string with [yyyy-mm-dd] pattern.
+  /// Must be executed after [getBuildingList]!
+  Future<List<EmptyClassroomData>> searchEmptyClassroomData({
+    required String buildingCode,
+    required String date,
+  }) async {
+    List<EmptyClassroomData> toReturn = [];
+    await authorizationDio.get(
+        "https://ehall.xidian.edu.cn/jwmobile/biz/v410/spareClassroom/listUsedStatus",
+        queryParameters: {
+          "pageNumber": 1,
+          "pageSize": 999,
+          "buildingNo": buildingCode,
+          "date": date,
+          "periodOfTime": "00",
+        }).then((value) {
+      for (var i in value.data["data"]["rows"]) {
+        toReturn.add(
+          EmptyClassroomData(
+            name: i["classroomName"],
+            isUsed1To2: i["morning"][0]["used"] || i["morning"][1]["used"],
+            isUsed3To4: i["morning"][2]["used"] || i["morning"][3]["used"],
+            isUsed5To6: i["afternoon"][0]["used"] || i["afternoon"][1]["used"],
+            isUsed7To8: i["afternoon"][2]["used"] || i["afternoon"][3]["used"],
+            isUsed9To10: i["night"][0]["used"] || i["night"][1]["used"],
+          ),
+        );
+      }
+    });
+    return toReturn;
   }
 }
 

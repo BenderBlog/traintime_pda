@@ -13,18 +13,18 @@ class EmptyClassroomPlace {
 
 class EmptyClassroomData {
   final String name;
-  final bool isEmpty1To2;
-  final bool isEmpty3To4;
-  final bool isEmpty5To6;
-  final bool isEmpty7To8;
-  final bool isEmpty9To10;
+  final bool isUsed1To2;
+  final bool isUsed3To4;
+  final bool isUsed5To6;
+  final bool isUsed7To8;
+  final bool isUsed9To10;
 
   EmptyClassroomData({
     required this.name,
-    required this.isEmpty1To2,
-    required this.isEmpty3To4,
-    required this.isEmpty5To6,
-    required this.isEmpty7To8,
-    required this.isEmpty9To10,
+    required this.isUsed1To2,
+    required this.isUsed3To4,
+    required this.isUsed5To6,
+    required this.isUsed7To8,
+    required this.isUsed9To10,
   });
 }

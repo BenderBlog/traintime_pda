@@ -33,10 +33,10 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
     super.dispose();
   }
 
-  Widget getIcon(bool isTransparent) => Center(
+  Widget getIcon(bool isUsed) => Center(
         child: Icon(
           Icons.flag,
-          color: isTransparent ? Colors.transparent : Colors.red,
+          color: isUsed ? Colors.red : Colors.transparent,
         ),
       );
 
@@ -212,19 +212,19 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                                 ),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty1To2),
+                                getIcon(c.data[index].isUsed1To2),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty3To4),
+                                getIcon(c.data[index].isUsed3To4),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty5To6),
+                                getIcon(c.data[index].isUsed5To6),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty7To8),
+                                getIcon(c.data[index].isUsed7To8),
                               ),
                               DataCell(
-                                getIcon(c.data[index].isEmpty9To10),
+                                getIcon(c.data[index].isUsed9To10),
                               ),
                             ],
                           ),
