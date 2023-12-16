@@ -34,7 +34,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
             vertical: 5,
           ),
           elevation: 0,
-          color: c.isSelectMod && c.isSelected[widget.mark]
+          color: c.isSelectMod.value && c.isSelected[widget.mark]
               ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
               : Theme.of(context).colorScheme.secondary,
           child: Container(
@@ -70,12 +70,14 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                               Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 5),
-                        TagsBoxes(
-                          text: c.scoreTable[widget.mark].examType,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 5),
+                        if (c.scoreTable[widget.mark].examType.isNotEmpty)
+                          TagsBoxes(
+                            text: c.scoreTable[widget.mark].examType,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
+                        if (c.scoreTable[widget.mark].examType.isNotEmpty)
+                          const SizedBox(width: 5),
                         TagsBoxes(
                           text: c.scoreTable[widget.mark].examProp,
                           backgroundColor:
@@ -104,7 +106,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         );
         return GestureDetector(
           onTap: () {
-            if (c.isSelectMod) {
+            if (c.isSelectMod.value) {
               /// Animation
               if (c.isSelected[widget.mark] == true && widget.isScoreChoice) {
                 setState(() {
@@ -120,17 +122,6 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                 c.setScoreChoiceState(widget.mark);
               }
             }
-            /*
-             else {
-              BothSideSheet.show(
-                context: context,
-                title: "成绩详情",
-                child: ScoreComposeCard(
-                  score: c.scoreTable[widget.mark],
-                ),
-              );
-            }
-            */
           },
           child: AnimatedOpacity(
             opacity: _isVisible ? 1.0 : 0.0,

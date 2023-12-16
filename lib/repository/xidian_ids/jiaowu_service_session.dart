@@ -11,7 +11,6 @@ import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -23,10 +22,10 @@ class JiaowuServiceSession extends IDSSession {
   };
 
   static String authorization = "";
-  Dio get authorizationDio => Dio(BaseOptions(headers: {
-        HttpHeaders.authorizationHeader: authorization,
-      }))
-        ..interceptors.add(alice.getDioInterceptor());
+  Dio get authorizationDio => super.dio
+    ..options = BaseOptions(headers: {
+      HttpHeaders.authorizationHeader: authorization,
+    });
 
   Future<void> getToken() async {
     String location = await checkAndLogin(
@@ -126,8 +125,6 @@ class JiaowuServiceSession extends IDSSession {
       return preference.getString(preference.Preference.currentSemester);
     });
 
-    semester = "2022-2023-1";
-
     /// If failed, it is more likely that no exam has arranged.
     developer.log("My exam arrangemet $semester", name: "Jiaowu getExam");
     List<Subject> examData = await authorizationDio
@@ -136,6 +133,10 @@ class JiaowuServiceSession extends IDSSession {
       "?termCode=$semester",
     )
         .then((value) {
+      if (value.data["code"] != 200) {
+        throw GetExamFailedException(value.data["msg"]);
+      }
+
       var data = value.data["data"];
       return List<Subject>.generate(
         data.length,
@@ -157,6 +158,10 @@ class JiaowuServiceSession extends IDSSession {
       "?termCode=$semester",
     )
         .then((value) {
+      if (value.data["code"] != 200) {
+        throw GetExamFailedException(value.data["msg"]);
+      }
+
       var data = value.data["data"];
       return List<ToBeArranged>.generate(
         data.length,
@@ -234,6 +239,14 @@ class JiaowuServiceSession extends IDSSession {
 class GetScoreFailedException implements Exception {
   final String msg;
   const GetScoreFailedException(this.msg);
+
+  @override
+  String toString() => msg;
+}
+
+class GetExamFailedException implements Exception {
+  final String msg;
+  const GetExamFailedException(this.msg);
 
   @override
   String toString() => msg;
