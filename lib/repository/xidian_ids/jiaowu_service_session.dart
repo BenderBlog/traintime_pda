@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
+import 'package:watermeter/repository/network_session.dart';
 
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -22,10 +23,10 @@ class JiaowuServiceSession extends IDSSession {
   };
 
   static String authorization = "";
-  Dio get authorizationDio => super.dio
-    ..options = BaseOptions(headers: {
-      HttpHeaders.authorizationHeader: authorization,
-    });
+  Dio get authorizationDio => Dio(BaseOptions(headers: {
+        HttpHeaders.authorizationHeader: authorization,
+      }))
+        ..interceptors.add(alice.getDioInterceptor());
 
   Future<void> getToken() async {
     String location = await checkAndLogin(
