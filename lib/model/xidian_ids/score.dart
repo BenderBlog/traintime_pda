@@ -70,6 +70,7 @@ class Score {
     switch (scoreStr) {
       case "优秀":
         return 95;
+      case "免修":
       case "良好":
         return 85;
       case "通过":
