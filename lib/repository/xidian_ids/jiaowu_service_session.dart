@@ -145,7 +145,9 @@ class JiaowuServiceSession extends IDSSession {
           subject: data[index]["courseName"],
           type: data[index]["batchName"].toString().contains("期末考试")
               ? "期末考试"
-              : data[index]["batchName"],
+              : data[index]["batchName"].toString().contains("期中考试")
+                  ? "期中考试"
+                  : data[index]["batchName"],
           time: data[index]["timeNote"],
           place: data[index]["classroomName"],
           seat: int.parse(data[index]["seatNo"]),
