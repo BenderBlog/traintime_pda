@@ -80,6 +80,7 @@ class Score {
         return 65;
       case "不通过":
       case "不及格":
+      case "暂无":
         return 0;
       default:
         return double.parse(scoreStr);

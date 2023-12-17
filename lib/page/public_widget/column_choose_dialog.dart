@@ -14,7 +14,6 @@ class ColumnChooseDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(chooseList);
     return SimpleDialog(
       title: const Text('选择学期'),
       children: List.generate(

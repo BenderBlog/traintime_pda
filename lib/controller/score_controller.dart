@@ -152,7 +152,6 @@ class ScoreController extends GetxController {
   void onInit() {
     currentSemester =
         preference.getString(preference.Preference.currentSemester);
-    print(currentSemester);
     super.onInit();
   }
 
