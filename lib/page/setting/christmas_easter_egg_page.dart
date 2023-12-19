@@ -12,7 +12,7 @@ class EasterEggPage extends StatelessWidget {
   final String androidSong = '''
 Catch the Rainbow / Ritchie Blackmore's Rainbow
 
-Credit: Ronnie James Dio/Ritchie Blackmore, 1975
+Credit: Ronnie James Dio & Ritchie Blackmore, 1975
 
 When evening falls, she'll run to me
 当夜晚来临，她会跑向我
@@ -65,7 +65,7 @@ Come the dawn
   final String appleSong = '''
 The Temple of the King / Ritchie Blackmore's Rainbow
 
-Credit: Ronnie James Dio/Ritchie Blackmore, 1975
+Credit: Ronnie James Dio & Ritchie Blackmore, 1975
 
 One day, in the Year of the Fox
 在懵懂之年的某一天
