@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// TODO: Completely remove score controller.
+
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:developer' as developer;

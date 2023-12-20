@@ -18,15 +18,6 @@ class ThemeController extends GetxController {
   }
 
   void onUpdate() {
-    /*
-    if (preference.getInt(preference.Preference.color) == 0) {
-    } else {
-      apptheme = ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: ColorSeed
-            .values[preference.getInt(preference.Preference.color)].color,
-      );
-    }*/
     colorState =
         demoBlueModeMap[preference.getInt(preference.Preference.brightness)]!;
     update();
