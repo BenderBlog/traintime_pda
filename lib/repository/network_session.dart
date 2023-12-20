@@ -15,8 +15,6 @@ Alice alice = Alice();
 
 late Directory supportPath;
 
-bool offline = false;
-
 class NetworkSession {
   //@protected
   final PersistCookieJar cookieJar = PersistCookieJar(

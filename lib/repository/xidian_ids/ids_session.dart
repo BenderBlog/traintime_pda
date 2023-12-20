@@ -13,14 +13,31 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
+enum IDSLoginState {
+  none,
+  requesting,
+  success,
+  fail,
+
+  /// Indicate that the user will login via LoginWindow
+  manual,
+}
+
+IDSLoginState loginState = IDSLoginState.none;
+
+bool get offline =>
+    loginState != IDSLoginState.success && loginState != IDSLoginState.manual;
+
 class IDSSession extends NetworkSession {
   @override
   Dio get dio => super.dio
     ..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          developer.log("Offline status: $offline",
-              name: "OfflineCheckInspector");
+          developer.log(
+            "Offline status: $offline",
+            name: "OfflineCheckInspector",
+          );
           if (offline) {
             handler.reject(
               DioException.requestCancelled(
@@ -34,6 +51,8 @@ class IDSSession extends NetworkSession {
         },
       ),
     );
+
+  Dio get dioNoOfflineCheck => super.dio;
 
   /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
   /// Padding part is libxduauth's idea.
@@ -71,13 +90,12 @@ class IDSSession extends NetworkSession {
 
   Future<String> checkAndLogin({
     required String target,
+    Future<void> Function(String)? sliderCaptcha,
   }) async {
     developer.log("Ready to get $target.", name: "ids checkAndLogin");
-    var data = await dio.get(
+    var data = await dioNoOfflineCheck.get(
       "https://ids.xidian.edu.cn/authserver/login",
-      queryParameters: {
-        'service': target,
-      },
+      queryParameters: {'service': target},
     );
     developer.log("Received: $data.", name: "ids checkAndLogin");
     if (data.statusCode == 401) {
@@ -94,16 +112,12 @@ class IDSSession extends NetworkSession {
       );
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress, due to something wrong, return the location here...
-      // while (data.headers[HttpHeaders.locationHeader] != null) {
       return data.headers[HttpHeaders.locationHeader]![0];
-      //  developer.log("Received: $location.", name: "ids checkAndLogin");
-      //  data = await dio.get(location);
-      // }
-      // return data;
     } else {
       return await login(
         username: preference.getString(preference.Preference.idsAccount),
         password: preference.getString(preference.Preference.idsPassword),
+        sliderCaptcha: sliderCaptcha,
         target: target,
       );
     }
@@ -112,7 +126,6 @@ class IDSSession extends NetworkSession {
   Future<String> login({
     required String username,
     required String password,
-    Future<String?> Function(String)? getCaptcha,
 
     /// TODO: remove this goddame ?.
     Future<void> Function(String)? sliderCaptcha,
@@ -125,7 +138,7 @@ class IDSSession extends NetworkSession {
       onResponse(10, "准备获取登录网页");
       developer.log("Ready to get the login webpage.", name: "ids login");
     }
-    var response = await dio
+    var response = await dioNoOfflineCheck
         .get(
           "https://ids.xidian.edu.cn/authserver/login",
           queryParameters: target != null ? {'service': target} : null,
@@ -176,7 +189,7 @@ class IDSSession extends NetworkSession {
       onResponse(45, "滑块验证");
     }
 
-    await dio.get(
+    await dioNoOfflineCheck.get(
       "https://ids.xidian.edu.cn/authserver/common/openSliderCaptcha.htl",
       queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
     );
@@ -188,7 +201,7 @@ class IDSSession extends NetworkSession {
       onResponse(50, "准备登录");
     }
     try {
-      var data = await dio.post(
+      var data = await dioNoOfflineCheck.post(
         "https://ids.xidian.edu.cn/authserver/login",
         data: head,
         options: Options(
@@ -201,12 +214,7 @@ class IDSSession extends NetworkSession {
         if (onResponse != null) {
           onResponse(80, "登录后处理");
         }
-        //while (data.headers[HttpHeaders.locationHeader] != null) {
         return data.headers[HttpHeaders.locationHeader]![0];
-        //  developer.log("Received: $location.", name: "ids login");
-        // data = await dio.get(location);
-        //}
-        ///return data;
       } else {
         throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
       }

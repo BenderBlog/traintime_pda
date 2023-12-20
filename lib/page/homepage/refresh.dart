@@ -13,8 +13,42 @@ import 'package:watermeter/repository/message_session.dart';
 //import 'package:watermeter/repository/experiment/experiment_session.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-void update() {
+Future<void> _comboLogin({
+  Future<void> Function(String)? sliderCaptcha,
+}) async {
+  // Guard
+  if (loginState == IDSLoginState.requesting) {
+    return;
+  }
+  loginState = IDSLoginState.requesting;
+
+  try {
+    await IDSSession().checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/login?service="
+          "https://ehall.xidian.edu.cn/new/index.html",
+      sliderCaptcha: sliderCaptcha,
+    );
+    loginState = IDSLoginState.success;
+  } catch (e, s) {
+    loginState = IDSLoginState.fail;
+
+    developer.log(
+      "Combo login failed! Because of the following error: ",
+      name: "Watermeter",
+    );
+    developer.log(
+      "$e\nThe stack of the error is: $s",
+      name: "Watermeter",
+    );
+  }
+}
+
+Future<void> update({
+  bool forceRetryLogin = false,
+  Future<void> Function(String)? sliderCaptcha,
+}) async {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
   final libraryController = Get.put(LibraryController());
@@ -22,6 +56,13 @@ void update() {
 
   // Update data
   MessageSession().checkMessage();
+
+  // Retry Login
+  if (forceRetryLogin || loginState == IDSLoginState.fail) {
+    await _comboLogin(
+      sliderCaptcha: sliderCaptcha,
+    );
+  }
 
   // Update Classtable
   developer.log(

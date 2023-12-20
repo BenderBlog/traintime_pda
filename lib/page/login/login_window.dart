@@ -179,12 +179,6 @@ class _LoginWindowState extends State<LoginWindow> {
             ),
           );
         },
-        getCaptcha: (String cookieStr) {
-          return showDialog<String>(
-            context: context,
-            builder: (context) => CaptchaWidget(cookie: cookieStr),
-          );
-        },
       );
       if (!mounted) return;
       if (isGood == true) {

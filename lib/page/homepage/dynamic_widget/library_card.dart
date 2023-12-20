@@ -8,7 +8,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class LibraryCard extends StatelessWidget {
   const LibraryCard({super.key});

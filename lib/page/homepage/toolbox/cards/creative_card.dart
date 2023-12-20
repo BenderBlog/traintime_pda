@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/creative_job/creative_job.dart';
 import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class CreativeCard extends StatelessWidget {
   const CreativeCard({super.key});

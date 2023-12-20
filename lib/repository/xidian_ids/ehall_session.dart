@@ -40,7 +40,6 @@ class EhallSession extends IDSSession {
   Future<void> loginEhall({
     required String username,
     required String password,
-    required Future<String?> Function(String) getCaptcha,
     required Future<void> Function(String) sliderCaptcha,
     required void Function(int, String) onResponse,
   }) async {
@@ -49,7 +48,6 @@ class EhallSession extends IDSSession {
           "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
       username: username,
       password: password,
-      getCaptcha: getCaptcha,
       sliderCaptcha: sliderCaptcha,
       onResponse: onResponse,
     );

@@ -61,33 +61,9 @@ void main() async {
   MessageSession().checkMessage();
 
   // Have user registered?
-  bool isFirst = false;
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
-  if (username.isNotEmpty && password.isNotEmpty) {
-    try {
-      await IDSSession().checkAndLogin(
-        target:
-            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
-      );
-    } catch (e, s) {
-      developer.log(
-        "Offline mode activated! Because of the following error: ",
-        name: "Watermeter",
-      );
-      developer.log(
-        "$e\nThe stack of the error is: $s",
-        name: "Watermeter",
-      );
-      offline = true;
-    }
-  } else {
-    isFirst = true;
-  }
-  developer.log(
-    "Registered in status: ${!isFirst}",
-    name: "Watermeter",
-  );
+  bool isFirst = username.isEmpty || password.isEmpty;
 
   runApp(MyApp(isFirst: isFirst));
 }
@@ -107,6 +83,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     if (widget.isFirst) {
+      loginState = IDSLoginState.manual;
       IDSSession().dio.get("https://www.xidian.edu.cn");
     }
   }
