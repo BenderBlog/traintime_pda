@@ -84,6 +84,11 @@ void setInt(Preference key, int value) {
   prefs.reload();
 }
 
+void remove(Preference key) {
+  prefs.remove(key.key);
+  prefs.reload();
+}
+
 void prefrenceClear() {
   prefs.clear();
   prefs.reload();

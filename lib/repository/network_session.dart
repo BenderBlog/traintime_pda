@@ -29,10 +29,9 @@ class NetworkSession {
         BaseOptions(
           contentType: Headers.formUrlEncodedContentType,
           headers: {
-            HttpHeaders.userAgentHeader: "Mozilla/5.0 (Linux; Android 11;"
-                "WayDroid x86_64 Device Build/RQ3A.211001.001; wv)"
-                "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0"
-                "Chrome/112.0.5615.136 Safari/537.36",
+            HttpHeaders.userAgentHeader: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
           },
         ),
       )

@@ -5,6 +5,7 @@
 
 import 'dart:developer' as developer;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -204,10 +205,22 @@ class _LoginWindowState extends State<LoginWindow> {
       if (mounted) {
         if (e is PasswordWrongException) {
           Fluttertoast.showToast(msg: e.msg);
+        } else if (e is LoginFailedException) {
+          Fluttertoast.showToast(msg: e.msg);
+        } else if (e is DioException) {
+          if (e.message == null) {
+            if (e.response == null) {
+              Fluttertoast.showToast(msg: "无法连接到服务器。");
+            } else {
+              Fluttertoast.showToast(msg: "请求失败，响应状态码：${e.response!.statusCode}。");
+            }
+          } else {
+            Fluttertoast.showToast(msg: "请求失败。${e.message}");
+          }
         } else {
           developer.log("Login failed: $e", name: "Login");
           Fluttertoast.showToast(
-            msg: "登录遇到错误，请清除登录缓存。\n${e.toString().substring(20)}",
+            msg: "未知错误，请联系开发者。${e.toString().substring(20)}",
           );
         }
       }
@@ -216,6 +229,16 @@ class _LoginWindowState extends State<LoginWindow> {
 
   double get width => MediaQuery.sizeOf(context).width;
   double get height => MediaQuery.sizeOf(context).height;
+
+  @override
+  void initState() {
+    super.initState();
+
+    var cachedAccount = preference.getString(preference.Preference.idsAccount);
+    if (cachedAccount.isNotEmpty) {
+      _idsAccountController.text = cachedAccount;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

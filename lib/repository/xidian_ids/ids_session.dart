@@ -18,6 +18,7 @@ enum IDSLoginState {
   requesting,
   success,
   fail,
+  passwordWrong,
 
   /// Indicate that the user will login via LoginWindow
   manual,
@@ -88,6 +89,21 @@ class IDSSession extends NetworkSession {
     "execution",
   ];
 
+  String _parsePasswordWrongMsg(String html) {
+    var page = BeautifulSoup(html);
+    var form = page.findAll("span", attrs: {
+      "id": "showErrorTip",
+    })[0];
+    var msg = form.children[0].string;
+
+    // Simplify the error message because there is no '找回密码' button here XD.
+    // "用户名或密码有误，用户名为工号/学号，如果确认用户名无误，请点‘找回密码’自助重置密码。"
+    if (msg.contains(RegExp(r"(用户名|密码).*误", unicode: true, dotAll: true))) {
+      msg = "用户名或密码有误。";
+    }
+    return msg;
+  }
+
   Future<String> checkAndLogin({
     required String target,
     Future<void> Function(String)? sliderCaptcha,
@@ -99,17 +115,7 @@ class IDSSession extends NetworkSession {
     );
     developer.log("Received: $data.", name: "ids checkAndLogin");
     if (data.statusCode == 401) {
-      var page = BeautifulSoup(data.data);
-      var form = page.findAll("span", attrs: {
-        "id": "showErrorTip",
-      })[0];
-      throw PasswordWrongException(
-        msg: form.children[0].string,
-      );
-    } else if (data.statusCode == 500) {
-      throw const PasswordWrongException(
-        msg: "状态码 500，疑似学校服务器目前超载。可以查看网络拦截器了解详情。",
-      );
+      throw PasswordWrongException(msg: _parsePasswordWrongMsg(data.data));
     } else if (data.statusCode == 301 || data.statusCode == 302) {
       /// Post login progress, due to something wrong, return the location here...
       return data.headers[HttpHeaders.locationHeader]![0];
@@ -216,26 +222,12 @@ class IDSSession extends NetworkSession {
         }
         return data.headers[HttpHeaders.locationHeader]![0];
       } else {
-        throw LoginFailedException(msg: "未知失败，返回代码${data.statusCode}.");
+        throw LoginFailedException(msg: "登录失败，响应状态码：${data.statusCode}。");
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        var page = BeautifulSoup(e.response!.data);
-        var form = page.findAll("span", attrs: {
-          "id": "showErrorTip",
-        })[0];
-        throw PasswordWrongException(
-          msg: form.children[0].string,
-        );
-      } else if (e.response?.statusCode == 500) {
-        throw const PasswordWrongException(
-          msg: "状态码 500，疑似学校服务器目前超载。可以查看网络拦截器了解详情。",
-        );
+        throw PasswordWrongException(msg: _parsePasswordWrongMsg(e.response!.data));
       }
-      {
-        rethrow;
-      }
-    } catch (e) {
       rethrow;
     }
   }
