@@ -223,6 +223,16 @@ class _LoginWindowState extends State<LoginWindow> {
   double get height => MediaQuery.sizeOf(context).height;
 
   @override
+  void initState() {
+    super.initState();
+
+    var cachedAccount = preference.getString(preference.Preference.idsAccount);
+    if (cachedAccount.isNotEmpty) {
+      _idsAccountController.text = cachedAccount;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
