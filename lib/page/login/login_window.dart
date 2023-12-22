@@ -208,7 +208,15 @@ class _LoginWindowState extends State<LoginWindow> {
         } else if (e is LoginFailedException) {
           Fluttertoast.showToast(msg: e.msg);
         } else if (e is DioException) {
-          Fluttertoast.showToast(msg: "请求错误。${e.message ?? ''}");
+          if (e.message == null) {
+            if (e.response == null) {
+              Fluttertoast.showToast(msg: "无法连接到服务器。");
+            } else {
+              Fluttertoast.showToast(msg: "请求失败，响应状态码：${e.response!.statusCode}。");
+            }
+          } else {
+            Fluttertoast.showToast(msg: "请求失败。${e.message}");
+          }
         } else {
           developer.log("Login failed: $e", name: "Login");
           Fluttertoast.showToast(
