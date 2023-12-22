@@ -5,6 +5,7 @@
 
 import 'dart:developer' as developer;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -204,10 +205,14 @@ class _LoginWindowState extends State<LoginWindow> {
       if (mounted) {
         if (e is PasswordWrongException) {
           Fluttertoast.showToast(msg: e.msg);
+        } else if (e is LoginFailedException) {
+          Fluttertoast.showToast(msg: e.msg);
+        } else if (e is DioException) {
+          Fluttertoast.showToast(msg: "请求错误。${e.message ?? ''}");
         } else {
           developer.log("Login failed: $e", name: "Login");
           Fluttertoast.showToast(
-            msg: "登录遇到错误，请清除登录缓存。\n${e.toString().substring(20)}",
+            msg: "未知错误，请联系开发者。${e.toString().substring(20)}",
           );
         }
       }
