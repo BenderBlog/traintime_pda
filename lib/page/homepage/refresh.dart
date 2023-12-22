@@ -31,6 +31,17 @@ Future<void> _comboLogin({
       sliderCaptcha: sliderCaptcha,
     );
     loginState = IDSLoginState.success;
+  } on PasswordWrongException catch (e, s) {
+    loginState = IDSLoginState.passwordWrong;
+
+    developer.log(
+      "Combo login failed! Because of the following error: ",
+      name: "Watermeter",
+    );
+    developer.log(
+      "$e\nThe stack of the error is: $s",
+      name: "Watermeter",
+    );
   } catch (e, s) {
     loginState = IDSLoginState.fail;
 

@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
@@ -14,6 +15,7 @@ import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class PageInformation {
   final int index;
@@ -95,52 +97,86 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     MessageSession().checkMessage();
 
-    bool needLogin = (loginState == IDSLoginState.none);
-    if (needLogin) {
-      Fluttertoast.showToast(msg: "登陆中，暂时显示缓存数据");
+    if (loginState == IDSLoginState.none) {
+      _loginAsync();
+    } else {
+      update();
     }
+  }
 
-    update(
-      forceRetryLogin: needLogin,
-      sliderCaptcha: (String cookieStr) {
-        return Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => CaptchaWidget(cookie: cookieStr),
-          ),
-        );
-      },
-    ).then((_) {
-      switch (loginState) {
-        case IDSLoginState.success:
-          Fluttertoast.cancel();
-          Fluttertoast.showToast(msg: "登陆成功");
-          break;
-        case IDSLoginState.none:
-        case IDSLoginState.fail:
-          Fluttertoast.cancel();
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            await showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("统一认证服务离线模式开启"),
-                content: const Text(
-                  "无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。\n"
-                  "成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。\n"
-                  "如有不便，敬请谅解。",
+  void _loginAsync() async {
+    Fluttertoast.showToast(msg: "登陆中，暂时显示缓存数据");
+
+    try {
+      await update(
+        forceRetryLogin: true,
+        sliderCaptcha: (String cookieStr) {
+          return Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CaptchaWidget(cookie: cookieStr),
+            ),
+          );
+        },
+      );
+    } finally {
+      Fluttertoast.cancel();
+
+      if (loginState == IDSLoginState.success) {
+        Fluttertoast.showToast(msg: "登陆成功");
+      } else if (loginState == IDSLoginState.passwordWrong) {
+        preference.remove(preference.Preference.idsPassword);
+
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: const Text("用户名或密码有误"),
+              content: const Text("是否重启应用后手动登录？"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Restart.restartApp();
+                  },
+                  child: const Text("是"),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text("确定"),
-                  ),
-                ],
-              ),
-            );
-          });
-          break;
-        default:
-          break;
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showOfflineModeNotice();
+                  },
+                  child: const Text("否，进入离线模式"),
+                ),
+              ],
+            ),
+          );
+        });
+      } else {
+        _showOfflineModeNotice();
       }
+    }
+  }
+
+  void _showOfflineModeNotice() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("统一认证服务离线模式开启"),
+          content: const Text(
+            "无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。\n"
+            "成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。\n"
+            "如有不便，敬请谅解。",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("确定"),
+            ),
+          ],
+        ),
+      );
     });
   }
 

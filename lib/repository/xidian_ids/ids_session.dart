@@ -18,6 +18,7 @@ enum IDSLoginState {
   requesting,
   success,
   fail,
+  passwordWrong,
 
   /// Indicate that the user will login via LoginWindow
   manual,
