@@ -1,98 +1,47 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
-import 'package:get/get.dart';
-import 'package:watermeter/controller/score_controller.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
+import 'package:watermeter/page/score/score_state.dart';
 
-class ScoreChoiceWindow extends StatelessWidget {
+class ScoreChoiceWindow extends StatefulWidget {
   const ScoreChoiceWindow({super.key});
 
-  PreferredSizeWidget dropDownButton(context) => PreferredSize(
-        preferredSize: const Size.fromHeight(48.0),
-        child: GetBuilder<ScoreController>(
-          builder: (c) => Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
-                  ),
-                  onPressed: () async {
-                    await showDialog<int>(
-                      context: context,
-                      builder: (context) => ColumnChooseDialog(
-                        chooseList: ["所有学期", ...c.semester],
-                      ),
-                    ).then((value) {
-                      if (value != null) {
-                        c.chosenSemesterInScoreChoice =
-                            ["", ...c.semester].toList()[value];
-                        c.update();
-                      }
-                    });
-                  },
-                  child: Text(
-                    "学期 ${c.chosenSemesterInScoreChoice == "" ? "所有学期" : c.chosenSemesterInScoreChoice}",
-                  ),
-                ),
-                const VerticalDivider(),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
-                  ),
-                  onPressed: () async {
-                    await showDialog<int>(
-                      context: context,
-                      builder: (context) => ColumnChooseDialog(
-                        chooseList: ["所有类型", ...c.statuses].toList(),
-                      ),
-                    ).then((value) {
-                      if (value != null) {
-                        c.chosenStatusInScoreChoice =
-                            ["", ...c.statuses].toList()[value];
-                        c.update();
-                      }
-                    });
-                  },
-                  child: Text(
-                    "类型 ${c.chosenStatusInScoreChoice == "" ? "所有类型" : c.chosenStatusInScoreChoice}",
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+  @override
+  State<ScoreChoiceWindow> createState() => _ScoreChoiceWindowState();
+}
+
+class _ScoreChoiceWindowState extends State<ScoreChoiceWindow> {
+  late ScoreState state;
+
+  @override
+  void didChangeDependencies() {
+    state = ScoreState.of(context)!;
+    state.controllers.addListener(() => mounted ? setState(() {}) : null);
+    super.didChangeDependencies();
+  }
 
   Future<void> scoreInfoDialog(context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('小总结'),
-          content: GetBuilder<ScoreController>(
-            builder: (c) => Text(
-                "所有科目的GPA：${c.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
-                "所有科目的均分：${c.evalAvg(true).toStringAsFixed(2)}\n"
-                "所有科目的学分：${c.evalCredit(true).toStringAsFixed(2)}\n"
-                "未通过科目：${c.unPassed}\n"
-                "公共选修课已经修得学分：${c.notCoreClass}\n"
-                "本程序提供的数据仅供参考，开发者对其准确性不负责"),
-          ),
+          content: Text(
+              "所有科目的GPA：${state.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
+              "所有科目的均分：${state.evalAvg(true).toStringAsFixed(2)}\n"
+              "所有科目的学分：${state.evalCredit(true).toStringAsFixed(2)}\n"
+              "未通过科目：${state.unPassed}\n"
+              "公共选修课已经修得学分：${state.notCoreClass}\n"
+              "本程序提供的数据仅供参考，开发者对其准确性不负责"),
           actions: <Widget>[
             TextButton(
               child: const Text("确定"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         ),
@@ -110,52 +59,110 @@ class ScoreChoiceWindow extends StatelessWidget {
       return rowItem;
     }
 
-    return GetBuilder<ScoreController>(
-      builder: (c) => Scaffold(
-        appBar: AppBar(
-          title: const Text("成绩单"),
-          actions: [
-            IconButton(
-              onPressed: () => scoreInfoDialog(context),
-              icon: const Icon(Icons.info),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Platform.isIOS || Platform.isMacOS
+                ? Icons.arrow_back_ios_new
+                : Icons.arrow_back,
+          ),
+          onPressed: Navigator.of(context).pop,
+        ),
+        title: const Text("成绩单"),
+        actions: [
+          IconButton(
+            onPressed: () => scoreInfoDialog(context),
+            icon: const Icon(Icons.info),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(46.0),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                  ),
+                  onPressed: () async {
+                    await showDialog<int>(
+                      context: context,
+                      builder: (context) => ColumnChooseDialog(
+                        chooseList: ["所有学期", ...state.semester],
+                      ),
+                    ).then((value) {
+                      if (value != null) {
+                        state.controllers.chosenSemesterInScoreChoice =
+                            ["", ...state.semester].toList()[value];
+                      }
+                    });
+                  },
+                  child: Text(
+                    "学期 ${state.controllers.chosenSemesterInScoreChoice == "" ? "所有学期" : state.controllers.chosenSemesterInScoreChoice}",
+                  ),
+                ),
+                const VerticalDivider(),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                  ),
+                  onPressed: () async {
+                    await showDialog<int>(
+                      context: context,
+                      builder: (context) => ColumnChooseDialog(
+                        chooseList: ["所有类型", ...state.statuses].toList(),
+                      ),
+                    ).then((value) {
+                      if (value != null) {
+                        state.controllers.chosenStatusInScoreChoice =
+                            ["", ...state.statuses].toList()[value];
+                      }
+                    });
+                  },
+                  child: Text(
+                    "类型 ${state.controllers.chosenStatusInScoreChoice == "" ? "所有类型" : state.controllers.chosenStatusInScoreChoice}",
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: state.selectedScoreList.isNotEmpty
+          ? SingleChildScrollView(
+              child: LayoutGrid(
+                columnSizes: repeat(
+                  crossItems,
+                  [auto],
+                ),
+                rowSizes: repeat(
+                  rowItem(state.selectedScoreList.length),
+                  [auto],
+                ),
+                children: List<Widget>.generate(
+                  state.selectedScoreList.length,
+                  (index) => ScoreInfoCard(
+                    mark: state.selectedScoreList[index].mark,
+                    isScoreChoice: true,
+                  ),
+                ),
+              ),
+            )
+          : const Center(child: Text("没有选择该学期的课程计入均分计算")),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              state.bottomInfo,
+              textScaleFactor: 1.2,
             ),
           ],
-          bottom: dropDownButton(context),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: c.selectedScoreList.isNotEmpty
-              ? SingleChildScrollView(
-                  child: LayoutGrid(
-                    columnSizes: repeat(
-                      crossItems,
-                      [auto],
-                    ),
-                    rowSizes: repeat(
-                      rowItem(c.selectedScoreList.length),
-                      [auto],
-                    ),
-                    children: List<Widget>.generate(
-                      c.selectedScoreList.length,
-                      (index) => ScoreInfoCard(
-                        mark: c.selectedScoreList[index].mark,
-                        isScoreChoice: true,
-                      ),
-                    ),
-                  ),
-                )
-              : const Center(child: Text("没有选择该学期的课程计入均分计算")),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                c.bottomInfo,
-                textScaleFactor: 1.2,
-              ),
-            ],
-          ),
         ),
       ),
     );

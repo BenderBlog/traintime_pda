@@ -1,10 +1,9 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/controller/score_controller.dart';
+import 'package:watermeter/page/score/score_state.dart';
 
 class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class
@@ -22,21 +21,48 @@ class ScoreInfoCard extends StatefulWidget {
 }
 
 class _ScoreInfoCardState extends State<ScoreInfoCard> {
+  late ScoreState c;
+
+  @override
+  void didChangeDependencies() {
+    c = ScoreState.of(context)!;
+    c.controllers.addListener(() => mounted ? setState(() {}) : null);
+    super.didChangeDependencies();
+  }
+
   bool _isVisible = true;
   Duration get _duration => Duration(milliseconds: _isVisible ? 0 : 150);
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ScoreController>(
-      builder: (c) {
-        Widget infoCard = Card(
+    return GestureDetector(
+      onTap: () {
+        if (c.controllers.isSelectMod) {
+          /// Animation
+          if (c.controllers.isSelected[widget.mark] == true &&
+              widget.isScoreChoice) {
+            setState(() => _isVisible = false);
+            Future.delayed(_duration).then((value) {
+              c.setScoreChoiceFromIndex(widget.mark);
+              setState(() => _isVisible = true);
+            });
+          } else {
+            c.setScoreChoiceFromIndex(widget.mark);
+          }
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: _isVisible ? 1.0 : 0.0,
+        duration: _duration,
+        child: Card(
           margin: const EdgeInsets.symmetric(
             horizontal: 10,
             vertical: 5,
           ),
           elevation: 0,
-          color: c.isSelectMod.value && c.isSelected[widget.mark]
-              ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
-              : Theme.of(context).colorScheme.secondary,
+          color:
+              c.controllers.isSelectMod && c.controllers.isSelected[widget.mark]
+                  ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
+                  : Theme.of(context).colorScheme.secondary,
           child: Container(
             padding: const EdgeInsets.all(15),
             child: Column(
@@ -103,33 +129,8 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
               ],
             ),
           ),
-        );
-        return GestureDetector(
-          onTap: () {
-            if (c.isSelectMod.value) {
-              /// Animation
-              if (c.isSelected[widget.mark] == true && widget.isScoreChoice) {
-                setState(() {
-                  _isVisible = false;
-                });
-                Future.delayed(_duration).then((value) {
-                  c.setScoreChoiceState(widget.mark);
-                  setState(() {
-                    _isVisible = true;
-                  });
-                });
-              } else {
-                c.setScoreChoiceState(widget.mark);
-              }
-            }
-          },
-          child: AnimatedOpacity(
-            opacity: _isVisible ? 1.0 : 0.0,
-            duration: _duration,
-            child: infoCard,
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
