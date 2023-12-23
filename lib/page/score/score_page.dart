@@ -68,12 +68,18 @@ class _ScorePageState extends State<ScorePage> {
             onPressed: () => c.setScoreChoiceMod(),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(46.0),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 6,
+            ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: isPhone(context)
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
               children: [
                 TextButton(
                   style: TextButton.styleFrom(
@@ -121,28 +127,29 @@ class _ScorePageState extends State<ScorePage> {
               ],
             ),
           ),
-        ),
+          Expanded(
+              child: c.toShow.isNotEmpty
+                  ? SingleChildScrollView(
+                      child: LayoutGrid(
+                        columnSizes: repeat(
+                          crossItems,
+                          [auto],
+                        ),
+                        rowSizes: repeat(
+                          rowItem(c.toShow.length),
+                          [auto],
+                        ),
+                        children: List<Widget>.generate(
+                          c.toShow.length,
+                          (index) => ScoreInfoCard(
+                            mark: c.toShow[index].mark,
+                          ),
+                        ),
+                      ),
+                    ).paddingDirectional(horizontal: 8)
+                  : const Text("未筛查到合请求的记录").center()),
+        ],
       ),
-      body: c.toShow.isNotEmpty
-          ? SingleChildScrollView(
-              child: LayoutGrid(
-                columnSizes: repeat(
-                  crossItems,
-                  [auto],
-                ),
-                rowSizes: repeat(
-                  rowItem(c.toShow.length),
-                  [auto],
-                ),
-                children: List<Widget>.generate(
-                  c.toShow.length,
-                  (index) => ScoreInfoCard(
-                    mark: c.toShow[index].mark,
-                  ),
-                ),
-              ),
-            ).paddingDirectional(horizontal: 8)
-          : const Text("未筛查到合请求的记录").center(),
       bottomNavigationBar: Visibility(
         visible: c.controllers.isSelectMod,
         child: BottomAppBar(

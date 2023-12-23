@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
@@ -76,10 +77,14 @@ class _ScoreChoiceWindowState extends State<ScoreChoiceWindow> {
             icon: const Icon(Icons.info),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(46.0),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 6,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -131,29 +136,33 @@ class _ScoreChoiceWindowState extends State<ScoreChoiceWindow> {
               ],
             ),
           ),
-        ),
-      ),
-      body: state.selectedScoreList.isNotEmpty
-          ? SingleChildScrollView(
-              child: LayoutGrid(
-                columnSizes: repeat(
-                  crossItems,
-                  [auto],
-                ),
-                rowSizes: repeat(
-                  rowItem(state.selectedScoreList.length),
-                  [auto],
-                ),
-                children: List<Widget>.generate(
-                  state.selectedScoreList.length,
-                  (index) => ScoreInfoCard(
-                    mark: state.selectedScoreList[index].mark,
-                    isScoreChoice: true,
+          Expanded(
+            child: state.selectedScoreList.isNotEmpty
+                ? SingleChildScrollView(
+                    child: LayoutGrid(
+                      columnSizes: repeat(
+                        crossItems,
+                        [auto],
+                      ),
+                      rowSizes: repeat(
+                        rowItem(state.selectedScoreList.length),
+                        [auto],
+                      ),
+                      children: List<Widget>.generate(
+                        state.selectedScoreList.length,
+                        (index) => ScoreInfoCard(
+                          mark: state.selectedScoreList[index].mark,
+                          isScoreChoice: true,
+                        ),
+                      ),
+                    ),
+                  ).paddingDirectional(horizontal: 8)
+                : const Center(
+                    child: Text("没有选择该学期的课程计入均分计算"),
                   ),
-                ),
-              ),
-            )
-          : const Center(child: Text("没有选择该学期的课程计入均分计算")),
+          )
+        ],
+      ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
