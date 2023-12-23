@@ -36,18 +36,15 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (c.controllers.isSelectMod) {
-          /// Animation
-          if (c.controllers.isSelected[widget.mark] == true &&
-              widget.isScoreChoice) {
-            setState(() => _isVisible = false);
-            Future.delayed(_duration).then((value) {
-              c.setScoreChoiceFromIndex(widget.mark);
-              setState(() => _isVisible = true);
-            });
-          } else {
+        /// Score choice window
+        if (widget.isScoreChoice) {
+          setState(() => _isVisible = false);
+          Future.delayed(_duration).then((value) {
             c.setScoreChoiceFromIndex(widget.mark);
-          }
+            setState(() => _isVisible = true);
+          });
+        } else if (c.controllers.isSelectMod) {
+          c.setScoreChoiceFromIndex(widget.mark);
         }
       },
       child: AnimatedOpacity(
@@ -56,13 +53,13 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         child: Card(
           margin: const EdgeInsets.symmetric(
             horizontal: 10,
-            vertical: 5,
+            vertical: 6,
           ),
           elevation: 0,
-          color:
-              c.controllers.isSelectMod && c.controllers.isSelected[widget.mark]
-                  ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
-                  : Theme.of(context).colorScheme.secondary,
+          color: (c.controllers.isSelectMod || widget.isScoreChoice) &&
+                  c.controllers.isSelected[widget.mark]
+              ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
+              : Theme.of(context).colorScheme.secondary,
           child: Container(
             padding: const EdgeInsets.all(15),
             child: Column(

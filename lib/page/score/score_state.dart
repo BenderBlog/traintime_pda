@@ -176,11 +176,15 @@ class ScoreState extends InheritedWidget {
         controllers.isSelected[stuff.mark] = true;
       } else if (state == ChoiceState.none) {
         controllers.isSelected[stuff.mark] = false;
-      } else if (courseIgnore.contains(scoreTable[stuff.mark].name) ||
-          scoreTable[stuff.mark].status.contains(scoreTable[stuff.mark].name)) {
-        controllers.isSelected[stuff.mark] = false;
       } else {
-        controllers.isSelected[stuff.mark] = true;
+        bool toBeGiven = true;
+        for (var i in courseIgnore) {
+          if (stuff.name.contains(i)) toBeGiven = false;
+        }
+        for (var i in statusIgnore) {
+          if (stuff.status.contains(i)) toBeGiven = false;
+        }
+        controllers.isSelected[stuff.mark] = toBeGiven;
       }
     }
     controllers.notifyListeners();

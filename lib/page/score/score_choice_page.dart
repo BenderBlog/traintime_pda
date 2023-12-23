@@ -11,14 +11,14 @@ import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 
-class ScoreChoiceWindow extends StatefulWidget {
-  const ScoreChoiceWindow({super.key});
+class ScoreChoicePage extends StatefulWidget {
+  const ScoreChoicePage({super.key});
 
   @override
-  State<ScoreChoiceWindow> createState() => _ScoreChoiceWindowState();
+  State<ScoreChoicePage> createState() => _ScoreChoicePageState();
 }
 
-class _ScoreChoiceWindowState extends State<ScoreChoiceWindow> {
+class _ScoreChoicePageState extends State<ScoreChoicePage> {
   late ScoreState state;
 
   @override
