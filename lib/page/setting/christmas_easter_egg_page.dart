@@ -5,11 +5,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EasterEggPage extends StatelessWidget {
   const EasterEggPage({super.key});
 
+  final String androidUrl = "https://www.bilibili.com/video/BV16U4y1n7ZP";
+
   final String androidSong = '''
+She caught the rainbow 2023, and you?
+
 Catch the Rainbow / Ritchie Blackmore's Rainbow
 
 Credit: Ronnie James Dio & Ritchie Blackmore, 1975
@@ -62,7 +67,11 @@ Come the dawn
 黎明来临
 ''';
 
+  final String appleUrl = "https://www.bilibili.com/video/BV19b4y1k74P/";
+
   final String appleSong = '''
+This ghost is the temple of the king, as of 2023...
+
 The Temple of the King / Ritchie Blackmore's Rainbow
 
 Credit: Ronnie James Dio & Ritchie Blackmore, 1975
@@ -160,7 +169,7 @@ DO NOT USE DEBIAN GNU/LINUX!
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("圣诞节快乐")),
+      appBar: AppBar(title: const Text("圣诞节和元旦快乐")),
       body: ListView(children: [
         Image.asset(
           Platform.isIOS || Platform.isMacOS
@@ -168,11 +177,29 @@ DO NOT USE DEBIAN GNU/LINUX!
               : "assets/Bocchi_Christmas.jpg",
           width: 250,
           height: 250,
+        ).padding(top: 20, bottom: 10),
+        TextButton(
+          onPressed: () => launchUrl(
+            Uri.parse(
+              Platform.isIOS || Platform.isMacOS ? appleUrl : androidUrl,
+            ),
+            mode: LaunchMode.externalApplication,
+          ),
+          child: const Text("听歌时间"),
         ),
         Text(
           Platform.isIOS || Platform.isMacOS ? appleSong : androidSong,
           textAlign: TextAlign.center,
         ).padding(vertical: 10),
+        TextButton(
+          onPressed: () => launchUrl(
+            Uri.parse(
+              Platform.isIOS || Platform.isMacOS ? androidUrl : appleUrl,
+            ),
+            mode: LaunchMode.externalApplication,
+          ),
+          child: const Text("听另一首歌的时间"),
+        ),
       ]),
     );
   }
