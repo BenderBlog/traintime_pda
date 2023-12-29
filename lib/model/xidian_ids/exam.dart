@@ -3,8 +3,6 @@
 
 import 'package:jiffy/jiffy.dart';
 
-RegExp timeRegExp = RegExp(r'[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}');
-
 class Subject {
   String subject;
   String type;
@@ -14,10 +12,25 @@ class Subject {
   String place;
   int seat;
 
+  static RegExp timeRegExp = RegExp(
+    r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})',
+  );
+
   @override
   String toString() => "$subject $type $time $place $seat\n";
 
-  Jiffy get startTime => Jiffy.parse(timeRegExp.firstMatch(time)![0]!);
+  Jiffy get startTime {
+    RegExpMatch? match = timeRegExp.firstMatch(time);
+    if (match == null) throw NotImplementedException();
+
+    return Jiffy.parseFromDateTime(DateTime(
+      int.parse(match.namedGroup('year')!),
+      int.parse(match.namedGroup('month')!),
+      int.parse(match.namedGroup('day')!),
+      int.parse(match.namedGroup('hour')!),
+      int.parse(match.namedGroup('minute')!),
+    ));
+  }
 
   Subject({
     required this.subject,
@@ -43,3 +56,5 @@ class ToBeArranged {
     required this.id,
   });
 }
+
+class NotImplementedException implements Exception {}
