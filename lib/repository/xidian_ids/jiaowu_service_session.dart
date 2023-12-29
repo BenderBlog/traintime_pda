@@ -3,6 +3,7 @@
 
 // Super class contains Score, Exam and empty classroom.
 
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
@@ -128,6 +129,8 @@ class JiaowuServiceSession extends IDSSession {
 
     /// If failed, it is more likely that no exam has arranged.
     developer.log("My exam arrangemet $semester", name: "Jiaowu getExam");
+
+    /*
     List<Subject> examData = await authorizationDio
         .get(
       "https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/listStuExamPlan"
@@ -154,7 +157,102 @@ class JiaowuServiceSession extends IDSSession {
         ),
       );
     });
+    */
 
+    var data = jsonDecode('''{
+  "code": 200,
+  "msg": "操作成功",
+  "data": [
+    {
+      "batchId": "7406b04551fa4dc4a05826e2a67257e2",
+      "batchName": "2023-2024学年第一学期 期末考试",
+      "courseNo": "MI204011",
+      "courseName": "半导体器件物理（II）",
+      "examStart": "2024-01-12 00:00:00",
+      "timeStart": "15:40",
+      "timeEnd": "17:40",
+      "campusNo": "S",
+      "campusName": null,
+      "buildingNo": "A",
+      "buildingName": null,
+      "classroomNo": "A-318",
+      "classroomName": "A-318",
+      "seatNo": "26",
+      "timeNote": "2024-01-12 15:40-17:40(星期五)",
+      "examTaskStatus": "1"
+    },
+    {
+      "batchId": "7406b04551fa4dc4a05826e2a67257e2",
+      "batchName": "2023-2024学年第一学期 期末考试",
+      "courseNo": "MI024003",
+      "courseName": "数字信号处理",
+      "examStart": "2024-01-09 00:00:00",
+      "timeStart": "18:40",
+      "timeEnd": "20:40",
+      "campusNo": "S",
+      "campusName": null,
+      "buildingNo": "A",
+      "buildingName": null,
+      "classroomNo": "A-217",
+      "classroomName": "A-217",
+      "seatNo": "29",
+      "timeNote": "2024-01-09 18:40-20:40(星期二)",
+      "examTaskStatus": "1"
+    },
+    {
+      "batchId": "7e96d9d438ee4c6da363a250a03540d9",
+      "batchName": "2023-2024学年第一学期 结课考试",
+      "courseNo": "MI205003",
+      "courseName": "计算机原理与系统设计",
+      "examStart": "2024-01-05 00:00:00",
+      "timeStart": "15:40",
+      "timeEnd": "17:40",
+      "campusNo": "S",
+      "campusName": null,
+      "buildingNo": "A",
+      "buildingName": null,
+      "classroomNo": "A-223",
+      "classroomName": "A-223",
+      "seatNo": "6",
+      "timeNote": "2024-01-05 15:40-17:40(星期五)",
+      "examTaskStatus": "1"
+    },
+    {
+      "batchId": "7e96d9d438ee4c6da363a250a03540d9",
+      "batchName": "2023-2024学年第一学期 结课考试",
+      "courseNo": "MI204010",
+      "courseName": "半导体器件物理（I）（双语）",
+      "examStart": "2023-12-29 00:00:00",
+      "timeStart": "18::4",
+      "timeEnd": "-20:4",
+      "campusNo": "S",
+      "campusName": null,
+      "buildingNo": "A",
+      "buildingName": null,
+      "classroomNo": "A-217",
+      "classroomName": "A-217",
+      "seatNo": "34",
+      "timeNote": "2023-12-29 18::40-20:40(星期五)",
+      "examTaskStatus": "1"
+    }
+  ]
+}''')["data"];
+    List<Subject> examData = List<Subject>.generate(
+      data.length,
+      (index) => Subject(
+        subject: data[index]["courseName"],
+        type: data[index]["batchName"].toString().contains("期末考试")
+            ? "期末考试"
+            : data[index]["batchName"].toString().contains("期中考试")
+                ? "期中考试"
+                : data[index]["batchName"].toString().contains("结课考试")
+                    ? "结课考试"
+                    : data[index]["batchName"],
+        time: data[index]["timeNote"],
+        place: data[index]["classroomName"],
+        seat: int.parse(data[index]["seatNo"]),
+      ),
+    );
     List<ToBeArranged> toBeArrangedData = await authorizationDio
         .get(
       "https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/listStuExamUnPlan"

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/flow_event_row.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class TimelineWidget extends StatelessWidget {
   final List<bool> isTitle;
@@ -25,7 +26,7 @@ class TimelineWidget extends StatelessWidget {
           fit: StackFit.loose,
           children: <Widget>[
             Positioned(
-              left: isPhone(context) ? 14 : 20,
+              left: preference.isPhone ? 14 : 20,
               top: 16,
               bottom: 16,
               child: const VerticalDivider(

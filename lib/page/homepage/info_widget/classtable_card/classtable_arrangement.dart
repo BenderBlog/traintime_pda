@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/class_detail_tile.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ClasstableArrangementColumn extends StatelessWidget {
   const ClasstableArrangementColumn({super.key});
@@ -32,7 +32,7 @@ class ClasstableArrangementColumn extends StatelessWidget {
           .clipRRect(all: 12)
           .center();
 
-      if (!isPhone(context)) {
+      if (!preference.isPhone) {
         return textWidget.center().expanded();
       } else {
         return textWidget;
@@ -56,7 +56,8 @@ class ClasstableArrangementColumn extends StatelessWidget {
             if (c.nextClassArrangements.$1.isNotEmpty) ...[
               ClassDetailTile(
                 isTomorrow: c.nextClassArrangements.$2,
-                name: c.classTableData.classDetail[c.nextClassArrangements.$1.first.index].name,
+                name: c.classTableData
+                    .classDetail[c.nextClassArrangements.$1.first.index].name,
                 time:
                     '${time[(c.nextClassArrangements.$1.first.start - 1) * 2]}'
                     '-${time[(c.nextClassArrangements.$1.first.stop - 1) * 2 + 1]}',

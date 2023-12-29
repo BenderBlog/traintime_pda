@@ -37,19 +37,20 @@ void main() async {
   final data = WidgetsBinding.instance.platformDispatcher.views.first;
 
   developer.log(
-    "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} ${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
+    "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} "
+    "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
     name: "Watermeter",
   );
 
   if (min(data.physicalSize.width, data.physicalSize.height) /
           data.devicePixelRatio <
       480) {
-    await SystemChrome.setPreferredOrientations(
-      [
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ],
-    );
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } else {
+    preference.isPhone = false;
   }
 
   // Loading cookiejar.

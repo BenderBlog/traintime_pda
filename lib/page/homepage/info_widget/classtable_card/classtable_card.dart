@@ -10,8 +10,8 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_arrangement.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_current.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ClassTableCard extends StatelessWidget {
   const ClassTableCard({super.key});
@@ -24,7 +24,7 @@ class ClassTableCard extends StatelessWidget {
         vertical: 14,
       );
 
-      if (isPhone(context)) {
+      if (preference.isPhone) {
         w = w
             .backgroundColor(
               Theme.of(context).colorScheme.secondary,
@@ -89,7 +89,7 @@ class ClassTableCard extends StatelessWidget {
             //   ],
             // ),
             const SizedBox(height: 4),
-            if (isPhone(context))
+            if (preference.isPhone)
               FixedTimeline.tileBuilder(
                 theme: TimelineThemeData(
                   nodePosition: 0,

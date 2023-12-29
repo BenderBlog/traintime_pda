@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR MIT
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class BothSideSheet extends StatefulWidget {
   final Widget child;
@@ -33,7 +33,7 @@ class BothSideSheet extends StatefulWidget {
         transitionBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween(
-              begin: isPhone(context)
+              begin: preference.isPhone
                   ? const Offset(0.0, 1.0)
                   : const Offset(1.0, 0.0),
               end: Offset.zero,
@@ -59,18 +59,19 @@ class _BothSideSheetState extends State<BothSideSheet> {
 
   BorderRadius radius(context) => BorderRadius.only(
         topLeft: const Radius.circular(16),
-        bottomLeft: !isPhone(context) ? const Radius.circular(16) : Radius.zero,
-        topRight: isPhone(context) ? const Radius.circular(16) : Radius.zero,
+        bottomLeft:
+            !preference.isPhone ? const Radius.circular(16) : Radius.zero,
+        topRight: preference.isPhone ? const Radius.circular(16) : Radius.zero,
         bottomRight: Radius.zero,
       );
 
-  double get width => isPhone(context)
+  double get width => preference.isPhone
       ? MediaQuery.of(context).size.width
       : MediaQuery.of(context).size.width * 0.4 < 360
           ? 360
           : MediaQuery.of(context).size.width * 0.4;
 
-  Widget get onTop => isPhone(context)
+  Widget get onTop => preference.isPhone
       ? GestureDetector(
           onVerticalDragUpdate: (DragUpdateDetails details) {
             setState(() {
@@ -130,22 +131,22 @@ class _BothSideSheetState extends State<BothSideSheet> {
   Widget build(BuildContext context) {
     return Align(
       alignment:
-          isPhone(context) ? Alignment.bottomCenter : Alignment.centerRight,
+          preference.isPhone ? Alignment.bottomCenter : Alignment.centerRight,
       child: Container(
         width: width,
-        height: isPhone(context) ? heightForVertical : double.infinity,
+        height: preference.isPhone ? heightForVertical : double.infinity,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: radius(context),
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: isPhone(context) ? 15 : 10,
-            vertical: isPhone(context) ? 0 : 10,
+            horizontal: preference.isPhone ? 15 : 10,
+            vertical: preference.isPhone ? 0 : 10,
           ),
           child: Scaffold(
             extendBodyBehindAppBar: true,
-            appBar: isPhone(context)
+            appBar: preference.isPhone
                 ? PreferredSize(
                     preferredSize: const Size.fromHeight(20),
                     child: onTop,

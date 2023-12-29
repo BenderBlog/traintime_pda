@@ -16,7 +16,6 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 
@@ -212,7 +211,8 @@ class _LoginWindowState extends State<LoginWindow> {
             if (e.response == null) {
               Fluttertoast.showToast(msg: "无法连接到服务器。");
             } else {
-              Fluttertoast.showToast(msg: "请求失败，响应状态码：${e.response!.statusCode}。");
+              Fluttertoast.showToast(
+                  msg: "请求失败，响应状态码：${e.response!.statusCode}。");
             }
           } else {
             Fluttertoast.showToast(msg: "请求失败。${e.message}");
@@ -245,8 +245,8 @@ class _LoginWindowState extends State<LoginWindow> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(
-          left: isPhone(context) ? widthOfSquare : width * 0.2,
-          right: isPhone(context) ? widthOfSquare : width * 0.2,
+          left: preference.isPhone ? widthOfSquare : width * 0.2,
+          right: preference.isPhone ? widthOfSquare : width * 0.2,
           top: kToolbarHeight,
         ),
         child: width / height > 1.0

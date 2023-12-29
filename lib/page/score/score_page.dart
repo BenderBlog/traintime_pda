@@ -15,6 +15,7 @@ import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -77,7 +78,7 @@ class _ScorePageState extends State<ScorePage> {
               vertical: 6,
             ),
             child: Row(
-              mainAxisAlignment: isPhone(context)
+              mainAxisAlignment: preference.isPhone
                   ? MainAxisAlignment.start
                   : MainAxisAlignment.center,
               children: [
