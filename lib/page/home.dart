@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _loginAsync() async {
-    Fluttertoast.showToast(msg: "登陆中，暂时显示缓存数据");
+    Fluttertoast.showToast(msg: "登录中，暂时显示缓存数据");
 
     try {
       await update(
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       Fluttertoast.cancel();
 
       if (loginState == IDSLoginState.success) {
-        Fluttertoast.showToast(msg: "登陆成功");
+        Fluttertoast.showToast(msg: "登录成功");
       } else if (loginState == IDSLoginState.passwordWrong) {
         preference.remove(preference.Preference.idsPassword);
 
