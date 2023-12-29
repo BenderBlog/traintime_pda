@@ -79,7 +79,7 @@ class BookInfoCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "索书号: ${toUse.searchCode ?? "没有相关信息"}",
+                        "索书号: ${toUse.barCode ?? "没有相关信息"}",
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],

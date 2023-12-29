@@ -45,7 +45,6 @@ class BorrowData {
 class BookInfo {
   final String? author;
   final String? subject;
-  final List<String>? searchCode;
   final String? isbn;
   final String? description;
   final String bookName;
@@ -64,7 +63,6 @@ class BookInfo {
   const BookInfo({
     this.author,
     this.subject,
-    this.searchCode,
     this.isbn,
     this.description,
     required this.bookName,

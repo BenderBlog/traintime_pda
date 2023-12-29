@@ -48,7 +48,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     Text(
                       "作者：${widget.toUse.author ?? "没有提供"}\n"
                       "ISBN：${widget.toUse.isbn ?? "没有提供"}\n"
-                      "索书号: ${widget.toUse.searchCode ?? "没有提供"}\n"
+                      "索书号: ${widget.toUse.barCode ?? "没有提供"}\n"
                       "描述：${widget.toUse.description ?? "没有提供"}",
                     ),
                   ],
