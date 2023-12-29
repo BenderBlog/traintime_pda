@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +24,19 @@ class SchoolCardInfoCard extends StatelessWidget {
           if (offline) {
             Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else if (c.errorPrice.isNotEmpty) {
-            Fluttertoast.showToast(msg: "遇到错误：${c.errorPrice}");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(c.errorPrice.substring(
+                  0,
+                  min(
+                    c.errorPrice.value.length,
+                    120,
+                  ),
+                )),
+              ),
+            );
+
+            Fluttertoast.showToast(msg: "遇到错误，请联系开发者");
           } else if (!c.isGetPrice.value) {
             Fluttertoast.showToast(msg: "正在获取信息，请稍后再来看");
           } else {

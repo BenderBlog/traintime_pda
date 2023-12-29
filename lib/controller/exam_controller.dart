@@ -63,10 +63,10 @@ class ExamController extends GetxController {
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
       developer.log(
-        "Other exception: $e\nStack: $s",
+        "On exam controller: $e\nStack: $s",
         name: "ScoreController",
       );
-      error = "未知错误，请向开发者联系。";
+      error = "On exam controller: $e\nStack: $s";
     }
     update();
   }

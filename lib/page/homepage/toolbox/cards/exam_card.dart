@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -26,7 +28,19 @@ class ExamCard extends StatelessWidget {
           } else if (c.error == null) {
             Fluttertoast.showToast(msg: "请稍候，正在获取考试信息");
           } else {
-            Fluttertoast.showToast(msg: "遇到错误：${c.error!}");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(c.error?.substring(
+                      0,
+                      min(
+                        c.error?.length ?? 0,
+                        120,
+                      ),
+                    ) ??
+                    "未提供报错信息"),
+              ),
+            );
+            Fluttertoast.showToast(msg: "遇到错误，请联系开发者");
           }
         },
         icon: MingCuteIcons.mgc_calendar_line,

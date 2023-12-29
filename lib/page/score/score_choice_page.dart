@@ -35,12 +35,13 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
         builder: (context) => AlertDialog(
           title: const Text('小总结'),
           content: Text(
-              "所有科目的GPA：${state.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
-              "所有科目的均分：${state.evalAvg(true).toStringAsFixed(2)}\n"
-              "所有科目的学分：${state.evalCredit(true).toStringAsFixed(2)}\n"
-              "未通过科目：${state.unPassed}\n"
-              "公共选修课已经修得学分：${state.notCoreClass}\n"
-              "本程序提供的数据仅供参考，开发者对其准确性不负责"),
+            "所有科目的GPA：${state.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
+            "所有科目的均分：${state.evalAvg(true).toStringAsFixed(2)}\n"
+            "所有科目的学分：${state.evalCredit(true).toStringAsFixed(2)}\n"
+            "未通过科目：${state.unPassed}\n"
+            "公共选修课已经修得学分：${state.notCoreClass}\n"
+            "本程序提供的数据仅供参考，开发者对其准确性不负责",
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text("确定"),

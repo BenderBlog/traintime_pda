@@ -44,10 +44,10 @@ class SchoolCardController extends GetxController {
       errorPrice.value = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
       developer.log(
-        "Other exception: $e\nStack: $s",
+        "On school card exception: $e\nStack: $s",
         name: "ScoreController",
       );
-      errorPrice.value = "未知错误，请向开发者联系。";
+      errorPrice.value = "On school card exception: $e\nStack: $s";
     }
     super.onReady();
   }

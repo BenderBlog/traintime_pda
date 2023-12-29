@@ -4,6 +4,7 @@
 // Login window of the program.
 
 import 'dart:developer' as developer;
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -219,8 +220,21 @@ class _LoginWindowState extends State<LoginWindow> {
           }
         } else {
           developer.log("Login failed: $e", name: "Login");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                e.toString().substring(
+                      0,
+                      min(
+                        e.toString().length,
+                        120,
+                      ),
+                    ),
+              ),
+            ),
+          );
           Fluttertoast.showToast(
-            msg: "未知错误，请联系开发者。${e.toString().substring(20)}",
+            msg: "未知错误，请联系开发者。",
           );
         }
       }
