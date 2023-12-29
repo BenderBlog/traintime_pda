@@ -21,6 +21,8 @@ class ScoreChoicePage extends StatefulWidget {
 class _ScoreChoicePageState extends State<ScoreChoicePage> {
   late ScoreState state;
 
+  static const horizontalPadding = 8.0;
+
   @override
   void didChangeDependencies() {
     state = ScoreState.of(context)!;
@@ -50,7 +52,10 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = max(MediaQuery.sizeOf(context).width ~/ 360, 1);
+    int crossItems = max(
+      (MediaQuery.sizeOf(context).width - horizontalPadding * 2) ~/ 360,
+      1,
+    );
 
     int rowItem(int length) {
       int rowItem = length ~/ crossItems;
@@ -156,7 +161,7 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                         ),
                       ),
                     ),
-                  ).paddingDirectional(horizontal: 8)
+                  ).paddingDirectional(horizontal: horizontalPadding)
                 : const Center(
                     child: Text("没有选择该学期的课程计入均分计算"),
                   ),

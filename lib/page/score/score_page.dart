@@ -26,6 +26,7 @@ class ScorePage extends StatefulWidget {
 
 class _ScorePageState extends State<ScorePage> {
   late ScoreState c;
+  static const horizontalPadding = 8.0;
 
   @override
   void didChangeDependencies() {
@@ -42,7 +43,10 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = max(MediaQuery.sizeOf(context).width ~/ 360, 1);
+    int crossItems = max(
+      (MediaQuery.sizeOf(context).width - horizontalPadding * 2) ~/ 360,
+      1,
+    );
 
     int rowItem(int length) {
       int rowItem = length ~/ crossItems;
@@ -147,7 +151,7 @@ class _ScorePageState extends State<ScorePage> {
                           ),
                         ),
                       ),
-                    ).paddingDirectional(horizontal: 8)
+                    ).paddingDirectional(horizontal: horizontalPadding)
                   : const Text("未筛查到合请求的记录").center()),
         ],
       ),
