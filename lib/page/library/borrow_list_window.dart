@@ -11,12 +11,15 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class BorrowListWindow extends StatelessWidget {
   const BorrowListWindow({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final LibraryController c = Get.put(LibraryController());
+
     int crossItems = max(MediaQuery.sizeOf(context).width ~/ 360, 1);
 
     int rowItem(int length) {
@@ -27,7 +30,11 @@ class BorrowListWindow extends StatelessWidget {
       return rowItem;
     }
 
-    final LibraryController c = Get.put(LibraryController());
+    List<Widget> borrowList = List<Widget>.generate(
+      c.borrowList.length,
+      (index) => BorrowInfoCard(toUse: c.borrowList[index]),
+    );
+
     return Column(
       children: [
         ConstrainedBox(
@@ -63,9 +70,13 @@ class BorrowListWindow extends StatelessWidget {
           ),
         ),
         if (c.borrowList.isNotEmpty)
-          ListView(
-            children: [
-              LayoutGrid(
+          if (preference.isPhone)
+            ListView(
+              children: borrowList,
+            )
+          else
+            SingleChildScrollView(
+              child: LayoutGrid(
                 columnSizes: repeat(
                   crossItems,
                   [auto],
@@ -74,13 +85,9 @@ class BorrowListWindow extends StatelessWidget {
                   rowItem(c.borrowList.length),
                   [auto],
                 ),
-                children: List<Widget>.generate(
-                  c.borrowList.length,
-                  (index) => BorrowInfoCard(toUse: c.borrowList[index]),
-                ),
+                children: borrowList,
               ),
-            ],
-          ).expanded()
+            ).expanded()
         else
           const Text("目前没有查询到在借图书").center().expanded(),
       ],

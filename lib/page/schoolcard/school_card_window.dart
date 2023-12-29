@@ -45,7 +45,8 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         appBar: AppBar(
           title: const Text("校园卡流水信息"),
           bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(48.0),
+            preferredSize:
+                Size.fromHeight(48.0 * MediaQuery.textScaleFactorOf(context)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: TextButton(
@@ -110,7 +111,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                       DataColumn2(
                         size: ColumnSize.L,
                         label: Center(
-                          child: Text('时间(共${moneySunUp(c.getPaid)} 元)'),
+                          child: Text('时间(共${moneySunUp(c.getPaid)}元)'),
                         ),
                       ),
                     ],

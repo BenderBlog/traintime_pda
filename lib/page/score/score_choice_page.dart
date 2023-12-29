@@ -6,10 +6,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ScoreChoicePage extends StatefulWidget {
   const ScoreChoicePage({super.key});
@@ -20,8 +20,6 @@ class ScoreChoicePage extends StatefulWidget {
 
 class _ScoreChoicePageState extends State<ScoreChoicePage> {
   late ScoreState state;
-
-  static const horizontalPadding = 8.0;
 
   @override
   void didChangeDependencies() {
@@ -54,7 +52,7 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
   @override
   Widget build(BuildContext context) {
     int crossItems = max(
-      (MediaQuery.sizeOf(context).width - horizontalPadding * 2) ~/ 360,
+      MediaQuery.sizeOf(context).width ~/ 360,
       1,
     );
 
@@ -65,6 +63,14 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
       }
       return rowItem;
     }
+
+    List<Widget> scoreList = List<Widget>.generate(
+      state.selectedScoreList.length,
+      (index) => ScoreInfoCard(
+        mark: state.selectedScoreList[index].mark,
+        isScoreChoice: true,
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -144,25 +150,29 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
           ),
           Expanded(
             child: state.selectedScoreList.isNotEmpty
-                ? SingleChildScrollView(
-                    child: LayoutGrid(
-                      columnSizes: repeat(
-                        crossItems,
-                        [auto],
-                      ),
-                      rowSizes: repeat(
-                        rowItem(state.selectedScoreList.length),
-                        [auto],
-                      ),
-                      children: List<Widget>.generate(
-                        state.selectedScoreList.length,
-                        (index) => ScoreInfoCard(
-                          mark: state.selectedScoreList[index].mark,
-                          isScoreChoice: true,
+                ? preference.isPhone
+                    ? ListView(
+                        children: scoreList,
+                      )
+                    : SingleChildScrollView(
+                        child: LayoutGrid(
+                          columnSizes: repeat(
+                            crossItems,
+                            [auto],
+                          ),
+                          rowSizes: repeat(
+                            rowItem(state.selectedScoreList.length),
+                            [auto],
+                          ),
+                          children: List<Widget>.generate(
+                            state.selectedScoreList.length,
+                            (index) => ScoreInfoCard(
+                              mark: state.selectedScoreList[index].mark,
+                              isScoreChoice: true,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ).paddingDirectional(horizontal: horizontalPadding)
+                      )
                 : const Center(
                     child: Text("没有选择该学期的课程计入均分计算"),
                   ),

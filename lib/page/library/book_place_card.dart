@@ -20,13 +20,8 @@ class BookPlaceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(toUse.locationName ?? "没有位置信息"),
-                TagsBoxes(text: toUse.processType),
-              ],
-            ),
+            Text(toUse.locationName ?? "没有位置信息"),
+            Text("书籍状态：${toUse.processType}"),
             Text("书籍编号：${toUse.barCode}"),
             Text("书籍状态：${toUse.circAttr}"),
           ],

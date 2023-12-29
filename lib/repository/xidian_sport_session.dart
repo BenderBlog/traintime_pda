@@ -84,7 +84,7 @@ class SportSession {
 
       punchData.value.situation.value = "";
     } on NoPasswordException {
-      punchData.value.situation.value = "没有密码";
+      punchData.value.situation.value = "没密码";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
       punchData.value.situation.value = e.msg == "系统维护" ? e.msg : "登录失败";
@@ -118,6 +118,7 @@ class SportSession {
         if (i.keys.contains("graduationStatus")) {
           toReturn.total = i["totalScore"];
           toReturn.detail = i["gradeType"];
+          toReturn.rank = i['rank'];
         } else {
           SportScoreOfYear toAdd = SportScoreOfYear(
             year: i["year"],
@@ -149,7 +150,7 @@ class SportSession {
         }
       }
     } on NoPasswordException {
-      toReturn.situation = "没有密码";
+      toReturn.situation = "没密码";
     } on LoginFailedException catch (e) {
       developer.log("登录失败：$e", name: "GetPunchSession");
       toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";

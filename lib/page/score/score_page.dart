@@ -26,7 +26,6 @@ class ScorePage extends StatefulWidget {
 
 class _ScorePageState extends State<ScorePage> {
   late ScoreState c;
-  static const horizontalPadding = 8.0;
 
   @override
   void didChangeDependencies() {
@@ -44,7 +43,7 @@ class _ScorePageState extends State<ScorePage> {
   @override
   Widget build(BuildContext context) {
     int crossItems = max(
-      (MediaQuery.sizeOf(context).width - horizontalPadding * 2) ~/ 360,
+      MediaQuery.sizeOf(context).width ~/ 360,
       1,
     );
 
@@ -55,6 +54,14 @@ class _ScorePageState extends State<ScorePage> {
       }
       return rowItem;
     }
+
+    List<Widget> scoreList = List<Widget>.generate(
+      c.toShow.length,
+      (index) => SafeArea(
+          child: ScoreInfoCard(
+        mark: c.toShow[index].mark,
+      )),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -134,24 +141,23 @@ class _ScorePageState extends State<ScorePage> {
           ),
           Expanded(
               child: c.toShow.isNotEmpty
-                  ? SingleChildScrollView(
-                      child: LayoutGrid(
-                        columnSizes: repeat(
-                          crossItems,
-                          [auto],
-                        ),
-                        rowSizes: repeat(
-                          rowItem(c.toShow.length),
-                          [auto],
-                        ),
-                        children: List<Widget>.generate(
-                          c.toShow.length,
-                          (index) => ScoreInfoCard(
-                            mark: c.toShow[index].mark,
+                  ? preference.isPhone
+                      ? ListView(
+                          children: scoreList,
+                        )
+                      : SingleChildScrollView(
+                          child: LayoutGrid(
+                            columnSizes: repeat(
+                              crossItems,
+                              [auto],
+                            ),
+                            rowSizes: repeat(
+                              rowItem(c.toShow.length),
+                              [auto],
+                            ),
+                            children: scoreList,
                           ),
-                        ),
-                      ),
-                    ).paddingDirectional(horizontal: horizontalPadding)
+                        )
                   : const Text("未筛查到合请求的记录").center()),
         ],
       ),

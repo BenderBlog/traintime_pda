@@ -84,8 +84,9 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                     vertical: 8,
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Wrap(
                         children: [
                           TextButton(
                             style: TextButton.styleFrom(
@@ -179,23 +180,23 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                                       size: ColumnSize.L,
                                     ),
                                     DataColumn2(
-                                      label: Center(child: Text('1-2节')),
+                                      label: Center(child: Text('1-2')),
                                       size: ColumnSize.S,
                                     ),
                                     DataColumn2(
-                                      label: Center(child: Text('3-4节')),
+                                      label: Center(child: Text('3-4')),
                                       size: ColumnSize.S,
                                     ),
                                     DataColumn2(
-                                      label: Center(child: Text('5-6节')),
+                                      label: Center(child: Text('5-6')),
                                       size: ColumnSize.S,
                                     ),
                                     DataColumn2(
-                                      label: Center(child: Text('7-8节')),
+                                      label: Center(child: Text('7-8')),
                                       size: ColumnSize.S,
                                     ),
                                     DataColumn2(
-                                      label: Center(child: Text('9-10节')),
+                                      label: Center(child: Text('9-10')),
                                       size: ColumnSize.S,
                                     ),
                                   ],

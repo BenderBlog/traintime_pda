@@ -9,6 +9,7 @@ import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class QueryBookWindow extends StatefulWidget {
   final BoxConstraints constraints;
@@ -96,35 +97,40 @@ class _QueryBookWindowState extends State<QueryBookWindow>
         onLoad: () async {
           await c.searchBook();
         },
-        child: Obx(
-          () => c.searchList.isNotEmpty
-              ? SingleChildScrollView(
-                  child: LayoutGrid(
-                    columnSizes: repeat(crossItems, [1.fr]),
-                    rowSizes: repeat(rowItem(c.searchList.length), [auto]),
-                    children: List<Widget>.generate(
-                      c.searchList.length,
-                      (index) => GestureDetector(
-                        child: BookInfoCard(toUse: c.searchList[index]),
-                        onTap: () => BothSideSheet.show(
-                          context: context,
-                          title: "书籍详细信息",
-                          child: BookDetailCard(
-                            toUse: c.searchList[index],
-                          ),
-                        ),
-                      ),
-                    ),
+        child: Obx(() {
+          if (c.searchList.isNotEmpty) {
+            List<Widget> bookList = List<Widget>.generate(
+              c.searchList.length,
+              (index) => GestureDetector(
+                child: BookInfoCard(toUse: c.searchList[index]),
+                onTap: () => BothSideSheet.show(
+                  context: context,
+                  title: "书籍详细信息",
+                  child: BookDetailCard(
+                    toUse: c.searchList[index],
                   ),
-                )
-              : c.isSearching.value
-                  ? const Center(child: CircularProgressIndicator())
-                  : c.search.value.isNotEmpty
-                      ? const Center(child: Text("没有结果"))
-                      : const Center(
-                          child: Text("请在上面的搜索框中搜索"),
-                        ),
-        ),
+                ),
+              ),
+            );
+            return preference.isPhone
+                ? ListView(children: bookList)
+                : SingleChildScrollView(
+                    child: LayoutGrid(
+                      columnSizes: repeat(crossItems, [1.fr]),
+                      rowSizes: repeat(rowItem(c.searchList.length), [auto]),
+                      children: bookList,
+                    ),
+                  );
+          } else if (c.isSearching.value) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (c.search.value.isNotEmpty) {
+            return const Center(child: Text("没有结果"));
+          } else {
+            return const Center(
+              child: Text("请在上面的搜索框中搜索"),
+            );
+          }
+        }),
       ),
     );
   }

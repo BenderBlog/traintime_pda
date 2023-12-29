@@ -101,7 +101,7 @@ class SportCard extends StatelessWidget {
               ),
             );
           } else {
-            if (punchData.value.situation.contains("没有密码")) {
+            if (punchData.value.situation.contains("没密码")) {
               showDialog(
                 context: context,
                 builder: (context) => const SportPasswordDialog(),

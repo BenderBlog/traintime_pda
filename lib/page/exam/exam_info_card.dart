@@ -32,7 +32,8 @@ class ExamInfoCard extends StatelessWidget {
                     children: [
                       Text(
                         toUse!.subject,
-                        textScaleFactor: 1.1,
+                        textScaleFactor:
+                            MediaQuery.of(context).textScaleFactor * 1.1,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
