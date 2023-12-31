@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 
 /// Check the width
-bool isPhone(context) => MediaQuery.of(context).size.width > 480;
+bool isPhone(context) => MediaQuery.of(context).size.width < 480;
 bool isDesktop(context) => MediaQuery.of(context).size.width > 840;
 const double sheetMaxWidth = 600;
 

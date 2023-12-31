@@ -12,7 +12,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class BorrowListWindow extends StatelessWidget {
   const BorrowListWindow({super.key});

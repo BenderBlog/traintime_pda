@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class BothSideSheet extends StatefulWidget {
   final Widget child;

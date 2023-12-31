@@ -14,7 +14,6 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/login/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
@@ -148,7 +147,7 @@ class _LoginWindowState extends State<LoginWindow> {
           const SizedBox(height: 8.0),
           const ButtomButtons(),
         ],
-      );
+      ).constrained(maxWidth: 400);
 
   Future<void> login() async {
     bool isGood = true;
@@ -260,8 +259,8 @@ class _LoginWindowState extends State<LoginWindow> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(
-          left: isPhone(context) ? widthOfSquare : width * 0.2,
-          right: isPhone(context) ? widthOfSquare : width * 0.2,
+          left: width / height > 1.0 ? width * 0.2 : widthOfSquare,
+          right: width / height > 1.0 ? width * 0.2 : widthOfSquare,
           top: kToolbarHeight,
         ),
         child: width / height > 1.0
@@ -284,7 +283,7 @@ class _LoginWindowState extends State<LoginWindow> {
                   ),
                   contentColumn(),
                 ],
-              ),
+              ).center(),
       ),
     );
   }
