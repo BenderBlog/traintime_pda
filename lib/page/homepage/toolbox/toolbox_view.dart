@@ -72,7 +72,7 @@ class ToolBoxView extends StatelessWidget {
           ),
           LayoutGrid(
             columnSizes: repeat(crossItems, [1.fr]),
-            rowSizes: repeat(rowItem(list.length), [84.px]),
+            rowSizes: repeat(rowItem(list.length), [auto]),
             children: list,
           ),
         ];

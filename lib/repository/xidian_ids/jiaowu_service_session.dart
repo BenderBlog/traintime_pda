@@ -98,7 +98,10 @@ class JiaowuServiceSession extends IDSSession {
             scoreStr: k["score"] ?? "暂无",
             year: k["termCode"],
             credit: double.parse(k["coursePoint"]),
-            status: k["majorFlag"],
+            status: k["majorFlag"]
+                .toString()
+                .replaceAll('（', '(')
+                .replaceAll('）', ')'),
             examType: k["examType"],
             examProp: k["examProp"],
             isPassed: k["passFlag"],

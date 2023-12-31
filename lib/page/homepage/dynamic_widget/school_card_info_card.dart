@@ -98,6 +98,7 @@ class SchoolCardInfoCard extends StatelessWidget {
                     : c.errorPrice.isNotEmpty
                         ? "目前无法获取信息"
                         : "正在查询信息中",
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),

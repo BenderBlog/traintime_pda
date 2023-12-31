@@ -11,15 +11,16 @@ class MainPageCard extends StatelessWidget {
   final Widget infoText;
   final Widget bottomText;
   final bool? isBold;
-  const MainPageCard(
-      {super.key,
-      required this.icon,
-      required this.text,
-      required this.infoText,
-      required this.bottomText,
-      required this.isLoad,
-      this.progress,
-      this.isBold});
+  const MainPageCard({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.infoText,
+    required this.bottomText,
+    required this.isLoad,
+    this.progress,
+    this.isBold,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +122,7 @@ class MainPageCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  bottomText,
+                  Flexible(child: bottomText),
                   if (!isLoad &&
                       (progress != null && progress! >= 0 && progress! <= 1))
                     Text("${(progress! * 100).toInt()}%"),

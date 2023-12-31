@@ -3,13 +3,12 @@
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class QueryBookWindow extends StatefulWidget {
   final BoxConstraints constraints;
@@ -112,15 +111,17 @@ class _QueryBookWindowState extends State<QueryBookWindow>
                 ),
               ),
             );
-            return isPhone(context)
-                ? ListView(children: bookList)
-                : SingleChildScrollView(
-                    child: LayoutGrid(
-                      columnSizes: repeat(crossItems, [1.fr]),
-                      rowSizes: repeat(rowItem(c.searchList.length), [auto]),
-                      children: bookList,
-                    ),
-                  );
+            return AlignedGridView.count(
+              shrinkWrap: true,
+              itemCount: bookList.length,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+              ),
+              crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              itemBuilder: (context, index) => bookList[index],
+            );
           } else if (c.isSearching.value) {
             return const Center(child: CircularProgressIndicator());
           } else if (c.search.value.isNotEmpty) {

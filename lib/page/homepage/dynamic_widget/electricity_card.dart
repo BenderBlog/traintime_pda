@@ -85,7 +85,10 @@ class ElectricityCard extends StatelessWidget {
                     ],
             ),
           ),
-          bottomText: Text(owe_session.owe.value),
+          bottomText: Text(
+            owe_session.owe.value,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     );

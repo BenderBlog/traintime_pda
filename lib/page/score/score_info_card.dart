@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_state.dart';
 
@@ -51,10 +52,6 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
         child: Card(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 6,
-          ),
           elevation: 0,
           color: (c.controllers.isSelectMod || widget.isScoreChoice) &&
                   c.controllers.isSelected[widget.mark]
@@ -81,43 +78,42 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                     TagsBoxes(
                       text: c.scoreTable[widget.mark].year,
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 5),
+                    ).padding(right: 6),
                     TagsBoxes(
                       text: c.scoreTable[widget.mark].status,
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 5),
+                    ).padding(right: 6),
                     if (c.scoreTable[widget.mark].examType.isNotEmpty)
                       TagsBoxes(
                         text: c.scoreTable[widget.mark].examType,
                         backgroundColor: Theme.of(context).colorScheme.primary,
-                      ),
-                    if (c.scoreTable[widget.mark].examType.isNotEmpty)
-                      const SizedBox(width: 5),
+                      ).padding(right: 6),
                     TagsBoxes(
                       text: c.scoreTable[widget.mark].examProp,
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                    ),
+                    ).padding(right: 6),
                   ],
                 ),
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  children: [
-                    const Divider(
-                      color: Colors.transparent,
-                      height: 5,
-                    ),
-                    Text(
-                      "学分: ${c.scoreTable[widget.mark].credit}",
-                    ),
-                    Text(
-                      "GPA: ${c.scoreTable[widget.mark].gpa}",
-                    ),
-                    Text(
-                      "成绩：${c.scoreTable[widget.mark].scoreStr}",
-                    ),
-                  ],
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    children: [
+                      const Divider(
+                        color: Colors.transparent,
+                        height: 5,
+                      ),
+                      Text(
+                        "学分: ${c.scoreTable[widget.mark].credit}",
+                      ),
+                      Text(
+                        "GPA: ${c.scoreTable[widget.mark].gpa}",
+                      ),
+                      Text(
+                        "成绩：${c.scoreTable[widget.mark].scoreStr}",
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

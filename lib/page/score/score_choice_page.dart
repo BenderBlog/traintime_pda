@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 
@@ -51,27 +49,6 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = max(
-      MediaQuery.sizeOf(context).width ~/ 360,
-      1,
-    );
-
-    int rowItem(int length) {
-      int rowItem = length ~/ crossItems;
-      if (crossItems * rowItem < length) {
-        rowItem += 1;
-      }
-      return rowItem;
-    }
-
-    List<Widget> scoreList = List<Widget>.generate(
-      state.selectedScoreList.length,
-      (index) => ScoreInfoCard(
-        mark: state.selectedScoreList[index].mark,
-        isScoreChoice: true,
-      ),
-    );
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -150,27 +127,20 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
           ),
           Expanded(
             child: state.selectedScoreList.isNotEmpty
-                ? isPhone(context)
-                    ? ListView(children: scoreList)
-                    : SingleChildScrollView(
-                        child: LayoutGrid(
-                          columnSizes: repeat(
-                            crossItems,
-                            [auto],
-                          ),
-                          rowSizes: repeat(
-                            rowItem(state.selectedScoreList.length),
-                            [auto],
-                          ),
-                          children: List<Widget>.generate(
-                            state.selectedScoreList.length,
-                            (index) => ScoreInfoCard(
-                              mark: state.selectedScoreList[index].mark,
-                              isScoreChoice: true,
-                            ),
-                          ),
-                        ),
-                      )
+                ? AlignedGridView.count(
+                    shrinkWrap: true,
+                    itemCount: state.selectedScoreList.length,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                    ),
+                    crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    itemBuilder: (context, index) => ScoreInfoCard(
+                      mark: state.selectedScoreList[index].mark,
+                      isScoreChoice: true,
+                    ),
+                  )
                 : const Center(
                     child: Text("没有选择该学期的课程计入均分计算"),
                   ),

@@ -3,15 +3,12 @@
 
 // Borrow list, shows the user's borrowlist.
 
-import 'dart:math';
-
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class BorrowListWindow extends StatelessWidget {
   const BorrowListWindow({super.key});
@@ -19,16 +16,6 @@ class BorrowListWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LibraryController c = Get.put(LibraryController());
-
-    int crossItems = max(MediaQuery.sizeOf(context).width ~/ 360, 1);
-
-    int rowItem(int length) {
-      int rowItem = length ~/ crossItems;
-      if (crossItems * rowItem < length) {
-        rowItem += 1;
-      }
-      return rowItem;
-    }
 
     List<Widget> borrowList = List<Widget>.generate(
       c.borrowList.length,
@@ -70,22 +57,17 @@ class BorrowListWindow extends StatelessWidget {
           ),
         ),
         if (c.borrowList.isNotEmpty)
-          if (isPhone(context))
-            ListView(children: borrowList)
-          else
-            SingleChildScrollView(
-              child: LayoutGrid(
-                columnSizes: repeat(
-                  crossItems,
-                  [auto],
-                ),
-                rowSizes: repeat(
-                  rowItem(c.borrowList.length),
-                  [auto],
-                ),
-                children: borrowList,
-              ),
-            ).expanded()
+          AlignedGridView.count(
+            shrinkWrap: true,
+            itemCount: borrowList.length,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+            ),
+            crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+            itemBuilder: (context, index) => borrowList[index],
+          )
         else
           const Text("目前没有查询到在借图书").center().expanded(),
       ],

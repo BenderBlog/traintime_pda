@@ -145,6 +145,7 @@ class SportCard extends StatelessWidget {
             punchData.value.situation.isEmpty
                 ? "成功 ${punchData.value.validTime} 次"
                 : punchData.value.situation.value,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),

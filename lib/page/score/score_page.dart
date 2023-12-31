@@ -4,9 +4,8 @@
 /// Main window for score.
 
 import 'dart:io';
-import 'dart:math';
 
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
@@ -41,25 +40,11 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = max(
-      MediaQuery.sizeOf(context).width ~/ 360,
-      1,
-    );
-
-    int rowItem(int length) {
-      int rowItem = length ~/ crossItems;
-      if (crossItems * rowItem < length) {
-        rowItem += 1;
-      }
-      return rowItem;
-    }
-
     List<Widget> scoreList = List<Widget>.generate(
       c.toShow.length,
-      (index) => SafeArea(
-          child: ScoreInfoCard(
+      (index) => ScoreInfoCard(
         mark: c.toShow[index].mark,
-      )),
+      ),
     );
 
     return Scaffold(
@@ -139,25 +124,20 @@ class _ScorePageState extends State<ScorePage> {
             ),
           ),
           Expanded(
-              child: c.toShow.isNotEmpty
-                  ? isPhone(context)
-                      ? ListView(
-                          children: scoreList,
-                        )
-                      : SingleChildScrollView(
-                          child: LayoutGrid(
-                            columnSizes: repeat(
-                              crossItems,
-                              [auto],
-                            ),
-                            rowSizes: repeat(
-                              rowItem(c.toShow.length),
-                              [auto],
-                            ),
-                            children: scoreList,
-                          ),
-                        )
-                  : const Text("未筛查到合请求的记录").center()),
+            child: c.toShow.isNotEmpty
+                ? AlignedGridView.count(
+                    shrinkWrap: true,
+                    itemCount: c.toShow.length,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                    ),
+                    crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    itemBuilder: (context, index) => scoreList[index],
+                  )
+                : const Text("未筛查到合请求的记录").center(),
+          ),
         ],
       ),
       bottomNavigationBar: Visibility(

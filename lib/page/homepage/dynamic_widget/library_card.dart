@@ -71,9 +71,15 @@ class LibraryCard extends StatelessWidget {
             ),
             bottomText: Obx(() {
               if (c.isGet.value) {
-                return Text(c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍");
+                return Text(
+                  c.dued == 0 ? "目前没有待归还书籍" : "待归还${c.dued}本书籍",
+                  overflow: TextOverflow.ellipsis,
+                );
               } else {
-                return Text(c.error.value ? "目前无法获取信息" : "正在查询信息中");
+                return Text(
+                  c.error.value ? "目前无法获取信息" : "正在查询信息中",
+                  overflow: TextOverflow.ellipsis,
+                );
               }
             }),
           ),

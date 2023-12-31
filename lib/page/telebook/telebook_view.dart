@@ -77,7 +77,7 @@ class DepartmentWindow extends StatelessWidget {
             Text(
               toUse.title,
               textAlign: TextAlign.left,
-              textScaleFactor: 1.4,
+              textScaleFactor: MediaQuery.textScaleFactorOf(context) * 1.4,
             ),
             const Divider(),
             LayoutGrid(
@@ -131,7 +131,6 @@ class InsideWindow extends StatelessWidget {
             Text(
               isSouth ? "南校区" : "北校区",
               textAlign: TextAlign.left,
-              textScaleFactor: 1.00,
             ),
             Expanded(
               child: Column(
