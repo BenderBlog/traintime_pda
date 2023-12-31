@@ -29,11 +29,11 @@ class LibraryController extends GetxController {
 
   Future<void> getBorrowList() async {
     try {
+      borrowList.clear();
       if (error.value) {
         error.value = false;
         await LibrarySession().initSession();
       }
-      borrowList.clear();
       borrowList.addAll(await LibrarySession().getBorrowList());
       isGet.value = true;
       error.value = false;
