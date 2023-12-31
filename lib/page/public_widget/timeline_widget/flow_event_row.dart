@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 @immutable
 class FlowEventRow extends StatelessWidget {
@@ -27,7 +27,7 @@ class FlowEventRow extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: preference.isPhone ? 8 : 20 - circleRadius,
+              horizontal: isPhone(context) ? 8 : 20 - circleRadius,
             ),
             child: Container(
               width: circleRadius * 2,

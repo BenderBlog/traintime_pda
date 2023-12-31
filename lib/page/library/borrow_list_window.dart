@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class BorrowListWindow extends StatelessWidget {
@@ -70,10 +71,8 @@ class BorrowListWindow extends StatelessWidget {
           ),
         ),
         if (c.borrowList.isNotEmpty)
-          if (preference.isPhone)
-            ListView(
-              children: borrowList,
-            )
+          if (isPhone(context))
+            ListView(children: borrowList)
           else
             SingleChildScrollView(
               child: LayoutGrid(

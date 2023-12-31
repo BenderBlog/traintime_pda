@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences prefs;
 late PackageInfo packageInfo;
-bool isPhone = true;
 
 enum Preference {
   name(key: "name", type: "String"),

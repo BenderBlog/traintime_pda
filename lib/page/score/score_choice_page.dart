@@ -7,9 +7,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class ScoreChoicePage extends StatefulWidget {
   const ScoreChoicePage({super.key});
@@ -150,10 +150,8 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
           ),
           Expanded(
             child: state.selectedScoreList.isNotEmpty
-                ? preference.isPhone
-                    ? ListView(
-                        children: scoreList,
-                      )
+                ? isPhone(context)
+                    ? ListView(children: scoreList)
                     : SingleChildScrollView(
                         child: LayoutGrid(
                           columnSizes: repeat(

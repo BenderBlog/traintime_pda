@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/class_detail_tile.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class ClasstableArrangementColumn extends StatelessWidget {
   const ClasstableArrangementColumn({super.key});
@@ -32,7 +32,7 @@ class ClasstableArrangementColumn extends StatelessWidget {
           .clipRRect(all: 12)
           .center();
 
-      if (!preference.isPhone) {
+      if (!isPhone(context)) {
         return textWidget.center().expanded();
       } else {
         return textWidget;

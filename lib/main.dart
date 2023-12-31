@@ -49,8 +49,6 @@ void main() async {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-  } else {
-    preference.isPhone = false;
   }
 
   // Loading cookiejar.

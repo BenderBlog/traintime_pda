@@ -14,6 +14,7 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/login/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/home.dart';
@@ -259,8 +260,8 @@ class _LoginWindowState extends State<LoginWindow> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(
-          left: preference.isPhone ? widthOfSquare : width * 0.2,
-          right: preference.isPhone ? widthOfSquare : width * 0.2,
+          left: isPhone(context) ? widthOfSquare : width * 0.2,
+          right: isPhone(context) ? widthOfSquare : width * 0.2,
           top: kToolbarHeight,
         ),
         child: width / height > 1.0

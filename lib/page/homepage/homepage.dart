@@ -9,7 +9,7 @@ import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/page/homepage/pad_main_page.dart';
 import 'package:watermeter/page/homepage/phone_main_page.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -20,6 +20,6 @@ class MainPage extends StatelessWidget {
     Get.put(ExamController());
     Get.put(LibraryController());
     Get.put(SchoolCardController());
-    return preference.isPhone ? const PhoneMainPage() : const PadMainPage();
+    return isPhone(context) ? const PhoneMainPage() : const PadMainPage();
   }
 }

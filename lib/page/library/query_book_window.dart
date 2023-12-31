@@ -9,7 +9,7 @@ import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class QueryBookWindow extends StatefulWidget {
   final BoxConstraints constraints;
@@ -112,7 +112,7 @@ class _QueryBookWindowState extends State<QueryBookWindow>
                 ),
               ),
             );
-            return preference.isPhone
+            return isPhone(context)
                 ? ListView(children: bookList)
                 : SingleChildScrollView(
                     child: LayoutGrid(

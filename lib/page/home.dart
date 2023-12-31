@@ -9,6 +9,7 @@ import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -193,7 +194,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: Row(
         children: [
           Visibility(
-            visible: !preference.isPhone,
+            visible: !isPhone(context),
             child: NavigationRail(
               backgroundColor: Theme.of(context).colorScheme.background,
               indicatorColor: Theme.of(context).colorScheme.secondary,
@@ -223,7 +224,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ],
       ),
-      bottomNavigationBar: preference.isPhone
+      bottomNavigationBar: isPhone(context)
           ? NavigationBar(
               backgroundColor: Theme.of(context).colorScheme.background,
               indicatorColor: Theme.of(context).colorScheme.secondary,
