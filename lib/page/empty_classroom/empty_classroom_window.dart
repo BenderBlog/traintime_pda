@@ -78,7 +78,10 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
           body: Column(
             children: [
               if (c.places.isNotEmpty)
-                Padding(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: sheetMaxWidth,
+                  ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 8,
@@ -170,7 +173,8 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                           : Center(
                               child: ConstrainedBox(
                                 constraints: const BoxConstraints(
-                                    maxWidth: sheetMaxWidth),
+                                  maxWidth: sheetMaxWidth,
+                                ),
                                 child: DataTable2(
                                   columnSpacing: 0,
                                   horizontalMargin: 6,

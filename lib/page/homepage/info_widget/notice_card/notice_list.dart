@@ -38,7 +38,12 @@ class NoticeList extends StatelessWidget {
               children: [
                 TagsBoxes(text: messages[index].type),
                 const SizedBox(width: 8),
-                Text(messages[index].title),
+                Flexible(
+                  child: Text(
+                    messages[index].title,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ),

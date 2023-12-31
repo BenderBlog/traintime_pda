@@ -33,20 +33,28 @@ class NoticeCard extends StatelessWidget {
         child: messages.isNotEmpty
             ? MarqueeWidget(
                 itemCount: messages.length,
-                itemBuilder: (context, index) => Row(
-                  children: [
-                    TagsBoxes(text: messages[index].type),
-                    const SizedBox(width: 8),
-                    Text(
-                      messages[index].title,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                itemBuilder: (context, index) => Flexible(
+                  child: Row(
+                    children: [
+                      TagsBoxes(text: messages[index].type),
+                      const SizedBox(width: 8),
+                      Text(
+                        messages[index].title,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )
-            : const Text("没有获取应用公告"),
+            : Text(
+                "没有获取应用公告",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ).center().expanded(),
       )
           .constrained(height: 30)
           .paddingDirectional(
