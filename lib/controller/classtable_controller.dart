@@ -258,13 +258,18 @@ class ClassTableController extends GetxController {
     startDay = DateTime.parse(classTableData.termStartDay).add(
         Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
+    updateTime = DateTime.now();
+
     // Get the current index.
-    int delta =
-        Jiffy.now().dayOfYear - Jiffy.parseFromDateTime(startDay).dayOfYear;
+    // A day = 1000 milliseconds as one second
+    // A hour contains 3600 seconds = 60 * 60.
+    // A day contains 24 * 3600 seconds
+    // emmm
+    int delta = (Jiffy.parseFromDateTime(updateTime).millisecondsSinceEpoch -
+            Jiffy.parseFromDateTime(startDay).millisecondsSinceEpoch) ~/
+        86400000;
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
-
-    updateTime = DateTime.now();
 
     developer.log(
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
