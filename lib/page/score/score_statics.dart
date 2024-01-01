@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+const double cardWidth = 280;
+
 enum ChoiceState {
   /// All stuff from the index array.
   all,

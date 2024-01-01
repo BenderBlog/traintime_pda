@@ -24,11 +24,15 @@ class ScorePage extends StatefulWidget {
 
 class _ScorePageState extends State<ScorePage> {
   late ScoreState c;
+  late TextEditingController text;
 
   @override
   void didChangeDependencies() {
     c = ScoreState.of(context)!;
     c.controllers.addListener(() => mounted ? setState(() {}) : null);
+    text = TextEditingController.fromValue(
+      TextEditingValue(text: c.controllers.search),
+    );
     super.didChangeDependencies();
   }
 
@@ -67,62 +71,76 @@ class _ScorePageState extends State<ScorePage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 6,
-            ),
-            child: Row(
-              mainAxisAlignment: isPhone(context)
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
+          Wrap(
+            alignment: WrapAlignment.start,
+            children: [
+              TextField(
+                style: const TextStyle(fontSize: 14),
+                controller: text,
+                autofocus: false,
+                decoration: InputDecoration(
+                  isDense: true,
+                  fillColor: Colors.grey.withOpacity(0.2),
+                  filled: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  onPressed: () async {
-                    await showDialog<int>(
-                      context: context,
-                      builder: (context) => ColumnChooseDialog(
-                        chooseList: ["所有学期", ...c.semester].toList(),
-                      ),
-                    ).then((value) {
-                      if (value != null) {
-                        c.chosenSemester = ["", ...c.semester].toList()[value];
-                      }
-                    });
-                  },
-                  child: Text(
-                    "学期 ${c.controllers.chosenSemester == "" ? "所有学期" : c.controllers.chosenSemester}",
+                  hintText: "搜索成绩记录",
+                  hintStyle: const TextStyle(fontSize: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                const VerticalDivider(),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
-                  ),
-                  onPressed: () async {
-                    await showDialog<int>(
-                      context: context,
-                      builder: (context) => ColumnChooseDialog(
-                        chooseList: ["所有类型", ...c.statuses].toList(),
-                      ),
-                    ).then((value) {
-                      if (value != null) {
-                        c.chosenStatus = ["", ...c.statuses].toList()[value];
-                      }
-                    });
-                  },
-                  child: Text(
-                    "类型 ${c.controllers.chosenStatus == "" ? "所有类型" : c.controllers.chosenStatus}",
-                  ),
+                onSubmitted: (String text) => c.search = text,
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
                 ),
-              ],
-            ),
-          ),
+                onPressed: () async {
+                  await showDialog<int>(
+                    context: context,
+                    builder: (context) => ColumnChooseDialog(
+                      chooseList: ["所有学期", ...c.semester].toList(),
+                    ),
+                  ).then((value) {
+                    if (value != null) {
+                      c.chosenSemester = ["", ...c.semester].toList()[value];
+                    }
+                  });
+                },
+                child: Text(
+                  "学期 ${c.controllers.chosenSemester == "" ? "所有学期" : c.controllers.chosenSemester}",
+                ),
+              ).padding(right: 8),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
+                ),
+                onPressed: () async {
+                  await showDialog<int>(
+                    context: context,
+                    builder: (context) => ColumnChooseDialog(
+                      chooseList: ["所有类型", ...c.statuses].toList(),
+                    ),
+                  ).then((value) {
+                    if (value != null) {
+                      c.chosenStatus = ["", ...c.statuses].toList()[value];
+                    }
+                  });
+                },
+                child: Text(
+                  "类型 ${c.controllers.chosenStatus == "" ? "所有类型" : c.controllers.chosenStatus}",
+                ),
+              ),
+            ],
+          )
+              .padding(horizontal: 14, top: 8, bottom: 6)
+              .constrained(maxWidth: 480),
           Expanded(
             child: c.toShow.isNotEmpty
                 ? MasonryGridView.count(
@@ -131,7 +149,8 @@ class _ScorePageState extends State<ScorePage> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                     ),
-                    crossAxisCount: MediaQuery.sizeOf(context).width ~/ 320,
+                    crossAxisCount:
+                        MediaQuery.sizeOf(context).width ~/ cardWidth,
                     mainAxisSpacing: 4,
                     crossAxisSpacing: 4,
                     itemBuilder: (context, index) => scoreList[index],
@@ -195,10 +214,7 @@ class _ScorePageState extends State<ScorePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    c.bottomInfo,
-                    textScaleFactor: 1.2,
-                  ),
+                  Text(c.bottomInfo),
                   FloatingActionButton(
                     elevation: 0.0,
                     highlightElevation: 0.0,

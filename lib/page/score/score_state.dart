@@ -73,6 +73,9 @@ class ScoreState extends InheritedWidget {
         (element) => element.status != controllers.chosenStatus,
       );
     }
+    whatever.removeWhere(
+      (element) => !element.name.contains(controllers.search),
+    );
     return whatever;
   }
 
@@ -81,6 +84,7 @@ class ScoreState extends InheritedWidget {
 
   List<Score> get selectedScoreList {
     List<Score> whatever = List.from(getSelectedScoreList);
+    print("eval");
     if (controllers.chosenSemesterInScoreChoice != "") {
       whatever.removeWhere(
         (element) => element.year != controllers.chosenSemesterInScoreChoice,
@@ -91,6 +95,9 @@ class ScoreState extends InheritedWidget {
         (element) => element.status != controllers.chosenStatusInScoreChoice,
       );
     }
+    whatever.removeWhere(
+      (element) => !element.name.contains(controllers.searchInScoreChoice),
+    );
     return whatever;
   }
 
@@ -190,6 +197,11 @@ class ScoreState extends InheritedWidget {
     controllers.notifyListeners();
   }
 
+  set search(String text) {
+    controllers.search = text;
+    controllers.notifyListeners();
+  }
+
   set chosenSemester(String str) {
     controllers.chosenSemester = str;
     controllers.notifyListeners();
@@ -200,12 +212,17 @@ class ScoreState extends InheritedWidget {
     controllers.notifyListeners();
   }
 
-  void chosenSemesterInScoreChoice(String str) {
+  set searchInScoreChoice(String text) {
+    controllers.searchInScoreChoice = text;
+    controllers.notifyListeners();
+  }
+
+  set chosenSemesterInScoreChoice(String str) {
     controllers.chosenSemesterInScoreChoice = str;
     controllers.notifyListeners();
   }
 
-  void chosenStatusInScoreChoice(String str) {
+  set chosenStatusInScoreChoice(String str) {
     controllers.chosenStatusInScoreChoice = str;
     controllers.notifyListeners();
   }
@@ -225,7 +242,9 @@ class ScoreState extends InheritedWidget {
         oldState.chosenSemesterInScoreChoice !=
             newState.chosenSemesterInScoreChoice ||
         oldState.chosenStatusInScoreChoice !=
-            newState.chosenStatusInScoreChoice);
+            newState.chosenStatusInScoreChoice ||
+        oldState.search != newState.search ||
+        oldState.searchInScoreChoice != newState.chosenSemesterInScoreChoice);
   }
 }
 
@@ -247,6 +266,10 @@ class ScoreWidgetState extends ChangeNotifier {
 
   /// Empty means all status, especially in score choice window.
   String chosenStatusInScoreChoice = "";
+
+  /// Search parameter
+  String search = "";
+  String searchInScoreChoice = "";
 
   ScoreWidgetState({
     required this.isSelected,

@@ -5,9 +5,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
+import 'package:watermeter/page/score/score_statics.dart';
 
 class ScoreChoicePage extends StatefulWidget {
   const ScoreChoicePage({super.key});
@@ -18,11 +20,15 @@ class ScoreChoicePage extends StatefulWidget {
 
 class _ScoreChoicePageState extends State<ScoreChoicePage> {
   late ScoreState state;
+  late TextEditingController text;
 
   @override
   void didChangeDependencies() {
     state = ScoreState.of(context)!;
     state.controllers.addListener(() => mounted ? setState(() {}) : null);
+    text = TextEditingController.fromValue(
+      TextEditingValue(text: state.controllers.searchInScoreChoice),
+    );
     super.didChangeDependencies();
   }
 
@@ -69,62 +75,78 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 6,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
+          Wrap(
+            alignment: WrapAlignment.start,
+            children: [
+              TextField(
+                style: const TextStyle(fontSize: 14),
+                controller: text,
+                autofocus: false,
+                decoration: InputDecoration(
+                  isDense: true,
+                  fillColor: Colors.grey.withOpacity(0.2),
+                  filled: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  onPressed: () async {
-                    await showDialog<int>(
-                      context: context,
-                      builder: (context) => ColumnChooseDialog(
-                        chooseList: ["所有学期", ...state.semester],
-                      ),
-                    ).then((value) {
-                      if (value != null) {
-                        state.controllers.chosenSemesterInScoreChoice =
-                            ["", ...state.semester].toList()[value];
-                      }
-                    });
-                  },
-                  child: Text(
-                    "学期 ${state.controllers.chosenSemesterInScoreChoice == "" ? "所有学期" : state.controllers.chosenSemesterInScoreChoice}",
+                  hintText: "搜索成绩记录",
+                  hintStyle: const TextStyle(fontSize: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                const VerticalDivider(),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
-                  ),
-                  onPressed: () async {
-                    await showDialog<int>(
-                      context: context,
-                      builder: (context) => ColumnChooseDialog(
-                        chooseList: ["所有类型", ...state.statuses].toList(),
-                      ),
-                    ).then((value) {
-                      if (value != null) {
-                        state.controllers.chosenStatusInScoreChoice =
-                            ["", ...state.statuses].toList()[value];
-                      }
-                    });
-                  },
-                  child: Text(
-                    "类型 ${state.controllers.chosenStatusInScoreChoice == "" ? "所有类型" : state.controllers.chosenStatusInScoreChoice}",
-                  ),
+                onSubmitted: (String text) => state.searchInScoreChoice = text,
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
                 ),
-              ],
-            ),
-          ),
+                onPressed: () async {
+                  await showDialog<int>(
+                    context: context,
+                    builder: (context) => ColumnChooseDialog(
+                      chooseList: ["所有学期", ...state.semester],
+                    ),
+                  ).then((value) {
+                    if (value != null) {
+                      state.chosenSemesterInScoreChoice =
+                          ["", ...state.semester].toList()[value];
+                    }
+                  });
+                },
+                child: Text(
+                  "学期 ${state.controllers.chosenSemesterInScoreChoice == "" ? "所有学期" : state.controllers.chosenSemesterInScoreChoice}",
+                ),
+              ).padding(right: 4),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
+                ),
+                onPressed: () async {
+                  await showDialog<int>(
+                    context: context,
+                    builder: (context) => ColumnChooseDialog(
+                      chooseList: ["所有类型", ...state.statuses].toList(),
+                    ),
+                  ).then((value) {
+                    if (value != null) {
+                      state.chosenStatusInScoreChoice =
+                          ["", ...state.statuses].toList()[value];
+                    }
+                  });
+                },
+                child: Text(
+                  "类型 ${state.controllers.chosenStatusInScoreChoice == "" ? "所有类型" : state.controllers.chosenStatusInScoreChoice}",
+                ),
+              ),
+            ],
+          )
+              .padding(horizontal: 14, top: 8, bottom: 6)
+              .constrained(maxWidth: 480),
           Expanded(
             child: state.selectedScoreList.isNotEmpty
                 ? AlignedGridView.count(
@@ -133,7 +155,8 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                     ),
-                    crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+                    crossAxisCount:
+                        MediaQuery.sizeOf(context).width ~/ cardWidth,
                     mainAxisSpacing: 4,
                     crossAxisSpacing: 4,
                     itemBuilder: (context, index) => ScoreInfoCard(

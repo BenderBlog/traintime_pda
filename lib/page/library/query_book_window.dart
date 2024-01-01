@@ -23,16 +23,6 @@ class _QueryBookWindowState extends State<QueryBookWindow>
     with AutomaticKeepAliveClientMixin {
   final LibraryController c = Get.put(LibraryController());
 
-  int get crossItems => widget.constraints.minWidth ~/ 360;
-
-  int rowItem(int length) {
-    int rowItem = length ~/ crossItems;
-    if (crossItems * rowItem < length) {
-      rowItem += 1;
-    }
-    return rowItem;
-  }
-
   @override
   bool get wantKeepAlive => true;
 

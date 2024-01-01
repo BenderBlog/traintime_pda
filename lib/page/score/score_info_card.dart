@@ -88,6 +88,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                     if (c.scoreTable[widget.mark].examType.isNotEmpty &&
                         c.scoreTable[widget.mark].examType != "考试") ...[
                       VerticalDivider(
+                        width: 8,
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       Text(
