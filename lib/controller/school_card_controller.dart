@@ -39,13 +39,13 @@ class SchoolCardController extends GetxController {
     } on DioException catch (e, s) {
       developer.log(
         "Network exception: ${e.message}\nStack: $s",
-        name: "ScoreController",
+        name: "SchoolCardController",
       );
       errorPrice.value = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
       developer.log(
         "On school card exception: $e\nStack: $s",
-        name: "ScoreController",
+        name: "SchoolCardController",
       );
       errorPrice.value = "On school card exception: $e\nStack: $s";
     }

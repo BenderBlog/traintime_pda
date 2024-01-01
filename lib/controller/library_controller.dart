@@ -24,7 +24,7 @@ class LibraryController extends GetxController {
     super.onReady();
     isGet.value = false;
     await LibrarySession().initSession();
-    await getBorrowList();
+    getBorrowList();
   }
 
   Future<void> getBorrowList() async {

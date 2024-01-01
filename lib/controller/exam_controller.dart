@@ -58,13 +58,13 @@ class ExamController extends GetxController {
     } on DioException catch (e, s) {
       developer.log(
         "Network exception: ${e.message}\nStack: $s",
-        name: "ScoreController",
+        name: "ExamController",
       );
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
       developer.log(
         "On exam controller: $e\nStack: $s",
-        name: "ScoreController",
+        name: "ExamController",
       );
       error = "On exam controller: $e\nStack: $s";
     }
