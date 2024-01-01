@@ -50,7 +50,7 @@ class Score {
   String scoreStr; // 分数
   String year; // 学年
   double credit; // 学分
-  String status; // 修读状态
+  String statusStr; // 课程性质
   String examType; // 考试类型
   String examProp;
   bool isPassed; //是否及格
@@ -60,11 +60,22 @@ class Score {
     required this.scoreStr,
     required this.year,
     required this.credit,
-    required this.status,
+    required this.statusStr,
     required this.isPassed,
     required this.examType,
     required this.examProp,
   });
+
+  /// From ehall, score status:
+  /// 学院选修（任选）；人文限选；公共任选；辅修
+  /// 非标；必修；学院选修；学院限选；学院选修（限选）
+  /// 学校任选；学院任选；学校限选
+  String get status {
+    if (statusStr.contains(RegExp(r'（|）'))) {
+      return statusStr.replaceAll(RegExp(r"选修|（|）"), "");
+    }
+    return statusStr;
+  }
 
   double get score {
     switch (scoreStr) {
