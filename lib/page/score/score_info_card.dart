@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_state.dart';
 
 class ScoreInfoCard extends StatefulWidget {
@@ -23,6 +22,18 @@ class ScoreInfoCard extends StatefulWidget {
 
 class _ScoreInfoCardState extends State<ScoreInfoCard> {
   late ScoreState c;
+
+  static const rem = 12.0;
+  static const cardPadding = 8.0;
+
+  double get cardOpacity {
+    if ((c.controllers.isSelectMod || widget.isScoreChoice) &&
+        !c.controllers.isSelected[widget.mark]) {
+      return 0.38;
+    } else {
+      return 1;
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -51,74 +62,91 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
       child: AnimatedOpacity(
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
-        child: Card(
-          elevation: 0,
-          color: (c.controllers.isSelectMod || widget.isScoreChoice) &&
-                  c.controllers.isSelected[widget.mark]
-              ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2)
-              : Theme.of(context).colorScheme.secondary,
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  c.scoreTable[widget.mark].name,
-                  textScaleFactor: MediaQuery.of(context).textScaleFactor * 1.1,
+                  "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
+                  "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
+                  "${c.scoreTable[widget.mark].name}",
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
-                ),
-                const Divider(
-                  color: Colors.transparent,
-                  height: 4,
-                ),
-                Wrap(
+                ).flexible(),
+                Row(
                   children: [
-                    TagsBoxes(
-                      text: c.scoreTable[widget.mark].year,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ).padding(right: 6),
-                    TagsBoxes(
-                      text: c.scoreTable[widget.mark].status,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ).padding(right: 6),
-                    if (c.scoreTable[widget.mark].examType.isNotEmpty)
-                      TagsBoxes(
-                        text: c.scoreTable[widget.mark].examType,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                      ).padding(right: 6),
-                    TagsBoxes(
-                      text: c.scoreTable[widget.mark].examProp,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ).padding(right: 6),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    children: [
-                      const Divider(
-                        color: Colors.transparent,
-                        height: 5,
+                    Text(
+                      c.scoreTable[widget.mark].status,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    if (c.scoreTable[widget.mark].examType.isNotEmpty &&
+                        c.scoreTable[widget.mark].examType != "考试") ...[
+                      VerticalDivider(
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       Text(
-                        "学分: ${c.scoreTable[widget.mark].credit}",
-                      ),
-                      Text(
-                        "GPA: ${c.scoreTable[widget.mark].gpa}",
-                      ),
-                      Text(
-                        "成绩：${c.scoreTable[widget.mark].scoreStr}",
+                        c.scoreTable[widget.mark].examType,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
               ],
-            ),
-          ),
-        ),
+            )
+                .padding(
+                  horizontal: rem,
+                  top: rem,
+                  bottom: 0.5 * rem,
+                )
+                .backgroundColor(
+                  Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(cardOpacity),
+                ),
+            Row(
+              children: [
+                Text(
+                  "学分 ${c.scoreTable[widget.mark].credit}",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ).expanded(flex: 3),
+                Text(
+                  "GPA ${c.scoreTable[widget.mark].gpa}",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ).expanded(flex: 3),
+                Text(
+                  "成绩 ${c.scoreTable[widget.mark].scoreStr}",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ).expanded(flex: 2),
+              ],
+            )
+                .padding(
+                  horizontal: rem,
+                  top: 0.75 * rem,
+                  bottom: rem,
+                )
+                .backgroundColor(
+                  Theme.of(context)
+                      .colorScheme
+                      .surfaceVariant
+                      .withOpacity(cardOpacity),
+                ),
+          ],
+        ).clipRRect(all: rem).padding(all: cardPadding),
       ),
     );
   }

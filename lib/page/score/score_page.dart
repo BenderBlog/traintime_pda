@@ -125,13 +125,13 @@ class _ScorePageState extends State<ScorePage> {
           ),
           Expanded(
             child: c.toShow.isNotEmpty
-                ? AlignedGridView.count(
+                ? MasonryGridView.count(
                     shrinkWrap: true,
                     itemCount: c.toShow.length,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                     ),
-                    crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+                    crossAxisCount: MediaQuery.sizeOf(context).width ~/ 320,
                     mainAxisSpacing: 4,
                     crossAxisSpacing: 4,
                     itemBuilder: (context, index) => scoreList[index],
