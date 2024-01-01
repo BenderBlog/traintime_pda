@@ -101,8 +101,11 @@ class ClassTableController extends GetxController {
 
     int currentDataIndex = -1;
     try {
-      currentDataIndex =
-          pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+      if (pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2]
+          .isNotEmpty) {
+        currentDataIndex =
+            pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+      }
     } catch (e, s) {
       developer.log(
         "No class table data, $e",
