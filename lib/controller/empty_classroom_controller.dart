@@ -9,7 +9,7 @@ import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
 // TODO: Completely remove empty classroom controller.
 
 class EmptyClassroomController extends GetxController {
-  List<EmptyClassroomPlace> places = [];
+  RxList<EmptyClassroomPlace> places = <EmptyClassroomPlace>[].obs;
   JiaowuServiceSession session = JiaowuServiceSession();
 
   RxBool isLoad = true.obs;
