@@ -29,9 +29,11 @@ class _ScoreWindowState extends State<ScoreWindow> {
     );
   }
 
+  void dataInit() => scoreList = JiaowuServiceSession().getScore();
+
   @override
   void initState() {
-    scoreList = JiaowuServiceSession().getScore();
+    dataInit();
     super.initState();
   }
 
@@ -52,7 +54,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
           );
         } else if (snapshot.hasError) {
           body = ReloadWidget(
-            function: () => JiaowuServiceSession().getScore(),
+            function: () => dataInit(),
           );
         } else {
           body = const Center(
