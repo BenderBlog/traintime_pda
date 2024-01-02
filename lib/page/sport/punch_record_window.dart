@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/model/xidian_sport/punch.dart';
+import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 class PunchRecordWindow extends StatefulWidget {
@@ -154,57 +155,45 @@ class RecordCard extends StatelessWidget {
   const RecordCard({Key? key, required this.mark, required this.toUse})
       : super(key: key);
 
-  TagsBoxes situation() {
+  ReXCardRemaining situation() {
     String toShow;
-    Color background;
+    Color? background;
     if (toUse.state.contains("成功")) {
       toShow = toUse.state.length == 4
           ? toUse.state
           : "成功：${toUse.state.substring(18)}";
-      background = Colors.green;
     } else if (toUse.state.contains("失败")) {
       toShow = "失败";
       background = Colors.red;
     } else {
       toShow = "信息";
-      background = Colors.blueAccent;
     }
-    return TagsBoxes(
-      text: toShow,
-      backgroundColor: background,
+    return ReXCardRemaining(
+      toShow,
+      color: background,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Theme.of(context).colorScheme.secondary,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        child: Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          children: [
-            TagsBoxes(
-              text: "第 $mark 条",
+    return ReXCard(
+      title: "第 $mark 条",
+      remaining: [situation()],
+      bottomRow: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          informationWithIcon(Icons.punch_clock,
+              toUse.time.format(pattern: "yyyy-MM-dd HH:mm:ss"), context),
+          informationWithIcon(Icons.place, toUse.machineName, context),
+          if (!toUse.state.contains("成功"))
+            informationWithIcon(
+              Icons.error_outline,
+              toUse.state.contains("锻炼间隔需30分钟以上")
+                  ? toUse.state.replaceAll("锻炼间隔需30分钟以上", "")
+                  : toUse.state,
+              context,
             ),
-            situation(),
-            const Divider(
-              color: Colors.transparent,
-              height: 5,
-            ),
-            informationWithIcon(Icons.punch_clock,
-                toUse.time.format(pattern: "yyyy-MM-dd HH:mm:ss"), context),
-            informationWithIcon(Icons.place, toUse.machineName, context),
-            if (!toUse.state.contains("成功"))
-              informationWithIcon(
-                  Icons.error_outline,
-                  toUse.state.contains("锻炼间隔需30分钟以上")
-                      ? toUse.state.replaceAll("锻炼间隔需30分钟以上", "")
-                      : toUse.state,
-                  context),
-          ],
-        ),
+        ],
       ),
     );
   }

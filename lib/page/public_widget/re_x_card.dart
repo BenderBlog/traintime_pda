@@ -1,5 +1,5 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: MPL-2.0 OR MIT
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -42,18 +42,13 @@ class ReXCard extends StatelessWidget {
                   children: [
                     Text(
                       remaining.first.text,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: remaining.first.color,
-                      ),
+                      style: TextStyle(color: remaining.first.color),
                     ),
                     for (int i = 1; i < remaining.length; ++i) ...[
                       const VerticalDivider(width: 8),
                       Text(
                         remaining[i].text,
-                        style: TextStyle(
-                          color: remaining[i].color,
-                        ),
+                        style: TextStyle(color: remaining[i].color),
                       ),
                     ]
                   ],

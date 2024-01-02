@@ -15,9 +15,6 @@ import 'package:watermeter/model/xidian_sport/score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
-const rem = 12.0;
-const cardPadding = 8.0;
-
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({Key? key}) : super(key: key);
 

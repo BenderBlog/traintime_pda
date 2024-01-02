@@ -26,12 +26,6 @@ class TabForSport extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("体育查询"),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
           bottom: const TabBar(
             tabs: [
               Tab(text: "打卡记录"),
