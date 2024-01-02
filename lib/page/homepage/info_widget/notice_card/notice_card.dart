@@ -43,7 +43,12 @@ class NoticeCard extends StatelessWidget {
                   ],
                 ),
               )
-            : const Text("没有获取应用公告").center().expanded(),
+            : Text(
+                "没有获取应用公告",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ).center(),
       )
           .constrained(height: 30)
           .paddingDirectional(
@@ -52,9 +57,9 @@ class NoticeCard extends StatelessWidget {
           )
           .decorated(
             color: Theme.of(context).colorScheme.secondaryContainer,
-            borderRadius: isDesktop(context) ? BorderRadius.circular(12) : null,
+            borderRadius: isPhone(context) ? null : BorderRadius.circular(12),
           )
-          .paddingAll(isDesktop(context) ? 4 : 0),
+          .paddingAll(isPhone(context) ? 0 : 4),
     );
   }
 }
