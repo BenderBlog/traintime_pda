@@ -70,9 +70,7 @@ Future<void> update({
 
   // Retry Login
   if (forceRetryLogin || loginState == IDSLoginState.fail) {
-    await _comboLogin(
-      sliderCaptcha: sliderCaptcha,
-    );
+    await _comboLogin(sliderCaptcha: sliderCaptcha);
   }
 
   // Update Classtable
@@ -82,27 +80,40 @@ Future<void> update({
   );
   classTableController.updateCurrent();
   classTableController.update();
+
   // Update Examation Info
   developer.log(
     "Updating exam info",
     name: "Homepage Update",
   );
   examController.get().then((value) => examController.update());
+
   // Update Electricity
   developer.log(
     "Updating electricity",
     name: "Homepage Update",
   );
   electricity.update();
+
   // Update Sport
   developer.log(
     "Updating punch data",
     name: "Homepage Update",
   );
   SportSession().getPunch();
+
   // Update Library
-  libraryController.onReady();
+  developer.log(
+    "Updating library",
+    name: "Homepage Update",
+  );
+  libraryController.updateController();
+
   // Update school card
+  developer.log(
+    "Updating school card",
+    name: "Homepage Update",
+  );
   schoolCardController.updateMoney();
 }
 

@@ -73,6 +73,10 @@ class LibrarySession extends IDSSession {
   }
 
   Future<List<BorrowData>> getBorrowList() async {
+    developer.log(
+      "Getting borrow list",
+      name: "LibrarySession",
+    );
     if (userId == 0 && token == "") {
       await initSession();
     }
@@ -112,6 +116,10 @@ class LibrarySession extends IDSSession {
   }
 
   Future<void> initSession() async {
+    developer.log(
+      "Initalizing Library Session",
+      name: "LibrarySession",
+    );
     try {
       String location = await checkAndLogin(
         target: "https://mgce.natapp4.cc/api/index/casLoginDo.html?"
