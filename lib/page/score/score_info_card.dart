@@ -64,7 +64,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
           opacity: cardOpacity,
           title: Text(
             "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
-            "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
+            "${!c.scoreTable[widget.mark].isPassed && c.scoreTable[widget.mark].statusStr != "暂无" ? "[挂] " : ""}"
             "${c.scoreTable[widget.mark].name}",
           ),
           remaining: [
