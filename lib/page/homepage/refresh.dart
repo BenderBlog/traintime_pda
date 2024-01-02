@@ -10,6 +10,8 @@ import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/repository/electricity_session.dart' as electricity;
 import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/xidian_ids/payment_session.dart'
+    as owe_session;
 //import 'package:watermeter/repository/experiment/experiment_session.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
@@ -94,6 +96,7 @@ Future<void> update({
     name: "Homepage Update",
   );
   electricity.update();
+  owe_session.update();
 
   // Update Sport
   developer.log(

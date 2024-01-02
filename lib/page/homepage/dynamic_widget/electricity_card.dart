@@ -15,12 +15,6 @@ class ElectricityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (electricity_session.electricityInfo.value.isEmpty) {
-      electricity_session.update();
-    }
-    if (owe_session.owe.value.isEmpty) {
-      owe_session.update();
-    }
     return GestureDetector(
       onTap: () async {
         showDialog(
