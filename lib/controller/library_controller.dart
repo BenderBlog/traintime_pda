@@ -57,8 +57,10 @@ class LibraryController extends GetxController {
   Future<void> searchBook() async {
     if (!noMore) {
       isSearching.value = true;
-      List<BookInfo> get =
-          await LibrarySession().searchBook(search.value, page);
+      List<BookInfo> get = await LibrarySession().searchBook(
+        search.value,
+        page,
+      );
       if (get.isEmpty) {
         noMore = true;
       } else {

@@ -25,6 +25,7 @@ class LibrarySession extends IDSSession {
     if (userId == 0 && token == "") {
       await initSession();
     }
+    if (searchWord.isEmpty) return [];
     var rawData = await dio.post(
       "https://shuwo.xidian.edu.cn/xidian_book/api/search/list.html",
       data: {
@@ -34,7 +35,7 @@ class LibrarySession extends IDSSession {
         "page": page,
         "searchLocationStatus": 1,
       },
-    ).then((value) => value.data["data"]["list"]);
+    ).then((value) => value.data["data"]["list"] ?? []);
 
     return List<BookInfo>.generate(
       rawData.length ?? 0,
