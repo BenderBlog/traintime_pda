@@ -22,9 +22,9 @@ class TeleBookWindow extends StatelessWidget {
       appBar: AppBar(
         title: const Text("电话本"),
       ),
-      body: dataList<TeleyInformation, DepartmentWindow>(
-        list,
-        (a) => DepartmentWindow(toUse: a),
+      body: DataList(
+        list: list,
+        initFormula: (a) => DepartmentWindow(toUse: a),
       ),
     );
   }
@@ -70,7 +70,7 @@ class DepartmentWindow extends StatelessWidget {
       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       elevation: 0,
       child: Container(
-        padding: const EdgeInsets.all(12.5),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

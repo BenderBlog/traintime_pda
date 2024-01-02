@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class ExamInfoCard extends StatelessWidget {
   final Subject? toUse;
@@ -14,77 +16,58 @@ class ExamInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 6,
-      ),
-      elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        child: toUse != null
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        toUse!.subject,
-                        textScaleFactor:
-                            MediaQuery.of(context).textScaleFactor * 1.1,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      TagsBoxes(
-                        text: toUse!.type,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                      ),
-                      const Divider(
-                        color: Colors.transparent,
-                        height: 5,
-                      ),
-                      informationWithIcon(
-                        Icons.access_time_filled_rounded,
-                        toUse!.time,
+    return toUse != null
+        ? ReXCard(
+            title: Text(toUse!.subject),
+            remaining: [
+              ReXCardRemaining(toUse!.type),
+            ],
+            bottomRow: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              children: [
+                informationWithIcon(
+                  Icons.access_time_filled_rounded,
+                  toUse!.time,
+                  context,
+                ),
+                Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: informationWithIcon(
+                        Icons.room,
+                        toUse!.place,
                         context,
                       ),
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: informationWithIcon(
-                              Icons.room,
-                              toUse!.place,
-                              context,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: informationWithIcon(
-                              Icons.chair,
-                              toUse!.seat.toString(),
-                              context,
-                            ),
-                          ),
-                        ],
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: informationWithIcon(
+                        Icons.chair,
+                        toUse!.seat.toString(),
+                        context,
                       ),
-                    ],
-                  ),
-                ],
-              )
-            : Text(
-                title!,
-                textScaleFactor: 1.1,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ],
                 ),
+              ],
+            ),
+          )
+        : Text(
+            title!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ).padding(all: 14).card(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 6,
               ),
-      ),
-    );
+              elevation: 0,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            );
   }
 }

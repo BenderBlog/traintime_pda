@@ -15,29 +15,26 @@ class NoArrangedInfo extends StatelessWidget {
       appBar: AppBar(
         title: const Text("目前无安排考试的科目"),
       ),
-      body: dataList<Card, Card>(
-        List.generate(
-          list.length,
-          (index) => Card(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 6,
-            ),
-            elevation: 0,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            child: ListTile(
-              title: Text(
-                list[index].subject,
-                textScaleFactor: MediaQuery.of(context).textScaleFactor * 1.1,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+      body: DataList<ToBeArranged>(
+        list: list,
+        initFormula: (toUse) => Card(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
+          elevation: 0,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          child: ListTile(
+            title: Text(
+              toUse.subject,
+              textScaleFactor: MediaQuery.of(context).textScaleFactor * 1.1,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
               ),
-              subtitle: Text("编号: ${list[index].id}"),
             ),
+            subtitle: Text("编号: ${toUse.id}"),
           ),
         ),
-        (toUse) => toUse,
       ),
     );
   }

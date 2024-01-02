@@ -70,7 +70,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
           childBuilder: (context, physics) => Obx(() {
             if (sportScore.value.situation == null &&
                 sportScore.value.detail.isNotEmpty) {
-              List things = [
+              List<Widget> things = [
                 ReXCard(
                   title: const Text("四年总分"),
                   remaining: [
@@ -97,14 +97,13 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                   ),
                 ),
               ];
-              things.addAll(List.generate(
+              things.addAll(List<Widget>.generate(
                 sportScore.value.list.length,
                 (index) => ScoreCard(toUse: sportScore.value.list[index]),
               ).reversed);
-              return dataList<dynamic, Widget>(
-                things,
-                (toUse) => toUse,
-                physics: physics,
+              return DataList<Widget>(
+                list: things,
+                initFormula: (toUse) => toUse,
               );
             } else if (sportScore.value.situation == "正在获取") {
               return const Center(child: CircularProgressIndicator());

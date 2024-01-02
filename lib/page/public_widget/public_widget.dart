@@ -47,21 +47,34 @@ class TagsBoxes extends StatelessWidget {
 }
 
 /// A listview widget. First is the type, second is the list...
-Widget dataList<T, W extends Widget>(List<T> a, W Function(T toUse) init,
-        {ScrollPhysics? physics}) =>
-    ListView.separated(
+class DataList<T> extends StatelessWidget {
+  final List<T> list;
+  final Widget Function(T toUse) initFormula;
+  final ScrollPhysics? physics;
+  const DataList({
+    super.key,
+    required this.list,
+    required this.initFormula,
+    this.physics,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
       physics: physics,
-      itemCount: a.length,
+      itemCount: list.length,
       itemBuilder: (context, index) {
-        return init(a[index]);
+        return initFormula(list[index]);
       },
       separatorBuilder: (BuildContext context, int index) =>
-          const SizedBox(height: 3),
+          const SizedBox(height: 4),
       padding: const EdgeInsets.symmetric(
         horizontal: 12.5,
         vertical: 9.0,
       ),
     );
+  }
+}
 
 Widget informationWithIcon(IconData icon, String text, context) => Row(
       children: [

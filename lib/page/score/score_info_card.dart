@@ -61,6 +61,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
         child: ReXCard(
+          opacity: cardOpacity,
           title: Text(
             "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
             "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
@@ -94,7 +95,6 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
               ).expanded(flex: 2),
             ],
           ),
-          opacity: cardOpacity,
         ),
       ),
     );

@@ -76,10 +76,9 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                         count++;
                       }
                     }
-                    return dataList<RecordCard, RecordCard>(
-                      toUse,
-                      (toUse) => toUse,
-                      physics: physics,
+                    return DataList<RecordCard>(
+                      list: toUse,
+                      initFormula: (toUse) => toUse,
                     );
                   } else {
                     return ListView(

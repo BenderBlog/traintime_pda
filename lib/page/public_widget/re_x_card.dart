@@ -26,9 +26,8 @@ class ReXCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Material(
-          textStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-          color: Theme.of(context).colorScheme.primary.withOpacity(opacity),
+        DefaultTextStyle.merge(
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
