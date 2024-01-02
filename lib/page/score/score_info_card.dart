@@ -61,10 +61,11 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
         child: ReXCard(
-          title:
-              "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
-              "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
-              "${c.scoreTable[widget.mark].name}",
+          title: Text(
+            "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
+            "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
+            "${c.scoreTable[widget.mark].name}",
+          ),
           remaining: [
             ReXCardRemaining(c.scoreTable[widget.mark].status),
             if (c.scoreTable[widget.mark].examType.isNotEmpty &&

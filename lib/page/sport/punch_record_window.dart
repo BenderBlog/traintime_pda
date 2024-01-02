@@ -158,6 +158,7 @@ class RecordCard extends StatelessWidget {
   ReXCardRemaining situation() {
     String toShow;
     Color? background;
+    bool isBold = false;
     if (toUse.state.contains("成功")) {
       toShow = toUse.state.length == 4
           ? toUse.state
@@ -165,19 +166,21 @@ class RecordCard extends StatelessWidget {
     } else if (toUse.state.contains("失败")) {
       toShow = "失败";
       background = Colors.red;
+      isBold = true;
     } else {
       toShow = "信息";
     }
     return ReXCardRemaining(
       toShow,
       color: background,
+      isBold: isBold,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return ReXCard(
-      title: "第 $mark 条",
+      title: Text("第 $mark 条"),
       remaining: [situation()],
       bottomRow: Wrap(
         alignment: WrapAlignment.spaceBetween,

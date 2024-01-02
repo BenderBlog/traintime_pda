@@ -72,19 +72,21 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                 sportScore.value.detail.isNotEmpty) {
               List things = [
                 ReXCard(
-                  title: "四年总分",
+                  title: const Text("四年总分"),
                   remaining: [
                     ReXCardRemaining(
                       sportScore.value.total,
                       color: sportScore.value.rank.contains("不")
                           ? Colors.red
                           : null,
+                      isBold: true,
                     ),
                     ReXCardRemaining(
                       sportScore.value.rank,
                       color: sportScore.value.rank.contains("不")
                           ? Colors.red
                           : null,
+                      isBold: sportScore.value.rank.contains("不"),
                     )
                   ],
                   bottomRow: Text(
@@ -127,15 +129,17 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReXCard(
-      title: "${toUse.year} 第${toUse.gradeType}",
+      title: Text("${toUse.year} 第${toUse.gradeType}"),
       remaining: [
         ReXCardRemaining(
           toUse.totalScore,
           color: toUse.rank.contains("不") ? Colors.red : null,
+          isBold: true,
         ),
         ReXCardRemaining(
           toUse.rank,
           color: toUse.rank.contains("不") ? Colors.red : null,
+          isBold: toUse.rank.contains("不"),
         )
       ],
       bottomRow: toUse.details.isNotEmpty

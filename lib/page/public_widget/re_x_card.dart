@@ -8,7 +8,7 @@ class ReXCard extends StatelessWidget {
   static const _rem = 12.0;
   static const _cardPadding = 8.0;
 
-  final String title;
+  final Widget title;
   final List<ReXCardRemaining> remaining;
   final Widget bottomRow;
   final double opacity;
@@ -27,35 +27,42 @@ class ReXCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Material(
-          textStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
+          textStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          color: Theme.of(context).colorScheme.primary.withOpacity(opacity),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+              DefaultTextStyle.merge(
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),
+                child: title,
               ).flexible(),
               if (remaining.isNotEmpty)
                 Row(
                   children: [
                     Text(
                       remaining.first.text,
-                      style: TextStyle(color: remaining.first.color),
+                      style: TextStyle(
+                        color: remaining.first.color,
+                        fontWeight:
+                            remaining.first.isBold ? FontWeight.w700 : null,
+                      ),
                     ),
                     for (int i = 1; i < remaining.length; ++i) ...[
                       const VerticalDivider(width: 8),
                       Text(
                         remaining[i].text,
-                        style: TextStyle(color: remaining[i].color),
+                        style: TextStyle(
+                          color: remaining[i].color,
+                          fontWeight:
+                              remaining[i].isBold ? FontWeight.w700 : null,
+                        ),
                       ),
                     ]
                   ],
                 ),
             ],
-          ).backgroundColor(
-            Theme.of(context).colorScheme.primary.withOpacity(opacity),
           ),
         )
             .padding(
@@ -84,5 +91,10 @@ class ReXCard extends StatelessWidget {
 class ReXCardRemaining {
   final String text;
   final Color? color;
-  ReXCardRemaining(this.text, {this.color});
+  final bool isBold;
+  ReXCardRemaining(
+    this.text, {
+    this.color,
+    this.isBold = false,
+  });
 }
