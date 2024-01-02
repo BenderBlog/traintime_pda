@@ -140,12 +140,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("课程表"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         actions: [
           if (haveClass)
             PopupMenuButton<String>(

@@ -84,7 +84,6 @@ class ScoreState extends InheritedWidget {
 
   List<Score> get selectedScoreList {
     List<Score> whatever = List.from(getSelectedScoreList);
-    print("eval");
     if (controllers.chosenSemesterInScoreChoice != "") {
       whatever.removeWhere(
         (element) => element.year != controllers.chosenSemesterInScoreChoice,

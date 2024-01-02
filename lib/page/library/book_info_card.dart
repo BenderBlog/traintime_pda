@@ -20,7 +20,7 @@ class BookInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReXCard(
       title: Text(toUse.bookName),
-      remaining: [],
+      remaining: const [],
       bottomRow: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

@@ -9,6 +9,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 /// THe classtable view, the way the the classtable sheet rendered.
 class ClassTableView extends StatefulWidget {
@@ -31,7 +32,9 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   /// The height is suitable to show 1-8 class, 9-10 are hidden at the bottom.
   double classTableContentHeight(int count) =>
-      count * (widget.constraint.minHeight - midRowHeightVertical) / 8.5;
+      count *
+      (widget.constraint.minHeight - midRowHeightVertical) /
+      (isPhone(context) ? 8.5 : 10);
 
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(int index) {
