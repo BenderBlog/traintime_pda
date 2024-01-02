@@ -12,8 +12,7 @@ import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 
 class QueryBookWindow extends StatefulWidget {
-  final BoxConstraints constraints;
-  const QueryBookWindow({super.key, required this.constraints});
+  const QueryBookWindow({super.key});
 
   @override
   State<QueryBookWindow> createState() => _QueryBookWindowState();
@@ -64,9 +63,8 @@ class _QueryBookWindowState extends State<QueryBookWindow>
               contentPadding: EdgeInsets.symmetric(vertical: 10.0),
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(25),
-                ),
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+                borderSide: BorderSide.none,
               ),
             ),
             onChanged: (String text) => setState(() {
