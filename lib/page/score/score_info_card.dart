@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 
 class ScoreInfoCard extends StatefulWidget {
@@ -22,9 +23,6 @@ class ScoreInfoCard extends StatefulWidget {
 
 class _ScoreInfoCardState extends State<ScoreInfoCard> {
   late ScoreState c;
-
-  static const rem = 12.0;
-  static const cardPadding = 8.0;
 
   double get cardOpacity {
     if ((c.controllers.isSelectMod || widget.isScoreChoice) &&
@@ -62,92 +60,41 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
       child: AnimatedOpacity(
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
-                  "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
-                  "${c.scoreTable[widget.mark].name}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                ).flexible(),
-                Row(
-                  children: [
-                    Text(
-                      c.scoreTable[widget.mark].status,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
-                    if (c.scoreTable[widget.mark].examType.isNotEmpty &&
-                        c.scoreTable[widget.mark].examType != "考试") ...[
-                      VerticalDivider(
-                        width: 8,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      Text(
-                        c.scoreTable[widget.mark].examType,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-            )
-                .padding(
-                  horizontal: rem,
-                  top: rem,
-                  bottom: 0.5 * rem,
-                )
-                .backgroundColor(
-                  Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withOpacity(cardOpacity),
-                ),
-            Row(
-              children: [
-                Text(
-                  "学分 ${c.scoreTable[widget.mark].credit}",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ).expanded(flex: 3),
-                Text(
-                  "GPA ${c.scoreTable[widget.mark].gpa}",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ).expanded(flex: 3),
-                Text(
-                  "成绩 ${c.scoreTable[widget.mark].scoreStr}",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ).expanded(flex: 2),
-              ],
-            )
-                .padding(
-                  horizontal: rem,
-                  top: 0.75 * rem,
-                  bottom: rem,
-                )
-                .backgroundColor(
-                  Theme.of(context)
-                      .colorScheme
-                      .surfaceVariant
-                      .withOpacity(cardOpacity),
-                ),
+        child: ReXCard(
+          title:
+              "${c.scoreTable[widget.mark].examProp != "初修" ? "[${c.scoreTable[widget.mark].examProp}] " : ""}"
+              "${!c.scoreTable[widget.mark].isPassed ? "[挂] " : ""}"
+              "${c.scoreTable[widget.mark].name}",
+          remaining: [
+            ReXCardRemaining(c.scoreTable[widget.mark].status),
+            if (c.scoreTable[widget.mark].examType.isNotEmpty &&
+                c.scoreTable[widget.mark].examType != "考试")
+              ReXCardRemaining(c.scoreTable[widget.mark].examType),
           ],
-        ).clipRRect(all: rem).padding(all: cardPadding),
+          bottomRow: Row(
+            children: [
+              Text(
+                "学分 ${c.scoreTable[widget.mark].credit}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ).expanded(flex: 3),
+              Text(
+                "GPA ${c.scoreTable[widget.mark].gpa}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ).expanded(flex: 3),
+              Text(
+                "成绩 ${c.scoreTable[widget.mark].scoreStr}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ).expanded(flex: 2),
+            ],
+          ),
+          opacity: cardOpacity,
+        ),
       ),
     );
   }

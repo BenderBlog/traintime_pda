@@ -12,6 +12,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
+import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 const rem = 12.0;
@@ -73,34 +74,34 @@ class _SportScoreWindowState extends State<SportScoreWindow>
             if (sportScore.value.situation == null &&
                 sportScore.value.detail.isNotEmpty) {
               List things = [
-                Column(
-                  children: [
-                    ScoreCardTitleRow(
-                      title: "四年总分",
-                      score: double.parse(sportScore.value.total),
-                      rank: sportScore.value.rank,
+                ReXCard(
+                  title: "四年总分",
+                  remaining: [
+                    ReXCardRemaining(
+                      sportScore.value.total,
+                      color: sportScore.value.rank.contains("不")
+                          ? Colors.red
+                          : null,
                     ),
-                    Text(
-                      sportScore.value.detail.substring(
-                        0,
-                        sportScore.value.detail.indexOf("\\"),
-                      ),
-                    ).padding(
-                      horizontal: rem,
-                      top: 0.75 * rem,
-                      bottom: rem,
-                    ),
-                  ],
-                )
-                    .backgroundColor(
-                      Theme.of(context).colorScheme.surfaceVariant,
+                    ReXCardRemaining(
+                      sportScore.value.rank,
+                      color: sportScore.value.rank.contains("不")
+                          ? Colors.red
+                          : null,
                     )
-                    .clipRRect(all: rem)
-                    .padding(all: cardPadding),
+                  ],
+                  bottomRow: Text(
+                    sportScore.value.detail.substring(
+                      0,
+                      sportScore.value.detail.indexOf("\\"),
+                    ),
+                  ),
+                ),
               ];
-              things.addAll(List.generate(sportScore.value.list.length,
-                      (index) => ScoreCard(toUse: sportScore.value.list[index]))
-                  .reversed);
+              things.addAll(List.generate(
+                sportScore.value.list.length,
+                (index) => ScoreCard(toUse: sportScore.value.list[index]),
+              ).reversed);
               return dataList<dynamic, Widget>(
                 things,
                 (toUse) => toUse,
@@ -128,168 +129,96 @@ class ScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ScoreCardTitleRow(
-          title: "${toUse.year} 第${toUse.gradeType}",
-          score: double.parse(toUse.totalScore),
-          rank: toUse.rank,
+    return ReXCard(
+      title: "${toUse.year} 第${toUse.gradeType}",
+      remaining: [
+        ReXCardRemaining(
+          toUse.totalScore,
+          color: toUse.rank.contains("不") ? Colors.red : null,
         ),
-        if (toUse.details.isNotEmpty)
-          Table(
-            columnWidths: const {
-              0: FlexColumnWidth(1.2),
-              1: FlexColumnWidth(1.4),
-              2: FlexColumnWidth(0.8),
-              3: FlexColumnWidth(0.4),
-            },
-            children: [
-              const TableRow(
-                children: [
-                  Text(
-                    "项目",
-                    textAlign: TextAlign.start,
-                  ),
-                  Text(
-                    "数据",
-                    style: TextStyle(fontFeatures: [
-                      FontFeature.tabularFigures(),
-                    ]),
-                    textAlign: TextAlign.start,
-                  ),
-                  Text(
-                    "分数",
-                    style: TextStyle(fontFeatures: [
-                      FontFeature.tabularFigures(),
-                    ]),
-                    textAlign: TextAlign.start,
-                  ),
-                  Text(
-                    "及格",
-                    style: TextStyle(fontFeatures: [
-                      FontFeature.tabularFigures(),
-                    ]),
-                    textAlign: TextAlign.end,
-                  ),
-                ],
-              ),
-              TableRow(
-                children: List<Widget>.generate(
-                  4,
-                  (index) => const Divider(height: 8),
-                ),
-              ),
-              for (var i in toUse.details)
-                TableRow(
+        ReXCardRemaining(
+          toUse.rank,
+          color: toUse.rank.contains("不") ? Colors.red : null,
+        )
+      ],
+      bottomRow: toUse.details.isNotEmpty
+          ? Table(
+              columnWidths: const {
+                0: FlexColumnWidth(1.2),
+                1: FlexColumnWidth(1.4),
+                2: FlexColumnWidth(0.8),
+                3: FlexColumnWidth(0.4),
+              },
+              children: [
+                const TableRow(
                   children: [
                     Text(
-                      i.examName,
+                      "项目",
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      i.actualScore.contains('/')
-                          ? "${i.actualScore.split('/')[0]}cm/${i.actualScore.split('/')[1]}kg"
-                          : "${i.actualScore}${unitToShow(i.examunit)}",
-                      style: const TextStyle(fontFeatures: [
+                      "数据",
+                      style: TextStyle(fontFeatures: [
                         FontFeature.tabularFigures(),
                       ]),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      "${i.score}分",
-                      style: const TextStyle(fontFeatures: [
+                      "分数",
+                      style: TextStyle(fontFeatures: [
                         FontFeature.tabularFigures(),
                       ]),
                       textAlign: TextAlign.start,
                     ),
-                    Icon(
-                      i.score >= 60
-                          ? MingCuteIcons.mgc_check_circle_line
-                          : MingCuteIcons.mgc_close_circle_line,
-                      color: i.score >= 60 ? Colors.green : Colors.red,
-                    ).alignment(Alignment.centerRight),
+                    Text(
+                      "及格",
+                      style: TextStyle(fontFeatures: [
+                        FontFeature.tabularFigures(),
+                      ]),
+                      textAlign: TextAlign.end,
+                    ),
                   ],
                 ),
-            ],
-          ).padding(
-            horizontal: rem,
-            top: 0.75 * rem,
-            bottom: rem,
-          )
-        else
-          Text(toUse.moreinfo).padding(
-            horizontal: rem,
-            top: 0.75 * rem,
-            bottom: rem,
-          ),
-      ],
-    )
-        .backgroundColor(
-          Theme.of(context).colorScheme.surfaceVariant,
-        )
-        .clipRRect(all: rem)
-        .padding(all: cardPadding);
-  }
-}
-
-class ScoreCardTitleRow extends StatelessWidget {
-  final String title;
-  final double score;
-  final String rank;
-
-  const ScoreCardTitleRow({
-    super.key,
-    required this.title,
-    required this.score,
-    required this.rank,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ).flexible(),
-        Row(
-          children: [
-            Text(
-              "$score分",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: rank.contains("不")
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-            VerticalDivider(
-              width: 8,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-            Text(
-              rank,
-              style: TextStyle(
-                color: rank.contains("不")
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ],
-        ),
-      ],
-    )
-        .padding(
-          horizontal: rem,
-          top: rem,
-          bottom: 0.5 * rem,
-        )
-        .backgroundColor(
-          Theme.of(context).colorScheme.primary,
-        );
+                TableRow(
+                  children: List<Widget>.generate(
+                    4,
+                    (index) => const Divider(height: 8),
+                  ),
+                ),
+                for (var i in toUse.details)
+                  TableRow(
+                    children: [
+                      Text(
+                        i.examName,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        i.actualScore.contains('/')
+                            ? "${i.actualScore.split('/')[0]}cm/${i.actualScore.split('/')[1]}kg"
+                            : "${i.actualScore}${unitToShow(i.examunit)}",
+                        style: const TextStyle(fontFeatures: [
+                          FontFeature.tabularFigures(),
+                        ]),
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        "${i.score}分",
+                        style: const TextStyle(fontFeatures: [
+                          FontFeature.tabularFigures(),
+                        ]),
+                        textAlign: TextAlign.start,
+                      ),
+                      Icon(
+                        i.score >= 60
+                            ? MingCuteIcons.mgc_check_circle_line
+                            : MingCuteIcons.mgc_close_circle_line,
+                        color: i.score >= 60 ? Colors.green : Colors.red,
+                      ).alignment(Alignment.centerRight),
+                    ],
+                  ),
+              ],
+            )
+          : Text(toUse.moreinfo),
+    );
   }
 }
