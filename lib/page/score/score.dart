@@ -43,19 +43,23 @@ class _ScoreWindowState extends State<ScoreWindow> {
       future: scoreList,
       builder: (context, snapshot) {
         Widget body;
-        if (snapshot.hasData) {
-          return ScoreState.init(
-            scoreTable: snapshot.data!,
-            context: context,
-            child: _getNavigator(
-              context,
-              const ScorePage(),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          body = ReloadWidget(
-            function: () => dataInit(),
-          );
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            body = ReloadWidget(
+              function: () => setState(() {
+                dataInit();
+              }),
+            );
+          } else {
+            return ScoreState.init(
+              scoreTable: snapshot.data!,
+              context: context,
+              child: _getNavigator(
+                context,
+                const ScorePage(),
+              ),
+            );
+          }
         } else {
           body = const Center(
             child: CircularProgressIndicator(),
