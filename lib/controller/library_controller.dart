@@ -7,48 +7,21 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 import 'dart:developer' as developer;
 
-class LibraryController extends GetxController {
-  RxBool isGet = false.obs;
-  RxBool error = false.obs;
-  List<BorrowData> borrowList = [];
+// TODO: Remove this controller.
 
+class LibraryController extends GetxController {
   var searchList = <BookInfo>[].obs;
   var search = "".obs;
   int page = 1;
   bool noMore = false;
   var isSearching = false.obs;
 
-  int get dued => borrowList.where((element) => element.lendDay < 0).length;
-  int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
-
   void updateController() async {
     developer.log(
       "Updating...",
       name: "LibraryController",
     );
-    isGet.value = false;
     await LibrarySession().initSession();
-    getBorrowList();
-  }
-
-  Future<void> getBorrowList() async {
-    developer.log(
-      "Getting book borrow list",
-      name: "LibraryController",
-    );
-    try {
-      borrowList.clear();
-      if (error.value) {
-        error.value = false;
-        await LibrarySession().initSession();
-      }
-      borrowList.addAll(await LibrarySession().getBorrowList());
-      isGet.value = true;
-      error.value = false;
-      update();
-    } catch (e) {
-      error.value = true;
-    }
   }
 
   @override

@@ -4,10 +4,12 @@
 // Borrow list, shows the user's borrowlist.
 
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/xidian_ids/library_session.dart'
+    as borrow_info;
 import 'package:watermeter/page/library/borrow_info_card.dart';
 
 class BorrowListWindow extends StatelessWidget {
@@ -15,14 +17,42 @@ class BorrowListWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LibraryController c = Get.put(LibraryController());
+    return Obx(() {
+      Widget child() {
+        switch (borrow_info.state.value) {
+          case borrow_info.BorrowListState.fetched:
+            return const BorrowListDetail();
+          case borrow_info.BorrowListState.fetching:
+            return borrow_info.borrowList.isEmpty
+                ? const CircularProgressIndicator().center()
+                : const BorrowListDetail();
+          case borrow_info.BorrowListState.error:
+          case borrow_info.BorrowListState.none:
+            return ReloadWidget(
+              function: borrow_info.refreshBorrowList,
+            );
+        }
+      }
 
+      return RefreshIndicator(
+        onRefresh: borrow_info.refreshBorrowList,
+        child: child(),
+      );
+    });
+  }
+}
+
+class BorrowListDetail extends StatelessWidget {
+  const BorrowListDetail({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     List<Widget> borrowList = List<Widget>.generate(
-      c.borrowList.length,
-      (index) => BorrowInfoCard(toUse: c.borrowList[index]),
+      borrow_info.borrowList.length,
+      (index) => BorrowInfoCard(toUse: borrow_info.borrowList[index]),
     );
 
-    return Column(
+    return ListView(
       children: [
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
@@ -41,14 +71,14 @@ class BorrowListWindow extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text("仍在借"),
-                      Text("${c.notDued} 本"),
+                      Text("${borrow_info.notDued} 本"),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text("已过期"),
-                      Text("${c.dued} 本"),
+                      Text("${borrow_info.dued} 本"),
                     ],
                   )
                 ],
@@ -56,9 +86,10 @@ class BorrowListWindow extends StatelessWidget {
             ),
           ),
         ),
-        if (c.borrowList.isNotEmpty)
+        if (borrow_info.borrowList.isNotEmpty)
           AlignedGridView.count(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: borrowList.length,
             padding: const EdgeInsets.symmetric(
               horizontal: 8,

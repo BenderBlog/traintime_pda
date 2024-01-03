@@ -6,12 +6,13 @@
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/repository/electricity_session.dart' as electricity;
-import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/payment_session.dart'
     as owe_session;
+import 'package:watermeter/repository/xidian_ids/library_session.dart'
+    as borrow_info;
 //import 'package:watermeter/repository/experiment/experiment_session.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
@@ -64,11 +65,10 @@ Future<void> update({
 }) async {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
-  final libraryController = Get.put(LibraryController());
   final schoolCardController = Get.put(SchoolCardController());
 
   // Update data
-  MessageSession().checkMessage();
+  message.checkMessage();
 
   // Retry Login
   if (forceRetryLogin || loginState == IDSLoginState.fail) {
@@ -110,7 +110,7 @@ Future<void> update({
     "Updating library",
     name: "Homepage Update",
   );
-  libraryController.updateController();
+  borrow_info.LibrarySession().getBorrowList();
 
   // Update school card
   developer.log(

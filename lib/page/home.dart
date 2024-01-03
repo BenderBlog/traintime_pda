@@ -11,7 +11,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/setting.dart';
-import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       },
     );
     WidgetsBinding.instance.addObserver(this);
-    MessageSession().checkMessage();
+    message.checkMessage();
 
     if (loginState == IDSLoginState.none) {
       _loginAsync();
