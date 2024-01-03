@@ -13,7 +13,6 @@ class ScoreState extends InheritedWidget {
   final Set<String> semester;
   final Set<String> statuses;
   final Set<String> unPassedSet;
-  final String currentSemester;
 
   /// Parent's Buildcontext.
   final BuildContext context;
@@ -130,9 +129,6 @@ class ScoreState extends InheritedWidget {
     };
     return ScoreState._(
       scoreTable: scoreTable,
-      currentSemester: preference.getString(
-        preference.Preference.currentSemester,
-      ),
       controllers: ScoreWidgetState(
         isSelected: List<bool>.generate(
           scoreTable.length,
@@ -145,6 +141,9 @@ class ScoreState extends InheritedWidget {
             }
             return true;
           },
+        ),
+        chosenSemester: preference.getString(
+          preference.Preference.currentSemester,
         ),
       ),
       semester: semester,
@@ -162,7 +161,6 @@ class ScoreState extends InheritedWidget {
     required this.semester,
     required this.statuses,
     required this.unPassedSet,
-    required this.currentSemester,
     required this.context,
   });
 
@@ -272,6 +270,7 @@ class ScoreWidgetState extends ChangeNotifier {
 
   ScoreWidgetState({
     required this.isSelected,
+    required this.chosenSemester,
   });
 
   @override
