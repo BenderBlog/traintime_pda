@@ -90,10 +90,13 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                 borderSide: BorderSide.none,
               ),
             ),
-            onChanged: (String text) => setState(() {
-              search.value = text;
+            onChanged: (String text) => search.value = text,
+            onFieldSubmitted: (value) => setState(() {
+              searchList.clear();
+              page = 1;
+              noMore = false;
+              searchBook();
             }),
-            onFieldSubmitted: (value) => searchBook(),
           ),
         ).padding(
           vertical: 10,
