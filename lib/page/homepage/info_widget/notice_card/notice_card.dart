@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/message_observer.dart';
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/marquee_widget.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_list.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';

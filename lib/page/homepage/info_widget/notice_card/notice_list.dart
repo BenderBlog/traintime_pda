@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:watermeter/controller/message_observer.dart';
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class NoticeList extends StatelessWidget {

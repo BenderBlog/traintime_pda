@@ -5,9 +5,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:watermeter/controller/message_observer.dart';
+import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/message/message.dart';
+
+RxList<NoticeMessage> messages = <NoticeMessage>[].obs;
 
 Dio get dio => Dio()..interceptors.add(alice.getDioInterceptor());
 
