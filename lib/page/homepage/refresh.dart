@@ -6,7 +6,8 @@
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/school_card_controller.dart';
+import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
+    as school_card_session;
 import 'package:watermeter/repository/electricity_session.dart' as electricity;
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/payment_session.dart'
@@ -65,7 +66,6 @@ Future<void> update({
 }) async {
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
-  final schoolCardController = Get.put(SchoolCardController());
 
   // Update data
   message.checkMessage();
@@ -117,7 +117,7 @@ Future<void> update({
     "Updating school card",
     name: "Homepage Update",
   );
-  schoolCardController.updateMoney();
+  school_card_session.SchoolCardSession().initSession();
 }
 
 void updateOnAppResumed() {
