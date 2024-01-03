@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 class ReXCard extends StatelessWidget {
-  static const _rem = 12.0;
-  static const _cardPadding = 8.0;
+  static const _rem = 16.0;
 
   final Widget title;
   final List<ReXCardRemaining> remaining;
@@ -27,7 +26,10 @@ class ReXCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DefaultTextStyle.merge(
-          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontSize: _rem,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -70,9 +72,18 @@ class ReXCard extends StatelessWidget {
               bottom: 0.5 * _rem,
             )
             .backgroundColor(
-              Theme.of(context).colorScheme.primary.withOpacity(opacity),
+              Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withOpacity(opacity),
             ),
-        bottomRow.padding(
+        DefaultTextStyle.merge(
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSecondaryContainer,
+            fontSize: 0.875 * _rem,
+          ),
+          child: bottomRow,
+        ).padding(
           horizontal: _rem,
           top: 0.75 * _rem,
           bottom: _rem,
@@ -80,10 +91,10 @@ class ReXCard extends StatelessWidget {
       ],
     )
         .backgroundColor(
-          Theme.of(context).colorScheme.surfaceVariant.withOpacity(opacity),
+          Theme.of(context).colorScheme.secondaryContainer.withOpacity(opacity),
         )
         .clipRRect(all: _rem)
-        .padding(all: _cardPadding);
+        .padding(all: 0.5 * _rem);
   }
 }
 
