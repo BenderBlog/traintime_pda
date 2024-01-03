@@ -3,15 +3,12 @@
 
 // Library Window.
 
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
-import 'package:watermeter/page/library/query_book_window.dart';
+import 'package:watermeter/page/library/search_book_window.dart';
 
 class LibraryWindow extends StatelessWidget {
-  final LibraryController c = Get.put(LibraryController());
-  LibraryWindow({super.key});
+  const LibraryWindow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +49,7 @@ class LibraryWindow extends StatelessWidget {
         body: const TabBarView(
           children: [
             BorrowListWindow(),
-            QueryBookWindow(),
+            SearchBookWindow(),
           ],
         ),
       ),

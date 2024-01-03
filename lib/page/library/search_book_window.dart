@@ -6,21 +6,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/repository/xidian_ids/library_session.dart'
+    as search_book;
+import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 
-class QueryBookWindow extends StatefulWidget {
-  const QueryBookWindow({super.key});
+class SearchBookWindow extends StatefulWidget {
+  const SearchBookWindow({super.key});
 
   @override
-  State<QueryBookWindow> createState() => _QueryBookWindowState();
+  State<SearchBookWindow> createState() => _SearchBookWindowState();
 }
 
-class _QueryBookWindowState extends State<QueryBookWindow>
+class _SearchBookWindowState extends State<SearchBookWindow>
     with AutomaticKeepAliveClientMixin {
-  final LibraryController c = Get.put(LibraryController());
+  var searchList = <BookInfo>[].obs;
+  var search = "".obs;
+  int page = 1;
+  bool noMore = false;
+  var isSearching = false.obs;
 
   @override
   bool get wantKeepAlive => true;
@@ -35,9 +41,26 @@ class _QueryBookWindowState extends State<QueryBookWindow>
       controlFinishLoad: true,
     );
     text = TextEditingController.fromValue(
-      TextEditingValue(text: c.search.value),
+      TextEditingValue(text: search.value),
     );
     super.initState();
+  }
+
+  Future<void> searchBook() async {
+    if (!noMore) {
+      isSearching.value = true;
+      List<BookInfo> get = await search_book.LibrarySession().searchBook(
+        search.value,
+        page,
+      );
+      if (get.isEmpty) {
+        noMore = true;
+      } else {
+        searchList.addAll(get);
+        page++;
+      }
+      isSearching.value = false;
+    }
   }
 
   @override
@@ -68,9 +91,9 @@ class _QueryBookWindowState extends State<QueryBookWindow>
               ),
             ),
             onChanged: (String text) => setState(() {
-              c.search.value = text;
+              search.value = text;
             }),
-            onFieldSubmitted: (value) => c.searchBook(),
+            onFieldSubmitted: (value) => searchBook(),
           ),
         ).padding(
           vertical: 10,
@@ -88,19 +111,19 @@ class _QueryBookWindowState extends State<QueryBookWindow>
               infiniteOffset: null,
             ),
             onLoad: () async {
-              await c.searchBook();
+              await searchBook();
             },
             child: Obx(() {
-              if (c.searchList.isNotEmpty) {
+              if (searchList.isNotEmpty) {
                 List<Widget> bookList = List<Widget>.generate(
-                  c.searchList.length,
+                  searchList.length,
                   (index) => GestureDetector(
-                    child: BookInfoCard(toUse: c.searchList[index]),
+                    child: BookInfoCard(toUse: searchList[index]),
                     onTap: () => BothSideSheet.show(
                       context: context,
                       title: "书籍详细信息",
                       child: BookDetailCard(
-                        toUse: c.searchList[index],
+                        toUse: searchList[index],
                       ),
                     ),
                   ),
@@ -116,9 +139,9 @@ class _QueryBookWindowState extends State<QueryBookWindow>
                   crossAxisSpacing: 4,
                   itemBuilder: (context, index) => bookList[index],
                 );
-              } else if (c.isSearching.value) {
+              } else if (isSearching.value) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (c.search.value.isNotEmpty) {
+              } else if (search.value.isNotEmpty) {
                 return const Center(child: Text("没有结果"));
               } else {
                 return const Center(
