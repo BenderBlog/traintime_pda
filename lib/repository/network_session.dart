@@ -15,6 +15,13 @@ Alice alice = Alice();
 
 late Directory supportPath;
 
+enum SessionState {
+  fetching,
+  fetched,
+  error,
+  none,
+}
+
 class NetworkSession {
   //@protected
   final PersistCookieJar cookieJar = PersistCookieJar(
@@ -29,9 +36,10 @@ class NetworkSession {
         BaseOptions(
           contentType: Headers.formUrlEncodedContentType,
           headers: {
-            HttpHeaders.userAgentHeader: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+            HttpHeaders.userAgentHeader:
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
           },
         ),
       )

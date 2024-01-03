@@ -9,17 +9,11 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-enum BorrowListState {
-  fetching,
-  fetched,
-  error,
-  none,
-}
-
-Rx<BorrowListState> state = BorrowListState.none.obs;
+Rx<SessionState> state = SessionState.none.obs;
 RxString error = "".obs;
 List<BorrowData> borrowList = [];
 
@@ -91,7 +85,7 @@ class LibrarySession extends IDSSession {
   }
 
   Future<void> getBorrowList() async {
-    if (state.value == BorrowListState.fetching) {
+    if (state.value == SessionState.fetching) {
       return;
     }
     developer.log(
@@ -100,7 +94,7 @@ class LibrarySession extends IDSSession {
     );
 
     try {
-      state.value = BorrowListState.fetching;
+      state.value = SessionState.fetching;
       if (userId == 0 && token == "") {
         await initSession();
       }
@@ -138,10 +132,10 @@ class LibrarySession extends IDSSession {
         rawData.length,
         (index) => BorrowData.fromJson(rawData[index]),
       ));
-      state.value = BorrowListState.fetched;
+      state.value = SessionState.fetched;
     } catch (e) {
       error.value = e.toString();
-      state.value = BorrowListState.error;
+      state.value = SessionState.error;
     }
   }
 

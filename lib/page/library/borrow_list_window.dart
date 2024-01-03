@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 import 'package:watermeter/page/library/borrow_info_card.dart';
@@ -20,14 +21,14 @@ class BorrowListWindow extends StatelessWidget {
     return Obx(() {
       Widget child() {
         switch (borrow_info.state.value) {
-          case borrow_info.BorrowListState.fetched:
+          case SessionState.fetched:
             return const BorrowListDetail();
-          case borrow_info.BorrowListState.fetching:
+          case SessionState.fetching:
             return borrow_info.borrowList.isEmpty
                 ? const CircularProgressIndicator().center()
                 : const BorrowListDetail();
-          case borrow_info.BorrowListState.error:
-          case borrow_info.BorrowListState.none:
+          case SessionState.error:
+          case SessionState.none:
             return ReloadWidget(
               function: borrow_info.refreshBorrowList,
             );

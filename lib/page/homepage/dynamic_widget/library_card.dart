@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 import 'package:watermeter/page/homepage/dynamic_widget/main_page_card.dart';
@@ -23,15 +24,14 @@ class LibraryCard extends StatelessWidget {
         } else {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => LibraryWindow(),
+              builder: (context) => const LibraryWindow(),
             ),
           );
         }
       },
       child: Obx(
         () => MainPageCard(
-          isLoad:
-              borrow_info.state.value == borrow_info.BorrowListState.fetching,
+          isLoad: borrow_info.state.value == SessionState.fetching,
           icon: MingCuteIcons.mgc_book_2_line,
           text: "图书借阅",
           infoText: RichText(
@@ -41,8 +41,7 @@ class LibraryCard extends StatelessWidget {
                 fontSize: 20,
               ),
               children: [
-                if (borrow_info.state.value ==
-                    borrow_info.BorrowListState.fetched) ...[
+                if (borrow_info.state.value == SessionState.fetched) ...[
                   TextSpan(
                     text: "${borrow_info.borrowList.length}",
                     style: const TextStyle(
@@ -50,8 +49,7 @@ class LibraryCard extends StatelessWidget {
                     ),
                   ),
                   const TextSpan(text: " 本"),
-                ] else if (borrow_info.state.value ==
-                    borrow_info.BorrowListState.error)
+                ] else if (borrow_info.state.value == SessionState.error)
                   const TextSpan(text: "发生错误")
                 else
                   const TextSpan(text: "正在获取")
@@ -62,12 +60,11 @@ class LibraryCard extends StatelessWidget {
             return DefaultTextStyle.merge(
               overflow: TextOverflow.ellipsis,
               child: Text(
-                borrow_info.state.value == borrow_info.BorrowListState.fetched
+                borrow_info.state.value == SessionState.fetched
                     ? borrow_info.dued == 0
                         ? "目前没有待归还书籍"
                         : "待归还${borrow_info.dued}本书籍"
-                    : borrow_info.state.value ==
-                            borrow_info.BorrowListState.error
+                    : borrow_info.state.value == SessionState.error
                         ? "目前无法获取信息"
                         : "正在查询信息中",
               ),
