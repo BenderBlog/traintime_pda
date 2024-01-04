@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watermeter/repository/preference.dart' as user_perference;
 
 class SportPasswordDialog extends StatefulWidget {
-  const SportPasswordDialog({Key? key}) : super(key: key);
+  const SportPasswordDialog({super.key});
 
   @override
   State<SportPasswordDialog> createState() => _SportPasswordDialogState();

@@ -8,7 +8,7 @@ import 'package:watermeter/page/sport/punch_record_window.dart';
 import 'package:watermeter/page/sport/sport_score_window.dart';
 
 class SportWindow extends StatelessWidget {
-  const SportWindow({Key? key}) : super(key: key);
+  const SportWindow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class SportWindow extends StatelessWidget {
 }
 
 class TabForSport extends StatelessWidget {
-  const TabForSport({Key? key}) : super(key: key);
+  const TabForSport({super.key});
 
   @override
   Widget build(BuildContext context) {

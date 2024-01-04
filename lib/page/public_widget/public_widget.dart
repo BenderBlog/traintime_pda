@@ -17,11 +17,11 @@ class TagsBoxes extends StatelessWidget {
   final Color? textColor;
 
   const TagsBoxes({
-    Key? key,
+    super.key,
     required this.text,
     this.backgroundColor,
     this.textColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +112,7 @@ Route createRoute(Widget page) {
 /// Used with a card inside a card.
 class InfoDetailBox extends StatelessWidget {
   final Widget child;
-  const InfoDetailBox({Key? key, required this.child}) : super(key: key);
+  const InfoDetailBox({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

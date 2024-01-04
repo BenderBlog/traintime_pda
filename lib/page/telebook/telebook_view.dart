@@ -14,7 +14,7 @@ var list = getTelephoneData();
 
 /// Intro of the telephone book (address book if you want).
 class TeleBookWindow extends StatelessWidget {
-  const TeleBookWindow({Key? key}) : super(key: key);
+  const TeleBookWindow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class DepartmentWindow extends StatelessWidget {
   final TeleyInformation toUse;
   final List<Widget> mainCourse = [];
 
-  DepartmentWindow({Key? key, required this.toUse}) : super(key: key) {
+  DepartmentWindow({super.key, required this.toUse}) {
     if (toUse.isNorth == true) {
       mainCourse.add(InsideWindow(
         address: toUse.northAddress,
@@ -111,11 +111,11 @@ class InsideWindow extends StatelessWidget {
   final bool isSouth;
 
   const InsideWindow({
-    Key? key,
+    super.key,
     required this.address,
     required this.phone,
     this.isSouth = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

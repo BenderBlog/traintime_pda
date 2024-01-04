@@ -16,7 +16,7 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 class SportScoreWindow extends StatefulWidget {
-  const SportScoreWindow({Key? key}) : super(key: key);
+  const SportScoreWindow({super.key});
 
   @override
   State<SportScoreWindow> createState() => _SportScoreWindowState();

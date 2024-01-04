@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ElectricityPasswordDialog extends StatefulWidget {
-  const ElectricityPasswordDialog({Key? key}) : super(key: key);
+  const ElectricityPasswordDialog({super.key});
 
   @override
   State<ElectricityPasswordDialog> createState() =>

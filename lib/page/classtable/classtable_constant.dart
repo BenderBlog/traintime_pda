@@ -1,7 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
-
-/// These are some constant used in the class table.
+// These are some constant used in the class table.
 
 /// The width of the button.
 const weekButtonWidth = 74.0;

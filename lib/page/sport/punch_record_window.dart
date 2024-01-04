@@ -12,7 +12,7 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 class PunchRecordWindow extends StatefulWidget {
-  const PunchRecordWindow({Key? key}) : super(key: key);
+  const PunchRecordWindow({super.key});
 
   @override
   State<PunchRecordWindow> createState() => _PunchRecordWindowState();
@@ -151,8 +151,7 @@ class RecordCard extends StatelessWidget {
   final PunchData toUse;
   final int mark;
 
-  const RecordCard({Key? key, required this.mark, required this.toUse})
-      : super(key: key);
+  const RecordCard({super.key, required this.mark, required this.toUse});
 
   ReXCardRemaining situation() {
     String toShow;

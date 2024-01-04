@@ -21,7 +21,7 @@ import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 
 class LoginWindow extends StatefulWidget {
-  const LoginWindow({Key? key}) : super(key: key);
+  const LoginWindow({super.key});
 
   @override
   State<LoginWindow> createState() => _LoginWindowState();

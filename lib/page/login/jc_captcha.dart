@@ -91,9 +91,9 @@ class CaptchaWidget extends StatefulWidget {
   static double deviation = 5;
 
   const CaptchaWidget({
-    Key? key,
+    super.key,
     required this.cookie,
-  }) : super(key: key);
+  });
 
   @override
   State<CaptchaWidget> createState() => _CaptchaWidgetState();

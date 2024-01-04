@@ -26,7 +26,7 @@ import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
-  const SettingWindow({Key? key}) : super(key: key);
+  const SettingWindow({super.key});
 
   @override
   State<SettingWindow> createState() => _SettingWindowState();

@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watermeter/repository/preference.dart' as user_perference;
 
 class ExperimentPasswordDialog extends StatefulWidget {
-  const ExperimentPasswordDialog({Key? key}) : super(key: key);
+  const ExperimentPasswordDialog({super.key});
 
   @override
   State<ExperimentPasswordDialog> createState() =>
