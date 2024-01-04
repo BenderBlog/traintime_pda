@@ -176,7 +176,7 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
           children: [
             Text(
               state.bottomInfo,
-              textScaleFactor: 1.2,
+              textScaler: const TextScaler.linear(1.2),
             ),
           ],
         ),

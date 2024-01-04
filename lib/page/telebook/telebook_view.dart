@@ -77,7 +77,7 @@ class DepartmentWindow extends StatelessWidget {
             Text(
               toUse.title,
               textAlign: TextAlign.left,
-              textScaleFactor: MediaQuery.textScaleFactorOf(context) * 1.4,
+              textScaler: const TextScaler.linear(1.4),
             ),
             const Divider(),
             LayoutGrid(

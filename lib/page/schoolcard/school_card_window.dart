@@ -61,8 +61,9 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
       appBar: AppBar(
         title: const Text("校园卡流水信息"),
         bottom: PreferredSize(
-          preferredSize:
-              Size.fromHeight(48.0 * MediaQuery.textScaleFactorOf(context)),
+          preferredSize: Size.fromHeight(
+            48.0 * MediaQuery.textScalerOf(context).scale(14),
+          ),
           child: TextButton(
             style: TextButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.secondaryContainer,

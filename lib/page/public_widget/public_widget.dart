@@ -34,7 +34,7 @@ class TagsBoxes extends StatelessWidget {
       ),
       child: Text(
         text,
-        textScaleFactor: MediaQuery.of(context).textScaleFactor * 0.9,
+        textScaler: const TextScaler.linear(0.9),
         style: TextStyle(
           color: textColor ??
               (Theme.of(context).brightness == Brightness.light

@@ -15,7 +15,7 @@ class TimelineTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      textScaleFactor: MediaQuery.of(context).textScaleFactor * 1.1,
+      textScaler: const TextScaler.linear(1.1),
       style: TextStyle(
         color: Theme.of(context).colorScheme.primary,
       ),

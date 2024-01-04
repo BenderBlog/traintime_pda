@@ -92,14 +92,12 @@ class _WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (await controller.canGoBack()) {
-          await controller.goBack();
-          return false;
-        } else {
-          return true;
-        }
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) return;
+        controller.canGoBack().then((value) =>
+            value ? controller.goBack() : Navigator.of(context).pop());
       },
       child: Scaffold(
         appBar: AppBar(

@@ -27,7 +27,7 @@ class NoArrangedInfo extends StatelessWidget {
           child: ListTile(
             title: Text(
               toUse.subject,
-              textScaleFactor: MediaQuery.of(context).textScaleFactor * 1.1,
+              textScaler: const TextScaler.linear(1.1),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),

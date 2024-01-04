@@ -121,7 +121,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             children: [
               Text(
                 "总次数: ${punchData.value.allTime}\n成功次数: ${punchData.value.validTime}",
-                textScaleFactor: 1.2,
+                textScaler: const TextScaler.linear(1.2),
               ),
               FloatingActionButton.extended(
                 elevation: 0.0,
@@ -136,7 +136,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
                 },
                 label: Text(
                   isValid ? "查看所有记录" : "查看成功记录",
-                  textScaleFactor: 1.1,
+                  textScaler: const TextScaler.linear(1.1),
                 ),
               ),
             ],

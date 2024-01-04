@@ -34,7 +34,7 @@ class ExperimentInfoCard extends StatelessWidget {
                     children: [
                       Text(
                         data!.name,
-                        textScaleFactor: 1.1,
+                        textScaler: const TextScaler.linear(1.1),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -87,7 +87,7 @@ class ExperimentInfoCard extends StatelessWidget {
               )
             : Text(
                 title!,
-                textScaleFactor: 1.1,
+                textScaler: const TextScaler.linear(1.1),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
