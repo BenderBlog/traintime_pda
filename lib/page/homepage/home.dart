@@ -3,6 +3,8 @@
 
 // Main page of this program.
 
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
@@ -96,10 +98,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     WidgetsBinding.instance.addObserver(this);
     message.checkMessage();
-
+    developer.log("$loginState", name: "Home");
     if (loginState == IDSLoginState.none) {
+      developer.log("Relogin.", name: "Home");
       _loginAsync();
     } else {
+      developer.log("Updating infos.", name: "Home");
       update();
     }
   }
@@ -183,7 +187,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-
     super.dispose();
   }
 

@@ -17,7 +17,7 @@ import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/network_session.dart' as repo_general;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/home.dart';
+import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'dart:developer' as developer;
 import 'package:get/get.dart';

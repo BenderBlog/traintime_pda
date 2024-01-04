@@ -257,6 +257,8 @@ class ClassTableController extends GetxController {
   }
 
   void updateCurrent() {
+    if (!isGet) return;
+
     // Get the start day of the semester. Append offset
     startDay = DateTime.parse(classTableData.termStartDay).add(
         Duration(days: 7 * preference.getInt(preference.Preference.swift)));
