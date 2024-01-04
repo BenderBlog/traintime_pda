@@ -58,103 +58,102 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("校园卡流水信息"),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(
-            48.0 * MediaQuery.textScalerOf(context).scale(14),
-          ),
-          child: TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-            ),
-            child: Text(
-              "选择日期：从 ${Jiffy.parseFromDateTime(timeRange[0]!).format(pattern: "yyyy-MM-dd")} "
-              "到 ${Jiffy.parseFromDateTime(timeRange[1]!).format(pattern: "yyyy-MM-dd")}",
-            ),
-            onPressed: () async {
-              await showCalendarDatePicker2Dialog(
-                context: context,
-                config: CalendarDatePicker2WithActionButtonsConfig(
-                  calendarType: CalendarDatePicker2Type.range,
-                  selectedDayHighlightColor:
-                      Theme.of(context).colorScheme.primary,
-                ),
-                dialogSize: const Size(324, 400),
-                value: timeRange,
-                borderRadius: BorderRadius.circular(16),
-              ).then((value) {
-                if (value?.length == 1) {
-                  timeRange = [value?[0], value?[0]];
-                  refreshPaidStatus();
-                } else if (value?.length == 2) {
-                  timeRange = [value?[0], value?[1]];
-                  refreshPaidStatus();
-                }
-              });
-            },
-          ).padding(horizontal: 16, bottom: 8),
+        appBar: AppBar(
+          title: const Text("校园卡流水信息"),
         ),
-      ),
-      body: FutureBuilder(
-        future: getPaid,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return ReloadWidget(
-                function: () => refreshPaidStatus(),
-              );
-            } else {
-              return DataTable2(
-                columnSpacing: 0,
-                horizontalMargin: 6,
-                columns: [
-                  const DataColumn2(
-                    size: ColumnSize.S,
-                    label: Center(
-                      child: Text('商户名称'),
-                    ),
+        body: Column(
+          children: [
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor:
+                    Theme.of(context).colorScheme.secondaryContainer,
+              ),
+              child: Text(
+                "选择日期：从 ${Jiffy.parseFromDateTime(timeRange[0]!).format(pattern: "yyyy-MM-dd")} "
+                "到 ${Jiffy.parseFromDateTime(timeRange[1]!).format(pattern: "yyyy-MM-dd")}",
+              ),
+              onPressed: () async {
+                await showCalendarDatePicker2Dialog(
+                  context: context,
+                  config: CalendarDatePicker2WithActionButtonsConfig(
+                    calendarType: CalendarDatePicker2Type.range,
+                    selectedDayHighlightColor:
+                        Theme.of(context).colorScheme.primary,
                   ),
-                  const DataColumn2(
-                    size: ColumnSize.S,
-                    label: Center(
-                      child: Text('金额'),
-                    ),
-                  ),
-                  DataColumn2(
-                    size: ColumnSize.L,
-                    label: Center(
-                      child: Text('时间(共${moneySunUp(snapshot.data!)}元)'),
-                    ),
-                  ),
-                ],
-                rows: List<DataRow>.generate(
-                  snapshot.data!.length,
-                  (index) => DataRow(
-                    cells: [
-                      DataCell(
-                        Text(
-                          snapshot.data![index].place,
-                          textAlign: TextAlign.center,
-                        ).center(),
+                  dialogSize: const Size(324, 400),
+                  value: timeRange,
+                  borderRadius: BorderRadius.circular(16),
+                ).then((value) {
+                  if (value?.length == 1) {
+                    timeRange = [value?[0], value?[0]];
+                    refreshPaidStatus();
+                  } else if (value?.length == 2) {
+                    timeRange = [value?[0], value?[1]];
+                    refreshPaidStatus();
+                  }
+                });
+              },
+            ).padding(horizontal: 16, vertical: 8),
+            FutureBuilder(
+              future: getPaid,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasError) {
+                    return ReloadWidget(
+                      function: () => refreshPaidStatus(),
+                    );
+                  } else {
+                    return DataTable2(
+                      columnSpacing: 0,
+                      horizontalMargin: 6,
+                      columns: [
+                        const DataColumn2(
+                          size: ColumnSize.S,
+                          label: Center(
+                            child: Text('商户名称'),
+                          ),
+                        ),
+                        const DataColumn2(
+                          size: ColumnSize.S,
+                          label: Center(
+                            child: Text('金额'),
+                          ),
+                        ),
+                        DataColumn2(
+                          size: ColumnSize.L,
+                          label: Center(
+                            child: Text('时间(共${moneySunUp(snapshot.data!)}元)'),
+                          ),
+                        ),
+                      ],
+                      rows: List<DataRow>.generate(
+                        snapshot.data!.length,
+                        (index) => DataRow(
+                          cells: [
+                            DataCell(
+                              Text(
+                                snapshot.data![index].place,
+                                textAlign: TextAlign.center,
+                              ).center(),
+                            ),
+                            DataCell(
+                              Center(child: Text(snapshot.data![index].money)),
+                            ),
+                            DataCell(
+                              Center(child: Text(snapshot.data![index].date)),
+                            ),
+                          ],
+                        ),
                       ),
-                      DataCell(
-                        Center(child: Text(snapshot.data![index].money)),
-                      ),
-                      DataCell(
-                        Center(child: Text(snapshot.data![index].date)),
-                      ),
-                    ],
-                  ),
-                ),
-              ).constrained(maxWidth: sheetMaxWidth).center();
-            }
-          } else {
-            return const CircularProgressIndicator().center();
-          }
-        },
-      ),
-    );
+                    ).constrained(maxWidth: sheetMaxWidth).center();
+                  }
+                } else {
+                  return const CircularProgressIndicator().center();
+                }
+              },
+            ).expanded(),
+          ],
+        ));
   }
 }
 
