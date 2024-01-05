@@ -6,7 +6,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classtable.g.dart';
 
-<<<<<<< HEAD
 /// This is for the main page applet.
 @JsonSerializable(explicitToJson: true)
 class ClassToShow {
@@ -55,7 +54,8 @@ class ClassToShowList {
       _$ClassToShowListFromJson(json);
 
   Map<String, dynamic> toJson() => _$ClassToShowListToJson(this);
-=======
+}
+
 enum Source {
   empty,
   school,
@@ -99,7 +99,6 @@ class NotArrangementClassDetail {
       other is ClassDetail &&
       other.runtimeType == runtimeType &&
       name == other.name;
->>>>>>> main
 }
 
 @JsonSerializable(explicitToJson: true)

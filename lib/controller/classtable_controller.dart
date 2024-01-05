@@ -1,9 +1,7 @@
-<<<<<<< HEAD
-import 'dart:convert';
-=======
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
->>>>>>> main
+
+import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
@@ -262,45 +260,7 @@ class ClassTableController extends GetxController {
   }
 
   void updateCurrent() {
-<<<<<<< HEAD
-    // Get the current time.
-    if (currentWeek >= 0 && currentWeek < classTableData.semesterLength) {
-      developer.log("Get the current class", name: "ClassTableController");
-      DateTime now = DateTime(2023, 4, 4, 11, 0, 00);
-
-      ClassToShowList toApplet = ClassToShowList();
-      // Get the class happens today
-      for (var i in pretendLayout[currentWeek][now.weekday - 1]) {
-        for (var j in i) {
-          if (j != -1) {
-            toApplet.list.add(ClassToShow(
-              name: classTableData
-                  .classDetail[classTableData.timeArrangement[j].index].name,
-              teacher: classTableData
-                  .classDetail[classTableData.timeArrangement[j].index].teacher,
-              place: classTableData.timeArrangement[j].classroom,
-              startTime: classTableData.timeArrangement[j].start,
-              endTime: classTableData.timeArrangement[j].stop,
-            ));
-          }
-        }
-      }
-
-      developer.log(jsonEncode(toApplet.toJson()));
-
-      if ((now.hour >= 8 && now.hour < 20) ||
-          (now.hour == 20 && now.minute < 35)) {
-        // Check the index.
-        int index = -1;
-        developer.log(
-          "Current time is $now",
-          name: "ClassTableController",
-        );
-        for (int i = 0; i < time.length; ++i) {
-          var split = time[i].split(":");
-=======
     if (!isGet) return;
->>>>>>> main
 
     // Get the start day of the semester. Append offset
     startDay = DateTime.parse(classTableData.termStartDay).add(
@@ -330,50 +290,6 @@ class ClassTableController extends GetxController {
     error = null;
     try {
       classTableData = await ClassTableFile().get(isForce: isForce);
-<<<<<<< HEAD
-      startDay = DateTime.parse(classTableData.termStartDay);
-      currentWeek =
-          (Jiffy.parseFromDateTime(DateTime(2023, 4, 4, 11, 0, 00)).dayOfYear -
-                  Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-              7;
-
-      // Uncomment to see the conflict.
-      /*
-      classDetail.add(ClassDetail(
-        name: "测试连课",
-        teacher: "SPRT",
-        place: "Flutter",
-      ));
-      timeArrangement.addAll([
-        TimeArrangement(
-          index: classDetail.length - 1,
-          start: 9,
-          stop: 10,
-          day: 1,
-          weekList: "1111111111111111111111",
-        ),
-        TimeArrangement(
-          index: classDetail.length - 1,
-          start: 4,
-          stop: 8,
-          day: 3,
-          weekList: "1111111111111111111111",
-        ),
-      ]);*/
-
-      // Get the start day of the semester.
-      startDay = DateTime.parse(classTableData.termStartDay);
-      if (user["swift"] != null) {
-        startDay = startDay.add(Duration(days: 7 * int.parse(user["swift"]!)));
-      }
-
-      // Get the current index.
-      currentWeek =
-          (Jiffy.parseFromDateTime(DateTime(2023, 4, 4, 11, 0, 00)).dayOfYear -
-                  Jiffy.parseFromDateTime(startDay).dayOfYear) ~/
-              7;
-=======
->>>>>>> main
 
       // Init the matrix.
       // 1. prepare the structure, a three-deminision array.
