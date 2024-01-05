@@ -1,0 +1,6 @@
+1. Sport Session fix. (Important fix)
+2. Maxium 600px page width implemented elsewhere.
+3. Toolbox able to scroll.
+4. Classtable toprow(week choice row) fix.
+
+Sorry for your inconvenience.

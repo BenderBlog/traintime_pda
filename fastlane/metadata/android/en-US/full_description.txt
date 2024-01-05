@@ -1,0 +1,18 @@
+"Traintime PDA" is an open-source personal data assistant for XDU undergraduates.
+
+ - View classtable and set your idol as the background.
+ - View sport related data: punch record and test score.
+ - Check your dorm's electricity balance and (maybe) pay your electricty fee.
+ - View your grade and easily calculate GPA and average score by choosing the subjects.
+ - View the exam schedule by semester.
+ - View the due time of the borrowed books and query the books in the library.
+ - View the bill you spent in the cafeteria.
+ - Empty classroom check.
+ - Physics experiment schedule check and output to iCalendar.
+ - Other tools such as call for repairing, school email, etc.
+ - Shuangchuang (Innovation and Entrepreneurship) project query.
+ - XDU Planet: Look around the blogs of your schoolmates.
+
+Also, this is a software with better privacy, cross-platform Flutter SDK, and not serious developer.
+
+If you got some idea about it, contact me freely.

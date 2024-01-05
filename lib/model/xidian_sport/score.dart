@@ -1,3 +1,6 @@
+// Copyright 2023 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
+
 class SportItems {
   String examName;
   String examunit;
@@ -19,6 +22,7 @@ class SportScoreOfYear {
   String totalScore;
   String rank;
   String gradeType;
+  String moreinfo = "";
   List<SportItems> details = [];
 
   SportScoreOfYear({
@@ -32,6 +36,7 @@ class SportScoreOfYear {
 class SportScore {
   String? situation;
   String total = "0.0";
+  String rank = "";
   String detail = "";
   List<SportScoreOfYear> list = [];
 }

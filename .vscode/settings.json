@@ -1,3 +1,21 @@
 {
-  "mesonbuild.configureOnOpen": false
+  "mesonbuild.configureOnOpen": false,
+  "dart.flutterSdkPaths": [
+    ".fvm/flutter_sdk",
+  ],
+  "dart.analysisExcludedFolders": [
+    ".flutter"
+  ],
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "files.associations": {
+    "*.arb": "json"
+  },
+  "licenser.author": "BenderBlog Rodriguez and contributors",
+  "licenser.license": "MPLv2",
+  "licenser.useSPDXLicenseFormat": true,
 }

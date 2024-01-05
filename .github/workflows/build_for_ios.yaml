@@ -1,0 +1,57 @@
+name: Unofficial build for iOS
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+\+[0-9]+'
+
+jobs:
+  build_run_file:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        name: Init the Flutter environment
+        with:
+          channel: "stable"
+          cache: true
+          architecture: x64
+
+      - run: flutter pub get
+        name: Fetch dependencies
+
+      - run: flutter build ios --release --no-codesign
+        name: Build the runner
+
+      - uses: actions/upload-artifact@v3
+        name: Upload for the next job
+        with:
+          name: Runner.app
+          path: build/ios/iphoneos/Runner.app
+
+  generate_ipa:
+    needs: build_run_file
+    runs-on: ubuntu-latest
+    steps:
+      - run: mkdir Payload && cd Payload && mkdir Runner.app && cd ..
+        name: Make a folder
+      - uses: actions/download-artifact@v3
+        name: Download the previous job
+        with:
+          name: Runner.app
+          path: Payload/Runner.app/
+      - uses: montudor/action-zip@v1
+        name: Zip the file to ipa
+        with:
+          args: zip -qq -r watermeter.ipa Payload
+      - uses: actions/upload-artifact@v3
+        name: Upload the final stuff
+        with:
+          name: watermeter.ipa
+          path: watermeter.ipa
+          if-no-files-found: error
+      - uses: geekyeggo/delete-artifact@v2
+        name: Delete the middle part
+        with:
+          name: Runner.app

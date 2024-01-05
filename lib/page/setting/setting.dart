@@ -1,35 +1,32 @@
-/*
-Setting window.
-Copyright 2022 SuperBart
+// Copyright 2023 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
-*/
+// Setting window.
 
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/model/user.dart';
-import 'package:watermeter/page/setting/subwindow/electricity_password_dialog.dart';
-import 'package:watermeter/page/setting/subwindow/sport_password_dialog.dart';
-import 'package:watermeter/page/setting/subwindow/change_swift_dialog.dart';
-import 'package:watermeter/page/setting/subwindow/change_color_dialog.dart';
-import 'package:watermeter/page/widget.dart';
-import 'package:watermeter/repository/general.dart';
+import 'package:watermeter/page/setting/about_page.dart';
+import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
+import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
-  const SettingWindow({Key? key}) : super(key: key);
+  const SettingWindow({super.key});
 
   @override
   State<SettingWindow> createState() => _SettingWindowState();
@@ -41,36 +38,58 @@ class _SettingWindowState extends State<SettingWindow> {
     return SafeArea(
       child: SettingsList(
         lightTheme: SettingsThemeData(
-            settingsListBackground: Theme.of(context).colorScheme.background),
+          settingsListBackground: Theme.of(context).colorScheme.background,
+        ),
         sections: [
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile(
-                title: const Text('XDYou 0.0.5'),
-                value: const Text('Codebase Traintime PDA 0.0.5'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://github.com/BenderBlog/watermeter"),
-                  mode: LaunchMode.externalApplication,
+                title: Text("关于 ${preference.packageInfo.appName}"),
+                value: Text(
+                    '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
+                onPressed: (context) => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AboutPage(),
+                  ),
                 ),
               ),
               SettingsTile(
                 title: const Text('用户信息'),
-                value: Text("${user["name"]} ${user["execution"]}\n"
-                    "${user["institutes"]} ${user["subject"]}"),
+                value: Text(
+                    "${preference.getString(preference.Preference.name)} ${preference.getString(preference.Preference.execution)}\n"
+                    "${preference.getString(preference.Preference.institutes)} ${preference.getString(preference.Preference.subject)}"),
               ),
             ],
           ),
+          // SettingsSection(
+          //   title: const Text('颜色设置'),
+          //   tiles: <SettingsTile>[
+          //     SettingsTile.navigation(
+          //         title: const Text('设置程序主题色'),
+          //         value: Text(ColorSeed
+          //             .values[preference.getInt(preference.Preference.color)]
+          //             .label),
+          //         onPressed: (content) {
+          //           showDialog(
+          //             context: context,
+          //             builder: (context) => const ChangeColorDialog(),
+          //           );
+          //         }),
+          //   ],
+          // ),
           SettingsSection(
-            title: const Text('颜色设置'),
+            title: const Text('主题设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                  title: const Text('设置程序主题色'),
+                  title: const Text('设置深浅色'),
                   value: Text(
-                      ColorSeed.values[int.parse(user["color"] ?? "0")].label),
+                    demoBlueModeName[
+                        preference.getInt(preference.Preference.brightness)],
+                  ),
                   onPressed: (content) {
                     showDialog(
                       context: context,
-                      builder: (context) => const ChangeColorDialog(),
+                      builder: (context) => const ChangeBrightnessDialog(),
                     );
                   }),
             ],
@@ -87,7 +106,16 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   }),
               SettingsTile.navigation(
+                  title: const Text('物理实验系统密码'),
+                  onPressed: (content) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const ExperimentPasswordDialog(),
+                    );
+                  }),
+              SettingsTile.navigation(
                   title: const Text('电费帐号密码设置'),
+                  description: const Text('非 123456 请设置'),
                   onPressed: (content) {
                     showDialog(
                       context: context,
@@ -99,118 +127,131 @@ class _SettingWindowState extends State<SettingWindow> {
           SettingsSection(
             title: const Text('课表相关设置'),
             tiles: <SettingsTile>[
-              SettingsTile.navigation(
-                  title: const Text('课程偏移设置'),
-                  value: Text("目前为 ${user["swift"] ?? '0'}"),
-                  onPressed: (content) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => ChangeSwiftDialog(),
-                    );
-                  }),
               SettingsTile.switchTile(
                 title: const Text("开启课表背景图"),
                 initialValue:
-                    user["decorated"] != null && user["decorated"]! == "true"
-                        ? true
-                        : false,
+                    preference.getBool(preference.Preference.decorated),
                 onToggle: (bool value) {
                   if (value == true &&
-                      (user["decoration"] == null ||
-                          user["decoration"]!.isEmpty)) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('你先选个图片罢，就在下面'),
-                    ));
+                      !preference.getBool(preference.Preference.decoration)) {
+                    Fluttertoast.showToast(msg: '你先选个图片罢，就在下面');
                   } else {
                     setState(() {
-                      addUser("decorated", value.toString());
+                      preference.setBool(
+                          preference.Preference.decorated, value);
                     });
                   }
                 },
               ),
               SettingsTile.navigation(
-                  title: const Text('课表背景图选择'),
-                  onPressed: (content) async {
-                    FilePickerResult? result = await FilePicker.platform
-                        .pickFiles(type: FileType.image);
-                    if (mounted) {
-                      if (result != null) {
-                        Directory appDocDir =
-                            await getApplicationDocumentsDirectory();
-                        Directory destination = Directory(
-                            "${appDocDir.path}/org.superbart.watermeter");
-                        if (!destination.existsSync()) {
-                          await destination.create();
-                        }
-                        var decorated = File(result.files.single.path!)
-                            .copySync("${destination.path}/decoration.jpg");
-                        addUser("decoration", decorated.path);
-                        if (mounted) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text('设定成功'),
-                          ));
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('你没有选捏，目前设置${user["decoration"]}'),
-                        ));
+                title: const Text('课表背景图选择'),
+                onPressed: (content) async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(type: FileType.image);
+                  if (mounted) {
+                    if (result != null) {
+                      File(result.files.single.path!)
+                          .copySync("${supportPath.path}/decoration.jpg");
+                      preference.setBool(
+                          preference.Preference.decoration, true);
+                      if (mounted) {
+                        Fluttertoast.showToast(msg: '设定成功');
                       }
+                    } else {
+                      Fluttertoast.showToast(msg: '你没有选图片捏');
                     }
-                  }),
+                  }
+                },
+              ),
+              SettingsTile(
+                title: const Text("清除所有用户添加课程"),
+                onPressed: (context) async {
+                  var file = File(
+                    "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  Get.find<ClassTableController>().updateClassTable();
+                  Fluttertoast.showToast(msg: "已经清除完毕");
+                },
+              ),
+              SettingsTile(
+                title: const Text("强制刷新课表"),
+                onPressed: (context) => Get.put(ClassTableController())
+                    .updateClassTable(isForce: true),
+              ),
+              SettingsTile.navigation(
+                title: const Text('课程偏移设置'),
+                description: const Text('正数错后开学日期，负数提前开学日期'),
+                value: Text(
+                    "目前为 ${preference.getInt(preference.Preference.swift)}"),
+                onPressed: (content) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ChangeSwiftDialog(),
+                  ).then((value) {
+                    Get.put(ClassTableController()).updateCurrent();
+                    setState(() {});
+                  });
+                },
+              ),
             ],
           ),
           SettingsSection(
             title: const Text('缓存登录设置'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: const Text("Alice 网络拦截器"),
+                title: const Text('查看网络拦截器'),
                 onPressed: (context) => alice.showInspector(),
               ),
               SettingsTile.navigation(
-                title: const Text('清除 Cookie'),
+                title: const Text('清除 Cookie 后重启'),
                 onPressed: (context) async {
                   try {
-                    await IDSCookieJar.deleteAll();
-                    await SportCookieJar.deleteAll();
+                    await NetworkSession().clearCookieJar();
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Cookie 已被清除'),
-                      ));
+                      Fluttertoast.showToast(msg: 'Cookie 已被清除');
+                      Restart.restartApp();
                     }
                   } on PathNotFoundException {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('目前没有缓存 Cookie'),
-                    ));
+                    if (mounted) {
+                      Fluttertoast.showToast(msg: '目前没有缓存 Cookie');
+                    }
                   }
                 },
               ),
               SettingsTile.navigation(
                 title: const Text('退出登录并重启应用'),
                 onPressed: (context) async {
+                  ProgressDialog pd = ProgressDialog(context: context);
+                  pd.show(msg: '正在退出登录');
+
                   /// Clean Cookie
                   try {
-                    await IDSCookieJar.deleteAll();
-                    await SportCookieJar.deleteAll();
+                    await NetworkSession().clearCookieJar();
                     // I don't care.
                     // ignore: empty_catches
                   } on Exception {}
 
                   /// Clean Classtable cache.
-                  Directory appDocDir =
-                      await getApplicationDocumentsDirectory();
-                  Directory destination =
-                      Directory("${appDocDir.path}/org.superbart.watermeter");
-                  if (!destination.existsSync()) {
-                    await destination.create();
+                  var file = File(
+                    "${supportPath.path}/${ClassTableFile.schoolClassName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
                   }
-                  var file = File("${destination.path}/ClassTable.json");
+
+                  file = File(
+                    "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
+                  );
                   if (file.existsSync()) {
                     file.deleteSync();
                   }
 
                   /// Clean user information
-                  prefrenceClear();
+                  preference.prefrenceClear();
 
                   /// Theme back to default
                   ThemeController toChange = Get.put(ThemeController());
@@ -218,74 +259,9 @@ class _SettingWindowState extends State<SettingWindow> {
 
                   /// Restart app
                   if (mounted) {
+                    pd.close();
                     Restart.restartApp();
                   }
-                },
-              ),
-            ],
-          ),
-          SettingsSection(
-            title: const Text('关于本软件'),
-            tiles: <SettingsTile>[
-              SettingsTile.navigation(
-                title: const Text('Developed by BenderBlog Rodriguez'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://legacy.superbart.xyz/"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
-                // onPressed: (context) => _playEffect("QuadDamage.wav"),
-              ),
-              SettingsTile(
-                title: const Text('受到 Myxdu (电表)启发'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://myxdu.moefactory.com/"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: Make your attack 4 times stronger, ALSO AN ANGRILY FACE.
-                // onPressed: (context) => _playEffect("QuadDamage.wav"),
-              ),
-              SettingsTile(
-                title: const Text('网络逻辑 xidian-script'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://github.com/xdlinux/xidian-scripts"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: You don't need to fear about anything, even Shub-Niggurath...
-                // onPressed: (context) => _playEffect("HellProtecting.wav"),
-              ),
-              SettingsTile(
-                title: const Text('西电目录原版'),
-                onPressed: (context) => launchUrl(
-                  Uri.parse("https://ncov.hawa130.com/about"),
-                  mode: LaunchMode.externalApplication,
-                ),
-                // Quake: ...with the power of HELL, the updown Pentagram.
-                // onPressed: (context) => _playEffect("HellProtection.wav"),
-              ),
-              SettingsTile(
-                title: const Text('Apple 硬件支援者自画像'),
-                onPressed: (context) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Self-Portrait of this person"),
-                      content: Image.asset("assets/Ray.jpg"),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text("文章"),
-                          onPressed: () => launchUrl(
-                            Uri.parse("https://www.coolapk.com/feed/45104934"),
-                            mode: LaunchMode.externalApplication,
-                          ),
-                        ),
-                        TextButton(
-                          child: const Text("确定"),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                  );
                 },
               ),
             ],

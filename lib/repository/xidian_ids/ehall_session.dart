@@ -1,26 +1,35 @@
-/*
-E-hall class, which get lots of useful data here.
-Copyright 2022 SuperBart
+// Copyright 2023 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// E-hall class, which get lots of useful data here.
+// Thanks xidian-script and libxdauth!
 
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
-
-Thanks xidian-script and libxdauth!
-*/
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/model/user.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class EhallSession extends IDSSession {
-  @override
+  /// This header shall only be used in the ehall related stuff...
+  Map<String, String> refererHeader = {
+    HttpHeaders.refererHeader: "http://ehall.xidian.edu.cn/new/index_xd.html",
+    HttpHeaders.hostHeader: "ehall.xidian.edu.cn",
+    HttpHeaders.acceptHeader:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    HttpHeaders.acceptLanguageHeader:
+        'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    HttpHeaders.acceptEncodingHeader: 'identity',
+    HttpHeaders.connectionHeader: 'Keep-Alive',
+    HttpHeaders.contentTypeHeader:
+        "application/x-www-form-urlencoded; charset=UTF-8",
+  };
+
+  Dio get dioEhall => super.dio..options = BaseOptions(headers: refererHeader);
+
   Future<bool> isLoggedIn() async {
-    var response = await dio.get(
+    var response = await dioEhall.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
     developer.log("Ehall isLoggedin: ${response.data["hasLogin"]}",
@@ -31,43 +40,51 @@ class EhallSession extends IDSSession {
   Future<void> loginEhall({
     required String username,
     required String password,
-    bool forceReLogin = false,
-    Future<String?> Function(String)? getCaptcha,
-    void Function(int, String)? onResponse,
+    required Future<void> Function(String) sliderCaptcha,
+    required void Function(int, String) onResponse,
   }) async {
-    if (await isLoggedIn() == false || forceReLogin == true) {
-      developer.log(
-          "Ready to log in the ehall. Is force relogin: $forceReLogin.",
-          name: "Ehall login");
-      await super.login(
-        username: username,
-        password: password,
-        onResponse: onResponse,
-        target:
-            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
-        getCaptcha: getCaptcha,
-      );
+    String location = await super.login(
+      target:
+          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+      username: username,
+      password: password,
+      sliderCaptcha: sliderCaptcha,
+      onResponse: onResponse,
+    );
+    var response = await dio.get(location);
+    while (response.headers[HttpHeaders.locationHeader] != null) {
+      location = response.headers[HttpHeaders.locationHeader]![0];
+      developer.log("Received: $location.", name: "ids login");
+      response = await dioEhall.get(location);
     }
+    return;
   }
 
   Future<String> useApp(String appID) async {
     developer.log("Ready to use the app $appID.", name: "Ehall useApp");
     developer.log("Try to login.", name: "Ehall useApp");
-    await loginEhall(
-        username: user["idsAccount"]!, password: user["idsPassword"]!);
+    if (!await isLoggedIn()) {
+      String location = await super.checkAndLogin(
+        target:
+            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+      );
+      var response = await dio.get(location);
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        developer.log("Received: $location.", name: "ids login");
+        response = await dioEhall.get(location);
+      }
+    }
     developer.log("Try to use the $appID.", name: "Ehall useApp");
-    var value = await dio.get(
+    var value = await dioEhall.get(
       "https://ehall.xidian.edu.cn/appShow",
       queryParameters: {'appId': appID},
       options: Options(
-          followRedirects: false,
-          validateStatus: (status) {
-            return status! < 500;
-          },
-          headers: {
-            "Accept": "text/html,application/xhtml+xml,application/xml;"
-                "q=0.9,image/webp,image/apng,*/*;q=0.8",
-          }),
+        followRedirects: false,
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
     );
     developer.log("Transfer address: ${value.headers['location']![0]}.",
         name: "Ehall useApp");
@@ -80,15 +97,16 @@ class EhallSession extends IDSSession {
     developer.log("Ready to get the user information.",
         name: "Ehall getInformation");
     var firstPost = await useApp("4618295887225301");
-    await dio.get(firstPost).then((value) => value.data);
+    await dioEhall.get(firstPost).then((value) => value.data);
 
     /// Get information here. resultCode==00000 is successful.
     developer.log("Getting the user information.",
         name: "Ehall getInformation");
-    var detailed = await dio.post(
+    var detailed = await dioEhall.post(
       "https://ehall.xidian.edu.cn/xsfw/sys/xszsapp/commoncall/callQuery/xsjbxxcx-MINE-QUERY.do",
       data: {
-        "requestParams": "{\"XSBH\":\"${user["idsAccount"]}\"}",
+        "requestParams":
+            "{\"XSBH\":\"${preference.getString(preference.Preference.idsAccount)}\"}",
         "actionType": "MINE",
         "actionName": "xsjbxxcx",
         "dataModelAction": "QUERY",
@@ -99,39 +117,59 @@ class EhallSession extends IDSSession {
     if (detailed["resultCode"] != "00000") {
       throw GetInformationFailedException(detailed["msg"]);
     } else {
-      await addUser("name", detailed["data"][0]["XM"]);
-      await addUser("sex", detailed["data"][0]["XBDM_DISPLAY"]);
-      await addUser(
-          "execution",
-          detailed["data"][0]["DZ_SYDM_DISPLAY"]
-              .toString()
-              .replaceAll("·", ""));
-      await addUser("institutes", detailed["data"][0]["DZ_DWDM_DISPLAY"]);
-      await addUser("subject", detailed["data"][0]["ZYDM_DISPLAY"]);
-      await addUser("dorm", detailed["data"][0]["ZSDZ"]);
+      preference.setString(
+        preference.Preference.name,
+        detailed["data"][0]["XM"],
+      );
+      preference.setString(
+        preference.Preference.sex,
+        detailed["data"][0]["XBDM_DISPLAY"],
+      );
+      preference.setString(
+        preference.Preference.execution,
+        detailed["data"][0]["DZ_SYDM_DISPLAY"].toString().replaceAll("·", ""),
+      );
+      preference.setString(
+        preference.Preference.institutes,
+        detailed["data"][0]["DZ_DWDM_DISPLAY"],
+      );
+      preference.setString(
+        preference.Preference.subject,
+        detailed["data"][0]["ZYDM_DISPLAY"],
+      );
+      preference.setString(
+        preference.Preference.dorm,
+        detailed["data"][0]["ZSDZ"],
+      );
     }
 
     developer.log("Get the semester information.",
         name: "Ehall getInformation");
     String get = await useApp("4770397878132218");
-    await dio.post(get);
-    String semesterCode = await dio
+    await dioEhall.post(get);
+    String semesterCode = await dioEhall
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    await addUser("currentSemester", semesterCode);
+    preference.setString(
+      preference.Preference.currentSemester,
+      semesterCode,
+    );
 
     developer.log("Get the day the semester begin.",
         name: "Ehall getInformation");
-    String termStartDay = await dio.post(
+    String termStartDay = await dioEhall.post(
       'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
       data: {
         'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
         'XQ': semesterCode.split('-')[2]
       },
     ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    await addUser("currentStartDay", termStartDay);
+    preference.setString(
+      preference.Preference.currentStartDay,
+      termStartDay,
+    );
   }
 }
 

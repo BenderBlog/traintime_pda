@@ -1,16 +1,10 @@
-/*
-A captcha input dialog.
-Copyright 2022 SuperBart
+// Copyright 2023 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
-*/
+// A captcha input dialog.
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CaptchaInputDialog extends StatelessWidget {
   final TextEditingController _captchaController = TextEditingController();
@@ -21,8 +15,9 @@ class CaptchaInputDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     NetworkImage cappic = NetworkImage(
-        "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
-        headers: {"Cookie": cookie});
+      "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
+      headers: {"Cookie": cookie},
+    );
 
     return AlertDialog(
       title: const Text('请输入验证码'),
@@ -31,20 +26,21 @@ class CaptchaInputDialog extends StatelessWidget {
         color: Colors.black,
       ),
       content: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image(image: cappic),
           TextField(
             autofocus: true,
             style: const TextStyle(fontSize: 20),
             controller: _captchaController,
-            keyboardType: TextInputType.number,
             decoration: InputDecoration(
               hintText: "输入验证码",
               fillColor: Colors.grey.withOpacity(0.4),
               filled: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(24),
                 borderSide: BorderSide.none,
               ),
             ),
@@ -62,11 +58,7 @@ class CaptchaInputDialog extends StatelessWidget {
           child: const Text('提交'),
           onPressed: () async {
             if (_captchaController.text.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('请输入验证码'),
-                ),
-              );
+              Fluttertoast.showToast(msg: '请输入验证码');
             } else {
               Navigator.of(context).pop(_captchaController.text);
             }

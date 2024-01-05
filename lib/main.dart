@@ -1,66 +1,75 @@
-/*
-Intro of the watermeter program.
-Copyright 2022 SuperBart
+// Copyright 2023 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-Please refer to ADDITIONAL TERMS APPLIED TO WATERMETER SOURCE CODE
-if you want to use.
-*/
+// Intro of the watermeter program.
 
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:home_widget/home_widget.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/model/user.dart';
-import 'package:watermeter/page/home.dart';
-import 'package:watermeter/page/login/login.dart';
-import 'package:watermeter/repository/general.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-import 'package:workmanager/workmanager.dart';
-
-import 'applet/widget_worker.dart';
+import 'package:watermeter/repository/message_session.dart' as message;
+import 'package:watermeter/repository/network_session.dart' as repo_general;
+import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/homepage/home.dart';
+import 'package:watermeter/page/login/login_window.dart';
+import 'dart:developer' as developer;
+import 'package:get/get.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/themes/demo_blue.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:work_manager/work_manager.dart';
 
 void main() async {
   developer.log(
-    "Watermeter, by BenderBlog, with dragon power.",
+    "Watermeter is written by BenderBlog Rodriguez and contributors.",
     name: "Watermeter",
   );
 
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Init the widget data.
+  // Init the homepage widget data.
   Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
 
-  // Loading cookiejar.
-  Directory supportPath = await getApplicationSupportDirectory();
-  SportCookieJar = PersistCookieJar(
-      ignoreExpires: true, storage: FileStorage("${supportPath.path}/sport"));
-  IDSCookieJar = PersistCookieJar(
-      ignoreExpires: true, storage: FileStorage("${supportPath.path}/ids"));
-  // Have user registered?
-  bool isFirst = false;
-  try {
-    await initUser();
-    await EhallSession().loginEhall(
-        username: user["idsAccount"]!, password: user["idsPassword"]!);
-  } on String {
-    isFirst = true;
-  }
+  // Disable horizontal screen in phone.
+  // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
+  final data = WidgetsBinding.instance.platformDispatcher.views.first;
+
   developer.log(
-    "Registered in status: ${!isFirst}",
+    "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} "
+    "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
     name: "Watermeter",
   );
+
+  if (min(data.physicalSize.width, data.physicalSize.height) /
+          data.devicePixelRatio <
+      480) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  // Loading cookiejar.
+  repo_general.supportPath = await getApplicationSupportDirectory();
+  preference.prefs = await SharedPreferences.getInstance();
+  preference.packageInfo = await PackageInfo.fromPlatform();
+
+  // Get message of the app.
+  message.checkMessage();
+
+  // Have user registered?
+  String username = preference.getString(preference.Preference.idsAccount);
+  String password = preference.getString(preference.Preference.idsPassword);
+  bool isFirst = username.isEmpty || password.isEmpty;
 
   runApp(MyApp(isFirst: isFirst));
 }
@@ -83,6 +92,11 @@ class _MyAppState extends State<MyApp> {
     //TODO replace YOUR_GROUP_ID with the proper one
     HomeWidget.setAppGroupId('YOUR_GROUP_ID');
     HomeWidget.registerBackgroundCallback(backgroundCallback);
+
+    if (widget.isFirst) {
+      loginState = IDSLoginState.manual;
+      IDSSession().dio.get("https://www.xidian.edu.cn");
+    }
   }
 
   @override
@@ -107,10 +121,23 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('zh', ''),
+        ],
         navigatorKey: alice.getNavigatorKey(),
-        title: 'WaterMeter Pre-Alpha',
-        theme: c.apptheme,
-        home: widget.isFirst ? const LoginWindow() : const HomePage(),
+        title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
+        theme: demoBlue,
+        darkTheme: demoBlueDark,
+        themeMode: c.colorState,
+        home: DefaultTextStyle.merge(
+          style: const TextStyle(textBaseline: TextBaseline.ideographic),
+          child: widget.isFirst ? const LoginWindow() : const HomePage(),
+        ),
       ),
     );
   }
