@@ -3,15 +3,18 @@
 
 // Intro of the watermeter program.
 
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watermeter/applet/widget_worker.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/network_session.dart' as repo_general;
@@ -19,18 +22,23 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
-import 'dart:developer' as developer;
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:workmanager/workmanager.dart';
 
 void main() async {
   developer.log(
     "Watermeter is written by BenderBlog Rodriguez and contributors.",
     name: "Watermeter",
   );
+
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Init the homepage widget data.
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
 
   // Disable horizontal screen in phone.
   // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
@@ -69,6 +77,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final bool isFirst;
+
   const MyApp({super.key, required this.isFirst});
 
   @override
@@ -81,9 +90,31 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    //TODO replace YOUR_GROUP_ID with the proper one
+    HomeWidget.setAppGroupId('YOUR_GROUP_ID');
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
       IDSSession().dio.get("https://www.xidian.edu.cn");
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkForWidgetLaunch();
+    HomeWidget.widgetClicked.listen(_launchedFromWidget);
+  }
+
+  void _checkForWidgetLaunch() {
+    HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
+  }
+
+  void _launchedFromWidget(Uri? uri) {
+    if (uri != null) {
+      //TODO do work when start app from home widgets
+      print(uri);
     }
   }
 

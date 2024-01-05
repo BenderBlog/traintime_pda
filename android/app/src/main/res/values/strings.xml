@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_classtable_description">课程表</string>
+    <string name="widget_electricity_description">电费详情</string>
+</resources>

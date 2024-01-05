@@ -60,6 +60,9 @@ dependencies:
   styled_widget: ^0.4.1
   ming_cute_icons: ^0.0.1
   timelines: ^0.1.0
+  # Homepage Widget
+  home_widget: ^0.4.1
+  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_test:

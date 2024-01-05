@@ -205,10 +205,10 @@ packages:
     dependency: "direct main"
     description:
       name: charset_converter
-      sha256: e4827b2d623ab75c2b6767d69e03485ea5bc894db6f6bdcb2ffeda58446bbe26
+      sha256: "3e09da76e7ca6c1f7f2bf794ff4e4ec3df37a5f1fd418beed39bc98236d34622"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   checked_yaml:
     dependency: transitive
     description:
@@ -317,10 +317,10 @@ packages:
     dependency: "direct main"
     description:
       name: data_table_2
-      sha256: "3ce61e066aba255b2b346a62984dfb0effddb8ca34c123c23c5c3d0f3c4e9fb7"
+      sha256: cec4010dd756bd7d0cc3eb8a30932b8109608132c6c8d643e80ea412d3e51a9c
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.9"
+    version: "2.5.10"
   dbus:
     dependency: transitive
     description:
@@ -581,6 +581,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.1"
+  home_widget:
+    dependency: "direct main"
+    description:
+      name: home_widget
+      sha256: c58a9e6d3b94490f1a8d5ddcbeeeeebc79abd0befe5889c26b0713fb09be6857
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   html:
     dependency: transitive
     description:
@@ -1334,10 +1342,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_platform_interface
-      sha256: f099b552bd331eacd69affed7ff2f23bfa6b0cb825b629edf3d844375a7501ad
+      sha256: "4aca1e060978e19b2998ee28503f40b5ba6226819c2b5e3e4d1821e8ccd92198"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.1"
+    version: "2.3.0"
   url_launcher_web:
     dependency: transitive
     description:
@@ -1398,10 +1406,10 @@ packages:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: d88238e5eac9a42bb43ca4e721edba3c08c6354d4a53063afaa568516217621b
+      sha256: cc1f6c632a248278a091fd7d9a68f624906830f7c1c5aa66503fae0804633e1c
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "2.4.2"
   webview_flutter:
     dependency: "direct main"
     description:
@@ -1438,10 +1446,18 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: b0f37db61ba2f2e9b7a78a1caece0052564d1bc70668156cf3a29d676fe4e574
+      sha256: "464f5674532865248444b4c3daca12bd9bf2d7c47f759ce2617986e7229494a8"
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.1"
+    version: "5.2.0"
+  workmanager:
+    dependency: "direct main"
+    description:
+      name: workmanager
+      sha256: ed13530cccd28c5c9959ad42d657cd0666274ca74c56dea0ca183ddd527d3a00
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
   xdg_directories:
     dependency: transitive
     description:
