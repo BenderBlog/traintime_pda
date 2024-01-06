@@ -5,7 +5,7 @@ import 'package:jiffy/jiffy.dart';
 
 class Subject {
   String subject;
-  String type;
+  String typeStr;
   //DateTime start;
   //DateTime end;
   String time;
@@ -17,7 +17,7 @@ class Subject {
   );
 
   @override
-  String toString() => "$subject $type $time $place $seat\n";
+  String toString() => "$subject $typeStr $type $time $place $seat\n";
 
   Jiffy get startTime {
     RegExpMatch? match = timeRegExp.firstMatch(time);
@@ -32,9 +32,17 @@ class Subject {
     ));
   }
 
+  String get type {
+    if (typeStr.contains("期末考试")) return "期末考试";
+    if (typeStr.contains("期中考试")) return "期中考试";
+    if (typeStr.contains("结课考试")) return "结课考试";
+    if (typeStr.contains("入学")) return "入学考试";
+    return typeStr;
+  }
+
   Subject({
     required this.subject,
-    required this.type,
+    required this.typeStr,
     required this.time,
     //required this.start,
     //required this.end,

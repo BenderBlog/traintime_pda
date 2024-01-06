@@ -140,20 +140,15 @@ class JiaowuServiceSession extends IDSSession {
       }
 
       var data = value.data["data"];
+
       return List<Subject>.generate(
         data.length,
         (index) => Subject(
           subject: data[index]["courseName"],
-          type: data[index]["batchName"].toString().contains("期末考试")
-              ? "期末考试"
-              : data[index]["batchName"].toString().contains("期中考试")
-                  ? "期中考试"
-                  : data[index]["batchName"].toString().contains("结课考试")
-                      ? "结课考试"
-                      : data[index]["batchName"],
-          time: data[index]["timeNote"],
-          place: data[index]["classroomName"],
-          seat: int.parse(data[index]["seatNo"]),
+          typeStr: data[index]["batchName"] ?? "未知类型考试",
+          time: data[index]["timeNote"] ?? "未知考试时间",
+          place: data[index]["classroomName"] ?? "尚无安排",
+          seat: int.parse(data[index]["seatNo"] ?? '-1'),
         ),
       );
     });
