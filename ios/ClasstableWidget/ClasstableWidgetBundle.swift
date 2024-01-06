@@ -2,7 +2,7 @@
 //  ClasstableWidgetBundle.swift
 //  ClasstableWidget
 //
-//  Created by sprt on 2024/1/6.
+//  Created by sprt on 2024/1/7.
 //
 
 import WidgetKit
