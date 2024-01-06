@@ -33,22 +33,17 @@ class ExamInfoCard extends StatelessWidget {
                 Flex(
                   direction: Axis.horizontal,
                   children: [
-                    Expanded(
-                      flex: 1,
-                      child: informationWithIcon(
-                        Icons.room,
-                        toUse!.place,
-                        context,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: informationWithIcon(
+                    informationWithIcon(
+                      Icons.room,
+                      toUse!.place,
+                      context,
+                    ).flexible(),
+                    if (toUse!.seat != -1)
+                      informationWithIcon(
                         Icons.chair,
                         toUse!.seat.toString(),
                         context,
-                      ),
-                    ),
+                      ).flexible(),
                   ],
                 ),
               ],
