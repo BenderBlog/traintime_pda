@@ -12,6 +12,8 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart'
+    as classtable_module;
 
 Future<bool> updateClasstableInfo() async {
   /// TODO: Add exception dealt...
@@ -21,6 +23,7 @@ Future<bool> updateClasstableInfo() async {
   DateTime time = DateTime.now().add(Duration(days: c.$2 ? 1 : 0));
 
   /// Update exam info
+  /// TODO: Add exam cache and remove exam controller
   var examList = Get.put(ExamController()).isNotFinished;
   for (var i in examList) {
     if (i.startTime.year == time.year &&
@@ -30,26 +33,26 @@ Future<bool> updateClasstableInfo() async {
         name: i.subject,
         teacher: "Exam",
         place: i.place,
-        // TODO: Rewrite this to string...
-        startTime: 1,
-        endTime: 2,
+        startTime: i.startTime.Hm,
+        endTime: i.stopTime.Hm,
       ));
     }
   }
 
   /// Update class info
   for (var i in c.$1) {
+    var toUse = con.classTableData.timeArrangement[i];
     toSend.list.add(ClassToShow(
-      name: con.classTableData.getClassDetail(i.index).name,
-      teacher: i.teacher ?? "未知老师",
-      place: i.classroom ?? "未知教室",
-      startTime: i.start,
-      endTime: i.stop,
+      name: con.classTableData.getClassDetail(i).name,
+      teacher: toUse.teacher ?? "未知老师",
+      place: toUse.classroom ?? "未知教室",
+      startTime: classtable_module.time[(toUse.start - 1) * 2],
+      endTime: classtable_module.time[(toUse.stop - 1) * 2],
     ));
   }
   await HomeWidget.saveWidgetData(
     'class_table_date',
-    Jiffy.parseFromDateTime(time).yMd,
+    Jiffy.parseFromDateTime(time).format(pattern: 'yyyy-MM-dd'),
   ).then(
     (value) => developer.log(
       "saveData 'class_table_date' status: $value",

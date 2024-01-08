@@ -13,9 +13,9 @@ class ClassToShow {
   String teacher;
   String place;
   @JsonKey(name: 'start_time')
-  int startTime;
+  String startTime;
   @JsonKey(name: 'end_time')
-  int endTime;
+  String endTime;
 
   @override
   int get hashCode => "$name $teacher $place $startTime $endTime".hashCode;

@@ -12,16 +12,24 @@ import SwiftUI
 private let widgetGroupId = "group.xdyou"
 
 struct Provider: TimelineProvider {
+    let myDateFormatter = DateFormatter()
+    
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), class_table_date: Date().formatted(), class_table_json: "{\"list\":[]}")
+        myDateFormatter.dateFormat = "yyyy-MM-dd"
+        return SimpleEntry(
+            date: Date(),
+            class_table_date: myDateFormatter.string(from: Date()),
+            class_table_json: "{\"list\":[]}"
+        )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        myDateFormatter.dateFormat = "yyyy-MM-dd"
+
         let data = UserDefaults.init(suiteName: widgetGroupId)
-        print(data?.string(forKey: "class_table_json") ?? "No data")
         let entry = SimpleEntry(
           date: Date(), 
-          class_table_date: data?.string(forKey: "class_table_date") ?? Date().formatted(),
+          class_table_date: data?.string(forKey: "class_table_date") ?? myDateFormatter.string(from: Date()),
           class_table_json: data?.string(forKey: "class_table_json") ?? "{\"list\":[]}"
         )
         completion(entry)
@@ -66,26 +74,32 @@ struct ClasstableWidgetEntryView : View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            // TODO: redesign title text
             if (!classList.isEmpty) {
+                // TODO: redesign title text
+                HStack {
+                    Text("\(entry.class_table_date)日程").font(.system(size: 14))
+                    Spacer()
+                    if (widgetFamily != .systemSmall) {
+                        Text("还剩\(classList.count)项").font(.system(size: 14))
+                    }
+                }
+
+                
                 if (widgetFamily == .systemSmall || widgetFamily == .systemMedium) {
-                    Text("XDYou 今日日程").font(.system(size: 14))
                     EventItem(classList[0])
                     if (classList.count > 1) {
                         EventItem(classList[1])
                     }
-                } else if (widgetFamily == .systemLarge) {
-                    Text("XDYou 今日日程 还剩\(classList.count)").font(.system(size: 14))
+                } else {
                     ForEach(0..<classList.count, id: \.self) {
                         i in EventItem(classList[i])
                     }
-                } else {
-                    Text("Unsupported widget family")
                 }
+                
                 Spacer()
             } else {
-                Text("XDYou 今日日程").font(.system(size: 14))
-                Text("今日没有安排了")
+                Text("\(entry.class_table_date) 日程").font(.system(size: 14))
+                Text("目前没有安排了")
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
         }
@@ -115,16 +129,17 @@ struct ClasstableWidget: Widget {
 #Preview(as: .systemSmall) {
     ClasstableWidget()
 } timeline: {
+    // Ignore time problem when preview...
     SimpleEntry(
         date: Date.now,
         class_table_date: Date().formatted(),
         class_table_json:
-            "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":1,\"end_time\":2},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":3,\"end_time\":4},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":7,\"end_time\":8},{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":1,\"end_time\":2},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":3,\"end_time\":4},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":7,\"end_time\":8}]}")
+            "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"},{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"}]}")
     SimpleEntry(
         date: Date.now,
         class_table_date: Date().formatted(),
         class_table_json:
-            "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":1,\"end_time\":2},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":3,\"end_time\":4},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":7,\"end_time\":8}]}")
+            "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"}]}")
     SimpleEntry(
         date: Date.now,
         class_table_date: Date().formatted(),
@@ -132,7 +147,7 @@ struct ClasstableWidget: Widget {
     SimpleEntry(
         date: Date.now,
         class_table_date: Date().formatted(),
-        class_table_json: "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":1,\"end_time\":2},]}")
+        class_table_json: "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:45\",\"end_time\":\"10:05\"},]}")
 }
 
 // Data struct
@@ -145,32 +160,9 @@ struct ClasstableStructItems : Codable {
     var name : String
     var teacher : String
     var place : String
-    var start_time : Int
-    var end_time : Int
+    var start_time : String
+    var end_time : String
 }
-
-var TimeArray : [String] = [
-    "08:30",
-    "09:15",
-    "09:20",
-    "10:05",
-    "10:25",
-    "11:10",
-    "11:15",
-    "12:00",
-    "14:00",
-    "14:45",
-    "14:50",
-    "15:35",
-    "15:55",
-    "16:40",
-    "16:45",
-    "17:30",
-    "19:00",
-    "19:45",
-    "19:55",
-    "20:30",
-]
 
 // Event view
 
@@ -192,10 +184,10 @@ struct EventItem: View {
                 if (widgetFamily == .systemSmall) {
                     Text(event.name)
                         .font(.subheadline.weight(.medium))
-                    Text("\(TimeArray[event.start_time]) \(event.place)")
+                    Text("\(event.start_time) \(event.place)")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.secondary)
-                } else if (widgetFamily == .systemMedium || widgetFamily == .systemLarge) {
+                } else {
                     HStack(alignment: .firstTextBaseline) {
                         VStack(alignment: .leading) {
                             Text(event.name)
@@ -206,16 +198,14 @@ struct EventItem: View {
                         }
                         Spacer()
                         VStack(alignment: .leading) {
-                            Text(TimeArray[event.start_time])
+                            Text(event.start_time)
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(.secondary)
-                            Text(TimeArray[event.end_time * 2 - 1])
+                            Text(event.end_time)
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(.secondary)
                         }
                     }
-                } else  {
-                    Text("Unsupported widget family")
                 }
             }
             .padding(.vertical, 6)
@@ -228,7 +218,7 @@ struct EventItem: View {
             eventColour.opacity(0.125)
                 .blendMode(colourScheme == .light ? .normal : .hardLight)
         }
-        .frame(maxHeight: 48)
+        .frame(maxHeight: 42)
         .clipShape(ContainerRelativeShape())
     }
 }
@@ -239,8 +229,8 @@ struct EventItem_Previews: PreviewProvider {
             name: "形势与政策",
             teacher: "哲学dark师",
             place: "C-666",
-            start_time: 7,
-            end_time: 8
+            start_time: "11:45",
+            end_time: "19:19"
         )).previewContext(WidgetPreviewContext(family: .systemSmall)).containerBackground(.blue.gradient, for: .widget)
     }
 }

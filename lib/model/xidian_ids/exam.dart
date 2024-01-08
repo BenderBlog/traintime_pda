@@ -13,7 +13,7 @@ class Subject {
   int seat;
 
   static RegExp timeRegExp = RegExp(
-    r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})',
+    r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})',
   );
 
   @override
@@ -29,6 +29,19 @@ class Subject {
       int.parse(match.namedGroup('day')!),
       int.parse(match.namedGroup('hour')!),
       int.parse(match.namedGroup('minute')!),
+    ));
+  }
+
+  Jiffy get stopTime {
+    RegExpMatch? match = timeRegExp.firstMatch(time);
+    if (match == null) throw NotImplementedException();
+
+    return Jiffy.parseFromDateTime(DateTime(
+      int.parse(match.namedGroup('year')!),
+      int.parse(match.namedGroup('month')!),
+      int.parse(match.namedGroup('day')!),
+      int.parse(match.namedGroup('stopHour')!),
+      int.parse(match.namedGroup('stopMinute')!),
     ));
   }
 

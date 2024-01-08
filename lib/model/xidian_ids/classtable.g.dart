@@ -10,8 +10,8 @@ ClassToShow _$ClassToShowFromJson(Map<String, dynamic> json) => ClassToShow(
       name: json['name'] as String,
       teacher: json['teacher'] as String?,
       place: json['place'] as String?,
-      startTime: json['start_time'] as int,
-      endTime: json['end_time'] as int,
+      startTime: json['start_time'] as String,
+      endTime: json['end_time'] as String,
     );
 
 Map<String, dynamic> _$ClassToShowToJson(ClassToShow instance) =>

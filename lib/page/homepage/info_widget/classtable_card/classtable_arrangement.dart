@@ -57,11 +57,16 @@ class ClasstableArrangementColumn extends StatelessWidget {
               ClassDetailTile(
                 isTomorrow: c.nextClassArrangements.$2,
                 name: c.classTableData
-                    .classDetail[c.nextClassArrangements.$1.first.index].name,
+                    .getClassDetail(c.nextClassArrangements.$1.first)
+                    .name,
                 time:
-                    '${time[(c.nextClassArrangements.$1.first.start - 1) * 2]}'
-                    '-${time[(c.nextClassArrangements.$1.first.stop - 1) * 2 + 1]}',
-                place: c.nextClassArrangements.$1.first.classroom ?? "未定教室",
+                    '${time[(c.classTableData.timeArrangement[c.nextClassArrangements.$1.first].start - 1) * 2]}'
+                    '-${time[(c.classTableData.timeArrangement[c.nextClassArrangements.$1.first].stop - 1) * 2 + 1]}',
+                place: c
+                        .classTableData
+                        .timeArrangement[c.nextClassArrangements.$1.first]
+                        .classroom ??
+                    "未定教室",
               ),
               noticeBox(
                   "${c.nextClassArrangements.$2 ? "明天一共" : "今天还剩"}${c.nextClassArrangements.$1.length}节课"),

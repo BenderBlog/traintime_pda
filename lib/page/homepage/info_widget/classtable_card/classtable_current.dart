@@ -13,7 +13,9 @@ class ClasstableCurrentColumn extends StatelessWidget {
 
   ClassDetail? getClassDetail(ClassTableController c) {
     if (isArrangementMode) {
-      List<TimeArrangement> arrangements = c.nextClassArrangements.$1;
+      List<TimeArrangement> arrangements = c.nextClassArrangements.$1
+          .map((e) => c.classTableData.timeArrangement[e])
+          .toList();
       return arrangements.isEmpty
           ? null
           : c.classTableData.classDetail[arrangements.first.index];
@@ -23,7 +25,9 @@ class ClasstableCurrentColumn extends StatelessWidget {
 
   TimeArrangement? getTimeArrangement(ClassTableController c) {
     if (isArrangementMode) {
-      List<TimeArrangement> arrangements = c.nextClassArrangements.$1;
+      List<TimeArrangement> arrangements = c.nextClassArrangements.$1
+          .map((e) => c.classTableData.timeArrangement[e])
+          .toList();
       return arrangements.isEmpty ? null : arrangements.first;
     }
     return c.currentData?.$2;

@@ -146,7 +146,7 @@ class ClassTableController extends GetxController {
   }
 
   /// Get next class arrangements today or tomorrow
-  (List<TimeArrangement>, bool) get nextClassArrangements {
+  (List<int>, bool) get nextClassArrangements {
     int weekday = updateTime.weekday - 1;
     int week = currentWeek;
     bool isTomorrow = false;
@@ -229,12 +229,7 @@ class ClassTableController extends GetxController {
         }
       }
 
-      return (
-        classArrangementIndices
-            .map((idx) => classTableData.timeArrangement[idx])
-            .toList(),
-        isTomorrow
-      );
+      return (classArrangementIndices.toList(), isTomorrow);
     }
   }
 
