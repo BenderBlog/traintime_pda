@@ -1,11 +1,9 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:convert';
-
 import 'package:get/get.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:watermeter/applet/widget_worker.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -17,8 +15,6 @@ class ClassTableController extends GetxController {
 
   // Classtable Data
   ClassTableData classTableData = ClassTableData();
-
-  // TODO: Add experiment and exam info here.
 
   // The start day of the semester.
   var startDay = DateTime.parse("2022-01-22");
@@ -283,6 +279,8 @@ class ClassTableController extends GetxController {
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
       name: "ClassTableController",
     );
+
+    updateClasstableInfo();
   }
 
   Future<void> updateClassTable({bool isForce = false}) async {

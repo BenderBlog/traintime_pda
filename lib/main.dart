@@ -7,7 +7,6 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -26,7 +25,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 void main() async {
   developer.log(
@@ -38,8 +37,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Init the homepage widget data.
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
-
+  // Register to receive BackgroundFetch events after app is terminated.
+  // Requires {stopOnTerminate: false, enableHeadless: true}
   // Disable horizontal screen in phone.
   // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
   final data = WidgetsBinding.instance.platformDispatcher.views.first;
@@ -73,6 +72,7 @@ void main() async {
   bool isFirst = username.isEmpty || password.isEmpty;
 
   runApp(MyApp(isFirst: isFirst));
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends StatefulWidget {
@@ -90,9 +90,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    //TODO replace YOUR_GROUP_ID with the proper one
-    HomeWidget.setAppGroupId('YOUR_GROUP_ID');
-    HomeWidget.registerBackgroundCallback(backgroundCallback);
+    HomeWidget.setAppGroupId('group.xdyou');
+    //HomeWidget.registerInteractivityCallback(backgroundCallback);
 
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
