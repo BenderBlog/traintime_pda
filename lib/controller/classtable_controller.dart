@@ -142,7 +142,10 @@ class ClassTableController extends GetxController {
       name: "ClassTableControllerCurrentData",
     );
 
-    return (classTableData.classDetail[arrangement.index], arrangement);
+    return (
+      classTableData.getClassDetail(currentDataIndex),
+      arrangement,
+    );
   }
 
   /// Get next class arrangements today or tomorrow

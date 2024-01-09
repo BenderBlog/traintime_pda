@@ -18,9 +18,10 @@ import 'package:watermeter/model/xidian_ids/classtable.dart'
 Future<bool> updateClasstableInfo() async {
   /// TODO: Add exception dealt...
   ClassToShowList toSend = ClassToShowList();
-  var con = Get.put(ClassTableController());
-  var c = con.nextClassArrangements;
-  DateTime time = DateTime.now().add(Duration(days: c.$2 ? 1 : 0));
+  var classTableController = Get.put(ClassTableController());
+  var nextClass = classTableController.nextClassArrangements;
+  var current = classTableController.currentData;
+  DateTime time = DateTime.now().add(Duration(days: nextClass.$2 ? 1 : 0));
 
   /// Update exam info
   var examController = Get.put(ExamController());
@@ -43,10 +44,19 @@ Future<bool> updateClasstableInfo() async {
   }
 
   /// Update class info
-  for (var i in c.$1) {
-    var toUse = con.classTableData.timeArrangement[i];
+  if (current != null) {
     toSend.list.add(ClassToShow(
-      name: con.classTableData.getClassDetail(i).name,
+      name: current.$1.name,
+      teacher: current.$2.teacher ?? "未知老师",
+      place: current.$2.classroom ?? "未知教室",
+      startTime: classtable_module.time[(current.$2.start - 1) * 2],
+      endTime: classtable_module.time[(current.$2.stop - 1) * 2],
+    ));
+  }
+  for (var i in nextClass.$1) {
+    var toUse = classTableController.classTableData.timeArrangement[i];
+    toSend.list.add(ClassToShow(
+      name: classTableController.classTableData.getClassDetail(i).name,
       teacher: toUse.teacher ?? "未知老师",
       place: toUse.classroom ?? "未知教室",
       startTime: classtable_module.time[(toUse.start - 1) * 2],
