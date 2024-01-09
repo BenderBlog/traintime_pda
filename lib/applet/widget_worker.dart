@@ -23,19 +23,22 @@ Future<bool> updateClasstableInfo() async {
   DateTime time = DateTime.now().add(Duration(days: c.$2 ? 1 : 0));
 
   /// Update exam info
-  /// TODO: Add exam cache and remove exam controller
-  var examList = Get.put(ExamController()).isNotFinished;
-  for (var i in examList) {
-    if (i.startTime.year == time.year &&
-        i.startTime.month == time.month &&
-        i.startTime.date == time.day) {
-      toSend.list.add(ClassToShow(
-        name: i.subject,
-        teacher: "Exam",
-        place: i.place,
-        startTime: i.startTime.Hm,
-        endTime: i.stopTime.Hm,
-      ));
+  var examController = Get.put(ExamController());
+  if (examController.status == ExamStatus.cache ||
+      examController.status == ExamStatus.fetched) {
+    var examList = examController.subjects;
+    for (var i in examList) {
+      if (i.startTime.year == time.year &&
+          i.startTime.month == time.month &&
+          i.startTime.date == time.day) {
+        toSend.list.add(ClassToShow(
+          name: i.subject,
+          teacher: "Exam",
+          place: i.place,
+          startTime: i.startTime.Hm,
+          endTime: i.stopTime.Hm,
+        ));
+      }
     }
   }
 

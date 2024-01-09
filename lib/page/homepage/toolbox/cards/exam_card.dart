@@ -22,22 +22,19 @@ class ExamCard extends StatelessWidget {
         onTap: () async {
           if (offline) {
             Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
-          } else if (c.isGet == true) {
+          } else if (c.status == ExamStatus.cache ||
+              c.status == ExamStatus.fetched) {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const ExamInfoWindow()));
-          } else if (c.error == null) {
+          } else if (c.status != ExamStatus.error) {
             Fluttertoast.showToast(msg: "请稍候，正在获取考试信息");
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(c.error?.substring(
-                      0,
-                      min(
-                        c.error?.length ?? 0,
-                        120,
-                      ),
-                    ) ??
-                    "未提供报错信息"),
+                content: Text(c.error.substring(
+                  0,
+                  min(c.error.length, 120),
+                )),
               ),
             );
             Fluttertoast.showToast(msg: "遇到错误，请联系开发者");

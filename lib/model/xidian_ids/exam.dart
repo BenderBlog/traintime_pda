@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:jiffy/jiffy.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'exam.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Subject {
   String subject;
   String typeStr;
@@ -62,9 +66,15 @@ class Subject {
     required this.place,
     required this.seat,
   });
+
+  factory Subject.fromJson(Map<String, dynamic> json) =>
+      _$SubjectFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SubjectToJson(this);
 }
 
 // Or should I say, to be dead?
+@JsonSerializable(explicitToJson: true)
 class ToBeArranged {
   String subject;
   String id;
@@ -76,6 +86,27 @@ class ToBeArranged {
     required this.subject,
     required this.id,
   });
+
+  factory ToBeArranged.fromJson(Map<String, dynamic> json) =>
+      _$ToBeArrangedFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ToBeArrangedToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class ExamData {
+  List<Subject> subject;
+  List<ToBeArranged> toBeArranged;
+
+  ExamData({
+    required this.subject,
+    required this.toBeArranged,
+  });
+
+  factory ExamData.fromJson(Map<String, dynamic> json) =>
+      _$ExamDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ExamDataToJson(this);
 }
 
 class NotImplementedException implements Exception {}

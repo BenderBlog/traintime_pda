@@ -40,7 +40,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
             ),
           ],
         ),
-        body: c.isGet == true
+        body: c.status == ExamStatus.cache || c.status == ExamStatus.fetched
             ? c.subjects.isNotEmpty
                 ? TimelineWidget(
                     isTitle: const [true, false, true, false],
@@ -70,7 +70,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     ],
                   )
                 : const Center(child: Text("没有考试安排"))
-            : c.error != null
+            : c.status == ExamStatus.error
                 ? Center(child: Text(c.error.toString()))
                 : const Center(child: CircularProgressIndicator()),
       ),

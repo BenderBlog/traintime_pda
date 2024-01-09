@@ -11,6 +11,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/experiment/experiment_dio_transfer.dart';
 
 class ExperimentSession extends NetworkSession {
+  static const experimentCacheName = "Experiment.json";
   @override
   Dio get dio => Dio()
     ..interceptors.add(alice.getDioInterceptor())
@@ -119,7 +120,7 @@ class ExperimentSession extends NetworkSession {
 
   Future<List<ExperimentData>> getData() async {
     developer.log("Path at ${supportPath.path}.", name: "ExperimentSession");
-    var file = File("${supportPath.path}/Experiment.json");
+    var file = File("${supportPath.path}/$experimentCacheName");
     bool isExist = file.existsSync();
     developer.log("File exist: $isExist.", name: "ExperimentSession");
     try {

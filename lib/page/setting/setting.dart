@@ -13,10 +13,12 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+import 'package:watermeter/repository/experiment/experiment_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
@@ -24,6 +26,7 @@ import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
+import 'dart:developer' as developer;
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -207,18 +210,42 @@ class _SettingWindowState extends State<SettingWindow> {
                 onPressed: (context) => alice.showInspector(),
               ),
               SettingsTile.navigation(
-                title: const Text('清除 Cookie 后重启'),
+                title: const Text('清除缓存后重启'),
                 onPressed: (context) async {
                   try {
                     await NetworkSession().clearCookieJar();
-                    if (mounted) {
-                      Fluttertoast.showToast(msg: 'Cookie 已被清除');
-                      Restart.restartApp();
-                    }
                   } on PathNotFoundException {
-                    if (mounted) {
-                      Fluttertoast.showToast(msg: '目前没有缓存 Cookie');
-                    }
+                    developer.log(
+                      "No cookies at present",
+                      name: "Setting ClearAllCache",
+                    );
+                  }
+
+                  /// Clean Classtable cache.
+                  var file = File(
+                    "${supportPath.path}/${ClassTableFile.schoolClassName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  file = File(
+                    "${supportPath.path}/${ExamController.examDataCacheName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  file = File(
+                    "${supportPath.path}/${ExperimentSession.experimentCacheName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  if (mounted) {
+                    Fluttertoast.showToast(msg: 'Cookie 已被清除');
+                    Restart.restartApp();
                   }
                 },
               ),
@@ -245,6 +272,20 @@ class _SettingWindowState extends State<SettingWindow> {
 
                   file = File(
                     "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  file = File(
+                    "${supportPath.path}/${ExamController.examDataCacheName}",
+                  );
+                  if (file.existsSync()) {
+                    file.deleteSync();
+                  }
+
+                  file = File(
+                    "${supportPath.path}/${ExperimentSession.experimentCacheName}",
                   );
                   if (file.existsSync()) {
                     file.deleteSync();
