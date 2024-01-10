@@ -25,10 +25,7 @@ class ExamController extends GetxController {
 
   ExamStatus status = ExamStatus.none;
   String error = "";
-  ExamData data = ExamData(
-    subject: [],
-    toBeArranged: [],
-  );
+  late ExamData data;
   late File file;
   Jiffy now = Jiffy.now();
 
@@ -58,11 +55,14 @@ class ExamController extends GetxController {
     super.onInit();
     developer.log("Path at ${supportPath.path}.", name: "ExamController");
     file = File("${supportPath.path}/$examDataCacheName");
+    bool isExist = file.existsSync();
 
-    if (file.existsSync()) {
+    if (isExist) {
       developer.log("Init from cache.", name: "ExamController");
       data = ExamData.fromJson(jsonDecode(file.readAsStringSync()));
       status = ExamStatus.cache;
+    } else {
+      data = ExamData(subject: [], toBeArranged: []);
     }
   }
 
