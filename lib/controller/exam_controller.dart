@@ -25,13 +25,15 @@ class ExamController extends GetxController {
 
   ExamStatus status = ExamStatus.none;
   String error = "";
-  List<Subject> subjects = [];
-  List<ToBeArranged> toBeArranged = [];
-  int dropdownValue = 0;
+  ExamData data = ExamData(
+    subject: [],
+    toBeArranged: [],
+  );
+  late File file;
   Jiffy now = Jiffy.now();
 
   List<Subject> get isFinished {
-    List<Subject> isFinished = List.from(subjects);
+    List<Subject> isFinished = List.from(data.subject);
     isFinished.removeWhere(
       (element) => element.startTime.isAfter(now),
     );
@@ -39,7 +41,7 @@ class ExamController extends GetxController {
   }
 
   List<Subject> get isNotFinished {
-    List<Subject> isNotFinished = List.from(subjects);
+    List<Subject> isNotFinished = List.from(data.subject);
     isNotFinished.removeWhere(
       (element) => element.startTime.isSameOrBefore(now),
     );
@@ -55,15 +57,12 @@ class ExamController extends GetxController {
   void onInit() {
     super.onInit();
     developer.log("Path at ${supportPath.path}.", name: "ExamController");
-    var file = File("${supportPath.path}/$examDataCacheName");
-    bool isExist = file.existsSync();
-    developer.log("File exist: $isExist.", name: "ExamController");
+    file = File("${supportPath.path}/$examDataCacheName");
 
-    if (isExist) {
-      ExamData data = ExamData.fromJson(jsonDecode(file.readAsStringSync()));
-      subjects = data.subject;
-      toBeArranged = data.toBeArranged;
-      status = ExamStatus.none;
+    if (file.existsSync()) {
+      developer.log("Init from cache.", name: "ExamController");
+      data = ExamData.fromJson(jsonDecode(file.readAsStringSync()));
+      status = ExamStatus.cache;
     }
   }
 
@@ -78,13 +77,8 @@ class ExamController extends GetxController {
     ExamStatus previous = status;
     try {
       now = Jiffy.now();
-      var data = await JiaowuServiceSession().getExam();
-
       status = ExamStatus.fetching;
-
-      subjects = data.$1;
-      toBeArranged = data.$2;
-
+      data = await JiaowuServiceSession().getExam();
       status = ExamStatus.fetched;
       error = "";
     } on DioException catch (e, s) {
@@ -100,12 +94,18 @@ class ExamController extends GetxController {
       );
       error = "On exam controller: $e\nStack: $s";
     } finally {
-      if (status != ExamStatus.fetched) {
-        if (previous == ExamStatus.cache) {
-          status = ExamStatus.cache;
-        } else {
-          status = ExamStatus.error;
-        }
+      if (status == ExamStatus.fetched) {
+        developer.log(
+          "Store to cache.",
+          name: "ExamController",
+        );
+        file.writeAsStringSync(jsonEncode(
+          data.toJson(),
+        ));
+      } else if (previous == ExamStatus.cache) {
+        status = ExamStatus.cache;
+      } else {
+        status = ExamStatus.error;
       }
     }
     update();

@@ -34,14 +34,16 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
               icon: const Icon(Icons.more_time),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => NoArrangedInfo(list: c.toBeArranged),
+                  builder: (context) => NoArrangedInfo(
+                    list: c.data.toBeArranged,
+                  ),
                 ),
               ),
             ),
           ],
         ),
         body: c.status == ExamStatus.cache || c.status == ExamStatus.fetched
-            ? c.subjects.isNotEmpty
+            ? c.data.subject.isNotEmpty
                 ? TimelineWidget(
                     isTitle: const [true, false, true, false],
                     children: [

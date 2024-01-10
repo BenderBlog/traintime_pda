@@ -111,7 +111,7 @@ class JiaowuServiceSession extends IDSSession {
   }
 
   /// Default fetch the current semester's exam.
-  Future<(List<Subject>, List<ToBeArranged>)> getExam() async {
+  Future<ExamData> getExam() async {
     developer.log("Getting the exam data.", name: "Jiaowu getExam");
     await useService("exam");
 
@@ -129,7 +129,7 @@ class JiaowuServiceSession extends IDSSession {
     /// If failed, it is more likely that no exam has arranged.
     developer.log("My exam arrangemet $semester", name: "Jiaowu getExam");
 
-    List<Subject> examData = await authorizationDio
+    List<Subject> subject = await authorizationDio
         .get(
       "https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/listStuExamPlan"
       "?termCode=$semester",
@@ -173,7 +173,10 @@ class JiaowuServiceSession extends IDSSession {
       );
     });
 
-    return (examData, toBeArrangedData);
+    return ExamData(
+      subject: subject,
+      toBeArranged: toBeArrangedData,
+    );
   }
 
   /// Fetch the buildings for empty classroom.

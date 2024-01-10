@@ -6,56 +6,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classtable.g.dart';
 
-/// This is for the main page applet.
-@JsonSerializable(explicitToJson: true)
-class ClassToShow {
-  String name;
-  String teacher;
-  String place;
-  @JsonKey(name: 'start_time')
-  String startTime;
-  @JsonKey(name: 'end_time')
-  String endTime;
-
-  @override
-  int get hashCode => "$name $teacher $place $startTime $endTime".hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      other is ClassToShow &&
-      other.name == name &&
-      other.teacher == teacher &&
-      other.place == place &&
-      other.startTime == startTime &&
-      other.endTime == endTime;
-
-  ClassToShow({
-    required this.name,
-    String? teacher,
-    String? place,
-    required this.startTime,
-    required this.endTime,
-  })  : teacher = teacher ?? "未安排老师",
-        place = place ?? "未找到地点";
-
-  factory ClassToShow.fromJson(Map<String, dynamic> json) =>
-      _$ClassToShowFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ClassToShowToJson(this);
-}
-
-@JsonSerializable()
-class ClassToShowList {
-  Set<ClassToShow> list = {};
-
-  ClassToShowList();
-
-  factory ClassToShowList.fromJson(Map<String, dynamic> json) =>
-      _$ClassToShowListFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ClassToShowListToJson(this);
-}
-
 enum Source {
   empty,
   school,

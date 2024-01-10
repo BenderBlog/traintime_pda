@@ -8,7 +8,7 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/home_arrangement.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -17,25 +17,36 @@ import 'package:watermeter/model/xidian_ids/classtable.dart'
 
 Future<bool> updateClasstableInfo() async {
   /// TODO: Add exception dealt...
-  ClassToShowList toSend = ClassToShowList();
+  Set<HomeArrangement> toSend = {};
+  developer.log(
+    "Ready to update to homepage...",
+    name: "WidgetWorker updateClasstableInfo",
+  );
   var classTableController = Get.put(ClassTableController());
   var nextClass = classTableController.nextClassArrangements;
   var current = classTableController.currentData;
   DateTime time = DateTime.now().add(Duration(days: nextClass.$2 ? 1 : 0));
 
-  /// Update exam info
+  developer.log(
+    "Updating exam info.",
+    name: "WidgetWorker updateClasstableInfo",
+  );
   var examController = Get.put(ExamController());
   if (examController.status == ExamStatus.cache ||
       examController.status == ExamStatus.fetched) {
-    var examList = examController.subjects;
+    developer.log(
+      "Exam can be updated.",
+      name: "WidgetWorker updateClasstableInfo",
+    );
+    var examList = examController.data.subject;
     for (var i in examList) {
       if (i.startTime.year == time.year &&
           i.startTime.month == time.month &&
-          i.startTime.date == time.day) {
-        toSend.list.add(ClassToShow(
+          i.startTime.date == 15) {
+        toSend.add(HomeArrangement(
           name: i.subject,
           teacher: "Exam",
-          place: i.place,
+          place: "${i.place} ${i.seat}",
           startTime: i.startTime.Hm,
           endTime: i.stopTime.Hm,
         ));
@@ -43,9 +54,12 @@ Future<bool> updateClasstableInfo() async {
     }
   }
 
-  /// Update class info
+  developer.log(
+    "Updating current class info.",
+    name: "WidgetWorker updateClasstableInfo",
+  );
   if (current != null) {
-    toSend.list.add(ClassToShow(
+    toSend.add(HomeArrangement(
       name: current.$1.name,
       teacher: current.$2.teacher ?? "未知老师",
       place: current.$2.classroom ?? "未知教室",
@@ -53,9 +67,14 @@ Future<bool> updateClasstableInfo() async {
       endTime: classtable_module.time[(current.$2.stop - 1) * 2],
     ));
   }
+
+  developer.log(
+    "Updating next class info.",
+    name: "WidgetWorker updateClasstableInfo",
+  );
   for (var i in nextClass.$1) {
     var toUse = classTableController.classTableData.timeArrangement[i];
-    toSend.list.add(ClassToShow(
+    toSend.add(HomeArrangement(
       name: classTableController.classTableData.getClassDetail(i).name,
       teacher: toUse.teacher ?? "未知老师",
       place: toUse.classroom ?? "未知教室",
@@ -63,29 +82,35 @@ Future<bool> updateClasstableInfo() async {
       endTime: classtable_module.time[(toUse.stop - 1) * 2],
     ));
   }
+
   await HomeWidget.saveWidgetData(
     'class_table_date',
     Jiffy.parseFromDateTime(time).format(pattern: 'yyyy-MM-dd'),
   ).then(
     (value) => developer.log(
       "saveData 'class_table_date' status: $value",
-      name: "WidgetWorker",
+      name: "WidgetWorker updateClasstableInfo",
     ),
+  );
+
+  List<HomeArrangement> toSendList = toSend.toList();
+  toSendList.sort(
+    (a, b) => a.startTimeByMinutesOfDay - b.startTimeByMinutesOfDay,
   );
   await HomeWidget.saveWidgetData(
     'class_table_json',
-    jsonEncode(toSend.toJson()),
+    jsonEncode(toSendList),
   ).then(
     (value) => developer.log(
-      "saveData 'class_table_json' status: $value\nvalue: ${jsonEncode(toSend.toJson())}",
-      name: "WidgetWorker",
+      "saveData 'class_table_json' status: $value\nvalue: ${jsonEncode(toSendList)}",
+      name: "WidgetWorker updateClasstableInfo",
     ),
   );
 
   await HomeWidget.getWidgetData('class_table_json').then(
     (value) => developer.log(
       "confirm 'class_table_json' status: $value",
-      name: "WidgetWorker",
+      name: "WidgetWorker updateClasstableInfo",
     ),
   );
 
@@ -95,7 +120,7 @@ Future<bool> updateClasstableInfo() async {
   ).then((value) {
     developer.log(
       "UpdateStatus: $value",
-      name: "WidgetWorker",
+      name: "WidgetWorker updateClasstableInfo",
     );
     return value;
   });

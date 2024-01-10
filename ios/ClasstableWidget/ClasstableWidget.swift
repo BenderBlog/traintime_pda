@@ -19,7 +19,7 @@ struct Provider: TimelineProvider {
         return SimpleEntry(
             date: Date(),
             class_table_date: myDateFormatter.string(from: Date()),
-            class_table_json: "{\"list\":[]}"
+            class_table_json: "[]"
         )
     }
 
@@ -30,7 +30,7 @@ struct Provider: TimelineProvider {
         let entry = SimpleEntry(
           date: Date(), 
           class_table_date: data?.string(forKey: "class_table_date") ?? myDateFormatter.string(from: Date()),
-          class_table_json: data?.string(forKey: "class_table_json") ?? "{\"list\":[]}"
+          class_table_json: data?.string(forKey: "class_table_json") ?? "[]"
         )
         completion(entry)
     }
@@ -62,9 +62,9 @@ struct ClasstableWidgetEntryView : View {
         let decoder = JSONDecoder()
         do {
             classList = try decoder.decode(
-                ClasstableStruct.self,
+                [ClasstableStructItems].self,
                 from: Data(entry.class_table_json.utf8)
-            ).list
+            )
         } catch {
             // Hope never happens.
             print(error.localizedDescription)
@@ -86,13 +86,13 @@ struct ClasstableWidgetEntryView : View {
 
                 
                 if (widgetFamily == .systemSmall || widgetFamily == .systemMedium) {
-                    EventItem(classList[0])
+                    EventItem(classList[0], color: colors[0])
                     if (classList.count > 1) {
-                        EventItem(classList[1])
+                        EventItem(classList[1], color: colors[1])
                     }
                 } else {
                     ForEach(0..<classList.count, id: \.self) {
-                        i in EventItem(classList[i])
+                        i in EventItem(classList[i], color: colors[i % colors.count])
                     }
                 }
                 
@@ -152,10 +152,6 @@ struct ClasstableWidget: Widget {
 
 // Data struct
 
-struct ClasstableStruct : Codable {
-    var list : [ClasstableStructItems]
-}
-
 struct ClasstableStructItems : Codable {
     var name : String
     var teacher : String
@@ -167,17 +163,19 @@ struct ClasstableStructItems : Codable {
 // Event view
 
 struct EventItem: View {
-    var event:ClasstableStructItems;
+    var event : ClasstableStructItems;
+    var color : Color;
     
-    internal init(_ event: ClasstableStructItems) {
+    internal init(_ event: ClasstableStructItems, color: Color) {
         self.event = event
+        self.color = color
     }
     
     @Environment(\.colorScheme) private var colourScheme
     @Environment(\.widgetFamily) var widgetFamily
     
     var body: some View {
-        let eventColour = Color.blue
+        let eventColour = color
         HStack {
             RoundedRectangle(cornerRadius: 120).frame(width: 6).padding(.vertical, 6)
             VStack(alignment: .leading) {
@@ -197,7 +195,7 @@ struct EventItem: View {
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .trailing) {
                             Text(event.start_time)
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(.secondary)
@@ -235,3 +233,19 @@ struct EventItem_Previews: PreviewProvider {
     }
 }
 */
+
+// Colors
+var colors: [Color] = [
+    Color(.blue),
+    Color(.cyan),
+    Color(.teal),
+    Color(.green),
+    Color(.yellow),
+    Color(.orange),
+    Color(.red),
+    Color(.pink),
+    Color(.purple),
+    Color(.indigo),
+    Color(.brown),
+]
+
