@@ -1,17 +1,12 @@
 package io.github.benderblog.traintime_pda
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundIntent
-import es.antonborri.home_widget.HomeWidgetPlugin
 import es.antonborri.home_widget.HomeWidgetProvider
 
 private object ClassTableWidgetKeys {
@@ -49,6 +44,8 @@ class ClassTableWidgetProvider : HomeWidgetProvider() {
                 context.packageName,
                 R.layout.widget_class_table_layout
             ).apply {
+                /*
+                // Not for the moment...
                 setImageViewResource(
                     R.id.widget_classtable_switcher,
                     if (widgetData.getBoolean(ClassTableWidgetKeys.SWITCHER_NEXT, true)) {
@@ -64,13 +61,14 @@ class ClassTableWidgetProvider : HomeWidgetProvider() {
                         Uri.parse("widget://switcherClicked?widgetName=ClassTable")
                     )
                 )
+                 */
                 setTextViewText(
                     R.id.widget_classtable_date,
                     widgetData.getString(ClassTableWidgetKeys.DATE, "Date Loading...")
                 )
                 //load class items
                 val intent = Intent(context, ClassTableItemsService::class.java)
-                intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+                intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME));
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID)
                 intent.putExtra(
                     "json",

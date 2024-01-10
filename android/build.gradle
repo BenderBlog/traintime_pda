@@ -1,6 +1,9 @@
 buildscript {
     ext {
         agp_version = '7.0.4'
+        compileSdkVersion   = 31                // or latest
+        targetSdkVersion    = 31                // or latest
+        appCompatVersion    = "1.4.2"           // or latest
     }
     ext.kotlin_version = '1.8.21'
     repositories {
@@ -18,6 +21,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "${project(':background_fetch').projectDir}/libs"
+        }
     }
 }
 

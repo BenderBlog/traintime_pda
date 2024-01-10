@@ -129,24 +129,24 @@ struct ClasstableWidget: Widget {
 #Preview(as: .systemSmall) {
     ClasstableWidget()
 } timeline: {
-    // Ignore time problem when preview...
+
     SimpleEntry(
         date: Date.now,
-        class_table_date: Date().formatted(),
+        class_table_date: "2023-12-31",
         class_table_json:
             "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"},{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"}]}")
     SimpleEntry(
         date: Date.now,
-        class_table_date: Date().formatted(),
+        class_table_date: "2023-12-31",
         class_table_json:
             "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"}]}")
     SimpleEntry(
         date: Date.now,
-        class_table_date: Date().formatted(),
+        class_table_date: "2023-12-31",
         class_table_json: "{\"list\":[]}")
     SimpleEntry(
         date: Date.now,
-        class_table_date: Date().formatted(),
+        class_table_date: "2023-12-31",
         class_table_json: "{\"list\":[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:45\",\"end_time\":\"10:05\"},]}")
 }
 
@@ -222,7 +222,7 @@ struct EventItem: View {
         .clipShape(ContainerRelativeShape())
     }
 }
-
+/*
 struct EventItem_Previews: PreviewProvider {
     static var previews: some View {
         EventItem(ClasstableStructItems(
@@ -234,3 +234,4 @@ struct EventItem_Previews: PreviewProvider {
         )).previewContext(WidgetPreviewContext(family: .systemSmall)).containerBackground(.blue.gradient, for: .widget)
     }
 }
+*/
