@@ -42,7 +42,7 @@ Future<bool> updateClasstableInfo() async {
     for (var i in examList) {
       if (i.startTime.year == time.year &&
           i.startTime.month == time.month &&
-          i.startTime.date == 15) {
+          i.startTime.date == time.day) {
         toSend.add(HomeArrangement(
           name: i.subject,
           teacher: "Exam",
