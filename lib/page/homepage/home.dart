@@ -9,7 +9,8 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:watermeter/applet/widget_worker.dart';
+import 'package:watermeter/applet/update_classtable_info.dart';
+import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
@@ -74,9 +75,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       );
       // IMPORTANT:  You must signal completion of your task or the OS can punish your app
       // for taking too long in the background.
-      await updateClasstableInfo().then(
-        (value) => BackgroundFetch.finish(taskId),
-      );
+      await Future.wait([
+        updateClasstableInfo(),
+        updateSportInfo(),
+      ]);
     }, (String taskId) async {
       // <-- Task timeout handler.
       // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)

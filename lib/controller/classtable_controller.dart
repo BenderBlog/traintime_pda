@@ -3,7 +3,7 @@
 
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:watermeter/applet/widget_worker.dart';
+import 'package:watermeter/applet/update_classtable_info.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
