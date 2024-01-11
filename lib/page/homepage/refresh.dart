@@ -4,6 +4,7 @@
 // Refresh formula for homepage.
 
 import 'package:get/get.dart';
+import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
@@ -15,7 +16,6 @@ import 'package:watermeter/repository/xidian_ids/payment_session.dart'
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 //import 'package:watermeter/repository/experiment/experiment_session.dart';
-import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -103,7 +103,7 @@ Future<void> update({
     "Updating punch data",
     name: "Homepage Update",
   );
-  SportSession().getPunch();
+  updateSportInfo();
 
   // Update Library
   developer.log(
