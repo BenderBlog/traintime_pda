@@ -50,24 +50,36 @@ struct SimpleEntry: TimelineEntry {
 struct SportWidgetEntryView : View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var widgetFamily
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
         if (widgetFamily != .systemMedium) {
             ZStack {
                 ProgressView(value: (Double(entry.score) / 100.0))
                     .progressViewStyle(.circular)
-                    .tint(.purple)
+                    .tint(colorScheme == .dark ? .purple : .blue)
                 
-                if (entry.success == -1 && entry.score == -1) {
-                    Text("--")
-                } else if #available(iOS 16, *) {
-                    if (widgetFamily != .accessoryCircular) {
-                        VStack {
+                VStack {
+                    Image(systemName: "figure.run")
+                    
+                    if #available(iOS 16, *) {
+                        if (widgetFamily == .accessoryCircular) {
+                            Text(entry.success == -1 && entry.score == -1 ? "-- " : "\(entry.success)")
+                        } else {
+                            if (entry.success == -1 && entry.score == -1) {
+                                Text("--")
+                            } else {
+                                Text("\(entry.success) 次")
+                                Text("\(entry.score) 分")
+                            }
+                        }
+                    } else {
+                        if (entry.success == -1 && entry.score == -1) {
+                            Text("--")
+                        } else {
                             Text("\(entry.success) 次")
                             Text("\(entry.score) 分")
                         }
                     }
-                } else {
-                    Text("\(entry.success)")
                 }
             }
         } else {
@@ -75,28 +87,34 @@ struct SportWidgetEntryView : View {
                 ZStack {
                     ProgressView(value: (Double(entry.score) / 100.0))
                         .progressViewStyle(.circular)
-                        .tint(.purple)
-                    
-                    if (entry.success == -1 && entry.score == -1) {
-                        Text("--")
-                    } else if #available(iOS 16, *) {
-                        if (widgetFamily != .accessoryCircular) {
-                            VStack {
-                                Text("\(entry.success) 次")
-                                Text("\(entry.score) 分")
-                            }
+                        .tint(colorScheme == .dark ? .purple : .blue)
+                    VStack {
+                        Image(systemName: "figure.run")
+                        if (entry.success == -1 && entry.score == -1) {
+                            Text("--")
+                        } else {
+                            Text("\(entry.success) 次")
+                            Text("\(entry.score) 分")
                         }
-                    } else {
-                        Text("\(entry.success)")
                     }
                 }
                 Spacer()
                 if (entry.lastInfoTime != nil) {
                     VStack (alignment: .leading){
-                        Text("上次记录")
-                        Text("\(entry.lastInfoTime!)")
-                        Text("位置：\(entry.lastInfoPlace!)")
-                        Text("信息：\(entry.lastInfoDescription!)")
+                        Text("上次记录").font(.body)
+                        Divider().hidden()
+                        HStack {
+                            Image(systemName: "clock").font(.footnote)
+                            Text("\(entry.lastInfoTime!)").font(.footnote)
+                        }
+                        HStack {
+                            Image(systemName: "location").font(.footnote)
+                            Text("\(entry.lastInfoPlace!)").font(.footnote)
+                        }
+                        HStack {
+                            Image(systemName: "info.circle").font(.footnote)
+                            Text("\(entry.lastInfoDescription!)").font(.footnote)
+                        }
                     }.padding()
                 } else if (entry.success == -1 && entry.score == -1) {
                     Text("获取刷脸信息失败").padding()
