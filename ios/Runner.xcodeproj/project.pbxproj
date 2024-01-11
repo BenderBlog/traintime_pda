@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		266DEF222B4FB00700D8D01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA22B49B50B006B2B17 /* WidgetKit.framework */; };
+		266DEF232B4FB00700D8D01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA42B49B50B006B2B17 /* SwiftUI.framework */; };
+		266DEF262B4FB00700D8D01E /* SportWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266DEF252B4FB00700D8D01E /* SportWidgetBundle.swift */; };
+		266DEF282B4FB00700D8D01E /* SportWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266DEF272B4FB00700D8D01E /* SportWidget.swift */; };
+		266DEF2A2B4FB00800D8D01E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 266DEF292B4FB00800D8D01E /* Assets.xcassets */; };
+		266DEF2E2B4FB00800D8D01E /* SportWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 266DEF212B4FB00700D8D01E /* SportWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		26947A9B2B49B450006B2B17 /* ClasstableWidget in Resources */ = {isa = PBXBuildFile; fileRef = 26947A9A2B49B450006B2B17 /* ClasstableWidget */; };
 		26947AA32B49B50B006B2B17 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA22B49B50B006B2B17 /* WidgetKit.framework */; };
 		26947AA52B49B50B006B2B17 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA42B49B50B006B2B17 /* SwiftUI.framework */; };
@@ -26,6 +32,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		266DEF2C2B4FB00800D8D01E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 266DEF202B4FB00700D8D01E;
+			remoteInfo = SportWidgetExtension;
+		};
 		26947AAE2B49B50C006B2B17 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -50,6 +63,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				26947AB02B49B50C006B2B17 /* ClasstableWidgetExtension.appex in Embed Foundation Extensions */,
+				266DEF2E2B4FB00800D8D01E /* SportWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -69,6 +83,11 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		266DEF212B4FB00700D8D01E /* SportWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SportWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		266DEF252B4FB00700D8D01E /* SportWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportWidgetBundle.swift; sourceTree = "<group>"; };
+		266DEF272B4FB00700D8D01E /* SportWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportWidget.swift; sourceTree = "<group>"; };
+		266DEF292B4FB00800D8D01E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		266DEF2B2B4FB00800D8D01E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26947A9A2B49B450006B2B17 /* ClasstableWidget */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ClasstableWidget; sourceTree = "<group>"; };
 		26947AA12B49B50B006B2B17 /* ClasstableWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ClasstableWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		26947AA22B49B50B006B2B17 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -103,6 +122,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		266DEF1E2B4FB00700D8D01E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				266DEF232B4FB00700D8D01E /* SwiftUI.framework in Frameworks */,
+				266DEF222B4FB00700D8D01E /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26947A9E2B49B50B006B2B17 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -131,6 +159,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		266DEF242B4FB00700D8D01E /* SportWidget */ = {
+			isa = PBXGroup;
+			children = (
+				266DEF252B4FB00700D8D01E /* SportWidgetBundle.swift */,
+				266DEF272B4FB00700D8D01E /* SportWidget.swift */,
+				266DEF292B4FB00800D8D01E /* Assets.xcassets */,
+				266DEF2B2B4FB00800D8D01E /* Info.plist */,
+			);
+			path = SportWidget;
+			sourceTree = "<group>";
+		};
 		26947AA62B49B50B006B2B17 /* ClasstableWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -169,6 +208,7 @@
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				26947AA62B49B50B006B2B17 /* ClasstableWidget */,
+				266DEF242B4FB00700D8D01E /* SportWidget */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				C9C6CBC03B7F1A33197D45B4 /* Pods */,
@@ -182,6 +222,7 @@
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				26947AA12B49B50B006B2B17 /* ClasstableWidgetExtension.appex */,
+				266DEF212B4FB00700D8D01E /* SportWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -229,6 +270,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		266DEF202B4FB00700D8D01E /* SportWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 266DEF322B4FB00800D8D01E /* Build configuration list for PBXNativeTarget "SportWidgetExtension" */;
+			buildPhases = (
+				266DEF1D2B4FB00700D8D01E /* Sources */,
+				266DEF1E2B4FB00700D8D01E /* Frameworks */,
+				266DEF1F2B4FB00700D8D01E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SportWidgetExtension;
+			productName = SportWidgetExtension;
+			productReference = 266DEF212B4FB00700D8D01E /* SportWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		26947AA02B49B50B006B2B17 /* ClasstableWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 26947AB12B49B50C006B2B17 /* Build configuration list for PBXNativeTarget "ClasstableWidgetExtension" */;
@@ -283,6 +341,7 @@
 			);
 			dependencies = (
 				26947AAF2B49B50C006B2B17 /* PBXTargetDependency */,
+				266DEF2D2B4FB00800D8D01E /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -300,6 +359,9 @@
 				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					266DEF202B4FB00700D8D01E = {
+						CreatedOnToolsVersion = 15.0.1;
+					};
 					26947AA02B49B50B006B2B17 = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
@@ -329,11 +391,20 @@
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				26947AA02B49B50B006B2B17 /* ClasstableWidgetExtension */,
+				266DEF202B4FB00700D8D01E /* SportWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		266DEF1F2B4FB00700D8D01E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				266DEF2A2B4FB00800D8D01E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26947A9F2B49B50B006B2B17 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -459,6 +530,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		266DEF1D2B4FB00700D8D01E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				266DEF282B4FB00700D8D01E /* SportWidget.swift in Sources */,
+				266DEF262B4FB00700D8D01E /* SportWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26947A9D2B49B50B006B2B17 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -488,6 +568,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		266DEF2D2B4FB00800D8D01E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 266DEF202B4FB00700D8D01E /* SportWidgetExtension */;
+			targetProxy = 266DEF2C2B4FB00800D8D01E /* PBXContainerItemProxy */;
+		};
 		26947AAF2B49B50C006B2B17 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 26947AA02B49B50B006B2B17 /* ClasstableWidgetExtension */;
@@ -593,6 +678,120 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Profile;
+		};
+		266DEF2F2B4FB00800D8D01E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YXS6PA6787;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SportWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SportWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.SportWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		266DEF302B4FB00800D8D01E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YXS6PA6787;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SportWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SportWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.SportWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		266DEF312B4FB00800D8D01E /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YXS6PA6787;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SportWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SportWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.SportWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Profile;
 		};
@@ -932,6 +1131,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		266DEF322B4FB00800D8D01E /* Build configuration list for PBXNativeTarget "SportWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				266DEF2F2B4FB00800D8D01E /* Debug */,
+				266DEF302B4FB00800D8D01E /* Release */,
+				266DEF312B4FB00800D8D01E /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		26947AB12B49B50C006B2B17 /* Build configuration list for PBXNativeTarget "ClasstableWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

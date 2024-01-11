@@ -120,8 +120,8 @@ struct ClasstableWidget: Widget {
                     .background()
             }
         }
-        .configurationDisplayName("ClasstableWidget")
-        .description("Show the time arrangement info of today.")
+        .configurationDisplayName("课程表组件")
+        .description("展示今日课程信息")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
@@ -238,14 +238,14 @@ struct EventItem_Previews: PreviewProvider {
 var colors: [Color] = [
     Color(.blue),
     Color(.cyan),
-    Color(.teal),
+    //Color(.teal),
     Color(.green),
     Color(.yellow),
     Color(.orange),
     Color(.red),
-    Color(.pink),
+    //Color(.pink),
     Color(.purple),
-    Color(.indigo),
+    //Color(.indigo),
     Color(.brown),
 ]
 
