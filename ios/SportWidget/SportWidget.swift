@@ -59,10 +59,12 @@ struct SportWidgetEntryView : View {
                 
                 if (entry.success == -1 && entry.score == -1) {
                     Text("--")
-                } else if (widgetFamily != .accessoryCircular) {
-                    VStack {
-                        Text("\(entry.success) 次")
-                        Text("\(entry.score) 分")
+                } else if #available(iOS 16, *) {
+                    if (widgetFamily != .accessoryCircular) {
+                        VStack {
+                            Text("\(entry.success) 次")
+                            Text("\(entry.score) 分")
+                        }
                     }
                 } else {
                     Text("\(entry.success)")
@@ -77,10 +79,12 @@ struct SportWidgetEntryView : View {
                     
                     if (entry.success == -1 && entry.score == -1) {
                         Text("--")
-                    } else if (widgetFamily != .accessoryCircular) {
-                        VStack {
-                            Text("\(entry.success) 次")
-                            Text("\(entry.score) 分")
+                    } else if #available(iOS 16, *) {
+                        if (widgetFamily != .accessoryCircular) {
+                            VStack {
+                                Text("\(entry.success) 次")
+                                Text("\(entry.score) 分")
+                            }
                         }
                     } else {
                         Text("\(entry.success)")

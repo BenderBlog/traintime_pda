@@ -23,7 +23,7 @@ class AboutPage extends StatelessWidget {
             children: [
               Text(
                 "${Platform.isIOS || Platform.isMacOS ? "XDYou" : "Traintime PDA"} v${preference.packageInfo.version} \n"
-                "${Platform.isIOS || Platform.isMacOS ? "Saigyouji Yuyuko" : "Catch the Rainbow"} Edition",
+                "${Platform.isIOS || Platform.isMacOS ? "The Perfect Kiss" : "The Call of Ktulu"} Edition",
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 18),
               )

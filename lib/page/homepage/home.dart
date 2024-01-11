@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       await Future.wait([
         updateClasstableInfo(),
         updateSportInfo(),
-      ]);
+      ]).then((value) => BackgroundFetch.finish(taskId));
     }, (String taskId) async {
       // <-- Task timeout handler.
       // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
