@@ -8,13 +8,23 @@ class PunchData {
   String machineName;
   String weekNum;
   Jiffy time;
-  String state;
+  String stateStr;
+
+  String get state {
+    if (stateStr.contains("成功")) {
+      return stateStr.length == 4 ? stateStr : "成功：${stateStr.substring(18)}";
+    } else if (stateStr.contains("锻炼间隔需30分钟以上")) {
+      return stateStr.replaceAll("锻炼间隔需30分钟以上", "");
+    } else {
+      return stateStr;
+    }
+  }
 
   PunchData(
     this.machineName,
     this.weekNum,
     this.time,
-    this.state,
+    this.stateStr,
   );
 }
 

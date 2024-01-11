@@ -31,7 +31,7 @@ Future<bool> updateSportInfo() async {
     score = punchData.value.score.toInt();
     if (punchData.value.all.isNotEmpty) {
       PunchData toUse = punchData.value.all.last;
-      lastInfoTime = toUse.time.format(pattern: 'yyyy-MM-dd HH:mm');
+      lastInfoTime = toUse.time.format(pattern: 'yyyy-MM-dd HH:mm:ss');
       lastInfoPlace = toUse.machineName;
       lastInfoDescription = toUse.state;
     }

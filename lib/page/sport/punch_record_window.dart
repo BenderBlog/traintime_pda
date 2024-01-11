@@ -66,15 +66,27 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
               childBuilder: (context, physics) {
                 if (punchData.value.situation.isEmpty) {
                   if (punchData.value.all.isNotEmpty) {
-                    int count = 0;
                     List<RecordCard> toUse = [];
-                    for (var i in punchData.value.all) {
-                      if ((isValid && i.state.contains("恭喜你本次打卡成功")) ||
-                          !isValid) {
-                        toUse.insertAll(
-                            0, [RecordCard(mark: count + 1, toUse: i)]);
-                        count++;
-                      }
+                    if (isValid) {
+                      toUse.addAll(
+                        List<RecordCard>.generate(
+                          punchData.value.valid.length,
+                          (index) => RecordCard(
+                            mark: index + 1,
+                            toUse: punchData.value.all[index],
+                          ),
+                        ).reversed,
+                      );
+                    } else {
+                      toUse.addAll(
+                        List<RecordCard>.generate(
+                          punchData.value.all.length,
+                          (index) => RecordCard(
+                            mark: index + 1,
+                            toUse: punchData.value.all[index],
+                          ),
+                        ).reversed,
+                      );
                     }
                     return DataList<RecordCard>(
                       list: toUse,
@@ -120,7 +132,8 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "总次数: ${punchData.value.allTime}\n成功次数: ${punchData.value.validTime}",
+                "次数: ${punchData.value.validTime} / ${punchData.value.allTime}\n"
+                " 成绩 ${punchData.value.score}",
                 textScaler: const TextScaler.linear(1.2),
               ),
               FloatingActionButton.extended(
@@ -158,9 +171,7 @@ class RecordCard extends StatelessWidget {
     Color? background;
     bool isBold = false;
     if (toUse.state.contains("成功")) {
-      toShow = toUse.state.length == 4
-          ? toUse.state
-          : "成功：${toUse.state.substring(18)}";
+      toShow = toUse.state;
     } else if (toUse.state.contains("失败")) {
       toShow = "失败";
       background = Colors.red;
@@ -189,9 +200,7 @@ class RecordCard extends StatelessWidget {
           if (!toUse.state.contains("成功"))
             informationWithIcon(
               Icons.error_outline,
-              toUse.state.contains("锻炼间隔需30分钟以上")
-                  ? toUse.state.replaceAll("锻炼间隔需30分钟以上", "")
-                  : toUse.state,
+              toUse.state,
               context,
             ),
         ],
