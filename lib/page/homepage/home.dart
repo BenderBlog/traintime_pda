@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     int status = await BackgroundFetch.configure(
         BackgroundFetchConfig(
           minimumFetchInterval: 15,
-          stopOnTerminate: false,
+          stopOnTerminate: true,
           enableHeadless: true,
           requiresBatteryNotLow: false,
           requiresCharging: false,
