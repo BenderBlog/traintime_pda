@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        agp_version = '7.0.4'
+        agp_version = '7.4.2'
         compileSdkVersion   = 31                // or latest
         targetSdkVersion    = 31                // or latest
         appCompatVersion    = "1.4.2"           // or latest

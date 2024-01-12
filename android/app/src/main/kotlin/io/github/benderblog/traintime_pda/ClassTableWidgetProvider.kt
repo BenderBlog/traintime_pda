@@ -36,7 +36,7 @@ class ClassTableWidgetProvider : HomeWidgetProvider() {
         //when ClassTableItemsService loads data, the context is needed for SharePreference.
         widgetData.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
             if (ClassTableWidgetKeys.CLASS_TABLE_JSON == key) {
-                ClassTableItemsFactory.json = sharedPreferences.getString(key, "{\"list\":[]}")!!
+                ClassTableItemsFactory.json = sharedPreferences.getString(key, "[]")!!
             }
         }
         appWidgetIds.forEach { widgetID ->
@@ -72,7 +72,7 @@ class ClassTableWidgetProvider : HomeWidgetProvider() {
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID)
                 intent.putExtra(
                     "json",
-                    widgetData.getString(ClassTableWidgetKeys.CLASS_TABLE_JSON, "{\"list\":[]}")
+                    widgetData.getString(ClassTableWidgetKeys.CLASS_TABLE_JSON, "[]")
                 )
                 intent.putExtra("packageName", context.packageName)
                 setRemoteAdapter(R.id.widget_classtable_list, intent)

@@ -21,7 +21,7 @@ class ClassTableItemsFactory(private val packageName: String) :
         // However we need SharedPreference to act as data bridge between Native and Dart,
         // this json variable is used to store the latest data of class table.
         // Also see ClassTableWidgetProvider.onUpdate(...), in which the json is updated.
-        var json = "{\"list\":[]}"
+        var json = "[]"
             @Synchronized
             set(value) {
                 field = value
@@ -34,21 +34,7 @@ class ClassTableItemsFactory(private val packageName: String) :
 
     private fun reloadData() {
         try {
-            val jsonObject = JSONObject(ClassTableItemsFactory.json)
-            val classList = jsonObject.getJSONArray("list")
-            for (i in 0 until classList.length()) {
-                classList.getJSONObject(i).run {
-                    classItems.add(
-                        ClassItem(
-                            getString("name"),
-                            getString("teacher"),
-                            getString("place"),
-                            getString("start_time"),
-                            getString("end_time"),
-                        )
-                    )
-                }
-            }
+            val classItems = JSONObject(ClassTableItemsFactory.json)
         } catch (e: Exception) {
             e.printStackTrace()
         }
