@@ -88,9 +88,11 @@ class ClassDetail {
 class TimeArrangement {
   /// 课程索引（注：是 `ClassDetail` 的索引，不是 `TimeArrangement` 的索引）
   int index;
-  // 返回的是 0 和 1 组成的数组，0 代表这周没课程，1 代表这周有课
+
+  /// 返回的是布尔类型列表，true 表示该周有课，false 表示该周无课
+  /// 绕过 Swift 字符串不好处理的代价就是 json 要大很多了......
   @JsonKey(name: 'week_list')
-  String weekList; // 上课周次
+  List<bool> weekList; // 上课周次
   String? teacher; // 老师
   int day; // 星期几上课
   int start; // 上课开始
@@ -198,10 +200,10 @@ class ClassChange {
   final String className;
 
   /// 来自 SKZC 原周次信息，可能是空
-  final String? originalAffectedWeeks;
+  final List<bool>? originalAffectedWeeks;
 
   /// 来自 XSKZC 新周次信息，可能是空
-  final String? newAffectedWeeks;
+  final List<bool>? newAffectedWeeks;
 
   /// YSKJS 原先的老师
   final String? originalTeacherData;
@@ -244,13 +246,13 @@ class ClassChange {
     required this.newClassroom,
   });
 
+  /// 必须假设后台有问题，返回长度不一样的数组
+  /// 亏他们想得出来用 01 表示布尔信息，日子不是这么省的啊
   List<int> get originalAffectedWeeksList {
-    if (originalAffectedWeeks == null) {
-      return [];
-    }
+    if (originalAffectedWeeks == null) return [];
     List<int> toReturn = [];
     for (int i = 0; i < originalAffectedWeeks!.length; ++i) {
-      if (originalAffectedWeeks![i] == '1') toReturn.add(i);
+      if (originalAffectedWeeks![i]) toReturn.add(i);
     }
     return toReturn;
   }
@@ -258,7 +260,7 @@ class ClassChange {
   List<int> get newAffectedWeeksList {
     List<int> toReturn = [];
     for (int i = 0; i < (newAffectedWeeks?.length ?? 0); ++i) {
-      if (newAffectedWeeks![i] == '1') toReturn.add(i);
+      if (newAffectedWeeks![i]) toReturn.add(i);
     }
     return toReturn;
   }
@@ -295,7 +297,7 @@ class ClassChange {
     return !listEquals(originalTeacherCode, newTeacherCode);
   }
 
-  String get chagneTypeString {
+  String get changeTypeString {
     switch (type) {
       case ChangeType.change:
         return "调课";

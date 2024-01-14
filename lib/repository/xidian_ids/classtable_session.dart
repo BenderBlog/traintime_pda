@@ -43,7 +43,10 @@ class ClassTableFile extends EhallSession {
           teacher: i["SKJS"],
           stop: int.parse(i["JSJC"]),
           day: int.parse(i["SKXQ"]),
-          weekList: i["SKZC"].toString(),
+          weekList: List<bool>.generate(
+            i["SKZC"].toString().length,
+            (index) => i["SKZC"].toString()[index] == "1",
+          ),
           classroom: i["JASMC"],
         ),
       );
@@ -229,8 +232,18 @@ class ClassTableFile extends EhallSession {
             classCode: i["KCH"],
             classNumber: i["KXH"],
             className: i["KCM"],
-            originalAffectedWeeks: i["SKZC"],
-            newAffectedWeeks: i["XSKZC"],
+            originalAffectedWeeks: i["SKZC"] == null
+                ? null
+                : List<bool>.generate(
+                    i["SKZC"].toString().length,
+                    (index) => i["SKZC"].toString()[index] == "1",
+                  ),
+            newAffectedWeeks: i["XSKZC"] == null
+                ? null
+                : List<bool>.generate(
+                    i["XSKZC"].toString().length,
+                    (index) => i["XSKZC"].toString()[index] == "1",
+                  ),
             originalTeacherData: i["YSKJS"],
             newTeacherData: i["XSKJS"],
             originalClassRange: [
@@ -312,21 +325,18 @@ class ClassTableFile extends EhallSession {
           );
           for (int i in e.originalAffectedWeeksList) {
             developer.log(
-              "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i] == '1'}",
+              "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
               name: "Ehall getClasstable",
             );
-            if (preliminaryData.timeArrangement[indexOriginalTimeArrangement]
-                    .weekList[i] ==
-                '1') {
-              preliminaryData
-                      .timeArrangement[indexOriginalTimeArrangement].weekList =
-                  preliminaryData
-                      .timeArrangement[indexOriginalTimeArrangement].weekList
-                      .replaceRange(i, i + 1, '0');
+            if (preliminaryData
+                .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
+              preliminaryData.timeArrangement[indexOriginalTimeArrangement]
+                  .weekList[i] = false;
               timeArrangementIndex = preliminaryData
                   .timeArrangement[indexOriginalTimeArrangement].index;
             }
           }
+
           developer.log(
             "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}. ",
             name: "Ehall getClasstable",
@@ -385,17 +395,13 @@ class ClassTableFile extends EhallSession {
           );
           for (int i in e.originalAffectedWeeksList) {
             developer.log(
-              "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i] == '1'}",
+              "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
               name: "Ehall getClasstable",
             );
-            if (preliminaryData.timeArrangement[indexOriginalTimeArrangement]
-                    .weekList[i] ==
-                '1') {
-              preliminaryData
-                      .timeArrangement[indexOriginalTimeArrangement].weekList =
-                  preliminaryData
-                      .timeArrangement[indexOriginalTimeArrangement].weekList
-                      .replaceRange(i, i + 1, '0');
+            if (preliminaryData
+                .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
+              preliminaryData.timeArrangement[indexOriginalTimeArrangement]
+                  .weekList[i] = false;
             }
           }
           developer.log(
@@ -463,7 +469,8 @@ class ClassTableFile extends EhallSession {
         toUse.userDefinedDetail = userClass.$1.userDefinedDetail;
         toUse.timeArrangement.addAll(userClass.$1.timeArrangement);
         return toUse;
-      } catch (e) {
+      } catch (e, s) {
+        developer.log(e.toString() + s.toString(), name: "Ehall getClasstable");
         if (isExist) {
           return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
         } else {

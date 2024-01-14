@@ -305,7 +305,7 @@ class ClassTableController extends GetxController {
             if (i.weekList.length < week + 1) {
               continue;
             }
-            if (i.weekList[week] == "1" && i.day == day + 1) {
+            if (i.weekList[week] && i.day == day + 1) {
               thisDay.add(i);
             }
           }
@@ -335,6 +335,10 @@ class ClassTableController extends GetxController {
       update();
     } catch (e, s) {
       error = e.toString() + s.toString();
+      developer.log(
+        error ?? "Unknown error",
+        name: "ClasstableController updateClassTable",
+      );
       rethrow;
     }
   }

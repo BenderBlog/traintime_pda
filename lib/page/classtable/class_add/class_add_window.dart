@@ -95,10 +95,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                           classroom: classRoomController.text.isNotEmpty
                               ? classRoomController.text
                               : null,
-                          weekList: String.fromCharCodes(List.generate(
-                            chosenWeek.length,
-                            (index) => chosenWeek[index] ? 1 + 48 : 0 + 48,
-                          )),
+                          weekList: chosenWeek,
                           day: week,
                           start: start,
                           stop: stop,

@@ -68,7 +68,7 @@ class ClassTableState extends InheritedWidget {
       String description =
           "DESCRIPTION:课程名称：${classDetail[i.index].name}; 上课地点：${i.classroom ?? "待定"}\n";
       for (int j = 0; j < i.weekList.length; ++j) {
-        if (i.weekList[j] == '0') {
+        if (!i.weekList[j]) {
           continue;
         }
         Jiffy day =

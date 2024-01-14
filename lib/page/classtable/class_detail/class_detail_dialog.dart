@@ -24,7 +24,7 @@ class ClassDetailDialog extends StatelessWidget {
   /// time arrangement occurs in this week.
   Widget weekDoc({required int index}) {
     bool isOccupied = true;
-    if (timeArrangement.weekList[index] == "0") {
+    if (!timeArrangement.weekList[index]) {
       isOccupied = false;
     }
     return ClipOval(

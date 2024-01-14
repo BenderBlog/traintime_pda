@@ -37,7 +37,7 @@ Future<bool> updateClasstableInfo() async {
       "Exam can be updated.",
       name: "WidgetWorker updateClasstableInfo",
     );
-    var examList = examController.data.subject;
+    var examList = examController.isNotFinished;
     for (var i in examList) {
       if (i.startTime.year == time.year &&
           i.startTime.month == time.month &&

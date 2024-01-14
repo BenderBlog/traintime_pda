@@ -41,7 +41,8 @@ TimeArrangement _$TimeArrangementFromJson(Map<String, dynamic> json) =>
     TimeArrangement(
       source: $enumDecode(_$SourceEnumMap, json['source']),
       index: json['index'] as int,
-      weekList: json['week_list'] as String,
+      weekList:
+          (json['week_list'] as List<dynamic>).map((e) => e as bool).toList(),
       classroom: json['classroom'] as String?,
       teacher: json['teacher'] as String?,
       day: json['day'] as int,
@@ -120,8 +121,12 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       classCode: json['classCode'] as String,
       classNumber: json['classNumber'] as String,
       className: json['className'] as String,
-      originalAffectedWeeks: json['originalAffectedWeeks'] as String?,
-      newAffectedWeeks: json['newAffectedWeeks'] as String?,
+      originalAffectedWeeks: (json['originalAffectedWeeks'] as List<dynamic>?)
+          ?.map((e) => e as bool)
+          .toList(),
+      newAffectedWeeks: (json['newAffectedWeeks'] as List<dynamic>?)
+          ?.map((e) => e as bool)
+          .toList(),
       originalTeacherData: json['originalTeacherData'] as String?,
       newTeacherData: json['newTeacherData'] as String?,
       originalClassRange: (json['originalClassRange'] as List<dynamic>)
