@@ -11,20 +11,24 @@ import 'package:watermeter/model/home_arrangement.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart'
-    as classtable_module;
 
 Future<bool> updateClasstableInfo() async {
   /// TODO: Add exception dealt...
-  Set<HomeArrangement> toSend = {};
   developer.log(
     "Ready to update to homepage...",
     name: "WidgetWorker updateClasstableInfo",
   );
   var classTableController = Get.put(ClassTableController());
-  var nextClass = classTableController.nextClassArrangements;
-  var current = classTableController.currentData;
-  DateTime time = DateTime.now().add(Duration(days: nextClass.$2 ? 1 : 0));
+
+  developer.log(
+    "Updating class info.",
+    name: "WidgetWorker updateClasstableInfo",
+  );
+
+  var data = classTableController.homeArrangementData;
+  List<HomeArrangement> todayData = [...data.$1];
+  List<HomeArrangement> tomorrowData = [...data.$2];
+  DateTime time = classTableController.updateTime;
 
   developer.log(
     "Updating exam info.",
@@ -42,59 +46,40 @@ Future<bool> updateClasstableInfo() async {
       if (i.startTime.year == time.year &&
           i.startTime.month == time.month &&
           i.startTime.date == time.day) {
-        toSend.add(HomeArrangement(
+        todayData.add(HomeArrangement(
           name: i.subject,
           teacher: "Exam",
           place: "${i.place} ${i.seat}",
-          startTime: i.startTime.Hm,
-          endTime: i.stopTime.Hm,
+          startTimeStr: Jiffy.parseFromDateTime(i.startTime.dateTime)
+              .format(pattern: HomeArrangement.format),
+          endTimeStr: Jiffy.parseFromDateTime(i.stopTime.dateTime)
+              .format(pattern: HomeArrangement.format),
+        ));
+      } else if (i.startTime.year == time.year &&
+          i.startTime.month == time.month &&
+          i.startTime.date == time.day + 1) {
+        tomorrowData.add(HomeArrangement(
+          name: i.subject,
+          teacher: "Exam",
+          place: "${i.place} ${i.seat}",
+          startTimeStr: Jiffy.parseFromDateTime(i.startTime.dateTime)
+              .format(pattern: HomeArrangement.format),
+          endTimeStr: Jiffy.parseFromDateTime(i.stopTime.dateTime)
+              .format(pattern: HomeArrangement.format),
         ));
       }
     }
   }
 
-  developer.log(
-    "Updating current class info.",
-    name: "WidgetWorker updateClasstableInfo",
-  );
-  if (current != null) {
-    toSend.add(HomeArrangement(
-      name: current.$1.name,
-      teacher: current.$2.teacher ?? "未知老师",
-      place: current.$2.classroom ?? "未知教室",
-      startTime: classtable_module.time[(current.$2.start - 1) * 2],
-      endTime: classtable_module.time[(current.$2.stop - 1) * 2],
-    ));
-  }
+  await saveToWidget('class_table_date',
+      Jiffy.parseFromDateTime(time).format(pattern: HomeArrangement.format));
 
-  developer.log(
-    "Updating next class info.",
-    name: "WidgetWorker updateClasstableInfo",
-  );
-  for (var i in nextClass.$1) {
-    var toUse = classTableController.classTableData.timeArrangement[i];
-    toSend.add(HomeArrangement(
-      name: classTableController.classTableData.getClassDetail(i).name,
-      teacher: toUse.teacher ?? "未知老师",
-      place: toUse.classroom ?? "未知教室",
-      startTime: classtable_module.time[(toUse.start - 1) * 2],
-      endTime: classtable_module.time[(toUse.stop - 1) * 2],
-    ));
-  }
-
-  await saveToWidget(
-    'class_table_date',
-    Jiffy.parseFromDateTime(time).format(pattern: 'yyyy-MM-dd'),
-  );
-
-  List<HomeArrangement> toSendList = toSend.toList();
-  toSendList.sort(
-    (a, b) => a.startTimeByMinutesOfDay - b.startTimeByMinutesOfDay,
-  );
-  await saveToWidget(
-    'class_table_json',
-    jsonEncode(toSendList),
-  );
+  todayData.sort((a, b) =>
+      a.startTime.microsecondsSinceEpoch - b.startTime.microsecondsSinceEpoch);
+  tomorrowData.sort((a, b) =>
+      a.startTime.microsecondsSinceEpoch - b.startTime.microsecondsSinceEpoch);
+  await saveToWidget('today_data', jsonEncode(todayData));
+  await saveToWidget('tomorrow_data', jsonEncode(tomorrowData));
 
   var toReturn = await HomeWidget.updateWidget(
     name: 'ClassTableWidgetProvider',

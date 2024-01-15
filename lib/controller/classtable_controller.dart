@@ -4,6 +4,7 @@
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
+import 'package:watermeter/model/home_arrangement.dart';
 import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -234,6 +235,76 @@ class ClassTableController extends GetxController {
 
       return (classArrangementIndices.toList(), isTomorrow);
     }
+  }
+
+  /// Homearrangement get today's data...
+  (List<HomeArrangement>, List<HomeArrangement>) get homeArrangementData {
+    Set<HomeArrangement> todayData = {};
+    Set<HomeArrangement> tomorrowData = {};
+    int currentWeekIndex = currentWeek;
+    int currentDayIndex = updateTime.weekday;
+    if (currentWeekIndex >= 0 &&
+        currentWeekIndex < classTableData.semesterLength) {
+      for (var i in classTableData.timeArrangement) {
+        if (i.weekList.length > currentWeekIndex &&
+            i.weekList[currentWeekIndex] &&
+            i.day == currentDayIndex) {
+          todayData.add(HomeArrangement(
+            name: getClassDetail(i.index).name,
+            teacher: i.teacher ?? "未知",
+            place: i.classroom ?? "未知",
+            startTimeStr: Jiffy.parseFromDateTime(DateTime(
+              updateTime.year,
+              updateTime.month,
+              updateTime.day,
+              int.parse(time[(i.start - 1) * 2].split(':')[0]),
+              int.parse(time[(i.start - 1) * 2].split(':')[1]),
+            )).format(pattern: HomeArrangement.format),
+            endTimeStr: Jiffy.parseFromDateTime(DateTime(
+              updateTime.year,
+              updateTime.month,
+              updateTime.day,
+              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
+              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
+            )).format(pattern: HomeArrangement.format),
+          ));
+        }
+      }
+    }
+    currentDayIndex += 1;
+    if (currentDayIndex > 7) {
+      currentDayIndex = 1;
+      currentWeekIndex += 1;
+    }
+    if (currentWeekIndex >= 0 &&
+        currentWeekIndex < classTableData.semesterLength) {
+      for (var i in classTableData.timeArrangement) {
+        if (i.weekList.length > currentWeekIndex &&
+            i.weekList[currentWeekIndex] &&
+            i.day == currentDayIndex) {
+          tomorrowData.add(HomeArrangement(
+            name: getClassDetail(i.index).name,
+            teacher: i.teacher ?? "未知",
+            place: i.classroom ?? "未知",
+            startTimeStr: Jiffy.parseFromDateTime(DateTime(
+              updateTime.year,
+              updateTime.month,
+              updateTime.day,
+              int.parse(time[(i.start - 1) * 2].split(':')[0]),
+              int.parse(time[(i.start - 1) * 2].split(':')[1]),
+            )).format(pattern: HomeArrangement.format),
+            endTimeStr: Jiffy.parseFromDateTime(DateTime(
+              updateTime.year,
+              updateTime.month,
+              updateTime.day,
+              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
+              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
+            )).format(pattern: HomeArrangement.format),
+          ));
+        }
+      }
+    }
+    return (todayData.toList(), tomorrowData.toList());
   }
 
   bool get isNotVacation =>

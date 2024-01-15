@@ -14,13 +14,14 @@
 		266DEF282B4FB00700D8D01E /* SportWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266DEF272B4FB00700D8D01E /* SportWidget.swift */; };
 		266DEF2A2B4FB00800D8D01E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 266DEF292B4FB00800D8D01E /* Assets.xcassets */; };
 		266DEF2E2B4FB00800D8D01E /* SportWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 266DEF212B4FB00700D8D01E /* SportWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		26947A9B2B49B450006B2B17 /* ClasstableWidget in Resources */ = {isa = PBXBuildFile; fileRef = 26947A9A2B49B450006B2B17 /* ClasstableWidget */; };
 		26947AA32B49B50B006B2B17 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA22B49B50B006B2B17 /* WidgetKit.framework */; };
 		26947AA52B49B50B006B2B17 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA42B49B50B006B2B17 /* SwiftUI.framework */; };
 		26947AA82B49B50B006B2B17 /* ClasstableWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26947AA72B49B50B006B2B17 /* ClasstableWidgetBundle.swift */; };
 		26947AAA2B49B50B006B2B17 /* ClasstableWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26947AA92B49B50B006B2B17 /* ClasstableWidget.swift */; };
 		26947AAC2B49B50C006B2B17 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26947AAB2B49B50C006B2B17 /* Assets.xcassets */; };
 		26947AB02B49B50C006B2B17 /* ClasstableWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 26947AA12B49B50B006B2B17 /* ClasstableWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A462B526A0C007E67CB /* ClasstableModel.swift */; };
+		26CC2A492B541A9A007E67CB /* EventItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A482B541A9A007E67CB /* EventItem.swift */; };
 		2975AC8C714C909F92B48DAE /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D23921CB5F98DE0F747EF1E /* Pods_Runner.framework */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -89,7 +90,6 @@
 		266DEF292B4FB00800D8D01E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		266DEF2B2B4FB00800D8D01E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		266DEF332B4FD14600D8D01E /* SportWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SportWidgetExtension.entitlements; sourceTree = "<group>"; };
-		26947A9A2B49B450006B2B17 /* ClasstableWidget */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ClasstableWidget; sourceTree = "<group>"; };
 		26947AA12B49B50B006B2B17 /* ClasstableWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ClasstableWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		26947AA22B49B50B006B2B17 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		26947AA42B49B50B006B2B17 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -99,6 +99,8 @@
 		26947AAD2B49B50C006B2B17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26947AB62B4AF161006B2B17 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		26B4A9C82B4C05D0003F5F24 /* ClasstableWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClasstableWidgetExtension.entitlements; sourceTree = "<group>"; };
+		26CC2A462B526A0C007E67CB /* ClasstableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClasstableModel.swift; sourceTree = "<group>"; };
+		26CC2A482B541A9A007E67CB /* EventItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventItem.swift; sourceTree = "<group>"; };
 		2D23921CB5F98DE0F747EF1E /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -178,6 +180,8 @@
 				26947AA92B49B50B006B2B17 /* ClasstableWidget.swift */,
 				26947AAB2B49B50C006B2B17 /* Assets.xcassets */,
 				26947AAD2B49B50C006B2B17 /* Info.plist */,
+				26CC2A462B526A0C007E67CB /* ClasstableModel.swift */,
+				26CC2A482B541A9A007E67CB /* EventItem.swift */,
 			);
 			path = ClasstableWidget;
 			sourceTree = "<group>";
@@ -206,7 +210,6 @@
 			children = (
 				266DEF332B4FD14600D8D01E /* SportWidgetExtension.entitlements */,
 				26B4A9C82B4C05D0003F5F24 /* ClasstableWidgetExtension.entitlements */,
-				26947A9A2B49B450006B2B17 /* ClasstableWidget */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				26947AA62B49B50B006B2B17 /* ClasstableWidget */,
@@ -429,7 +432,6 @@
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
-				26947A9B2B49B450006B2B17 /* ClasstableWidget in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -545,8 +547,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */,
 				26947AA82B49B50B006B2B17 /* ClasstableWidgetBundle.swift in Sources */,
 				26947AAA2B49B50B006B2B17 /* ClasstableWidget.swift in Sources */,
+				26CC2A492B541A9A007E67CB /* EventItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

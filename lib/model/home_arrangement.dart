@@ -6,26 +6,26 @@ import 'package:json_annotation/json_annotation.dart';
 part 'home_arrangement.g.dart';
 
 /// This is for the main page applet.
+/// [startTime] and [endTime] must be stored with the following format
+// 'yyyy-MM-dd HH:mm:ss'
 @JsonSerializable(explicitToJson: true)
 class HomeArrangement {
+  static const format = 'yyyy-MM-dd HH:mm:ss';
+
   String name;
   String teacher;
   String place;
   @JsonKey(name: 'start_time')
-  String startTime;
+  String startTimeStr;
   @JsonKey(name: 'end_time')
-  String endTime;
+  String endTimeStr;
 
   @override
-  int get hashCode => "$name $teacher $place $startTime $endTime".hashCode;
+  int get hashCode =>
+      "$name $teacher $place $startTimeStr $endTimeStr".hashCode;
 
-  int get startTimeByMinutesOfDay {
-    var data = RegExp(
-      r'^(?<hour>\d+):(?<minute>\d+)',
-    ).allMatches(startTime).toList();
-    return int.parse(data[0].namedGroup('hour')!) * 60 +
-        int.parse(data[0].namedGroup('minute')!);
-  }
+  DateTime get startTime => DateTime.parse(startTimeStr);
+  DateTime get endTime => DateTime.parse(endTimeStr);
 
   @override
   bool operator ==(Object other) =>
@@ -40,8 +40,8 @@ class HomeArrangement {
     required this.name,
     String? teacher,
     String? place,
-    required this.startTime,
-    required this.endTime,
+    required this.startTimeStr,
+    required this.endTimeStr,
   })  : teacher = teacher ?? "未安排老师",
         place = place ?? "未找到地点";
 

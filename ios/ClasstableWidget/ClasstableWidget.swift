@@ -10,96 +10,155 @@ import WidgetKit
 import SwiftUI
 
 private let widgetGroupId = "group.xdyou"
+private let format = "yyyy-MM-dd HH:mm:ss"
+private let myDateFormatter = DateFormatter()
 
 struct Provider: TimelineProvider {
-    let myDateFormatter = DateFormatter()
     
     func placeholder(in context: Context) -> SimpleEntry {
-        myDateFormatter.dateFormat = "yyyy-MM-dd"
         return SimpleEntry(
             date: Date(),
-            class_table_date: myDateFormatter.string(from: Date()),
-            class_table_json: "[]"
+            currentArrangement: [],
+            tomorrowArrangement: []
         )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        myDateFormatter.dateFormat = "yyyy-MM-dd"
-
-        let data = UserDefaults.init(suiteName: widgetGroupId)
-        let entry = SimpleEntry(
-          date: Date(), 
-          class_table_date: data?.string(forKey: "class_table_date") ?? myDateFormatter.string(from: Date()),
-          class_table_json: data?.string(forKey: "class_table_json") ?? "[]"
-        )
-        completion(entry)
+        print("getSnapshot")
+        getTimeline(in: context, completion: { (timeLine) in
+            completion(timeLine.entries.first!)
+        })
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        getSnapshot(in: context) { (entry) in
-          let timeline = Timeline(entries: [entry], policy: .atEnd)
-          completion(timeline)
+        print("gettingTimeline")
+        let data = UserDefaults.init(suiteName: widgetGroupId)
+        var todayArr : [TimeLineStructItems] = []
+        var tomorrowArr : [TimeLineStructItems] = []
+        do {
+            let decoder = JSONDecoder()
+            todayArr.append(
+                contentsOf: try decoder.decode(
+                    [TimeLineStructItems].self,
+                    from: Data(data?.string(forKey: "today_data")?.utf8 ?? "[]".utf8)
+                )
+            )
+            tomorrowArr.append(
+                contentsOf: try decoder.decode(
+                    [TimeLineStructItems].self,
+                    from: Data(data?.string(forKey: "tomorrow_data")?.utf8 ?? "[]".utf8)
+                )
+            )
+        } catch {
+            print(error.localizedDescription)
         }
+
+        var entryDates : Set<Date?> = []
+        var entries: [SimpleEntry] = []
+        for todayItem in todayArr {
+            entryDates.insert(todayItem.startTime)
+            entryDates.insert(todayItem.endTime)
+        }
+        for entryDate in entryDates {
+            if (entryDate == nil) {
+                continue
+            }
+            var toShow : [TimeLineStructItems] = []
+            for arr in todayArr {
+                if (arr.endTime == nil){
+                    continue
+                }
+                if arr.endTime! > entryDate! {
+                    toShow.append(arr)
+                }
+            }
+            entries.append(SimpleEntry(
+                date: entryDate!,
+                currentArrangement: toShow,
+                tomorrowArrangement: tomorrowArr
+            ))
+            print("\(entries)")
+        }
+        if entries.isEmpty {
+            entries.append(SimpleEntry(
+                date: Date(),
+                currentArrangement: [],
+                tomorrowArrangement: []
+            ))
+        }
+        print("Updating timeline")
+        let timeline = Timeline(entries: entries, policy: .atEnd)
+        completion(timeline)
     }
 }
 
 struct SimpleEntry: TimelineEntry {
     var date: Date
-    
-    let class_table_date: String
-    let class_table_json: String
+    let currentArrangement : [TimeLineStructItems]
+    let tomorrowArrangement : [TimeLineStructItems]
 }
+
+// Data struct
+struct TimeLineStructItems : Codable {
+    var name : String
+    var teacher : String
+    var place : String
+    var start_time : String
+    var end_time : String
+    
+    var startTime : Date? {
+        get {
+            myDateFormatter.dateFormat = format
+            return myDateFormatter.date(from: start_time)
+        }
+    }
+    
+    var endTime : Date? {
+        get {
+            myDateFormatter.dateFormat = format
+            return myDateFormatter.date(from: end_time)
+        }
+    }
+}
+
+
 
 struct ClasstableWidgetEntryView : View {
     var entry: Provider.Entry
-    let data = UserDefaults.init(suiteName: widgetGroupId)
-    let classList:[ClasstableStructItems]
-    
     @Environment(\.widgetFamily) var widgetFamily
     
     init(entry: Provider.Entry) {
         self.entry = entry
-        let decoder = JSONDecoder()
-        do {
-            classList = try decoder.decode(
-                [ClasstableStructItems].self,
-                from: Data(entry.class_table_json.utf8)
-            )
-        } catch {
-            // Hope never happens.
-            print(error.localizedDescription)
-            classList = []
-        }
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            if (!classList.isEmpty) {
+        return VStack(alignment: .leading) {
+            if (!entry.currentArrangement.isEmpty) {
                 // TODO: redesign title text
                 HStack {
-                    Text("\(entry.class_table_date)日程").font(.system(size: 14))
-                    Spacer()
+                    Text("日程信息").font(.system(size: 14))
                     if (widgetFamily != .systemSmall) {
-                        Text("还剩\(classList.count)项").font(.system(size: 14))
+                        Spacer()
+                        Text("还剩\(entry.currentArrangement.count)项").font(.system(size: 14))
                     }
                 }
 
                 
                 if (widgetFamily == .systemSmall || widgetFamily == .systemMedium) {
-                    EventItem(classList[0], color: colors[0])
-                    if (classList.count > 1) {
-                        EventItem(classList[1], color: colors[1])
+                    EventItem(entry.currentArrangement[0], color: colors[0])
+                    if (entry.currentArrangement.count > 1) {
+                        EventItem(entry.currentArrangement[1], color: colors[1])
                     }
                 } else {
-                    ForEach(0..<classList.count, id: \.self) {
-                        i in EventItem(classList[i], color: colors[i % colors.count])
+                    ForEach(0..<entry.currentArrangement.count, id: \.self) {
+                        i in EventItem(entry.currentArrangement[i], color: colors[i % colors.count])
                     }
                 }
                 
                 Spacer()
             } else {
-                Text("\(entry.class_table_date) 日程").font(.system(size: 14))
-                Text("目前没有安排了")
+                Text("今日日程").font(.system(size: 14))
+                Text("目前没有安排了\n明日有\(entry.tomorrowArrangement.count)项日程")
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
         }
@@ -126,11 +185,11 @@ struct ClasstableWidget: Widget {
     }
 }
 
+/*
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
 #Preview(as: .systemSmall) {
     ClasstableWidget()
 } timeline: {
-
     SimpleEntry(
         date: Date.now,
         class_table_date: "2023-12-31",
@@ -149,91 +208,10 @@ struct ClasstableWidget: Widget {
         date: Date.now,
         class_table_date: "2023-12-31",
         class_table_json: "[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:45\",\"end_time\":\"10:05\"},]")
-}
 
-// Data struct
+}*/
 
-struct ClasstableStructItems : Codable {
-    var name : String
-    var teacher : String
-    var place : String
-    var start_time : String
-    var end_time : String
-}
 
-// Event view
-
-struct EventItem: View {
-    var event : ClasstableStructItems;
-    var color : Color;
-    
-    internal init(_ event: ClasstableStructItems, color: Color) {
-        self.event = event
-        self.color = color
-    }
-    
-    @Environment(\.colorScheme) private var colourScheme
-    @Environment(\.widgetFamily) var widgetFamily
-    
-    var body: some View {
-        let eventColour = color
-        HStack {
-            RoundedRectangle(cornerRadius: 120).frame(width: 6).padding(.vertical, 6)
-            VStack(alignment: .leading) {
-                if (widgetFamily == .systemSmall) {
-                    Text(event.name)
-                        .font(.subheadline.weight(.medium))
-                    Text("\(event.start_time) \(event.place)")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                } else {
-                    HStack(alignment: .firstTextBaseline) {
-                        VStack(alignment: .leading) {
-                            Text(event.name)
-                                .font(.subheadline.weight(.medium))
-                            Text("\(event.teacher) \(event.place)")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        VStack(alignment: .trailing) {
-                            Text(event.start_time)
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                            Text(event.end_time)
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
-            .padding(.vertical, 6)
-            Spacer(minLength: .zero)
-        }
-        .foregroundColor(eventColour)
-        .blendMode(colourScheme == .light ? .plusDarker : .plusLighter)
-        .padding(.horizontal, 8)
-        .background {
-            eventColour.opacity(0.125)
-                .blendMode(colourScheme == .light ? .normal : .hardLight)
-        }
-        .frame(maxHeight: 42)
-        .clipShape(ContainerRelativeShape())
-    }
-}
-/*
-struct EventItem_Previews: PreviewProvider {
-    static var previews: some View {
-        EventItem(ClasstableStructItems(
-            name: "形势与政策",
-            teacher: "哲学dark师",
-            place: "C-666",
-            start_time: "11:45",
-            end_time: "19:19"
-        )).previewContext(WidgetPreviewContext(family: .systemSmall)).containerBackground(.blue.gradient, for: .widget)
-    }
-}
-*/
 
 // Colors
 var colors: [Color] = [
