@@ -6,7 +6,7 @@
 
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -23,9 +23,8 @@ class ClassTableFile extends EhallSession {
     toReturn.semesterCode = qResult["semesterCode"];
     toReturn.termStartDay = qResult["termStartDay"];
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "simplifyData",
+    log.i(
+      "[getClasstable][simplifyData] "
       "${toReturn.semesterCode} ${toReturn.termStartDay}",
     );
 
@@ -74,9 +73,8 @@ class ClassTableFile extends EhallSession {
   (UserDefinedClassData, File) getUserDefinedData() {
     var file = File("${supportPath.path}/$userDefinedClassName");
     bool isExist = file.existsSync();
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getUserDefinedData",
+    log.i(
+      "[getClasstable][getUserDefinedData] "
       "File exist: $isExist.",
     );
 
@@ -118,24 +116,13 @@ class ClassTableFile extends EhallSession {
 
   Future<ClassTableData> getFromWeb() async {
     Map<String, dynamic> qResult = {};
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
-      "Login the system.",
-    );
+    log.i("[getClasstable][getFromWeb] Login the system.");
     String get = await useApp("4770397878132218");
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
-      get,
-    );
-    await dioEhall.post(
-      get,
-    );
+    log.i("[getClasstable][getFromWeb] Location: $get");
+    await dioEhall.post(get);
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
+    log.i(
+      "[getClasstable][getFromWeb] "
       "Fetch the semester information.",
     );
     String semesterCode = await dioEhall
@@ -151,9 +138,8 @@ class ClassTableFile extends EhallSession {
       );
     }
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
+    log.i(
+      "[getClasstable][getFromWeb] "
       "Fetch the day the semester begin.",
     );
     String termStartDay = await dioEhall.post(
@@ -174,9 +160,8 @@ class ClassTableFile extends EhallSession {
       var userClassFile = File("${supportPath.path}/$userDefinedClassName");
       if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
+    log.i(
+      "[getClasstable][getFromWeb] "
       "Will get $semesterCode which start at $termStartDay.",
     );
 
@@ -188,16 +173,15 @@ class ClassTableFile extends EhallSession {
       },
     ).then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
-      FlutterLogs.logWarn(
-        "PDA getClasstable",
-        "getFromWeb",
+      log.w(
+        "[getClasstable][getFromWeb] "
         "extParams: ${qResult['extParams']['msg']} isNotPublish: "
-            "${qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
+        "${qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
       );
       if (qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")) {
-        FlutterLogs.logInfo(
-          "PDA getClasstable",
-          "getFromWeb",
+        log.w(
+          "[getClasstable][getFromWeb] "
+          "extParams: ${qResult['extParams']['msg']} isNotPublish: "
           "Classtable not released.",
         );
         return ClassTableData(
@@ -209,9 +193,8 @@ class ClassTableFile extends EhallSession {
       }
     }
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
+    log.i(
+      "[getClasstable][getFromWeb] "
       "Preliminary storage...",
     );
     qResult["semesterCode"] = semesterCode;
@@ -225,19 +208,16 @@ class ClassTableFile extends EhallSession {
       },
     ).then((value) => value.data['datas']['cxxsllsywpk']);
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
-      "$notOnTable",
+    log.i(
+      "[getClasstable][getFromWeb] $notOnTable",
     );
     qResult["notArranged"] = notOnTable["rows"];
 
     ClassTableData preliminaryData = simplifyData(qResult);
 
     /// Deal with the class change.
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
+    log.i(
+      "[getClasstable][getFromWeb] "
       "Deal with the class change...",
     );
 
@@ -250,10 +230,8 @@ class ClassTableFile extends EhallSession {
       },
     ).then((value) => value.data['datas']['xsdkkc']);
     if (qResult['extParams']['code'] != 1) {
-      FlutterLogs.logWarn(
-        "PDA getClasstable",
-        "getFromWeb",
-        qResult['extParams']['msg'],
+      log.w(
+        "[getClasstable][getFromWeb] ${qResult['extParams']['msg']}",
       );
     }
 
@@ -307,9 +285,8 @@ class ClassTableFile extends EhallSession {
       }
     }
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "getFromWeb",
+    log.i(
+      "[getClasstable][getFromWeb] "
       "Dealing class change with ${preliminaryData.classChanges.length} info(s).",
     );
 
@@ -324,9 +301,8 @@ class ClassTableFile extends EhallSession {
       }
 
       /// Second, find the all time arrangement related to the class.
-      FlutterLogs.logInfo(
-        "PDA getClasstable",
-        "getFromWeb",
+      log.i(
+        "[getClasstable][getFromWeb] "
         "Class change related to class detail index $indexClassDetailList.",
       );
       List<int> indexOriginalTimeArrangementList = [];
@@ -344,9 +320,8 @@ class ClassTableFile extends EhallSession {
       }
 
       /// Third, search for the time arrangements, seek for the truth.
-      FlutterLogs.logInfo(
-        "PDA getClasstable",
-        "getFromWeb",
+      log.i(
+        "[getClasstable][getFromWeb] "
         "Class change related to time arrangement index $indexOriginalTimeArrangementList.",
       );
 
@@ -354,24 +329,21 @@ class ClassTableFile extends EhallSession {
         /// Give a value to the
         int timeArrangementIndex = indexOriginalTimeArrangementList.first;
 
-        FlutterLogs.logInfo(
-          "PDA getClasstable",
-          "getFromWeb",
+        log.i(
+          "[getClasstable][getFromWeb] "
           "Class change. Teacher changed? ${e.isTeacherChanged}.",
         );
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
           /// Seek for the change entry. Delete the classes moved away.
-          FlutterLogs.logInfo(
-            "PDA getClasstable",
-            "getFromWeb",
+          log.i(
+            "[getClasstable][getFromWeb] "
             "Original weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
-                "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
+            "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
           );
           for (int i in e.originalAffectedWeeksList) {
-            FlutterLogs.logInfo(
-              "PDA getClasstable",
-              "getFromWeb",
+            log.i(
+              "[getClasstable][getFromWeb] "
               "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
             );
             if (preliminaryData
@@ -383,20 +355,18 @@ class ClassTableFile extends EhallSession {
             }
           }
 
-          FlutterLogs.logInfo(
-            "PDA getClasstable",
-            "getFromWeb",
+          log.i(
+            "[getClasstable][getFromWeb] "
             "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
           );
         }
 
-        FlutterLogs.logInfo(
-          "PDA getClasstable",
-          "getFromWeb",
+        log.i(
+          "[getClasstable][getFromWeb] "
           "New week: ${e.newAffectedWeeks}, "
-              "day: ${e.newWeek}, "
-              "startToStop: ${e.newClassRange}, "
-              "timeArrangementIndex: $timeArrangementIndex.",
+          "day: ${e.newWeek}, "
+          "startToStop: ${e.newClassRange}, "
+          "timeArrangementIndex: $timeArrangementIndex.",
         );
 
         /// Add classes.
@@ -413,9 +383,8 @@ class ClassTableFile extends EhallSession {
           ),
         );
       } else if (e.type == ChangeType.patch) {
-        FlutterLogs.logInfo(
-          "PDA getClasstable",
-          "getFromWeb",
+        log.i(
+          "[getClasstable][getFromWeb] "
           "Class patch.",
         );
 
@@ -433,25 +402,22 @@ class ClassTableFile extends EhallSession {
           ),
         );
       } else {
-        FlutterLogs.logInfo(
-          "PDA getClasstable",
-          "getFromWeb",
+        log.i(
+          "[getClasstable][getFromWeb] "
           "Class stop.",
         );
 
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
-          FlutterLogs.logInfo(
-            "PDA getClasstable",
-            "getFromWeb",
+          log.i(
+            "[getClasstable][getFromWeb] "
             "Original weeklist "
-                "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
-                "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
+            "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
+            "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
           );
           for (int i in e.originalAffectedWeeksList) {
-            FlutterLogs.logInfo(
-              "PDA getClasstable",
-              "getFromWeb",
+            log.i(
+              "[getClasstable][getFromWeb] "
               "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
             );
             if (preliminaryData
@@ -460,11 +426,10 @@ class ClassTableFile extends EhallSession {
                   .weekList[i] = false;
             }
           }
-          FlutterLogs.logInfo(
-            "PDA getClasstable",
-            "getFromWeb",
+          log.i(
+            "[getClasstable][getFromWeb] "
             "New weeklist "
-                "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
+            "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
           );
         }
       }
@@ -476,48 +441,42 @@ class ClassTableFile extends EhallSession {
   Future<ClassTableData> get({
     bool isForce = false,
   }) async {
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "get",
+    log.i(
+      "[getClasstable][get] "
       "Check whether the classtable has fetched.",
     );
 
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "get",
+    log.i(
+      "[getClasstable][get] "
       "Start fetching the classtable. Path at ${supportPath.path}.",
     );
 
     var file = File("${supportPath.path}/$schoolClassName");
     bool isExist = file.existsSync();
-    FlutterLogs.logInfo(
-      "PDA getClasstable",
-      "get",
+    log.i(
+      "[getClasstable][get] "
       "File exist: $isExist.",
     );
     if (isExist) {
-      FlutterLogs.logInfo(
-        "PDA getClasstable",
-        "get",
+      log.i(
+        "[getClasstable][get] "
         "File exist: $isExist.",
       );
     }
 
+    bool isNeedRefreshCache() =>
+        isExist &&
+        isForce == false &&
+        DateTime.now().difference(file.lastModifiedSync()).inDays <= 2;
+
     if (isExist) {
-      FlutterLogs.logInfo(
-        "PDA getClasstable",
-        "get",
-        (isExist &&
-                isForce == false &&
-                DateTime.now().difference(file.lastModifiedSync()).inDays <= 2)
-            ? "Cache"
-            : "Fetch from Internet.",
+      log.i(
+        "[getClasstable][get] "
+        "${isNeedRefreshCache() ? "Cache" : "Fetch from Internet."}",
       );
     }
 
-    if (isExist &&
-        isForce == false &&
-        DateTime.now().difference(file.lastModifiedSync()).inDays <= 2) {
+    if (isNeedRefreshCache()) {
       ClassTableData data =
           ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
       var userClass = getUserDefinedData();
@@ -533,10 +492,11 @@ class ClassTableFile extends EhallSession {
         toUse.timeArrangement.addAll(userClass.$1.timeArrangement);
         return toUse;
       } catch (e, s) {
-        FlutterLogs.logWarn(
-          "PDA getClasstable",
-          "get",
-          "Fetch error with exception:\n$e\nStacktrace is:\n$s",
+        log.w(
+          "[getClasstable][get] "
+          "Fetch error with exception.",
+          error: e,
+          stackTrace: s,
         );
         if (isExist) {
           return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));

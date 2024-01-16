@@ -5,7 +5,7 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
@@ -40,9 +40,8 @@ class JiaowuServiceSession extends IDSSession {
 
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      FlutterLogs.logInfo(
-        "PDA JiaowuServiceSession",
-        "getToken",
+      log.i(
+        "[JiaowuServiceSession][getToken] "
         "Received location: $location.",
       );
       if (location.contains("ehall.xidian.edu.cn/jwmobile/index#/?token=")) {
@@ -79,9 +78,8 @@ class JiaowuServiceSession extends IDSSession {
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
 
-    FlutterLogs.logInfo(
-      "PDA JiaowuServiceSession",
-      "getScore",
+    log.i(
+      "[JiaowuServiceSession][getScore] "
       "Getting the score data.",
     );
 
@@ -118,17 +116,15 @@ class JiaowuServiceSession extends IDSSession {
 
   /// Default fetch the current semester's exam.
   Future<ExamData> getExam() async {
-    FlutterLogs.logInfo(
-      "PDA JiaowuServiceSession",
-      "getExam",
+    log.i(
+      "[JiaowuServiceSession][getExam] "
       "Getting the exam data.",
     );
     await useService("exam");
 
     /// Choose the first period...
-    FlutterLogs.logInfo(
-      "PDA JiaowuServiceSession",
-      "getExam",
+    log.i(
+      "[JiaowuServiceSession][getExam] "
       "Seek for the semesters.",
     );
     String semester = await authorizationDio
@@ -141,9 +137,8 @@ class JiaowuServiceSession extends IDSSession {
     });
 
     /// If failed, it is more likely that no exam has arranged.
-    FlutterLogs.logInfo(
-      "PDA JiaowuServiceSession",
-      "getExam",
+    log.i(
+      "[JiaowuServiceSession][getExam] "
       "My exam arrangemet $semester.",
     );
 
@@ -200,9 +195,8 @@ class JiaowuServiceSession extends IDSSession {
   /// Fetch the buildings for empty classroom.
   Future<List<EmptyClassroomPlace>> getBuildingList() async {
     List<EmptyClassroomPlace> toReturn = [];
-    FlutterLogs.logInfo(
-      "PDA JiaowuServiceSession",
-      "getBuildingList",
+    log.i(
+      "[JiaowuServiceSession][getBuildingList] "
       "Getting the empty classroom.",
     );
     await useService("exam");

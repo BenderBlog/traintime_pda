@@ -6,7 +6,7 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -161,15 +161,13 @@ class _LoginWindowState extends State<LoginWindow> {
 
     try {
       await ses.clearCookieJar();
-      FlutterLogs.logInfo(
-        "PDA login_window",
-        "login",
+      log.w(
+        "[login_window][login] "
         "Have cleared login state.",
       );
     } on Exception {
-      FlutterLogs.logInfo(
-        "PDA login_window",
-        "login",
+      log.w(
+        "[login_window][login] "
         "No clear state.",
       );
     }
@@ -226,9 +224,8 @@ class _LoginWindowState extends State<LoginWindow> {
             Fluttertoast.showToast(msg: "请求失败。${e.message}");
           }
         } else {
-          FlutterLogs.logWarn(
-            "PDA login_window",
-            "login",
+          log.w(
+            "[login_window][login] "
             "Login failed with error: \n$e\nStacktrace is:\n$s",
           );
           ScaffoldMessenger.of(context).showSnackBar(

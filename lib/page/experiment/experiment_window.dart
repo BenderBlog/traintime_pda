@@ -42,6 +42,8 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 icon: const Icon(Icons.calendar_month),
                 label: const Text("导出课表"),
                 onPressed: () async {
+                  final box = context.findRenderObject() as RenderBox?;
+
                   String toStore = "BEGIN:VCALENDAR\n";
                   for (var i in snapshot.data!) {
                     String summary =
@@ -68,7 +70,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                     }
                     await file.writeAsString(toStore);
                     await Share.shareXFiles(
-                        [XFile("$tempPath/experiment-$now.ics")]);
+                      [XFile("$tempPath/experiment-$now.ics")],
+                      sharePositionOrigin:
+                          box!.localToGlobal(Offset.zero) & box.size,
+                    );
                     await file.delete();
                     Fluttertoast.showToast(msg: "应该保存成功");
                   } on FileSystemException {

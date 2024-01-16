@@ -3,7 +3,7 @@
 
 // Refresh formula for homepage.
 
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -38,19 +38,17 @@ Future<void> _comboLogin({
   } on PasswordWrongException {
     loginState = IDSLoginState.passwordWrong;
 
-    FlutterLogs.logWarn(
-      "PDA refresh",
-      "_comboLogin",
+    log.w(
+      "[_comboLogin] "
       "Combo login failed! Because your password is wrong.",
     );
   } catch (e, s) {
     loginState = IDSLoginState.fail;
 
-    FlutterLogs.logWarn(
-      "PDA refresh",
-      "_comboLogin",
+    log.w(
+      "[_comboLogin] "
       "Combo login failed! Because of the following error: "
-          "$e\nThe stack of the error is: \n$s",
+      "$e\nThe stack of the error is: \n$s",
     );
   }
 }
@@ -71,51 +69,45 @@ Future<void> update({
   }
 
   // Update Classtable
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "update",
+  log.i(
+    "[refresh][update] "
     "Updating current class",
   );
   classTableController.updateCurrent();
   classTableController.update();
 
   // Update Examation Info
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "update",
+  log.i(
+    "[refresh][update] "
     "Updating exam info",
   );
   examController.get().then((value) => examController.update());
 
   // Update Electricity
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "update",
+  log.i(
+    "[refresh][update] "
     "Updating electricity",
   );
   electricity.update();
   owe_session.update();
 
   // Update Sport
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "update",
+  log.i(
+    "[refresh][update] "
     "Updating sport info",
   );
   updateSportInfo();
 
   // Update Library
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "update",
+  log.i(
+    "[refresh][update] "
     "Updating library",
   );
   borrow_info.LibrarySession().getBorrowList();
 
   // Update school card
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "update",
+  log.i(
+    "[refresh][update] "
     "Updating school card",
   );
   school_card_session.SchoolCardSession().initSession();
@@ -125,9 +117,8 @@ void updateOnAppResumed() {
   final classTableController = Get.put(ClassTableController());
 
   // Update Classtable
-  FlutterLogs.logWarn(
-    "PDA refresh",
-    "updateOnAppResumed",
+  log.i(
+    "[updateOnAppResumed]"
     "Updating current class",
   );
   classTableController.updateCurrent();

@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -54,18 +54,16 @@ class ExamController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    FlutterLogs.logInfo(
-      "PDA ExamController",
-      "onInit",
+    log.i(
+      "[ExamController][onInit] "
       "Path at ${supportPath.path}.",
     );
     file = File("${supportPath.path}/$examDataCacheName");
     bool isExist = file.existsSync();
 
     if (isExist) {
-      FlutterLogs.logInfo(
-        "PDA ExamController",
-        "onInit",
+      log.i(
+        "[ExamController][onInit] "
         "Init from cache.",
       );
       data = ExamData.fromJson(jsonDecode(file.readAsStringSync()));
@@ -83,9 +81,8 @@ class ExamController extends GetxController {
 
   Future<void> get() async {
     ExamStatus previous = status;
-    FlutterLogs.logInfo(
-      "PDA ExamController",
-      "get",
+    log.i(
+      "[ExamController][get] "
       "Fetching data from Internet.",
     );
     try {
@@ -95,24 +92,24 @@ class ExamController extends GetxController {
       status = ExamStatus.fetched;
       error = "";
     } on DioException catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA ExamController",
-        "get",
-        "Network exception: \n${e.message}\nStack: \n$s",
+      log.w(
+        "[ExamController][get] "
+        "Network exception",
+        error: e,
+        stackTrace: s,
       );
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA ExamController",
-        "get",
-        "Exception: \n$e\nStack: \n$s",
+      log.w(
+        "[ExamController][get] "
+        "Exception",
+        error: e,
+        stackTrace: s,
       );
-      error = "获取考试信息错误，请刷新。";
     } finally {
       if (status == ExamStatus.fetched) {
-        FlutterLogs.logInfo(
-          "PDA ExamController",
-          "get",
+        log.i(
+          "[ExamController][get] "
           "Store to cache.",
         );
         file.writeAsStringSync(jsonEncode(

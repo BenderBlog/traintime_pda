@@ -5,7 +5,7 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -21,18 +21,16 @@ class CreativeServiceSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        FlutterLogs.logInfo(
-          "PDA CreativeServiceSession",
-          "initSession",
+        log.i(
+          "[CreativeServiceSession][initSession] "
           "Received location: $location.",
         );
         response = await dio.get(location);
       }
       String urlReceived = "${response.realUri}";
       String ticket = RegExp(r'ST\S+').firstMatch(urlReceived)![0]!;
-      FlutterLogs.logInfo(
-        "PDA CreativeServiceSession",
-        "initSession",
+      log.i(
+        "[CreativeServiceSession][initSession] "
         "Received ticket: $ticket.",
       );
       bool isLogin = await dio
@@ -50,9 +48,8 @@ class CreativeServiceSession extends IDSSession {
         },
       );
 
-      FlutterLogs.logInfo(
-        "PDA CreativeServiceSession",
-        "initSession",
+      log.i(
+        "[CreativeServiceSession][initSession] "
         "Received isLogin: $isLogin.",
       );
 

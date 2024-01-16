@@ -9,7 +9,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -38,9 +38,8 @@ class SportSession {
       punchData.value.score.value = getStore["data"][0]["score"];
       //String termId = await getTermID();
 
-      FlutterLogs.logInfo(
-        "PDA SportSession",
-        "getPunch",
+      log.i(
+        "[SportSession][getPunch] "
         "Ready to fetch all punch info.",
       );
 
@@ -64,9 +63,8 @@ class SportSession {
         punchData.value.allTime.value = punchData.value.all.length;
       });
 
-      FlutterLogs.logInfo(
-        "PDA SportSession",
-        "getPunch",
+      log.i(
+        "[SportSession][getPunch] "
         "Ready to fetch successful punch info.",
       );
 
@@ -94,31 +92,31 @@ class SportSession {
     } on NoPasswordException {
       punchData.value.situation.value = "没密码";
     } on LoginFailedException catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getPunch",
-        "Login Failed with error:\n$e\nStacktrace:\n$s",
+      log.w(
+        "[SportSession][getPunch] LoginFailedException",
+        error: e,
+        stackTrace: s,
       );
       punchData.value.situation.value = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getPunch",
-        "SemesterFailedException with error:\n$e\n$s",
+      log.w(
+        "[SportSession][getPunch] SemesterFailedException",
+        error: e,
+        stackTrace: s,
       );
       punchData.value.situation.value = "查询失败";
-    } on DioException {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getPunch",
-        "NetworkException",
+    } on DioException catch (e, s) {
+      log.w(
+        "[SportSession][getPunch] NetWorkExceptions",
+        error: e,
+        stackTrace: s,
       );
       punchData.value.situation.value = "网络故障";
     } catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getPunch",
-        "Failed with exception:\n$e\nStacktrace is:\n$s",
+      log.w(
+        "[SportSession][getPunch] Exception",
+        error: e,
+        stackTrace: s,
       );
       punchData.value.situation.value = "未知故障";
     } finally {
@@ -128,9 +126,8 @@ class SportSession {
 
   Future<void> getScore() async {
     sportScore.value.situation = "正在获取";
-    FlutterLogs.logInfo(
-      "PDA SportSession",
-      "getScore",
+    log.i(
+      "[SportSession][getScore]"
       "Ready to get sport score.",
     );
     SportScore toReturn = SportScore();
@@ -180,31 +177,31 @@ class SportSession {
     } on NoPasswordException {
       toReturn.situation = "没密码";
     } on LoginFailedException catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getScore",
-        "LoginFailedException:\n$e\n$s",
+      log.w(
+        "[SportSession][getScore] LoginFailedException",
+        error: e,
+        stackTrace: s,
       );
       toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getScore",
-        "SemesterFailedException:\n$e\n$s",
+      log.w(
+        "[SportSession][getScore] SemesterFailedException",
+        error: e,
+        stackTrace: s,
       );
       toReturn.situation = "查询失败";
-    } on DioException {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getScore",
-        "NetworkException",
+    } on DioException catch (e, s) {
+      log.w(
+        "[SportSession][getScore] NetworkException",
+        error: e,
+        stackTrace: s,
       );
       toReturn.situation = "网络故障";
     } catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA SportSession",
-        "getScore",
-        "Failed with exception:\n$e\nStacktrace is:\n$s",
+      log.w(
+        "[SportSession][getScore] Exception",
+        error: e,
+        stackTrace: s,
       );
       toReturn.situation = "未知故障";
     } finally {
@@ -298,9 +295,8 @@ awb4B45zUwIDAQAB
       throw NoPasswordException();
     }
     if (userId.isNotEmpty && token.isNotEmpty) {
-      FlutterLogs.logInfo(
-        "PDA SportSession",
-        "login",
+      log.i(
+        "[SportSession][login]"
         "Already login.",
       );
       return;

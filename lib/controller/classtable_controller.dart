@@ -1,7 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
@@ -74,17 +74,15 @@ class ClassTableController extends GetxController {
 
     int index = timeIndex;
     if (index < 0 || index >= time.length - 1) {
-      FlutterLogs.logInfo(
-        "PDA ClassTableController",
-        "CurrentData",
+      log.i(
+        "[ClassTableController][CurrentData] "
         "Current time is out of range. The index is $index. Now exit.",
       );
       return null;
     }
 
-    FlutterLogs.logInfo(
-      "PDA ClassTableController",
-      "CurrentData",
+    log.i(
+      "[ClassTableController][CurrentData] "
       "Get the current class $index, current time is after ${time[index]}.",
     );
 
@@ -96,18 +94,16 @@ class ClassTableController extends GetxController {
             pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
       }
     } catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA ClassTableController",
-        "CurrentData",
+      log.i(
+        "[ClassTableController][CurrentData] "
         "No class table data, error is: \n$e\nStacktrace is:\n$s.",
       );
     }
 
     // No class
     if (currentDataIndex == -1) {
-      FlutterLogs.logWarn(
-        "PDA ClassTableController",
-        "CurrentData",
+      log.i(
+        "[ClassTableController][CurrentData] "
         "No class at the monent.",
       );
       return null;
@@ -118,19 +114,17 @@ class ClassTableController extends GetxController {
         classTableData.timeArrangement[currentDataIndex];
     if (index < ((arrangement.start - 1) * 2) ||
         index >= ((arrangement.stop - 1) * 2 + 1)) {
-      FlutterLogs.logWarn(
-        "PDA ClassTableController",
-        "CurrentData",
+      log.i(
+        "[ClassTableController][CurrentData] "
         "Current class has not started or has ended. "
-            "${time[index]} not in [${time[(arrangement.start - 1) * 2]},"
-            " ${time[(arrangement.stop - 1) * 2 + 1]}).",
+        "${time[index]} not in [${time[(arrangement.start - 1) * 2]},"
+        " ${time[(arrangement.stop - 1) * 2 + 1]}).",
       );
       return null;
     }
 
-    FlutterLogs.logWarn(
-      "PDA ClassTableController",
-      "CurrentData",
+    log.i(
+      "[ClassTableController][CurrentData] "
       "Final data is $currentDataIndex.",
     );
 
@@ -146,12 +140,11 @@ class ClassTableController extends GetxController {
     int week = currentWeek;
     bool isTomorrow = false;
 
-    FlutterLogs.logWarn(
-      "PDA ClassTableController",
-      "ClassSet",
+    log.i(
+      "[ClassTableController][ClassSet] "
       "weekday: $weekday, currentWeek: $currentWeek,"
-          " isTomorrow: $isTomorrow,"
-          " ${updateTime.hour}:${updateTime.minute}.",
+      " isTomorrow: $isTomorrow,"
+      " ${updateTime.hour}:${updateTime.minute}.",
     );
 
     if (week >= classTableData.semesterLength || week < 0) {
@@ -159,9 +152,8 @@ class ClassTableController extends GetxController {
     } else {
       Set<int> classArrangementIndices = {};
       int i = timeIndex ~/ 2 + 1;
-      FlutterLogs.logWarn(
-        "PDA ClassTableController",
-        "ClassSet",
+      log.i(
+        "[ClassTableController][ClassSet] "
         "currentTimeIndex: $i, ${time[i]}",
       );
 
@@ -182,10 +174,8 @@ class ClassTableController extends GetxController {
       if (classArrangementIndices.isEmpty &&
               updateTime.hour * 60 + updateTime.minute >= 19 * 60 ||
           updateTime.hour * 60 + updateTime.minute >= 20 * 60 + 35) {
-        FlutterLogs.logWarn(
-          "PDA ClassTableController",
-          "ClassSet",
-          "Need tomorrow data.",
+        log.i(
+          "[ClassTableController][ClassSet] Need tomorrow data.",
         );
 
         weekday += 1;
@@ -196,18 +186,16 @@ class ClassTableController extends GetxController {
           week += 1;
         }
 
-        FlutterLogs.logInfo(
-          "PDA ClassTableController",
-          "CurrentData",
+        log.i(
+          "[ClassTableController][ClassSet] "
           "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
         );
 
         classArrangementIndices.clear();
 
         if (week <= classTableData.semesterLength) {
-          FlutterLogs.logInfo(
-            "PDA ClassTableController",
-            "CurrentData",
+          log.i(
+            "[ClassTableController][ClassSet] "
             "Adding ${pretendLayout[week][weekday]}.",
           );
           for (i = 0; i < 10; ++i) {
@@ -215,9 +203,8 @@ class ClassTableController extends GetxController {
           }
           classArrangementIndices.remove(-1);
         }
-        FlutterLogs.logInfo(
-          "PDA ClassTableController",
-          "CurrentData",
+        log.i(
+          "[ClassTableController][ClassSet] "
           "Tomorrow classArrangementIndices $classArrangementIndices.",
         );
       }
@@ -320,9 +307,8 @@ class ClassTableController extends GetxController {
     startDay = DateTime.parse(classTableData.termStartDay).add(
         Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
-    FlutterLogs.logWarn(
-      "PDA ClassTableController",
-      "updateCurrent",
+    log.i(
+      "[ClassTableController][addUserDefinedClass] "
       "startDay is $startDay with offset ${preference.getInt(preference.Preference.swift)}.",
     );
 
@@ -339,9 +325,8 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    FlutterLogs.logWarn(
-      "PDA ClassTableController",
-      "updateCurrent",
+    log.i(
+      "[ClassTableController][addUserDefinedClass] "
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
     );
 
@@ -401,10 +386,11 @@ class ClassTableController extends GetxController {
       updateCurrent();
       update();
     } catch (e, s) {
-      FlutterLogs.logWarn(
-        "PDA ClassTableController",
-        "updateClassTable",
-        "updateClassTable failed, error is: \n$e\nStacktrace is:\n$s.",
+      log.w(
+        "[ClassTableController][updateClassTable] "
+        "updateClassTable failed",
+        error: e,
+        stackTrace: s,
       );
       //rethrow;
     }

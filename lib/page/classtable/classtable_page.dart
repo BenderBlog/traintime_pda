@@ -162,6 +162,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 ),
               ],
               onSelected: (String action) async {
+                final box = context.findRenderObject() as RenderBox?;
+
                 // 点击选项的时候
                 switch (action) {
                   case 'A':
@@ -211,7 +213,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       }
                       await file.writeAsString(classTableState.iCalenderStr);
                       await Share.shareXFiles(
-                          [XFile("$tempPath/classtable-$now-$semester.ics")]);
+                        [XFile("$tempPath/classtable-$now-$semester.ics")],
+                        sharePositionOrigin:
+                            box!.localToGlobal(Offset.zero) & box.size,
+                      );
                       await file.delete();
                       Fluttertoast.showToast(msg: "应该保存成功");
                     } on FileSystemException {

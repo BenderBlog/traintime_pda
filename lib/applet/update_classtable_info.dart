@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 import 'dart:convert';
 
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:jiffy/jiffy.dart';
@@ -15,16 +15,14 @@ import 'package:watermeter/controller/exam_controller.dart';
 Future<bool> updateClasstableInfo() async {
   /// TODO: Add exception dealt...
 
-  FlutterLogs.logInfo(
-    "PDA",
-    "WidgetWorker updateClasstableInfo",
+  log.i(
+    "[WidgetWorker updateClasstableInfo] "
     "Ready to update to homepage.",
   );
   var classTableController = Get.put(ClassTableController());
 
-  FlutterLogs.logInfo(
-    "PDA",
-    "WidgetWorker updateClasstableInfo",
+  log.i(
+    "[WidgetWorker updateClasstableInfo] "
     "Updating class info.",
   );
 
@@ -34,16 +32,14 @@ Future<bool> updateClasstableInfo() async {
   DateTime time = classTableController.updateTime;
 
   var examController = Get.put(ExamController());
-  FlutterLogs.logInfo(
-    "PDA",
-    "WidgetWorker updateClasstableInfo",
+  log.i(
+    "[WidgetWorker updateClasstableInfo] "
     "Updating exam info, state is ${examController.status}.",
   );
   if (examController.status == ExamStatus.cache ||
       examController.status == ExamStatus.fetched) {
-    FlutterLogs.logInfo(
-      "PDA",
-      "WidgetWorker updateClasstableInfo",
+    log.i(
+      "[WidgetWorker updateClasstableInfo] "
       "Exam info can be updated.",
     );
     var examList = examController.isNotFinished;
@@ -90,9 +86,8 @@ Future<bool> updateClasstableInfo() async {
     name: 'ClassTableWidgetProvider',
     iOSName: 'ClasstableWidget',
   ).then((value) {
-    FlutterLogs.logInfo(
-      "PDA",
-      "WidgetWorker updateClasstableInfo",
+    log.i(
+      "[WidgetWorker updateClasstableInfo] "
       "UpdateStatus: $value",
     );
     return value;

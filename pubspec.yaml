@@ -64,8 +64,8 @@ dependencies:
   home_widget: ^0.4.1
   #workmanager: ^0.5.2
   background_fetch: ^1.2.1
-  flutter_logs: ^2.1.11
-
+  logger: ^2.0.2+1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

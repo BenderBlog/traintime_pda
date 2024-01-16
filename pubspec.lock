@@ -491,14 +491,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_logs:
-    dependency: "direct main"
-    description:
-      name: flutter_logs
-      sha256: "0fb84868b02e5880a1488f5282a4e193a1293280b85be7a56e58f29c0d1e6bea"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.11"
   flutter_markdown:
     dependency: "direct main"
     description:
@@ -717,6 +709,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: "6bbb9d6f7056729537a4309bda2e74e18e5d9f14302489cc1e93f33b3fe32cac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2+1"
   logging:
     dependency: transitive
     description:

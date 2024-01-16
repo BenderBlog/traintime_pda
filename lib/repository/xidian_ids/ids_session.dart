@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -35,9 +35,8 @@ class IDSSession extends NetworkSession {
     ..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          FlutterLogs.logInfo(
-            "PDA IDSSession",
-            "OfflineCheckInspector",
+          log.i(
+            "[IDSSession][OfflineCheckInspector]"
             "Offline status: $offline",
           );
           if (offline) {
@@ -109,18 +108,16 @@ class IDSSession extends NetworkSession {
     required String target,
     Future<void> Function(String)? sliderCaptcha,
   }) async {
-    FlutterLogs.logInfo(
-      "PDA IDSSession",
-      "checkAndLogin",
+    log.i(
+      "[IDSSession][checkAndLogin] "
       "Ready to get $target.",
     );
     var data = await dioNoOfflineCheck.get(
       "https://ids.xidian.edu.cn/authserver/login",
       queryParameters: {'service': target},
     );
-    FlutterLogs.logInfo(
-      "PDA IDSSession",
-      "checkAndLogin",
+    log.i(
+      "[IDSSession][checkAndLogin] "
       "Received: $data.",
     );
     if (data.statusCode == 401) {
@@ -151,9 +148,8 @@ class IDSSession extends NetworkSession {
     /// Get the login webpage.
     if (onResponse != null) {
       onResponse(10, "准备获取登录网页");
-      FlutterLogs.logInfo(
-        "PDA IDSSession",
-        "login",
+      log.i(
+        "[IDSSession][login] "
         "Ready to get the login webpage.",
       );
     }
@@ -176,9 +172,8 @@ class IDSSession extends NetworkSession {
     for (var i in cookie) {
       cookieStr += "${i.name}=${i.value}; ";
     }
-    FlutterLogs.logInfo(
-      "PDA IDSSession",
-      "login",
+    log.i(
+      "[IDSSession][login] "
       "cookie: $cookieStr.",
     );
 
@@ -188,9 +183,8 @@ class IDSSession extends NetworkSession {
     }
     String keys = form
         .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
-    FlutterLogs.logInfo(
-      "PDA IDSSession",
-      "login",
+    log.i(
+      "[IDSSession][login] "
       "encrypt key: $keys.",
     );
 

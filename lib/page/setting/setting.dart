@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -19,6 +19,7 @@ import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+import 'package:watermeter/page/setting/log_page.dart';
 import 'package:watermeter/repository/experiment/experiment_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
@@ -30,7 +31,6 @@ import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
-
   @override
   State<SettingWindow> createState() => _SettingWindowState();
 }
@@ -202,6 +202,19 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
             ],
           ),
+
+          SettingsSection(title: const Text("日志相关"), tiles: [
+            /// Omit this from release mod...
+            SettingsTile.navigation(
+              title: const Text("显示日志"),
+              onPressed: (context) async {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const LogWindow(),
+                ));
+              },
+            ),
+          ]),
+
           SettingsSection(
             title: const Text('缓存登录设置'),
             tiles: <SettingsTile>[
@@ -215,9 +228,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   try {
                     await NetworkSession().clearCookieJar();
                   } on PathNotFoundException {
-                    FlutterLogs.logInfo(
-                      "PDA setting",
-                      "ClearAllCache",
+                    log.d(
+                      "[setting][ClearAllCache]"
                       "No cookies.",
                     );
                   }

@@ -1,7 +1,7 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/applet/widget_worker.dart';
@@ -9,9 +9,8 @@ import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 Future<bool> updateSportInfo() async {
-  FlutterLogs.logInfo(
-    "PDA",
-    "WidgetWorker updateSportInfo",
+  log.i(
+    "[WidgetWorker updateSportInfo] "
     "Updating sport homewidget info.",
   );
 
@@ -31,20 +30,17 @@ Future<bool> updateSportInfo() async {
       lastInfoPlace = toUse.machineName;
       lastInfoDescription = toUse.state;
     }
-    FlutterLogs.logInfo(
-      "PDA",
-      "WidgetWorker updateSportInfo",
+    log.i(
+      "[WidgetWorker updateSportInfo] "
       "Updating sport info successful, sending data...",
     );
   } catch (e, s) {
-    FlutterLogs.logWarn(
-      "PDA",
-      "WidgetWorker updateSportInfo",
+    log.i(
+      "[WidgetWorker updateSportInfo] "
       "Updating sport info failed, sending empty data...",
     );
-    FlutterLogs.logWarn(
-      "PDA",
-      "WidgetWorker updateSportInfo",
+    log.i(
+      "[WidgetWorker updateSportInfo] "
       "Exception: \n$e\nStacktrace: \n$s",
     );
     success = -1;
@@ -60,9 +56,8 @@ Future<bool> updateSportInfo() async {
   var toReturn = await HomeWidget.updateWidget(
     iOSName: 'SportWidget',
   ).then((value) {
-    FlutterLogs.logInfo(
-      "PDA",
-      "WidgetWorker updateSportInfo",
+    log.i(
+      "[WidgetWorker updateSportInfo] "
       "UpdateStatus: $value.",
     );
     return value;

@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -79,9 +79,8 @@ class SchoolCardSession extends IDSSession {
   }
 
   Future<void> initSession() async {
-    FlutterLogs.logInfo(
-      "PDA SchoolCardSession",
-      "initSession",
+    log.i(
+      "[SchoolCardSession][initSession] "
       "Current State: ${isInit.value}",
     );
     if (isInit.value == SessionState.fetching) {
@@ -89,9 +88,8 @@ class SchoolCardSession extends IDSSession {
     }
     try {
       isInit.value = SessionState.fetching;
-      FlutterLogs.logInfo(
-        "PDA SchoolCardSession",
-        "initSession",
+      log.i(
+        "[SchoolCardSession][initSession] "
         "Fetching...",
       );
       var response = await dio.get(
@@ -99,9 +97,8 @@ class SchoolCardSession extends IDSSession {
       );
       while (response.headers[HttpHeaders.locationHeader] != null) {
         String location = response.headers[HttpHeaders.locationHeader]![0];
-        FlutterLogs.logInfo(
-          "PDA SchoolCardSession",
-          "initSession",
+        log.i(
+          "[SchoolCardSession][initSession] "
           "Received location: $location.",
         );
         response = await dio.get(location);

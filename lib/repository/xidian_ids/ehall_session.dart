@@ -7,7 +7,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -32,9 +32,8 @@ class EhallSession extends IDSSession {
     var response = await dioEhall.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "isLoggedIn",
+    log.i(
+      "[ehall_session][isLoggedIn] "
       "Ehall isLoggedin: ${response.data["hasLogin"]}",
     );
     return response.data["hasLogin"];
@@ -57,9 +56,8 @@ class EhallSession extends IDSSession {
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      FlutterLogs.logInfo(
-        "PDA ehall_session",
-        "loginEhall",
+      log.i(
+        "[ehall_session][loginEhall] "
         "Received location: $location",
       );
       response = await dioEhall.get(location);
@@ -68,9 +66,8 @@ class EhallSession extends IDSSession {
   }
 
   Future<String> useApp(String appID) async {
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "useApp",
+    log.i(
+      "[ehall_session][useApp] "
       "Ready to use the app $appID.\nTry to Login.",
     );
     if (!await isLoggedIn()) {
@@ -81,17 +78,15 @@ class EhallSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        FlutterLogs.logInfo(
-          "PDA ehall_session",
-          "useApp",
+        log.i(
+          "[ehall_session][useApp] "
           "Received location: $location.",
         );
         response = await dioEhall.get(location);
       }
     }
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "useApp",
+    log.i(
+      "[ehall_session][useApp] "
       "Try to use the $appID.",
     );
     var value = await dioEhall.get(
@@ -104,9 +99,8 @@ class EhallSession extends IDSSession {
         },
       ),
     );
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "useApp",
+    log.i(
+      "[ehall_session][useApp] "
       "Transfer address: ${value.headers['location']![0]}.",
     );
     return value.headers['location']![0];
@@ -115,18 +109,16 @@ class EhallSession extends IDSSession {
   /// 学生个人信息  4585275700341858 Unable to use because of xgxt.xidian.edu.cn (学工系统)
   /// 宿舍学生住宿  4618295887225301
   Future<void> getInformation() async {
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "getInformation",
+    log.i(
+      "[ehall_session][getInformation] "
       "Ready to get the user information.",
     );
     var firstPost = await useApp("4618295887225301");
     await dioEhall.get(firstPost).then((value) => value.data);
 
     /// Get information here. resultCode==00000 is successful.
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "getInformation",
+    log.i(
+      "[ehall_session][getInformation] "
       "Getting the user information.",
     );
     var detailed = await dioEhall.post(
@@ -139,9 +131,8 @@ class EhallSession extends IDSSession {
         "dataModelAction": "QUERY",
       },
     ).then((value) => value.data);
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "getInformation",
+    log.i(
+      "[ehall_session][getInformation] "
       "Storing the user information.",
     );
     if (detailed["resultCode"] != "00000") {
@@ -173,9 +164,8 @@ class EhallSession extends IDSSession {
       );
     }
 
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "getInformation",
+    log.i(
+      "[ehall_session][getInformation] "
       "Get the semester information.",
     );
     String get = await useApp("4770397878132218");
@@ -190,9 +180,8 @@ class EhallSession extends IDSSession {
       semesterCode,
     );
 
-    FlutterLogs.logInfo(
-      "PDA ehall_session",
-      "getInformation",
+    log.i(
+      "[ehall_session][getInformation] "
       "Get the day the semester begin.",
     );
     String termStartDay = await dioEhall.post(

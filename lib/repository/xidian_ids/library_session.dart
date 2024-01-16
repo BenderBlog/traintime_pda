@@ -5,7 +5,7 @@
 
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -87,9 +87,8 @@ class LibrarySession extends IDSSession {
     if (state.value == SessionState.fetching) {
       return;
     }
-    FlutterLogs.logInfo(
-      "PDA LibrarySession",
-      "getBorrowList",
+    log.i(
+      "[LibrarySession][getBorrowList] "
       "Getting borrow list",
     );
 
@@ -140,9 +139,8 @@ class LibrarySession extends IDSSession {
   }
 
   Future<void> initSession() async {
-    FlutterLogs.logInfo(
-      "PDA LibrarySession",
-      "initSession",
+    log.i(
+      "[LibrarySession][initSession] "
       "Initalizing Library Session",
     );
     try {
@@ -154,9 +152,8 @@ class LibrarySession extends IDSSession {
 
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        FlutterLogs.logInfo(
-          "PDA LibrarySession",
-          "initSession",
+        log.i(
+          "[LibrarySession][initSession] "
           "Received location: $location.",
         );
         response = await dio.get(location);
@@ -170,9 +167,8 @@ class LibrarySession extends IDSSession {
               .replaceFirst(");", "") ??
           "";
 
-      FlutterLogs.logInfo(
-        "PDA LibrarySession",
-        "initSession",
+      log.i(
+        "[LibrarySession][initSession] "
         "Result is $result.",
       );
 

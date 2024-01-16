@@ -4,7 +4,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -87,9 +87,8 @@ class ExperimentSession extends NetworkSession {
     }
 
     if (selectInfo[subject] != "B01") {
-      FlutterLogs.logInfo(
-        "PDA experiment_session",
-        "teacher",
+      log.d(
+        "[experiment_session][getData] "
         "${selectInfo[subject]} ferching...",
       );
       page = await dio
@@ -120,16 +119,14 @@ class ExperimentSession extends NetworkSession {
   }
 
   Future<List<ExperimentData>> getData() async {
-    FlutterLogs.logInfo(
-      "PDA experiment_session",
-      "getData",
+    log.i(
+      "[experiment_session][getData] "
       "Path at ${supportPath.path}.",
     );
     var file = File("${supportPath.path}/$experimentCacheName");
     bool isExist = file.existsSync();
-    FlutterLogs.logInfo(
-      "PDA experiment_session",
-      "getData",
+    log.i(
+      "[experiment_session][getData] "
       "File exist: $isExist.",
     );
     try {
@@ -143,9 +140,8 @@ class ExperimentSession extends NetworkSession {
         throw NoExperimentPasswordException;
       }
 
-      FlutterLogs.logInfo(
-        "PDA experiment_session",
-        "getData",
+      log.d(
+        "[experiment_session][getData] "
         "Get login in experiment_session.",
       );
 
@@ -173,17 +169,15 @@ class ExperimentSession extends NetworkSession {
 
       cookieStr = "";
 
-      FlutterLogs.logInfo(
-        "PDA experiment_session",
-        "getData",
+      log.d(
+        "[experiment_session][getData] "
         "Start fetching data.",
       );
 
       for (String i
           in loginResponse.headers[HttpHeaders.setCookieHeader] ?? []) {
-        FlutterLogs.logInfo(
-          "PDA experiment_session",
-          "getData",
+        log.d(
+          "[experiment_session][getData] "
           "Cookie $i.",
         );
         if (i.contains("PhyEws_StuName")) {
@@ -196,9 +190,8 @@ class ExperimentSession extends NetworkSession {
         }
       }
 
-      FlutterLogs.logInfo(
-        "PDA experiment_session",
-        "getData",
+      log.d(
+        "[experiment_session][getData] "
         "Cookie is $cookieStr.",
       );
 
@@ -247,15 +240,13 @@ class ExperimentSession extends NetworkSession {
         );
       }
 
-      FlutterLogs.logInfo(
-        "PDA experiment_session",
-        "getData",
+      log.i(
+        "[experiment_session][getData] "
         "Evaluating cache. ${jsonEncode(toReturn)}.",
       );
       if (isExist) {
-        FlutterLogs.logInfo(
-          "PDA experiment_session",
-          "getData",
+        log.i(
+          "[experiment_session][getData] "
           "Refreshing cache...",
         );
         file.deleteSync();
@@ -265,9 +256,8 @@ class ExperimentSession extends NetworkSession {
       return toReturn;
     } catch (e) {
       if (isExist) {
-        FlutterLogs.logInfo(
-          "PDA experiment_session",
-          "getData",
+        log.i(
+          "[experiment_session][getData] "
           "Using cache...",
         );
         List<dynamic> data = jsonDecode(file.readAsStringSync());

@@ -6,7 +6,7 @@
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -22,11 +22,11 @@ Future<void> update() async {
   } on NotSchoolNetworkException {
     electricityInfo.value = "非校园网";
     isNotice.value = false;
-  } on DioException catch (e) {
-    FlutterLogs.logWarn(
-      "PDA electricity_session",
-      "update",
-      "Network error: \n$e",
+  } on DioException catch (e, s) {
+    log.w(
+      "[electricity_session][update] Network error",
+      error: e,
+      stackTrace: s,
     );
     electricityInfo.value = "网络故障";
     isNotice.value = false;
@@ -34,10 +34,10 @@ Future<void> update() async {
     electricityInfo.value = "查询失败";
     isNotice.value = false;
   } catch (e, s) {
-    FlutterLogs.logWarn(
-      "PDA electricity_session",
-      "update",
-      "Network error: \n$e\nStacktrace:\n$s",
+    log.w(
+      "[electricity_session][update] Exception",
+      error: e,
+      stackTrace: s,
     );
     electricityInfo.value = "程序故障";
     isNotice.value = false;
@@ -164,10 +164,9 @@ class ElectricitySession extends NetworkSession {
     for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
         electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
-        FlutterLogs.logInfo(
-          "PDA electricity_session",
-          "ElectricitySession updateInformation",
-          "$electricityInfo.value",
+        log.i(
+          "[electricity_session][updateInformation] "
+          "electricity: ${electricityInfo.value}",
         );
         return;
       }

@@ -9,7 +9,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,28 +31,8 @@ void main() async {
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterLogs.logInfo(
-    "PDA",
-    "init",
+  log.i(
     "Traintime PDA Codebase is written by BenderBlog Rodriguez and contributors",
-  );
-
-  //Initialize Logging
-  await FlutterLogs.initLogs(
-    logLevelsEnabled: [
-      LogLevel.INFO,
-      LogLevel.WARNING,
-      LogLevel.ERROR,
-      LogLevel.SEVERE
-    ],
-    timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-    directoryStructure: DirectoryStructure.FOR_DATE,
-    logTypesEnabled: ["device", "network", "errors"],
-    logFileExtension: LogFileExtension.LOG,
-    logsWriteDirectoryName: "pda_logs",
-    logsExportDirectoryName: "pda_logs/exported",
-    debugFileOperations: true,
-    isDebuggable: true,
   );
 
   // Init the homepage widget data.
@@ -62,11 +42,9 @@ void main() async {
   // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
   final data = WidgetsBinding.instance.platformDispatcher.views.first;
 
-  FlutterLogs.logInfo(
-    "PDA",
-    "init",
+  log.i(
     "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} "
-        "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
+    "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
   );
 
   if (min(data.physicalSize.width, data.physicalSize.height) /
@@ -90,9 +68,7 @@ void main() async {
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
   bool isFirst = username.isEmpty || password.isEmpty;
-  FlutterLogs.logInfo(
-    "PDA",
-    "init",
+  log.i(
     "isFirstLogin: $isFirst",
   );
 

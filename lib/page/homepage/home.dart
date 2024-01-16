@@ -5,7 +5,7 @@
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
@@ -68,9 +68,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           requiresDeviceIdle: false,
           requiredNetworkType: NetworkType.NONE,
         ), (String taskId) async {
-      FlutterLogs.logInfo(
-        "PDA home",
-        "BackgroundFetchFromHome",
+      log.i(
+        "[home][BackgroundFetchFromHome]"
         "Headless event received $taskId.",
       );
       // IMPORTANT:  You must signal completion of your task or the OS can punish your app
@@ -82,16 +81,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }, (String taskId) async {
       // <-- Task timeout handler.
       // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-      FlutterLogs.logInfo(
-        "PDA home",
-        "BackgroundFetchFromHome",
+      log.i(
+        "[home][BackgroundFetchFromHome]"
         "TASK TIMEOUT taskId: $taskId.",
       );
       BackgroundFetch.finish(taskId);
     });
-    FlutterLogs.logInfo(
-      "PDA home",
-      "BackgroundFetchFromHome",
+    log.i(
+      "[home][BackgroundFetchFromHome]"
       "Configure status: $status.",
     );
 
@@ -147,9 +144,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     WidgetsBinding.instance.addObserver(this);
     message.checkMessage();
-    FlutterLogs.logInfo(
-      "PDA home",
-      "initState",
+    log.i(
+      "[home][BackgroundFetchFromHome]"
       "Current loginstate: $loginState, if none will _loginAsync.",
     );
     if (loginState == IDSLoginState.none) {

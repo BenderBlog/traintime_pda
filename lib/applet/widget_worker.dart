@@ -1,16 +1,15 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 import 'package:background_fetch/background_fetch.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
 import 'package:watermeter/applet/update_sport_info.dart';
 
 Future<void> saveToWidget(String key, dynamic value) async {
   await HomeWidget.saveWidgetData(key, value).then(
-    (result) => FlutterLogs.logInfo(
-      "PDA",
-      "WidgetWorker saveToWidget",
+    (result) => log.i(
+      "[widget_worker][saveToWidget] "
       "saveData '$key' status: $result value: $value",
     ),
   );
@@ -24,34 +23,26 @@ backgroundFetchHeadlessTask(HeadlessTask task) async {
   if (isTimeout) {
     // This task has exceeded its allowed running-time.
     // You must stop what you're doing and immediately .finish(taskId)
-    FlutterLogs.logWarn(
-      "PDA",
-      "BackgroundFetch",
+    log.i(
+      "[widget_worker][BackgroundFetch] "
       "Headless task timed-out: $taskId",
     );
     BackgroundFetch.finish(taskId);
     return;
   }
-  FlutterLogs.logWarn(
-    "PDA",
-    "BackgroundFetch",
+  log.i(
+    "[widget_worker][BackgroundFetch] "
     "Headless event received.",
   );
   // Do your work here...
-  FlutterLogs.logWarn(
-    "PDA",
-    "The BackgroundFetch has triggered, updating widget data...",
-    "Headless event received.",
-  );
 
   await Future.wait([
     updateClasstableInfo(),
     updateSportInfo(),
   ]).then((value) => BackgroundFetch.finish(taskId));
 
-  FlutterLogs.logWarn(
-    "PDA",
-    "Headless task $taskId finished.",
+  log.i(
+    "[widget_worker][BackgroundFetch] "
     "Headless event received.",
   );
 }
