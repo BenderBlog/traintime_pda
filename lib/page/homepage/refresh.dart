@@ -3,6 +3,7 @@
 
 // Refresh formula for homepage.
 
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -16,7 +17,6 @@ import 'package:watermeter/repository/xidian_ids/payment_session.dart'
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 //import 'package:watermeter/repository/experiment/experiment_session.dart';
-import 'dart:developer' as developer;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 Future<void> _comboLogin({
@@ -35,27 +35,22 @@ Future<void> _comboLogin({
       sliderCaptcha: sliderCaptcha,
     );
     loginState = IDSLoginState.success;
-  } on PasswordWrongException catch (e, s) {
+  } on PasswordWrongException {
     loginState = IDSLoginState.passwordWrong;
 
-    developer.log(
-      "Combo login failed! Because of the following error: ",
-      name: "Watermeter",
-    );
-    developer.log(
-      "$e\nThe stack of the error is: $s",
-      name: "Watermeter",
+    FlutterLogs.logWarn(
+      "PDA refresh",
+      "_comboLogin",
+      "Combo login failed! Because your password is wrong.",
     );
   } catch (e, s) {
     loginState = IDSLoginState.fail;
 
-    developer.log(
-      "Combo login failed! Because of the following error: ",
-      name: "Watermeter",
-    );
-    developer.log(
-      "$e\nThe stack of the error is: $s",
-      name: "Watermeter",
+    FlutterLogs.logWarn(
+      "PDA refresh",
+      "_comboLogin",
+      "Combo login failed! Because of the following error: "
+          "$e\nThe stack of the error is: \n$s",
     );
   }
 }
@@ -76,46 +71,52 @@ Future<void> update({
   }
 
   // Update Classtable
-  developer.log(
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "update",
     "Updating current class",
-    name: "Homepage Update",
   );
   classTableController.updateCurrent();
   classTableController.update();
 
   // Update Examation Info
-  developer.log(
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "update",
     "Updating exam info",
-    name: "Homepage Update",
   );
   examController.get().then((value) => examController.update());
 
   // Update Electricity
-  developer.log(
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "update",
     "Updating electricity",
-    name: "Homepage Update",
   );
   electricity.update();
   owe_session.update();
 
   // Update Sport
-  developer.log(
-    "Updating punch data",
-    name: "Homepage Update",
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "update",
+    "Updating sport info",
   );
   updateSportInfo();
 
   // Update Library
-  developer.log(
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "update",
     "Updating library",
-    name: "Homepage Update",
   );
   borrow_info.LibrarySession().getBorrowList();
 
   // Update school card
-  developer.log(
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "update",
     "Updating school card",
-    name: "Homepage Update",
   );
   school_card_session.SchoolCardSession().initSession();
 }
@@ -124,9 +125,10 @@ void updateOnAppResumed() {
   final classTableController = Get.put(ClassTableController());
 
   // Update Classtable
-  developer.log(
+  FlutterLogs.logWarn(
+    "PDA refresh",
+    "updateOnAppResumed",
     "Updating current class",
-    name: "Homepage Update",
   );
   classTableController.updateCurrent();
   classTableController.update();

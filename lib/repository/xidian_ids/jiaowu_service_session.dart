@@ -3,10 +3,9 @@
 
 // Super class contains Score, Exam and empty classroom.
 
-import 'dart:developer' as developer;
 import 'dart:io';
-
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
@@ -41,7 +40,11 @@ class JiaowuServiceSession extends IDSSession {
 
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      developer.log("Received: $location.", name: "Jiaowu initSession");
+      FlutterLogs.logInfo(
+        "PDA JiaowuServiceSession",
+        "getToken",
+        "Received location: $location.",
+      );
       if (location.contains("ehall.xidian.edu.cn/jwmobile/index#/?token=")) {
         authorization = location.replaceAll(
           RegExp(r'https?:\/\/ehall.xidian.edu.cn\/jwmobile\/index#\/\?token='),
@@ -76,8 +79,11 @@ class JiaowuServiceSession extends IDSSession {
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
 
-    developer.log("Getting the score data.", name: "Jiaowu getScore");
-    await useService("score");
+    FlutterLogs.logInfo(
+      "PDA JiaowuServiceSession",
+      "getScore",
+      "Getting the score data.",
+    );
 
     var getData = await authorizationDio.post(
       "https://ehall.xidian.edu.cn/jwmobile/biz/v410/score/termScore",
@@ -112,11 +118,19 @@ class JiaowuServiceSession extends IDSSession {
 
   /// Default fetch the current semester's exam.
   Future<ExamData> getExam() async {
-    developer.log("Getting the exam data.", name: "Jiaowu getExam");
+    FlutterLogs.logInfo(
+      "PDA JiaowuServiceSession",
+      "getExam",
+      "Getting the exam data.",
+    );
     await useService("exam");
 
     /// Choose the first period...
-    developer.log("Seek for the semesters.", name: "Jiaowu getExam");
+    FlutterLogs.logInfo(
+      "PDA JiaowuServiceSession",
+      "getExam",
+      "Seek for the semesters.",
+    );
     String semester = await authorizationDio
         .get("https://ehall.xidian.edu.cn/jwmobile/biz/v410/examTask/termList")
         .then((value) {
@@ -127,7 +141,11 @@ class JiaowuServiceSession extends IDSSession {
     });
 
     /// If failed, it is more likely that no exam has arranged.
-    developer.log("My exam arrangemet $semester", name: "Jiaowu getExam");
+    FlutterLogs.logInfo(
+      "PDA JiaowuServiceSession",
+      "getExam",
+      "My exam arrangemet $semester.",
+    );
 
     List<Subject> subject = await authorizationDio
         .get(
@@ -182,9 +200,10 @@ class JiaowuServiceSession extends IDSSession {
   /// Fetch the buildings for empty classroom.
   Future<List<EmptyClassroomPlace>> getBuildingList() async {
     List<EmptyClassroomPlace> toReturn = [];
-    developer.log(
+    FlutterLogs.logInfo(
+      "PDA JiaowuServiceSession",
+      "getBuildingList",
       "Getting the empty classroom.",
-      name: "Jiaowu getBuildingList",
     );
     await useService("exam");
 

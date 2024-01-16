@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -26,7 +27,6 @@ import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
-import 'dart:developer' as developer;
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -215,9 +215,10 @@ class _SettingWindowState extends State<SettingWindow> {
                   try {
                     await NetworkSession().clearCookieJar();
                   } on PathNotFoundException {
-                    developer.log(
-                      "No cookies at present",
-                      name: "Setting ClearAllCache",
+                    FlutterLogs.logInfo(
+                      "PDA setting",
+                      "ClearAllCache",
+                      "No cookies.",
                     );
                   }
 
@@ -244,7 +245,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   }
 
                   if (mounted) {
-                    Fluttertoast.showToast(msg: 'Cookie 已被清除');
+                    Fluttertoast.showToast(msg: '缓存已被清除');
                     Restart.restartApp();
                   }
                 },

@@ -1,10 +1,10 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:io';
+import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -87,9 +87,10 @@ class ExperimentSession extends NetworkSession {
     }
 
     if (selectInfo[subject] != "B01") {
-      developer.log(
+      FlutterLogs.logInfo(
+        "PDA experiment_session",
+        "teacher",
         "${selectInfo[subject]} ferching...",
-        name: "ExperimentSession",
       );
       page = await dio
           .post(
@@ -119,10 +120,18 @@ class ExperimentSession extends NetworkSession {
   }
 
   Future<List<ExperimentData>> getData() async {
-    developer.log("Path at ${supportPath.path}.", name: "ExperimentSession");
+    FlutterLogs.logInfo(
+      "PDA experiment_session",
+      "getData",
+      "Path at ${supportPath.path}.",
+    );
     var file = File("${supportPath.path}/$experimentCacheName");
     bool isExist = file.existsSync();
-    developer.log("File exist: $isExist.", name: "ExperimentSession");
+    FlutterLogs.logInfo(
+      "PDA experiment_session",
+      "getData",
+      "File exist: $isExist.",
+    );
     try {
       if (await NetworkSession.isInSchool() == false) {
         throw NotSchoolNetworkException;
@@ -134,9 +143,10 @@ class ExperimentSession extends NetworkSession {
         throw NoExperimentPasswordException;
       }
 
-      developer.log(
-        "Get login in experiment_session",
-        name: "ExperimentSession",
+      FlutterLogs.logInfo(
+        "PDA experiment_session",
+        "getData",
+        "Get login in experiment_session.",
       );
 
       var loginResponse = await dio.post(
@@ -163,16 +173,18 @@ class ExperimentSession extends NetworkSession {
 
       cookieStr = "";
 
-      developer.log(
-        "Start fetching data",
-        name: "ExperimentSession",
+      FlutterLogs.logInfo(
+        "PDA experiment_session",
+        "getData",
+        "Start fetching data.",
       );
 
       for (String i
           in loginResponse.headers[HttpHeaders.setCookieHeader] ?? []) {
-        developer.log(
-          i,
-          name: "ExperimentSession",
+        FlutterLogs.logInfo(
+          "PDA experiment_session",
+          "getData",
+          "Cookie $i.",
         );
         if (i.contains("PhyEws_StuName")) {
           /// This guy find out the secret.
@@ -183,9 +195,11 @@ class ExperimentSession extends NetworkSession {
           cookieStr += '${i.split(';')[0]}; ';
         }
       }
-      developer.log(
-        cookieStr,
-        name: "ExperimentSession",
+
+      FlutterLogs.logInfo(
+        "PDA experiment_session",
+        "getData",
+        "Cookie is $cookieStr.",
       );
 
       var data = await dio
@@ -233,14 +247,16 @@ class ExperimentSession extends NetworkSession {
         );
       }
 
-      developer.log(
-        "Evaluating cache. ${jsonEncode(toReturn)}",
-        name: "ExperimentSession",
+      FlutterLogs.logInfo(
+        "PDA experiment_session",
+        "getData",
+        "Evaluating cache. ${jsonEncode(toReturn)}.",
       );
       if (isExist) {
-        developer.log(
-          "Refreshing cache.",
-          name: "ExperimentSession",
+        FlutterLogs.logInfo(
+          "PDA experiment_session",
+          "getData",
+          "Refreshing cache...",
         );
         file.deleteSync();
       }
@@ -249,9 +265,10 @@ class ExperimentSession extends NetworkSession {
       return toReturn;
     } catch (e) {
       if (isExist) {
-        developer.log(
-          "Using cache for offline mode.",
-          name: "ExperimentSession",
+        FlutterLogs.logInfo(
+          "PDA experiment_session",
+          "getData",
+          "Using cache...",
         );
         List<dynamic> data = jsonDecode(file.readAsStringSync());
         return List<ExperimentData>.generate(

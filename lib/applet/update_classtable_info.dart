@@ -1,8 +1,8 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 import 'dart:convert';
-import 'dart:developer' as developer;
 
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:jiffy/jiffy.dart';
@@ -14,15 +14,18 @@ import 'package:watermeter/controller/exam_controller.dart';
 
 Future<bool> updateClasstableInfo() async {
   /// TODO: Add exception dealt...
-  developer.log(
-    "Ready to update to homepage...",
-    name: "WidgetWorker updateClasstableInfo",
+
+  FlutterLogs.logInfo(
+    "PDA",
+    "WidgetWorker updateClasstableInfo",
+    "Ready to update to homepage.",
   );
   var classTableController = Get.put(ClassTableController());
 
-  developer.log(
+  FlutterLogs.logInfo(
+    "PDA",
+    "WidgetWorker updateClasstableInfo",
     "Updating class info.",
-    name: "WidgetWorker updateClasstableInfo",
   );
 
   var data = classTableController.homeArrangementData;
@@ -30,16 +33,18 @@ Future<bool> updateClasstableInfo() async {
   List<HomeArrangement> tomorrowData = [...data.$2];
   DateTime time = classTableController.updateTime;
 
-  developer.log(
-    "Updating exam info.",
-    name: "WidgetWorker updateClasstableInfo",
-  );
   var examController = Get.put(ExamController());
+  FlutterLogs.logInfo(
+    "PDA",
+    "WidgetWorker updateClasstableInfo",
+    "Updating exam info, state is ${examController.status}.",
+  );
   if (examController.status == ExamStatus.cache ||
       examController.status == ExamStatus.fetched) {
-    developer.log(
-      "Exam can be updated.",
-      name: "WidgetWorker updateClasstableInfo",
+    FlutterLogs.logInfo(
+      "PDA",
+      "WidgetWorker updateClasstableInfo",
+      "Exam info can be updated.",
     );
     var examList = examController.isNotFinished;
     for (var i in examList) {
@@ -85,9 +90,10 @@ Future<bool> updateClasstableInfo() async {
     name: 'ClassTableWidgetProvider',
     iOSName: 'ClasstableWidget',
   ).then((value) {
-    developer.log(
+    FlutterLogs.logInfo(
+      "PDA",
+      "WidgetWorker updateClasstableInfo",
       "UpdateStatus: $value",
-      name: "WidgetWorker updateClasstableInfo",
     );
     return value;
   });

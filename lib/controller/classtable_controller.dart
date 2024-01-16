@@ -1,11 +1,11 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
 import 'package:watermeter/model/home_arrangement.dart';
-import 'dart:developer' as developer;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
@@ -23,8 +23,10 @@ class ClassTableController extends GetxController {
   // A list as an index of the classtable items.
   RxList<List<List<List<int>>>> pretendLayout = List.generate(
     1,
-    (week) =>
-        List.generate(7, (day) => List.generate(10, (classes) => <int>[])),
+    (week) => List.generate(
+      7,
+      (day) => List.generate(10, (classes) => <int>[]),
+    ),
   ).obs;
 
   // Mark the current week.
@@ -46,11 +48,6 @@ class ClassTableController extends GetxController {
   /// - `time.length-1`: means the time is after 20:35.
   /// - otherwise, means the time is in range [`time[timeIndex]`, `time[timeIndex+1]`).
   int get timeIndex {
-    developer.log(
-      "Current time is $updateTime, ${Jiffy.parse(time[0], pattern: "hh:mm").format()}",
-      name: "ClassTableControllerTimeIndex",
-    );
-
     // Deal with the current time.
     int currentTime = 60 * updateTime.hour + updateTime.minute;
 
@@ -66,12 +63,6 @@ class ClassTableController extends GetxController {
         break;
       }
     }
-
-    developer.log(
-      "Current index is $index, which is ${time[index < 0 ? 0 : index]}",
-      name: "ClassTableControllerTimeIndex",
-    );
-
     return index;
   }
 
@@ -83,20 +74,18 @@ class ClassTableController extends GetxController {
 
     int index = timeIndex;
     if (index < 0 || index >= time.length - 1) {
-      developer.log(
-        "Current time is out of range. The index is $index",
-        name: "ClassTableControllerCurrentData",
+      FlutterLogs.logInfo(
+        "PDA ClassTableController",
+        "CurrentData",
+        "Current time is out of range. The index is $index. Now exit.",
       );
       return null;
     }
 
-    developer.log(
-      "Get the current class $index",
-      name: "ClassTableControllerCurrentData",
-    );
-    developer.log(
-      "Current time is after ${time[index]} $index",
-      name: "ClassTableControllerCurrentData",
+    FlutterLogs.logInfo(
+      "PDA ClassTableController",
+      "CurrentData",
+      "Get the current class $index, current time is after ${time[index]}.",
     );
 
     int currentDataIndex = -1;
@@ -107,21 +96,19 @@ class ClassTableController extends GetxController {
             pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
       }
     } catch (e, s) {
-      developer.log(
-        "No class table data, $e",
-        name: "ClassTableControllerCurrentData",
-      );
-      developer.log(
-        "The stacktrace is $s",
-        name: "ClassTableControllerCurrentData",
+      FlutterLogs.logWarn(
+        "PDA ClassTableController",
+        "CurrentData",
+        "No class table data, error is: \n$e\nStacktrace is:\n$s.",
       );
     }
 
     // No class
     if (currentDataIndex == -1) {
-      developer.log(
-        "No class",
-        name: "ClassTableControllerCurrentData",
+      FlutterLogs.logWarn(
+        "PDA ClassTableController",
+        "CurrentData",
+        "No class at the monent.",
       );
       return null;
     }
@@ -131,16 +118,20 @@ class ClassTableController extends GetxController {
         classTableData.timeArrangement[currentDataIndex];
     if (index < ((arrangement.start - 1) * 2) ||
         index >= ((arrangement.stop - 1) * 2 + 1)) {
-      developer.log(
-        "Current class has not started or has ended. ${time[index]} not in [${time[(arrangement.start - 1) * 2]}, ${time[(arrangement.stop - 1) * 2 + 1]})",
-        name: "ClassTableControllerCurrentData",
+      FlutterLogs.logWarn(
+        "PDA ClassTableController",
+        "CurrentData",
+        "Current class has not started or has ended. "
+            "${time[index]} not in [${time[(arrangement.start - 1) * 2]},"
+            " ${time[(arrangement.stop - 1) * 2 + 1]}).",
       );
       return null;
     }
 
-    developer.log(
-      "Final data is $currentDataIndex",
-      name: "ClassTableControllerCurrentData",
+    FlutterLogs.logWarn(
+      "PDA ClassTableController",
+      "CurrentData",
+      "Final data is $currentDataIndex.",
     );
 
     return (
@@ -155,13 +146,12 @@ class ClassTableController extends GetxController {
     int week = currentWeek;
     bool isTomorrow = false;
 
-    developer.log(
-      "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
-      name: "ClassTableControllerClassSet",
-    );
-    developer.log(
-      "${updateTime.hour}:${updateTime.minute}",
-      name: "ClassTableControllerClassSet",
+    FlutterLogs.logWarn(
+      "PDA ClassTableController",
+      "ClassSet",
+      "weekday: $weekday, currentWeek: $currentWeek,"
+          " isTomorrow: $isTomorrow,"
+          " ${updateTime.hour}:${updateTime.minute}.",
     );
 
     if (week >= classTableData.semesterLength || week < 0) {
@@ -169,9 +159,10 @@ class ClassTableController extends GetxController {
     } else {
       Set<int> classArrangementIndices = {};
       int i = timeIndex ~/ 2 + 1;
-      developer.log(
-        "currentindex: $i.",
-        name: "ClassTableControllerClassSet",
+      FlutterLogs.logWarn(
+        "PDA ClassTableController",
+        "ClassSet",
+        "currentTimeIndex: $i, ${time[i]}",
       );
 
       for (i; i < 10; ++i) {
@@ -191,9 +182,10 @@ class ClassTableController extends GetxController {
       if (classArrangementIndices.isEmpty &&
               updateTime.hour * 60 + updateTime.minute >= 19 * 60 ||
           updateTime.hour * 60 + updateTime.minute >= 20 * 60 + 35) {
-        developer.log(
+        FlutterLogs.logWarn(
+          "PDA ClassTableController",
+          "ClassSet",
           "Need tomorrow data.",
-          name: "ClassTableControllerClassSet",
         );
 
         weekday += 1;
@@ -204,33 +196,30 @@ class ClassTableController extends GetxController {
           week += 1;
         }
 
-        developer.log(
+        FlutterLogs.logInfo(
+          "PDA ClassTableController",
+          "CurrentData",
           "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
-          name: "ClassTableControllerClassSet",
         );
 
         classArrangementIndices.clear();
 
         if (week <= classTableData.semesterLength) {
-          developer.log(
-            "adding  ${pretendLayout[week][weekday]}",
-            name: "ClassTableControllerClassSet",
+          FlutterLogs.logInfo(
+            "PDA ClassTableController",
+            "CurrentData",
+            "Adding ${pretendLayout[week][weekday]}.",
           );
           for (i = 0; i < 10; ++i) {
             classArrangementIndices.addAll(pretendLayout[week][weekday][i]);
-
-            developer.log(
-              "now tomorrow: $classArrangementIndices",
-              name: "ClassTableControllerClassSet",
-            );
           }
           classArrangementIndices.remove(-1);
-
-          developer.log(
-            "$classArrangementIndices",
-            name: "ClassTableControllerClassSet",
-          );
         }
+        FlutterLogs.logInfo(
+          "PDA ClassTableController",
+          "CurrentData",
+          "Tomorrow classArrangementIndices $classArrangementIndices.",
+        );
       }
 
       return (classArrangementIndices.toList(), isTomorrow);
@@ -331,6 +320,12 @@ class ClassTableController extends GetxController {
     startDay = DateTime.parse(classTableData.termStartDay).add(
         Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
+    FlutterLogs.logWarn(
+      "PDA ClassTableController",
+      "updateCurrent",
+      "startDay is $startDay with offset ${preference.getInt(preference.Preference.swift)}.",
+    );
+
     updateTime = DateTime.now();
 
     // Get the current index.
@@ -344,9 +339,10 @@ class ClassTableController extends GetxController {
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
-    developer.log(
+    FlutterLogs.logWarn(
+      "PDA ClassTableController",
+      "updateCurrent",
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
-      name: "ClassTableController",
     );
 
     updateClasstableInfo();
@@ -405,12 +401,12 @@ class ClassTableController extends GetxController {
       updateCurrent();
       update();
     } catch (e, s) {
-      error = e.toString() + s.toString();
-      developer.log(
-        error ?? "Unknown error",
-        name: "ClasstableController updateClassTable",
+      FlutterLogs.logWarn(
+        "PDA ClassTableController",
+        "updateClassTable",
+        "updateClassTable failed, error is: \n$e\nStacktrace is:\n$s.",
       );
-      rethrow;
+      //rethrow;
     }
   }
 }

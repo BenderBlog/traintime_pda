@@ -1,8 +1,7 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:developer' as developer;
-
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/applet/widget_worker.dart';
@@ -10,9 +9,10 @@ import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 Future<bool> updateSportInfo() async {
-  developer.log(
+  FlutterLogs.logInfo(
+    "PDA",
+    "WidgetWorker updateSportInfo",
     "Updating sport homewidget info.",
-    name: "WidgetWorker updateSportInfo",
   );
 
   int success = 0;
@@ -22,10 +22,6 @@ Future<bool> updateSportInfo() async {
   String? lastInfoDescription;
 
   try {
-    developer.log(
-      "Updating sport info.",
-      name: "WidgetWorker updateSportInfo",
-    );
     await SportSession().getPunch();
     success = punchData.value.validTime.value;
     score = punchData.value.score.toInt();
@@ -35,18 +31,21 @@ Future<bool> updateSportInfo() async {
       lastInfoPlace = toUse.machineName;
       lastInfoDescription = toUse.state;
     }
-    developer.log(
+    FlutterLogs.logInfo(
+      "PDA",
+      "WidgetWorker updateSportInfo",
       "Updating sport info successful, sending data...",
-      name: "WidgetWorker updateSportInfo",
     );
-  } catch (e) {
-    developer.log(
+  } catch (e, s) {
+    FlutterLogs.logWarn(
+      "PDA",
+      "WidgetWorker updateSportInfo",
       "Updating sport info failed, sending empty data...",
-      name: "WidgetWorker updateSportInfo",
     );
-    developer.log(
-      "Exception: $e",
-      name: "WidgetWorker updateSportInfo",
+    FlutterLogs.logWarn(
+      "PDA",
+      "WidgetWorker updateSportInfo",
+      "Exception: \n$e\nStacktrace: \n$s",
     );
     success = -1;
     score = -1;
@@ -61,9 +60,10 @@ Future<bool> updateSportInfo() async {
   var toReturn = await HomeWidget.updateWidget(
     iOSName: 'SportWidget',
   ).then((value) {
-    developer.log(
-      "UpdateStatus: $value",
-      name: "WidgetWorker updateSportInfo",
+    FlutterLogs.logInfo(
+      "PDA",
+      "WidgetWorker updateSportInfo",
+      "UpdateStatus: $value.",
     );
     return value;
   });

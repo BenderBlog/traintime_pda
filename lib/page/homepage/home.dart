@@ -3,10 +3,9 @@
 
 // Main page of this program.
 
-import 'dart:developer' as developer;
-
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
@@ -69,9 +68,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           requiresDeviceIdle: false,
           requiredNetworkType: NetworkType.NONE,
         ), (String taskId) async {
-      developer.log(
-        'Headless event received $taskId.',
-        name: "BackgroundFetchFromHome",
+      FlutterLogs.logInfo(
+        "PDA home",
+        "BackgroundFetchFromHome",
+        "Headless event received $taskId.",
       );
       // IMPORTANT:  You must signal completion of your task or the OS can punish your app
       // for taking too long in the background.
@@ -82,15 +82,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }, (String taskId) async {
       // <-- Task timeout handler.
       // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-      developer.log(
-        "TASK TIMEOUT taskId: $taskId",
-        name: "BackgroundFetchFromHome",
+      FlutterLogs.logInfo(
+        "PDA home",
+        "BackgroundFetchFromHome",
+        "TASK TIMEOUT taskId: $taskId.",
       );
       BackgroundFetch.finish(taskId);
     });
-    developer.log(
-      "Configure success: $status",
-      name: "BackgroundFetchFromHome",
+    FlutterLogs.logInfo(
+      "PDA home",
+      "BackgroundFetchFromHome",
+      "Configure status: $status.",
     );
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -145,12 +147,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     WidgetsBinding.instance.addObserver(this);
     message.checkMessage();
-    developer.log("$loginState", name: "Home");
+    FlutterLogs.logInfo(
+      "PDA home",
+      "initState",
+      "Current loginstate: $loginState, if none will _loginAsync.",
+    );
     if (loginState == IDSLoginState.none) {
-      developer.log("Relogin.", name: "Home");
       _loginAsync();
     } else {
-      developer.log("Updating infos.", name: "Home");
       update();
     }
     initPlatformState();

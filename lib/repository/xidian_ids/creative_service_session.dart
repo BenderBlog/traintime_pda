@@ -4,8 +4,8 @@
 // Creative School Service Session, related to Jichuang Studio
 
 import 'dart:io';
-import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -21,12 +21,20 @@ class CreativeServiceSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        developer.log("Received: $location.", name: "ids login");
+        FlutterLogs.logInfo(
+          "PDA CreativeServiceSession",
+          "initSession",
+          "Received location: $location.",
+        );
         response = await dio.get(location);
       }
       String urlReceived = "${response.realUri}";
       String ticket = RegExp(r'ST\S+').firstMatch(urlReceived)![0]!;
-      developer.log("Received: $ticket.", name: "CreativeServiceSession");
+      FlutterLogs.logInfo(
+        "PDA CreativeServiceSession",
+        "initSession",
+        "Received ticket: $ticket.",
+      );
       bool isLogin = await dio
           .post(
         "$url/api/v1/auth/ids",
@@ -42,9 +50,10 @@ class CreativeServiceSession extends IDSSession {
         },
       );
 
-      developer.log(
-        "Received: $isLogin",
-        name: "CreativeServiceSession",
+      FlutterLogs.logInfo(
+        "PDA CreativeServiceSession",
+        "initSession",
+        "Received isLogin: $isLogin.",
       );
 
       if (!isLogin) {

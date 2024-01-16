@@ -5,9 +5,9 @@
 
 import 'dart:io';
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -79,25 +79,31 @@ class SchoolCardSession extends IDSSession {
   }
 
   Future<void> initSession() async {
-    developer.log(
+    FlutterLogs.logInfo(
+      "PDA SchoolCardSession",
+      "initSession",
       "Current State: ${isInit.value}",
-      name: "SchoolCardSession",
     );
     if (isInit.value == SessionState.fetching) {
       return;
     }
     try {
       isInit.value = SessionState.fetching;
-      developer.log(
+      FlutterLogs.logInfo(
+        "PDA SchoolCardSession",
+        "initSession",
         "Fetching...",
-        name: "SchoolCardSession",
       );
       var response = await dio.get(
         "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
       );
       while (response.headers[HttpHeaders.locationHeader] != null) {
         String location = response.headers[HttpHeaders.locationHeader]![0];
-        developer.log("Received: $location.", name: "SchoolCardSession");
+        FlutterLogs.logInfo(
+          "PDA SchoolCardSession",
+          "initSession",
+          "Received location: $location.",
+        );
         response = await dio.get(location);
       }
       var page = BeautifulSoup(response.data);

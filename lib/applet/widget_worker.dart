@@ -1,18 +1,17 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
-
-import 'dart:developer' as developer;
-
 import 'package:background_fetch/background_fetch.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/applet/update_classtable_info.dart';
 import 'package:watermeter/applet/update_sport_info.dart';
 
 Future<void> saveToWidget(String key, dynamic value) async {
   await HomeWidget.saveWidgetData(key, value).then(
-    (result) => developer.log(
+    (result) => FlutterLogs.logInfo(
+      "PDA",
+      "WidgetWorker saveToWidget",
       "saveData '$key' status: $result value: $value",
-      name: "WidgetWorker saveToWidget",
     ),
   );
 }
@@ -25,29 +24,36 @@ backgroundFetchHeadlessTask(HeadlessTask task) async {
   if (isTimeout) {
     // This task has exceeded its allowed running-time.
     // You must stop what you're doing and immediately .finish(taskId)
-    developer.log(
+    FlutterLogs.logWarn(
+      "PDA",
+      "BackgroundFetch",
       "Headless task timed-out: $taskId",
-      name: "BackgroundFetch",
     );
     BackgroundFetch.finish(taskId);
     return;
   }
-  developer.log(
-    'Headless event received.',
-    name: "BackgroundFetch",
+  FlutterLogs.logWarn(
+    "PDA",
+    "BackgroundFetch",
+    "Headless event received.",
   );
   // Do your work here...
-  developer.log(
-    "The iOS background fetch was triggered, "
-    "BackgroundFetch",
+  FlutterLogs.logWarn(
+    "PDA",
+    "The BackgroundFetch has triggered, updating widget data...",
+    "Headless event received.",
   );
 
   await Future.wait([
     updateClasstableInfo(),
     updateSportInfo(),
-  ]);
+  ]).then((value) => BackgroundFetch.finish(taskId));
 
-  BackgroundFetch.finish(taskId);
+  FlutterLogs.logWarn(
+    "PDA",
+    "Headless task $taskId finished.",
+    "Headless event received.",
+  );
 }
 
 /* Do not add button on the widget for the moment..

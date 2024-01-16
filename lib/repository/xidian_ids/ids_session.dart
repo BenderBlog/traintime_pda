@@ -5,11 +5,11 @@
 // Thanks xidian-script and libxdauth!
 
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -35,9 +35,10 @@ class IDSSession extends NetworkSession {
     ..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          developer.log(
+          FlutterLogs.logInfo(
+            "PDA IDSSession",
+            "OfflineCheckInspector",
             "Offline status: $offline",
-            name: "OfflineCheckInspector",
           );
           if (offline) {
             handler.reject(
@@ -108,12 +109,20 @@ class IDSSession extends NetworkSession {
     required String target,
     Future<void> Function(String)? sliderCaptcha,
   }) async {
-    developer.log("Ready to get $target.", name: "ids checkAndLogin");
+    FlutterLogs.logInfo(
+      "PDA IDSSession",
+      "checkAndLogin",
+      "Ready to get $target.",
+    );
     var data = await dioNoOfflineCheck.get(
       "https://ids.xidian.edu.cn/authserver/login",
       queryParameters: {'service': target},
     );
-    developer.log("Received: $data.", name: "ids checkAndLogin");
+    FlutterLogs.logInfo(
+      "PDA IDSSession",
+      "checkAndLogin",
+      "Received: $data.",
+    );
     if (data.statusCode == 401) {
       throw PasswordWrongException(msg: _parsePasswordWrongMsg(data.data));
     } else if (data.statusCode == 301 || data.statusCode == 302) {
@@ -142,7 +151,11 @@ class IDSSession extends NetworkSession {
     /// Get the login webpage.
     if (onResponse != null) {
       onResponse(10, "准备获取登录网页");
-      developer.log("Ready to get the login webpage.", name: "ids login");
+      FlutterLogs.logInfo(
+        "PDA IDSSession",
+        "login",
+        "Ready to get the login webpage.",
+      );
     }
     var response = await dioNoOfflineCheck
         .get(
@@ -163,7 +176,11 @@ class IDSSession extends NetworkSession {
     for (var i in cookie) {
       cookieStr += "${i.name}=${i.value}; ";
     }
-    developer.log("cookie: $cookieStr.", name: "ids login");
+    FlutterLogs.logInfo(
+      "PDA IDSSession",
+      "login",
+      "cookie: $cookieStr.",
+    );
 
     /// Get AES encrypt key. There must be.
     if (onResponse != null) {
@@ -171,7 +188,11 @@ class IDSSession extends NetworkSession {
     }
     String keys = form
         .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
-    developer.log("encrypt key: $keys.", name: "ids login");
+    FlutterLogs.logInfo(
+      "PDA IDSSession",
+      "login",
+      "encrypt key: $keys.",
+    );
 
     /// Prepare for login.
     if (onResponse != null) {
@@ -226,7 +247,8 @@ class IDSSession extends NetworkSession {
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw PasswordWrongException(msg: _parsePasswordWrongMsg(e.response!.data));
+        throw PasswordWrongException(
+            msg: _parsePasswordWrongMsg(e.response!.data));
       }
       rethrow;
     }

@@ -6,8 +6,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
-import 'dart:developer' as developer;
 import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -18,16 +18,18 @@ Future<void> update() async {
   try {
     owe.value = "正在获取欠费";
     await PaymentSession().getOwe();
-  } on DioException catch (e) {
-    developer.log(
-      "Network error: $e",
-      name: "PaymentSession",
+  } on DioException {
+    FlutterLogs.logInfo(
+      "PDA PaymentSession",
+      "update",
+      "Network error",
     );
     owe.value = "欠费信息网络故障";
-  } catch (e) {
-    developer.log(
-      "Unknown error: $e",
-      name: "PaymentSession",
+  } catch (e, s) {
+    FlutterLogs.logWarn(
+      "PDA PaymentSession",
+      "update",
+      "Fetch failed with exception:\n$e\nStackTrace is:\n$s",
     );
     owe.value = "欠费程序故障";
   }
@@ -43,10 +45,6 @@ class PaymentSession extends IDSSession {
       String password = preference.getString(
         preference.Preference.electricityPassword,
       );
-      developer.log(
-        "Electricity password $password ${password.isEmpty}",
-        name: "PaymentSession",
-      );
       if (password.isEmpty) {
         password = "123456";
       }
@@ -57,12 +55,19 @@ class PaymentSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        developer.log("Received: $location.", name: "ids login");
+        FlutterLogs.logInfo(
+          "PDA PaymentSession",
+          "getOwe",
+          "Received location: $location.",
+        );
         response = await dio.get(location);
       }
       var nextStop = getTransfer.firstMatch(response.data);
-
-      developer.log("getTransfer: ${nextStop![0]!}", name: "PaymentSession");
+      FlutterLogs.logInfo(
+        "PDA PaymentSession",
+        "getOwe",
+        "getTransfer: ${nextStop![0]!}.",
+      );
 
       await dio.get(nextStop[0]!.replaceAll('"', ""));
 
@@ -101,8 +106,12 @@ class PaymentSession extends IDSSession {
           owe.value = "目前欠款无法查询";
         }
       });
-    } catch (e) {
-      developer.log(e.toString(), name: "PaymentSession");
+    } catch (e, s) {
+      FlutterLogs.logWarn(
+        "PDA PaymentSession",
+        "getOwe",
+        "Fetch failed with exception:\n$e\nStackTrace is:\n$s",
+      );
       owe.value = "目前欠款无法查询";
     }
   }

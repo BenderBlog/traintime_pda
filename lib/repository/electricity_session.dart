@@ -4,10 +4,9 @@
 // Get electricity usage data.
 
 import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import 'dart:developer' as developer;
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -24,19 +23,21 @@ Future<void> update() async {
     electricityInfo.value = "非校园网";
     isNotice.value = false;
   } on DioException catch (e) {
-    developer.log(
-      "Network error: $e",
-      name: "ElectricSession",
+    FlutterLogs.logWarn(
+      "PDA electricity_session",
+      "update",
+      "Network error: \n$e",
     );
     electricityInfo.value = "网络故障";
     isNotice.value = false;
   } on NotFoundException {
     electricityInfo.value = "查询失败";
     isNotice.value = false;
-  } catch (e) {
-    developer.log(
-      "Unknown error: $e",
-      name: "ElectricSession",
+  } catch (e, s) {
+    FlutterLogs.logWarn(
+      "PDA electricity_session",
+      "update",
+      "Network error: \n$e\nStacktrace:\n$s",
     );
     electricityInfo.value = "程序故障";
     isNotice.value = false;
@@ -105,10 +106,6 @@ class ElectricitySession extends NetworkSession {
     String password = preference.getString(
       preference.Preference.electricityPassword,
     );
-    developer.log(
-      "Electricity password $password ${password.isEmpty}",
-      name: "ElectricSession",
-    );
     if (password.isEmpty) {
       password = "123456";
     }
@@ -167,9 +164,10 @@ class ElectricitySession extends NetworkSession {
     for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
         electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
-        developer.log(
-          electricityInfo.value,
-          name: "ElectricSession",
+        FlutterLogs.logInfo(
+          "PDA electricity_session",
+          "ElectricitySession updateInformation",
+          "$electricityInfo.value",
         );
         return;
       }

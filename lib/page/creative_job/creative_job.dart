@@ -1,8 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:developer' as developer;
-
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,10 +37,6 @@ class _CreativeJobViewState extends State<CreativeJobView> {
   String searchParameter = "";
 
   Future<void> search({required bool isChanged}) async {
-    developer.log(
-      isChanged.toString(),
-      name: "CreativeJob",
-    );
     if (isChanged) {
       jobs.clear();
       page = 0;
@@ -83,11 +77,6 @@ class _CreativeJobViewState extends State<CreativeJobView> {
           }
         ],
       },
-    );
-
-    developer.log(
-      query.toString(),
-      name: "CreativeJob",
     );
 
     List<Job> getData = await CreativeServiceSession().getJob(

@@ -3,10 +3,9 @@
 
 // Library session.
 
-import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:io';
-
+import 'dart:convert';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -88,9 +87,10 @@ class LibrarySession extends IDSSession {
     if (state.value == SessionState.fetching) {
       return;
     }
-    developer.log(
+    FlutterLogs.logInfo(
+      "PDA LibrarySession",
+      "getBorrowList",
       "Getting borrow list",
-      name: "LibrarySession",
     );
 
     try {
@@ -140,9 +140,10 @@ class LibrarySession extends IDSSession {
   }
 
   Future<void> initSession() async {
-    developer.log(
+    FlutterLogs.logInfo(
+      "PDA LibrarySession",
+      "initSession",
       "Initalizing Library Session",
-      name: "LibrarySession",
     );
     try {
       String location = await checkAndLogin(
@@ -153,7 +154,11 @@ class LibrarySession extends IDSSession {
 
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        developer.log("Received: $location.", name: "ids login");
+        FlutterLogs.logInfo(
+          "PDA LibrarySession",
+          "initSession",
+          "Received location: $location.",
+        );
         response = await dio.get(location);
       }
 
@@ -165,7 +170,11 @@ class LibrarySession extends IDSSession {
               .replaceFirst(");", "") ??
           "";
 
-      developer.log("result is $result", name: "LibrarySession");
+      FlutterLogs.logInfo(
+        "PDA LibrarySession",
+        "initSession",
+        "Result is $result.",
+      );
 
       var toGet = jsonDecode(result);
 

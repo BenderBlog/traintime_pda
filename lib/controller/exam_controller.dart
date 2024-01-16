@@ -5,10 +5,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:get/get.dart';
-import 'dart:developer' as developer;
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
 
@@ -53,12 +54,20 @@ class ExamController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    developer.log("Path at ${supportPath.path}.", name: "ExamController");
+    FlutterLogs.logInfo(
+      "PDA ExamController",
+      "onInit",
+      "Path at ${supportPath.path}.",
+    );
     file = File("${supportPath.path}/$examDataCacheName");
     bool isExist = file.existsSync();
 
     if (isExist) {
-      developer.log("Init from cache.", name: "ExamController");
+      FlutterLogs.logInfo(
+        "PDA ExamController",
+        "onInit",
+        "Init from cache.",
+      );
       data = ExamData.fromJson(jsonDecode(file.readAsStringSync()));
       status = ExamStatus.cache;
     } else {
@@ -69,12 +78,16 @@ class ExamController extends GetxController {
   @override
   void onReady() async {
     super.onReady();
-    get();
-    update();
+    get().then((value) => update());
   }
 
   Future<void> get() async {
     ExamStatus previous = status;
+    FlutterLogs.logInfo(
+      "PDA ExamController",
+      "get",
+      "Fetching data from Internet.",
+    );
     try {
       now = Jiffy.now();
       status = ExamStatus.fetching;
@@ -82,22 +95,25 @@ class ExamController extends GetxController {
       status = ExamStatus.fetched;
       error = "";
     } on DioException catch (e, s) {
-      developer.log(
-        "Network exception: ${e.message}\nStack: $s",
-        name: "ExamController",
+      FlutterLogs.logWarn(
+        "PDA ExamController",
+        "get",
+        "Network exception: \n${e.message}\nStack: \n$s",
       );
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
-      developer.log(
-        "On exam controller: $e\nStack: $s",
-        name: "ExamController",
+      FlutterLogs.logWarn(
+        "PDA ExamController",
+        "get",
+        "Exception: \n$e\nStack: \n$s",
       );
-      error = "On exam controller: $e\nStack: $s";
+      error = "获取考试信息错误，请刷新。";
     } finally {
       if (status == ExamStatus.fetched) {
-        developer.log(
+        FlutterLogs.logInfo(
+          "PDA ExamController",
+          "get",
           "Store to cache.",
-          name: "ExamController",
         );
         file.writeAsStringSync(jsonEncode(
           data.toJson(),

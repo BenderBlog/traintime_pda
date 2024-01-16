@@ -3,13 +3,13 @@
 
 // Intro of the watermeter program.
 
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,13 +28,32 @@ import 'package:home_widget/home_widget.dart';
 import 'package:background_fetch/background_fetch.dart';
 
 void main() async {
-  developer.log(
-    "Watermeter is written by BenderBlog Rodriguez and contributors.",
-    name: "Watermeter",
-  );
-
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterLogs.logInfo(
+    "PDA",
+    "init",
+    "Traintime PDA Codebase is written by BenderBlog Rodriguez and contributors",
+  );
+
+  //Initialize Logging
+  await FlutterLogs.initLogs(
+    logLevelsEnabled: [
+      LogLevel.INFO,
+      LogLevel.WARNING,
+      LogLevel.ERROR,
+      LogLevel.SEVERE
+    ],
+    timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+    directoryStructure: DirectoryStructure.FOR_DATE,
+    logTypesEnabled: ["device", "network", "errors"],
+    logFileExtension: LogFileExtension.LOG,
+    logsWriteDirectoryName: "pda_logs",
+    logsExportDirectoryName: "pda_logs/exported",
+    debugFileOperations: true,
+    isDebuggable: true,
+  );
 
   // Init the homepage widget data.
   // Register to receive BackgroundFetch events after app is terminated.
@@ -43,10 +62,11 @@ void main() async {
   // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
   final data = WidgetsBinding.instance.platformDispatcher.views.first;
 
-  developer.log(
+  FlutterLogs.logInfo(
+    "PDA",
+    "init",
     "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} "
-    "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
-    name: "Watermeter",
+        "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
   );
 
   if (min(data.physicalSize.width, data.physicalSize.height) /
@@ -70,6 +90,11 @@ void main() async {
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
   bool isFirst = username.isEmpty || password.isEmpty;
+  FlutterLogs.logInfo(
+    "PDA",
+    "init",
+    "isFirstLogin: $isFirst",
+  );
 
   runApp(MyApp(isFirst: isFirst));
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
