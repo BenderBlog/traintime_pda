@@ -57,36 +57,45 @@ class _LogWindowState extends State<LogWindow> {
         title: const Text("日志窗口"),
         actions: [
           IconButton(
-              onPressed: () async {
-                String toStore = "";
-                final box = context.findRenderObject() as RenderBox?;
-                for (var i in logMemory.buffer) {
-                  toStore += printLog(i.origin);
+            onPressed: () async {
+              String toStore = "";
+              final box = context.findRenderObject() as RenderBox?;
+              for (var i in logMemory.buffer) {
+                toStore += printLog(i.origin);
+              }
+              try {
+                String now = Jiffy.now().format(
+                  pattern: "yyyyMMddTHHmmss",
+                );
+                String tempPath = await getTemporaryDirectory().then(
+                  (value) => value.path,
+                );
+                File file = File("$tempPath/log-$now.txt");
+                if (!(await file.exists())) {
+                  await file.create();
                 }
-                try {
-                  String now = Jiffy.now().format(
-                    pattern: "yyyyMMddTHHmmss",
-                  );
-                  String tempPath = await getTemporaryDirectory().then(
-                    (value) => value.path,
-                  );
-                  File file = File("$tempPath/log-$now.txt");
-                  if (!(await file.exists())) {
-                    await file.create();
-                  }
-                  await file.writeAsString(toStore);
-                  await Share.shareXFiles(
-                    [XFile("$tempPath/log-$now.txt")],
-                    sharePositionOrigin:
-                        box!.localToGlobal(Offset.zero) & box.size,
-                  );
-                  await file.delete();
-                  Fluttertoast.showToast(msg: "共享日志成功");
-                } on FileSystemException {
-                  Fluttertoast.showToast(msg: "共享日志失败");
-                }
-              },
-              icon: const Icon(Icons.share))
+                await file.writeAsString(toStore);
+                await Share.shareXFiles(
+                  [XFile("$tempPath/log-$now.txt")],
+                  sharePositionOrigin:
+                      box!.localToGlobal(Offset.zero) & box.size,
+                );
+                await file.delete();
+                Fluttertoast.showToast(msg: "共享日志成功");
+              } on FileSystemException {
+                Fluttertoast.showToast(msg: "共享日志失败");
+              }
+            },
+            icon: const Icon(Icons.share),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                logMemory.buffer.clear();
+              });
+            },
+            icon: const Icon(Icons.delete),
+          )
         ],
       ),
       body: ListView(children: [

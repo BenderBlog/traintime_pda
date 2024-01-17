@@ -58,35 +58,35 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> initPlatformState() async {
     // Configure BackgroundFetch.
     int status = await BackgroundFetch.configure(
-        BackgroundFetchConfig(
-          minimumFetchInterval: 15,
-          stopOnTerminate: true,
-          enableHeadless: true,
-          requiresBatteryNotLow: false,
-          requiresCharging: false,
-          requiresStorageNotLow: false,
-          requiresDeviceIdle: false,
-          requiredNetworkType: NetworkType.NONE,
-        ), (String taskId) async {
-      log.i(
-        "[home][BackgroundFetchFromHome]"
-        "Headless event received $taskId.",
-      );
-      // IMPORTANT:  You must signal completion of your task or the OS can punish your app
-      // for taking too long in the background.
-      await Future.wait([
-        updateClasstableInfo(),
-        updateSportInfo(),
-      ]).then((value) => BackgroundFetch.finish(taskId));
-    }, (String taskId) async {
-      // <-- Task timeout handler.
-      // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-      log.i(
-        "[home][BackgroundFetchFromHome]"
-        "TASK TIMEOUT taskId: $taskId.",
-      );
-      BackgroundFetch.finish(taskId);
-    });
+      BackgroundFetchConfig(
+        minimumFetchInterval: 15,
+        startOnBoot: true,
+        stopOnTerminate: true,
+        enableHeadless: true,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresStorageNotLow: false,
+        requiresDeviceIdle: false,
+        requiredNetworkType: NetworkType.NONE,
+      ),
+      (String taskId) async {
+        log.i(
+          "[home][BackgroundFetchFromHome]"
+          "Headless event received $taskId.",
+        );
+        await Future.wait([
+          updateClasstableInfo(),
+          updateSportInfo(),
+        ]).then((value) => BackgroundFetch.finish(taskId));
+      },
+      (String taskId) async {
+        log.i(
+          "[home][BackgroundFetchFromHome]"
+          "TASK TIMEOUT taskId: $taskId.",
+        );
+        BackgroundFetch.finish(taskId);
+      },
+    );
     log.i(
       "[home][BackgroundFetchFromHome]"
       "Configure status: $status.",
