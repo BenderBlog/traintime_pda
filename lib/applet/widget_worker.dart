@@ -3,7 +3,6 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:watermeter/applet/update_classtable_info.dart';
 import 'package:watermeter/applet/update_sport_info.dart';
 
 Future<void> saveToWidget(String key, dynamic value) async {
@@ -37,7 +36,6 @@ backgroundFetchHeadlessTask(HeadlessTask task) async {
   // Do your work here...
 
   await Future.wait([
-    updateClasstableInfo(),
     updateSportInfo(),
   ]).then((value) => BackgroundFetch.finish(taskId));
 

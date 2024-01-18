@@ -14,14 +14,18 @@ struct AppIdFailedError : Error {}
 // Sync classtable data to the public place...
 public class ApiImplementation: SaveToGroupIdSwiftApi {
     func saveToGroupId(data: FileToGroupID, completion: @escaping (Result<Bool, Error>) -> Void) {
+        let fileManager = FileManager()
         do {
             let fileURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: data.appid)
             if fileURL == nil {
                 throw AppIdFailedError()
             }
+            if fileManager.fileExists(atPath: fileURL!.absoluteString) {
+               try! fileManager.removeItem(at: fileURL!)
+            }
             try Data(data.data.utf8).write(
                 to: fileURL!.appendingPathComponent(data.fileName),
-                options: [.atomic]
+                options: [.atomic,]
             )
         } catch is AppIdFailedError {
             completion(.failure(FlutterError(

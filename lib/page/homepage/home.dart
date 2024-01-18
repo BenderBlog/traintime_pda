@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:watermeter/applet/update_classtable_info.dart';
 import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -75,7 +74,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           "Headless event received $taskId.",
         );
         await Future.wait([
-          updateClasstableInfo(),
           updateSportInfo(),
         ]).then((value) => BackgroundFetch.finish(taskId));
       },

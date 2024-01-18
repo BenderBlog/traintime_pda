@@ -156,7 +156,7 @@ struct UserDefinedClassData : Codable {
 
 struct ClassTableData : Codable {
     var semesterLength : Int
-    var semesterCode : Int
+    var semesterCode : String
     var termStartDay : String
     var classDetail : [ClassDetail]
     var userDefinedDetail : [ClassDetail]
@@ -229,61 +229,3 @@ var TimeInt : [(Int, Int)] = [
   (19,55),
   (20,35),
 ]
-
-// Refrence to /lib/model/xidian_ids/exam.dart
-private let dateRegex = #"^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})"#
-
-struct ExamSubject : Codable {
-    var subject : String
-    var typeStr : String
-    var time : String
-    var place : String
-    var seat : Int
-    
-    var startTime : Date {
-        get {
-            if let regex = try? NSRegularExpression(pattern: dateRegex) {
-                let matches = regex.matches(
-                    in: time,
-                    range: NSRange(time.startIndex..., in: time)
-                )
-                
-                let calendar = Calendar.current
-                var dateComponents = DateComponents()
-                dateComponents.year = Int(time[Range(matches[0].range(withName: "year"), in: time)!])
-                dateComponents.month = Int(time[Range(matches[0].range(withName: "month"), in: time)!])
-                dateComponents.day = Int(time[Range(matches[0].range(withName: "day"), in: time)!])
-                dateComponents.hour = Int(time[Range(matches[0].range(withName: "hour"), in: time)!])
-                dateComponents.minute = Int(time[Range(matches[0].range(withName: "minute"), in: time)!])
-                return calendar.date(from: dateComponents)!
-            } else {
-                ///  Absolutely never happens.
-                return Date()
-            }
-        }
-    }
-    
-    var stopTime : Date {
-        get {
-            if let regex = try? NSRegularExpression(pattern: dateRegex) {
-                let matches = regex.matches(
-                    in: time,
-                    range: NSRange(time.startIndex..., in: time)
-                )
-                
-                let calendar = Calendar.current
-                var dateComponents = DateComponents()
-                dateComponents.year = Int(time[Range(matches[0].range(withName: "year"), in: time)!])
-                dateComponents.month = Int(time[Range(matches[0].range(withName: "month"), in: time)!])
-                dateComponents.day = Int(time[Range(matches[0].range(withName: "day"), in: time)!])
-                dateComponents.hour = Int(time[Range(matches[0].range(withName: "stopHour"), in: time)!])
-                dateComponents.minute = Int(time[Range(matches[0].range(withName: "stopMinute"), in: time)!])
-                return calendar.date(from: dateComponents)!
-            } else {
-                ///  Absolutely never happens.
-                return Date()
-            }
-        }
-    }
-
-}

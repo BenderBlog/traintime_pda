@@ -12,6 +12,7 @@ import SwiftUI
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
 private let examFile = "ExamFile.json"
+private let swiftFile = "WeekSwift.txt"
 private let format = "yyyy-MM-dd HH:mm:ss"
 private let myDateFormatter = DateFormatter()
 
@@ -35,7 +36,6 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        let data = UserDefaults.init(suiteName: widgetGroupId)
         var todayArr : [TimeLineStructItems] = []
         var tomorrowArr : [TimeLineStructItems] = []
         
@@ -45,7 +45,6 @@ struct Provider: TimelineProvider {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
-        let userDefault = UserDefaults(suiteName: widgetGroupId)
         let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: widgetGroupId
         )!
@@ -53,9 +52,10 @@ struct Provider: TimelineProvider {
         // Deal with ClassTable data
         do {
             // Read data
+            print("getting classtable data")
             let fileURL = containerURL.appendingPathComponent(classTableFile)
             let jsonData = try Data(contentsOf: fileURL)
-            var classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
+            let classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
             
             // Fetch start day
             var startDay : Date? = dateFormatter.date(from: classData.termStartDay)
@@ -64,13 +64,24 @@ struct Provider: TimelineProvider {
             }
             
             // With swift
-            var classSwift : Int = userDefault?.integer(forKey: "swift") ?? 0
+            var classSwift : Int = 0
+            do {
+                let swiftData = try String(
+                    contentsOf: containerURL.appendingPathComponent(swiftFile),
+                    encoding: .utf8
+                )
+                classSwift = Int(swiftData) ?? 0
+            } catch {
+                print(String(describing: error))
+            }
+            print("swift: \(classSwift)")
+
             var dateComponent = DateComponents()
             dateComponent.day = 7 * classSwift
             startDay = Calendar.current.date(byAdding: dateComponent, to: startDay!)
-            
+
             // Current week and others
-            let components = calendar.dateComponents([.day], from: today, to: startDay!)
+            let components = calendar.dateComponents([.day], from: startDay!, to: today)
             var delta = components.day!
             if delta < 0 {
                 delta = -7
@@ -82,13 +93,14 @@ struct Provider: TimelineProvider {
             } else {
                 index -= 1
             }
+            print("startDay: \(String(describing: startDay)) currentWeek: \(currentWeek) index: \(index)")
             
             // Classes in today
             if currentWeek >= 0 && currentWeek < classData.semesterLength {
                 for i in classData.timeArrangement {
-                    if i.week_list[currentWeek] && i.day == index {
-                        var startData = TimeInt[(i.start - 1) * 2]
-                        var stopData = TimeInt[(i.start - 1) * 2]
+                    if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
+                        let startData = TimeInt[(i.start - 1) * 2]
+                        let stopData = TimeInt[(i.start - 1) * 2]
                         todayArr.append(TimeLineStructItems(
                             name: classData.getClassName(
                                 timeArrangementIndex: i.index
@@ -118,11 +130,12 @@ struct Provider: TimelineProvider {
                 index = 1
                 currentWeek += 1
             }
+            print("(tomorrow) startDay: \(String(describing: startDay)) currentWeek: \(currentWeek) index: \(index)")
             if currentWeek >= 0 && currentWeek < classData.semesterLength {
                 for i in classData.timeArrangement {
-                    if i.week_list[currentWeek] && i.day == index {
-                        var startData = TimeInt[(i.start - 1) * 2]
-                        var stopData = TimeInt[(i.start - 1) * 2]
+                    if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
+                        let startData = TimeInt[(i.start - 1) * 2]
+                        let stopData = TimeInt[(i.start - 1) * 2]
                         tomorrowArr.append(TimeLineStructItems(
                             name: classData.getClassName(
                                 timeArrangementIndex: i.index
@@ -146,7 +159,7 @@ struct Provider: TimelineProvider {
                 }
             }
         } catch {
-            print(error.localizedDescription)
+            print(String(describing: error))
         }
         
         // Deal with exam data
@@ -154,7 +167,7 @@ struct Provider: TimelineProvider {
             // Read data
             let fileURL = containerURL.appendingPathComponent(examFile)
             let jsonData = try Data(contentsOf: fileURL)
-            var examData : ExamData = try decoder.decode(ExamData.self, from: jsonData)
+            let examData : ExamData = try decoder.decode(ExamData.self, from: jsonData)
             
             var components = calendar.dateComponents([.day,.month,.year], from: today)
             var day = components.day
@@ -176,8 +189,8 @@ struct Provider: TimelineProvider {
             }
             
             // Tomorrow data
-            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)
-            components = calendar.dateComponents([.day,.month,.year], from: today)
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
+            components = calendar.dateComponents([.day,.month,.year], from: tomorrow)
             day = components.day
             month = components.month
             year = components.year
@@ -194,13 +207,14 @@ struct Provider: TimelineProvider {
                 }
             }
         } catch {
-            print(error.localizedDescription)
+            print(String(describing: error))
         }
         
         // Order
         todayArr.sort(by: {$0.start_time > $1.start_time})
         tomorrowArr.sort(by: {$0.start_time > $1.start_time})
 
+        print("todayArr: \(todayArr.count) tomorrowArr:\(tomorrowArr.count)")
         
         var entryDates : Set<Date?> = []
         var entries: [SimpleEntry] = []
@@ -252,8 +266,6 @@ struct TimeLineStructItems : Codable {
     var start_time : Date
     var end_time : Date
 }
-
-
 
 struct ClasstableWidgetEntryView : View {
     var entry: Provider.Entry

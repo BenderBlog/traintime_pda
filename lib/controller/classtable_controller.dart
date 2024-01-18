@@ -8,7 +8,6 @@ import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:watermeter/applet/update_classtable_info.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -333,8 +332,6 @@ class ClassTableController extends GetxController {
       "[ClassTableController][addUserDefinedClass] "
       "startDay: $startDay, currentWeek: $currentWeek, isNotVacation: $isNotVacation.",
     );
-
-    updateClasstableInfo();
   }
 
   Future<void> updateClassTable({bool isForce = false}) async {
@@ -395,12 +392,30 @@ class ClassTableController extends GetxController {
           ));
           log.i(
             "[ClassTableController][updateClassTable] "
-            "ios Save to public place status: $data.",
+            "ios ClassTable.json save to public place status: $data.",
           );
         } catch (e, s) {
           log.w(
             "[ClassTableController][updateClassTable] "
-            "ios Save to public place failed with error: ",
+            "ios ClassTable.json save to public place failed with error: ",
+            error: e,
+            stackTrace: s,
+          );
+        }
+        try {
+          bool data = await api.saveToGroupId(FileToGroupID(
+            appid: preference.appId,
+            fileName: "WeekSwift.txt",
+            data: preference.getInt(preference.Preference.swift).toString(),
+          ));
+          log.i(
+            "[ClassTableController][updateClassTable] "
+            "ios WeekSwift.txt save to public place status: $data.",
+          );
+        } catch (e, s) {
+          log.w(
+            "[ClassTableController][updateClassTable] "
+            "ios WeekSwift.txt save to public place failed with error: ",
             error: e,
             stackTrace: s,
           );
