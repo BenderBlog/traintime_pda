@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		262B016C2B58FED30094B372 /* SaveToGroupID.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B016B2B58FED30094B372 /* SaveToGroupID.g.swift */; };
+		262B01702B5905FA0094B372 /* ApiImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B016F2B5905FA0094B372 /* ApiImplementation.swift */; };
+		262B01722B5931740094B372 /* ExamModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B01712B5931740094B372 /* ExamModule.swift */; };
 		266DEF222B4FB00700D8D01E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA22B49B50B006B2B17 /* WidgetKit.framework */; };
 		266DEF232B4FB00700D8D01E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26947AA42B49B50B006B2B17 /* SwiftUI.framework */; };
 		266DEF262B4FB00700D8D01E /* SportWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266DEF252B4FB00700D8D01E /* SportWidgetBundle.swift */; };
@@ -84,6 +87,9 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		262B016B2B58FED30094B372 /* SaveToGroupID.g.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveToGroupID.g.swift; sourceTree = "<group>"; };
+		262B016F2B5905FA0094B372 /* ApiImplementation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiImplementation.swift; sourceTree = "<group>"; };
+		262B01712B5931740094B372 /* ExamModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamModule.swift; sourceTree = "<group>"; };
 		266DEF212B4FB00700D8D01E /* SportWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SportWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		266DEF252B4FB00700D8D01E /* SportWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportWidgetBundle.swift; sourceTree = "<group>"; };
 		266DEF272B4FB00700D8D01E /* SportWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportWidget.swift; sourceTree = "<group>"; };
@@ -182,6 +188,7 @@
 				26947AAD2B49B50C006B2B17 /* Info.plist */,
 				26CC2A462B526A0C007E67CB /* ClasstableModel.swift */,
 				26CC2A482B541A9A007E67CB /* EventItem.swift */,
+				262B01712B5931740094B372 /* ExamModule.swift */,
 			);
 			path = ClasstableWidget;
 			sourceTree = "<group>";
@@ -235,6 +242,8 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				262B016F2B5905FA0094B372 /* ApiImplementation.swift */,
+				262B016B2B58FED30094B372 /* SaveToGroupID.g.swift */,
 				26947AB62B4AF161006B2B17 /* Runner.entitlements */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -550,6 +559,7 @@
 				26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */,
 				26947AA82B49B50B006B2B17 /* ClasstableWidgetBundle.swift in Sources */,
 				26947AAA2B49B50B006B2B17 /* ClasstableWidget.swift in Sources */,
+				262B01722B5931740094B372 /* ExamModule.swift in Sources */,
 				26CC2A492B541A9A007E67CB /* EventItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -566,7 +576,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				262B016C2B58FED30094B372 /* SaveToGroupID.g.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				262B01702B5905FA0094B372 /* ApiImplementation.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

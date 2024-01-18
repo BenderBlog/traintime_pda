@@ -10,8 +10,8 @@ part 'exam.g.dart';
 class Subject {
   String subject;
   String typeStr;
-  //DateTime start;
-  //DateTime end;
+  String startTimeStr;
+  String endTimeStr;
   String time;
   String place;
   int seat;
@@ -57,12 +57,49 @@ class Subject {
     return typeStr;
   }
 
+  factory Subject.generate({
+    required String subject,
+    required String typeStr,
+    required String time,
+    required String place,
+    required int seat,
+  }) {
+    RegExpMatch? match = timeRegExp.firstMatch(time);
+    if (match == null) throw NotImplementedException();
+
+    String startTime = Jiffy.parseFromDateTime(DateTime(
+      int.parse(match.namedGroup('year')!),
+      int.parse(match.namedGroup('month')!),
+      int.parse(match.namedGroup('day')!),
+      int.parse(match.namedGroup('hour')!),
+      int.parse(match.namedGroup('minute')!),
+    )).format(pattern: "yyyy-MM-dd HH:mm:ss");
+
+    String stopTime = Jiffy.parseFromDateTime(DateTime(
+      int.parse(match.namedGroup('year')!),
+      int.parse(match.namedGroup('month')!),
+      int.parse(match.namedGroup('day')!),
+      int.parse(match.namedGroup('stopHour')!),
+      int.parse(match.namedGroup('stopMinute')!),
+    )).format(pattern: "yyyy-MM-dd HH:mm:ss");
+
+    return Subject(
+      subject: subject,
+      typeStr: typeStr,
+      time: time,
+      place: place,
+      seat: seat,
+      startTimeStr: startTime,
+      endTimeStr: stopTime,
+    );
+  }
+
   Subject({
     required this.subject,
     required this.typeStr,
     required this.time,
-    //required this.start,
-    //required this.end,
+    required this.startTimeStr,
+    required this.endTimeStr,
     required this.place,
     required this.seat,
   });

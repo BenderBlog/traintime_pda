@@ -9,9 +9,13 @@
 import WidgetKit
 import SwiftUI
 
-private let widgetGroupId = "group.xdyou"
+private let widgetGroupId = "group.xyz.superbart.xdyou"
+private let classTableFile = "ClassTable.json"
+private let examFile = "ExamFile.json"
 private let format = "yyyy-MM-dd HH:mm:ss"
 private let myDateFormatter = DateFormatter()
+
+struct StartDayFetchError : Error {}
 
 struct Provider: TimelineProvider {
     
@@ -31,33 +35,178 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        print("gettingTimeline")
         let data = UserDefaults.init(suiteName: widgetGroupId)
         var todayArr : [TimeLineStructItems] = []
         var tomorrowArr : [TimeLineStructItems] = []
+        
+        let today = Date()
+        let decoder = JSONDecoder()
+        let calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+        let userDefault = UserDefaults(suiteName: widgetGroupId)
+        let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: widgetGroupId
+        )!
+        
+        // Deal with ClassTable data
         do {
-            let decoder = JSONDecoder()
-            todayArr.append(
-                contentsOf: try decoder.decode(
-                    [TimeLineStructItems].self,
-                    from: Data(data?.string(forKey: "today_data")?.utf8 ?? "[]".utf8)
-                )
-            )
-            tomorrowArr.append(
-                contentsOf: try decoder.decode(
-                    [TimeLineStructItems].self,
-                    from: Data(data?.string(forKey: "tomorrow_data")?.utf8 ?? "[]".utf8)
-                )
-            )
+            // Read data
+            let fileURL = containerURL.appendingPathComponent(classTableFile)
+            let jsonData = try Data(contentsOf: fileURL)
+            var classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
+            
+            // Fetch start day
+            var startDay : Date? = dateFormatter.date(from: classData.termStartDay)
+            if startDay == nil {
+                throw StartDayFetchError()
+            }
+            
+            // With swift
+            var classSwift : Int = userDefault?.integer(forKey: "swift") ?? 0
+            var dateComponent = DateComponents()
+            dateComponent.day = 7 * classSwift
+            startDay = Calendar.current.date(byAdding: dateComponent, to: startDay!)
+            
+            // Current week and others
+            let components = calendar.dateComponents([.day], from: today, to: startDay!)
+            var delta = components.day!
+            if delta < 0 {
+                delta = -7
+            }
+            var currentWeek : Int = delta / 7
+            var index : Int = calendar.component(.weekday, from: today)
+            if index == 1 {
+                index = 7
+            } else {
+                index -= 1
+            }
+            
+            // Classes in today
+            if currentWeek >= 0 && currentWeek < classData.semesterLength {
+                for i in classData.timeArrangement {
+                    if i.week_list[currentWeek] && i.day == index {
+                        var startData = TimeInt[(i.start - 1) * 2]
+                        var stopData = TimeInt[(i.start - 1) * 2]
+                        todayArr.append(TimeLineStructItems(
+                            name: classData.getClassName(
+                                timeArrangementIndex: i.index
+                            ),
+                            teacher: i.teacher ?? "未知老师",
+                            place: i.classroom ?? "未安排教室",
+                            start_time: calendar.date(
+                                bySettingHour: startData.0,
+                                minute: startData.1,
+                                second: 0,
+                                of: today
+                            )!,
+                            end_time: calendar.date(
+                                bySettingHour: stopData.0,
+                                minute: stopData.1,
+                                second: 0,
+                                of: today
+                            )!
+                        ))
+                    }
+                }
+            }
+            
+            // Tomorrow class
+            index += 1
+            if index > 7 {
+                index = 1
+                currentWeek += 1
+            }
+            if currentWeek >= 0 && currentWeek < classData.semesterLength {
+                for i in classData.timeArrangement {
+                    if i.week_list[currentWeek] && i.day == index {
+                        var startData = TimeInt[(i.start - 1) * 2]
+                        var stopData = TimeInt[(i.start - 1) * 2]
+                        tomorrowArr.append(TimeLineStructItems(
+                            name: classData.getClassName(
+                                timeArrangementIndex: i.index
+                            ),
+                            teacher: i.teacher ?? "未知老师",
+                            place: i.classroom ?? "未安排教室",
+                            start_time: calendar.date(
+                                bySettingHour: startData.0,
+                                minute: startData.1,
+                                second: 0,
+                                of: today
+                            )!,
+                            end_time: calendar.date(
+                                bySettingHour: stopData.0,
+                                minute: stopData.1,
+                                second: 0,
+                                of: today
+                            )!
+                        ))
+                    }
+                }
+            }
         } catch {
             print(error.localizedDescription)
         }
+        
+        // Deal with exam data
+        do {
+            // Read data
+            let fileURL = containerURL.appendingPathComponent(examFile)
+            let jsonData = try Data(contentsOf: fileURL)
+            var examData : ExamData = try decoder.decode(ExamData.self, from: jsonData)
+            
+            var components = calendar.dateComponents([.day,.month,.year], from: today)
+            var day = components.day
+            var month = components.month
+            var year = components.year
+            
+            // Today data
+            for i in examData.subject {
+                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
+                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                    todayArr.append(TimeLineStructItems(
+                        name: i.subject,
+                        teacher: "考试",
+                        place: "\(i.place) \(i.seat)",
+                        start_time: i.startTime,
+                        end_time: i.endTime
+                    ))
+                }
+            }
+            
+            // Tomorrow data
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)
+            components = calendar.dateComponents([.day,.month,.year], from: today)
+            day = components.day
+            month = components.month
+            year = components.year
+            for i in examData.subject {
+                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
+                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                    tomorrowArr.append(TimeLineStructItems(
+                        name: i.subject,
+                        teacher: "考试",
+                        place: "\(i.place) \(i.seat)",
+                        start_time: i.startTime,
+                        end_time: i.endTime
+                    ))
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        // Order
+        todayArr.sort(by: {$0.start_time > $1.start_time})
+        tomorrowArr.sort(by: {$0.start_time > $1.start_time})
 
+        
         var entryDates : Set<Date?> = []
         var entries: [SimpleEntry] = []
         for todayItem in todayArr {
-            entryDates.insert(todayItem.startTime)
-            entryDates.insert(todayItem.endTime)
+            entryDates.insert(todayItem.start_time)
+            entryDates.insert(todayItem.end_time)
         }
         for entryDate in entryDates {
             if (entryDate == nil) {
@@ -65,10 +214,7 @@ struct Provider: TimelineProvider {
             }
             var toShow : [TimeLineStructItems] = []
             for arr in todayArr {
-                if (arr.endTime == nil){
-                    continue
-                }
-                if arr.endTime! > entryDate! {
+                if arr.end_time > entryDate! {
                     toShow.append(arr)
                 }
             }
@@ -103,22 +249,8 @@ struct TimeLineStructItems : Codable {
     var name : String
     var teacher : String
     var place : String
-    var start_time : String
-    var end_time : String
-    
-    var startTime : Date? {
-        get {
-            myDateFormatter.dateFormat = format
-            return myDateFormatter.date(from: start_time)
-        }
-    }
-    
-    var endTime : Date? {
-        get {
-            myDateFormatter.dateFormat = format
-            return myDateFormatter.date(from: end_time)
-        }
-    }
+    var start_time : Date
+    var end_time : Date
 }
 
 
@@ -210,8 +342,6 @@ struct ClasstableWidget: Widget {
         class_table_json: "[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:45\",\"end_time\":\"10:05\"},]")
 
 }*/
-
-
 
 // Colors
 var colors: [Color] = [

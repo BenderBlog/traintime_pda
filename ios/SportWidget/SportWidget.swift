@@ -9,7 +9,7 @@
 import WidgetKit
 import SwiftUI
 
-private let widgetGroupId = "group.xdyou"
+private let widgetGroupId = "group.xyz.superbart.xdyou"
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {

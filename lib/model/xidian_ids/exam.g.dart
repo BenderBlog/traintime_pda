@@ -10,6 +10,8 @@ Subject _$SubjectFromJson(Map<String, dynamic> json) => Subject(
       subject: json['subject'] as String,
       typeStr: json['typeStr'] as String,
       time: json['time'] as String,
+      startTimeStr: json['startTimeStr'] as String,
+      endTimeStr: json['endTimeStr'] as String,
       place: json['place'] as String,
       seat: json['seat'] as int,
     );
@@ -17,6 +19,8 @@ Subject _$SubjectFromJson(Map<String, dynamic> json) => Subject(
 Map<String, dynamic> _$SubjectToJson(Subject instance) => <String, dynamic>{
       'subject': instance.subject,
       'typeStr': instance.typeStr,
+      'startTimeStr': instance.startTimeStr,
+      'endTimeStr': instance.endTimeStr,
       'time': instance.time,
       'place': instance.place,
       'seat': instance.seat,

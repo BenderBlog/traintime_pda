@@ -1,0 +1,3 @@
+Copyright 2024 BenderBlog Rodriguez and contributors.
+SPDX-License-Identifier: MPL-2.0
+

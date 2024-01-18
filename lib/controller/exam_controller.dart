@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
@@ -12,6 +13,7 @@ import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 enum ExamStatus {
   cache,
@@ -115,6 +117,27 @@ class ExamController extends GetxController {
         file.writeAsStringSync(jsonEncode(
           data.toJson(),
         ));
+        if (Platform.isIOS) {
+          final api = SaveToGroupIdSwiftApi();
+          try {
+            bool result = await api.saveToGroupId(FileToGroupID(
+              appid: preference.appId,
+              fileName: "ExamFile.json",
+              data: jsonEncode(jsonEncode(data.toJson())),
+            ));
+            log.i(
+              "[ExamController][get] "
+              "ios Save to public place status: $result.",
+            );
+          } catch (e, s) {
+            log.w(
+              "[ExamController][get] "
+              "ios Save to public place failed with error: ",
+              error: e,
+              stackTrace: s,
+            );
+          }
+        }
       } else if (previous == ExamStatus.cache) {
         status = ExamStatus.cache;
       } else {

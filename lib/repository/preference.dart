@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 late SharedPreferences prefs;
 late PackageInfo packageInfo;
 
+const String appId = "group.xyz.superbart.xdyou";
+
 enum Preference {
   name(key: "name", type: "String"),
   sex(key: "sex", type: "String"),

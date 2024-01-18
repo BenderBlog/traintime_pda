@@ -8,6 +8,11 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
       GeneratedPluginRegistrant.register(with: self)
+      
+      let controller = window?.rootViewController as! FlutterViewController
+      let api = ApiImplementation()
+      SaveToGroupIdSwiftApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: api)
+      
       return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

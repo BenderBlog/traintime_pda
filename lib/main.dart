@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    HomeWidget.setAppGroupId('group.xyz.superbart.xdyou');
+    HomeWidget.setAppGroupId(preference.appId);
     //HomeWidget.registerInteractivityCallback(backgroundCallback);
 
     if (widget.isFirst) {

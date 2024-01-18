@@ -1,6 +1,10 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
@@ -379,6 +383,27 @@ class ClassTableController extends GetxController {
               i.add(-1);
             }
           }
+        }
+      }
+      if (Platform.isIOS) {
+        final api = SaveToGroupIdSwiftApi();
+        try {
+          bool data = await api.saveToGroupId(FileToGroupID(
+            appid: preference.appId,
+            fileName: "ClassTable.json",
+            data: jsonEncode(classTableData.toJson()),
+          ));
+          log.i(
+            "[ClassTableController][updateClassTable] "
+            "ios Save to public place status: $data.",
+          );
+        } catch (e, s) {
+          log.w(
+            "[ClassTableController][updateClassTable] "
+            "ios Save to public place failed with error: ",
+            error: e,
+            stackTrace: s,
+          );
         }
       }
 

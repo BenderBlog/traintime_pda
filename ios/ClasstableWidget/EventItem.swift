@@ -34,7 +34,7 @@ struct EventItem: View {
                 if (widgetFamily == .systemSmall) {
                     Text(event.name)
                         .font(.subheadline.weight(.medium))
-                    Text("\(myDateFormatter.string(from: event.startTime!)) \(event.place)")
+                    Text("\(myDateFormatter.string(from: event.start_time)) \(event.place)")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.secondary)
                 } else {
@@ -48,10 +48,10 @@ struct EventItem: View {
                         }
                         Spacer()
                         VStack(alignment: .trailing) {
-                            Text("\(myDateFormatter.string(from: event.startTime!))")
+                            Text("\(myDateFormatter.string(from: event.start_time))")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(.secondary)
-                            Text("\(myDateFormatter.string(from: event.endTime!))")
+                            Text("\(myDateFormatter.string(from: event.end_time))")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(.secondary)
                         }

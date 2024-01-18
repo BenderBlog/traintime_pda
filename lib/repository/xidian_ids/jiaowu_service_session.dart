@@ -156,7 +156,7 @@ class JiaowuServiceSession extends IDSSession {
 
       return List<Subject>.generate(
         data.length,
-        (index) => Subject(
+        (index) => Subject.generate(
           subject: data[index]["courseName"],
           typeStr: data[index]["batchName"] ?? "未知类型考试",
           time: data[index]["timeNote"] ?? "未知考试时间",
