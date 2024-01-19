@@ -20,6 +20,7 @@ public class ApiImplementation: SaveToGroupIdSwiftApi {
             if fileURL == nil {
                 throw AppIdFailedError()
             }
+            print("\(String(describing: fileURL?.absoluteString))")
             if fileManager.fileExists(atPath: fileURL!.absoluteString) {
                try! fileManager.removeItem(at: fileURL!)
             }
@@ -40,6 +41,7 @@ public class ApiImplementation: SaveToGroupIdSwiftApi {
                 details: error.localizedDescription
             )))
         }
+        print("Write complete!")
         completion(.success(true))
     }
     

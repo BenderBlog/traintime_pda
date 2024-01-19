@@ -100,11 +100,9 @@ struct Provider: TimelineProvider {
                 for i in classData.timeArrangement {
                     if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
                         let startData = TimeInt[(i.start - 1) * 2]
-                        let stopData = TimeInt[(i.start - 1) * 2]
+                        let stopData = TimeInt[(i.stop - 1) * 2 + 1]
                         todayArr.append(TimeLineStructItems(
-                            name: classData.getClassName(
-                                timeArrangementIndex: i.index
-                            ),
+                            name: classData.getClassName(t: i),
                             teacher: i.teacher ?? "未知老师",
                             place: i.classroom ?? "未安排教室",
                             start_time: calendar.date(
@@ -135,11 +133,9 @@ struct Provider: TimelineProvider {
                 for i in classData.timeArrangement {
                     if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
                         let startData = TimeInt[(i.start - 1) * 2]
-                        let stopData = TimeInt[(i.start - 1) * 2]
+                        let stopData = TimeInt[(i.stop - 1) * 2 + 1]
                         tomorrowArr.append(TimeLineStructItems(
-                            name: classData.getClassName(
-                                timeArrangementIndex: i.index
-                            ),
+                            name: classData.getClassName(t: i),
                             teacher: i.teacher ?? "未知老师",
                             place: i.classroom ?? "未安排教室",
                             start_time: calendar.date(
@@ -226,8 +222,10 @@ struct Provider: TimelineProvider {
             if (entryDate == nil) {
                 continue
             }
+            print("\(String(describing: entryDate?.formatted()))")
             var toShow : [TimeLineStructItems] = []
             for arr in todayArr {
+                print("\(arr.end_time.formatted()) \(arr.end_time > entryDate!)")
                 if arr.end_time > entryDate! {
                     toShow.append(arr)
                 }

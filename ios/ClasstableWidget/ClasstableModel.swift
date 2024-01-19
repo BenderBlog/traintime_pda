@@ -165,8 +165,7 @@ struct ClassTableData : Codable {
     var classChanges : [ClassChange]
     
     /// Only allowed to be used with classDetail
-    func getClassName(timeArrangementIndex : Int) -> String {
-        let t : TimeArrangement = timeArrangement[timeArrangementIndex]
+    func getClassName(t : TimeArrangement) -> String {
         switch (t.source) {
             case .school:
                 return classDetail[t.index].name;
