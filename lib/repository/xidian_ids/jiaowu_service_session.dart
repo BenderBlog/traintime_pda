@@ -6,12 +6,10 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class JiaowuServiceSession extends IDSSession {
   Map<String, String> services = {
@@ -116,6 +114,7 @@ class JiaowuServiceSession extends IDSSession {
   */
 
   /// Default fetch the current semester's exam.
+  /*
   Future<ExamData> getExam() async {
     log.i(
       "[JiaowuServiceSession][getExam] "
@@ -192,6 +191,7 @@ class JiaowuServiceSession extends IDSSession {
       toBeArranged: toBeArrangedData,
     );
   }
+  */
 
   /// Fetch the buildings for empty classroom.
   Future<List<EmptyClassroomPlace>> getBuildingList() async {
