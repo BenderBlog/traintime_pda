@@ -27,9 +27,9 @@ class ScoreState extends InheritedWidget {
   /// 4. Not first time learning this, but still failed.
   bool _evalCount(Score eval) => !(eval.name.contains("国家英语四级") ||
       eval.name.contains("国家英语六级") ||
-      eval.name.contains(notFinish) ||
-      (eval.score < 60 && !unPassedSet.contains(eval.name)) ||
-      (eval.name.contains(notFirstTime) && eval.score < 60));
+      !eval.isFinish ||
+      (!eval.isPassed! && !unPassedSet.contains(eval.name)) ||
+      (eval.scoreStatus != "初修" && !eval.isPassed!));
 
   double evalCredit(bool isAll) {
     double totalCredit = 0.0;
@@ -51,7 +51,7 @@ class ScoreState extends InheritedWidget {
       if (((controllers.isSelected[i] == true && isAll == false) ||
               isAll == true) &&
           _evalCount(scoreTable[i])) {
-        totalScore += (isGPA ? scoreTable[i].gpa : scoreTable[i].score) *
+        totalScore += (isGPA ? scoreTable[i].gpa : scoreTable[i].score!) *
             scoreTable[i].credit;
       }
     }
@@ -64,12 +64,12 @@ class ScoreState extends InheritedWidget {
     List<Score> whatever = List.from(scoreTable);
     if (controllers.chosenSemester != "") {
       whatever.removeWhere(
-        (element) => element.year != controllers.chosenSemester,
+        (element) => element.semesterCode != controllers.chosenSemester,
       );
     }
     if (controllers.chosenStatus != "") {
       whatever.removeWhere(
-        (element) => element.status != controllers.chosenStatus,
+        (element) => element.classStatus != controllers.chosenStatus,
       );
     }
     whatever.removeWhere(
@@ -85,12 +85,14 @@ class ScoreState extends InheritedWidget {
     List<Score> whatever = List.from(getSelectedScoreList);
     if (controllers.chosenSemesterInScoreChoice != "") {
       whatever.removeWhere(
-        (element) => element.year != controllers.chosenSemesterInScoreChoice,
+        (element) =>
+            element.semesterCode != controllers.chosenSemesterInScoreChoice,
       );
     }
     if (controllers.chosenStatusInScoreChoice != "") {
       whatever.removeWhere(
-        (element) => element.status != controllers.chosenStatusInScoreChoice,
+        (element) =>
+            element.classStatus != controllers.chosenStatusInScoreChoice,
       );
     }
     whatever.removeWhere(
@@ -109,7 +111,9 @@ class ScoreState extends InheritedWidget {
   double get notCoreClass {
     double toReturn = 0.0;
     for (var i in scoreTable) {
-      if (i.status.contains(notCoreClassType) && i.score >= 60) {
+      if (i.classStatus.contains(notCoreClassType) &&
+          i.isFinish &&
+          i.isPassed!) {
         toReturn += i.credit;
       }
     }
@@ -121,11 +125,11 @@ class ScoreState extends InheritedWidget {
     required Widget child,
     required BuildContext context,
   }) {
-    Set<String> semester = {for (var i in scoreTable) i.year};
-    Set<String> statuses = {for (var i in scoreTable) i.status};
+    Set<String> semester = {for (var i in scoreTable) i.semesterCode};
+    Set<String> statuses = {for (var i in scoreTable) i.classStatus};
     Set<String> unPassedSet = {
       for (var i in scoreTable)
-        if (i.score < 60) i.name
+        if (i.isFinish && !i.isPassed!) i.name
     };
     return ScoreState._(
       scoreTable: scoreTable,
@@ -136,8 +140,8 @@ class ScoreState extends InheritedWidget {
             for (var i in courseIgnore) {
               if (scoreTable[index].name.contains(i)) return false;
             }
-            for (var i in statusIgnore) {
-              if (scoreTable[index].status.contains(i)) return false;
+            for (var i in typesIgnore) {
+              if (scoreTable[index].classType.contains(i)) return false;
             }
             return true;
           },
@@ -185,8 +189,8 @@ class ScoreState extends InheritedWidget {
         for (var i in courseIgnore) {
           if (stuff.name.contains(i)) toBeGiven = false;
         }
-        for (var i in statusIgnore) {
-          if (stuff.status.contains(i)) toBeGiven = false;
+        for (var i in typesIgnore) {
+          if (stuff.classType.contains(i)) toBeGiven = false;
         }
         controllers.isSelected[stuff.mark] = toBeGiven;
       }

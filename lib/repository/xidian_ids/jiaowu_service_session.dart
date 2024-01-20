@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
-import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -75,6 +74,7 @@ class JiaowuServiceSession extends IDSSession {
   }
 
   /// All score list.
+  /*
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
 
@@ -113,6 +113,7 @@ class JiaowuServiceSession extends IDSSession {
     }
     return toReturn;
   }
+  */
 
   /// Default fetch the current semester's exam.
   Future<ExamData> getExam() async {

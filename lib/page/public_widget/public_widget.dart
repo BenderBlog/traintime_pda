@@ -119,7 +119,9 @@ class InfoDetailBox extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(10),
+        ),
       ),
       child: Container(
         padding: const EdgeInsets.all(8),
@@ -132,7 +134,13 @@ class InfoDetailBox extends StatelessWidget {
 /// A reload widget/page
 class ReloadWidget extends StatelessWidget {
   final void Function() function;
-  const ReloadWidget({super.key, required this.function});
+  // Stands for Exception...
+  final Object? errorStatus;
+  const ReloadWidget({
+    super.key,
+    required this.function,
+    this.errorStatus,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -140,9 +148,10 @@ class ReloadWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            "Ouch! 发生错误啦",
-            style: TextStyle(fontSize: 16),
+          Text(
+            "Ouch! 发生错误啦"
+            "${errorStatus != null ? errorStatus.toString() : ""}",
+            style: const TextStyle(fontSize: 16),
           ),
           FilledButton(
             onPressed: function,

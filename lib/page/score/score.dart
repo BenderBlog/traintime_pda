@@ -10,7 +10,7 @@ import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_page.dart';
 import 'package:watermeter/page/score/score_state.dart';
-import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 
 class ScoreWindow extends StatefulWidget {
   const ScoreWindow({super.key});
@@ -24,12 +24,13 @@ class _ScoreWindowState extends State<ScoreWindow> {
 
   Navigator _getNavigator(BuildContext context, Widget child) {
     return Navigator(
-      onGenerateRoute: (RouteSettings settings) =>
-          MaterialPageRoute(builder: (context) => child),
+      onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(
+        builder: (context) => child,
+      ),
     );
   }
 
-  void dataInit() => scoreList = JiaowuServiceSession().getScore();
+  void dataInit() => scoreList = ScoreSession().getScore();
 
   @override
   void initState() {
