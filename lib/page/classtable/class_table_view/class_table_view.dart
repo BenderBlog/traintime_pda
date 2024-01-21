@@ -3,7 +3,7 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
@@ -27,7 +27,7 @@ class ClassTableView extends StatefulWidget {
 }
 
 class _ClassTableViewState extends State<ClassTableView> {
-  late ClassTableState classTableState;
+  late ClassTableWidgetState classTableState;
   late Size mediaQuerySize;
 
   /// The height is suitable to show 1-8 class, 9-10 are hidden at the bottom.
@@ -118,7 +118,7 @@ class _ClassTableViewState extends State<ClassTableView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    classTableState = ClassTableState.of(context)!;
+    classTableState = ClassTableState.of(context)!.controllers;
     mediaQuerySize = MediaQuery.of(context).size;
   }
 
@@ -128,10 +128,9 @@ class _ClassTableViewState extends State<ClassTableView> {
       children: [
         /// The main class table.
         ClassTableDateRow(
-          firstDay: ClassTableState.of(context)!
-              .startDay
+          firstDay: classTableState.startDay
               .add(
-                Duration(days: 7 * ClassTableState.of(context)!.offset),
+                Duration(days: 7 * classTableState.offset),
               )
               .add(
                 Duration(days: 7 * widget.index),
@@ -139,29 +138,22 @@ class _ClassTableViewState extends State<ClassTableView> {
         ),
 
         /// The rest of the table.
-        Expanded(
-          child: Obx(
-            () => SingleChildScrollView(
-              child: Row(
-                children: List.generate(
-                  8,
-                  (i) => Container(
-                    color:
-                        i == 0 ? Colors.grey.shade200.withOpacity(0.75) : null,
-                    child: SizedBox(
-                      width: i > 0
-                          ? (mediaQuerySize.width - leftRow) / 7
-                          : leftRow,
-                      child: Column(
-                        children: classSubRow(i),
-                      ),
-                    ),
+        SingleChildScrollView(
+          child: Row(
+            children: List.generate(
+              8,
+              (i) => Container(
+                color: i == 0 ? Colors.grey.shade200.withOpacity(0.75) : null,
+                child: SizedBox(
+                  width: i > 0 ? (mediaQuerySize.width - leftRow) / 7 : leftRow,
+                  child: Column(
+                    children: classSubRow(i),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+        ).expanded(),
       ],
     );
   }

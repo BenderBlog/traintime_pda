@@ -39,11 +39,11 @@ class PadMainPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
         title: GetBuilder<ClassTableController>(builder: (c) {
-          String text = c.isGet
+          String text = c.state == ClassTableState.fetched
               ? c.isNotVacation
                   ? "第 ${c.currentWeek + 1} 周"
                   : "假期中"
-              : c.error != null
+              : c.state == ClassTableState.error
                   ? "加载错误"
                   : "正在加载";
           return Text(

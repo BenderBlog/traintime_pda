@@ -46,48 +46,23 @@ class ClassTableCard extends StatelessWidget {
     return GetBuilder<ClassTableController>(
       builder: (c) => GestureDetector(
         onTap: () {
-          try {
-            if (c.isGet == true) {
+          switch (c.state) {
+            case ClassTableState.fetched:
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const ClassTableWindow(),
                 ),
               );
-            } else {
+            case ClassTableState.error:
+              Fluttertoast.showToast(msg: "遇到错误：${c.error?.substring(0, 150)}");
+            case ClassTableState.fetching:
+            case ClassTableState.none:
               Fluttertoast.showToast(msg: "正在获取课表");
-            }
-          } on String catch (e) {
-            Fluttertoast.showToast(msg: "遇到错误：${e.substring(0, 150)}");
           }
         },
         child: withCardStyle(Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Row(
-            //   crossAxisAlignment: CrossAxisAlignment.center,
-            //   children: [
-            //     Icon(
-            //       Icons.access_time_filled,
-            //       color: Theme.of(context).colorScheme.primary,
-            //       size: 16,
-            //     ),
-            //     const SizedBox(width: 8),
-            //     Text(
-            //       c.isGet == true
-            //           ? c.currentData.$3 == null
-            //               ? "课程表"
-            //               : c.currentData.$3 == true
-            //                   ? "课程表 下一节课是"
-            //                   : "课程表 正在进行"
-            //           : "课程表",
-            //       style: TextStyle(
-            //         fontSize: 16,
-            //         textBaseline: TextBaseline.alphabetic,
-            //         color: Theme.of(context).colorScheme.primary,
-            //       ),
-            //     ),
-            //   ],
-            // ),
             const SizedBox(height: 4),
             if (isPhone(context))
               FixedTimeline.tileBuilder(
@@ -108,7 +83,7 @@ class ClassTableCard extends StatelessWidget {
                     _ => Padding(
                         padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                         child: Text(
-                          "之后还有 ${max(c.nextClassArrangements.$1.length - 1, 0)} 节课",
+                          "之后还有 ${max(c.todayArrangement.length - 1, 0)} 节课",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -134,7 +109,7 @@ class ClassTableCard extends StatelessWidget {
                       return null;
                     }
 
-                    if (index == 1 && c.nextClassArrangements.$2) {
+                    if (index == 1 && c.isTomorrow) {
                       // Use dashedLine between today and tomorrow
                       return Connector.dashedLine(
                         color: Theme.of(context).colorScheme.primary,
@@ -153,7 +128,7 @@ class ClassTableCard extends StatelessWidget {
                       return null;
                     }
 
-                    if (index == 0 && c.nextClassArrangements.$2) {
+                    if (index == 0 && c.isTomorrow) {
                       // Use dashedLine between today and tomorrow
                       return Connector.dashedLine(
                         color: Theme.of(context).colorScheme.primary,

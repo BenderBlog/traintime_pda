@@ -1,9 +1,9 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -22,22 +22,12 @@ class WeekChoiceButton extends StatefulWidget {
 }
 
 class _WeekChoiceButtonState extends State<WeekChoiceButton> {
-  late ClassTableState classTableState;
+  late ClassTableWidgetState classTableState;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    classTableState = ClassTableState.of(context)!;
-  }
-
-  /// The dot of the overview, [isOccupied] is used to identify the opacity of the dot.
-  Widget dot({required bool isOccupied}) {
-    double opacity = isOccupied ? 1 : 0.25;
-    return ClipOval(
-      child: Container(
-        color: Theme.of(context).colorScheme.primary.withOpacity(opacity),
-      ),
-    );
+    classTableState = ClassTableState.of(context)!.controllers;
   }
 
   /// [buttonInformaion] shows the botton's [index] and the overview.
@@ -60,34 +50,28 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
           /// These code are used to render the overview of the week,
           /// as long as the height of the page is over 500.
           if (MediaQuery.sizeOf(context).height >= 500)
-            Expanded(
-              child: Obx(
-                () => Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    6,
-                    4,
-                    6,
-                    2,
-                  ),
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: 5,
-                    mainAxisSpacing: 2,
-                    crossAxisSpacing: 2,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      for (int i = 0; i < 10; i += 2)
-                        for (int day = 0; day < 5; ++day)
-                          dot(
-                            isOccupied: !classTableState.pretendLayout[index]
-                                    [day][i]
-                                .contains(-1),
-                          )
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 5,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                for (int i = 0; i < 10; i += 2)
+                  for (int day = 0; day < 5; ++day)
+                    Dot(
+                      isOccupied: !classTableState.pretendLayout[index][day][i]
+                          .contains(-1),
+                    )
+              ],
+            )
+                .paddingDirectional(
+                  start: 6,
+                  top: 4,
+                  end: 6,
+                  bottom: 2,
+                )
+                .expanded(),
         ],
       );
 
@@ -101,9 +85,7 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
         width: weekButtonWidth,
         child: Card(
           color: Theme.of(context).primaryColor.withOpacity(
-                classTableState.controllers.chosenWeek == widget.index
-                    ? 0.3
-                    : 0.0,
+                classTableState.chosenWeek == widget.index ? 0.3 : 0.0,
               ),
           elevation: 0.0,
           child: InkWell(
@@ -118,6 +100,26 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The dot of the overview, [isOccupied] is used to identify the opacity of the dot.
+class Dot extends StatelessWidget {
+  final bool isOccupied;
+  const Dot({
+    super.key,
+    required this.isOccupied,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipOval(
+      child: Container(
+        color: Theme.of(context).colorScheme.primary.withOpacity(
+              isOccupied ? 1 : 0.25,
+            ),
       ),
     );
   }

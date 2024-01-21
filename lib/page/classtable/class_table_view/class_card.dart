@@ -21,7 +21,8 @@ class ClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ClassTableState classTableState = ClassTableState.of(context)!;
+    ClassTableWidgetState classTableState =
+        ClassTableState.of(context)!.controllers;
 
     Widget inside = index == -1
         ?

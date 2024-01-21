@@ -65,7 +65,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
           title: Text.rich(TextSpan(children: [
             if (c.scoreTable[widget.mark].scoreStatus != "初修")
               TextSpan(text: "${c.scoreTable[widget.mark].scoreStatus} "),
-            if (c.scoreTable[widget.mark].isPassed == "0")
+            if (c.scoreTable[widget.mark].isPassed == false)
               const TextSpan(text: "[挂] "),
             TextSpan(text: c.scoreTable[widget.mark].name)
           ])),

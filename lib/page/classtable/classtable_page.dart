@@ -25,6 +25,9 @@ class ClassTablePage extends StatefulWidget {
 }
 
 class _ClassTablePageState extends State<ClassTablePage> {
+  /// Check whether listener is pushed...
+  bool isPushedListener = false;
+
   /// A lock of the week choice row.
   /// When locked, choiceWeek cannot be changed.
   bool isTopRowLocked = false;
@@ -36,24 +39,56 @@ class _ClassTablePageState extends State<ClassTablePage> {
   late PageController rowControl;
 
   late BoxDecoration decoration;
-  late ClassTableState classTableState;
+  late ClassTableWidgetState classTableState;
+
+  void _switchPage() {
+    setState(() => isTopRowLocked = true);
+    Future.wait(
+      [
+        rowControl.animateTo(
+          (weekButtonWidth + 2 * weekButtonHorizontalPadding) *
+              classTableState.chosenWeek,
+          curve: Curves.easeInOut,
+          duration: const Duration(milliseconds: changePageTime),
+        ),
+        pageControl.animateToPage(
+          classTableState.chosenWeek,
+          curve: Curves.easeInOutCubic,
+          duration: const Duration(milliseconds: changePageTime),
+        ),
+      ],
+    ).then((value) => isTopRowLocked = false);
+  }
+
+  @override
+  void dispose() {
+    classTableState.removeListener(_switchPage);
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
-    classTableState = ClassTableState.of(context)!;
+    classTableState = ClassTableState.of(context)!.controllers;
+
     pageControl = PageController(
-      initialPage: classTableState.controllers.chosenWeek,
+      initialPage: classTableState.chosenWeek,
       keepPage: true,
     );
 
     /// (weekButtonWidth + 2 * weekButtonHorizontalPadding)
     /// is the width of the week choose button.
     rowControl = PageController(
-      initialPage: classTableState.controllers.chosenWeek,
+      initialPage: classTableState.chosenWeek,
       viewportFraction: (weekButtonWidth + 2 * weekButtonHorizontalPadding) /
           MediaQuery.sizeOf(context).width,
       keepPage: true,
     );
+
+    /// Let controllers listen to the currentWeek's change.
+    if (isPushedListener == false) {
+      classTableState.addListener(_switchPage);
+      isPushedListener = true;
+    }
 
     /// Init the background.
     File image = File("${supportPath.path}/decoration.jpg");
@@ -71,13 +106,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
 
     super.didChangeDependencies();
   }
-
-  /// Change the position in the topRow
-  void changeTopRow(int index) => rowControl.animateTo(
-        (weekButtonWidth + 2 * weekButtonHorizontalPadding) * index,
-        curve: Curves.easeInOut,
-        duration: const Duration(milliseconds: changePageTime),
-      );
 
   /// A row shows a series of buttons about the classtable's index.
   ///
@@ -105,22 +133,9 @@ class _ClassTablePageState extends State<ClassTablePage> {
           itemBuilder: (BuildContext context, int index) {
             return WeekChoiceButton(
               onTap: () {
-                isTopRowLocked = true;
-
-                /// The following sequence is used when triggering changing page.
-                ///  * topRowLocked
-                ///  * change the chosen week
-                ///  * trigger pageview controller [pageControl] change, as well as
-                ///  * change the [WeekChoiceRow]
-                classTableState.controllers.chosenWeek = index;
-                pageControl.animateToPage(
-                  index,
-                  curve: Curves.easeInOutCubic,
-                  duration: const Duration(milliseconds: changePageTime),
-                );
-                changeTopRow(index);
-
-                setState(() {});
+                if (isTopRowLocked == false) {
+                  classTableState.chosenWeek = index;
+                }
               },
               index: index,
             );
@@ -263,7 +278,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       height: 30,
                     ),
                     Text(
-                      "${ClassTableState.of(context)!.semesterCode} 学期没有课程。",
+                      "${classTableState.semesterCode} 学期没有课程。",
                     ),
                     const Text("如果刚选完课，过几天就更新了吧。"),
                     const Text("如果你没选课，快去 xk.xidian.edu.cn！"),
@@ -288,14 +303,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
           /// So that's the [isTopRowLocked] is used for. When week choice row is
           /// locked, it will not refresh the [chosenWeek]. And when [chosenWeek]
           /// is equal to the current page, unlock the [isTopRowLocked].
-          if (!isTopRowLocked) {
-            setState(() {
-              changeTopRow(value);
-              classTableState.controllers.chosenWeek = value;
-            });
-          }
-          if (classTableState.controllers.chosenWeek == value) {
-            isTopRowLocked = false;
+          if (isTopRowLocked == false) {
+            classTableState.chosenWeek = value;
           }
         },
         itemCount: classTableState.semesterLength,

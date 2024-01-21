@@ -3,39 +3,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/home_arrangement.dart';
 
 class ClasstableCurrentColumn extends StatelessWidget {
   final bool isArrangementMode;
 
-  const ClasstableCurrentColumn({super.key, this.isArrangementMode = false});
-
-  ClassDetail? getClassDetail(ClassTableController c) {
+  HomeArrangement? getArrangement(ClassTableController c) {
     if (isArrangementMode) {
-      List<TimeArrangement> arrangements = c.nextClassArrangements.$1
-          .map((e) => c.classTableData.timeArrangement[e])
-          .toList();
-      return arrangements.isEmpty
-          ? null
-          : c.classTableData.classDetail[arrangements.first.index];
+      return c.todayArrangement.isEmpty ? null : c.todayArrangement.first;
     }
-    return c.currentData?.$1;
+    return c.currentData.$2;
   }
 
-  TimeArrangement? getTimeArrangement(ClassTableController c) {
-    if (isArrangementMode) {
-      List<TimeArrangement> arrangements = c.nextClassArrangements.$1
-          .map((e) => c.classTableData.timeArrangement[e])
-          .toList();
-      return arrangements.isEmpty ? null : arrangements.first;
-    }
-    return c.currentData?.$2;
-  }
-
-  bool isTomorrow(ClassTableController c) {
-    return isArrangementMode && c.nextClassArrangements.$2;
-  }
+  const ClasstableCurrentColumn({
+    super.key,
+    this.isArrangementMode = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,15 +32,20 @@ class ClasstableCurrentColumn extends StatelessWidget {
           Expanded(
               child: Align(
             alignment: Alignment.centerLeft,
-            child: Text(
-              c.isGet == true
-                  ? (getClassDetail(c)?.name ??
-                      (isArrangementMode
-                          ? "无课程安排"
-                          : "没有正在进行的课程")) // "毛泽东思想和中国特色社会主义理论体系概论"
-                  : c.error == null
-                      ? "正在加载"
-                      : "遇到错误",
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  if (c.state == ClassTableState.fetched)
+                    TextSpan(
+                      text: (c.currentData.$2?.name ??
+                          (isArrangementMode ? "无课程安排" : "没有正在进行的课程")),
+                    )
+                  else if (c.state == ClassTableState.error)
+                    const TextSpan(text: "遇到错误")
+                  else
+                    const TextSpan(text: "正在加载"),
+                ],
+              ),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -64,72 +54,74 @@ class ClasstableCurrentColumn extends StatelessWidget {
             ),
           )),
           const SizedBox(height: 8.0),
-          c.isGet == true
-              ? getClassDetail(c) != null
-                  ? Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.person,
+          if (c.state == ClassTableState.fetched)
+            getArrangement(c) != null
+                ? Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            getArrangement(c)!.teacher,
+                            style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
-                              size: 18,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              getTimeArrangement(c)!.teacher ?? "老师未知",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.room,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.room,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            getArrangement(c)!.place,
+                            style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
-                              size: 18,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              getTimeArrangement(c)!.classroom ?? "地点未定",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time_filled_outlined,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_filled_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            "${c.isTomorrow ? "明天 " : ""}"
+                            "${Jiffy.parseFromDateTime(getArrangement(c)!.startTime).format(pattern: "HH:mm")}-"
+                            "${Jiffy.parseFromDateTime(getArrangement(c)!.endTime).format(pattern: "HH:mm")}",
+                            style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
-                              size: 18,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              "${isTomorrow(c) ? "明天 " : ""}${time[(getTimeArrangement(c)!.start - 1) * 2]}-"
-                              "${time[(getTimeArrangement(c)!.stop - 1) * 2 + 1]}",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                  : const SizedBox(height: 30.0)
-              : Text(
-                  c.error == null ? "请耐心等待片刻" : "课表获取失败",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : const SizedBox(height: 30.0)
+          else
+            Text(
+              c.state == ClassTableState.error ? "请耐心等待片刻" : "课表获取失败",
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
         ],
       ),
     );

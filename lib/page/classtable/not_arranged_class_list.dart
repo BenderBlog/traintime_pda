@@ -28,7 +28,8 @@ class NotArrangedClassList extends StatelessWidget {
         itemBuilder: (context, index) => ListTile(
           title: Text(notArranged[index].name),
           subtitle: Text(
-            "编号: ${notArranged[index].code} | ${notArranged[index].number} 班\n"
+            "编号: ${notArranged[index].code} | "
+            "${notArranged[index].number} 班\n"
             "老师: ${notArranged[index].teacher ?? "没有数据"}",
           ),
         ),

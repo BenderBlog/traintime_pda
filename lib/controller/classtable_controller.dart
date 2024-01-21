@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -13,30 +14,28 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
 
+enum ClassTableState {
+  fetching,
+  fetched,
+  error,
+  none,
+}
+
 class ClassTableController extends GetxController {
-  bool isGet = false;
+  ClassTableState state = ClassTableState.none;
   String? error;
 
   // Classtable Data
   ClassTableData classTableData = ClassTableData();
 
   // The start day of the semester.
-  var startDay = DateTime.parse("2022-01-22");
-
-  // A list as an index of the classtable items.
-  RxList<List<List<List<int>>>> pretendLayout = List.generate(
-    1,
-    (week) => List.generate(
-      7,
-      (day) => List.generate(10, (classes) => <int>[]),
-    ),
-  ).obs;
+  DateTime startDay = DateTime.parse("2022-01-22");
 
   // Mark the current week.
   int currentWeek = 0;
 
   // Current Information
-  DateTime updateTime = DateTime.now();
+  Jiffy updateTime = Jiffy.now();
 
   // Get ClassDetail name info
   ClassDetail getClassDetail(int timeArrangementIndex) =>
@@ -69,180 +68,125 @@ class ClassTableController extends GetxController {
     return index;
   }
 
-  /// Get the class data about current class.
-  (ClassDetail, TimeArrangement)? get currentData {
-    if (!isNotVacation) {
-      return null;
-    }
+  bool get isTomorrow =>
+      updateTime.hour * 60 + updateTime.minute > 20 * 60 + 35;
 
-    int index = timeIndex;
-    if (index < 0 || index >= time.length - 1) {
-      log.i(
-        "[ClassTableController][CurrentData] "
-        "Current time is out of range. The index is $index. Now exit.",
-      );
-      return null;
-    }
-
-    log.i(
-      "[ClassTableController][CurrentData] "
-      "Get the current class $index, current time is after ${time[index]}.",
-    );
-
-    int currentDataIndex = -1;
-    try {
-      if (pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2]
-          .isNotEmpty) {
-        currentDataIndex =
-            pretendLayout[currentWeek][updateTime.weekday - 1][index ~/ 2][0];
+  /// Get current class. (bool isNext, HomeArrangement arrangement)
+  (bool, HomeArrangement?) get currentData {
+    if (!isNotVacation) return (false, null);
+    for (var i in classTableData.timeArrangement) {
+      if (i.weekList.length > currentWeek &&
+          i.weekList[currentWeek] &&
+          i.day == updateTime.dayOfWeek) {
+        HomeArrangement toReturn = HomeArrangement(
+          name: getClassDetail(i.index).name,
+          teacher: i.teacher ?? "未知",
+          place: i.classroom ?? "未知",
+          startTimeStr: Jiffy.parseFromDateTime(DateTime(
+            updateTime.year,
+            updateTime.month,
+            updateTime.date,
+            int.parse(time[(i.start - 1) * 2].split(':')[0]),
+            int.parse(time[(i.start - 1) * 2].split(':')[1]),
+          )).format(pattern: HomeArrangement.format),
+          endTimeStr: Jiffy.parseFromDateTime(DateTime(
+            updateTime.year,
+            updateTime.month,
+            updateTime.date,
+            int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
+            int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
+          )).format(pattern: HomeArrangement.format),
+        );
+        if (updateTime.isBetween(
+          Jiffy.parseFromDateTime(toReturn.startTime),
+          Jiffy.parseFromDateTime(toReturn.endTime),
+        )) {
+          return (false, toReturn);
+        }
+        if (Jiffy.parseFromDateTime(toReturn.startTime)
+                .diff(updateTime, unit: Unit.minute) <
+            30) {
+          return (true, toReturn);
+        }
       }
-    } catch (e, s) {
-      log.i(
-        "[ClassTableController][CurrentData] "
-        "No class table data, error is: \n$e\nStacktrace is:\n$s.",
-      );
     }
-
-    // No class
-    if (currentDataIndex == -1) {
-      log.i(
-        "[ClassTableController][CurrentData] "
-        "No class at the monent.",
-      );
-      return null;
-    }
-
-    // Check the exact time
-    TimeArrangement arrangement =
-        classTableData.timeArrangement[currentDataIndex];
-    if (index < ((arrangement.start - 1) * 2) ||
-        index >= ((arrangement.stop - 1) * 2 + 1)) {
-      log.i(
-        "[ClassTableController][CurrentData] "
-        "Current class has not started or has ended. "
-        "${time[index]} not in [${time[(arrangement.start - 1) * 2]},"
-        " ${time[(arrangement.stop - 1) * 2 + 1]}).",
-      );
-      return null;
-    }
-
-    log.i(
-      "[ClassTableController][CurrentData] "
-      "Final data is $currentDataIndex.",
-    );
-
-    return (
-      classTableData.getClassDetail(currentDataIndex),
-      arrangement,
-    );
+    return (false, null);
   }
 
-  /// Get next class arrangements today or tomorrow
-  (List<int>, bool) get nextClassArrangements {
-    int weekday = updateTime.weekday - 1;
-    int week = currentWeek;
-    bool isTomorrow = false;
-
-    log.i(
-      "[ClassTableController][ClassSet] "
-      "weekday: $weekday, currentWeek: $currentWeek,"
-      " isTomorrow: $isTomorrow,"
-      " ${updateTime.hour}:${updateTime.minute}.",
-    );
-
-    if (week >= classTableData.semesterLength || week < 0) {
-      return ([], isTomorrow);
-    } else {
-      Set<int> classArrangementIndices = {};
-      int i = timeIndex ~/ 2 + 1;
-      log.i(
-        "[ClassTableController][ClassSet] "
-        "currentTimeIndex: $i, ${time[i]}",
-      );
-
-      for (i; i < 10; ++i) {
-        classArrangementIndices.addAll(pretendLayout[week][weekday][i]);
-      }
-
-      classArrangementIndices.remove(-1);
-
-      // Remove the current class
-      (ClassDetail, TimeArrangement)? currentClass = currentData;
-      if (currentClass != null) {
-        int idx = classTableData.timeArrangement.indexOf(currentClass.$2);
-        classArrangementIndices.remove(idx);
-      }
-
-      // Parse isTomorrow
-      if (classArrangementIndices.isEmpty &&
-              updateTime.hour * 60 + updateTime.minute >= 19 * 60 ||
-          updateTime.hour * 60 + updateTime.minute >= 20 * 60 + 35) {
-        log.i(
-          "[ClassTableController][ClassSet] Need tomorrow data.",
-        );
-
-        weekday += 1;
-        isTomorrow = true;
-
-        if (weekday >= 7) {
-          weekday = 0;
-          week += 1;
-        }
-
-        log.i(
-          "[ClassTableController][ClassSet] "
-          "weekday: $weekday, currentWeek: $currentWeek, isTomorrow: $isTomorrow.",
-        );
-
-        classArrangementIndices.clear();
-
-        if (week <= classTableData.semesterLength) {
-          log.i(
-            "[ClassTableController][ClassSet] "
-            "Adding ${pretendLayout[week][weekday]}.",
-          );
-          for (i = 0; i < 10; ++i) {
-            classArrangementIndices.addAll(pretendLayout[week][weekday][i]);
+  /// Get today's arrangement in classtable
+  List<HomeArrangement> get todayArrangement {
+    Set<HomeArrangement> todayArrangement = {};
+    if (isNotVacation) {
+      for (var i in classTableData.timeArrangement) {
+        if (i.weekList.length > currentWeek &&
+            i.weekList[currentWeek] &&
+            i.day == updateTime.dayOfWeek) {
+          /// If passed, do no show.
+          Jiffy start = Jiffy.parseFromDateTime(DateTime(
+            updateTime.year,
+            updateTime.month,
+            updateTime.date,
+            int.parse(time[(i.start - 1) * 2].split(':')[0]),
+            int.parse(time[(i.start - 1) * 2].split(':')[1]),
+          ));
+          Jiffy end = Jiffy.parseFromDateTime(DateTime(
+            updateTime.year,
+            updateTime.month,
+            updateTime.date,
+            int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
+            int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
+          ));
+          if (updateTime.isBefore(end)) {
+            todayArrangement.add(HomeArrangement(
+              name: getClassDetail(i.index).name,
+              teacher: i.teacher ?? "未知",
+              place: i.classroom ?? "未知",
+              startTimeStr: start.format(pattern: HomeArrangement.format),
+              endTimeStr: end.format(pattern: HomeArrangement.format),
+            ));
           }
-          classArrangementIndices.remove(-1);
         }
-        log.i(
-          "[ClassTableController][ClassSet] "
-          "Tomorrow classArrangementIndices $classArrangementIndices.",
-        );
       }
-
-      return (classArrangementIndices.toList(), isTomorrow);
     }
+    var toReturn = todayArrangement.toList();
+
+    toReturn.sort((a, b) => Jiffy.parseFromDateTime(a.startTime)
+        .diff(Jiffy.parseFromDateTime(b.startTime))
+        .toInt());
+
+    return toReturn;
   }
 
-  /// Homearrangement get today's data...
-  (List<HomeArrangement>, List<HomeArrangement>) get homeArrangementData {
-    Set<HomeArrangement> todayData = {};
-    Set<HomeArrangement> tomorrowData = {};
-    int currentWeekIndex = currentWeek;
-    int currentDayIndex = updateTime.weekday;
-    if (currentWeekIndex >= 0 &&
-        currentWeekIndex < classTableData.semesterLength) {
+  /// Tomorrow Arrangement
+  List<HomeArrangement> get tomorrowArrangement {
+    Set<HomeArrangement> tomorrowArrangement = {};
+    int tomorrowWeekIndex = currentWeek;
+    int tomorrowDayIndex = updateTime.dayOfWeek + 1;
+    if (tomorrowDayIndex > 7) {
+      tomorrowDayIndex = 1;
+      tomorrowWeekIndex += 1;
+    }
+    if (tomorrowWeekIndex >= 0 &&
+        tomorrowWeekIndex < classTableData.semesterLength) {
       for (var i in classTableData.timeArrangement) {
-        if (i.weekList.length > currentWeekIndex &&
-            i.weekList[currentWeekIndex] &&
-            i.day == currentDayIndex) {
-          todayData.add(HomeArrangement(
+        if (i.weekList.length > tomorrowWeekIndex &&
+            i.weekList[tomorrowWeekIndex] &&
+            i.day == tomorrowDayIndex) {
+          tomorrowArrangement.add(HomeArrangement(
             name: getClassDetail(i.index).name,
             teacher: i.teacher ?? "未知",
             place: i.classroom ?? "未知",
             startTimeStr: Jiffy.parseFromDateTime(DateTime(
               updateTime.year,
               updateTime.month,
-              updateTime.day,
+              updateTime.date,
               int.parse(time[(i.start - 1) * 2].split(':')[0]),
               int.parse(time[(i.start - 1) * 2].split(':')[1]),
             )).format(pattern: HomeArrangement.format),
             endTimeStr: Jiffy.parseFromDateTime(DateTime(
               updateTime.year,
               updateTime.month,
-              updateTime.day,
+              updateTime.date,
               int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
               int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
             )).format(pattern: HomeArrangement.format),
@@ -250,40 +194,13 @@ class ClassTableController extends GetxController {
         }
       }
     }
-    currentDayIndex += 1;
-    if (currentDayIndex > 7) {
-      currentDayIndex = 1;
-      currentWeekIndex += 1;
-    }
-    if (currentWeekIndex >= 0 &&
-        currentWeekIndex < classTableData.semesterLength) {
-      for (var i in classTableData.timeArrangement) {
-        if (i.weekList.length > currentWeekIndex &&
-            i.weekList[currentWeekIndex] &&
-            i.day == currentDayIndex) {
-          tomorrowData.add(HomeArrangement(
-            name: getClassDetail(i.index).name,
-            teacher: i.teacher ?? "未知",
-            place: i.classroom ?? "未知",
-            startTimeStr: Jiffy.parseFromDateTime(DateTime(
-              updateTime.year,
-              updateTime.month,
-              updateTime.day,
-              int.parse(time[(i.start - 1) * 2].split(':')[0]),
-              int.parse(time[(i.start - 1) * 2].split(':')[1]),
-            )).format(pattern: HomeArrangement.format),
-            endTimeStr: Jiffy.parseFromDateTime(DateTime(
-              updateTime.year,
-              updateTime.month,
-              updateTime.day,
-              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
-              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
-            )).format(pattern: HomeArrangement.format),
-          ));
-        }
-      }
-    }
-    return (todayData.toList(), tomorrowData.toList());
+    var toReturn = tomorrowArrangement.toList();
+
+    toReturn.sort((a, b) => Jiffy.parseFromDateTime(a.startTime)
+        .diff(Jiffy.parseFromDateTime(b.startTime))
+        .toInt());
+
+    return toReturn;
   }
 
   bool get isNotVacation =>
@@ -304,27 +221,14 @@ class ClassTableController extends GetxController {
   }
 
   void updateCurrent() {
-    if (!isGet) return;
+    if (state != ClassTableState.fetched) return;
 
-    // Get the start day of the semester. Append offset
-    startDay = DateTime.parse(classTableData.termStartDay).add(
-        Duration(days: 7 * preference.getInt(preference.Preference.swift)));
-
-    log.i(
-      "[ClassTableController][addUserDefinedClass] "
-      "startDay is $startDay with offset ${preference.getInt(preference.Preference.swift)}.",
-    );
-
-    updateTime = DateTime.now();
+    updateTime = Jiffy.now();
 
     // Get the current index.
-    // A day = 1000 milliseconds as one second
-    // A hour contains 3600 seconds = 60 * 60.
-    // A day contains 24 * 3600 seconds
-    // emmm
-    int delta = (Jiffy.parseFromDateTime(updateTime).millisecondsSinceEpoch -
-            Jiffy.parseFromDateTime(startDay).millisecondsSinceEpoch) ~/
-        86400000;
+    int delta = updateTime
+        .diff(Jiffy.parseFromDateTime(startDay), unit: Unit.day)
+        .toInt();
     if (delta < 0) delta = -7;
     currentWeek = delta ~/ 7;
 
@@ -335,53 +239,17 @@ class ClassTableController extends GetxController {
   }
 
   Future<void> updateClassTable({bool isForce = false}) async {
-    isGet = false;
+    state = ClassTableState.fetching;
     error = null;
     try {
       classTableData = await ClassTableFile().get(isForce: isForce);
 
-      // Init the matrix.
-      // 1. prepare the structure, a three-deminision array.
-      //    for week-day~class array
-      pretendLayout.value = List.generate(
-        classTableData.semesterLength,
-        (week) => List.generate(7, (day) => List.generate(10, (classes) => [])),
-      );
+      /// Get the start day of the semester. Append offset
+      startDay = DateTime.parse(classTableData.termStartDay).add(
+          Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
-      // 2. init each week's array
-      for (int week = 0; week < classTableData.semesterLength; ++week) {
-        for (int day = 0; day < 7; ++day) {
-          // 2.a. Choice the class in this day.
-          List<TimeArrangement> thisDay = [];
-          for (var i in classTableData.timeArrangement) {
-            // If the class has ended, skip.
-            if (i.weekList.length < week + 1) {
-              continue;
-            }
-            if (i.weekList[week] && i.day == day + 1) {
-              thisDay.add(i);
-            }
-          }
-
-          // 2.b. The longest class should be solved first.
-          thisDay.sort((a, b) => b.step.compareTo(a.step));
-
-          // 2.c Arrange the layout. Solve the conflex.
-          for (var i in thisDay) {
-            for (int j = i.start - 1; j <= i.stop - 1; ++j) {
-              pretendLayout[week][day][j]
-                  .add(classTableData.timeArrangement.indexOf(i));
-            }
-          }
-
-          // 2.d. Deal with the empty space.
-          for (var i in pretendLayout[week][day]) {
-            if (i.isEmpty) {
-              i.add(-1);
-            }
-          }
-        }
-      }
+      /// If ios, store the file to groupid public place
+      /// in order to refresh the widget...
       if (Platform.isIOS) {
         final api = SaveToGroupIdSwiftApi();
         try {
@@ -420,9 +288,10 @@ class ClassTableController extends GetxController {
             stackTrace: s,
           );
         }
+        HomeWidget.updateWidget(iOSName: "ClasstableWidget");
       }
 
-      isGet = true;
+      state = ClassTableState.fetched;
       updateCurrent();
       update();
     } catch (e, s) {
@@ -432,7 +301,8 @@ class ClassTableController extends GetxController {
         error: e,
         stackTrace: s,
       );
-      //rethrow;
+      state = ClassTableState.error;
+      error = e.toString();
     }
   }
 }
