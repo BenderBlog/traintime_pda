@@ -116,7 +116,6 @@ class ClassTableController extends GetxController {
         }
       }
     }
-    print("Ain't");
     return (false, null);
   }
 
