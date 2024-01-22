@@ -132,8 +132,7 @@ class ClassTableData {
   List<ClassChange> classChanges;
 
   /// Only allowed to be used with classDetail
-  ClassDetail getClassDetail(int timeArrangementIndex) {
-    TimeArrangement t = timeArrangement[timeArrangementIndex];
+  ClassDetail getClassDetail(TimeArrangement t) {
     switch (t.source) {
       case Source.school:
         return classDetail[t.index];

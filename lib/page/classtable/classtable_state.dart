@@ -139,7 +139,9 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Get class detail by prividing index of timearrangement
   ClassDetail getClassDetail(int index) =>
-      classTableController.classTableData.getClassDetail(index);
+      classTableController.classTableData.getClassDetail(
+        classTableController.classTableData.timeArrangement[index],
+      );
 
   /// Generate icalendar file string.
   String get iCalenderStr {

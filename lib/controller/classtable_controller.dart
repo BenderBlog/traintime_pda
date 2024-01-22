@@ -38,7 +38,7 @@ class ClassTableController extends GetxController {
   Jiffy updateTime = Jiffy.now();
 
   // Get ClassDetail name info
-  ClassDetail getClassDetail(int timeArrangementIndex) =>
+  ClassDetail getClassDetail(TimeArrangement timeArrangementIndex) =>
       classTableData.getClassDetail(timeArrangementIndex);
 
   // Get all user-add classes
@@ -77,9 +77,9 @@ class ClassTableController extends GetxController {
     for (var i in classTableData.timeArrangement) {
       if (i.weekList.length > currentWeek &&
           i.weekList[currentWeek] &&
-          i.day == updateTime.dayOfWeek) {
+          i.day == updateTime.dateTime.weekday) {
         HomeArrangement toReturn = HomeArrangement(
-          name: getClassDetail(i.index).name,
+          name: getClassDetail(i).name,
           teacher: i.teacher ?? "未知",
           place: i.classroom ?? "未知",
           startTimeStr: Jiffy.parseFromDateTime(DateTime(
@@ -103,13 +103,20 @@ class ClassTableController extends GetxController {
         )) {
           return (false, toReturn);
         }
-        if (Jiffy.parseFromDateTime(toReturn.startTime)
-                .diff(updateTime, unit: Unit.minute) <
-            30) {
+        if (List<int>.generate(
+          30,
+          (index) => index,
+        ).contains(
+          Jiffy.parseFromDateTime(toReturn.startTime).diff(
+            updateTime,
+            unit: Unit.minute,
+          ),
+        )) {
           return (true, toReturn);
         }
       }
     }
+    print("Ain't");
     return (false, null);
   }
 
@@ -120,7 +127,7 @@ class ClassTableController extends GetxController {
       for (var i in classTableData.timeArrangement) {
         if (i.weekList.length > currentWeek &&
             i.weekList[currentWeek] &&
-            i.day == updateTime.dayOfWeek) {
+            i.day == updateTime.dateTime.weekday) {
           /// If passed, do no show.
           Jiffy start = Jiffy.parseFromDateTime(DateTime(
             updateTime.year,
@@ -138,7 +145,7 @@ class ClassTableController extends GetxController {
           ));
           if (updateTime.isBefore(end)) {
             todayArrangement.add(HomeArrangement(
-              name: getClassDetail(i.index).name,
+              name: getClassDetail(i).name,
               teacher: i.teacher ?? "未知",
               place: i.classroom ?? "未知",
               startTimeStr: start.format(pattern: HomeArrangement.format),
@@ -161,7 +168,7 @@ class ClassTableController extends GetxController {
   List<HomeArrangement> get tomorrowArrangement {
     Set<HomeArrangement> tomorrowArrangement = {};
     int tomorrowWeekIndex = currentWeek;
-    int tomorrowDayIndex = updateTime.dayOfWeek + 1;
+    int tomorrowDayIndex = updateTime.dateTime.weekday + 1;
     if (tomorrowDayIndex > 7) {
       tomorrowDayIndex = 1;
       tomorrowWeekIndex += 1;
@@ -173,7 +180,7 @@ class ClassTableController extends GetxController {
             i.weekList[tomorrowWeekIndex] &&
             i.day == tomorrowDayIndex) {
           tomorrowArrangement.add(HomeArrangement(
-            name: getClassDetail(i.index).name,
+            name: getClassDetail(i).name,
             teacher: i.teacher ?? "未知",
             place: i.classroom ?? "未知",
             startTimeStr: Jiffy.parseFromDateTime(DateTime(
