@@ -3,22 +3,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// A new page to show the class without time arrangement.
-///
-/// When executing [Navigator.of(context).push()], the page is not mounted under
-/// the [ClassTableState] node on the Widget Tree, so I cannot use [ClassTableState.of(context)!].
 
 class NotArrangedClassList extends StatelessWidget {
-  /// A list of [ClassDetail] which do not have the time arrangement.
-  final List<NotArrangementClassDetail> notArranged;
-  const NotArrangedClassList({
-    super.key,
-    required this.notArranged,
-  });
+  const NotArrangedClassList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<NotArrangementClassDetail> notArranged =
+        ClassTableState.of(context)!.controllers.notArranged;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("没有时间安排的科目"),

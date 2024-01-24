@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
-import 'package:watermeter/page/classtable/classtable_page.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_page.dart';
 
 /// Intro of the classtable.
 
@@ -15,7 +15,11 @@ class ClassTableWindow extends StatelessWidget {
     return ClassTableState(
       context: context,
       controllers: ClassTableWidgetState(),
-      child: const ClassTablePage(),
+      child: Navigator(
+        onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(
+          builder: (context) => const ClassTablePage(),
+        ),
+      ),
     );
   }
 }

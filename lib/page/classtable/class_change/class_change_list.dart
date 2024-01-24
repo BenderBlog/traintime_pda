@@ -3,22 +3,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// A new page to show the class changed.
-///
-/// When executing [Navigator.of(context).push()], the page is not mounted under
-/// the [ClassTableState] node on the Widget Tree, so I cannot use [ClassTableState.of(context)!].
+/// Shows a list of [ClassDetail] which do not have the time arrangement.
 
 class ClassChangeList extends StatelessWidget {
-  /// A list of [ClassDetail] which do not have the time arrangement.
-  final List<ClassChange> classChanges;
   const ClassChangeList({
     super.key,
-    required this.classChanges,
   });
 
   @override
   Widget build(BuildContext context) {
+    final List<ClassChange> classChanges =
+        ClassTableState.of(context)!.controllers.classChange;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("课程调整"),

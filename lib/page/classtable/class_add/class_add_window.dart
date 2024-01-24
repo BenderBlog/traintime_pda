@@ -1,14 +1,13 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/wheel_choser.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/classtable_state.dart';
 
 class ClassAddWindow extends StatefulWidget {
   const ClassAddWindow({super.key});
@@ -18,12 +17,11 @@ class ClassAddWindow extends StatefulWidget {
 }
 
 class _ClassAddWindowState extends State<ClassAddWindow> {
-  final ClassTableController controller = Get.find();
-
+  late final ClassTableWidgetState controller;
   late List<bool> chosenWeek;
-  late TextEditingController classNameController;
-  late TextEditingController teacherNameController;
-  late TextEditingController classRoomController;
+  TextEditingController classNameController = TextEditingController();
+  TextEditingController teacherNameController = TextEditingController();
+  TextEditingController classRoomController = TextEditingController();
 
   int week = 1;
   int start = 1;
@@ -35,15 +33,14 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   Color get color => Theme.of(context).colorScheme.primary;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    controller = ClassTableState.of(context)!.controllers;
     chosenWeek = List<bool>.generate(
-      controller.classTableData.semesterLength,
+      controller.semesterLength,
       (index) => false,
     );
-    classNameController = TextEditingController();
-    teacherNameController = TextEditingController();
-    classRoomController = TextEditingController();
   }
 
   InputDecoration get inputDecoration => InputDecoration(
@@ -83,7 +80,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   msg: "必须输入课程名",
                 );
               } else if ((week > 0 && week <= 7) && (start <= stop)) {
-                controller
+                await controller
                     .addUserDefinedClass(
                         ClassDetail(name: classNameController.text),
                         TimeArrangement(
@@ -186,7 +183,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 crossAxisSpacing: 4,
                 maxCrossAxisExtent: 30,
                 children: List.generate(
-                  controller.classTableData.semesterLength,
+                  controller.semesterLength,
                   (index) => weekDoc(index: index),
                 ),
               ),

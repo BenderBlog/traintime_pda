@@ -143,6 +143,16 @@ class ClassTableWidgetState with ChangeNotifier {
         classTableController.classTableData.timeArrangement[index],
       );
 
+  /// bridge function to add/del user defined class
+  Future<void> addUserDefinedClass(
+    ClassDetail classDetail,
+    TimeArrangement timeArrangement,
+  ) async {
+    await classTableController
+        .addUserDefinedClass(classDetail, timeArrangement)
+        .then((value) => updatePretendLayout());
+  }
+
   /// Generate icalendar file string.
   String get iCalenderStr {
     String toReturn = "BEGIN:VCALENDAR\n";
