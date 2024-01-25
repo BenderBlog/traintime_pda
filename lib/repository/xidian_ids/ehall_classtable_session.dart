@@ -88,23 +88,20 @@ class ClassTableFile extends EhallSession {
     return (storedData, file);
   }
 
-  void deleteUserDefinedData(int index) async {
+  /// TODO: Write update user defined data function...
+
+  void deleteUserDefinedData(TimeArrangement t) {
     (UserDefinedClassData, File) data = getUserDefinedData();
 
-    data.$1.timeArrangement.removeAt(index);
-    data.$1.userDefinedDetail.removeAt(index);
-
-    for (int i = index; i < data.$1.timeArrangement.length; ++i) {
-      data.$1.timeArrangement[i].index = 1;
-    }
-
+    data.$1.timeArrangement.remove(t);
+    data.$1.userDefinedDetail.removeAt(t.index);
     data.$2.writeAsStringSync(jsonEncode(data.$1.toJson()));
   }
 
   void saveUserDefinedData(
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
-  ) async {
+  ) {
     (UserDefinedClassData, File) data = getUserDefinedData();
 
     data.$1.userDefinedDetail.add(classDetail);
@@ -440,43 +437,27 @@ class ClassTableFile extends EhallSession {
 
   Future<ClassTableData> get({
     bool isForce = false,
+    bool isUserDefinedChanged = false,
   }) async {
     log.i(
       "[getClasstable][get] "
-      "Check whether the classtable has fetched.",
-    );
-
-    log.i(
-      "[getClasstable][get] "
-      "Start fetching the classtable. Path at ${supportPath.path}.",
+      "Start fetching the classtable.",
     );
 
     var file = File("${supportPath.path}/$schoolClassName");
     bool isExist = file.existsSync();
-    log.i(
-      "[getClasstable][get] "
-      "File exist: $isExist.",
-    );
-    if (isExist) {
-      log.i(
-        "[getClasstable][get] "
-        "File exist: $isExist.",
-      );
-    }
-
-    bool isNeedRefreshCache() =>
-        isExist &&
+    bool isNotNeedRefreshCache = isExist &&
         isForce == false &&
         DateTime.now().difference(file.lastModifiedSync()).inDays <= 2;
 
-    if (isExist) {
-      log.i(
-        "[getClasstable][get] "
-        "${isNeedRefreshCache() ? "Cache" : "Fetch from Internet."}",
-      );
-    }
+    log.i(
+      "[getClasstable][get] "
+      "Cache file exist: $isExist."
+      "Is not need refresh cache: $isNotNeedRefreshCache\n"
+      "Is user class changed: $isUserDefinedChanged",
+    );
 
-    if (isNeedRefreshCache()) {
+    if (isNotNeedRefreshCache || isUserDefinedChanged) {
       ClassTableData data =
           ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
       var userClass = getUserDefinedData();

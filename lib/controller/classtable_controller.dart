@@ -223,7 +223,15 @@ class ClassTableController extends GetxController {
     TimeArrangement timeArrangement,
   ) async {
     ClassTableFile().saveUserDefinedData(classDetail, timeArrangement);
-    await updateClassTable(isForce: false);
+    await updateClassTable(isUserDefinedChanged: true);
+  }
+
+  Future<void> deleteUserDefinedClass(
+    TimeArrangement timeArrangement,
+  ) async {
+    if (timeArrangement.source != Source.user) return;
+    ClassTableFile().deleteUserDefinedData(timeArrangement);
+    await updateClassTable(isUserDefinedChanged: true);
   }
 
   void updateCurrent() {
@@ -244,11 +252,17 @@ class ClassTableController extends GetxController {
     );
   }
 
-  Future<void> updateClassTable({bool isForce = false}) async {
+  Future<void> updateClassTable({
+    bool isForce = false,
+    bool isUserDefinedChanged = false,
+  }) async {
     state = ClassTableState.fetching;
     error = null;
     try {
-      classTableData = await ClassTableFile().get(isForce: isForce);
+      classTableData = await ClassTableFile().get(
+        isForce: isForce,
+        isUserDefinedChanged: isUserDefinedChanged,
+      );
 
       /// Get the start day of the semester. Append offset
       startDay = DateTime.parse(classTableData.termStartDay).add(
