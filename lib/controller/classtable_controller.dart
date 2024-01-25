@@ -237,6 +237,10 @@ class ClassTableController extends GetxController {
   void updateCurrent() {
     if (state != ClassTableState.fetched) return;
 
+    /// Get the start day of the semester. Append offset
+    startDay = DateTime.parse(classTableData.termStartDay).add(
+        Duration(days: 7 * preference.getInt(preference.Preference.swift)));
+
     updateTime = Jiffy.now();
 
     // Get the current index.
@@ -263,10 +267,6 @@ class ClassTableController extends GetxController {
         isForce: isForce,
         isUserDefinedChanged: isUserDefinedChanged,
       );
-
-      /// Get the start day of the semester. Append offset
-      startDay = DateTime.parse(classTableData.termStartDay).add(
-          Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
       /// If ios, store the file to groupid public place
       /// in order to refresh the widget...
