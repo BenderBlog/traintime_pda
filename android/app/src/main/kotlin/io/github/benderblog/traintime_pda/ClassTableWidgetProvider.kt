@@ -8,12 +8,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
-
-private object ClassTableWidgetKeys {
-    const val SWITCHER_NEXT = "class_table_switcher_next"
-    const val DATE = "class_table_date"
-    const val CLASS_TABLE_JSON = "class_table_json"
-}
+import io.github.benderblog.traintime_pda.model.ClassTableWidgetKeys
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ClassTableWidgetProvider : HomeWidgetProvider() {
     override fun onAppWidgetOptionsChanged(
@@ -32,13 +30,6 @@ class ClassTableWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences
     ) {
-        //cache context
-        //when ClassTableItemsService loads data, the context is needed for SharePreference.
-        widgetData.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
-            if (ClassTableWidgetKeys.CLASS_TABLE_JSON == key) {
-                ClassTableItemsFactory.json = sharedPreferences.getString(key, "[]")!!
-            }
-        }
         appWidgetIds.forEach { widgetID ->
             val views = RemoteViews(
                 context.packageName,
@@ -64,17 +55,18 @@ class ClassTableWidgetProvider : HomeWidgetProvider() {
                  */
                 setTextViewText(
                     R.id.widget_classtable_date,
-                    widgetData.getString(ClassTableWidgetKeys.DATE, "Date Loading...")
+                    "${
+                        SimpleDateFormat(
+                            "MM月dd日 EEE",
+                            Locale.getDefault()
+                        ).format(Date())
+                    }（今日）"
                 )
                 //load class items
                 val intent = Intent(context, ClassTableItemsService::class.java)
                 intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME));
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID)
-                intent.putExtra(
-                    "json",
-                    widgetData.getString(ClassTableWidgetKeys.CLASS_TABLE_JSON, "[]")
-                )
-                intent.putExtra("packageName", context.packageName)
+                intent.putExtra(ClassTableWidgetKeys.PACKAGE_NAME, context.packageName)
                 setRemoteAdapter(R.id.widget_classtable_list, intent)
             }
             appWidgetManager.updateAppWidget(widgetID, views)

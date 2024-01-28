@@ -2,4 +2,8 @@
 <resources>
     <string name="widget_classtable_description">课程表</string>
     <string name="widget_electricity_description">电费详情</string>
+    <string name="widget_classtable_date_tip_loading">Loading...</string>
+    <string name="widget_classtable_titile">课程表</string>
+    <string name="widget_classtable_item_tip">暂无课程信息</string>
+    <string name="widget_classtable_no_course_tip">好像没课啦？</string>
 </resources>

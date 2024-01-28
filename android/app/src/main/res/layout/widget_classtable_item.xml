@@ -80,7 +80,7 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/widget_classtable_item_classroom"
+            android:id="@+id/widget_classtable_item_place"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/widget_classtable_item_name"
@@ -94,7 +94,7 @@
             android:layout_below="@id/widget_classtable_item_name"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_toRightOf="@id/widget_classtable_item_classroom"
+            android:layout_toRightOf="@id/widget_classtable_item_place"
             android:singleLine="true"
             android:text="|"
             android:textSize="10sp" />
