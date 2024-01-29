@@ -1,10 +1,11 @@
-package io.github.benderblog.traintime_pda
+package io.github.benderblog.traintime_pda.widget.classtable
 
 import android.content.Context
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService.RemoteViewsFactory
 import com.google.gson.Gson
+import io.github.benderblog.traintime_pda.R
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ExamData

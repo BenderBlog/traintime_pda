@@ -30,14 +30,14 @@
 
         <service android:name="es.antonborri.home_widget.HomeWidgetBackgroundService" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver android:name="ClassTableWidgetProvider" android:exported="true">
+        <receiver android:name=".widget.classtable.ClassTableWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/classtable_widget_config" />
         </receiver>
 
-        <service android:name=".ClassTableItemsService" android:exported="true" android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <service android:name=".widget.classtable.ClassTableItemsService" android:exported="true" android:permission="android.permission.BIND_REMOTEVIEWS" />
 
 
         <!-- Don't delete the meta-data below.

@@ -1,4 +1,4 @@
-package io.github.benderblog.traintime_pda
+package io.github.benderblog.traintime_pda.widget.classtable
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
+import io.github.benderblog.traintime_pda.R
 import io.github.benderblog.traintime_pda.model.ClassTableWidgetKeys
 import java.text.SimpleDateFormat
 import java.util.Date

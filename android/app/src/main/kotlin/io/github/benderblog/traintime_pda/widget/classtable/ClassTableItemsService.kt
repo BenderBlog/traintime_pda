@@ -1,17 +1,10 @@
-package io.github.benderblog.traintime_pda
+package io.github.benderblog.traintime_pda.widget.classtable
 
 import android.content.Intent
-import android.os.Environment
-import android.util.Log
 import android.widget.RemoteViewsService
-import io.github.benderblog.traintime_pda.ClassTableItemsFactory
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableWidgetKeys
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
