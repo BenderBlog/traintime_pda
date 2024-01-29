@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ExamData
+import io.github.benderblog.traintime_pda.model.Source
 import io.github.benderblog.traintime_pda.model.TimeLineItem
 import io.github.benderblog.traintime_pda.model.endTime
 import io.github.benderblog.traintime_pda.model.startTime
@@ -159,7 +160,8 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
                                 set(Calendar.MINUTE, endTimePoints[1])
                             }.time,
                             start = arrangement.start,
-                            end = arrangement.stop
+                            end = arrangement.stop,
+                            type = Source.SCHOOL
                         )
                     )
                 }
@@ -191,12 +193,13 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
                 arrangements.add(
                     TimeLineItem(
                         name = subject.subject,
-                        teacher = "考试",
-                        place = "(${subject.place}) (${subject.seat})",
+                        teacher = subject.seat.toString(),
+                        place = subject.place,
                         startTime = subject.startTime,
                         endTime = subject.endTime,
                         start = 0,
-                        end = 0
+                        end = 0,
+                        type = Source.EXAM
                     )
                 )
             }
@@ -244,8 +247,8 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         }
         val arrangementItem = arrangements[position]
         return RemoteViews(packageName, R.layout.widget_classtable_item).apply {
-            setTextViewText(R.id.widget_classtable_item_start, arrangementItem.start.toString())
-            setTextViewText(R.id.widget_classtable_item_end, arrangementItem.end.toString())
+            setTextViewText(R.id.widget_classtable_item_start, arrangementItem.startTimeStr)
+            setTextViewText(R.id.widget_classtable_item_end, arrangementItem.endTimeStr)
             setTextViewText(
                 R.id.widget_classtable_item_start_time,
                 SimpleDateFormat("HH:mm", Locale.getDefault())

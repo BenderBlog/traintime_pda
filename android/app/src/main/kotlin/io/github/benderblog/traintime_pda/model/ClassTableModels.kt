@@ -75,8 +75,21 @@ data class TimeLineItem(
     val startTime: Date,
     val endTime: Date,
     val start: Int,
-    val end: Int
-)
+    val end: Int,
+    val type: Source = Source.SCHOOL
+) {
+    val startTimeStr: String = when (type) {
+        Source.EXAM -> "考"
+        Source.EXPERIMENT -> "实"
+        else -> start.toString()
+    }
+
+    val endTimeStr: String = when (type) {
+        Source.EXAM -> "试"
+        Source.EXPERIMENT -> "验"
+        else -> end.toString()
+    }
+}
 
 data class ClassTableData(
     @SerializedName("semesterLength")
