@@ -7,12 +7,12 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
 /// A dialog/card shows the class detail / time arrangement.
-class ClassDetailDialog extends StatelessWidget {
+class ClassDetailCard extends StatelessWidget {
   final ClassDetail classDetail;
   final TimeArrangement timeArrangement;
   final MaterialColor infoColor;
   final int currentWeek;
-  const ClassDetailDialog({
+  const ClassDetailCard({
     super.key,
     required this.classDetail,
     required this.timeArrangement,

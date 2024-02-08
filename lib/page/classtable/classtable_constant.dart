@@ -16,7 +16,7 @@ const changePageTime = 200;
 const double leftRow = 32;
 
 /// The height of the top row.
-const topRowHeightBig = 96.0;
+const topRowHeightBig = 100.0;
 const topRowHeightSmall = 50.0;
 
 /// The height of the middle row.

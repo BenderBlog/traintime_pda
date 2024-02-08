@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
+import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
@@ -26,70 +27,36 @@ class ClassTablePage extends StatefulWidget {
   State<StatefulWidget> createState() => _ClassTablePageState();
 }
 
-class _ClassTablePageState extends State<ClassTablePage> {
+class _ClassTablePageState extends State<ClassTablePage>
+    with TickerProviderStateMixin {
   /// Check whether listener is pushed...
   bool isPushedListener = false;
 
   /// A lock of the week choice row.
   /// When locked, choiceWeek cannot be changed.
-  bool isTopRowLocked = false;
-
-  /// Classtable pageView controller.
-  late PageController pageControl;
-
-  /// Week choice row controller.
-  late PageController rowControl;
+  bool isInit = false;
+  late TabController _tabController;
 
   File image = File("${supportPath.path}/decoration.jpg");
   late ClassTableWidgetState classTableState;
 
-  void _switchPage() {
-    setState(() => isTopRowLocked = true);
-    Future.wait(
-      [
-        rowControl.animateTo(
-          (weekButtonWidth + 2 * weekButtonHorizontalPadding) *
-              classTableState.chosenWeek,
-          curve: Curves.easeInOut,
-          duration: const Duration(milliseconds: changePageTime),
-        ),
-        pageControl.animateToPage(
-          classTableState.chosenWeek,
-          curve: Curves.easeInOutCubic,
-          duration: const Duration(milliseconds: changePageTime),
-        ),
-      ],
-    ).then((value) => isTopRowLocked = false);
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
-  void dispose() {
-    classTableState.removeListener(_switchPage);
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     classTableState = ClassTableState.of(context)!.controllers;
+    if (!isInit) {
+      _tabController = TabController(
+        length: classTableState.semesterLength,
+        vsync: this,
+      );
 
-    pageControl = PageController(
-      initialPage: classTableState.chosenWeek,
-      keepPage: true,
-    );
-
-    /// (weekButtonWidth + 2 * weekButtonHorizontalPadding)
-    /// is the width of the week choose button.
-    rowControl = PageController(
-      initialPage: classTableState.chosenWeek,
-      viewportFraction: (weekButtonWidth + 2 * weekButtonHorizontalPadding) /
-          MediaQuery.sizeOf(context).width,
-      keepPage: true,
-    );
-
-    /// Let controllers listen to the currentWeek's change.
-    if (isPushedListener == false) {
-      classTableState.addListener(_switchPage);
-      isPushedListener = true;
+      await Future(
+        () => _tabController.animateTo(classTableState.chosenWeek),
+      ).then((value) => isInit = true);
     }
 
     super.didChangeDependencies();
@@ -129,8 +96,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 ],
                 onSelected: (String action) async {
                   final box = context.findRenderObject() as RenderBox?;
-
-                  // 点击选项的时候
                   switch (action) {
                     case 'A':
                       Navigator.of(context).push(
@@ -191,61 +156,32 @@ class _ClassTablePageState extends State<ClassTablePage> {
           ],
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            /// Following is a row shows a series of buttons related to the classtable's index.
-            ///
-            /// This is at the top of the classtable. It contains a series of
-            /// buttons which shows the week index, as well as an overview in a 5x5 dot gridview.
-            ///
-            /// When user click on the button, the pageview will show the class table of the
-            /// week the button suggested.
-            PageView.builder(
-              controller: rowControl,
-              physics: const ClampingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              itemCount: classTableState.semesterLength,
-              itemBuilder: (BuildContext context, int index) {
-                return WeekChoiceButton(
-                  onTap: () {
-                    if (isTopRowLocked == false) {
-                      classTableState.chosenWeek = index;
-                    }
-                  },
-                  index: index,
-                );
-              },
-            )
-                .padding(
-                  top: 2,
-                  bottom: 4,
-                )
-                .constrained(
-                  height: MediaQuery.sizeOf(context).height >= 500
-                      ? topRowHeightBig
-                      : topRowHeightSmall,
+          children: <Widget>[
+            ButtonsTabBar(
+              controller: _tabController,
+              height: MediaQuery.sizeOf(context).height >= 500
+                  ? topRowHeightBig
+                  : topRowHeightSmall,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.3),
+              splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
+              unselectedBackgroundColor:
+                  Theme.of(context).primaryColor.withOpacity(0.0),
+              tabs: List.generate(
+                classTableState.semesterLength,
+                (index) => Tab(
+                  child: WeekChoiceButton(index: index),
                 ),
-            PageView.builder(
-              scrollDirection: Axis.horizontal,
-              controller: pageControl,
-              onPageChanged: (value) {
-                /// When [pageControl.animateTo] triggered,
-                /// page view will try to refresh the [chosenWeek] everytime the page
-                /// view changed into a new page. Because animateTo will load every page
-                /// it passed.
-                ///
-                /// So that's the [isTopRowLocked] is used for. When week choice row is
-                /// locked, it will not refresh the [chosenWeek]. And when [chosenWeek]
-                /// is equal to the current page, unlock the [isTopRowLocked].
-                if (isTopRowLocked == false) {
-                  classTableState.chosenWeek = value;
-                }
-              },
-              itemCount: classTableState.semesterLength,
-              itemBuilder: (context, index) => LayoutBuilder(
-                builder: (context, constraint) => ClassTableView(
-                  constraint: constraint,
-                  index: index,
+              ),
+            ),
+            TabBarView(
+              controller: _tabController,
+              children: List<Widget>.generate(
+                classTableState.semesterLength,
+                (index) => LayoutBuilder(
+                  builder: (context, constraint) => ClassTableView(
+                    constraint: constraint,
+                    index: index,
+                  ),
                 ),
               ),
             )

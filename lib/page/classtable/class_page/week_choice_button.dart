@@ -10,11 +10,9 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 /// This is the button of the toprow
 class WeekChoiceButton extends StatefulWidget {
   final int index;
-  final void Function() onTap;
   const WeekChoiceButton({
     super.key,
     required this.index,
-    required this.onTap,
   });
 
   @override
@@ -77,31 +75,9 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: weekButtonHorizontalPadding,
-      ),
-      child: SizedBox(
-        width: weekButtonWidth,
-        child: Card(
-          color: Theme.of(context).primaryColor.withOpacity(
-                classTableState.chosenWeek == widget.index ? 0.3 : 0.0,
-              ),
-          elevation: 0.0,
-          child: InkWell(
-            /// The following themes are the same as the Material 3 Card Radius.
-            borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-            splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            highlightColor: Theme.of(context).primaryColor.withOpacity(0.3),
-            onTap: widget.onTap,
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: buttonInformaion(index: widget.index),
-            ),
-          ),
-        ),
-      ),
-    );
+    return buttonInformaion(index: widget.index)
+        .padding(all: 6)
+        .constrained(width: weekButtonWidth);
   }
 }
 
