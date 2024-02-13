@@ -44,32 +44,6 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
             maxLines: 1,
             group: AutoSizeGroup(),
           ),
-
-          /// These code are used to render the overview of the week,
-          /// as long as the height of the page is over 500.
-          if (MediaQuery.sizeOf(context).height >= 500)
-            GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 5,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 2,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                for (int i = 0; i < 10; i += 2)
-                  for (int day = 0; day < 5; ++day)
-                    Dot(
-                      isOccupied: !classTableState.pretendLayout[index][day][i]
-                          .contains(-1),
-                    )
-              ],
-            )
-                .paddingDirectional(
-                  start: 6,
-                  top: 4,
-                  end: 6,
-                  bottom: 2,
-                )
-                .expanded(),
         ],
       );
 
@@ -78,25 +52,5 @@ class _WeekChoiceButtonState extends State<WeekChoiceButton> {
     return buttonInformaion(index: widget.index)
         .padding(all: 6)
         .constrained(width: weekButtonWidth);
-  }
-}
-
-/// The dot of the overview, [isOccupied] is used to identify the opacity of the dot.
-class Dot extends StatelessWidget {
-  final bool isOccupied;
-  const Dot({
-    super.key,
-    required this.isOccupied,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipOval(
-      child: Container(
-        color: Theme.of(context).colorScheme.primary.withOpacity(
-              isOccupied ? 1 : 0.25,
-            ),
-      ),
-    );
   }
 }

@@ -9,8 +9,6 @@ part 'classtable.g.dart';
 enum Source {
   empty,
   school,
-  experiment,
-  exam,
   user,
 }
 
@@ -138,8 +136,6 @@ class ClassTableData {
         return classDetail[t.index];
       case Source.user:
         return userDefinedDetail[t.index];
-      case Source.exam:
-      case Source.experiment:
       case Source.empty:
         throw NotImplementedException();
     }
@@ -335,9 +331,9 @@ class UserDefinedClassData {
 // Time arrangements.
 // Even means start, odd means end.
 List<String> time = [
-  "8:30",
-  "9:15",
-  "9:20",
+  "08:30",
+  "09:15",
+  "09:20",
   "10:05",
   "10:25",
   "11:10",
@@ -355,4 +351,6 @@ List<String> time = [
   "19:45",
   "19:55",
   "20:35",
+  "20:40",
+  "21:25",
 ];

@@ -13,7 +13,7 @@ RxList<NoticeMessage> messages = <NoticeMessage>[].obs;
 
 Dio get dio => Dio()..interceptors.add(alice.getDioInterceptor());
 
-const url = "https://legacy.superbart.xyz/traintime_pda_backend";
+const url = "https://legacy.superbart.top/traintime_pda_backend";
 
 // Never used lol...
 Future<UpdateMessage> checkUpdate() async {
