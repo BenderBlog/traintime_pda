@@ -85,10 +85,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             .diff(Jiffy.parseFromDateTime(classTableState.startDay),
                 unit: Unit.day)
             .toInt();
-        print(
-          "occursWeek $diff ${diff ~/ 7} ${diff % 7} "
-          "${widget.index} $index\n",
-        );
+
         if (diff ~/ 7 == widget.index && diff % 7 + 1 == index) {
           events.add(ClassOrgainzedData.fromSubject(i));
         }
@@ -156,10 +153,6 @@ class _ClassTableViewState extends State<ClassTableView> {
 
       /// Choice the day and render it!
       for (var i in arrangedEvents) {
-        print(
-          "${i.name} ${i.start} ${i.stop} ${index}",
-        );
-
         /// Generate the row.
         thisRow.add(Positioned(
           top: blockheight(i.start),

@@ -75,8 +75,8 @@ class ClassOrgainzedData {
         data: [(subject)],
         start: subject.startTime.dateTime,
         stop: subject.stopTime.dateTime,
-        name: subject.subject,
-        place: "${subject.place} ${subject.seat}",
+        name: "${subject.subject}\n${subject.type}",
+        place: "${subject.place} ${subject.seat}座",
       );
 
   factory ClassOrgainzedData.fromExperiment(
@@ -86,7 +86,7 @@ class ClassOrgainzedData {
         data: [exp],
         start: exp.time.first,
         stop: exp.time.last,
-        name: exp.name,
+        name: "${exp.name}\n物理实验",
         place: exp.classroom,
       );
 
@@ -116,22 +116,22 @@ class ClassOrgainzedData {
           previous = timeChosen;
           continue;
         }
-        if (timeInMin >= previous && timeInMin <= timeChosen) {
+        if (timeInMin >= previous && timeInMin < timeChosen) {
           double basic = 0;
           double blocks = 5;
-          double ratio = (timeInMin - previous) * 5 / (timeChosen - previous);
+          double ratio = (timeInMin - previous) / (timeChosen - previous);
           if (previous < 12 * 60) {
-            basic = _timeInBlock.indexOf(i) * 5;
+            basic = (_timeInBlock.indexOf(i) - 1) * 5;
           } else if (previous < 14 * 60) {
             basic = 20;
             blocks = 2;
           } else if (previous < 17.5 * 60) {
-            basic = 22 + (_timeInBlock.indexOf(i) - 5) * 5;
+            basic = 22 + (_timeInBlock.indexOf(i) - 6) * 5;
           } else if (previous <= 19 * 60) {
             basic = 42;
             blocks = 3;
           } else {
-            basic = 45 + (_timeInBlock.indexOf(i) - 10) * 5;
+            basic = 45 + (_timeInBlock.indexOf(i) - 11) * 5;
           }
           return basic + blocks * ratio;
         } else {
@@ -144,7 +144,6 @@ class ClassOrgainzedData {
 
     this.start = transferIndex(start);
     this.stop = transferIndex(stop);
-    print("$start $stop $name");
   }
 }
 
