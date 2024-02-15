@@ -17,6 +17,7 @@ Ripples... / Genesis
 
 Credit: Mike Rutherford & Tony Banks, 1976
 With: Steve Hackett & Phil Collins
+From: A Trick of the Tail
 
 （不是翻译，纯属第一印象）
 
@@ -110,30 +111,32 @@ They've gone to the other side
 看着湖中的涟漪，她们不会再回来
 我潜入湖中，又浮上来，想追上她们的痕迹
 她们已经到达了对岸
-
 ''';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("你找到了彩蛋")),
-      body: ListView(children: [
-        TextButton(
-          onPressed: () => launchUrl(
-            Uri.parse(url),
-            mode: LaunchMode.externalApplication,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        children: [
+          TextButton(
+            onPressed: () => launchUrl(
+              Uri.parse(url),
+              mode: LaunchMode.externalApplication,
+            ),
+            child: const Text("听歌时间"),
           ),
-          child: const Text("听歌时间"),
-        ),
-        Text(song, textAlign: TextAlign.center).padding(vertical: 10),
-        TextButton(
-          onPressed: () => launchUrl(
-            Uri.parse(articleUrl),
-            mode: LaunchMode.externalApplication,
+          Text(song, textAlign: TextAlign.center).padding(vertical: 10),
+          TextButton(
+            onPressed: () => launchUrl(
+              Uri.parse(articleUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+            child: const Text("了解这个乐队吧"),
           ),
-          child: const Text("了解这个乐队吧"),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }

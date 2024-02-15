@@ -17,10 +17,9 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/page/setting/about_page.dart';
+import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
-import 'package:watermeter/page/setting/log_page.dart';
 import 'package:watermeter/repository/experiment/experiment_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
@@ -37,39 +36,42 @@ class SettingWindow extends StatefulWidget {
 }
 
 class _SettingWindowState extends State<SettingWindow> {
-  Widget _buildListSubtitle(String text) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(text, style: const TextStyle(fontWeight: FontWeight.bold))
-              .padding(
-            left: 12,
+  Widget _buildListSubtitle(String text) => Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      )
+          .padding(
             bottom: 8,
           )
-        ],
-      );
+          .center();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "设置",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.background,
-        ),
         body: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(
-              Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const Text('Powered by BenderBlog Rodriguez and contributors'),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: Platform.isIOS || Platform.isMacOS
+                        ? "XDYou"
+                        : 'Traintime PDA',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: '\nWritten by BenderBlog Rodriguez and contributors',
+                  ),
+                ],
+              ),
+            ).padding(horizontal: 8.0),
             // 功能1
             const SizedBox(height: 20),
             ReXCard(
@@ -82,8 +84,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       subtitle: Text(
                           '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
                       onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const AboutPage()),
+                        MaterialPageRoute(builder: (context) => AboutPage()),
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.navigate_next),
@@ -190,126 +191,107 @@ class _SettingWindowState extends State<SettingWindow> {
               ),
             ),
             ReXCard(
-                title: _buildListSubtitle('课表相关设置'),
-                remaining: [],
-                bottomRow: Column(
-                  children: [
-                    ListTile(
-                      title: const Text("开启课表背景图"),
-                      trailing: Switch(
-                        value:
-                            preference.getBool(preference.Preference.decorated),
-                        onChanged: (bool value) {
-                          if (value == true &&
-                              !preference
-                                  .getBool(preference.Preference.decoration)) {
-                            Fluttertoast.showToast(msg: '你先选个图片罢，就在下面');
-                          } else {
-                            setState(() {
-                              preference.setBool(
-                                  preference.Preference.decorated, value);
-                            });
-                          }
-                        },
-                      ),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('课表背景图选择'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
-                      onTap: () async {
-                        FilePickerResult? result = await FilePicker.platform
-                            .pickFiles(type: FileType.image);
-                        if (mounted) {
-                          if (result != null) {
-                            File(result.files.single.path!)
-                                .copySync("${supportPath.path}/decoration.jpg");
-                            preference.setBool(
-                                preference.Preference.decoration, true);
-                            if (mounted) {
-                              Fluttertoast.showToast(msg: '设定成功');
-                            }
-                          } else {
-                            Fluttertoast.showToast(msg: '你没有选图片捏');
-                          }
-                        }
-                      },
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("清除所有用户添加课程"),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
-                      onTap: () async {
-                        var file = File(
-                          "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
-                        );
-                        if (file.existsSync()) {
-                          file.deleteSync();
-                        }
-
-                        Get.find<ClassTableController>().updateClassTable();
-                        Fluttertoast.showToast(msg: "已经清除完毕");
-                      },
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("强制刷新课表"),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
-                      onTap: () => Get.put(ClassTableController())
-                          .updateClassTable(isForce: true),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('课程偏移设置'),
-                      subtitle: Text(
-                        '正数错后开学日期，负数提前开学日期\n'
-                        '目前为 ${preference.getInt(preference.Preference.swift)}',
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => ChangeSwiftDialog(),
-                        ).then((value) {
-                          Get.put(ClassTableController()).updateCurrent();
-                          setState(() {});
-                        });
-                      },
-                    ),
-                  ],
-                )),
-            ReXCard(
-              title: _buildListSubtitle("日志相关"),
+              title: _buildListSubtitle('课表相关设置'),
               remaining: [],
-              bottomRow: Column(children: [
-                /// Omit this from release mod...
-                ListTile(
-                  title: const Text("显示日志"),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.navigate_next),
-                    onPressed: () {},
+              bottomRow: Column(
+                children: [
+                  ListTile(
+                    title: const Text("开启课表背景图"),
+                    trailing: Switch(
+                      value:
+                          preference.getBool(preference.Preference.decorated),
+                      onChanged: (bool value) {
+                        if (value == true &&
+                            !preference
+                                .getBool(preference.Preference.decoration)) {
+                          Fluttertoast.showToast(msg: '你先选个图片罢，就在下面');
+                        } else {
+                          setState(() {
+                            preference.setBool(
+                                preference.Preference.decorated, value);
+                          });
+                        }
+                      },
+                    ),
                   ),
-                  onTap: () async {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const LogWindow(),
-                    ));
-                  },
-                ),
-              ]),
-            ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('课表背景图选择'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.navigate_next),
+                      onPressed: () {},
+                    ),
+                    onTap: () async {
+                      FilePickerResult? result = await FilePicker.platform
+                          .pickFiles(type: FileType.image);
+                      if (mounted) {
+                        if (result != null) {
+                          File(result.files.single.path!)
+                              .copySync("${supportPath.path}/decoration.jpg");
+                          preference.setBool(
+                              preference.Preference.decoration, true);
+                          if (mounted) {
+                            Fluttertoast.showToast(msg: '设定成功');
+                          }
+                        } else {
+                          Fluttertoast.showToast(msg: '你没有选图片捏');
+                        }
+                      }
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text("清除所有用户添加课程"),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.navigate_next),
+                      onPressed: () {},
+                    ),
+                    onTap: () async {
+                      var file = File(
+                        "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
+                      );
+                      if (file.existsSync()) {
+                        file.deleteSync();
+                      }
 
+                      Get.find<ClassTableController>().updateClassTable();
+                      Fluttertoast.showToast(msg: "已经清除完毕");
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text("强制刷新课表"),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.navigate_next),
+                      onPressed: () {},
+                    ),
+                    onTap: () => Get.put(ClassTableController())
+                        .updateClassTable(isForce: true),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('课程偏移设置'),
+                    subtitle: Text(
+                      '正数错后开学日期，负数提前开学日期\n'
+                      '目前为 ${preference.getInt(preference.Preference.swift)}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.navigate_next),
+                      onPressed: () {},
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => ChangeSwiftDialog(),
+                      ).then((value) {
+                        Get.put(ClassTableController()).updateCurrent();
+                        setState(() {});
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
             ReXCard(
               title: _buildListSubtitle('缓存登录设置'),
               remaining: [],
