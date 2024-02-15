@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
-import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
@@ -14,7 +13,6 @@ import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_not_arranged/not_arranged_class_list.dart';
-import 'package:watermeter/page/classtable/class_page/week_choice_button.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
@@ -49,13 +47,10 @@ class _ClassTablePageState extends State<ClassTablePage>
     classTableState = ClassTableState.of(context)!.controllers;
     if (!isInit) {
       _tabController = TabController(
-        length: classTableState.semesterLength,
         vsync: this,
+        length: classTableState.semesterLength,
+        initialIndex: classTableState.chosenWeek,
       );
-
-      await Future(
-        () => _tabController.animateTo(classTableState.chosenWeek),
-      ).then((value) => isInit = true);
     }
 
     super.didChangeDependencies();
@@ -71,7 +66,13 @@ class _ClassTablePageState extends State<ClassTablePage>
     if (haveClass) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text("课程表"),
+          title: const Text("日程表"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(
+              ClassTableState.of(context)!.parentContext,
+            ).pop(),
+          ),
           actions: [
             if (haveClass)
               PopupMenuButton<String>(
@@ -153,55 +154,52 @@ class _ClassTablePageState extends State<ClassTablePage>
                 },
               ),
           ],
-        ),
-        body: Column(
-          children: <Widget>[
-            ButtonsTabBar(
-              controller: _tabController,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.3),
-              splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
-              unselectedBackgroundColor:
-                  Theme.of(context).primaryColor.withOpacity(0.0),
-              tabs: List.generate(
-                classTableState.semesterLength,
-                (index) => Tab(
-                  child: WeekChoiceButton(index: index),
-                ),
+          bottom: TabBar(
+            isScrollable: true,
+            controller: _tabController,
+            tabAlignment: TabAlignment.start,
+            tabs: List.generate(
+              classTableState.semesterLength,
+              (index) => Tab(
+                text: "第${index + 1}周",
               ),
             ),
-            TabBarView(
-              controller: _tabController,
-              children: List<Widget>.generate(
-                classTableState.semesterLength,
-                (index) => LayoutBuilder(
-                  builder: (context, constraint) => ClassTableView(
-                    constraint: constraint,
-                    index: index,
-                  ),
-                ),
+          ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: List<Widget>.generate(
+            classTableState.semesterLength,
+            (index) => LayoutBuilder(
+              builder: (context, constraint) => ClassTableView(
+                constraint: constraint,
+                index: index,
               ),
-            )
-                .decorated(
-                  image: (preference.getBool(preference.Preference.decorated) &&
-                          image.existsSync())
-                      ? DecorationImage(
-                          image: FileImage(image),
-                          fit: BoxFit.cover,
-                          opacity:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? 0.4
-                                  : 1.0,
-                        )
-                      : null,
+            ),
+          ),
+        ).decorated(
+          image: (preference.getBool(preference.Preference.decorated) &&
+                  image.existsSync())
+              ? DecorationImage(
+                  image: FileImage(image),
+                  fit: BoxFit.cover,
+                  opacity: Theme.of(context).brightness == Brightness.dark
+                      ? 0.4
+                      : 1.0,
                 )
-                .expanded(),
-          ],
+              : null,
         ),
       );
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: const Text("课程表"),
+          title: const Text("日程表"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(
+              ClassTableState.of(context)!.parentContext,
+            ).pop(),
+          ),
         ),
         body: const EmptyClasstablePage(),
       );

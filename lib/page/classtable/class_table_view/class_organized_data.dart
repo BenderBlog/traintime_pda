@@ -4,6 +4,7 @@
 // Copied from https://github.com/SimformSolutionsPvtLtd/flutter_calendar_view/blob/master/lib/src/event_arrangers/event_arrangers.dart.
 // Removed left/right, only use stack.
 
+import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -18,6 +19,8 @@ class ClassOrgainzedData {
 
   final String name;
   final String? place;
+
+  final MaterialColor color;
 
   /// Following is the begin/end for each blocks...
   static const _timeInBlock = [
@@ -39,6 +42,7 @@ class ClassOrgainzedData {
 
   factory ClassOrgainzedData.fromTimeArrangement(
     TimeArrangement timeArrangement,
+    MaterialColor color,
     String name,
   ) {
     double transferIndex(int index, {bool isStart = false}) {
@@ -46,15 +50,15 @@ class ClassOrgainzedData {
       if (index <= 4) {
         toReturn = index * 5;
         if (isStart && index == 4) {
-          toReturn += 2;
+          toReturn += 3;
         }
       } else if (index <= 8) {
-        toReturn = index * 5 + 2;
+        toReturn = index * 5 + 3;
         if (isStart && index == 8) {
           toReturn += 3;
         }
       } else {
-        return (index + 1) * 5;
+        return index * 5 + 6;
       }
       return toReturn;
     }
@@ -63,30 +67,35 @@ class ClassOrgainzedData {
       data: [timeArrangement],
       start: transferIndex(timeArrangement.start - 1, isStart: true),
       stop: transferIndex(timeArrangement.stop),
+      color: color,
       name: name,
       place: timeArrangement.classroom,
     );
   }
 
   factory ClassOrgainzedData.fromSubject(
+    MaterialColor color,
     Subject subject,
   ) =>
       ClassOrgainzedData._(
         data: [(subject)],
         start: subject.startTime.dateTime,
         stop: subject.stopTime.dateTime,
-        name: "${subject.subject}\n${subject.type}",
+        color: color,
+        name: "${subject.subject}${subject.type}",
         place: "${subject.place} ${subject.seat}座",
       );
 
   factory ClassOrgainzedData.fromExperiment(
+    MaterialColor color,
     ExperimentData exp,
   ) =>
       ClassOrgainzedData._(
         data: [exp],
         start: exp.time.first,
         stop: exp.time.last,
-        name: "${exp.name}\n物理实验",
+        color: color,
+        name: exp.name,
         place: exp.classroom,
       );
 
@@ -95,6 +104,7 @@ class ClassOrgainzedData {
     required this.start,
     required this.stop,
     required this.name,
+    required this.color,
     this.place,
   });
 
@@ -102,6 +112,7 @@ class ClassOrgainzedData {
     required this.data,
     required DateTime start,
     required DateTime stop,
+    required this.color,
     required this.name,
     this.place,
   }) {

@@ -5,7 +5,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 /// THe classtable view, the way the the classtable sheet rendered.
 class ClassTableView extends StatefulWidget {
@@ -33,11 +33,11 @@ class ClassTableView extends StatefulWidget {
 ///
 /// Classtable blanks below per blocks.
 ///  * Morning 1-4 each 5 blocks.
-///  * Noon break 2 blocks, means 12:00, 13:00, 14:00,
+///  * Noon break 3 blocks
 ///  * Afternoon 5-8 each 5 blocks.
-///  * Supper time 3 blocks, means 17:30, 18:00, 18:30, 19:00.
+///  * Supper time 3 blocks.
 ///  * Evening time 9-11 each 5 blocks.
-/// Total 60 parts, 48 as phone divider.
+/// Total 61 parts, 49 as phone divider.
 ///
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
@@ -47,7 +47,7 @@ class _ClassTableViewState extends State<ClassTableView> {
   double blockheight(double count) =>
       count *
       (widget.constraint.minHeight - midRowHeightVertical) /
-      (isPhone(context) ? 48 : 60);
+      (isPhone(context) ? 49 : 61);
 
   double get blockwidth => (mediaQuerySize.width - leftRow) / 7;
 
@@ -65,7 +65,7 @@ class _ClassTableViewState extends State<ClassTableView> {
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(int index) {
     if (index != 0) {
-      /// Fetch all class in this range
+      /// Fetch all class in this range.
       List<ClassOrgainzedData> events = [];
       for (final i in classTableState.timeArrangement) {
         if (i.weekList.length > widget.index &&
@@ -73,6 +73,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             i.day == index) {
           events.add(ClassOrgainzedData.fromTimeArrangement(
             i,
+            colorList[i.index % colorList.length],
             classTableState
                 .getClassDetail(classTableState.timeArrangement.indexOf(i))
                 .name,
@@ -87,7 +88,10 @@ class _ClassTableViewState extends State<ClassTableView> {
             .toInt();
 
         if (diff ~/ 7 == widget.index && diff % 7 + 1 == index) {
-          events.add(ClassOrgainzedData.fromSubject(i));
+          events.add(ClassOrgainzedData.fromSubject(
+            colorList[classTableState.subjects.indexOf(i) % colorList.length],
+            i,
+          ));
         }
       }
 
@@ -143,6 +147,7 @@ class _ClassTableViewState extends State<ClassTableView> {
               ...arrangedEventData.data,
               ...event.data,
             ],
+            color: shouldNew ? event.color : arrangedEventData.color,
             name: shouldNew ? event.name : arrangedEventData.name,
             place: shouldNew ? event.place : arrangedEventData.place,
           );
@@ -159,12 +164,7 @@ class _ClassTableViewState extends State<ClassTableView> {
           height: blockheight(i.stop - i.start),
           left: leftRow + blockwidth * (index - 1),
           width: blockwidth,
-          child: ClassCard(
-            color: Colors.blue,
-            conflict: i.data,
-            name: i.name,
-            place: i.place,
-          ),
+          child: ClassCard(detail: i),
         ));
       }
 
@@ -173,11 +173,7 @@ class _ClassTableViewState extends State<ClassTableView> {
       /// Leftest side, the index array.
       return List.generate(13, (index) {
         double height = blockheight(
-          index == 4
-              ? 2
-              : index == 10
-                  ? 3
-                  : 5,
+          index != 4 && index != 9 ? 5 : 3,
         );
 
         late int indexOfChar;
@@ -194,49 +190,44 @@ class _ClassTableViewState extends State<ClassTableView> {
           indexOfChar = index - 2;
         }
 
-        return SizedBox(
-          width: leftRow,
-          height: height,
-          child: Center(
-            child: AutoSizeText.rich(
-              TextSpan(children: [
-                if (indexOfChar == -1)
-                  const TextSpan(
-                    text: "午休",
-                    style: TextStyle(fontSize: 10),
-                  )
-                else if (indexOfChar == -2)
-                  const TextSpan(
-                    text: "晚饭",
-                    style: TextStyle(fontSize: 10),
-                  )
-                else ...[
-                  TextSpan(
-                    text: "${indexOfChar + 1}\n",
-                    style: const TextStyle(fontSize: 10),
-                  ),
-                  TextSpan(
-                    text: "${time[indexOfChar * 2]}\n",
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  TextSpan(
-                    text: time[indexOfChar * 2 + 1],
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ]),
-              group: AutoSizeGroup(),
-              textAlign: TextAlign.center,
-              minFontSize: 6,
-            ),
-          ),
-        );
+        return Text.rich(
+          TextSpan(children: [
+            if (indexOfChar == -1)
+              const TextSpan(
+                text: "午休",
+                style: TextStyle(fontSize: 10),
+              )
+            else if (indexOfChar == -2)
+              const TextSpan(
+                text: "晚饭",
+                style: TextStyle(fontSize: 10),
+              )
+            else ...[
+              TextSpan(
+                text: "${indexOfChar + 1}\n",
+                style: const TextStyle(fontSize: 10),
+              ),
+              TextSpan(
+                text: "${time[indexOfChar * 2]}\n",
+                style: TextStyle(
+                  fontSize: 8,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              TextSpan(
+                text: time[indexOfChar * 2 + 1],
+                style: TextStyle(
+                  fontSize: 8,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ]),
+          textAlign: TextAlign.center,
+        ).center().constrained(
+              width: leftRow,
+              height: height,
+            );
       });
     }
   }
@@ -250,33 +241,30 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        /// The main class table.
-        ClassTableDateRow(
-          firstDay: classTableState.startDay
-              .add(Duration(days: 7 * classTableState.offset))
-              .add(Duration(days: 7 * widget.index)),
-        ),
+    return [
+      /// The main class table.
+      ClassTableDateRow(
+        firstDay: classTableState.startDay
+            .add(Duration(days: 7 * classTableState.offset))
+            .add(Duration(days: 7 * widget.index)),
+      ),
 
-        /// The rest of the table.
-        Stack(
-          children: [
-            Container(
-              color: Colors.grey.shade200.withOpacity(0.75),
-              width: leftRow,
-              child: classSubRow(0).toColumn(),
-            ).positioned(left: 0),
-            for (int i in List.generate(7, (i) => i + 1)) ...classSubRow(i),
-          ],
-        )
-            .constrained(
-              height: blockheight(60),
-              width: mediaQuerySize.width,
-            )
-            .scrollable()
-            .expanded(),
-      ],
-    );
+      /// The rest of the table.
+      [
+        classSubRow(0)
+            .toColumn()
+            .decorated(color: Colors.grey.shade200.withOpacity(0.75))
+            .constrained(width: leftRow)
+            .positioned(left: 0),
+        for (int i in List.generate(7, (i) => i + 1)) ...classSubRow(i),
+      ]
+          .toStack()
+          .constrained(
+            height: blockheight(60),
+            width: mediaQuerySize.width,
+          )
+          .scrollable()
+          .expanded(),
+    ].toColumn();
   }
 }

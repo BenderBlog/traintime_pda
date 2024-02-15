@@ -13,11 +13,12 @@ import 'package:watermeter/repository/preference.dart' as preference;
 /// Use a inheritedWidget to share the ClassTableWidgetState
 class ClassTableState extends InheritedWidget {
   final ClassTableWidgetState controllers;
+  final BuildContext parentContext;
 
   const ClassTableState({
     super.key,
     required super.child,
-    required BuildContext context,
+    required this.parentContext,
     required this.controllers,
   });
 

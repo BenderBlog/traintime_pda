@@ -13,7 +13,7 @@ class ClassTableWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClassTableState(
-      context: context,
+      parentContext: context,
       controllers: ClassTableWidgetState(),
       child: Navigator(
         onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(
