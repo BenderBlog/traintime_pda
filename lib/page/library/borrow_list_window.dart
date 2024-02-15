@@ -53,44 +53,11 @@ class BorrowListDetail extends StatelessWidget {
       (index) => BorrowInfoCard(toUse: borrow_info.borrowList[index]),
     );
 
-    return ListView(
-      children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Card(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 6,
-            ),
-            elevation: 0,
-            color: Theme.of(context).colorScheme.secondary,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("仍在借"),
-                      Text("${borrow_info.notDued} 本"),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("已过期"),
-                      Text("${borrow_info.dued} 本"),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (borrow_info.borrowList.isNotEmpty)
-          AlignedGridView.count(
+    return Scaffold(
+      body: Builder(builder: (context) {
+        if (borrow_info.borrowList.isNotEmpty) {
+          return AlignedGridView.count(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
             itemCount: borrowList.length,
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -99,10 +66,21 @@ class BorrowListDetail extends StatelessWidget {
             mainAxisSpacing: 4,
             crossAxisSpacing: 4,
             itemBuilder: (context, index) => borrowList[index],
-          )
-        else
-          const Text("目前没有查询到在借图书").center().expanded(),
-      ],
+          );
+        } else {
+          return const Text("目前没有查询到在借图书").center().expanded();
+        }
+      }),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "仍在借 ${borrow_info.notDued} 本\n" "已过期 ${borrow_info.dued} 本",
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

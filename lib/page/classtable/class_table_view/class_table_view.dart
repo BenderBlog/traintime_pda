@@ -190,40 +190,31 @@ class _ClassTableViewState extends State<ClassTableView> {
           indexOfChar = index - 2;
         }
 
-        return Text.rich(
-          TextSpan(children: [
-            if (indexOfChar == -1)
-              const TextSpan(
-                text: "午休",
-                style: TextStyle(fontSize: 10),
-              )
-            else if (indexOfChar == -2)
-              const TextSpan(
-                text: "晚饭",
-                style: TextStyle(fontSize: 10),
-              )
-            else ...[
-              TextSpan(
-                text: "${indexOfChar + 1}\n",
-                style: const TextStyle(fontSize: 10),
-              ),
-              TextSpan(
-                text: "${time[indexOfChar * 2]}\n",
-                style: TextStyle(
-                  fontSize: 8,
-                  color: Colors.grey.shade600,
+        return DefaultTextStyle.merge(
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.black87,
+          ),
+          child: Text.rich(
+            TextSpan(children: [
+              if (indexOfChar == -1)
+                const TextSpan(text: "午休")
+              else if (indexOfChar == -2)
+                const TextSpan(text: "晚饭")
+              else ...[
+                TextSpan(text: "${indexOfChar + 1}\n"),
+                TextSpan(
+                  text: "${time[indexOfChar * 2]}\n",
+                  style: const TextStyle(fontSize: 8),
                 ),
-              ),
-              TextSpan(
-                text: time[indexOfChar * 2 + 1],
-                style: TextStyle(
-                  fontSize: 8,
-                  color: Colors.grey.shade600,
+                TextSpan(
+                  text: time[indexOfChar * 2 + 1],
+                  style: const TextStyle(fontSize: 8),
                 ),
-              ),
-            ],
-          ]),
-          textAlign: TextAlign.center,
+              ],
+            ]),
+            textAlign: TextAlign.center,
+          ),
         ).center().constrained(
               width: leftRow,
               height: height,
@@ -265,6 +256,6 @@ class _ClassTableViewState extends State<ClassTableView> {
           )
           .scrollable()
           .expanded(),
-    ].toColumn();
+    ].toColumn().safeArea();
   }
 }

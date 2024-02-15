@@ -23,7 +23,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "BellssGit",
       "https://avatars.githubusercontent.com/u/107785251",
-      "支持：最佳/最久故障反馈者",
+      "支持：最佳&最久故障反馈者",
       "https://space.bilibili.com/17772726",
     ),
     Developer(
@@ -83,7 +83,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "ZCWzy",
       "https://avatars.githubusercontent.com/u/87163986",
-      "开发：修复丁香电费/支持：研究生版本开发",
+      "开发：修复丁香电费 / 支持：研究生版本开发",
       "https://github.com/ZCWzy",
     ),
   ];

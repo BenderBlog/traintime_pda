@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
 /// The index row of the class table, shows the index of the day and the week.
@@ -29,19 +30,16 @@ class ClassTableDateRow extends StatelessWidget {
           if (index > 0) {
             return WeekInfomation(time: dateList[index - 1]);
           } else {
-            return SizedBox(
-              width: leftRow,
-              child: Center(
-                child: AutoSizeText(
-                  "课次",
-                  textAlign: TextAlign.center,
-                  group: AutoSizeGroup(),
-                  style: const TextStyle(
-                    color: Colors.black87,
-                  ),
-                ),
+            return const Text(
+              "课\n次",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 12,
               ),
-            );
+            ).center().constrained(
+                  width: leftRow,
+                );
           }
         }),
       ),

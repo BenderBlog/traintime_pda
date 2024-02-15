@@ -4,6 +4,7 @@
 // Useful weights to simplify watermeter programming.
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 
 /// Check the width
 bool isPhone(context) => MediaQuery.of(context).size.width < 480;
@@ -72,7 +73,7 @@ class DataList<T> extends StatelessWidget {
         horizontal: 12.5,
         vertical: 9.0,
       ),
-    );
+    ).safeArea();
   }
 }
 

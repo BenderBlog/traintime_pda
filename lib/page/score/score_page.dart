@@ -140,22 +140,23 @@ class _ScorePageState extends State<ScorePage> {
           )
               .padding(horizontal: 14, top: 8, bottom: 6)
               .constrained(maxWidth: 480),
-          Expanded(
-            child: c.toShow.isNotEmpty
-                ? MasonryGridView.count(
-                    shrinkWrap: true,
-                    itemCount: c.toShow.length,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                    ),
-                    crossAxisCount:
-                        MediaQuery.sizeOf(context).width ~/ cardWidth,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    itemBuilder: (context, index) => scoreList[index],
-                  )
-                : const Text("未筛查到合请求的记录").center(),
-          ),
+          Builder(builder: (context) {
+            if (c.toShow.isNotEmpty) {
+              return MasonryGridView.count(
+                shrinkWrap: true,
+                itemCount: c.toShow.length,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                ),
+                crossAxisCount: MediaQuery.sizeOf(context).width ~/ cardWidth,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                itemBuilder: (context, index) => scoreList[index],
+              );
+            } else {
+              return const Text("未筛查到合请求的记录").center();
+            }
+          }).safeArea().expanded(),
         ],
       ),
       bottomNavigationBar: Visibility(

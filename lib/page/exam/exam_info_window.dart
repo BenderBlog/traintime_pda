@@ -5,6 +5,7 @@
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
@@ -25,10 +26,6 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
       builder: (c) => Scaffold(
         appBar: AppBar(
           title: const Text("考试安排"),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.more_time),
@@ -42,39 +39,47 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
             ),
           ],
         ),
-        body: c.status == ExamStatus.cache || c.status == ExamStatus.fetched
-            ? c.data.subject.isNotEmpty
-                ? TimelineWidget(
-                    isTitle: const [true, false, true, false],
-                    children: [
-                      const TimelineTitle(title: "未完成考试"),
-                      c.isNotFinished.isNotEmpty
-                          ? Column(
-                              children: List.generate(
-                                c.isNotFinished.length,
-                                (index) => ExamInfoCard(
-                                  toUse: c.isNotFinished[index],
-                                ),
-                              ),
-                            )
-                          : const ExamInfoCard(title: "所有考试全部完成"),
-                      const TimelineTitle(title: "已完成考试"),
-                      c.isFinished.isNotEmpty
-                          ? Column(
-                              children: List.generate(
-                                c.isFinished.length,
-                                (index) => ExamInfoCard(
-                                  toUse: c.isFinished[index],
-                                ),
-                              ),
-                            )
-                          : const ExamInfoCard(title: "一门还没考呢"),
-                    ],
-                  )
-                : const Center(child: Text("没有考试安排"))
-            : c.status == ExamStatus.error
-                ? Center(child: Text(c.error.toString()))
-                : const Center(child: CircularProgressIndicator()),
+        body: Builder(builder: (context) {
+          if (c.status == ExamStatus.cache || c.status == ExamStatus.fetched) {
+            if (c.data.subject.isNotEmpty) {
+              return TimelineWidget(
+                isTitle: const [true, false, true, false],
+                children: [
+                  const TimelineTitle(title: "未完成考试"),
+                  if (c.isNotFinished.isNotEmpty)
+                    Column(
+                      children: List.generate(
+                        c.isNotFinished.length,
+                        (index) => ExamInfoCard(
+                          toUse: c.isNotFinished[index],
+                        ),
+                      ),
+                    )
+                  else
+                    const ExamInfoCard(title: "所有考试全部完成"),
+                  const TimelineTitle(title: "已完成考试"),
+                  if (c.isFinished.isNotEmpty)
+                    Column(
+                      children: List.generate(
+                        c.isFinished.length,
+                        (index) => ExamInfoCard(
+                          toUse: c.isFinished[index],
+                        ),
+                      ),
+                    )
+                  else
+                    const ExamInfoCard(title: "一门还没考呢"),
+                ],
+              ).safeArea();
+            } else {
+              return const Center(child: Text("没有考试安排"));
+            }
+          } else if (c.status == ExamStatus.error) {
+            return Center(child: Text(c.error.toString()));
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        }),
       ),
     );
   }
