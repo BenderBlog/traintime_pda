@@ -6,10 +6,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Link {
   final String name;
-  final IconData icon;
+  final Icon icon;
   final String url;
 
-  Link({
+  const Link({
     required this.name,
     required this.icon,
     required this.url,
@@ -18,7 +18,7 @@ class Link {
 
 class LinkWidget extends StatelessWidget {
   final String name;
-  final IconData icon;
+  final Icon icon;
   final String url;
   const LinkWidget({
     super.key,
@@ -32,7 +32,7 @@ class LinkWidget extends StatelessWidget {
     return ListTile(
       minLeadingWidth: 0,
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon),
+      leading: icon,
       title: Text(name),
       onTap: () => launchUrl(
         Uri.parse("https://legacy.superbart.xyz/xdyou.html"),

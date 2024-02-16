@@ -51,6 +51,12 @@ class AboutPage extends StatelessWidget {
       "https://space.bilibili.com/49892391/",
     ),
     Developer(
+      "lsy223622 (木生睡不着)",
+      "https://shp.qlogo.cn/ttsing/43714034/43714034/100?ts=0",
+      "设计：iOS 图标",
+      "https://github.com/lsy223622",
+    ),
+    Developer(
       "ReverierXu",
       "https://blog.woooo.tech/img/avatar.png",
       "设计：用于信息展示的 ReX 卡片",
@@ -71,7 +77,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "xeonds",
       "https://avatars.githubusercontent.com/u/68117734",
-      "设计：设置页面",
+      "设计：设置页面 / 开发：XDU Planet",
       "https://mxts.jiujiuer.xyz",
     ),
     Developer(
@@ -88,108 +94,164 @@ class AboutPage extends StatelessWidget {
     ),
   ];
 
-  final List<Link> linkData = [
+  final List<Link> linkData = const [
     Link(
-      icon: Icons.home,
+      icon: Icon(Icons.home),
       name: "主页",
-      url: "https://legacy.superbart.xyz/xdyou.html",
+      url: "https://legacy.superbart.top/xdyou.html",
     ),
     Link(
-      icon: Icons.code,
+      icon: Icon(Icons.code),
       name: "代码",
-      url: "https://github.com/BenderBlog/watermeter",
+      url: "https://github.com/BenderBlog/traintime_pda",
     ),
     Link(
-      icon: Icons.copyright,
+      icon: Icon(Icons.copyright),
       name: "授权协议",
-      url: "https://legacy.superbart.xyz/xdyou_eula.html",
+      url: "https://legacy.superbart.top/xdyou_eula.html",
     ),
     Link(
-      icon: Icons.redeem,
+      icon: Icon(Icons.redeem),
       name: "给我捐款",
       url: "https://afdian.net/a/benderblog",
     ),
   ];
 
-  AboutPage({super.key});
+  const AboutPage({super.key});
+
+  Widget _title(context) => [
+        const AppIconWidget(),
+        const Divider(color: Colors.transparent),
+        DefaultTextStyle.merge(
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 22),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: Platform.isIOS || Platform.isMacOS
+                      ? "XDYou"
+                      : "Traintime PDA",
+                ),
+                TextSpan(
+                  text: " v${preference.packageInfo.version}\n",
+                ),
+                TextSpan(
+                  text: Platform.isIOS || Platform.isMacOS
+                      ? "Sakurako Edition"
+                      : "Himawari Edition",
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ]
+          .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
+          .padding(all: 32)
+          .gestures(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const EasterEggPage()),
+            ),
+          );
+
+  Widget get _developerList => ReXCard(
+        title: Text("Made with love from ${getDevelopers.length} people")
+            .padding(
+              bottom: 8,
+            )
+            .center(),
+        remaining: const [],
+        bottomRow: getDevelopers
+            .map((e) => DeveloperWidget(developer: e))
+            .toList()
+            .toColumn(),
+      );
+
+  Widget _moreList(context) => ReXCard(
+        title: const Text("知道更多")
+            .padding(
+              bottom: 8,
+            )
+            .center(),
+        remaining: const [],
+        bottomRow: [
+          ...linkData.map((e) => LinkWidget(
+                icon: e.icon,
+                name: e.name,
+                url: e.url,
+              )),
+          ListTile(
+            minLeadingWidth: 0,
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.balance),
+            title: const Text("开源协议"),
+            onTap: () => showLicensePage(
+              context: context,
+              applicationName: Platform.isIOS || Platform.isMacOS
+                  ? "XDYou"
+                  : "Traintime PDA",
+              applicationVersion: "v${preference.packageInfo.version}+"
+                  "${preference.packageInfo.buildNumber}",
+              applicationLegalese:
+                  "本拷贝基于 traintime_pda 代码编译，traintime_pda，或称 watermeter，代码"
+                  "按照 Mozilla Public License, v. 2.0授权。",
+            ),
+          ),
+          if (Platform.isIOS || Platform.isMacOS)
+            const ListTile(
+              minLeadingWidth: 0,
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.code),
+              title: Text("备案号"),
+              subtitle: Text("陕ICP备2024026116号"),
+            ),
+          if (Platform.isAndroid)
+            ListTile(
+              minLeadingWidth: 0,
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.code),
+              title: const Text("安卓签名"),
+              subtitle: Text(preference.packageInfo.buildSignature),
+            ),
+        ].toList().toColumn(),
+      );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("关于本软件")),
-      body: [
-        [
-          const AppIconWidget(size: 56),
-          const VerticalDivider(),
-          DefaultTextStyle.merge(
-            style: const TextStyle(fontSize: 18),
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: Platform.isIOS || Platform.isMacOS
-                        ? "XDYou"
-                        : "Traintime PDA",
-                  ),
-                  TextSpan(
-                    text: " v${preference.packageInfo.version}\n",
-                  ),
-                  const TextSpan(
-                    text: "\"Ripples...\" Edition",
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ]
-            .toRow(mainAxisAlignment: MainAxisAlignment.center)
-            .padding(all: 32)
-            .gestures(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const EasterEggPage()),
-              ),
-            ),
-        ReXCard(
-          title: const Text("Made with love from")
-              .padding(
-                bottom: 8,
-              )
-              .center(),
-          remaining: const [],
-          bottomRow: getDevelopers
-              .map((e) => DeveloperWidget(developer: e))
-              .toList()
-              .toColumn(),
-        ),
-        ReXCard(
-          title: const Text("知道更多")
-              .padding(
-                bottom: 8,
-              )
-              .center(),
-          remaining: const [],
-          bottomRow: [
-            ...linkData.map((e) => LinkWidget(
-                  icon: e.icon,
-                  name: e.name,
-                  url: e.url,
-                )),
-            if (Platform.isIOS || Platform.isMacOS)
-              const ListTile(
-                minLeadingWidth: 0,
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.code),
-                title: Text("备案号"),
-                subtitle: Text("陕ICP备2024026116号"),
-              )
-          ].toList().toColumn(),
-        ),
-      ]
-          .toColumn(mainAxisAlignment: MainAxisAlignment.center)
-          .scrollable()
-          .constrained(maxWidth: 600)
-          .safeArea(),
-    );
+        appBar: AppBar(title: const Text("关于本软件")),
+        body: Builder(builder: (context) {
+          if (MediaQuery.sizeOf(context).width > 600 &&
+              MediaQuery.sizeOf(context).width /
+                      MediaQuery.sizeOf(context).height >
+                  1) {
+            return [
+              [
+                const Spacer(),
+                _title(context),
+                const Spacer(),
+                _moreList(context),
+              ]
+                  .toColumn(mainAxisAlignment: MainAxisAlignment.end)
+                  .flexible(flex: 1),
+              _developerList.scrollable().flexible(flex: 1),
+            ]
+                .toRow(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                )
+                .constrained(maxWidth: 800)
+                .center()
+                .safeArea();
+          } else {
+            return [_title(context), _developerList, _moreList(context)]
+                .toColumn(mainAxisAlignment: MainAxisAlignment.center)
+                .scrollable()
+                .constrained(maxWidth: 600)
+                .center()
+                .safeArea();
+          }
+        }));
   }
 }

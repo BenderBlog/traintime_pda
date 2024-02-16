@@ -67,8 +67,9 @@ Sail away, away
 The face that launched a thousand ships
 Is sinking fast, that happens you know
 
-那张美丽的脸庞（一千艘船代表希腊神话中海伦的美貌导致的特洛伊战争）
+那张美丽的脸庞
 在水中慢慢地消失
+注释：一千艘船代表希腊神话中海伦的美貌导致的特洛伊战争
 
 The water gets below, seems not very long ago
 Lovelier she was than any that I know
@@ -117,26 +118,28 @@ They've gone to the other side
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("你找到了彩蛋")),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        children: [
-          TextButton(
-            onPressed: () => launchUrl(
-              Uri.parse(url),
-              mode: LaunchMode.externalApplication,
-            ),
-            child: const Text("听歌时间"),
+      body: [
+        TextButton(
+          onPressed: () => launchUrl(
+            Uri.parse(url),
+            mode: LaunchMode.externalApplication,
           ),
-          Text(song, textAlign: TextAlign.center).padding(vertical: 10),
-          TextButton(
-            onPressed: () => launchUrl(
-              Uri.parse(articleUrl),
-              mode: LaunchMode.externalApplication,
-            ),
-            child: const Text("了解这个乐队吧"),
+          child: const Text("听歌时间"),
+        ).padding(vertical: 20),
+        Text(song, textAlign: TextAlign.center),
+        TextButton(
+          onPressed: () => launchUrl(
+            Uri.parse(articleUrl),
+            mode: LaunchMode.externalApplication,
           ),
-        ],
-      ),
+          child: const Text("了解这个乐队吧"),
+        ),
+      ]
+          .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
+          .center()
+          .padding(horizontal: 20)
+          .scrollable()
+          .safeArea(),
     );
   }
 }

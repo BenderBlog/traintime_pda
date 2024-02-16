@@ -298,7 +298,7 @@ class _SettingWindowState extends State<SettingWindow> {
               bottomRow: Column(
                 children: [
                   ListTile(
-                    title: const Text('查看网络拦截器'),
+                    title: const Text('查看网络拦截器和日志'),
                     trailing: IconButton(
                       icon: const Icon(Icons.navigate_next),
                       onPressed: () {},
