@@ -126,7 +126,7 @@ class _SettingWindowState extends State<SettingWindow> {
             // ),
             ReXCard(
                 title: _buildListSubtitle('主题设置'),
-                remaining: [],
+                remaining: const [],
                 bottomRow: Column(children: [
                   ListTile(
                       title: const Text('设置深浅色'),
@@ -145,7 +145,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 ])),
             ReXCard(
               title: _buildListSubtitle('帐号设置'),
-              remaining: [],
+              remaining: const [],
               bottomRow: Column(
                 children: [
                   ListTile(
@@ -194,7 +194,7 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
             ReXCard(
               title: _buildListSubtitle('课表相关设置'),
-              remaining: [],
+              remaining: const [],
               bottomRow: Column(
                 children: [
                   ListTile(
@@ -296,7 +296,7 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
             ReXCard(
               title: _buildListSubtitle('缓存登录设置'),
-              remaining: [],
+              remaining: const [],
               bottomRow: Column(
                 children: [
                   ListTile(

@@ -34,7 +34,7 @@ class ArrangementList extends StatelessWidget {
             infoColor: colorList[2 % colorList.length],
           );
         }
-        return Placeholder();
+        return const Placeholder();
       }),
     );
   }
