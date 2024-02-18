@@ -13,7 +13,11 @@ import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 
 class ExamInfoWindow extends StatefulWidget {
-  const ExamInfoWindow({super.key});
+  final DateTime time;
+  const ExamInfoWindow({
+    super.key,
+    required this.time,
+  });
 
   @override
   State<ExamInfoWindow> createState() => _ExamInfoWindowState();
@@ -46,29 +50,29 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                 isTitle: const [true, false, true, false],
                 children: [
                   const TimelineTitle(title: "未完成考试"),
-                  if (c.isNotFinished.isNotEmpty)
-                    Column(
-                      children: List.generate(
-                        c.isNotFinished.length,
-                        (index) => ExamInfoCard(
-                          toUse: c.isNotFinished[index],
-                        ),
-                      ),
-                    )
-                  else
-                    const ExamInfoCard(title: "所有考试全部完成"),
+                  Builder(builder: (context) {
+                    final isNotFinished = c.isNotFinished(widget.time);
+                    if (isNotFinished.isNotEmpty) {
+                      return isNotFinished
+                          .map((e) => ExamInfoCard(toUse: e))
+                          .toList()
+                          .toColumn();
+                    } else {
+                      return const ExamInfoCard(title: "所有考试全部完成");
+                    }
+                  }),
                   const TimelineTitle(title: "已完成考试"),
-                  if (c.isFinished.isNotEmpty)
-                    Column(
-                      children: List.generate(
-                        c.isFinished.length,
-                        (index) => ExamInfoCard(
-                          toUse: c.isFinished[index],
-                        ),
-                      ),
-                    )
-                  else
-                    const ExamInfoCard(title: "一门还没考呢"),
+                  Builder(builder: (context) {
+                    final isFinished = c.isFinished(widget.time);
+                    if (isFinished.isNotEmpty) {
+                      return isFinished
+                          .map((e) => ExamInfoCard(toUse: e))
+                          .toList()
+                          .toColumn();
+                    } else {
+                      return const ExamInfoCard(title: "一门还没考呢");
+                    }
+                  }),
                 ],
               ).safeArea();
             } else {

@@ -83,9 +83,12 @@ class PhoneMainPage extends StatelessWidget {
                       ),
                     ),
                     Text(
+                      /// TODO: check it
                       c.state == ClassTableState.fetched
-                          ? c.isNotVacation
-                              ? "第 ${c.currentWeek + 1} 周"
+                          ? c.getCurrentWeek(updateTime) >= 0 &&
+                                  c.getCurrentWeek(updateTime) <
+                                      c.classTableData.semesterLength
+                              ? "第 ${c.getCurrentWeek(updateTime) + 1} 周"
                               : "假期中"
                           : c.state == ClassTableState.error
                               ? "加载错误"

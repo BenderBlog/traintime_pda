@@ -5,7 +5,6 @@
 // Thanks xidian-script and libxdauth!
 
 import 'dart:io';
-import 'dart:convert';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -70,48 +69,7 @@ class ClassTableFile extends EhallSession {
     return toReturn;
   }
 
-  (UserDefinedClassData, File) getUserDefinedData() {
-    var file = File("${supportPath.path}/$userDefinedClassName");
-    bool isExist = file.existsSync();
-    log.i(
-      "[getClasstable][getUserDefinedData] "
-      "File exist: $isExist.",
-    );
-
-    if (!isExist) {
-      file.writeAsStringSync(jsonEncode(UserDefinedClassData.empty()));
-    }
-
-    UserDefinedClassData storedData =
-        UserDefinedClassData.fromJson(jsonDecode(file.readAsStringSync()));
-
-    return (storedData, file);
-  }
-
-  /// TODO: Write update user defined data function...
-
-  void deleteUserDefinedData(TimeArrangement t) {
-    (UserDefinedClassData, File) data = getUserDefinedData();
-
-    data.$1.timeArrangement.remove(t);
-    data.$1.userDefinedDetail.removeAt(t.index);
-    data.$2.writeAsStringSync(jsonEncode(data.$1.toJson()));
-  }
-
-  void saveUserDefinedData(
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) {
-    (UserDefinedClassData, File) data = getUserDefinedData();
-
-    data.$1.userDefinedDetail.add(classDetail);
-    timeArrangement.index = data.$1.userDefinedDetail.length - 1;
-    data.$1.timeArrangement.add(timeArrangement);
-
-    data.$2.writeAsStringSync(jsonEncode(data.$1.toJson()));
-  }
-
-  Future<ClassTableData> getFromWeb() async {
+  Future<ClassTableData> get() async {
     Map<String, dynamic> qResult = {};
     log.i("[getClasstable][getFromWeb] Login the system.");
     String get = await useApp("4770397878132218");
@@ -433,58 +391,5 @@ class ClassTableFile extends EhallSession {
     }
 
     return preliminaryData;
-  }
-
-  Future<ClassTableData> get({
-    bool isForce = false,
-    bool isUserDefinedChanged = false,
-  }) async {
-    log.i(
-      "[getClasstable][get] "
-      "Start fetching the classtable.",
-    );
-
-    var file = File("${supportPath.path}/$schoolClassName");
-    bool isExist = file.existsSync();
-    bool isNotNeedRefreshCache = isExist &&
-        isForce == false &&
-        DateTime.now().difference(file.lastModifiedSync()).inDays <= 2;
-
-    log.i(
-      "[getClasstable][get] "
-      "Cache file exist: $isExist."
-      "Is not need refresh cache: $isNotNeedRefreshCache\n"
-      "Is user class changed: $isUserDefinedChanged",
-    );
-
-    if (isNotNeedRefreshCache || isUserDefinedChanged) {
-      ClassTableData data =
-          ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
-      var userClass = getUserDefinedData();
-      data.userDefinedDetail = userClass.$1.userDefinedDetail;
-      data.timeArrangement.addAll(userClass.$1.timeArrangement);
-      return data;
-    } else {
-      try {
-        var toUse = await getFromWeb();
-        file.writeAsStringSync(jsonEncode(toUse.toJson()));
-        var userClass = getUserDefinedData();
-        toUse.userDefinedDetail = userClass.$1.userDefinedDetail;
-        toUse.timeArrangement.addAll(userClass.$1.timeArrangement);
-        return toUse;
-      } catch (e, s) {
-        log.w(
-          "[getClasstable][get] "
-          "Fetch error with exception.",
-          error: e,
-          stackTrace: s,
-        );
-        if (isExist) {
-          return ClassTableData.fromJson(jsonDecode(file.readAsStringSync()));
-        } else {
-          rethrow;
-        }
-      }
-    }
   }
 }

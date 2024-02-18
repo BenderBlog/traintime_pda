@@ -84,7 +84,9 @@ class _SettingWindowState extends State<SettingWindow> {
                       subtitle: Text(
                           '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
                       onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => AboutPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const AboutPage(),
+                        ),
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.navigate_next),

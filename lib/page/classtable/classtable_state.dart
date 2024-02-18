@@ -72,7 +72,7 @@ class ClassTableWidgetState with ChangeNotifier {
       Jiffy.parse(classTableController.classTableData.termStartDay).dateTime;
 
   /// The currentWeek.
-  int get currentWeek => classTableController.currentWeek;
+  final int currentWeek;
 
   /// The exam list.
   List<Subject> get subjects => examController.data.subject;
@@ -149,7 +149,7 @@ class ClassTableWidgetState with ChangeNotifier {
     return "${toReturn}END:VCALENDAR";
   }
 
-  ClassTableWidgetState() {
+  ClassTableWidgetState({required this.currentWeek}) {
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {

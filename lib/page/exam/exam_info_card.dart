@@ -11,8 +11,11 @@ class ExamInfoCard extends StatelessWidget {
   final Subject? toUse;
   final String? title;
 
-  const ExamInfoCard({super.key, this.toUse, this.title})
-      : assert(toUse != null || title != null);
+  const ExamInfoCard({
+    super.key,
+    this.toUse,
+    this.title,
+  }) : assert(toUse != null || title != null);
 
   @override
   Widget build(BuildContext context) {

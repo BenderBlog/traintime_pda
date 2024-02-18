@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/class_detail_tile.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class NoticeBox extends StatelessWidget {
@@ -48,43 +48,47 @@ class ClasstableArrangementColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ClassTableController>(
-      builder: (c) => Column(
+    return Obx(
+      () => Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            "接下来课程",
+            "接下来日程",
             style: TextStyle(
               fontSize: 14,
               textBaseline: TextBaseline.alphabetic,
               color: Theme.of(context).colorScheme.primary,
             ),
           ).padding(bottom: 8.0),
-          if (c.state == ClassTableState.fetched)
-            if (c.isTomorrow && c.tomorrowArrangement.isNotEmpty) ...[
-              ClassDetailTile(
-                isTomorrow: c.isTomorrow,
-                name: c.tomorrowArrangement.first.name,
-                time:
-                    '${Jiffy.parseFromDateTime(c.tomorrowArrangement.first.startTime).format(pattern: "HH:mm")}'
-                    '-${Jiffy.parseFromDateTime(c.tomorrowArrangement.first.endTime).format(pattern: "HH:mm")}',
-                place: c.tomorrowArrangement.first.place,
-              ),
-              NoticeBox(text: "明天一共${c.tomorrowArrangement.length}节课"),
-            ] else if (c.todayArrangement.isNotEmpty) ...[
-              ClassDetailTile(
-                isTomorrow: c.isTomorrow,
-                name: c.todayArrangement.first.name,
-                time:
-                    '${Jiffy.parseFromDateTime(c.todayArrangement.first.startTime).format(pattern: "HH:mm")}'
-                    '-${Jiffy.parseFromDateTime(c.todayArrangement.first.endTime).format(pattern: "HH:mm")}',
-                place: c.todayArrangement.first.place,
-              ),
-              NoticeBox(text: "今天还剩${c.todayArrangement.length}节课"),
+          if (arrangementState.value == ArrangementState.fetched)
+            if (isTomorrow.isTrue && arrangement.isNotEmpty) ...[
+              for (var i in arrangement)
+                ClassDetailTile(
+                  isTomorrow: isTomorrow.isTrue,
+                  name: i.name,
+                  time:
+                      '${Jiffy.parseFromDateTime(i.startTime).format(pattern: "HH:mm")}'
+                      '-${Jiffy.parseFromDateTime(i.endTime).format(pattern: "HH:mm")}',
+                  place: arrangement.first.place,
+                ),
+              const Spacer(),
+              NoticeBox(text: "明天一共${arrangement.length}个日程"),
+            ] else if (arrangement.isNotEmpty) ...[
+              for (var i in arrangement)
+                ClassDetailTile(
+                  isTomorrow: isTomorrow.isTrue,
+                  name: i.name,
+                  time:
+                      '${Jiffy.parseFromDateTime(i.startTime).format(pattern: "HH:mm")}'
+                      '-${Jiffy.parseFromDateTime(i.endTime).format(pattern: "HH:mm")}',
+                  place: arrangement.first.place,
+                ),
+              const Spacer(),
+              NoticeBox(text: "今天还剩${arrangement.length}个日程"),
             ] else
-              NoticeBox(text: c.isTomorrow ? "明天没有课" : "已无课程安排")
-          else if (c.state == ClassTableState.error)
+              NoticeBox(text: isTomorrow.isTrue ? "明天暂无日程" : "已完成所有日程")
+          else if (arrangementState.value == ArrangementState.error)
             const NoticeBox(text: "遇到错误")
           else
             const NoticeBox(text: "正在加载"),

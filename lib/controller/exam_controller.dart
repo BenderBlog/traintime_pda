@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
@@ -30,20 +31,42 @@ class ExamController extends GetxController {
   String error = "";
   late ExamData data;
   late File file;
-  Jiffy now = Jiffy.now();
 
-  List<Subject> get isFinished {
+  List<HomeArrangement> getExamOfDate(DateTime now) {
+    List<Subject> isFinished = List.from(data.subject);
+
+    isFinished.removeWhere(
+      (element) => !element.startTime.isSame(
+        Jiffy.parseFromDateTime(now),
+        unit: Unit.day,
+      ),
+    );
+    return isFinished
+        .map((e) => HomeArrangement(
+              name: e.subject,
+              place: "${e.place} ${e.seat}座",
+              startTimeStr: e.startTime.format(pattern: HomeArrangement.format),
+              endTimeStr: e.stopTime.format(pattern: HomeArrangement.format),
+            ))
+        .toList();
+  }
+
+  List<Subject> isFinished(DateTime now) {
     List<Subject> isFinished = List.from(data.subject);
     isFinished.removeWhere(
-      (element) => element.startTime.isAfter(now),
+      (element) => element.startTime.isAfter(
+        Jiffy.parseFromDateTime(now),
+      ),
     );
     return isFinished;
   }
 
-  List<Subject> get isNotFinished {
+  List<Subject> isNotFinished(DateTime now) {
     List<Subject> isNotFinished = List.from(data.subject);
     isNotFinished.removeWhere(
-      (element) => element.startTime.isSameOrBefore(now),
+      (element) => element.startTime.isSameOrBefore(
+        Jiffy.parseFromDateTime(now),
+      ),
     );
     return isNotFinished
       ..sort(
@@ -88,7 +111,6 @@ class ExamController extends GetxController {
       "Fetching data from Internet.",
     );
     try {
-      now = Jiffy.now();
       status = ExamStatus.fetching;
       data = await ExamSession().getExam();
       status = ExamStatus.fetched;

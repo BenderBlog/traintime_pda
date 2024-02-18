@@ -68,7 +68,7 @@ class BorrowListDetail extends StatelessWidget {
             itemBuilder: (context, index) => borrowList[index],
           );
         } else {
-          return const Text("目前没有查询到在借图书").center().expanded();
+          return const Text("目前没有查询到在借图书").center();
         }
       }),
       bottomNavigationBar: BottomAppBar(
