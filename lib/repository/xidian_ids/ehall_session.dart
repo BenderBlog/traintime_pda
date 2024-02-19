@@ -7,11 +7,14 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class EhallSession extends IDSSession {
+  static final _ehallLock = Lock();
+
   /// This header shall only be used in the ehall related stuff...
   Map<String, String> refererHeader = {
     HttpHeaders.refererHeader: "http://ehall.xidian.edu.cn/new/index_xd.html",
@@ -66,44 +69,47 @@ class EhallSession extends IDSSession {
   }
 
   Future<String> useApp(String appID) async {
-    log.i(
-      "[ehall_session][useApp] "
-      "Ready to use the app $appID.\nTry to Login.",
-    );
-    if (!await isLoggedIn()) {
-      String location = await super.checkAndLogin(
-        target:
-            "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+    return await _ehallLock.synchronized(() async {
+      log.i(
+        "[ehall_session][useApp] "
+        "Ready to use the app $appID.\nTry to Login.",
       );
-      var response = await dio.get(location);
-      while (response.headers[HttpHeaders.locationHeader] != null) {
-        location = response.headers[HttpHeaders.locationHeader]![0];
-        log.i(
-          "[ehall_session][useApp] "
-          "Received location: $location.",
+      if (!await isLoggedIn()) {
+        String location = await super.checkAndLogin(
+          target: "https://ehall.xidian.edu.cn/login?"
+              "service=https://ehall.xidian.edu.cn/new/index.html",
+          sliderCaptcha: (p0) async {},
         );
-        response = await dioEhall.get(location);
+        var response = await dio.get(location);
+        while (response.headers[HttpHeaders.locationHeader] != null) {
+          location = response.headers[HttpHeaders.locationHeader]![0];
+          log.i(
+            "[ehall_session][useApp] "
+            "Received location: $location.",
+          );
+          response = await dioEhall.get(location);
+        }
       }
-    }
-    log.i(
-      "[ehall_session][useApp] "
-      "Try to use the $appID.",
-    );
-    var value = await dioEhall.get(
-      "https://ehall.xidian.edu.cn/appShow",
-      queryParameters: {'appId': appID},
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) {
-          return status! < 500;
-        },
-      ),
-    );
-    log.i(
-      "[ehall_session][useApp] "
-      "Transfer address: ${value.headers['location']![0]}.",
-    );
-    return value.headers['location']![0];
+      log.i(
+        "[ehall_session][useApp] "
+        "Try to use the $appID.",
+      );
+      var value = await dioEhall.get(
+        "https://ehall.xidian.edu.cn/appShow",
+        queryParameters: {'appId': appID},
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status! < 500;
+          },
+        ),
+      );
+      log.i(
+        "[ehall_session][useApp] "
+        "Transfer address: ${value.headers['location']![0]}.",
+      );
+      return value.headers['location']![0];
+    });
   }
 
   /// 学生个人信息  4585275700341858 Unable to use because of xgxt.xidian.edu.cn (学工系统)

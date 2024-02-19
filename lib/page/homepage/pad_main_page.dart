@@ -18,6 +18,7 @@ import 'package:watermeter/page/homepage/dynamic_widget/sport_card.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 
 import 'package:watermeter/page/homepage/refresh.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 
 class PadMainPage extends StatelessWidget {
   const PadMainPage({super.key});
@@ -63,7 +64,13 @@ class PadMainPage extends StatelessWidget {
                 msg: "请稍候，正在刷新信息",
                 timeInSecForIosWeb: 1,
               );
-              update();
+              update(sliderCaptcha: (String cookieStr) {
+                return Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CaptchaWidget(cookie: cookieStr),
+                  ),
+                );
+              });
             },
             icon: const Icon(Icons.refresh),
           ),

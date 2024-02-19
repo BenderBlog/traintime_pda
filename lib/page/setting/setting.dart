@@ -88,10 +88,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           builder: (context) => const AboutPage(),
                         ),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
+                      trailing: const Icon(Icons.navigate_next),
                     ),
                     const Divider(),
                     ListTile(
@@ -132,10 +129,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       title: const Text('设置深浅色'),
                       subtitle: Text(demoBlueModeName[
                           preference.getInt(preference.Preference.brightness)]),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
+                      trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
                             context: context,
@@ -150,10 +144,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 children: [
                   ListTile(
                       title: const Text('体适能密码设置'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
+                      trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
                           context: context,
@@ -163,10 +154,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   const Divider(),
                   ListTile(
                       title: const Text('物理实验系统密码'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
+                      trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
                           context: context,
@@ -178,10 +166,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                       title: const Text('电费帐号密码设置'),
                       subtitle: const Text('非 123456 请设置'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: () {},
-                      ),
+                      trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
                           context: context,
@@ -219,10 +204,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   const Divider(),
                   ListTile(
                     title: const Text('课表背景图选择'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () async {
                       FilePickerResult? result = await FilePicker.platform
                           .pickFiles(type: FileType.image);
@@ -244,10 +226,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   const Divider(),
                   ListTile(
                     title: const Text("清除所有用户添加课程"),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () async {
                       var file = File(
                         "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
@@ -263,10 +242,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   const Divider(),
                   ListTile(
                     title: const Text("强制刷新课表"),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () => Get.put(ClassTableController())
                         .updateClassTable(isForce: true),
                   ),
@@ -274,13 +250,10 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                     title: const Text('课程偏移设置'),
                     subtitle: Text(
-                      '正数错后开学日期，负数提前开学日期\n'
+                      '正数错后开学日期，负数提前开学日期'
                       '目前为 ${preference.getInt(preference.Preference.swift)}',
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
                         context: context,
@@ -301,19 +274,13 @@ class _SettingWindowState extends State<SettingWindow> {
                 children: [
                   ListTile(
                     title: const Text('查看网络拦截器和日志'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () => alice.showInspector(),
                   ),
                   const Divider(),
                   ListTile(
                     title: const Text('清除缓存后重启'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () async {
                       try {
                         await NetworkSession().clearCookieJar();
@@ -355,10 +322,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   const Divider(),
                   ListTile(
                     title: const Text('退出登录并重启应用'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.navigate_next),
-                      onPressed: () {},
-                    ),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () async {
                       ProgressDialog pd = ProgressDialog(context: context);
                       pd.show(msg: '正在退出登录');

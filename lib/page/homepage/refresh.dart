@@ -37,7 +37,7 @@ enum ArrangementState {
 }
 
 Future<void> _comboLogin({
-  Future<void> Function(String)? sliderCaptcha,
+  required Future<void> Function(String) sliderCaptcha,
 }) async {
   // Guard
   if (loginState == IDSLoginState.requesting) {
@@ -72,10 +72,8 @@ Future<void> _comboLogin({
 
 Future<void> update({
   bool forceRetryLogin = false,
-  Future<void> Function(String)? sliderCaptcha,
+  required Future<void> Function(String) sliderCaptcha,
 }) async {
-  final examController = Get.put(ExamController());
-
   // Update data
   message.checkMessage();
 
@@ -85,10 +83,23 @@ Future<void> update({
   }
 
   await Future.wait([
-    examController
-        .get()
-        .then((value) => updateCurrentData())
-        .onError((error, stackTrace) => updateCurrentData()),
+    Future.wait([
+      Future(() async {
+        final c = Get.put(ExamController());
+        await c.get();
+      }),
+      Future(() async {
+        final c = Get.put(ClassTableController());
+        await c.updateClassTable();
+      }),
+    ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
+      log.i(
+        "[homepage Update]"
+        "Update failed with following exception: $error\n"
+        "$stackTrace",
+      );
+      updateCurrentData();
+    }),
     electricity.update(),
     owe_session.update(),
     updateSportInfo(),
@@ -103,12 +114,22 @@ void updateCurrentData() {
     "[updateCurrentData]"
     "Updating current data. ${arrangementState.value}",
   );
+  final classTableController = Get.put(ClassTableController());
+  final examController = Get.put(ExamController());
+
   if (arrangementState.value == ArrangementState.fetching) {
     return;
   }
+  if (classTableController.state == ClassTableState.fetching) {
+    return;
+  }
+
   arrangementState.value = ArrangementState.fetching;
-  final classTableController = Get.put(ClassTableController());
-  final examController = Get.put(ExamController());
+
+  if (classTableController.state == ClassTableState.error) {
+    arrangementState.value = ArrangementState.error;
+    return;
+  }
 
   // Update Classtable
 

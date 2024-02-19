@@ -286,6 +286,7 @@ class ClassTableController extends GetxController {
       }
 
       state = ClassTableState.fetched;
+      error = null;
       updateCurrent();
       update();
     } catch (e, s) {

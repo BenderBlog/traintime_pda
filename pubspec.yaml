@@ -12,6 +12,7 @@ dependencies:
   crypto: ^3.0.2
   encrypt: ^5.0.1
   alice: ^0.4.1
+  synchronized: ^3.1.0+1
   # Stroage Cache
   shared_preferences: ^2.0.15
   dio_cookie_manager: ^3.0.0
@@ -64,6 +65,7 @@ dependencies:
   #workmanager: ^0.5.2
   background_fetch: ^1.2.1
   logger: ^2.0.2+1
+
   
 dev_dependencies:
   flutter_test:

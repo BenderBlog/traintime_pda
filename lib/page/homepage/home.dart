@@ -149,7 +149,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (loginState == IDSLoginState.none) {
       _loginAsync();
     } else {
-      update();
+      update(
+        forceRetryLogin: true,
+        sliderCaptcha: (String cookieStr) {
+          return Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CaptchaWidget(cookie: cookieStr),
+            ),
+          );
+        },
+      );
     }
     initPlatformState();
   }

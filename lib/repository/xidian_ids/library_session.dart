@@ -147,6 +147,7 @@ class LibrarySession extends IDSSession {
       String location = await checkAndLogin(
         target: "https://mgce.natapp4.cc/api/index/casLoginDo.html?"
             "libraryId=5&source=xdbb",
+        sliderCaptcha: (p0) async {},
       );
       var response = await dio.get(location);
 

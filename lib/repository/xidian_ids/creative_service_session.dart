@@ -17,6 +17,7 @@ class CreativeServiceSession extends IDSSession {
     try {
       String location = await checkAndLogin(
         target: "$url/login/ids",
+        sliderCaptcha: (p0) async {},
       );
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
