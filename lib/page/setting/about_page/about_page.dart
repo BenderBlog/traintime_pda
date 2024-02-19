@@ -106,11 +106,6 @@ class AboutPage extends StatelessWidget {
       url: "https://github.com/BenderBlog/traintime_pda",
     ),
     Link(
-      icon: Icon(Icons.copyright),
-      name: "授权协议",
-      url: "https://legacy.superbart.top/xdyou_eula.html",
-    ),
-    Link(
       icon: Icon(Icons.redeem),
       name: "给我捐款",
       url: "https://afdian.net/a/benderblog",
@@ -185,7 +180,7 @@ class AboutPage extends StatelessWidget {
             minLeadingWidth: 0,
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.balance),
-            title: const Text("开源协议"),
+            title: const Text("开源协议和授权信息"),
             onTap: () => showLicensePage(
               context: context,
               applicationName: Platform.isIOS || Platform.isMacOS
@@ -194,8 +189,12 @@ class AboutPage extends StatelessWidget {
               applicationVersion: "v${preference.packageInfo.version}+"
                   "${preference.packageInfo.buildNumber}",
               applicationLegalese:
-                  "本拷贝基于 traintime_pda 代码编译，traintime_pda，或称 watermeter，代码"
-                  "按照 Mozilla Public License, v. 2.0授权。",
+                  "本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，"
+                  "代码按照 Mozilla Public License, v. 2.0 授权。\n\n"
+                  "本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。\n\n"
+                  "Copyright 2023-Present BenderBlog Rodriguez and contributors. "
+                  "The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. "
+                  "If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.",
             ),
           ),
           if (Platform.isIOS || Platform.isMacOS)
@@ -204,7 +203,7 @@ class AboutPage extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.code),
               title: Text("备案号"),
-              subtitle: Text("陕ICP备2024026116号"),
+              subtitle: Text("陕ICP备2024026116号-1A"),
             ),
           if (Platform.isAndroid)
             ListTile(

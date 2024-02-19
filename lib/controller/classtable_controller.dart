@@ -120,6 +120,17 @@ class ClassTableController extends GetxController {
       "[ClassTableController][onInit] "
       "Init user defined file.",
     );
+    refreshUserDefinedClass();
+  }
+
+  @override
+  void onReady() async {
+    await updateClassTable();
+  }
+
+  /// TODO: Write update user defined data function...
+
+  void refreshUserDefinedClass() {
     userDefinedFile = File(
       "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
     );
@@ -133,13 +144,6 @@ class ClassTableController extends GetxController {
       jsonDecode(userDefinedFile.readAsStringSync()),
     );
   }
-
-  @override
-  void onReady() async {
-    await updateClassTable();
-  }
-
-  /// TODO: Write update user defined data function...
 
   Future<void> addUserDefinedClass(
     ClassDetail classDetail,
@@ -193,6 +197,7 @@ class ClassTableController extends GetxController {
         "Start fetching the classtable.",
       );
 
+      refreshUserDefinedClass();
       bool classTableFileIsExist = classTableFile.existsSync();
       bool isNotNeedRefreshCache = classTableFileIsExist &&
           !isForce &&

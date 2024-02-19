@@ -72,7 +72,7 @@ class EhallSession extends IDSSession {
     return await _ehallLock.synchronized(() async {
       log.i(
         "[ehall_session][useApp] "
-        "Ready to use the app $appID.\nTry to Login.",
+        "Ready to use the app $appID. Try to Login.",
       );
       if (!await isLoggedIn()) {
         String location = await super.checkAndLogin(
