@@ -20,17 +20,16 @@ const topRowHeightBig = 100.0;
 const topRowHeightSmall = 50.0;
 
 /// The height of the middle row.
-const midRowHeightVertical = 60.0;
-const midRowHeightHorizontal = 30.0;
+const midRowHeight = 54.0;
 
 List<String> weekList = [
-  '周一',
-  '周二',
-  '周三',
-  '周四',
-  '周五',
-  '周六',
-  '周日',
+  '一',
+  '二',
+  '三',
+  '四',
+  '五',
+  '六',
+  '日',
 ];
 
 String pageTitle = "我的课表";

@@ -1,7 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -34,7 +33,7 @@ class ClassCard extends StatelessWidget {
       padding: const EdgeInsets.all(2),
       child: ClipRRect(
         // Out
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(6),
         child: Container(
           // Border
           color: color.shade300.withOpacity(0.8),
@@ -43,7 +42,7 @@ class ClassCard extends StatelessWidget {
             children: [
               ClipRRect(
                 // Inner
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(4),
                 child: Container(
                   color: color.shade100.withOpacity(0.7),
                   child: TextButton(
@@ -83,9 +82,9 @@ class ClassCard extends StatelessWidget {
                       "${data.length > 1 ? "还有${data.length - 1}个日程" : ""}",
                       style: TextStyle(
                         color: color.shade900,
-                        fontSize: isPhone(context) ? 12 : 16,
+                        fontSize: isPhone(context) ? 10 : 12,
                       ),
-                    ).alignment(Alignment.topLeft).padding(all: 8),
+                    ).alignment(Alignment.topLeft).padding(all: 4),
                   ),
                 ),
               ),
@@ -95,8 +94,8 @@ class ClassCard extends StatelessWidget {
                   child: Container(
                     color: color.shade300,
                   ).constrained(
-                    width: 20,
-                    height: 20,
+                    width: 10,
+                    height: 10,
                   ),
                 ).alignment(Alignment.topRight),
             ],

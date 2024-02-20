@@ -46,8 +46,8 @@ class _ClassTableViewState extends State<ClassTableView> {
   /// The height of the class card.
   double blockheight(double count) =>
       count *
-      (widget.constraint.minHeight - midRowHeightVertical) /
-      (isPhone(context) ? 49 : 61);
+      (widget.constraint.minHeight - midRowHeight) /
+      (isPhone(context) ? 45 : 61);
 
   double get blockwidth => (mediaQuerySize.width - leftRow) / 7;
 
@@ -202,7 +202,13 @@ class _ClassTableViewState extends State<ClassTableView> {
               else if (indexOfChar == -2)
                 const TextSpan(text: "晚饭")
               else ...[
-                TextSpan(text: "${indexOfChar + 1}\n"),
+                TextSpan(
+                  text: "${indexOfChar + 1}\n",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black,
+                  ),
+                ),
                 TextSpan(
                   text: "${time[indexOfChar * 2]}\n",
                   style: const TextStyle(fontSize: 8),
