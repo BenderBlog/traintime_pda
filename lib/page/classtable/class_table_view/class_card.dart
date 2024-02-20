@@ -105,7 +105,10 @@ class ClassCard extends StatelessWidget {
                             ),
                           ),
                       ],
-                    ).alignment(Alignment.topLeft).padding(all: 3),
+                    ).alignment(Alignment.topLeft).padding(
+                          horizontal: isPhone(context) ? 2 : 4,
+                          vertical: 4,
+                        ),
                   ),
                 ),
               ),
