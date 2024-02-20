@@ -13,7 +13,7 @@ const weekButtonHorizontalPadding = 2.0;
 const changePageTime = 200;
 
 /// The width ratio for the week column.
-const double leftRow = 32;
+const double leftRow = 28;
 
 /// The height of the top row.
 const topRowHeightBig = 100.0;

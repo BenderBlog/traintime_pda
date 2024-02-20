@@ -198,9 +198,19 @@ class _ClassTableViewState extends State<ClassTableView> {
           child: Text.rich(
             TextSpan(children: [
               if (indexOfChar == -1)
-                const TextSpan(text: "午\n休")
+                const TextSpan(
+                  text: "午休",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                )
               else if (indexOfChar == -2)
-                const TextSpan(text: "晚\n饭")
+                const TextSpan(
+                  text: "晚饭",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                )
               else ...[
                 TextSpan(text: "${indexOfChar + 1}\n"),
                 TextSpan(
