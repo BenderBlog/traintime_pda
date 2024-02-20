@@ -91,7 +91,7 @@ class ClassDetailCard extends StatelessWidget {
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
                 str: "${weekList[timeArrangement.day - 1]}"
-                    "${timeArrangement.start}-${timeArrangement.stop}节课 "
+                    "${timeArrangement.start}-${timeArrangement.stop}节 "
                     "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
                 infoColor: infoColor,
               ),

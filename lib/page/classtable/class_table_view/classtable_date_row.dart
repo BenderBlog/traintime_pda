@@ -25,7 +25,7 @@ class ClassTableDateRow extends StatelessWidget {
         Text(
           "${dateList.first.month}月",
           style: const TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             color: Colors.black,
           ),
         ).center().constrained(width: leftRow),
@@ -53,29 +53,22 @@ class WeekInfomation extends StatelessWidget {
     bool isToday =
         (time.month == DateTime.now().month && time.day == DateTime.now().day);
     Size mediaQuerySize = MediaQuery.of(context).size;
-    return Container(
+    return SizedBox(
       width: (mediaQuerySize.width - leftRow) / 7,
-
-      /// Color may determine today.
-      color: isToday ? const Color(0x00f7f7f7) : Colors.transparent,
-
-      /// Row and column are divided with:
-      /// [mediaQuerySize.width / mediaQuerySize.height >= 1.20]
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             weekList[time.weekday - 1],
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 4),
           Text(
             time.day.toString(),
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: isToday ? FontWeight.bold : null,
               color: isToday
                   ? Theme.of(context).colorScheme.primary

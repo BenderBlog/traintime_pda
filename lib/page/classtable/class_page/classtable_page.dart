@@ -175,7 +175,7 @@ class _ClassTablePageState extends State<ClassTablePage>
                 constraint: constraint,
                 index: index,
               ),
-            ),
+            ).safeArea(),
           ),
         ).decorated(
           image: (preference.getBool(preference.Preference.decorated) &&

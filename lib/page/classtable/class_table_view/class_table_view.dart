@@ -47,7 +47,7 @@ class _ClassTableViewState extends State<ClassTableView> {
   double blockheight(double count) =>
       count *
       (widget.constraint.minHeight - midRowHeight) /
-      (isPhone(context) ? 45 : 61);
+      (isPhone(context) ? 48 : 61);
 
   double get blockwidth => (mediaQuerySize.width - leftRow) / 7;
 
@@ -192,23 +192,17 @@ class _ClassTableViewState extends State<ClassTableView> {
 
         return DefaultTextStyle.merge(
           style: const TextStyle(
-            fontSize: 10,
+            fontSize: 14,
             color: Colors.black87,
           ),
           child: Text.rich(
             TextSpan(children: [
               if (indexOfChar == -1)
-                const TextSpan(text: "午休")
+                const TextSpan(text: "午\n休")
               else if (indexOfChar == -2)
-                const TextSpan(text: "晚饭")
+                const TextSpan(text: "晚\n饭")
               else ...[
-                TextSpan(
-                  text: "${indexOfChar + 1}\n",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
-                  ),
-                ),
+                TextSpan(text: "${indexOfChar + 1}\n"),
                 TextSpan(
                   text: "${time[indexOfChar * 2]}\n",
                   style: const TextStyle(fontSize: 8),
@@ -262,6 +256,6 @@ class _ClassTableViewState extends State<ClassTableView> {
           )
           .scrollable()
           .expanded(),
-    ].toColumn().safeArea();
+    ].toColumn();
   }
 }

@@ -63,14 +63,15 @@ class SmallFunctionCard extends StatelessWidget {
         ),
       ].toColumn(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
       )
     ]
         .toRow(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
         )
-        .padding(all: 12)
+        .padding(all: 8)
         .card(
           elevation: 0,
           shape: RoundedRectangleBorder(
