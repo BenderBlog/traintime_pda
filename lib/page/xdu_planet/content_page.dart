@@ -8,6 +8,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -54,11 +55,6 @@ class _ContentPageState extends State<ContentPage> {
       body: FutureBuilder<String>(
         future: content,
         builder: (context, snapshot) {
-          String title = '''
-<h2>${widget.article.title}</h2>
-<i>by: ${widget.author}</i></br>
-<i>at: ${Jiffy.parseFromDateTime(widget.article.time).format(pattern: "yyyy年MM月dd日")}</i>
-''';
           late Widget addon;
           if (snapshot.connectionState == ConnectionState.done) {
             try {
@@ -84,39 +80,50 @@ class _ContentPageState extends State<ContentPage> {
           } else {
             addon = const Center(child: CircularProgressIndicator());
           }
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
+          return [
+            Text.rich(
+              TextSpan(children: [
+                TextSpan(
+                  text: widget.article.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(
+                  text: "\nby: ${widget.author}",
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                TextSpan(
+                  text: "\nat: "
+                      "${Jiffy.parseFromDateTime(widget.article.time).format(pattern: "yyyy年MM月dd日")}",
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ]),
+            ).padding(all: 8),
+            //HtmlWidget(title),
+            addon
+                .padding(
                   left: 8,
                   right: 8,
                   bottom: 8,
-                ),
-                child: HtmlWidget(
-                  title,
-                ),
-              ),
-              Expanded(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: sheetMaxWidth - 16,
-                    minWidth: min(
-                      MediaQuery.of(context).size.width,
-                      sheetMaxWidth - 16,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                      bottom: 8,
-                    ),
-                    child: addon,
-                  ),
-                ),
-              ),
-            ],
-          );
+                )
+                .expanded(),
+          ]
+              .toColumn(
+                crossAxisAlignment: CrossAxisAlignment.start,
+              )
+              .constrained(
+                  maxWidth: sheetMaxWidth - 16,
+                  minWidth: min(
+                    MediaQuery.of(context).size.width,
+                    sheetMaxWidth - 16,
+                  ))
+              .safeArea();
         },
       ),
     );

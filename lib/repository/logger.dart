@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:developer' as developer;
+import 'package:alice/alice.dart';
 import 'package:logger/logger.dart';
+import 'package:watermeter/repository/network_session.dart';
 
 /// Prints all logs with `level >= Logger.level` while in development mode (eg
 /// when `assert`s are evaluated, Flutter calls this debug mode).
@@ -31,7 +33,13 @@ class PDALogFilter extends LogFilter {
 class ConsoleOutput extends LogOutput {
   @override
   void output(OutputEvent event) {
-    event.lines.forEach(developer.log);
+    for (var str in event.lines) {
+      developer.log(str);
+      alice.addLog(AliceLog(
+        message: str,
+        timestamp: event.origin.time,
+      ));
+    }
   }
 }
 
@@ -41,9 +49,6 @@ var logMemory = MemoryOutput(
 
 var log = Logger(
   filter: PDALogFilter(),
-  printer: SimplePrinter(),
-  output: MultiOutput([
-    ConsoleOutput(),
-    logMemory,
-  ]),
+  printer: LogfmtPrinter(),
+  output: ConsoleOutput(),
 );

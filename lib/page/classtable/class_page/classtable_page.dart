@@ -11,10 +11,8 @@ import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_change/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_not_arranged/not_arranged_class_list.dart';
-import 'package:watermeter/page/classtable/class_page/week_choice_button.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
@@ -26,70 +24,33 @@ class ClassTablePage extends StatefulWidget {
   State<StatefulWidget> createState() => _ClassTablePageState();
 }
 
-class _ClassTablePageState extends State<ClassTablePage> {
+class _ClassTablePageState extends State<ClassTablePage>
+    with TickerProviderStateMixin {
   /// Check whether listener is pushed...
   bool isPushedListener = false;
 
   /// A lock of the week choice row.
   /// When locked, choiceWeek cannot be changed.
-  bool isTopRowLocked = false;
-
-  /// Classtable pageView controller.
-  late PageController pageControl;
-
-  /// Week choice row controller.
-  late PageController rowControl;
+  bool isInit = false;
+  late TabController _tabController;
 
   File image = File("${supportPath.path}/decoration.jpg");
   late ClassTableWidgetState classTableState;
 
-  void _switchPage() {
-    setState(() => isTopRowLocked = true);
-    Future.wait(
-      [
-        rowControl.animateTo(
-          (weekButtonWidth + 2 * weekButtonHorizontalPadding) *
-              classTableState.chosenWeek,
-          curve: Curves.easeInOut,
-          duration: const Duration(milliseconds: changePageTime),
-        ),
-        pageControl.animateToPage(
-          classTableState.chosenWeek,
-          curve: Curves.easeInOutCubic,
-          duration: const Duration(milliseconds: changePageTime),
-        ),
-      ],
-    ).then((value) => isTopRowLocked = false);
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
-  void dispose() {
-    classTableState.removeListener(_switchPage);
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     classTableState = ClassTableState.of(context)!.controllers;
-
-    pageControl = PageController(
-      initialPage: classTableState.chosenWeek,
-      keepPage: true,
-    );
-
-    /// (weekButtonWidth + 2 * weekButtonHorizontalPadding)
-    /// is the width of the week choose button.
-    rowControl = PageController(
-      initialPage: classTableState.chosenWeek,
-      viewportFraction: (weekButtonWidth + 2 * weekButtonHorizontalPadding) /
-          MediaQuery.sizeOf(context).width,
-      keepPage: true,
-    );
-
-    /// Let controllers listen to the currentWeek's change.
-    if (isPushedListener == false) {
-      classTableState.addListener(_switchPage);
-      isPushedListener = true;
+    if (!isInit) {
+      _tabController = TabController(
+        vsync: this,
+        length: classTableState.semesterLength,
+        initialIndex: classTableState.chosenWeek,
+      );
     }
 
     super.didChangeDependencies();
@@ -105,7 +66,13 @@ class _ClassTablePageState extends State<ClassTablePage> {
     if (haveClass) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text("课程表"),
+          title: const Text("日程表"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(
+              ClassTableState.of(context)!.parentContext,
+            ).pop(),
+          ),
           actions: [
             if (haveClass)
               PopupMenuButton<String>(
@@ -129,8 +96,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 ],
                 onSelected: (String action) async {
                   final box = context.findRenderObject() as RenderBox?;
-
-                  // 点击选项的时候
                   switch (action) {
                     case 'A':
                       Navigator.of(context).push(
@@ -189,87 +154,52 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 },
               ),
           ],
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            /// Following is a row shows a series of buttons related to the classtable's index.
-            ///
-            /// This is at the top of the classtable. It contains a series of
-            /// buttons which shows the week index, as well as an overview in a 5x5 dot gridview.
-            ///
-            /// When user click on the button, the pageview will show the class table of the
-            /// week the button suggested.
-            PageView.builder(
-              controller: rowControl,
-              physics: const ClampingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              itemCount: classTableState.semesterLength,
-              itemBuilder: (BuildContext context, int index) {
-                return WeekChoiceButton(
-                  onTap: () {
-                    if (isTopRowLocked == false) {
-                      classTableState.chosenWeek = index;
-                    }
-                  },
-                  index: index,
-                );
-              },
-            )
-                .padding(
-                  top: 2,
-                  bottom: 4,
-                )
-                .constrained(
-                  height: MediaQuery.sizeOf(context).height >= 500
-                      ? topRowHeightBig
-                      : topRowHeightSmall,
-                ),
-            PageView.builder(
-              scrollDirection: Axis.horizontal,
-              controller: pageControl,
-              onPageChanged: (value) {
-                /// When [pageControl.animateTo] triggered,
-                /// page view will try to refresh the [chosenWeek] everytime the page
-                /// view changed into a new page. Because animateTo will load every page
-                /// it passed.
-                ///
-                /// So that's the [isTopRowLocked] is used for. When week choice row is
-                /// locked, it will not refresh the [chosenWeek]. And when [chosenWeek]
-                /// is equal to the current page, unlock the [isTopRowLocked].
-                if (isTopRowLocked == false) {
-                  classTableState.chosenWeek = value;
-                }
-              },
-              itemCount: classTableState.semesterLength,
-              itemBuilder: (context, index) => LayoutBuilder(
-                builder: (context, constraint) => ClassTableView(
-                  constraint: constraint,
-                  index: index,
-                ),
+          bottom: TabBar(
+            isScrollable: true,
+            controller: _tabController,
+            tabAlignment: TabAlignment.start,
+            tabs: List.generate(
+              classTableState.semesterLength,
+              (index) => Tab(
+                text: "第${index + 1}周",
               ),
-            )
-                .decorated(
-                  image: (preference.getBool(preference.Preference.decorated) &&
-                          image.existsSync())
-                      ? DecorationImage(
-                          image: FileImage(image),
-                          fit: BoxFit.cover,
-                          opacity:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? 0.4
-                                  : 1.0,
-                        )
-                      : null,
+            ),
+          ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: List<Widget>.generate(
+            classTableState.semesterLength,
+            (index) => LayoutBuilder(
+              builder: (context, constraint) => ClassTableView(
+                constraint: constraint,
+                index: index,
+              ),
+            ).safeArea(),
+          ),
+        ).decorated(
+          image: (preference.getBool(preference.Preference.decorated) &&
+                  image.existsSync())
+              ? DecorationImage(
+                  image: FileImage(image),
+                  fit: BoxFit.cover,
+                  opacity: Theme.of(context).brightness == Brightness.dark
+                      ? 0.4
+                      : 1.0,
                 )
-                .expanded(),
-          ],
+              : null,
         ),
       );
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: const Text("课程表"),
+          title: const Text("日程表"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(
+              ClassTableState.of(context)!.parentContext,
+            ).pop(),
+          ),
         ),
         body: const EmptyClasstablePage(),
       );

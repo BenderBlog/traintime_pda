@@ -247,7 +247,7 @@ class _EmptyClassroomSearchWindowState
                 ],
               ),
             ),
-          ).constrained(maxWidth: sheetMaxWidth).center().expanded(),
+          ).constrained(maxWidth: sheetMaxWidth).center().safeArea().expanded(),
       ],
     );
   }

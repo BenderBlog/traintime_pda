@@ -74,8 +74,6 @@ Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) {
 const _$SourceEnumMap = {
   Source.empty: 'empty',
   Source.school: 'school',
-  Source.experiment: 'experiment',
-  Source.exam: 'exam',
   Source.user: 'user',
 };
 

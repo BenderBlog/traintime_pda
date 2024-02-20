@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.0.0+17
+version: 1.1.0+18
 
 environment:
   sdk: ">=3.0.0"
@@ -12,6 +12,7 @@ dependencies:
   crypto: ^3.0.2
   encrypt: ^5.0.1
   alice: ^0.4.1
+  synchronized: ^3.1.0+1
   # Stroage Cache
   shared_preferences: ^2.0.15
   dio_cookie_manager: ^3.0.0
@@ -33,7 +34,6 @@ dependencies:
   # Others
   url_launcher: ^6.1.6
   jiffy: ^6.1.0
-  icalendar_parser: any
   auto_size_text: ^3.0.0
   async: ^2.10.0 # For AsyncMemoizer
   graphic: ^2.2.0
@@ -65,12 +65,13 @@ dependencies:
   #workmanager: ^0.5.2
   background_fetch: ^1.2.1
   logger: ^2.0.2+1
+
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-  build_runner: ^2.3.3
+  build_runner: ^2.4.8
   json_serializable: ^6.7.1
   flutter_lints: ^3.0.1
   change_app_package_name: ^1.1.0
@@ -93,6 +94,4 @@ flutter:
   assets:
     - assets/Icon-App-iTunes.png
     - assets/Empty-Cover.jpg
-    - assets/Credit.jpg
-    - assets/Ray.jpg
     - assets/icon.png

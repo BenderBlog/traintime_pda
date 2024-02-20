@@ -35,7 +35,7 @@ enum WebViewAddresses {
     iconData: MingCuteIcons.mgc_chat_2_line,
   ),
   network(
-    name: "校园网查询",
+    name: "网络查询",
     url: "https://zfw.xidian.edu.cn",
     description: "希望永不收费",
     iconData: MingCuteIcons.mgc_wifi_line,

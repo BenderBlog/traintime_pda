@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
 
 class SmallFunctionCard extends StatelessWidget {
@@ -31,62 +32,57 @@ class SmallFunctionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16), // 这里调整圆角的大小
-        ),
-        color: Theme.of(context).colorScheme.secondary,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SizedBox(
-            width: 160,
-            height: 80,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(
-                  icon,
-                  size: 36,
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                ),
-                // const VerticalDivider(
-                //   width: 3,
-                //   color: Colors.transparent,
-                // ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondaryContainer
-                            .withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+    return [
+      Icon(
+        icon,
+        size: 48,
+        color: Theme.of(context).colorScheme.onSecondaryContainer,
+      ),
+      const VerticalDivider(
+        width: 16,
+        color: Colors.transparent,
+      ),
+      [
+        Text(
+          name,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-      ),
-    );
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 12,
+            color: Theme.of(context)
+                .colorScheme
+                .onSecondaryContainer
+                .withOpacity(0.6),
+          ),
+        ),
+      ].toColumn(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+      )
+    ]
+        .toRow(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+        )
+        .padding(all: 8)
+        .card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          color: Theme.of(context).colorScheme.secondary,
+        )
+        .center()
+        .gestures(
+          onTap: onTap,
+          onLongPress: onLongPress,
+        );
   }
 }

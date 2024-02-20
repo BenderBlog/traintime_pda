@@ -16,12 +16,11 @@ const changePageTime = 200;
 const double leftRow = 32;
 
 /// The height of the top row.
-const topRowHeightBig = 96.0;
+const topRowHeightBig = 100.0;
 const topRowHeightSmall = 50.0;
 
 /// The height of the middle row.
-const midRowHeightVertical = 60.0;
-const midRowHeightHorizontal = 30.0;
+const midRowHeight = 54.0;
 
 List<String> weekList = [
   '周一',

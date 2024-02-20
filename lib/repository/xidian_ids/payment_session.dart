@@ -51,6 +51,7 @@ class PaymentSession extends IDSSession {
 
       String location = await checkAndLogin(
         target: "http://payment.xidian.edu.cn/pages/caslogin.jsp",
+        sliderCaptcha: (p0) async {},
       );
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {

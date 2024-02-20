@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/class_detail/class_detail_list.dart';
-import 'package:watermeter/page/classtable/class_detail/class_detail_state.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_list.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_state.dart';
 
 /// The class info of the period. This is an entry.
-class ClassDetailPopUp extends StatelessWidget {
+class ArrangementDetail extends StatelessWidget {
   final int currentWeek;
-  final List<(ClassDetail, TimeArrangement)> information;
-  const ClassDetailPopUp({
+  final List<dynamic> information;
+  const ArrangementDetail({
     super.key,
     required this.currentWeek,
     required this.information,
@@ -18,10 +17,10 @@ class ClassDetailPopUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClassDetailState(
+    return ArrangementDetailState(
       currentWeek: currentWeek,
       information: information,
-      child: const ClassDetailList(),
+      child: const ArrangementList(),
     );
   }
 }

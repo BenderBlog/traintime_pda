@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -30,6 +31,8 @@ bool get offline =>
     loginState != IDSLoginState.success && loginState != IDSLoginState.manual;
 
 class IDSSession extends NetworkSession {
+  static final _idslock = Lock();
+
   @override
   Dio get dio => super.dio
     ..interceptors.add(
@@ -106,41 +109,41 @@ class IDSSession extends NetworkSession {
 
   Future<String> checkAndLogin({
     required String target,
-    Future<void> Function(String)? sliderCaptcha,
+    required Future<void> Function(String) sliderCaptcha,
   }) async {
-    log.i(
-      "[IDSSession][checkAndLogin] "
-      "Ready to get $target.",
-    );
-    var data = await dioNoOfflineCheck.get(
-      "https://ids.xidian.edu.cn/authserver/login",
-      queryParameters: {'service': target},
-    );
-    log.i(
-      "[IDSSession][checkAndLogin] "
-      "Received: $data.",
-    );
-    if (data.statusCode == 401) {
-      throw PasswordWrongException(msg: _parsePasswordWrongMsg(data.data));
-    } else if (data.statusCode == 301 || data.statusCode == 302) {
-      /// Post login progress, due to something wrong, return the location here...
-      return data.headers[HttpHeaders.locationHeader]![0];
-    } else {
-      return await login(
-        username: preference.getString(preference.Preference.idsAccount),
-        password: preference.getString(preference.Preference.idsPassword),
-        sliderCaptcha: sliderCaptcha,
-        target: target,
+    return await _idslock.synchronized(() async {
+      log.i(
+        "[IDSSession][checkAndLogin] "
+        "Ready to get $target.",
       );
-    }
+      var data = await dioNoOfflineCheck.get(
+        "https://ids.xidian.edu.cn/authserver/login",
+        queryParameters: {'service': target},
+      );
+      log.i(
+        "[IDSSession][checkAndLogin] "
+        "Received: $data.",
+      );
+      if (data.statusCode == 401) {
+        throw PasswordWrongException(msg: _parsePasswordWrongMsg(data.data));
+      } else if (data.statusCode == 301 || data.statusCode == 302) {
+        /// Post login progress, due to something wrong, return the location here...
+        return data.headers[HttpHeaders.locationHeader]![0];
+      } else {
+        return await login(
+          username: preference.getString(preference.Preference.idsAccount),
+          password: preference.getString(preference.Preference.idsPassword),
+          sliderCaptcha: sliderCaptcha,
+          target: target,
+        );
+      }
+    });
   }
 
   Future<String> login({
     required String username,
     required String password,
-
-    /// TODO: remove this goddame ?.
-    Future<void> Function(String)? sliderCaptcha,
+    required Future<void> Function(String) sliderCaptcha,
     bool forceReLogin = false,
     void Function(int, String)? onResponse,
     String? target,
@@ -215,7 +218,7 @@ class IDSSession extends NetworkSession {
       queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
     );
 
-    await sliderCaptcha!(cookieStr);
+    await sliderCaptcha(cookieStr);
 
     /// Post login request.
     if (onResponse != null) {

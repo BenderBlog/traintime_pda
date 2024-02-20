@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
   void _launchedFromWidget(Uri? uri) {
     if (uri != null) {
       //TODO do work when start app from home widgets
-      print(uri);
+      //print(uri);
     }
   }
 

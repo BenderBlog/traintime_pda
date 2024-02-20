@@ -5,25 +5,27 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 
 class AppIconWidget extends StatelessWidget {
-  const AppIconWidget({super.key});
+  final double size;
+
+  const AppIconWidget({super.key, this.size = 120});
 
   @override
   Widget build(BuildContext context) {
     return (Platform.isIOS || Platform.isMacOS)
         ? ClipRRect(
-            borderRadius: const BorderRadius.all(
-              Radius.circular(29),
+            borderRadius: BorderRadius.all(
+              Radius.circular(29 * size / 120),
             ),
             child: Image.asset(
               "assets/Icon-App-iTunes.png",
-              width: 120,
-              height: 120,
+              width: size,
+              height: size,
             ),
           )
         : Image.asset(
             "assets/icon.png",
-            width: 120,
-            height: 120,
+            width: size,
+            height: size,
           );
   }
 }

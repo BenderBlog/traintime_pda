@@ -2,21 +2,25 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
-import 'package:watermeter/page/classtable/class_detail/class_detail_popup.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
-import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
 /// The card in [classSubRow], metioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
-  final int index;
-  final Set<int> conflict;
-  final double height;
+  final ClassOrgainzedData detail;
+
+  List<dynamic> get data => detail.data;
+  MaterialColor get color => detail.color;
+  String get name => detail.name;
+  String? get place => detail.place;
   const ClassCard({
     super.key,
-    required this.height,
-    required this.index,
-    required this.conflict,
+    required this.detail,
   });
 
   @override
@@ -24,110 +28,98 @@ class ClassCard extends StatelessWidget {
     ClassTableWidgetState classTableState =
         ClassTableState.of(context)!.controllers;
 
-    Widget inside = index == -1
-        ?
-
-        /// A empty card used to occupy the place which have no class.
-        const Padding(
-            padding: EdgeInsets.all(2),
-
-            /// Easter egg, usless you read the code,
-            /// or reverse engineering...
-            child: Center(
-              child: Text(
-                "BOCCHI RULES!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.transparent,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-          )
-        : TextButton(
-            style: ButtonStyle(
-              padding: MaterialStateProperty.resolveWith(
-                (status) => EdgeInsets.zero,
-              ),
-              overlayColor: MaterialStateProperty.resolveWith(
-                (status) => Colors.transparent,
-              ),
-            ),
-            onPressed: () {
-              /// The way to show the class info of the period.
-              BothSideSheet.show(
-                title: "课程信息",
-                child: ClassDetailPopUp(
-                  information: List.generate(
-                    conflict.length,
-                    (index) => (
-                      classTableState.getClassDetail(conflict.elementAt(index)),
-                      classTableState
-                          .timeArrangement[conflict.elementAt(index)],
-                    ),
-                  ),
-                  currentWeek: classTableState.currentWeek,
-                ),
-                context: context,
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(2),
-              child: Center(
-                child: Text(
-                  "${classTableState.getClassDetail(index).name}\n"
-                  "${classTableState.timeArrangement[index].classroom ?? "未知教室"}",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: index != -1
-                        ? colorList[
-                                classTableState.timeArrangement[index].index %
-                                    colorList.length]
-                            .shade900
-                        : Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          );
-
     /// This is the result of the class info card.
-    return SizedBox(
-      height: height,
-      child: Padding(
-        padding: const EdgeInsets.all(2),
-        child: ClipRRect(
-          // Out
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            // Border
-            color: index == -1
-                ? const Color(0x00000000)
-                : colorList[classTableState.timeArrangement[index].index %
-                        colorList.length]
-                    .shade300
-                    .withOpacity(0.8),
-            padding: conflict.length == 1
-                ? const EdgeInsets.all(2)
-                : const EdgeInsets.fromLTRB(2, 2, 2, 8),
-            child: ClipRRect(
-              // Inner
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                color: index == -1
-                    ? const Color(0x00000000)
-                    : colorList[classTableState.timeArrangement[index].index %
-                            colorList.length]
-                        .shade100
-                        .withOpacity(0.7),
-                child: inside,
+    return Padding(
+      padding: const EdgeInsets.all(2),
+      child: ClipRRect(
+        // Out
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          // Border
+          color: color.shade300.withOpacity(0.8),
+          padding: const EdgeInsets.all(2),
+          child: Stack(
+            children: [
+              ClipRRect(
+                // Inner
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  color: color.shade100.withOpacity(0.7),
+                  child: TextButton(
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.resolveWith(
+                        (status) => EdgeInsets.zero,
+                      ),
+                      overlayColor: MaterialStateProperty.resolveWith(
+                        (status) => Colors.transparent,
+                      ),
+                    ),
+                    onPressed: () {
+                      /// The way to show the class info of the period.
+                      BothSideSheet.show(
+                        title: "日程信息",
+                        child: ArrangementDetail(
+                          information: List.generate(data.length, (index) {
+                            if (data.elementAt(index) is Subject) {
+                              return data.elementAt(index);
+                            } else {
+                              return (
+                                classTableState.getClassDetail(
+                                  classTableState.timeArrangement
+                                      .indexOf(data.elementAt(index)),
+                                ),
+                                data.elementAt(index),
+                              );
+                            }
+                          }),
+                          currentWeek: classTableState.currentWeek,
+                        ),
+                        context: context,
+                      );
+                    },
+                    child: Text(
+                      "$name\n@${place ?? "未知教室"}\n"
+                      "${data.length > 1 ? "还有${data.length - 1}个日程" : ""}",
+                      style: TextStyle(
+                        color: color.shade900,
+                        fontSize: isPhone(context) ? 10 : 12,
+                      ),
+                    ).alignment(Alignment.topLeft).padding(all: 4),
+                  ),
+                ),
               ),
-            ),
+              if (data.length > 1)
+                ClipPath(
+                  clipper: Triangle(),
+                  child: Container(
+                    color: color.shade300,
+                  ).constrained(
+                    width: 10,
+                    height: 10,
+                  ),
+                ).alignment(Alignment.topRight),
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+class Triangle extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.addPolygon([
+      const Offset(0, 0),
+      Offset(size.width, 0),
+      Offset(size.width, size.height),
+    ], true);
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return false;
   }
 }

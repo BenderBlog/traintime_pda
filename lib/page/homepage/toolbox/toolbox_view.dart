@@ -46,7 +46,7 @@ class ToolBoxView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = constraints.minWidth ~/ 180;
+    int crossItems = constraints.minWidth ~/ 160;
 
     int rowItem(int length) {
       int rowItem = length ~/ crossItems;

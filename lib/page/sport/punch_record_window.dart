@@ -133,7 +133,7 @@ class _PunchRecordWindowState extends State<PunchRecordWindow>
             children: [
               Text(
                 "次数: ${punchData.value.validTime} / ${punchData.value.allTime}\n"
-                " 成绩 ${punchData.value.score}",
+                "成绩 ${punchData.value.score}",
                 textScaler: const TextScaler.linear(1.2),
               ),
               FloatingActionButton.extended(

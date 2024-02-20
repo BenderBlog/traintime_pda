@@ -5,23 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 
 /// This is the shared data in the [ClassDetail].
-class ClassDetailState extends InheritedWidget {
+class ArrangementDetailState extends InheritedWidget {
   final int currentWeek;
-  final List<(ClassDetail, TimeArrangement)> information;
+  final List<dynamic> information;
 
-  const ClassDetailState({
+  const ArrangementDetailState({
     super.key,
     required this.currentWeek,
     required this.information,
     required super.child,
   });
 
-  static ClassDetailState? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ClassDetailState>();
+  static ArrangementDetailState? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ArrangementDetailState>();
   }
 
   @override
-  bool updateShouldNotify(covariant ClassDetailState oldWidget) {
+  bool updateShouldNotify(covariant ArrangementDetailState oldWidget) {
     return false;
   }
 }

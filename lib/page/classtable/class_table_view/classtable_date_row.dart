@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
 /// The index row of the class table, shows the index of the day and the week.
@@ -15,36 +15,27 @@ class ClassTableDateRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size mediaQuerySize = MediaQuery.sizeOf(context);
     return Container(
       /// This will detertime the height of the row, also the way week info and
       /// day shows.
-      height: mediaQuerySize.width / mediaQuerySize.height >= 1.20
-          ? midRowHeightHorizontal
-          : midRowHeightVertical,
+      height: midRowHeight,
       padding: const EdgeInsets.symmetric(vertical: 5),
       color: Colors.grey.shade200.withOpacity(0.75),
-      child: Row(
-        children: List.generate(8, (index) {
-          if (index > 0) {
-            return WeekInfomation(time: dateList[index - 1]);
-          } else {
-            return SizedBox(
-              width: leftRow,
-              child: Center(
-                child: AutoSizeText(
-                  "课次",
-                  textAlign: TextAlign.center,
-                  group: AutoSizeGroup(),
-                  style: const TextStyle(
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            );
-          }
-        }),
-      ),
+      child: Row(children: [
+        Text(
+          "${dateList.first.month}月",
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+          ),
+        ).center().constrained(width: leftRow),
+        ...List.generate(
+          7,
+          (index) => WeekInfomation(
+            time: dateList[index],
+          ),
+        ),
+      ]),
     );
   }
 }
@@ -62,44 +53,41 @@ class WeekInfomation extends StatelessWidget {
     bool isToday =
         (time.month == DateTime.now().month && time.day == DateTime.now().day);
     Size mediaQuerySize = MediaQuery.of(context).size;
-    bool isHorizontal() => mediaQuerySize.width / mediaQuerySize.height > 1;
-    var list = [
-      AutoSizeText(
-        weekList[time.weekday - 1],
-        group: AutoSizeGroup(),
-        textScaleFactor: 1.0,
-        style: TextStyle(
-          //fontSize: 14,
-          color: isToday ? Colors.lightBlue : Colors.black87,
-        ),
-      ),
-      isHorizontal() ? const SizedBox(width: 5) : const SizedBox(height: 5),
-      AutoSizeText(
-        "${time.month}/${time.day}",
-        group: AutoSizeGroup(),
-        textScaleFactor: isHorizontal() ? 1.0 : 0.8,
-        style: TextStyle(
-          color: isToday ? Colors.lightBlue : Colors.black87,
-        ),
-      ),
-    ];
-    return Container(
+    return SizedBox(
       width: (mediaQuerySize.width - leftRow) / 7,
-
-      /// Color may determine today.
-      color: isToday ? const Color(0x00f7f7f7) : Colors.transparent,
-
-      /// Row and column are divided with:
-      /// [mediaQuerySize.width / mediaQuerySize.height >= 1.20]
-      child: mediaQuerySize.width / mediaQuerySize.height >= 1.20
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: list,
-            )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: list,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            weekList[time.weekday - 1],
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
             ),
+          ),
+          Text(
+            time.day.toString(),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isToday ? FontWeight.bold : null,
+              color: isToday
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.black87,
+            ),
+          )
+              .center()
+              .constrained(
+                width: 26,
+                height: 20,
+              )
+              .decorated(
+                color: isToday
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Colors.transparent,
+              )
+              .clipRRect(all: 8),
+        ],
+      ),
     );
   }
 }

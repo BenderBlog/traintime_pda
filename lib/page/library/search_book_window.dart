@@ -102,58 +102,56 @@ class _SearchBookWindowState extends State<SearchBookWindow>
           vertical: 10,
           horizontal: 8,
         ),
-        Expanded(
-          child: EasyRefresh(
-            footer: ClassicFooter(
-              dragText: '上拉请求更多'.tr,
-              readyText: '正在加载......'.tr,
-              processingText: '正在加载......'.tr,
-              processedText: '请求成功'.tr,
-              noMoreText: '数据没有更多'.tr,
-              failedText: '数据获取失败更多'.tr,
-              infiniteOffset: null,
-            ),
-            onLoad: () async {
-              await searchBook();
-            },
-            child: Obx(() {
-              if (searchList.isNotEmpty) {
-                List<Widget> bookList = List<Widget>.generate(
-                  searchList.length,
-                  (index) => GestureDetector(
-                    child: BookInfoCard(toUse: searchList[index]),
-                    onTap: () => BothSideSheet.show(
-                      context: context,
-                      title: "书籍详细信息",
-                      child: BookDetailCard(
-                        toUse: searchList[index],
-                      ),
+        EasyRefresh(
+          footer: ClassicFooter(
+            dragText: '上拉请求更多'.tr,
+            readyText: '正在加载......'.tr,
+            processingText: '正在加载......'.tr,
+            processedText: '请求成功'.tr,
+            noMoreText: '数据没有更多'.tr,
+            failedText: '数据获取失败更多'.tr,
+            infiniteOffset: null,
+          ),
+          onLoad: () async {
+            await searchBook();
+          },
+          child: Obx(() {
+            if (searchList.isNotEmpty) {
+              List<Widget> bookList = List<Widget>.generate(
+                searchList.length,
+                (index) => GestureDetector(
+                  child: BookInfoCard(toUse: searchList[index]),
+                  onTap: () => BothSideSheet.show(
+                    context: context,
+                    title: "书籍详细信息",
+                    child: BookDetailCard(
+                      toUse: searchList[index],
                     ),
                   ),
-                );
-                return AlignedGridView.count(
-                  shrinkWrap: true,
-                  itemCount: bookList.length,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                  ),
-                  crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
-                  itemBuilder: (context, index) => bookList[index],
-                );
-              } else if (isSearching.value) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (search.value.isNotEmpty) {
-                return const Center(child: Text("没有结果"));
-              } else {
-                return const Center(
-                  child: Text("请在上面的搜索框中搜索"),
-                );
-              }
-            }),
-          ),
-        )
+                ),
+              );
+              return AlignedGridView.count(
+                shrinkWrap: true,
+                itemCount: bookList.length,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                ),
+                crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                itemBuilder: (context, index) => bookList[index],
+              ).safeArea();
+            } else if (isSearching.value) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (search.value.isNotEmpty) {
+              return const Center(child: Text("没有结果"));
+            } else {
+              return const Center(
+                child: Text("请在上面的搜索框中搜索"),
+              );
+            }
+          }),
+        ).expanded(),
       ],
     ));
   }
