@@ -10,6 +10,7 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/transfer_borrow_popout.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
@@ -59,7 +60,7 @@ class BorrowInfoCard extends StatelessWidget {
       bottomRow: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
                 padding: const EdgeInsets.all(2),
@@ -73,6 +74,7 @@ class BorrowInfoCard extends StatelessWidget {
                   height: 120,
                 ),
               ),
+              const VerticalDivider(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -102,10 +104,9 @@ class BorrowInfoCard extends StatelessWidget {
               ),
               TextButton(
                 child: const Text("转借"),
-                onPressed: () => showBottomSheet(
-                  builder: (((context) {
-                    return TransferQRCode(data: toUse);
-                  })),
+                onPressed: () => BothSideSheet.show(
+                  child: TransferQRCode(data: toUse),
+                  title: "转借码",
                   context: context,
                 ),
               ),
