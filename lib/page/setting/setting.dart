@@ -250,7 +250,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                     title: const Text('课程偏移设置'),
                     subtitle: Text(
-                      '正数错后开学日期，负数提前开学日期'
+                      '正数错后开学日期 负数提前开学日期 '
                       '目前为 ${preference.getInt(preference.Preference.swift)}',
                     ),
                     trailing: const Icon(Icons.navigate_next),
