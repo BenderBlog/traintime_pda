@@ -1,0 +1,23 @@
+name: Release for Windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+ build:
+   runs-on: windows-latest
+   steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter create --platforms=windows,macos,linux .
+      - run: flutter build windows --release
+     
+      - name: upload result
+        uses: actions/upload-artifact@v1
+        with:
+          name: Traintime_PDA_Windows
+          path: ${{ github.workspace }}/build/windows/x64/runner/Release/
