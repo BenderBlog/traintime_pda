@@ -7,7 +7,7 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
-  build_apk:
+  build_deb:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: Traintime_PDA_Ubuntu
-          path: ${{ github.workspace }}/build/linux/x64/release/debian/*
+          path: ${{ github.workspace }}/build/linux/x64/release/debian/

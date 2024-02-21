@@ -6,13 +6,13 @@ on:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
 jobs:
- build:
+ build_windows:
    runs-on: windows-latest
    steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+      - name: Install Flutter
+        run: |
+          git submodule update --init --recursive
       - run: flutter create --platforms=windows .
       - run: flutter build windows --release
      
