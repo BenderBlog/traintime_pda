@@ -110,7 +110,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
       : Container(
           height: kToolbarHeight,
           width: double.infinity,
-          color: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.background,
           child: Row(
             children: [
               IconButton(
