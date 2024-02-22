@@ -17,7 +17,8 @@ jobs:
       - run: flutter build windows --release
      
       - name: upload result
-        uses: actions/upload-artifact@v1
+        uses: ncipollo/release-action@v1.12.0
         with:
-          name: Traintime_PDA_Windows
-          path: ${{ github.workspace }}/build/windows/x64/runner/Release/
+          artifacts: > 
+            build/windows/x64/runner/Release/,
+          token: ${{ secrets.RELEASE_TOKEN }}

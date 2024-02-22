@@ -37,7 +37,8 @@ jobs:
           flutter_to_debian
 
       - name: upload result
-        uses: actions/upload-artifact@v1
+        uses: ncipollo/release-action@v1.12.0
         with:
-          name: Traintime_PDA_Ubuntu
-          path: ${{ github.workspace }}/build/linux/x64/release/debian/
+          artifacts: > 
+            build/linux/x64/release/debian/,
+          token: ${{ secrets.RELEASE_TOKEN }}
