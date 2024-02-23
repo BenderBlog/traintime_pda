@@ -130,6 +130,30 @@ class IDSSession extends NetworkSession {
         /// Post login progress, due to something wrong, return the location here...
         return data.headers[HttpHeaders.locationHeader]![0];
       } else {
+        var page = BeautifulSoup(data.data ?? "");
+        var form = page.findAll("form", id: "continue");
+        log.i(
+          "[IDSSession][login] "
+          "form: $form.",
+        );
+        if (form.isNotEmpty) {
+          var inputSearch = form[0].findAll("input");
+          Map<String, String> toPostAgain = {};
+          for (var i in inputSearch) {
+            toPostAgain[i.getAttrValue("name")!] = i.getAttrValue("value")!;
+          }
+          var data = await dioNoOfflineCheck.post(
+            "https://ids.xidian.edu.cn/authserver/login",
+            data: toPostAgain,
+            options: Options(
+              validateStatus: (status) =>
+                  status != null && status >= 200 && status < 400,
+            ),
+          );
+          if (data.statusCode == 301 || data.statusCode == 302) {
+            return data.headers[HttpHeaders.locationHeader]![0];
+          }
+        }
         return await login(
           username: preference.getString(preference.Preference.idsAccount),
           password: preference.getString(preference.Preference.idsPassword),
