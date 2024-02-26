@@ -18,6 +18,12 @@ private let myDateFormatter = DateFormatter()
 
 struct StartDayFetchError : Error {}
 
+enum ArrangementType {
+    case course
+    case exam
+    case experiment
+}
+
 struct Provider: TimelineProvider {
     
     func placeholder(in context: Context) -> SimpleEntry {
@@ -102,6 +108,7 @@ struct Provider: TimelineProvider {
                         let startData = TimeInt[(i.start - 1) * 2]
                         let stopData = TimeInt[(i.stop - 1) * 2 + 1]
                         todayArr.append(TimeLineStructItems(
+                            type: .course,
                             name: classData.getClassName(t: i),
                             teacher: i.teacher ?? "未知老师",
                             place: i.classroom ?? "未安排教室",
@@ -135,6 +142,7 @@ struct Provider: TimelineProvider {
                         let startData = TimeInt[(i.start - 1) * 2]
                         let stopData = TimeInt[(i.stop - 1) * 2 + 1]
                         tomorrowArr.append(TimeLineStructItems(
+                            type: .course,
                             name: classData.getClassName(t: i),
                             teacher: i.teacher ?? "未知老师",
                             place: i.classroom ?? "未安排教室",
@@ -175,8 +183,9 @@ struct Provider: TimelineProvider {
                 let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
                 if thisDay.year == year && thisDay.month == month && thisDay.day == day {
                     todayArr.append(TimeLineStructItems(
+                        type: .exam,
                         name: i.subject,
-                        teacher: "考试",
+                        teacher: "未知",
                         place: "\(i.place) \(i.seat)",
                         start_time: i.startTime,
                         end_time: i.endTime
@@ -194,6 +203,7 @@ struct Provider: TimelineProvider {
                 let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
                 if thisDay.year == year && thisDay.month == month && thisDay.day == day {
                     tomorrowArr.append(TimeLineStructItems(
+                        type: .exam,
                         name: i.subject,
                         teacher: "考试",
                         place: "\(i.place) \(i.seat)",
@@ -207,8 +217,8 @@ struct Provider: TimelineProvider {
         }
         
         // Order
-        todayArr.sort(by: {$0.start_time > $1.start_time})
-        tomorrowArr.sort(by: {$0.start_time > $1.start_time})
+        todayArr.sort(by: {$0.start_time < $1.start_time})
+        tomorrowArr.sort(by: {$0.start_time < $1.start_time})
 
         print("todayArr: \(todayArr.count) tomorrowArr:\(tomorrowArr.count)")
         
@@ -257,7 +267,8 @@ struct SimpleEntry: TimelineEntry {
 }
 
 // Data struct
-struct TimeLineStructItems : Codable {
+struct TimeLineStructItems {
+    var type : ArrangementType
     var name : String
     var teacher : String
     var place : String
@@ -278,14 +289,13 @@ struct ClasstableWidgetEntryView : View {
             if (!entry.currentArrangement.isEmpty) {
                 // TODO: redesign title text
                 HStack {
-                    Text("日程信息").font(.system(size: 14))
+                    Text("今日日程信息").font(.system(size: 14))
                     if (widgetFamily != .systemSmall) {
                         Spacer()
                         Text("还剩\(entry.currentArrangement.count)项").font(.system(size: 14))
                     }
                 }
-
-                
+                Divider().overlay(.background)
                 if (widgetFamily == .systemSmall || widgetFamily == .systemMedium) {
                     EventItem(entry.currentArrangement[0], color: colors[0])
                     if (entry.currentArrangement.count > 1) {
@@ -300,8 +310,22 @@ struct ClasstableWidgetEntryView : View {
                 Spacer()
             } else {
                 Text("今日日程").font(.system(size: 14))
-                Text("目前没有安排了\n明日有\(entry.tomorrowArrangement.count)项日程")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                var text =                     Text("目前没有安排了\n明日有\(entry.tomorrowArrangement.count)项日程")
+                var icon = Image(systemName: "tray")
+                if (widgetFamily == .systemSmall) {
+                    text.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else if (widgetFamily == .systemMedium) {
+                    HStack{
+                        icon.font(.largeTitle)
+                        text
+                    }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else {
+                    VStack{
+                        icon.font(.system(size: 72))
+                        Divider().overlay(.background)
+                        text
+                    }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                }
             }
         }
     }
@@ -327,38 +351,44 @@ struct ClasstableWidget: Widget {
     }
 }
 
-/*
+
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
 #Preview(as: .systemSmall) {
     ClasstableWidget()
 } timeline: {
     SimpleEntry(
         date: Date.now,
-        class_table_date: "2023-12-31",
-        class_table_json:
-            "[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"},{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"}]")
+         currentArrangement : [],
+         tomorrowArrangement : [TimeLineStructItems(
+            type: .exam,
+            name: "英语课",
+            teacher: "机器人",
+            place: "不知道",
+            start_time: Date.now,
+            end_time: Date.now
+        )]
+    )
     SimpleEntry(
         date: Date.now,
-        class_table_date: "2023-12-31",
-        class_table_json:
-            "[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:30\",\"end_time\":\"10:05\"},{\"name\":\"软件过程与项目管理\",\"teacher\":\"Angaj（印）\",\"place\":\"B-707\",\"start_time\":\"10:25\",\"end_time\":\"12:00\"},{\"name\":\"软件体系结构\",\"teacher\":\"蔺一帅,李飞\",\"place\":\"A-222\",\"start_time\":\"15:55\",\"end_time\":\"17:30\"}]")
-    SimpleEntry(
-        date: Date.now,
-        class_table_date: "2023-12-31",
-        class_table_json: "[]")
-    SimpleEntry(
-        date: Date.now,
-        class_table_date: "2023-12-31",
-        class_table_json: "[{\"name\":\"算法分析与设计\",\"teacher\":\"覃桂敏\",\"place\":\"B-706\",\"start_time\":\"08:45\",\"end_time\":\"10:05\"},]")
+         currentArrangement : [TimeLineStructItems(
+            type: .course,
+            name: "英语课",
+            teacher: "机器人",
+            place: "不知道",
+            start_time: Date.now,
+            end_time: Date.now
+        )],
+         tomorrowArrangement : []
+    )
 
-}*/
+}
 
 // Colors
 var colors: [Color] = [
     Color(.blue),
     //Color(.teal),
     Color(.green),
-    Color(.yellow),
+    //Color(.yellow),
     Color(.orange),
     Color(.red),
     //Color(.pink),

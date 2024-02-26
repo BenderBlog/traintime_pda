@@ -15,8 +15,6 @@ struct ExamData : Codable {
 }
 
 struct Subject : Codable {
-
-    
     var subject : String
     var typeStr : String
     var startTimeStr : String
