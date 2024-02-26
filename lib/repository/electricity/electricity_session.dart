@@ -8,7 +8,6 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -171,11 +170,6 @@ class ElectricitySession extends NetworkSession {
         log.d(
           "[electricity_session][update] "
           "electricity value: ${electricityInfo.value}.",
-        );
-        await HomeWidget.saveWidgetData<String>('electricity_title', "电费");
-        await HomeWidget.saveWidgetData<String>(
-          'electricity_info',
-          electricityInfo.value,
         );
         return;
       }
