@@ -23,7 +23,7 @@ dependencies:
   share_plus: ^7.2.1
   # Deal with html
   beautiful_soup_dart: ^0.3.0
-  charset_converter: ^2.1.1
+  charset_converter: ^2.2.0
   # Setting
   settings_ui: ^2.0.2
   # Homepage
@@ -75,7 +75,7 @@ dev_dependencies:
   json_serializable: ^6.7.1
   flutter_lints: ^3.0.1
   change_app_package_name: ^1.1.0
-  pigeon: ^16.0.3
+  pigeon: ^17.0.0
 
 flutter_launcher_icons:
   android: true
