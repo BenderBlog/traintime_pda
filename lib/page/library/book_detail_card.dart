@@ -25,7 +25,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 15,
+        horizontal: 14,
       ),
       child: ListView(
         shrinkWrap: true,

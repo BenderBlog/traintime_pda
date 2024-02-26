@@ -35,11 +35,11 @@ class SmallFunctionCard extends StatelessWidget {
     return [
       Icon(
         icon,
-        size: 48,
+        size: 42,
         color: Theme.of(context).colorScheme.onSecondaryContainer,
       ),
       const VerticalDivider(
-        width: 16,
+        width: 8,
         color: Colors.transparent,
       ),
       [
@@ -71,7 +71,7 @@ class SmallFunctionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
         )
-        .padding(all: 8)
+        .padding(all: 12)
         .card(
           elevation: 0,
           shape: RoundedRectangleBorder(

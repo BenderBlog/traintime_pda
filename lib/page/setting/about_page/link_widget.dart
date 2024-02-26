@@ -35,7 +35,7 @@ class LinkWidget extends StatelessWidget {
       leading: icon,
       title: Text(name),
       onTap: () => launchUrl(
-        Uri.parse("https://legacy.superbart.xyz/xdyou.html"),
+        Uri.parse(url),
         mode: LaunchMode.externalApplication,
       ),
     );

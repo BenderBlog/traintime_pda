@@ -11,7 +11,9 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:alice/alice.dart';
 
-Alice alice = Alice();
+Alice alice = Alice(
+  showNotification: false,
+);
 
 late Directory supportPath;
 

@@ -89,9 +89,7 @@ class ToolBoxView extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.background,
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.040,
-        ),
+        padding: const EdgeInsets.only(bottom: 12),
         children: [
           ...grid("学习", study),
           ...grid("服务", service),

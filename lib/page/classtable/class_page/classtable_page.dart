@@ -175,20 +175,22 @@ class _ClassTablePageState extends State<ClassTablePage>
                 constraint: constraint,
                 index: index,
               ),
-            ).safeArea(),
+            ),
           ),
-        ).decorated(
-          image: (preference.getBool(preference.Preference.decorated) &&
-                  image.existsSync())
-              ? DecorationImage(
-                  image: FileImage(image),
-                  fit: BoxFit.cover,
-                  opacity: Theme.of(context).brightness == Brightness.dark
-                      ? 0.4
-                      : 1.0,
-                )
-              : null,
-        ),
+        )
+            .decorated(
+              image: (preference.getBool(preference.Preference.decorated) &&
+                      image.existsSync())
+                  ? DecorationImage(
+                      image: FileImage(image),
+                      fit: BoxFit.cover,
+                      opacity: Theme.of(context).brightness == Brightness.dark
+                          ? 0.4
+                          : 1.0,
+                    )
+                  : null,
+            )
+            .safeArea(),
       );
     } else {
       return Scaffold(

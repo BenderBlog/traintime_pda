@@ -190,9 +190,18 @@ void updateCurrentData() {
         break;
       }
 
+      /// If break, an hour advance.
+      int inAdvance = 30;
+      int currentTime = updateTime.hour * 60 + updateTime.minute;
+      if (currentTime < 8.5 * 60 ||
+          (currentTime < 14 * 60 && currentTime >= 12 * 60) ||
+          (currentTime < 19 * 60 && currentTime >= 18 * 60)) {
+        inAdvance = 60;
+      }
+
       /// Will be occured next 30 minute.
       if (List<int>.generate(
-        30,
+        inAdvance,
         (index) => index,
       ).contains(
         Jiffy.parseFromDateTime(arr.current.startTime).diff(

@@ -30,10 +30,10 @@ class ClassCard extends StatelessWidget {
 
     /// This is the result of the class info card.
     return Padding(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(1),
       child: ClipRRect(
         // Out
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         child: Container(
           // Border
           color: color.shade300.withOpacity(0.8),
@@ -42,7 +42,7 @@ class ClassCard extends StatelessWidget {
             children: [
               ClipRRect(
                 // Inner
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(6),
                 child: Container(
                   color: color.shade100.withOpacity(0.7),
                   child: TextButton(
@@ -77,14 +77,38 @@ class ClassCard extends StatelessWidget {
                         context: context,
                       );
                     },
-                    child: Text(
-                      "$name\n@${place ?? "未知教室"}\n"
-                      "${data.length > 1 ? "还有${data.length - 1}个日程" : ""}",
-                      style: TextStyle(
-                        color: color.shade900,
-                        fontSize: isPhone(context) ? 10 : 12,
-                      ),
-                    ).alignment(Alignment.topLeft).padding(all: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: color.shade900,
+                            fontSize: isPhone(context) ? 12 : 14,
+                          ),
+                        ),
+                        Text(
+                          "@${place ?? "未知教室"}",
+                          style: TextStyle(
+                            color: color.shade900,
+                            fontSize: isPhone(context) ? 10 : 12,
+                          ),
+                        ),
+                        if (data.length > 1)
+                          Text(
+                            "还有${data.length - 1}个日程",
+                            style: TextStyle(
+                              color: color.shade900,
+                              fontSize: isPhone(context) ? 10 : 12,
+                            ),
+                          ),
+                      ],
+                    ).alignment(Alignment.topLeft).padding(
+                          horizontal: isPhone(context) ? 2 : 4,
+                          vertical: 4,
+                        ),
                   ),
                 ),
               ),
@@ -94,8 +118,8 @@ class ClassCard extends StatelessWidget {
                   child: Container(
                     color: color.shade300,
                   ).constrained(
-                    width: 10,
-                    height: 10,
+                    width: 8,
+                    height: 8,
                   ),
                 ).alignment(Alignment.topRight),
             ],

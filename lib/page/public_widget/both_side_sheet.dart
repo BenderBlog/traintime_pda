@@ -85,12 +85,11 @@ class _BothSideSheetState extends State<BothSideSheet> {
           child: Container(
             height: 30,
             width: double.infinity,
-            color: Theme.of(context).colorScheme.surface,
+            color: Colors.transparent,
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [
                 Container(
-                  color: Colors.transparent,
                   width: double.infinity,
                 ),
                 Container(
@@ -111,7 +110,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
       : Container(
           height: kToolbarHeight,
           width: double.infinity,
-          color: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.background,
           child: Row(
             children: [
               IconButton(
@@ -135,7 +134,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
         width: width,
         height: isPhone(context) ? heightForVertical : double.infinity,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.background,
           borderRadius: radius(context),
         ),
         child: Padding(

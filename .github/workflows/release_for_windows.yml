@@ -1,0 +1,24 @@
+name: Release for Windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+ build_windows:
+   runs-on: windows-latest
+   steps:
+      - uses: actions/checkout@v4
+      - name: Install Flutter
+        run: |
+          git submodule update --init --recursive
+      - run: flutter create --platforms=windows .
+      - run: flutter build windows --release
+     
+      - name: upload result
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          artifacts: > 
+            build/windows/x64/runner/Release/,
+          token: ${{ secrets.RELEASE_TOKEN }}

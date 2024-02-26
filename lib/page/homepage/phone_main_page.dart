@@ -131,6 +131,7 @@ class PhoneMainPage extends StatelessWidget {
             context: context,
             removeTop: true,
             child: ListView(
+              padding: const EdgeInsets.only(bottom: 12),
               children: [
                 const HeaderLocator(),
                 const NoticeCard(),

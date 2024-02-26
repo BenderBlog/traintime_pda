@@ -23,10 +23,11 @@ class ClassTableDateRow extends StatelessWidget {
       color: Colors.grey.shade200.withOpacity(0.75),
       child: Row(children: [
         Text(
-          "${dateList.first.month}月",
+          "${dateList.first.month}\n月",
+          textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 14,
-            color: Colors.black,
+            color: Colors.black87,
           ),
         ).center().constrained(width: leftRow),
         ...List.generate(

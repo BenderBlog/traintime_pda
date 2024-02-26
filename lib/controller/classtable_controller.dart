@@ -287,7 +287,7 @@ class ClassTableController extends GetxController {
             stackTrace: s,
           );
         }
-        HomeWidget.updateWidget(iOSName: "ClasstableWidget");
+        await HomeWidget.updateWidget(iOSName: "ClasstableWidget");
       }
 
       state = ClassTableState.fetched;

@@ -10,7 +10,7 @@ class EasterEggPage extends StatelessWidget {
 
   final String url = "https://www.bilibili.com/video/BV1Sg4y147VK";
 
-  final String articleUrl = "https://www.bilibili.com/read/cv28967035/";
+  final String articleUrl = "https://www.bilibili.com/read/cv12671388/";
 
   final String song = '''
 Ripples... / Genesis
