@@ -16,7 +16,7 @@ class ClassTableItemsService : RemoteViewsService() {
             try {
                 File(filesDir, ClassTableConstants.CLASS_FILE_NAME).run {
                     if (exists())
-                        ClassTableItemsFactory.classJsonData = run {
+                        ClassTableItemsFactory.schoolClassJsonData = run {
                             FileReader(this).readText()
                         }
                 }
@@ -26,7 +26,12 @@ class ClassTableItemsService : RemoteViewsService() {
                             FileReader(this).readText()
                         }
                 }
-
+                File(filesDir, ClassTableConstants.USER_CLASS_FILE_NAME).run {
+                    if (exists())
+                        ClassTableItemsFactory.userDefinedClassJsonData = run {
+                            FileReader(this).readText()
+                        }
+                }
             } catch (e: Exception) {
                 // not readable file or other errors
                 // just ignore and regard it as empty data file

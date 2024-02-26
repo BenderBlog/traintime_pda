@@ -11,6 +11,7 @@ import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ExamData
 import io.github.benderblog.traintime_pda.model.Source
 import io.github.benderblog.traintime_pda.model.TimeLineItem
+import io.github.benderblog.traintime_pda.model.UserDefinedClassData
 import io.github.benderblog.traintime_pda.model.endTime
 import io.github.benderblog.traintime_pda.model.startTime
 import io.github.benderblog.traintime_pda.utils.day
@@ -41,7 +42,12 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
 
     companion object {
         @JvmStatic
-        var classJsonData: String? = null
+        var schoolClassJsonData: String? = null
+            @Synchronized
+            set
+
+        @JvmStatic
+        var userDefinedClassJsonData: String? = null
             @Synchronized
             set
 
@@ -81,9 +87,12 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
 
     private fun loadBasicConfig() {
         // initialize data
-        classJsonData?.let {
-            classTableData = gson.fromJson(it, ClassTableData::class.java)
-        } ?: { classTableData = ClassTableData.EMPTY }
+        val schoolClassTableData = schoolClassJsonData?.let {
+            gson.fromJson(it, ClassTableData::class.java)
+        } ?: ClassTableData.EMPTY
+        val userDefinedClassData = userDefinedClassJsonData ?.let {
+            gson.fromJson(it, UserDefinedClassData::class.java)
+        } ?: UserDefinedClassData.EMPTY
         examJsonData?.let {
             examData = gson.fromJson(it, ExamData::class.java)
         } ?: { examData = ExamData.EMPTY }
@@ -93,6 +102,11 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
             Context.MODE_PRIVATE
         )
         weekSwift = prefs.getLong(ClassTableConstants.CONFIG_WEEK_SWIFT_KEY, 0)
+        // merge classtable with user added class
+        classTableData = schoolClassTableData.copy(
+            userDefinedDetail = userDefinedClassData.userDefinedDetail,
+            timeArrangement = schoolClassTableData.timeArrangement + userDefinedClassData.timeArrangement,
+        )
         // calculate day index of today
         var startDay: Date =
             SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())

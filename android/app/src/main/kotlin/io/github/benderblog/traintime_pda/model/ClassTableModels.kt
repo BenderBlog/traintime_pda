@@ -1,6 +1,5 @@
 package io.github.benderblog.traintime_pda.model
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -8,7 +7,9 @@ import java.util.Locale
 
 object ClassTableConstants {
     const val CLASS_FILE_NAME = "ClassTable.json"
+    const val USER_CLASS_FILE_NAME = "UserClass.json"
     const val EXAM_FILE_NAME = "exam.json"
+    // TODO: Add experiment file
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
     // Be attention to the changes of SharedPreferencesPlugin.SHARED_PREFERENCES_NAME.
@@ -18,9 +19,9 @@ object ClassTableConstants {
     const val DATE_FORMAT_STR = "yyyy-MM-dd HH:mm:ss"
 
     val CLASS_TIME_POINTS = listOf(
-        "8:30",
-        "9:15",
-        "9:20",
+        "08:30",
+        "09:15",
+        "09:20",
         "10:05",
         "10:25",
         "11:10",
@@ -65,7 +66,7 @@ object ClassTableConstants {
 }
 
 object ClassTableWidgetKeys {
-    const val PACKAGE_NAME = "packageName"
+    const val PACKAGE_NAME = "io.github.benderblog.traintime_pda"
 }
 
 data class TimeLineItem(
@@ -88,6 +89,19 @@ data class TimeLineItem(
         Source.EXAM -> "试"
         Source.EXPERIMENT -> "验"
         else -> end.toString()
+    }
+}
+
+data class UserDefinedClassData (
+    @SerializedName("userDefinedDetail")
+    val userDefinedDetail: List<ClassDetail>,
+    @SerializedName("timeArrangement")
+    val timeArrangement: List<TimeArrangement>,
+) {
+    companion object {
+        val EMPTY = UserDefinedClassData(
+            emptyList(), emptyList()
+        )
     }
 }
 
@@ -136,7 +150,7 @@ data class ClassDetail(
     val number: String?
 )
 
-//just a stub (It is unuseful for class table.)
+//just a stub (It is useless for class table.)
 class NotArrangedClassDetail
 
 enum class Source(val rawValue: String) {
