@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_course_item"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="10dp">
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_background"
+    android:backgroundTint="#FFFFFFFF"
+    android:backgroundTintMode="add"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="10dp"
+    android:paddingLeft="10dp"
+    android:paddingTop="10dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="10dp">
 
     <RelativeLayout
+        android:id="@+id/widget_class_table_course_time"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_alignTop="@id/widget_class_table_course_info"
+        android:layout_alignBottom="@id/widget_class_table_course_info"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/widget_classtable_item_start"
@@ -56,27 +67,33 @@
 
     </RelativeLayout>
 
+    <!--  View is not allowed in widget layout. So we use TextView. -->
     <TextView
+        android:id="@+id/widget_class_table_course_indicator"
         android:layout_width="3dp"
         android:layout_height="match_parent"
+        android:layout_alignTop="@id/widget_class_table_course_info"
+        android:layout_alignBottom="@id/widget_class_table_course_info"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_toEndOf="@id/widget_class_table_course_time"
         android:background="@drawable/spacer_background" />
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:id="@+id/widget_class_table_course_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/widget_class_table_course_indicator">
 
         <TextView
             android:id="@+id/widget_classtable_item_name"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-3dp"
-            android:ellipsize="marquee"
-            android:gravity="center_vertical|left"
-            android:singleLine="true"
-            android:text="课程名称"
-            android:textColor="#000000"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:text="@string/widget_classtable_date_tip_loading"
             android:textSize="12sp" />
 
         <TextView
@@ -84,17 +101,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/widget_classtable_item_name"
+            android:gravity="center_vertical"
+            android:singleLine="true"
             android:text="Loading"
             android:textSize="10sp" />
 
         <TextView
             android:id="@+id/widget_classtable_item_spacer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/widget_classtable_item_name"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/widget_classtable_item_place"
+            android:layout_alignBottom="@id/widget_classtable_item_place"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_toRightOf="@id/widget_classtable_item_place"
+            android:gravity="center_vertical"
             android:singleLine="true"
             android:text="|"
             android:textSize="10sp" />
@@ -102,11 +123,13 @@
         <TextView
             android:id="@+id/widget_classtable_item_teacher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/widget_classtable_item_name"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/widget_classtable_item_place"
+            android:layout_alignBottom="@id/widget_classtable_item_place"
             android:layout_toRightOf="@id/widget_classtable_item_spacer"
+            android:gravity="center_vertical"
             android:singleLine="true"
             android:text="Loading"
             android:textSize="10sp" />
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>
