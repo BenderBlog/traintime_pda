@@ -1,6 +1,7 @@
 package io.github.benderblog.traintime_pda.widget.classtable
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService.RemoteViewsFactory
@@ -23,6 +24,20 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+private val indicatorColorList = listOf(
+    Color.parseColor("#EF5350"),
+    Color.parseColor("#EC407A"),
+    Color.parseColor("#AB47BC"),
+    Color.parseColor("#7E57C2"),
+    Color.parseColor("#5C6BC0"),
+    Color.parseColor("#42A5F5"),
+    Color.parseColor("#29B6F6"),
+    Color.parseColor("#26C6DA"),
+    Color.parseColor("#26A69A"),
+    Color.parseColor("#66BB6A"),
+    Color.parseColor("#9CCC65"),
+    Color.parseColor("#66BB6A"),
+)
 
 class ClassTableItemsFactory(private val packageName: String, private val context: Context) :
     RemoteViewsFactory {
@@ -90,7 +105,7 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         val schoolClassTableData = schoolClassJsonData?.let {
             gson.fromJson(it, ClassTableData::class.java)
         } ?: ClassTableData.EMPTY
-        val userDefinedClassData = userDefinedClassJsonData ?.let {
+        val userDefinedClassData = userDefinedClassJsonData?.let {
             gson.fromJson(it, UserDefinedClassData::class.java)
         } ?: UserDefinedClassData.EMPTY
         examJsonData?.let {
@@ -277,6 +292,11 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
             setTextViewText(R.id.widget_classtable_item_name, arrangementItem.name)
             setTextViewText(R.id.widget_classtable_item_place, arrangementItem.place)
             setTextViewText(R.id.widget_classtable_item_teacher, arrangementItem.teacher)
+            setInt(
+                R.id.widget_class_table_course_indicator,
+                "setBackgroundColor",
+                indicatorColorList[arrangementItem.start - 1]
+            )
         }
     }
 
