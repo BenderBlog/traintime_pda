@@ -135,14 +135,14 @@ class ClassOrgainzedData {
             basic = (_timeInBlock.indexOf(i) - 1) * 5;
           } else if (previous < 14 * 60) {
             basic = 20;
-            blocks = 2;
+            blocks = 3;
           } else if (previous < 17.5 * 60) {
             basic = 22 + (_timeInBlock.indexOf(i) - 6) * 5;
-          } else if (previous <= 19 * 60) {
-            basic = 42;
+          } else if (previous < 19 * 60) {
+            basic = 43;
             blocks = 3;
           } else {
-            basic = 45 + (_timeInBlock.indexOf(i) - 11) * 5;
+            basic = 46 + (_timeInBlock.indexOf(i) - 11) * 5;
           }
           return basic + blocks * ratio;
         } else {

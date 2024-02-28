@@ -81,13 +81,6 @@ class ClassTableWidgetState with ChangeNotifier {
   /// Following are dynamic data. ///
   /// ****************************///
 
-  /// Multiplex array which means List[week][day][classindex][classes]
-  ///   * week: The week index of the week.
-  ///   * day: days in the week
-  ///   * classindex: indicate the range of the time when we attending class, normally 0-9
-  ///   * classes: the classes in this time, maybe conflicts occurs.
-  late List<List<List<List<int>>>> pretendLayout;
-
   /// Current showing week.
   int _chosenWeek = 0;
 
