@@ -95,7 +95,20 @@ class _ClassTableViewState extends State<ClassTableView> {
         }
       }
 
-      /// TODO: Add Experiment
+      for (final i in classTableState.experiments) {
+        int diff = Jiffy.parseFromDateTime(i.time[0])
+            .diff(Jiffy.parseFromDateTime(classTableState.startDay),
+                unit: Unit.day)
+            .toInt();
+
+        if (diff ~/ 7 == widget.index && diff % 7 + 1 == index) {
+          events.add(ClassOrgainzedData.fromExperiment(
+            colorList[
+                classTableState.experiments.indexOf(i) % colorList.length],
+            i,
+          ));
+        }
+      }
 
       /// Sort it with the ascending order of start time.
       events.sort((a, b) => a.start.compareTo(b.start));

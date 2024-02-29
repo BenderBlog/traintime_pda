@@ -6,8 +6,10 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
@@ -41,6 +43,7 @@ class ClassTableWidgetState with ChangeNotifier {
   /// The controller...
   final ClassTableController classTableController = Get.find();
   final ExamController examController = Get.find();
+  final ExperimentController experimentController = Get.find();
 
   /// The length of the semester, the amount of the class table.
   int get semesterLength => classTableController.classTableData.semesterLength;
@@ -76,6 +79,9 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// The exam list.
   List<Subject> get subjects => examController.data.subject;
+
+  /// The experiment list.
+  List<ExperimentData> get experiments => experimentController.data;
 
   ///*****************************///
   /// Following are dynamic data. ///

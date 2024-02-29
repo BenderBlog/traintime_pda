@@ -2,17 +2,16 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
 
 /// A dialog/card shows the exam detail.
-class ExamDetailCard extends StatelessWidget {
-  final Subject subject;
+class ExperimentDetailCard extends StatelessWidget {
+  final ExperimentData experiment;
   final MaterialColor infoColor;
-  const ExamDetailCard({
+  const ExperimentDetailCard({
     super.key,
-    required this.subject,
+    required this.experiment,
     required this.infoColor,
   });
 
@@ -35,7 +34,7 @@ class ExamDetailCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${subject.subject}${subject.type}",
+                experiment.name,
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -45,21 +44,19 @@ class ExamDetailCard extends StatelessWidget {
               const SizedBox(height: 6),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
-                str: subject.time,
+                str: experiment.timeStr,
                 infoColor: infoColor,
               ),
-              [
-                CustomListTile(
-                  icon: Icons.room,
-                  str: subject.place,
-                  infoColor: infoColor,
-                ).flexible(),
-                CustomListTile(
-                  icon: Icons.chair,
-                  str: subject.seat.toString(),
-                  infoColor: infoColor,
-                ).flexible(),
-              ].toRow(),
+              CustomListTile(
+                icon: Icons.room,
+                str: experiment.classroom,
+                infoColor: infoColor,
+              ),
+              CustomListTile(
+                icon: Icons.person,
+                str: experiment.teacher,
+                infoColor: infoColor,
+              ),
             ],
           ),
         ),

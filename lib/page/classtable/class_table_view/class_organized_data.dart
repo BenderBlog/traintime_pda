@@ -137,7 +137,7 @@ class ClassOrgainzedData {
             basic = 20;
             blocks = 3;
           } else if (previous < 17.5 * 60) {
-            basic = 22 + (_timeInBlock.indexOf(i) - 6) * 5;
+            basic = 23 + (_timeInBlock.indexOf(i) - 6) * 5;
           } else if (previous < 19 * 60) {
             basic = 43;
             blocks = 3;

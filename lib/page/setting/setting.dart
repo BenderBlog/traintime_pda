@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,7 +21,6 @@ import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
-import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
@@ -307,7 +307,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       }
 
                       file = File(
-                        "${supportPath.path}/${ExperimentSession.experimentCacheName}",
+                        "${supportPath.path}/${ExperimentController.experimentCacheName}",
                       );
                       if (file.existsSync()) {
                         file.deleteSync();
@@ -357,7 +357,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       }
 
                       file = File(
-                        "${supportPath.path}/${ExperimentSession.experimentCacheName}",
+                        "${supportPath.path}/${ExperimentController.experimentCacheName}",
                       );
                       if (file.existsSync()) {
                         file.deleteSync();

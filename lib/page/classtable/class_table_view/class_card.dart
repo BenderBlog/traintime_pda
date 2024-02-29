@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
@@ -60,7 +61,8 @@ class ClassCard extends StatelessWidget {
                         title: "日程信息",
                         child: ArrangementDetail(
                           information: List.generate(data.length, (index) {
-                            if (data.elementAt(index) is Subject) {
+                            if (data.elementAt(index) is Subject ||
+                                data.elementAt(index) is ExperimentData) {
                               return data.elementAt(index);
                             } else {
                               return (

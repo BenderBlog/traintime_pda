@@ -4,6 +4,7 @@
 // Refresh formula for homepage.
 
 import 'package:jiffy/jiffy.dart';
+import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -92,6 +93,10 @@ Future<void> update({
         final c = Get.put(ClassTableController());
         await c.updateClassTable();
       }),
+      Future(() async {
+        final c = Get.put(ExperimentController());
+        await c.get();
+      }),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.i(
         "[homepage Update]"
@@ -116,6 +121,7 @@ void updateCurrentData() {
   );
   final classTableController = Get.put(ClassTableController());
   final examController = Get.put(ExamController());
+  final experimentController = Get.put(ExperimentController());
 
   if (arrangementState.value == ArrangementState.fetching) {
     return;
@@ -152,6 +158,10 @@ void updateCurrentData() {
         examController.status == ExamStatus.cache) {
       toAdd.addAll(examController.getExamOfDate(tomorrow));
     }
+    if (experimentController.status == ExperimentStatus.fetched ||
+        experimentController.status == ExperimentStatus.cache) {
+      toAdd.addAll(experimentController.getExperimentOfDay(tomorrow));
+    }
   } else {
     isTomorrow.value = false;
     if (classTableController.state == ClassTableState.fetched) {
@@ -160,6 +170,10 @@ void updateCurrentData() {
     if (examController.status == ExamStatus.fetched ||
         examController.status == ExamStatus.cache) {
       toAdd.addAll(examController.getExamOfDate(updateTime));
+    }
+    if (experimentController.status == ExperimentStatus.fetched ||
+        experimentController.status == ExperimentStatus.cache) {
+      toAdd.addAll(experimentController.getExperimentOfDay(updateTime));
     }
     toAdd.removeWhere((element) => updateTime.isAfter(element.endTime));
   }

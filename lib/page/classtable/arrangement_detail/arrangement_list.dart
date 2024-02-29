@@ -4,9 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/course_detail_card.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_state.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/exam_detail_card.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/experiment_detail_card.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// A list of the class info in that period, in case of conflict class.
@@ -31,6 +33,11 @@ class ArrangementList extends StatelessWidget {
         } else if (classDetailState.information[i] is Subject) {
           return ExamDetailCard(
             subject: classDetailState.information[i],
+            infoColor: colorList[2 % colorList.length],
+          );
+        } else if (classDetailState.information[i] is ExperimentData) {
+          return ExperimentDetailCard(
+            experiment: classDetailState.information[i],
             infoColor: colorList[2 % colorList.length],
           );
         }
