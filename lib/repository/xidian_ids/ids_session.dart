@@ -4,10 +4,10 @@
 // IDS (统一认证服务) login class.
 // Thanks xidian-script and libxdauth!
 
-import 'dart:convert';
 import 'dart:io';
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:html/parser.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -93,11 +93,9 @@ class IDSSession extends NetworkSession {
   ];
 
   String _parsePasswordWrongMsg(String html) {
-    var page = BeautifulSoup(html);
-    var form = page.findAll("span", attrs: {
-      "id": "showErrorTip",
-    })[0];
-    var msg = form.children[0].string;
+    var form = parse(html).getElementsByClassName("span")
+      ..removeWhere((element) => element.id != "showErrorTip");
+    var msg = form.firstOrNull?.children[0].innerHtml ?? "登录遇到问题";
 
     // Simplify the error message because there is no '找回密码' button here XD.
     // "用户名或密码有误，用户名为工号/学号，如果确认用户名无误，请点‘找回密码’自助重置密码。"
@@ -130,17 +128,18 @@ class IDSSession extends NetworkSession {
         /// Post login progress, due to something wrong, return the location here...
         return data.headers[HttpHeaders.locationHeader]![0];
       } else {
-        var page = BeautifulSoup(data.data ?? "");
-        var form = page.findAll("form", id: "continue");
+        var page = parse(data.data ?? "");
+        var form = page.getElementsByTagName("form")
+          ..removeWhere((element) => element.id != "continue");
         log.i(
           "[IDSSession][login] "
           "form: $form.",
         );
         if (form.isNotEmpty) {
-          var inputSearch = form[0].findAll("input");
+          var inputSearch = form[0].getElementsByTagName("input");
           Map<String, String> toPostAgain = {};
           for (var i in inputSearch) {
-            toPostAgain[i.getAttrValue("name")!] = i.getAttrValue("value")!;
+            toPostAgain[i.attributes["name"]!] = i.attributes["value"]!;
           }
           var data = await dioNoOfflineCheck.post(
             "https://ids.xidian.edu.cn/authserver/login",
@@ -188,8 +187,11 @@ class IDSSession extends NetworkSession {
         .then((value) => value.data);
 
     /// Start getting data from webpage.
-    var page = BeautifulSoup(response);
-    var form = page.findAll("input", attrs: {"type": "hidden"});
+    var page = parse(response);
+    var form = page.getElementsByTagName("input")
+      ..removeWhere(
+        (element) => element.attributes["type"] != "hidden",
+      );
 
     /// Check whether it need CAPTCHA or not:-P
     /// Used in two captcha.
@@ -209,7 +211,8 @@ class IDSSession extends NetworkSession {
       onResponse(30, "获取密码加密密钥");
     }
     String keys = form
-        .firstWhere((element) => element["id"] == "pwdEncryptSalt")["value"]!;
+        .firstWhere((element) => element.id == "pwdEncryptSalt")
+        .attributes["value"]!;
     log.i(
       "[IDSSession][login] "
       "encrypt key: $keys.",
@@ -229,8 +232,11 @@ class IDSSession extends NetworkSession {
     };
 
     for (var i in _header) {
-      head[i] = form.firstWhere(
-          (element) => element["name"] == i || element.id == i)["value"]!;
+      head[i] = form
+          .firstWhere(
+            (element) => element.attributes["name"] == i || element.id == i,
+          )
+          .attributes["value"]!;
     }
 
     if (onResponse != null) {
@@ -270,17 +276,20 @@ class IDSSession extends NetworkSession {
           "data: ${(data.data as String).length}.",
         );
 
-        var page = BeautifulSoup(data.data ?? "");
-        var form = page.findAll("form", id: "continue");
+        var page = parse(data.data ?? "");
+        var form = page.getElementsByTagName("form")
+          ..removeWhere(
+            (element) => element.id != "continue",
+          );
         log.i(
           "[IDSSession][login] "
           "form: $form.",
         );
         if (form.isNotEmpty) {
-          var inputSearch = form[0].findAll("input");
+          var inputSearch = form[0].getElementsByTagName("input");
           Map<String, String> toPostAgain = {};
           for (var i in inputSearch) {
-            toPostAgain[i.getAttrValue("name")!] = i.getAttrValue("value")!;
+            toPostAgain[i.attributes["name"]!] = i.attributes["value"]!;
           }
           var data = await dioNoOfflineCheck.post(
             "https://ids.xidian.edu.cn/authserver/login",

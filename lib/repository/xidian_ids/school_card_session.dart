@@ -5,7 +5,7 @@
 
 import 'dart:io';
 import 'dart:convert';
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:html/parser.dart';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -103,27 +103,36 @@ class SchoolCardSession extends IDSSession {
         );
         response = await dio.get(location);
       }
-      var page = BeautifulSoup(response.data);
+      var page = parse(response.data);
 
-      openid = page.find(
-            'input',
-            attrs: {"id": "openid", "type": "hidden"},
-          )?["value"] ??
-          "";
+      var getOpenId = page.getElementsByTagName('input');
 
-      page.findAll('a').forEach((element) {
-        if (element["href"]?.contains("openVirtualcard") ?? false) {
-          virtualCardUrl += element["href"]!;
+      for (var i in getOpenId) {
+        if (i.id == "openid" && i.attributes["type"] == "hidden") {
+          openid = i.attributes["value"]!;
+          break;
         }
-        if (element["href"]?.contains("openMyAccount") ?? false) {
-          personalCenter += element["href"]!;
+      }
+
+      page.getElementsByTagName('a').forEach((element) {
+        if (element.attributes["href"]?.contains("openVirtualcard") ?? false) {
+          virtualCardUrl += element.attributes["href"]!;
+        }
+        if (element.attributes["href"]?.contains("openMyAccount") ?? false) {
+          personalCenter += element.attributes["href"]!;
         }
       });
 
       /// Post formula: fetch money.
-      String text =
-          page.find("span", attrs: {"name": "showbalanceid"})?.innerHtml ??
-              "查询失败";
+      String text = "";
+      var getSpans = page.getElementsByTagName("span");
+      for (var i in getSpans) {
+        if (i.attributes["name"] == "showbalanceid") {
+          text = i.innerHtml;
+          break;
+        }
+      }
+      if (text.isEmpty) text = "查询失败";
       if (text.contains(RegExp(r'[0-9]'))) {
         money.value = text.substring(4);
       } else if (text.contains("查询失败")) {
