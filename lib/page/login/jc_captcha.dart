@@ -212,7 +212,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                           //print(value.data.toString());
                           return value.data["errorCode"] == 1;
                         });
-                        if (mounted) {
+
+                        if (context.mounted) {
                           result
                               ? Navigator.of(context).pop()
                               : setState(() {

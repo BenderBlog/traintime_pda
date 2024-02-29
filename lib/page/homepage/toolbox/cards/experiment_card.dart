@@ -29,7 +29,7 @@ class _ExperimentCardState extends State<ExperimentCard> {
             builder: (context) => const ExperimentPasswordDialog(),
           );
         }
-        if (mounted && isGood) {
+        if (context.mounted && isGood) {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const ExperimentWindow(),
