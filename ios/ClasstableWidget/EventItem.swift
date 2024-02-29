@@ -15,9 +15,9 @@ private let myDateFormatter = DateFormatter()
 
 struct EventItem: View {
     var event : TimeLineStructItems
-    var color : Color;
+    var color : UIColor;
     
-    internal init(_ event: TimeLineStructItems, color: Color) {
+    internal init(_ event: TimeLineStructItems, color: UIColor) {
         self.event = event
         self.color = color
     }
@@ -68,11 +68,11 @@ struct EventItem: View {
             .padding(.vertical, 6)
             Spacer(minLength: .zero)
         }
-        .foregroundColor(eventColour)
+        .foregroundColor(Color(uiColor: color))
         .blendMode(colourScheme == .light ? .plusDarker : .plusLighter)
         .padding(.horizontal, 8)
         .background {
-            eventColour.opacity(0.125)
+            Color(uiColor: color).opacity(0.125)
                 .blendMode(colourScheme == .light ? .normal : .hardLight)
         }
         .frame(maxHeight: 42)

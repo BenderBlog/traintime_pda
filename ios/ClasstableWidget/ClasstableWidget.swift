@@ -12,6 +12,7 @@ import SwiftUI
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
 private let examFile = "ExamFile.json"
+private let experimentFile = "Experiment.json"
 private let swiftFile = "WeekSwift.txt"
 private let format = "yyyy-MM-dd HH:mm:ss"
 private let myDateFormatter = DateFormatter()
@@ -216,6 +217,55 @@ struct Provider: TimelineProvider {
             print(String(describing: error))
         }
         
+        // Deal with exam data
+        do {
+            // Read data
+            let fileURL = containerURL.appendingPathComponent(experimentFile)
+            let jsonData = try Data(contentsOf: fileURL)
+            let experimentData : [ExperimentData] = try decoder.decode([ExperimentData].self, from: jsonData)
+            
+            var components = calendar.dateComponents([.day,.month,.year], from: today)
+            var day = components.day
+            var month = components.month
+            var year = components.year
+            
+            // Today data
+            for i in experimentData {
+                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
+                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                    todayArr.append(TimeLineStructItems(
+                        type: .experiment,
+                        name: i.name,
+                        teacher: i.teacher,
+                        place: i.classroom,
+                        start_time: i.startTime,
+                        end_time: i.endTime
+                    ))
+                }
+            }
+            
+            // Tomorrow data
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
+            components = calendar.dateComponents([.day,.month,.year], from: tomorrow)
+            day = components.day
+            month = components.month
+            year = components.year
+            for i in experimentData {
+                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
+                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                    tomorrowArr.append(TimeLineStructItems(
+                        type: .experiment,
+                        name: i.name,
+                        teacher: i.teacher,
+                        place: i.classroom,
+                        start_time: i.startTime,
+                        end_time: i.endTime
+                    ))
+                }
+            }
+        } catch {
+            print(String(describing: error))
+        }
         // Order
         todayArr.sort(by: {$0.start_time < $1.start_time})
         tomorrowArr.sort(by: {$0.start_time < $1.start_time})
@@ -310,7 +360,7 @@ struct ClasstableWidgetEntryView : View {
                 Spacer()
             } else {
                 Text("今日日程").font(.system(size: 14))
-                var text =                     Text("目前没有安排了\n明日有\(entry.tomorrowArrangement.count)项日程")
+                var text = Text("目前没有安排了\n明日有\(entry.tomorrowArrangement.count)项日程")
                 var icon = Image(systemName: "tray")
                 if (widgetFamily == .systemSmall) {
                     text.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -382,17 +432,3 @@ struct ClasstableWidget: Widget {
     )
 
 }
-
-// Colors
-var colors: [Color] = [
-    Color(.blue),
-    //Color(.teal),
-    Color(.green),
-    //Color(.yellow),
-    Color(.orange),
-    Color(.red),
-    //Color(.pink),
-    Color(.purple),
-    //Color(.indigo),
-]
-
