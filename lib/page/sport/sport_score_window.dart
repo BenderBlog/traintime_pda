@@ -3,8 +3,6 @@
 
 // Interface of the sport score window of the sport data.
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';

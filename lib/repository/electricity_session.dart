@@ -24,7 +24,8 @@ Future<void> update() async {
     isNotice.value = false;
   } on DioException catch (e, s) {
     log.w(
-      "[electricity_session][update] Network error",
+      "[electricity_session][update] "
+      "Network Error.",
       error: e,
       stackTrace: s,
     );
@@ -35,7 +36,8 @@ Future<void> update() async {
     isNotice.value = false;
   } catch (e, s) {
     log.w(
-      "[electricity_session][update] Exception",
+      "[electricity_session][update] "
+      "Exception: ",
       error: e,
       stackTrace: s,
     );
@@ -164,9 +166,9 @@ class ElectricitySession extends NetworkSession {
     for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
         electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
-        log.i(
-          "[electricity_session][updateInformation] "
-          "electricity: ${electricityInfo.value}",
+        log.d(
+          "[electricity_session][update] "
+          "electricity value: ${electricityInfo.value}.",
         );
         return;
       }

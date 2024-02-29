@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/experiment/experiment_listview.dart';
-import 'package:watermeter/repository/experiment/experiment_session.dart';
+import 'package:watermeter/repository/experiment_session.dart';
 
 class ExperimentWindow extends StatefulWidget {
   const ExperimentWindow({super.key});

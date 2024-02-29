@@ -3,22 +3,30 @@
 
 import 'dart:io';
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:charset_converter/charset_converter.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
-import 'package:watermeter/repository/experiment/experiment_dio_transfer.dart';
 
 class ExperimentSession extends NetworkSession {
   static const experimentCacheName = "Experiment.json";
   @override
   Dio get dio => Dio()
     ..interceptors.add(alice.getDioInterceptor())
-    ..transformer = ExperimentDioTransformer()
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = false
+    ..options.responseDecoder = (responseBytes, options, responseBody) async {
+      String gbk = await CharsetConverter.availableCharsets().then(
+          (value) => value.firstWhere((element) => element.contains("18030")));
+      return await CharsetConverter.decode(
+        gbk,
+        Uint8List.fromList(responseBytes),
+      );
+    }
     ..options.validateStatus =
         (status) => status != null && status >= 200 && status < 400;
 
