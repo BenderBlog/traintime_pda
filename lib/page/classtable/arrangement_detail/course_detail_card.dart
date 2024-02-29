@@ -78,15 +78,23 @@ class ClassDetailCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
-              CustomListTile(
-                icon: Icons.person,
-                str: timeArrangement.teacher ?? "老师未定",
-                infoColor: infoColor,
-              ),
-              CustomListTile(
-                icon: Icons.room,
-                str: timeArrangement.classroom ?? "地点未定",
-                infoColor: infoColor,
+              Row(
+                children: [
+                  Flexible(
+                    child: CustomListTile(
+                      icon: Icons.person,
+                      str: timeArrangement.teacher ?? "老师未定",
+                      infoColor: infoColor,
+                    ),
+                  ),
+                  Flexible(
+                    child: CustomListTile(
+                      icon: Icons.room,
+                      str: timeArrangement.classroom ?? "地点未定",
+                      infoColor: infoColor,
+                    ),
+                  ),
+                ],
               ),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,

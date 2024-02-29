@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
 
@@ -42,19 +43,21 @@ class ExperimentDetailCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
+              [
+                CustomListTile(
+                  icon: Icons.room,
+                  str: experiment.classroom,
+                  infoColor: infoColor,
+                ).flexible(),
+                CustomListTile(
+                  icon: Icons.person,
+                  str: experiment.teacher,
+                  infoColor: infoColor,
+                ).flexible(),
+              ].toRow(),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
                 str: experiment.timeStr,
-                infoColor: infoColor,
-              ),
-              CustomListTile(
-                icon: Icons.room,
-                str: experiment.classroom,
-                infoColor: infoColor,
-              ),
-              CustomListTile(
-                icon: Icons.person,
-                str: experiment.teacher,
                 infoColor: infoColor,
               ),
             ],

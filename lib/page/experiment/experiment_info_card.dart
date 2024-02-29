@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class ExperimentInfoCard extends StatelessWidget {
   final ExperimentData? data;
@@ -16,84 +17,73 @@ class ExperimentInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 6,
-      ),
-      elevation: 0,
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        child: data != null
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Builder(builder: (context) {
+      if (data != null) {
+        return ReXCard(
+          title: Text(data!.name),
+          remaining: [
+            ReXCardRemaining(data!.score),
+          ],
+          bottomRow: Column(
+            children: [
+              informationWithIcon(
+                Icons.access_time_filled_rounded,
+                "${data!.date} ${data!.timeStr}",
+                context,
+              ),
+              Flex(
+                direction: Axis.horizontal,
                 children: [
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        data!.name,
-                        textScaler: const TextScaler.linear(1.1),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      TagsBoxes(
-                        text: data!.score,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                      ),
-                      const Divider(
-                        color: Colors.transparent,
-                        height: 5,
-                      ),
-                      informationWithIcon(
-                        Icons.access_time_filled_rounded,
-                        "${data!.date} ${data!.timeStr}",
-                        context,
-                      ),
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: informationWithIcon(
-                              Icons.room,
-                              data!.classroom,
-                              context,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: informationWithIcon(
-                              Icons.person,
-                              data!.teacher,
-                              context,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: informationWithIcon(
-                              Icons.book,
-                              data!.reference,
-                              context,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  Expanded(
+                    flex: 1,
+                    child: informationWithIcon(
+                      Icons.room,
+                      data!.classroom,
+                      context,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: informationWithIcon(
+                      Icons.person,
+                      data!.teacher,
+                      context,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: informationWithIcon(
+                      Icons.book,
+                      data!.reference.isNotEmpty ? data!.reference : "未提供",
+                      context,
+                    ),
                   ),
                 ],
-              )
-            : Text(
-                title!,
-                textScaler: const TextScaler.linear(1.1),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
               ),
-      ),
-    );
+            ],
+          ),
+        );
+      } else {
+        return Card(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
+          elevation: 0,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            child: Text(
+              title!,
+              textScaler: const TextScaler.linear(1.1),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        );
+      }
+    });
   }
 }

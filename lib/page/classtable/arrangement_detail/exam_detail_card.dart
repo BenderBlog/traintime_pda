@@ -43,11 +43,6 @@ class ExamDetailCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              CustomListTile(
-                icon: Icons.access_time_filled_outlined,
-                str: subject.time,
-                infoColor: infoColor,
-              ),
               [
                 CustomListTile(
                   icon: Icons.room,
@@ -60,6 +55,11 @@ class ExamDetailCard extends StatelessWidget {
                   infoColor: infoColor,
                 ).flexible(),
               ].toRow(),
+              CustomListTile(
+                icon: Icons.access_time_filled_outlined,
+                str: subject.time,
+                infoColor: infoColor,
+              ),
             ],
           ),
         ),

@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/experiment/experiment_info_card.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
@@ -83,7 +84,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                         title: "目前没有已经完成的实验",
                       ),
               ],
-            );
+            ).safeArea();
           } else if (controller.status == ExperimentStatus.error) {
             return Center(child: Text(controller.error.toString()));
           } else {
