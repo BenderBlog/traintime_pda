@@ -1,7 +1,9 @@
 package io.github.benderblog.traintime_pda.model
 
 import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -9,6 +11,7 @@ object ClassTableConstants {
     const val CLASS_FILE_NAME = "ClassTable.json"
     const val USER_CLASS_FILE_NAME = "UserClass.json"
     const val EXAM_FILE_NAME = "exam.json"
+    const val EXPERIMENT_FILE_NAME = "Experiment.json"
     // TODO: Add experiment file
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
@@ -17,29 +20,6 @@ object ClassTableConstants {
     const val CONFIG_WEEK_SWIFT_KEY = "flutter.swift"
 
     const val DATE_FORMAT_STR = "yyyy-MM-dd HH:mm:ss"
-
-    val CLASS_TIME_POINTS = listOf(
-        "08:30",
-        "09:15",
-        "09:20",
-        "10:05",
-        "10:25",
-        "11:10",
-        "11:15",
-        "12:00",
-        "14:00",
-        "14:45",
-        "14:50",
-        "15:35",
-        "15:55",
-        "16:40",
-        "16:45",
-        "17:30",
-        "19:00",
-        "19:45",
-        "19:55",
-        "20:35"
-    )
 
     val CLASS_TIME_POINTS_PAIR = listOf(
         listOf(8, 30),
@@ -120,13 +100,11 @@ data class ClassTableData(
     val notArranged: List<NotArrangedClassDetail>,
     @SerializedName("timeArrangement")
     val timeArrangement: List<TimeArrangement>,
-    @SerializedName("classChanges")
-    val classChanges: List<ClassChange>,
 ) {
     companion object {
         val EMPTY = ClassTableData(
             0, "", "2024-1-1",
-            emptyList(), emptyList(), emptyList(), emptyList(), emptyList()
+            emptyList(), emptyList(), emptyList(), emptyList(),
         )
     }
 
@@ -191,109 +169,6 @@ data class TimeArrangement(
     val step: Int = stop - start
 }
 
-sealed class ClassChangeType(val rawValue: String) {
-    object CHANGE : ClassChangeType("change")
-    object STOP : ClassChangeType("stop")
-    object PATCH : ClassChangeType("patch")
-}
-
-data class ClassChange(
-    /// KCH 课程号
-    @SerializedName("classCode")
-    var classCode: String,
-    /// KXH 班级号
-    @SerializedName("classNumber")
-    var classNumber: String,
-    /// KCM 课程名
-    @SerializedName("className")
-    var className: String,
-    /// 来自 SKZC 原周次信息，可能是空
-    @SerializedName("originalAffectedWeeks")
-    var originalAffectedWeeks: List<Boolean>?,
-    /// 来自 XSKZC 新周次信息，可能是空
-    @SerializedName("newAffectedWeeks")
-    var newAffectedWeeks: List<Boolean>?,
-    /// YSKJS 原先的老师
-    @SerializedName("originalTeacherData")
-    var originalTeacherData: String?,
-    /// XSKJS 新换的老师
-    @SerializedName("newTeacherData")
-    var newTeacherData: String?,
-    /// KSJS-JSJC 原先的课次信息
-    @SerializedName("originalClassRange")
-    var originalClassRange: List<Int>,
-    /// XKSJS-XJSJC 新的课次信息
-    @SerializedName("newClassRange")
-    var newClassRange: List<Int>,
-    /// SKXQ 原先的星期
-    @SerializedName("originalWeek")
-    var originalWeek: Int?,
-    /// XSKXQ 现在的星期
-    @SerializedName("newWeek")
-    var newWeek: Int?,
-    /// JASMC 旧教室
-    @SerializedName("originalClassroom")
-    var originalClassroom: String?,
-    /// XJASMC 新教室
-    @SerializedName("newClassroom")
-    var newClassroom: String?,
-) {
-    val originalAffectedWeeksList: List<Int>
-        get() {
-            if (originalAffectedWeeks.isNullOrEmpty()) {
-                return emptyList()
-            }
-            return mutableListOf<Int>().apply {
-                for (i in originalAffectedWeeks!!.indices) {
-                    if (originalAffectedWeeks!![i]) {
-                        add(i)
-                    }
-                }
-            }
-        }
-
-    val newAffectedWeeksList: List<Int>
-        get() {
-            if (newAffectedWeeks.isNullOrEmpty()) {
-                return emptyList()
-            }
-            return mutableListOf<Int>().apply {
-                for (i in newAffectedWeeks!!.indices) {
-                    if (newAffectedWeeks!![i]) {
-                        add(i)
-                    }
-                }
-            }
-        }
-
-    val isTeacherChanged: Boolean
-        get() {
-            val originalTeacherCodeStr =
-                originalTeacherData
-                    ?.replace(" ", "")?.split(",", "/")
-                    ?.toMutableList() ?: mutableListOf()
-            val originalTeacherCode: List<Int> = mutableListOf<Int>().apply {
-                for (i in originalTeacherCodeStr) {
-                    i.toIntOrNull()?.let { value ->
-                        add(value)
-                    }
-                }
-            }
-            val newTeacherCodeStr =
-                newTeacherData
-                    ?.replace(" ", "")?.split(",", "/")
-                    ?.toMutableList() ?: mutableListOf()
-            val newTeacherCode: List<Int> = mutableListOf<Int>().apply {
-                for (i in newTeacherCodeStr) {
-                    i.toIntOrNull()?.let { value ->
-                        add(value)
-                    }
-                }
-            }
-            return originalTeacherCode.toSet() == newTeacherCode.toSet()
-        }
-}
-
 data class ExamData(
     @SerializedName("subject")
     val subject: List<Subject>
@@ -338,3 +213,50 @@ val Subject.type: String
             typeStr
         }
     }
+
+data class ExperimentData(
+        @SerializedName("name")
+        val name: String,
+        @SerializedName("classroom")
+        val classroom: String,
+        @SerializedName("date")
+        val date: String,
+        @SerializedName("timeStr")
+        val timeStr: String,
+        @SerializedName("teacher")
+        val teacher: String,
+)
+
+class ExperimentDataListToken : TypeToken<List<ExperimentData>>()
+
+val ExperimentData.timeRange: Pair<Date, Date>
+    get() {
+        /// Return is month/day/year , hope not change...
+        val dateNums: List<Int> = date.split('/').map { it ->
+            it.toInt()
+        }
+        /// And the time arrangement too.
+        val cal = Calendar.getInstance()
+        cal.set(dateNums[2], dateNums[0] - 1, dateNums[1])
+        lateinit var startTime : Date
+        lateinit var stopTime : Date
+
+        if (timeStr.contains("15")) {
+            cal.set(3,15)
+            cal.set(4,55)
+            startTime = cal.time
+            cal.set(3,18)
+            cal.set(4,10)
+            stopTime = cal.time
+        } else {
+            cal.set(3,18)
+            cal.set(4,30)
+            startTime = cal.time
+            cal.set(3,20)
+            cal.set(4,45)
+            stopTime = cal.time
+        }
+
+        return Pair(startTime,stopTime)
+    }
+

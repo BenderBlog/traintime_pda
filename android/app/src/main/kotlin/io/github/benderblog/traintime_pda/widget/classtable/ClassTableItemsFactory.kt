@@ -10,11 +10,14 @@ import io.github.benderblog.traintime_pda.R
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ExamData
+import io.github.benderblog.traintime_pda.model.ExperimentData
+import io.github.benderblog.traintime_pda.model.ExperimentDataListToken
 import io.github.benderblog.traintime_pda.model.Source
 import io.github.benderblog.traintime_pda.model.TimeLineItem
 import io.github.benderblog.traintime_pda.model.UserDefinedClassData
 import io.github.benderblog.traintime_pda.model.endTime
 import io.github.benderblog.traintime_pda.model.startTime
+import io.github.benderblog.traintime_pda.model.timeRange
 import io.github.benderblog.traintime_pda.utils.day
 import io.github.benderblog.traintime_pda.utils.month
 import io.github.benderblog.traintime_pda.utils.toCalendar
@@ -52,6 +55,7 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
     private var curWeekIndex: Int = 0
     private lateinit var classTableData: ClassTableData
     private lateinit var examData: ExamData
+    private lateinit var experimentData: List<ExperimentData>
 
     private var errorMessage: String? = null
 
@@ -68,6 +72,11 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
 
         @JvmStatic
         var examJsonData: String? = null
+            @Synchronized
+            set
+
+        @JvmStatic
+        var experimentJsonData: String? = null
             @Synchronized
             set
 
@@ -93,6 +102,7 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
             // decode json data and add them to arrangements(today and tomorrow)
             loadClassTableData()
             loadExamData()
+            loadExperimentData()
             sortArrangements()
         } catch (e: Exception) {
             errorMessage = e.message
@@ -111,6 +121,9 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         examJsonData?.let {
             examData = gson.fromJson(it, ExamData::class.java)
         } ?: { examData = ExamData.EMPTY }
+        experimentJsonData?.let {
+            experimentData = gson.fromJson(it, ExperimentDataListToken().type)
+        }
         // get week swift (week offset)
         val prefs = context.getSharedPreferences(
             ClassTableConstants.CONFIG_SHARED_PREFS_NAME,
@@ -231,6 +244,43 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
                         end = 0,
                         type = Source.EXAM
                     )
+                )
+            }
+        }
+    }
+
+    private fun loadExperimentData() {
+        val curCalendar = Date().toCalendar()
+        loadOneDayExperiment(curCalendar, todayArrangements)
+        loadOneDayExperiment(
+                curCalendar.apply {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                },
+                tomorrowArrangements
+        )
+    }
+
+    private fun loadOneDayExperiment(curCalendar: Calendar, arrangements: MutableList<TimeLineItem>) {
+        val curYear: Int = curCalendar.year
+        val curMonth: Int = curCalendar.month
+        val curDay: Int = curCalendar.day
+        for (data in experimentData) {
+            val targetCalendar = data.timeRange.first.toCalendar()
+            if (targetCalendar.year == curYear
+                    && targetCalendar.month == curMonth
+                    && targetCalendar.day == curDay
+            ) {
+                arrangements.add(
+                        TimeLineItem(
+                                name = data.name,
+                                teacher = data.teacher,
+                                place = data.classroom,
+                                startTime = data.timeRange.first,
+                                endTime = data.timeRange.second,
+                                start = 0,
+                                end = 0,
+                                type = Source.EXPERIMENT
+                        )
                 )
             }
         }
