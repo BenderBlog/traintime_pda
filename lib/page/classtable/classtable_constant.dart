@@ -9,9 +9,6 @@ const weekButtonWidth = 74.0;
 /// The horizontal padding of the button.
 const weekButtonHorizontalPadding = 2.0;
 
-/// Change page time in milliseconds.
-const changePageTime = 200;
-
 /// The width ratio for the week column.
 const double leftRow = 26;
 
