@@ -13,7 +13,6 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watermeter/applet/widget_worker.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/network_session.dart' as repo_general;
@@ -25,7 +24,6 @@ import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:background_fetch/background_fetch.dart';
 
 void main() async {
   // Make sure the library is initialized.
@@ -73,7 +71,6 @@ void main() async {
   );
 
   runApp(MyApp(isFirst: isFirst));
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends StatefulWidget {
@@ -97,24 +94,6 @@ class _MyAppState extends State<MyApp> {
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
       IDSSession().dio.get("https://www.xidian.edu.cn");
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _checkForWidgetLaunch();
-    HomeWidget.widgetClicked.listen(_launchedFromWidget);
-  }
-
-  void _checkForWidgetLaunch() {
-    HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
-  }
-
-  void _launchedFromWidget(Uri? uri) {
-    if (uri != null) {
-      //TODO do work when start app from home widgets
-      //print(uri);
     }
   }
 

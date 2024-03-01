@@ -3,12 +3,10 @@
 
 // Main page of this program.
 
-import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
@@ -51,49 +49,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       updateCurrentData();
     }
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    // Configure BackgroundFetch.
-    int status = await BackgroundFetch.configure(
-      BackgroundFetchConfig(
-        minimumFetchInterval: 15,
-        startOnBoot: true,
-        stopOnTerminate: true,
-        enableHeadless: true,
-        requiresBatteryNotLow: false,
-        requiresCharging: false,
-        requiresStorageNotLow: false,
-        requiresDeviceIdle: false,
-        requiredNetworkType: NetworkType.NONE,
-      ),
-      (String taskId) async {
-        log.i(
-          "[home][BackgroundFetchFromHome]"
-          "Headless event received $taskId.",
-        );
-        await Future.wait([
-          updateSportInfo(),
-        ]).then((value) => BackgroundFetch.finish(taskId));
-      },
-      (String taskId) async {
-        log.i(
-          "[home][BackgroundFetchFromHome]"
-          "TASK TIMEOUT taskId: $taskId.",
-        );
-        BackgroundFetch.finish(taskId);
-      },
-    );
-    log.i(
-      "[home][BackgroundFetchFromHome]"
-      "Configure status: $status.",
-    );
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
   }
 
   static final _destinations = [
@@ -160,7 +115,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         },
       );
     }
-    initPlatformState();
   }
 
   void _loginAsync() async {

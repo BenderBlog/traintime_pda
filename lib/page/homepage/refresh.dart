@@ -8,7 +8,6 @@ import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
-import 'package:watermeter/applet/update_sport_info.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
@@ -107,7 +106,6 @@ Future<void> update({
     }),
     electricity.update(),
     owe_session.update(),
-    updateSportInfo(),
     borrow_info.LibrarySession().getBorrowList(),
     school_card_session.SchoolCardSession().initSession(),
   ]);

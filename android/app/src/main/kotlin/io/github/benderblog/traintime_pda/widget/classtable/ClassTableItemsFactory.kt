@@ -123,7 +123,7 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         } ?: { examData = ExamData.EMPTY }
         experimentJsonData?.let {
             experimentData = gson.fromJson(it, ExperimentDataListToken().type)
-        }
+        } ?: { experimentData = emptyList() }
         // get week swift (week offset)
         val prefs = context.getSharedPreferences(
             ClassTableConstants.CONFIG_SHARED_PREFS_NAME,
