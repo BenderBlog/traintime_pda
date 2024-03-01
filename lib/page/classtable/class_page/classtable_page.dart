@@ -11,6 +11,7 @@ import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_change/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_not_arranged/not_arranged_class_list.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -48,6 +49,9 @@ class _ClassTablePageState extends State<ClassTablePage>
     if (!isInit) {
       _tabController = TabController(
         vsync: this,
+        animationDuration: const Duration(
+          milliseconds: changePageTime,
+        ),
         length: classTableState.semesterLength,
         initialIndex: classTableState.chosenWeek,
       );
