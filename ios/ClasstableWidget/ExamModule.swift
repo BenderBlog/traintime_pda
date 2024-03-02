@@ -9,18 +9,19 @@
 
 import Foundation
 
-
 struct ExamData : Codable {
-    var subject : [Subject]
+    let subject : [Subject]
+    let toBeArranged : [ToBeArranged]
 }
 
-struct Subject : Codable {
-    var subject : String
-    var typeStr : String
-    var startTimeStr : String
-    var endTimeStr : String
-    var place : String
-    var seat : Int
+class Subject : Codable {
+    let subject : String
+    let typeStr : String
+    let startTimeStr : String
+    let endTimeStr : String
+    let time : String
+    let place : String
+    let seat : Int
     
     var startTime : Date {
         get {
@@ -49,4 +50,9 @@ struct Subject : Codable {
             return typeStr;
         }
     }
+}
+
+struct ToBeArranged : Codable {
+    let subject : String
+    let id : String
 }

@@ -145,7 +145,7 @@ class ExamController extends GetxController {
             bool result = await api.saveToGroupId(FileToGroupID(
               appid: preference.appId,
               fileName: "ExamFile.json",
-              data: jsonEncode(jsonEncode(data.toJson())),
+              data: jsonEncode(data.toJson()),
             ));
             log.i(
               "[ExamController][get] "

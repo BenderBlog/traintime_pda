@@ -15,18 +15,15 @@ private let myDateFormatter = DateFormatter()
 
 struct EventItem: View {
     var event : TimeLineStructItems
-    var color : UIColor;
     
-    internal init(_ event: TimeLineStructItems, color: UIColor) {
+    internal init(_ event: TimeLineStructItems) {
         self.event = event
-        self.color = color
     }
     
     @Environment(\.colorScheme) private var colourScheme
     @Environment(\.widgetFamily) var widgetFamily
     
     var body: some View {
-        let eventColour = color
         myDateFormatter.dateFormat = formatHourMinute
         let string : String
         switch(event.type) {
@@ -68,11 +65,11 @@ struct EventItem: View {
             .padding(.vertical, 6)
             Spacer(minLength: .zero)
         }
-        .foregroundColor(Color(uiColor: color))
+        .foregroundColor(colors[event.colorIndex % colors.count])
         .blendMode(colourScheme == .light ? .plusDarker : .plusLighter)
         .padding(.horizontal, 8)
         .background {
-            Color(uiColor: color).opacity(0.125)
+            colors[event.colorIndex % colors.count].opacity(0.125)
                 .blendMode(colourScheme == .light ? .normal : .hardLight)
         }
         .frame(maxHeight: 42)

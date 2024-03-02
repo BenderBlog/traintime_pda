@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import UIKit
+import SwiftUI
 
-extension UIColor {
-    convenience init(hexString: String) {
+extension Color {
+    init(hexString: String) {
         let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt64()
         Scanner(string: hex).scanHexInt64(&int)
@@ -24,23 +24,23 @@ extension UIColor {
         default:
             (a, r, g, b) = (255, 0, 0, 0)
         }
-        self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
+        self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, opacity: CGFloat(a) / 255)
     }
 }
 
 // Colors
-var colors: [UIColor] = [
-    UIColor(hexString: "#EF5350"),
-    UIColor(hexString: "#EC407A"),
-    UIColor(hexString: "#AB47BC"),
-    UIColor(hexString: "#7E57C2"),
-    UIColor(hexString: "#5C6BC0"),
-    UIColor(hexString: "#42A5F5"),
-    UIColor(hexString: "#29B6F6"),
-    UIColor(hexString: "#26C6DA"),
-    UIColor(hexString: "#26A69A"),
-    UIColor(hexString: "#66BB6A"),
-    UIColor(hexString: "#9CCC65"),
-    UIColor(hexString: "#66BB6A"),
+var colors: [Color] = [
+    Color(hexString: "#EF5350"),
+    Color(hexString: "#EC407A"),
+    Color(hexString: "#AB47BC"),
+    Color(hexString: "#7E57C2"),
+    Color(hexString: "#5C6BC0"),
+    Color(hexString: "#42A5F5"),
+    Color(hexString: "#29B6F6"),
+    Color(hexString: "#26C6DA"),
+    Color(hexString: "#26A69A"),
+    Color(hexString: "#66BB6A"),
+    Color(hexString: "#9CCC65"),
+    Color(hexString: "#66BB6A"),
 ]
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ExperimentData : Codable {
+class ExperimentData : Codable {
     var name : String
     var classroom : String
     var date : String

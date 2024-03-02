@@ -30,8 +30,8 @@ struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
         return SimpleEntry(
             date: Date(),
-            currentArrangement: [],
-            tomorrowArrangement: []
+            currentWeek: -1,
+            arrangement: []
         )
     }
 
@@ -43,12 +43,16 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var todayArr : [TimeLineStructItems] = []
-        var tomorrowArr : [TimeLineStructItems] = []
+        var arrangement : [TimeLineStructItems] = []
         
-        let today = Date()
-        let decoder = JSONDecoder()
+        var day = Date()
+        var currentWeekToStore = -1
         let calendar = Calendar.current
+        if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value {
+            day = calendar.date(byAdding: .day, value: 1, to: day)!
+        }
+        
+        let decoder = JSONDecoder()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
@@ -88,27 +92,27 @@ struct Provider: TimelineProvider {
             startDay = Calendar.current.date(byAdding: dateComponent, to: startDay!)
 
             // Current week and others
-            let components = calendar.dateComponents([.day], from: startDay!, to: today)
+            let components = calendar.dateComponents([.day], from: startDay!, to: day)
             var delta = components.day!
             if delta < 0 {
                 delta = -7
             }
-            var currentWeek : Int = delta / 7
-            var index : Int = calendar.component(.weekday, from: today)
+            let currentWeek : Int = delta / 7
+            var index : Int = calendar.component(.weekday, from: day)
             if index == 1 {
                 index = 7
             } else {
                 index -= 1
             }
+            
             print("startDay: \(String(describing: startDay)) currentWeek: \(currentWeek) index: \(index)")
-            
-            // Classes in today
             if currentWeek >= 0 && currentWeek < classData.semesterLength {
+                currentWeekToStore = currentWeek
                 for i in classData.timeArrangement {
                     if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
                         let startData = TimeInt[(i.start - 1) * 2]
                         let stopData = TimeInt[(i.stop - 1) * 2 + 1]
-                        todayArr.append(TimeLineStructItems(
+                        arrangement.append(TimeLineStructItems(
                             type: .course,
                             name: classData.getClassName(t: i),
                             teacher: i.teacher ?? "未知老师",
@@ -117,54 +121,21 @@ struct Provider: TimelineProvider {
                                 bySettingHour: startData.0,
                                 minute: startData.1,
                                 second: 0,
-                                of: today
+                                of: day
                             )!,
                             end_time: calendar.date(
                                 bySettingHour: stopData.0,
                                 minute: stopData.1,
                                 second: 0,
-                                of: today
-                            )!
-                        ))
-                    }
-                }
-            }
-            
-            // Tomorrow class
-            index += 1
-            if index > 7 {
-                index = 1
-                currentWeek += 1
-            }
-            print("(tomorrow) startDay: \(String(describing: startDay)) currentWeek: \(currentWeek) index: \(index)")
-            if currentWeek >= 0 && currentWeek < classData.semesterLength {
-                for i in classData.timeArrangement {
-                    if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
-                        let startData = TimeInt[(i.start - 1) * 2]
-                        let stopData = TimeInt[(i.stop - 1) * 2 + 1]
-                        tomorrowArr.append(TimeLineStructItems(
-                            type: .course,
-                            name: classData.getClassName(t: i),
-                            teacher: i.teacher ?? "未知老师",
-                            place: i.classroom ?? "未安排教室",
-                            start_time: calendar.date(
-                                bySettingHour: startData.0,
-                                minute: startData.1,
-                                second: 0,
-                                of: today
+                                of: day
                             )!,
-                            end_time: calendar.date(
-                                bySettingHour: stopData.0,
-                                minute: stopData.1,
-                                second: 0,
-                                of: today
-                            )!
+                            colorIndex: i.index
                         ))
                     }
                 }
             }
         } catch {
-            print(String(describing: error))
+            print("classtable error: \(String(describing: error))")
         }
         
         // Deal with exam data
@@ -174,136 +145,105 @@ struct Provider: TimelineProvider {
             let jsonData = try Data(contentsOf: fileURL)
             let examData : ExamData = try decoder.decode(ExamData.self, from: jsonData)
             
-            var components = calendar.dateComponents([.day,.month,.year], from: today)
-            var day = components.day
-            var month = components.month
-            var year = components.year
+            let components = calendar.dateComponents([.day,.month,.year], from: day)
+            let day = components.day
+            let month = components.month
+            let year = components.year
             
-            // Today data
             for i in examData.subject {
                 let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
                 if thisDay.year == year && thisDay.month == month && thisDay.day == day {
-                    todayArr.append(TimeLineStructItems(
+                    arrangement.append(TimeLineStructItems(
                         type: .exam,
                         name: i.subject,
-                        teacher: "未知",
-                        place: "\(i.place) \(i.seat)",
+                        teacher: i.place,
+                        place: String(i.seat),
                         start_time: i.startTime,
-                        end_time: i.endTime
-                    ))
-                }
-            }
-            
-            // Tomorrow data
-            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
-            components = calendar.dateComponents([.day,.month,.year], from: tomorrow)
-            day = components.day
-            month = components.month
-            year = components.year
-            for i in examData.subject {
-                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
-                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
-                    tomorrowArr.append(TimeLineStructItems(
-                        type: .exam,
-                        name: i.subject,
-                        teacher: "考试",
-                        place: "\(i.place) \(i.seat)",
-                        start_time: i.startTime,
-                        end_time: i.endTime
+                        end_time: i.endTime,
+                        colorIndex: examData.subject.firstIndex(where: {$0 === i}) ?? 0
                     ))
                 }
             }
         } catch {
-            print(String(describing: error))
+            print("exam error: \(String(describing: error))")
         }
         
-        // Deal with exam data
+        // Deal with experiment data
         do {
             // Read data
             let fileURL = containerURL.appendingPathComponent(experimentFile)
             let jsonData = try Data(contentsOf: fileURL)
             let experimentData : [ExperimentData] = try decoder.decode([ExperimentData].self, from: jsonData)
             
-            var components = calendar.dateComponents([.day,.month,.year], from: today)
-            var day = components.day
-            var month = components.month
-            var year = components.year
+            let components = calendar.dateComponents([.day,.month,.year], from: day)
+            let day = components.day
+            let month = components.month
+            let year = components.year
             
             // Today data
             for i in experimentData {
                 let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
                 if thisDay.year == year && thisDay.month == month && thisDay.day == day {
-                    todayArr.append(TimeLineStructItems(
+                    arrangement.append(TimeLineStructItems(
                         type: .experiment,
                         name: i.name,
                         teacher: i.teacher,
                         place: i.classroom,
                         start_time: i.startTime,
-                        end_time: i.endTime
-                    ))
-                }
-            }
-            
-            // Tomorrow data
-            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
-            components = calendar.dateComponents([.day,.month,.year], from: tomorrow)
-            day = components.day
-            month = components.month
-            year = components.year
-            for i in experimentData {
-                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
-                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
-                    tomorrowArr.append(TimeLineStructItems(
-                        type: .experiment,
-                        name: i.name,
-                        teacher: i.teacher,
-                        place: i.classroom,
-                        start_time: i.startTime,
-                        end_time: i.endTime
+                        end_time: i.endTime,
+                        colorIndex: experimentData.firstIndex(where: {$0 === i}) ?? 0
                     ))
                 }
             }
         } catch {
-            print(String(describing: error))
+            print("experiment error: \(String(describing: error))")
         }
+        
         // Order
-        todayArr.sort(by: {$0.start_time < $1.start_time})
-        tomorrowArr.sort(by: {$0.start_time < $1.start_time})
+        arrangement.sort(by: {$0.start_time < $1.start_time})
 
-        print("todayArr: \(todayArr.count) tomorrowArr:\(tomorrowArr.count)")
+        print("arrangement: \(arrangement.count)")
         
         var entryDates : Set<Date?> = []
         var entries: [SimpleEntry] = []
-        for todayItem in todayArr {
+        for todayItem in arrangement {
             entryDates.insert(todayItem.start_time)
             entryDates.insert(todayItem.end_time)
         }
-        for entryDate in entryDates {
-            if (entryDate == nil) {
-                continue
-            }
-            print("\(String(describing: entryDate?.formatted()))")
-            var toShow : [TimeLineStructItems] = []
-            for arr in todayArr {
-                print("\(arr.end_time.formatted()) \(arr.end_time > entryDate!)")
-                if arr.end_time > entryDate! {
-                    toShow.append(arr)
-                }
-            }
-            entries.append(SimpleEntry(
-                date: entryDate!,
-                currentArrangement: toShow,
-                tomorrowArrangement: tomorrowArr
-            ))
-            print("\(entries)")
-        }
-        if entries.isEmpty {
+        if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value == true {
             entries.append(SimpleEntry(
                 date: Date(),
-                currentArrangement: [],
-                tomorrowArrangement: []
+                currentWeek: currentWeekToStore,
+                arrangement: arrangement
             ))
+        } else if entries.isEmpty {
+            entries.append(SimpleEntry(
+                date: Date(),
+                currentWeek: currentWeekToStore,
+                arrangement: arrangement
+            ))
+        } else {
+            for entryDate in entryDates {
+                if (entryDate == nil) {
+                    continue
+                }
+                print("\(String(describing: entryDate?.formatted()))")
+                var toShow : [TimeLineStructItems] = []
+                for arr in arrangement {
+                    print("\(arr.end_time.formatted()) \(arr.end_time > entryDate!)")
+                    if arr.end_time > entryDate! {
+                        toShow.append(arr)
+                    }
+                }
+                entries.append(SimpleEntry(
+                    date: entryDate!,
+                    currentWeek: currentWeekToStore,
+                    arrangement: toShow
+                ))
+                print("\(entries)")
+            }
         }
+        
         print("Updating timeline")
         let timeline = Timeline(entries: entries, policy: .atEnd)
         completion(timeline)
@@ -311,9 +251,9 @@ struct Provider: TimelineProvider {
 }
 
 struct SimpleEntry: TimelineEntry {
-    var date: Date
-    let currentArrangement : [TimeLineStructItems]
-    let tomorrowArrangement : [TimeLineStructItems]
+    var date : Date
+    var currentWeek : Int
+    let arrangement : [TimeLineStructItems]
 }
 
 // Data struct
@@ -324,44 +264,75 @@ struct TimeLineStructItems {
     var place : String
     var start_time : Date
     var end_time : Date
+    var colorIndex : Int
 }
 
 struct ClasstableWidgetEntryView : View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var widgetFamily
+    @Environment(\.colorScheme) var colorScheme
     
     init(entry: Provider.Entry) {
         self.entry = entry
     }
     
     var body: some View {
+        var day = Date()
+        let calendar = Calendar.current
+        let array = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
+        if #available(iOS 17.0, macOS 13.0, tvOS 17.0, watchOS 10.0, *), IsTomorrowManager.value {
+            print("isTomorrow")
+            day = calendar.date(byAdding: .day, value: 1, to: day)!
+        }
+        var comps : DateComponents = DateComponents()
+        comps = calendar.dateComponents([.year,.month,.day,.weekday,], from: day)
+        var title = "日程信息"
+        if (widgetFamily != .systemSmall) {
+            title = "XDYou ".appending(title)
+        }
         return VStack(alignment: .leading) {
-            if (!entry.currentArrangement.isEmpty) {
-                // TODO: redesign title text
-                HStack {
-                    Text("今日日程信息").font(.system(size: 14))
-                    if (widgetFamily != .systemSmall) {
-                        Spacer()
-                        Text("还剩\(entry.currentArrangement.count)项").font(.system(size: 14))
-                    }
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .font(.system(size: 14))
+                        .fontWeight(.medium)
+                        .foregroundStyle(
+                            colorScheme == .dark ? .white :
+                            Color(hexString: "#314e7a")
+                        )
+                    Text(
+                        "\(comps.month!)月\(comps.day!)日 \(array[comps.weekday! - 1])" +
+                        " \(entry.currentWeek > 0 ? "第\(entry.currentWeek)周" : "")"
+                    ).font(.system(size: 10))
+                     .foregroundStyle(Color(hexString: "#abbed1"))
                 }
-                Divider().overlay(.background)
+                if #available(iOS 17.0, macOS 13.0, tvOS 17.0, watchOS 10.0, *) {
+                    Spacer()
+                    Button(intent: IsTomorrowIntent()) {
+                        Image(
+                            systemName: IsTomorrowManager.value ?
+                                        "chevron.backward" :
+                                        "chevron.forward"
+                        )
+                    }.buttonStyle(.plain)
+                }
+            }
+            if (!entry.arrangement.isEmpty) {
                 if (widgetFamily == .systemSmall || widgetFamily == .systemMedium) {
-                    EventItem(entry.currentArrangement[0], color: colors[0])
-                    if (entry.currentArrangement.count > 1) {
-                        EventItem(entry.currentArrangement[1], color: colors[1])
+                    EventItem(entry.arrangement[0])
+                    if (entry.arrangement.count > 1) {
+                        EventItem(entry.arrangement[1])
                     }
                 } else {
-                    ForEach(0..<entry.currentArrangement.count, id: \.self) {
-                        i in EventItem(entry.currentArrangement[i], color: colors[i % colors.count])
+                    ForEach(0..<entry.arrangement.count, id: \.self) {
+                        i in EventItem(entry.arrangement[i])
                     }
                 }
                 
                 Spacer()
             } else {
-                Text("今日日程").font(.system(size: 14))
-                var text = Text("目前没有安排了\n明日有\(entry.tomorrowArrangement.count)项日程")
-                var icon = Image(systemName: "tray")
+                let text = Text("目前没有安排了").foregroundStyle(Color(hexString: "#abbed1"))
+                let icon = Image(systemName: "tray").foregroundStyle(Color(hexString: "#abbed1"))
                 if (widgetFamily == .systemSmall) {
                     text.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else if (widgetFamily == .systemMedium) {
@@ -408,27 +379,21 @@ struct ClasstableWidget: Widget {
 } timeline: {
     SimpleEntry(
         date: Date.now,
-         currentArrangement : [],
-         tomorrowArrangement : [TimeLineStructItems(
-            type: .exam,
-            name: "英语课",
-            teacher: "机器人",
-            place: "不知道",
-            start_time: Date.now,
-            end_time: Date.now
-        )]
+        currentWeek: -1,
+        arrangement: []
     )
     SimpleEntry(
         date: Date.now,
-         currentArrangement : [TimeLineStructItems(
+        currentWeek: 10,
+        arrangement : [TimeLineStructItems(
             type: .course,
             name: "英语课",
             teacher: "机器人",
             place: "不知道",
             start_time: Date.now,
-            end_time: Date.now
-        )],
-         tomorrowArrangement : []
+            end_time: Date.now,
+            colorIndex: 1
+        )]
     )
 
 }

@@ -21,6 +21,7 @@
 		26947AB02B49B50C006B2B17 /* ClasstableWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 26947AA12B49B50B006B2B17 /* ClasstableWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A462B526A0C007E67CB /* ClasstableModel.swift */; };
 		26CC2A492B541A9A007E67CB /* EventItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A482B541A9A007E67CB /* EventItem.swift */; };
+		26E67DD52B9222FD00B2BD5D /* IsTomorrowIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */; };
 		2975AC8C714C909F92B48DAE /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D23921CB5F98DE0F747EF1E /* Pods_Runner.framework */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -91,6 +92,7 @@
 		26B4A9C82B4C05D0003F5F24 /* ClasstableWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClasstableWidgetExtension.entitlements; sourceTree = "<group>"; };
 		26CC2A462B526A0C007E67CB /* ClasstableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClasstableModel.swift; sourceTree = "<group>"; };
 		26CC2A482B541A9A007E67CB /* EventItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventItem.swift; sourceTree = "<group>"; };
+		26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsTomorrowIntent.swift; sourceTree = "<group>"; };
 		2D23921CB5F98DE0F747EF1E /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -155,6 +157,7 @@
 				262B01712B5931740094B372 /* ExamModule.swift */,
 				263322A72B908A1C009BEDF5 /* ColorList.swift */,
 				263322A92B908A8A009BEDF5 /* ExperimentModel.swift */,
+				26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */,
 			);
 			path = ClasstableWidget;
 			sourceTree = "<group>";
@@ -480,6 +483,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26E67DD52B9222FD00B2BD5D /* IsTomorrowIntent.swift in Sources */,
 				26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */,
 				26947AA82B49B50B006B2B17 /* ClasstableWidgetBundle.swift in Sources */,
 				26947AAA2B49B50B006B2B17 /* ClasstableWidget.swift in Sources */,
