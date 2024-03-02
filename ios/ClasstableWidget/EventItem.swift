@@ -2,9 +2,10 @@
 //  EventItem.swift
 //  ClasstableWidgetExtension
 //
-//  Created by sprt on 2024/1/14.
+//  Created by BenderBlog Rodriguez on 2024/1/14.
+//  SPDX-License-Identifier: MPL-2.0
 //
-// Event view
+//  Event view
 //
 
 import Foundation

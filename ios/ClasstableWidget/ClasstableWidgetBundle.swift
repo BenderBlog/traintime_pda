@@ -2,7 +2,8 @@
 //  ClasstableWidgetBundle.swift
 //  ClasstableWidget
 //
-//  Created by sprt on 2024/1/7.
+//  Created by BenderBlog Rodriguez on 2024/1/7.
+//  SPDX-License-Identifier: MPL-2.0
 //
 
 import WidgetKit

@@ -2,7 +2,8 @@
 //  ColorList.swift
 //  ClasstableWidgetExtension
 //
-//  Created by sprt on 2024/2/29.
+//  Created by BenderBlog Rodriguez on 2024/2/29.
+//  SPDX-License-Identifier: MPL-2.0
 //
 
 import Foundation

@@ -2,7 +2,8 @@
 //  IsTomorrowIntent.swift
 //  ClasstableWidgetExtension
 //
-//  Created by sprt on 2024/3/1.
+//  Created by BenderBlog Rodriguez on 2024/3/1.
+//  SPDX-License-Identifier: MPL-2.0
 //
 
 import Foundation

@@ -2,6 +2,7 @@
 //  ExamModule.swift
 //  ClasstableWidgetExtension
 //
+//  Created by BenderBlog Rodriguez on 2024/1/18.
 //  SPDX-License-Identifier: MPL-2.0
 //
 //  Refrence to /lib/model/xidian_ids/exam.dart
