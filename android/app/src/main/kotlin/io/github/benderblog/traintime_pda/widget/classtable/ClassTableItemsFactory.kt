@@ -55,7 +55,7 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
     private var curWeekIndex: Int = 0
     private lateinit var classTableData: ClassTableData
     private lateinit var examData: ExamData
-    private lateinit var experimentData: List<ExperimentData>
+    private var experimentData: List<ExperimentData> = emptyList()
 
     private var errorMessage: String? = null
 
@@ -253,34 +253,37 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         val curCalendar = Date().toCalendar()
         loadOneDayExperiment(curCalendar, todayArrangements)
         loadOneDayExperiment(
-                curCalendar.apply {
-                    add(Calendar.DAY_OF_YEAR, 1)
-                },
-                tomorrowArrangements
+            curCalendar.apply {
+                add(Calendar.DAY_OF_YEAR, 1)
+            },
+            tomorrowArrangements
         )
     }
 
-    private fun loadOneDayExperiment(curCalendar: Calendar, arrangements: MutableList<TimeLineItem>) {
+    private fun loadOneDayExperiment(
+        curCalendar: Calendar,
+        arrangements: MutableList<TimeLineItem>
+    ) {
         val curYear: Int = curCalendar.year
         val curMonth: Int = curCalendar.month
         val curDay: Int = curCalendar.day
         for (data in experimentData) {
             val targetCalendar = data.timeRange.first.toCalendar()
             if (targetCalendar.year == curYear
-                    && targetCalendar.month == curMonth
-                    && targetCalendar.day == curDay
+                && targetCalendar.month == curMonth
+                && targetCalendar.day == curDay
             ) {
                 arrangements.add(
-                        TimeLineItem(
-                                name = data.name,
-                                teacher = data.teacher,
-                                place = data.classroom,
-                                startTime = data.timeRange.first,
-                                endTime = data.timeRange.second,
-                                start = 0,
-                                end = 0,
-                                type = Source.EXPERIMENT
-                        )
+                    TimeLineItem(
+                        name = data.name,
+                        teacher = data.teacher,
+                        place = data.classroom,
+                        startTime = data.timeRange.first,
+                        endTime = data.timeRange.second,
+                        start = 0,
+                        end = 0,
+                        type = Source.EXPERIMENT
+                    )
                 )
             }
         }
@@ -323,7 +326,9 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
             }
         }
         if (position == 0 && arrangements.isEmpty()) {
-            return RemoteViews(packageName, R.layout.widget_class_table_tip_layout)
+            return RemoteViews(packageName, R.layout.widget_class_table_tip_layout).apply {
+                setTextViewText(R.id.widget_class_table_tip_text, "目前没有安排了")
+            }
         }
         val arrangementItem = arrangements[position]
         return RemoteViews(packageName, R.layout.widget_classtable_item).apply {
