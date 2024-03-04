@@ -26,14 +26,8 @@ struct EventItem: View {
     
     var body: some View {
         myDateFormatter.dateFormat = formatHourMinute
-        let string : String
-        switch(event.type) {
-            case .course: string = "课\n程"
-            case .exam: string = "考\n试"
-            case .experiment: string = "实\n验"
-        }
         return HStack {
-            Text(string).font(Font.custom("MyFont", size: 12))
+            Text(event.type.rawValue).font(Font.custom("MyFont", size: 12))
             RoundedRectangle(cornerRadius: 120).frame(width: 6).padding(.vertical, 6)
             VStack(alignment: .leading) {
                 if (widgetFamily == .systemSmall) {

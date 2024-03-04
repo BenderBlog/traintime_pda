@@ -19,10 +19,10 @@ private let myDateFormatter = DateFormatter()
 
 struct StartDayFetchError : Error {}
 
-enum ArrangementType {
-    case course
-    case exam
-    case experiment
+enum ArrangementType : String {
+    case course = "课\n程"
+    case exam = "考\n试"
+    case experiment = "实\n验"
 }
 
 struct Provider: TimelineProvider {
@@ -331,7 +331,7 @@ struct ClasstableWidgetEntryView : View {
                         i in EventItem(entry.arrangement[i])
                     }
                 }
-                
+
                 Spacer()
             } else {
                 let text = Text("目前没有安排了").foregroundStyle(Color(hexString: "#abbed1"))
@@ -397,6 +397,30 @@ struct ClasstableWidget: Widget {
             end_time: Date.now,
             colorIndex: 1
         )]
+    )
+    SimpleEntry(
+        date: Date.now,
+        currentWeek: 10,
+        arrangement : [
+            TimeLineStructItems(
+                type: .course,
+                name: "英语课",
+                teacher: "机器人",
+                place: "不知道",
+                start_time: Date.now,
+                end_time: Date.now,
+                colorIndex: 1
+            ),
+            TimeLineStructItems(
+                type: .course,
+                name: "英语课",
+                teacher: "机器人",
+                place: "不知道",
+                start_time: Date.now,
+                end_time: Date.now,
+                colorIndex: 2
+            )
+        ]
     )
 
 }
