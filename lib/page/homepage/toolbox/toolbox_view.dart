@@ -76,7 +76,7 @@ class ToolBoxView extends StatelessWidget {
             columnSizes: repeat(crossItems, [1.fr]),
             rowSizes: repeat(rowItem(list.length), [auto]),
             children: list,
-          ),
+          ).padding(horizontal: 16),
         ];
 
     return Scaffold(
