@@ -211,18 +211,21 @@ struct Provider: TimelineProvider {
             entryDates.insert(todayItem.end_time)
         }
         if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value == true {
+            print("isTomorrow")
             entries.append(SimpleEntry(
                 date: Date(),
                 currentWeek: currentWeekToStore,
                 arrangement: arrangement
             ))
-        } else if entries.isEmpty {
+        } else if arrangement.isEmpty {
+            print("Noitem")
             entries.append(SimpleEntry(
                 date: Date(),
                 currentWeek: currentWeekToStore,
                 arrangement: arrangement
             ))
         } else {
+            print("isToday")
             for entryDate in entryDates {
                 if (entryDate == nil) {
                     continue
@@ -302,7 +305,7 @@ struct ClasstableWidgetEntryView : View {
                         )
                     Text(
                         "\(comps.month!)月\(comps.day!)日 \(array[comps.weekday! - 1])" +
-                        " \(entry.currentWeek > 0 ? "第\(entry.currentWeek)周" : "")"
+                        " \(entry.currentWeek >= 0 ? "第\(entry.currentWeek + 1)周" : "")"
                     ).font(.system(size: 10))
                      .foregroundStyle(Color(hexString: "#abbed1"))
                 }
@@ -343,7 +346,7 @@ struct ClasstableWidgetEntryView : View {
                 } else {
                     VStack{
                         icon.font(.system(size: 72))
-                        Divider().overlay(.background)
+                        Divider().opacity(0)
                         text
                     }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }

@@ -38,32 +38,31 @@ struct EventItem: View {
             VStack(alignment: .leading) {
                 if (widgetFamily == .systemSmall) {
                     Text(event.name)
-                        .font(.subheadline.weight(.medium))
+                        .font(.footnote.weight(.medium))
                     Text("\(myDateFormatter.string(from: event.start_time)) \(event.place)")
-                        .font(.footnote.weight(.semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 } else {
                     HStack(alignment: .firstTextBaseline) {
                         VStack(alignment: .leading) {
                             Text(event.name)
-                                .font(.subheadline.weight(.medium))
+                                .font(.footnote.weight(.medium))
                             Text("\(event.teacher) \(event.place)")
-                                .font(.footnote.weight(.semibold))
+                                .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
                         VStack(alignment: .trailing) {
                             Text("\(myDateFormatter.string(from: event.start_time))")
-                                .font(.footnote.weight(.semibold))
+                                .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                             Text("\(myDateFormatter.string(from: event.end_time))")
-                                .font(.footnote.weight(.semibold))
+                                .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                         }
                     }
                 }
             }
-            .padding(.vertical, 6)
             Spacer(minLength: .zero)
         }
         .foregroundColor(colors[event.colorIndex % colors.count])

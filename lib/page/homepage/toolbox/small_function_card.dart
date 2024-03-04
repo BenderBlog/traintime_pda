@@ -38,7 +38,7 @@ class SmallFunctionCard extends StatelessWidget {
         size: 48,
         color: Theme.of(context).colorScheme.onSecondaryContainer,
       ),
-      const SizedBox(width: 12),
+      const SizedBox(width: 6),
       [
         Text(
           name,
