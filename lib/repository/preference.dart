@@ -62,38 +62,38 @@ int getInt(Preference key) {
   return prefs.getInt(key.key) ?? 0;
 }
 
-void setString(Preference key, String value) {
+Future<void> setString(Preference key, String value) async {
   if (key.type != 'String') {
     throw WrongTypeException;
   }
-  prefs.setString(key.key, value);
-  prefs.reload();
+  await prefs.setString(key.key, value);
+  await prefs.reload();
 }
 
-void setBool(Preference key, bool value) {
+Future<void> setBool(Preference key, bool value) async {
   if (key.type != 'bool') {
     throw WrongTypeException;
   }
-  prefs.setBool(key.key, value);
-  prefs.reload();
+  await prefs.setBool(key.key, value);
+  await prefs.reload();
 }
 
-void setInt(Preference key, int value) {
+Future<void> setInt(Preference key, int value) async {
   if (key.type != 'int') {
     throw WrongTypeException;
   }
-  prefs.setInt(key.key, value);
-  prefs.reload();
+  await prefs.setInt(key.key, value);
+  await prefs.reload();
 }
 
-void remove(Preference key) {
-  prefs.remove(key.key);
-  prefs.reload();
+Future<void> remove(Preference key) async {
+  await prefs.remove(key.key);
+  await prefs.reload();
 }
 
-void prefrenceClear() {
-  prefs.clear();
-  prefs.reload();
+Future<void> prefrenceClear() async {
+  await prefs.clear();
+  await prefs.reload();
 }
 
 class NotRegisteredException implements Exception {}

@@ -62,9 +62,9 @@ class ChangeSwiftDialog extends StatelessWidget {
           child: const Text('提交'),
           onPressed: () async {
             if (_getNumberController.text.isEmpty) {
-              preference.setInt(preference.Preference.swift, 0);
+              await preference.setInt(preference.Preference.swift, 0);
             } else {
-              preference.setInt(
+              await preference.setInt(
                 preference.Preference.swift,
                 int.parse(_getNumberController.text),
               );

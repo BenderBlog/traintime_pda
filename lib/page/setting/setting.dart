@@ -466,7 +466,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               }
 
                               /// Clean user information
-                              preference.prefrenceClear();
+                              await preference.prefrenceClear();
 
                               /// Theme back to default
                               ThemeController toChange =
