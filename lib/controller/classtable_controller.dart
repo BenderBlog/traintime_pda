@@ -287,7 +287,11 @@ class ClassTableController extends GetxController {
             stackTrace: s,
           );
         }
-        HomeWidget.updateWidget(iOSName: "ClasstableWidget",qualifiedAndroidName: "io.github.benderblog.traintime_pda.widget.classtable.ClassTableWidgetProvider");
+        HomeWidget.updateWidget(
+          iOSName: "ClasstableWidget",
+          qualifiedAndroidName: "io.github.benderblog.traintime_pda."
+              "widget.classtable.ClassTableWidgetProvider",
+        );
       }
 
       state = ClassTableState.fetched;

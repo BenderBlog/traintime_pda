@@ -10,6 +10,7 @@ import 'package:watermeter/page/homepage/toolbox/cards/exam_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/score_card.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/sport_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/telebook_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/webview_card.dart';
 import 'package:watermeter/page/homepage/toolbox/cards/xdu_planet_card.dart';
@@ -26,6 +27,7 @@ class ToolBoxView extends StatelessWidget {
     ExamCard(),
     EmptyClassroomCard(),
     ExperimentCard(),
+    SportCard(),
     WebViewCard(data: WebViewAddresses.calculator),
   ];
 

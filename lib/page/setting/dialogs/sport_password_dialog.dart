@@ -36,7 +36,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('修改体适能密码'),
+      title: const Text('修改体育系统密码'),
       titleTextStyle: TextStyle(
         fontSize: 20,
         color: Theme.of(context).colorScheme.onSurface,
@@ -68,7 +68,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
         TextButton(
           child: const Text('取消'),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).pop<bool>(false);
           },
         ),
         TextButton(
@@ -79,7 +79,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
                 user_perference.Preference.sportPassword,
                 _sportPasswordController.text,
               );
-              Navigator.of(context).pop();
+              Navigator.of(context).pop<bool>(true);
             } else {
               Fluttertoast.showToast(msg: "输入空白!");
             }

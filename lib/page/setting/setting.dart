@@ -143,7 +143,7 @@ class _SettingWindowState extends State<SettingWindow> {
               bottomRow: Column(
                 children: [
                   ListTile(
-                      title: const Text('体适能密码设置'),
+                      title: const Text('体育系统密码设置'),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(

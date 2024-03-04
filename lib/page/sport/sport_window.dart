@@ -4,20 +4,11 @@
 // Intro of the sport data.
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/sport/punch_record_window.dart';
+import 'package:watermeter/page/sport/sport_class_window.dart';
 import 'package:watermeter/page/sport/sport_score_window.dart';
 
 class SportWindow extends StatelessWidget {
   const SportWindow({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const TabForSport();
-  }
-}
-
-class TabForSport extends StatelessWidget {
-  const TabForSport({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +19,14 @@ class TabForSport extends StatelessWidget {
           title: const Text("体育查询"),
           bottom: const TabBar(
             tabs: [
-              Tab(text: "打卡记录"),
-              Tab(text: "体测记录"),
+              Tab(text: "课程信息"),
+              Tab(text: "体测成绩"),
             ],
           ),
         ),
         body: const TabBarView(
           children: [
-            PunchRecordWindow(),
+            SportClassWindow(),
             SportScoreWindow(),
           ],
         ),

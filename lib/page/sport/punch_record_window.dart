@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Interface of the punch record window of the sport data.
-
+/*
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -208,3 +208,4 @@ class RecordCard extends StatelessWidget {
     );
   }
 }
+*/

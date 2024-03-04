@@ -20,7 +20,7 @@ enum Preference {
   dorm(key: "dorm", type: "String"), // 宿舍
   idsAccount(key: "idsAccount", type: "String"), // 一站式帐号
   idsPassword(key: "idsPassword", type: "String"), // 一站式密码
-  sportPassword(key: "sportPassword", type: "String"), // 体适能密码
+  sportPassword(key: "sportPassword", type: "String"), // 体育系统密码
   experimentPassword(key: "experimentPassword", type: "String"), // 物理实验密码
   electricityPassword(key: "electricityPassword", type: "String"), // 电费密码
   decorated(key: "decorated", type: "bool"), // 课表是否开启背景
