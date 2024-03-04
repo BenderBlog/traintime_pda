@@ -13,7 +13,6 @@ import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_
 import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
-import 'package:watermeter/page/homepage/dynamic_widget/sport_card.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -24,7 +23,7 @@ class PhoneMainPage extends StatelessWidget {
   final classCardHeight = 140.0;
 
   final List<Widget> children = const [
-    SportCard(),
+    //SportCard(),
     ElectricityCard(),
     LibraryCard(),
     SchoolCardInfoCard(),

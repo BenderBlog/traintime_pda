@@ -35,18 +35,15 @@ class SmallFunctionCard extends StatelessWidget {
     return [
       Icon(
         icon,
-        size: 42,
+        size: 48,
         color: Theme.of(context).colorScheme.onSecondaryContainer,
       ),
-      const VerticalDivider(
-        width: 8,
-        color: Colors.transparent,
-      ),
+      const SizedBox(width: 6),
       [
         Text(
           name,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -54,7 +51,7 @@ class SmallFunctionCard extends StatelessWidget {
         Text(
           description,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             color: Theme.of(context)
                 .colorScheme
                 .onSecondaryContainer
@@ -67,7 +64,7 @@ class SmallFunctionCard extends StatelessWidget {
       )
     ]
         .toRow(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
         )

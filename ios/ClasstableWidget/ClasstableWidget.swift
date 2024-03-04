@@ -19,10 +19,10 @@ private let myDateFormatter = DateFormatter()
 
 struct StartDayFetchError : Error {}
 
-enum ArrangementType {
-    case course
-    case exam
-    case experiment
+enum ArrangementType : String {
+    case course = "课\n程"
+    case exam = "考\n试"
+    case experiment = "实\n验"
 }
 
 struct Provider: TimelineProvider {
@@ -211,18 +211,21 @@ struct Provider: TimelineProvider {
             entryDates.insert(todayItem.end_time)
         }
         if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value == true {
+            print("isTomorrow")
             entries.append(SimpleEntry(
                 date: Date(),
                 currentWeek: currentWeekToStore,
                 arrangement: arrangement
             ))
-        } else if entries.isEmpty {
+        } else if arrangement.isEmpty {
+            print("Noitem")
             entries.append(SimpleEntry(
                 date: Date(),
                 currentWeek: currentWeekToStore,
                 arrangement: arrangement
             ))
         } else {
+            print("isToday")
             for entryDate in entryDates {
                 if (entryDate == nil) {
                     continue
@@ -302,7 +305,7 @@ struct ClasstableWidgetEntryView : View {
                         )
                     Text(
                         "\(comps.month!)月\(comps.day!)日 \(array[comps.weekday! - 1])" +
-                        " \(entry.currentWeek > 0 ? "第\(entry.currentWeek)周" : "")"
+                        " \(entry.currentWeek >= 0 ? "第\(entry.currentWeek + 1)周" : "")"
                     ).font(.system(size: 10))
                      .foregroundStyle(Color(hexString: "#abbed1"))
                 }
@@ -328,7 +331,7 @@ struct ClasstableWidgetEntryView : View {
                         i in EventItem(entry.arrangement[i])
                     }
                 }
-                
+
                 Spacer()
             } else {
                 let text = Text("目前没有安排了").foregroundStyle(Color(hexString: "#abbed1"))
@@ -343,7 +346,7 @@ struct ClasstableWidgetEntryView : View {
                 } else {
                     VStack{
                         icon.font(.system(size: 72))
-                        Divider().overlay(.background)
+                        Divider().opacity(0)
                         text
                     }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
@@ -394,6 +397,30 @@ struct ClasstableWidget: Widget {
             end_time: Date.now,
             colorIndex: 1
         )]
+    )
+    SimpleEntry(
+        date: Date.now,
+        currentWeek: 10,
+        arrangement : [
+            TimeLineStructItems(
+                type: .course,
+                name: "英语课",
+                teacher: "机器人",
+                place: "不知道",
+                start_time: Date.now,
+                end_time: Date.now,
+                colorIndex: 1
+            ),
+            TimeLineStructItems(
+                type: .course,
+                name: "英语课",
+                teacher: "机器人",
+                place: "不知道",
+                start_time: Date.now,
+                end_time: Date.now,
+                colorIndex: 2
+            )
+        ]
     )
 
 }

@@ -35,9 +35,12 @@ class _ChangeBrightnessDialogState extends State<ChangeBrightnessDialog> {
               groupValue: preference.getInt(preference.Preference.brightness),
               onChanged: (int? value) {
                 setState(() {
-                  preference.setInt(preference.Preference.brightness, value!);
-                  ThemeController toChange = Get.put(ThemeController());
-                  toChange.onUpdate();
+                  preference
+                      .setInt(preference.Preference.brightness, value!)
+                      .then((value) {
+                    ThemeController toChange = Get.put(ThemeController());
+                    toChange.onUpdate();
+                  });
                 });
               },
             ),

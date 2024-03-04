@@ -9,23 +9,27 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/model/xidian_sport/punch.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
 
+var sportClass = SportClass().obs;
 var sportScore = SportScore().obs;
-var punchData = PunchDataList().obs;
+// var punchData = PunchDataList().obs;
 
 class SportSession {
+  static final _lock = Lock();
+
   final PersistCookieJar sportCookieJar = PersistCookieJar(
     persistSession: true,
     storage: FileStorage("${supportPath.path}/cookie/sport/"),
   );
 
+  /*
   Future<void> getPunch() async {
     punchData.value.reset();
     try {
@@ -123,6 +127,7 @@ class SportSession {
       punchData.value.isLoad.value = false;
     }
   }
+  */
 
   Future<void> getScore() async {
     sportScore.value.situation = "正在获取";
@@ -132,9 +137,12 @@ class SportSession {
     );
     SportScore toReturn = SportScore();
     try {
-      if (userId.isEmpty || token.isEmpty) {
-        await login();
-      }
+      await _lock.synchronized(() async {
+        if (userId.isEmpty || token.isEmpty) {
+          await login();
+        }
+      });
+
       var response = await require(
         subWebsite: "measure/getStuTotalScore",
         body: {"userId": userId},
@@ -206,6 +214,90 @@ class SportSession {
       toReturn.situation = "未知故障";
     } finally {
       sportScore.value = toReturn;
+    }
+  }
+
+  Future<void> getClass() async {
+    sportClass.value.situation = "正在获取";
+    log.i(
+      "[SportSession][getClass]"
+      "Ready to get latest class.",
+    );
+    SportClass toReturn = SportClass();
+    try {
+      await _lock.synchronized(() async {
+        if (userId.isEmpty || token.isEmpty) {
+          await login();
+        }
+      });
+      var response = await require(
+        subWebsite: "stuTermScore/uidSelect",
+        body: {
+          "uid": userId,
+          "pageIndex": "1",
+          "pageSize": "100",
+        },
+      );
+      for (var i in response["data"]) {
+        try {
+          int latestId = i["id"];
+          var classData = await require(
+            subWebsite: "stuTeacherCurriculum/selstuTeacherCurriculum",
+            body: {
+              "stuid": userId,
+              "stuTermScoreid": latestId,
+            },
+          ).then((value) => value["data"][0]);
+          toReturn.items.add(SportClassItem.fromData(
+            termName: classData["teacherCurriculumSysTermName"],
+            name: classData["teacherCurriculumTeachingCurriculumName"],
+            teacher: classData["teacherCurriculumSysUserName"],
+            time: classData["teacherCurriculumTeachingSchoolTimeName"],
+            place: classData["teacherCurriculumTeachingAddressName"],
+            score: i["score"],
+            type: i["type"],
+          ));
+        } catch (e, s) {
+          log.w(
+            "[SportSession][getClass] Exception, will continue. $s",
+            error: e,
+            stackTrace: s,
+          );
+          continue;
+        }
+      }
+    } on NoPasswordException {
+      toReturn.situation = "没密码";
+    } on LoginFailedException catch (e, s) {
+      log.w(
+        "[SportSession][getClass] LoginFailedException",
+        error: e,
+        stackTrace: s,
+      );
+      toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
+    } on SemesterFailedException catch (e, s) {
+      log.w(
+        "[SportSession][getClass] SemesterFailedException",
+        error: e,
+        stackTrace: s,
+      );
+      toReturn.situation = "查询失败";
+    } on DioException catch (e, s) {
+      log.w(
+        "[SportSession][getClass] NetworkException",
+        error: e,
+        stackTrace: s,
+      );
+      toReturn.situation = "网络故障";
+    } catch (e, s) {
+      log.w(
+        "[SportSession][getClass] Exception $s",
+        error: e,
+        stackTrace: s,
+      );
+      toReturn.situation = "未知故障: $e at\n$s";
+    } finally {
+      sportClass.value = toReturn;
     }
   }
 

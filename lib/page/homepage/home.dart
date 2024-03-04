@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (loginState == IDSLoginState.success) {
         Fluttertoast.showToast(msg: "登录成功");
       } else if (loginState == IDSLoginState.passwordWrong) {
-        preference.remove(preference.Preference.idsPassword);
+        await preference.remove(preference.Preference.idsPassword);
 
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           await showDialog(

@@ -143,7 +143,7 @@ class _SettingWindowState extends State<SettingWindow> {
               bottomRow: Column(
                 children: [
                   ListTile(
-                      title: const Text('体适能密码设置'),
+                      title: const Text('体育系统密码设置'),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
@@ -153,7 +153,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       }),
                   const Divider(),
                   ListTile(
-                      title: const Text('物理实验系统密码'),
+                      title: const Text('物理实验系统密码设置'),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
@@ -227,24 +227,79 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                     title: const Text("清除所有用户添加课程"),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () async {
-                      var file = File(
-                        "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
-
-                      Get.find<ClassTableController>().updateClassTable();
-                      Fluttertoast.showToast(msg: "已经清除完毕");
-                    },
+                    onTap: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text("确认对话框"),
+                        content: const Text(
+                          "是否要清除所有用户添加课程？"
+                          "这个功能对从学校获取的日程没有影响。",
+                        ),
+                        actions: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('取消'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              var file = File(
+                                "${supportPath.path}/"
+                                "${ClassTableFile.userDefinedClassName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
+                              Get.find<ClassTableController>()
+                                  .updateClassTable();
+                              Fluttertoast.showToast(msg: "已经清除完毕");
+                              Navigator.pop(context);
+                            },
+                            child: const Text('确定'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const Divider(),
                   ListTile(
                     title: const Text("强制刷新课表"),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () => Get.put(ClassTableController())
-                        .updateClassTable(isForce: true),
+                    onTap: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text("确认对话框"),
+                        content: const Text(
+                          "是否要强制刷新课表？同意后，"
+                          "将会从学校一站式后端重新获取课表，耗时会比较久。",
+                        ),
+                        actions: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('取消'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Get.put(ClassTableController())
+                                  .updateClassTable(isForce: true);
+                              Navigator.pop(context);
+                            },
+                            child: const Text('确定'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const Divider(),
                   ListTile(
@@ -281,101 +336,154 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                     title: const Text('清除缓存后重启'),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () async {
-                      try {
-                        await NetworkSession().clearCookieJar();
-                      } on PathNotFoundException {
-                        log.d(
-                          "[setting][ClearAllCache]"
-                          "No cookies.",
-                        );
-                      }
+                    onTap: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text("确认对话框"),
+                        content: const Text(
+                          "确定清楚缓存后重启程序？",
+                        ),
+                        actions: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('取消'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              ProgressDialog pd =
+                                  ProgressDialog(context: context);
+                              pd.show(msg: "正在清理缓存");
+                              try {
+                                await NetworkSession().clearCookieJar();
+                              } on PathNotFoundException {
+                                log.d(
+                                  "[setting][ClearAllCache]"
+                                  "No cookies.",
+                                );
+                              }
 
-                      /// Clean Classtable cache.
-                      var file = File(
-                        "${supportPath.path}/${ClassTableFile.schoolClassName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              /// Clean Classtable cache.
+                              var file = File(
+                                "${supportPath.path}/${ClassTableFile.schoolClassName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      file = File(
-                        "${supportPath.path}/${ExamController.examDataCacheName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              file = File(
+                                "${supportPath.path}/${ExamController.examDataCacheName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      file = File(
-                        "${supportPath.path}/${ExperimentController.experimentCacheName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              file = File(
+                                "${supportPath.path}/${ExperimentController.experimentCacheName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      if (mounted) {
-                        Fluttertoast.showToast(msg: '缓存已被清除');
-                        Restart.restartApp();
-                      }
-                    },
+                              if (mounted) {
+                                Fluttertoast.showToast(msg: '缓存已被清除');
+                                Restart.restartApp();
+                              }
+                            },
+                            child: const Text('确定'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const Divider(),
                   ListTile(
                     title: const Text('退出登录并重启应用'),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () async {
-                      ProgressDialog pd = ProgressDialog(context: context);
-                      pd.show(msg: '正在退出登录');
+                    onTap: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text("确认对话框"),
+                        content: const Text(
+                          "确定退出登录？你的所有数据将会被彻底删除！",
+                        ),
+                        actions: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('取消'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              ProgressDialog pd =
+                                  ProgressDialog(context: context);
+                              pd.show(msg: '正在退出登录');
 
-                      /// Clean Cookie
-                      try {
-                        await NetworkSession().clearCookieJar();
-                        // I don't care.
-                        // ignore: empty_catches
-                      } on Exception {}
+                              /// Clean Cookie
+                              try {
+                                await NetworkSession().clearCookieJar();
+                                // I don't care.
+                                // ignore: empty_catches
+                              } on Exception {}
 
-                      /// Clean Classtable cache.
-                      var file = File(
-                        "${supportPath.path}/${ClassTableFile.schoolClassName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              /// Clean Classtable cache.
+                              var file = File(
+                                "${supportPath.path}/${ClassTableFile.schoolClassName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      file = File(
-                        "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              file = File(
+                                "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      file = File(
-                        "${supportPath.path}/${ExamController.examDataCacheName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              file = File(
+                                "${supportPath.path}/${ExamController.examDataCacheName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      file = File(
-                        "${supportPath.path}/${ExperimentController.experimentCacheName}",
-                      );
-                      if (file.existsSync()) {
-                        file.deleteSync();
-                      }
+                              file = File(
+                                "${supportPath.path}/${ExperimentController.experimentCacheName}",
+                              );
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
 
-                      /// Clean user information
-                      preference.prefrenceClear();
+                              /// Clean user information
+                              await preference.prefrenceClear();
 
-                      /// Theme back to default
-                      ThemeController toChange = Get.put(ThemeController());
-                      toChange.onUpdate();
+                              /// Theme back to default
+                              ThemeController toChange =
+                                  Get.put(ThemeController());
+                              toChange.onUpdate();
 
-                      /// Restart app
-                      if (mounted) {
-                        pd.close();
-                        Restart.restartApp();
-                      }
-                    },
+                              /// Restart app
+                              if (mounted) {
+                                pd.close();
+                                Restart.restartApp();
+                              }
+                            },
+                            child: const Text('确定'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

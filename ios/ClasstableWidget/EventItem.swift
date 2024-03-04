@@ -26,44 +26,37 @@ struct EventItem: View {
     
     var body: some View {
         myDateFormatter.dateFormat = formatHourMinute
-        let string : String
-        switch(event.type) {
-            case .course: string = "课\n程"
-            case .exam: string = "考\n试"
-            case .experiment: string = "实\n验"
-        }
         return HStack {
-            Text(string).font(Font.custom("MyFont", size: 12))
+            Text(event.type.rawValue).font(Font.custom("MyFont", size: 12))
             RoundedRectangle(cornerRadius: 120).frame(width: 6).padding(.vertical, 6)
             VStack(alignment: .leading) {
                 if (widgetFamily == .systemSmall) {
                     Text(event.name)
-                        .font(.subheadline.weight(.medium))
+                        .font(.footnote.weight(.medium))
                     Text("\(myDateFormatter.string(from: event.start_time)) \(event.place)")
-                        .font(.footnote.weight(.semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 } else {
                     HStack(alignment: .firstTextBaseline) {
                         VStack(alignment: .leading) {
                             Text(event.name)
-                                .font(.subheadline.weight(.medium))
+                                .font(.footnote.weight(.medium))
                             Text("\(event.teacher) \(event.place)")
-                                .font(.footnote.weight(.semibold))
+                                .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
                         VStack(alignment: .trailing) {
                             Text("\(myDateFormatter.string(from: event.start_time))")
-                                .font(.footnote.weight(.semibold))
+                                .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                             Text("\(myDateFormatter.string(from: event.end_time))")
-                                .font(.footnote.weight(.semibold))
+                                .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                         }
                     }
                 }
             }
-            .padding(.vertical, 6)
             Spacer(minLength: .zero)
         }
         .foregroundColor(colors[event.colorIndex % colors.count])
