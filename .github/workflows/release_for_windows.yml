@@ -11,14 +11,20 @@ jobs:
    steps:
       - uses: actions/checkout@v4
       - name: Install Flutter
-        run: |
-          git submodule update --init --recursive
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'     
       - run: flutter create --platforms=windows .
       - run: flutter build windows --release
+
+      - name: Package Executable
+        run: 7z a -r -sse ..\..\..\..\build\app\app-release.zip *
+        working-directory: build\windows\runner\Release
      
-      - name: upload result
-        uses: ncipollo/release-action@v1.12.0
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          artifacts: > 
-            build/windows/x64/runner/Release/,
+          files: build/app/app-release.zip,
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
