@@ -63,6 +63,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
           onRefresh: () async {
             await SportSession().getScore();
             _controller.finishRefresh();
+            _controller.resetFooter();
           },
           refreshOnStart: true,
           childBuilder: (context, physics) => Obx(() {
@@ -100,13 +101,17 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                 (index) => ScoreCard(toUse: sportScore.value.list[index]),
               ).reversed);
               return DataList<Widget>(
+                physics: physics,
                 list: things,
                 initFormula: (toUse) => toUse,
               );
             } else if (sportScore.value.situation == "正在获取") {
               return const Center(child: CircularProgressIndicator());
             } else {
-              return Center(child: Text("坏事: ${sportScore.value.situation}"));
+              return ReloadWidget(
+                function: () => _controller.callRefresh(),
+                errorStatus: sportScore.value.situation,
+              );
             }
           }),
         ),
