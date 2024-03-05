@@ -167,7 +167,11 @@ class ExperimentController extends GetxController {
         error: e,
         stackTrace: s,
       );
-      error = "登录失败";
+      if (e.msg != null && e.msg!.isNotEmpty) {
+        error = e.msg!;
+      } else {
+        error = "登录失败";
+      }
     } on DioException catch (e, s) {
       log.w(
         "[ExperimentController][get] "

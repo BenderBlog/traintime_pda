@@ -165,7 +165,13 @@ class ExperimentSession extends NetworkSession {
     );
 
     if (loginResponse.statusCode != 302) {
-      throw LoginFailedException();
+      throw LoginFailedException()
+        ..msg = parse(loginResponse.data)
+            .getElementById("login1_Label1")
+            ?.innerHtml
+            .replaceAll("<font color=\"Red\">", "")
+            .replaceAll("</font>", "")
+            .replaceAll("<br>", "。");
     }
 
     cookieStr = "";
@@ -255,7 +261,9 @@ class ExperimentSession extends NetworkSession {
   }
 }
 
-class LoginFailedException implements Exception {}
+class LoginFailedException implements Exception {
+  String? msg;
+}
 
 class FailedToFetchException implements Exception {}
 

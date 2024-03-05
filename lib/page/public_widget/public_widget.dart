@@ -145,22 +145,21 @@ class ReloadWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Ouch! 发生错误啦\n"
-            "${errorStatus != null ? errorStatus.toString() : ""}",
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
-          FilledButton(
-            onPressed: function,
-            child: const Text("点我刷新"),
-          ),
-        ],
+    return [
+      Text(
+        "Ouch! 发生错误啦\n"
+        "${errorStatus != null ? errorStatus.toString() : ""}",
+        style: const TextStyle(fontSize: 16),
+        textAlign: TextAlign.center,
       ),
-    );
+      FilledButton(
+        onPressed: function,
+        child: const Text("点我刷新"),
+      ),
+    ]
+        .toColumn(mainAxisAlignment: MainAxisAlignment.center)
+        .center()
+        .padding(horizontal: 20)
+        .constrained(maxWidth: 600);
   }
 }
