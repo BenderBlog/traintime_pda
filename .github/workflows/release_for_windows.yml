@@ -19,7 +19,7 @@ jobs:
 
       - name: Package Executable
         run: 7z a -r -sse ..\..\..\..\build\app\app-release.zip *
-        working-directory: build\windows\runner\Release
+        working-directory: build\windows\x64\runner\Release
      
       - name: Release
         uses: softprops/action-gh-release@v1
