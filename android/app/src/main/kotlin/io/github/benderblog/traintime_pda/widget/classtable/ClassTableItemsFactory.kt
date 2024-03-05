@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import io.github.benderblog.traintime_pda.R
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
+import io.github.benderblog.traintime_pda.model.ClassTableWidgetKeys
 import io.github.benderblog.traintime_pda.model.ExamData
 import io.github.benderblog.traintime_pda.model.ExperimentData
 import io.github.benderblog.traintime_pda.model.ExperimentDataListToken
@@ -42,12 +43,24 @@ private val indicatorColorList = listOf(
     Color.parseColor("#66BB6A"),
 )
 
-class ClassTableItemsFactory(private val packageName: String, private val context: Context) :
+class ClassTableItemsFactory(
+    private val packageName: String,
+    private val context: Context
+) :
     RemoteViewsFactory {
+
+    private val showTodayArrangements: Boolean
+        get() {
+            return context.getSharedPreferences(
+                ClassTableWidgetKeys.SP_FILE_NAME,
+                Context.MODE_PRIVATE
+            ).getBoolean(
+                "show_today", true
+            )
+        }
 
     private val todayArrangements = mutableListOf<TimeLineItem>()
 
-    //TODO show tomorrow arrangements
     private val tomorrowArrangements = mutableListOf<TimeLineItem>()
     private val arrangements: List<TimeLineItem>
         get() = if (showTodayArrangements) todayArrangements else tomorrowArrangements
@@ -79,10 +92,6 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         var experimentJsonData: String? = null
             @Synchronized
             set
-
-        @JvmStatic
-        @set:Synchronized
-        var showTodayArrangements = true
 
         @JvmStatic
         private val gson = Gson()
@@ -160,16 +169,19 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
     }
 
     private fun loadClassTableData() {
-        // today classes
-        loadOneDayClass(curWeekIndex, todayIndex, todayArrangements)
-        // tomorrow classes
-        var tomorrowIndex = todayIndex + 1
-        var weekTomorrowIndex = curWeekIndex
-        if (tomorrowIndex > 7) {
-            tomorrowIndex = 1
-            weekTomorrowIndex += 1
+        if (showTodayArrangements) {
+            // today classes
+            loadOneDayClass(curWeekIndex, todayIndex, todayArrangements)
+        } else {
+            // tomorrow classes
+            var tomorrowIndex = todayIndex + 1
+            var weekTomorrowIndex = curWeekIndex
+            if (tomorrowIndex > 7) {
+                tomorrowIndex = 1
+                weekTomorrowIndex += 1
+            }
+            loadOneDayClass(weekTomorrowIndex, tomorrowIndex, tomorrowArrangements)
         }
-        loadOneDayClass(weekTomorrowIndex, tomorrowIndex, tomorrowArrangements)
     }
 
     private fun loadOneDayClass(
@@ -214,13 +226,16 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
 
     private fun loadExamData() {
         val curCalendar = Date().toCalendar()
-        loadOneDayExam(curCalendar, todayArrangements)
-        loadOneDayExam(
-            curCalendar.apply {
-                add(Calendar.DAY_OF_YEAR, 1)
-            },
-            tomorrowArrangements
-        )
+        if (showTodayArrangements) {
+            loadOneDayExam(curCalendar, todayArrangements)
+        } else {
+            loadOneDayExam(
+                curCalendar.apply {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                },
+                tomorrowArrangements
+            )
+        }
     }
 
     private fun loadOneDayExam(curCalendar: Calendar, arrangements: MutableList<TimeLineItem>) {
@@ -251,13 +266,16 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
 
     private fun loadExperimentData() {
         val curCalendar = Date().toCalendar()
-        loadOneDayExperiment(curCalendar, todayArrangements)
-        loadOneDayExperiment(
-            curCalendar.apply {
-                add(Calendar.DAY_OF_YEAR, 1)
-            },
-            tomorrowArrangements
-        )
+        if (showTodayArrangements) {
+            loadOneDayExperiment(curCalendar, todayArrangements)
+        } else {
+            loadOneDayExperiment(
+                curCalendar.apply {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                },
+                tomorrowArrangements
+            )
+        }
     }
 
     private fun loadOneDayExperiment(
@@ -297,10 +315,6 @@ class ClassTableItemsFactory(private val packageName: String, private val contex
         }
         todayArrangements.sortByStartTime()
         tomorrowArrangements.sortByStartTime()
-    }
-
-    private fun loadPhysicsExpData() {
-        //TODO show physics experiment arrangements
     }
 
     override fun onCreate() {

@@ -46,7 +46,9 @@ object ClassTableConstants {
 }
 
 object ClassTableWidgetKeys {
-    const val PACKAGE_NAME = "io.github.benderblog.traintime_pda"
+    const val PACKAGE_NAME = "package_name"
+    const val SHOW_TODAY = "show_today"
+    const val SP_FILE_NAME = "class_table_widget"
 }
 
 data class TimeLineItem(
@@ -72,7 +74,7 @@ data class TimeLineItem(
     }
 }
 
-data class UserDefinedClassData (
+data class UserDefinedClassData(
     @SerializedName("userDefinedDetail")
     val userDefinedDetail: List<ClassDetail>,
     @SerializedName("timeArrangement")
@@ -215,16 +217,16 @@ val Subject.type: String
     }
 
 data class ExperimentData(
-        @SerializedName("name")
-        val name: String,
-        @SerializedName("classroom")
-        val classroom: String,
-        @SerializedName("date")
-        val date: String,
-        @SerializedName("timeStr")
-        val timeStr: String,
-        @SerializedName("teacher")
-        val teacher: String,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("classroom")
+    val classroom: String,
+    @SerializedName("date")
+    val date: String,
+    @SerializedName("timeStr")
+    val timeStr: String,
+    @SerializedName("teacher")
+    val teacher: String,
 )
 
 class ExperimentDataListToken : TypeToken<List<ExperimentData>>()
@@ -238,25 +240,25 @@ val ExperimentData.timeRange: Pair<Date, Date>
         /// And the time arrangement too.
         val cal = Calendar.getInstance()
         cal.set(dateNums[2], dateNums[0] - 1, dateNums[1])
-        lateinit var startTime : Date
-        lateinit var stopTime : Date
+        lateinit var startTime: Date
+        lateinit var stopTime: Date
 
         if (timeStr.contains("15")) {
-            cal.set(3,15)
-            cal.set(4,55)
+            cal.set(3, 15)
+            cal.set(4, 55)
             startTime = cal.time
-            cal.set(3,18)
-            cal.set(4,10)
+            cal.set(3, 18)
+            cal.set(4, 10)
             stopTime = cal.time
         } else {
-            cal.set(3,18)
-            cal.set(4,30)
+            cal.set(3, 18)
+            cal.set(4, 30)
             startTime = cal.time
-            cal.set(3,20)
-            cal.set(4,45)
+            cal.set(3, 20)
+            cal.set(4, 45)
             stopTime = cal.time
         }
 
-        return Pair(startTime,stopTime)
+        return Pair(startTime, stopTime)
     }
 

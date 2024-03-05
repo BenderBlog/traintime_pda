@@ -29,6 +29,16 @@
             android:textColor="@color/colorDefaultTextSecondary"
             android:textSize="10sp" />
 
+        <ImageView
+            android:id="@+id/widget_classtable_switcher"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:contentDescription="@string/classtable_day_switcher_decription"
+            android:src="@drawable/icon_next" />
+
     </RelativeLayout>
 
     <ListView

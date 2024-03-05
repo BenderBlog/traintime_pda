@@ -6,4 +6,5 @@
     <string name="widget_classtable_titile">课程表</string>
     <string name="widget_classtable_item_tip">暂无课程信息</string>
     <string name="widget_classtable_no_course_tip">好像没课啦？</string>
+    <string name="classtable_day_switcher_decription">ClassTable Day Switcher</string>
 </resources>

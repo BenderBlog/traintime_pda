@@ -45,7 +45,8 @@ class ClassTableItemsService : RemoteViewsService() {
             }
         }
         ClassTableItemsFactory(
-            intent!!.getStringExtra(ClassTableWidgetKeys.PACKAGE_NAME)!!,
+            intent!!.getStringExtra(ClassTableWidgetKeys.PACKAGE_NAME)
+                ?: "io.github.benderblog.traintime_pda.widget.classtable",
             applicationContext
         )
     }
