@@ -100,7 +100,6 @@ class SportClassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String time = "星期";
-    print(data.week);
     switch (data.week) {
       case 1:
         time += "一";
@@ -124,10 +123,8 @@ class SportClassCard extends StatelessWidget {
         time += "日";
         break;
     }
-    print(time);
 
     time += "第${data.start}节到第${data.stop}节";
-    print(time);
 
     return ReXCard(
       title: Text(data.termToShow),

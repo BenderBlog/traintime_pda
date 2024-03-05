@@ -12,7 +12,6 @@ import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -21,8 +20,6 @@ enum ExperimentStatus {
   fetching,
   fetched,
   error,
-  nopassword,
-  notschoolnet,
   none,
 }
 
@@ -141,30 +138,39 @@ class ExperimentController extends GetxController {
 
   Future<void> get() async {
     ExperimentStatus previous = status;
+    status = ExperimentStatus.fetching;
+    update();
     log.i(
-      "[ExamController][get] "
+      "[ExperimentController][get] "
       "Fetching data from Internet.",
     );
     try {
-      status = ExperimentStatus.fetching;
       data = await ExperimentSession().getData();
       status = ExperimentStatus.fetched;
       error = "";
     } on NoExperimentPasswordException {
       log.w(
-        "[ExamController][get] "
+        "[ExperimentController][get] "
         "Do not find experiment password",
       );
       error = "没有物理实验密码";
     } on NotSchoolNetworkException {
       log.w(
-        "[ExamController][get] "
+        "[ExperimentController][get] "
         "Not in school exception",
       );
       error = "非校园网，无法获取数据";
+    } on LoginFailedException catch (e, s) {
+      log.w(
+        "[ExperimentController][get] "
+        "LoginFailed Exception",
+        error: e,
+        stackTrace: s,
+      );
+      error = "登录失败";
     } on DioException catch (e, s) {
       log.w(
-        "[ExamController][get] "
+        "[ExperimentController][get] "
         "Network exception",
         error: e,
         stackTrace: s,
@@ -172,7 +178,7 @@ class ExperimentController extends GetxController {
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
       log.w(
-        "[ExamController][get] "
+        "[ExperimentController][get] "
         "Exception",
         error: e,
         stackTrace: s,
@@ -181,7 +187,7 @@ class ExperimentController extends GetxController {
     } finally {
       if (status == ExperimentStatus.fetched) {
         log.i(
-          "[ExamController][get] "
+          "[ExperimentController][get] "
           "Store to cache.",
         );
         file.writeAsStringSync(jsonEncode(data));
@@ -194,12 +200,12 @@ class ExperimentController extends GetxController {
               data: jsonEncode(data),
             ));
             log.i(
-              "[ExamController][get] "
+              "[ExperimentController][get] "
               "ios Save to public place status: $result.",
             );
           } catch (e, s) {
             log.w(
-              "[ExamController][get] "
+              "[ExperimentController][get] "
               "ios Save to public place failed with error: ",
               error: e,
               stackTrace: s,
@@ -211,7 +217,7 @@ class ExperimentController extends GetxController {
       } else {
         status = ExperimentStatus.error;
       }
+      update();
     }
-    update();
   }
 }

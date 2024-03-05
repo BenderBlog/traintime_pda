@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/experiment/experiment_info_card.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 
@@ -86,7 +87,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
               ],
             ).safeArea();
           } else if (controller.status == ExperimentStatus.error) {
-            return Center(child: Text(controller.error.toString()));
+            return ReloadWidget(
+              function: controller.get,
+              errorStatus: controller.error,
+            );
           } else {
             return const Center(child: CircularProgressIndicator());
           }

@@ -69,8 +69,9 @@ class ChangeSwiftDialog extends StatelessWidget {
                 int.parse(_getNumberController.text),
               );
             }
-
-            Navigator.of(context).pop();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
           },
         ),
       ],

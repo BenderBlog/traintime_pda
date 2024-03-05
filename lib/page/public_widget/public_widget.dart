@@ -150,9 +150,10 @@ class ReloadWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Ouch! 发生错误啦"
+            "Ouch! 发生错误啦\n"
             "${errorStatus != null ? errorStatus.toString() : ""}",
             style: const TextStyle(fontSize: 16),
+            textAlign: TextAlign.center,
           ),
           FilledButton(
             onPressed: function,
