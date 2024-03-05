@@ -6,7 +6,7 @@ class SportClassItem {
     r'^(?<year_start>\d{4})-(?<year_end>\d{4})(.*)(?<term>\d{1})',
   );
   static final RegExp _timeDealer = RegExp(
-    r'^星期(?<week>.{1})(?<start>\d{1})(?<end>\d{1})',
+    r'^星期(?<week>.{1})(?<start>\d{1})(?<stop>\d{1})',
   );
 
   final String termToShow;
@@ -61,9 +61,9 @@ class SportClassItem {
       term: term,
       name: name,
       teacher: teacher,
-      start: week,
-      stop: int.parse(timeDealer.namedGroup('start')!),
-      week: int.parse(timeDealer.namedGroup('end')!),
+      start: int.parse(timeDealer.namedGroup('start')!),
+      stop: int.parse(timeDealer.namedGroup('stop')!),
+      week: week,
       place: place,
     );
   }

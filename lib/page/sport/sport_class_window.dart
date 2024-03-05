@@ -48,7 +48,7 @@ class _SportClassWindowState extends State<SportClassWindow>
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
-        child: EasyRefresh.builder(
+        child: EasyRefresh(
           controller: _controller,
           clipBehavior: Clip.none,
           header: const MaterialHeader(
@@ -63,7 +63,7 @@ class _SportClassWindowState extends State<SportClassWindow>
             _controller.finishRefresh();
           },
           refreshOnStart: true,
-          childBuilder: (context, physics) => Obx(
+          child: Obx(
             () {
               if (sportClass.value.situation == null &&
                   sportClass.value.items.isNotEmpty) {
@@ -76,7 +76,7 @@ class _SportClassWindowState extends State<SportClassWindow>
                   initFormula: (toUse) => toUse,
                 );
               } else if (sportClass.value.situation == "正在获取") {
-                return const Center(child: CircularProgressIndicator());
+                return const CircularProgressIndicator().center();
               } else {
                 return Center(
                   child: Text("坏事: ${sportClass.value.situation}"),
@@ -100,6 +100,7 @@ class SportClassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String time = "星期";
+    print(data.week);
     switch (data.week) {
       case 1:
         time += "一";
@@ -120,10 +121,13 @@ class SportClassCard extends StatelessWidget {
         time += "六";
         break;
       case 7:
-        time += "七";
+        time += "日";
         break;
     }
+    print(time);
+
     time += "第${data.start}节到第${data.stop}节";
+    print(time);
 
     return ReXCard(
       title: Text(data.termToShow),
