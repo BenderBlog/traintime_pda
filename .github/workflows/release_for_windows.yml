@@ -16,14 +16,18 @@ jobs:
       - run: .flutter/bin/flutter.bat create --platforms=windows .
       - run: .flutter/bin/flutter.bat build windows --release
 
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Package Executable
-        run: 7z a -r -sse ..\..\..\..\..\build\app\watermeter-release-${{ github.event.inputs.tag_name }}-amd64.zip *
+        run: 7z a -r -sse "..\..\..\..\..\build\app\watermeter-release-${{ steps.get_version.outputs.VERSION }}-amd64.zip" *
         working-directory: build\windows\x64\runner\Release
      
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/watermeter-release-${{ github.event.inputs.tag_name }}-amd64.zip,
+          files: "build/app/watermeter-release-${{ steps.get_version.outputs.VERSION }}-amd64.zip"
           prerelease: false
-          tag_name: ${{ github.event.inputs.tag_name }}
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
           token: ${{ secrets.RELEASE_TOKEN }}

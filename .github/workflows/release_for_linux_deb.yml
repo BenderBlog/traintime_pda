@@ -36,11 +36,15 @@ jobs:
           export PATH="$PATH":"$HOME/.pub-cache/bin":".flutter/bin/"
           flutter_to_debian
 
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: >
-            build/linux/x64/release/debian/watermeter_${{ github.event.inputs.tag_name }}_amd64.deb
+            "build/linux/x64/release/debian/watermeter_${{ steps.get_version.outputs.VERSION }}_amd64.deb"
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
