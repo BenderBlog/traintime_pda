@@ -13,8 +13,8 @@ jobs:
       - name: Install Flutter
         run: |
           git submodule update --init --recursive
-      - run: flutter create --platforms=windows .
-      - run: flutter build windows --release
+      - run: .flutter/bin/flutter.exe create --platforms=windows .
+      - run: .flutter/bin/flutter.exe build windows --release
 
       - name: Package Executable
         run: 7z a -r -sse ..\..\..\..\build\app\app-release.zip *
