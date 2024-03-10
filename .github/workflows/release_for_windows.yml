@@ -27,7 +27,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "build/app/watermeter-release-${{ steps.get_version.outputs.VERSION }}-amd64.zip"
+          files: build/app/watermeter-release-${{ steps.get_version.outputs.VERSION }}-amd64.zip
           prerelease: false
           tag_name: ${{ steps.get_version.outputs.VERSION }}
           token: ${{ secrets.RELEASE_TOKEN }}
