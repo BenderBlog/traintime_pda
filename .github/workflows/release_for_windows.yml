@@ -11,9 +11,8 @@ jobs:
    steps:
       - uses: actions/checkout@v4
       - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'     
+        run: |
+          git submodule update --init --recursive
       - run: flutter create --platforms=windows .
       - run: flutter build windows --release
 
