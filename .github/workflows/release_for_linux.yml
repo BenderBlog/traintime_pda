@@ -35,7 +35,7 @@ jobs:
 
       - name: Package Executable
         run: 7z a -r -sse "../../../../../build/app/watermeter-linux-release-amd64.zip" *
-        working-directory: build/linux/x64/runner/Release
+        working-directory: build/linux/x64/release/bundle
         
       - name: Release
         uses: softprops/action-gh-release@v1
