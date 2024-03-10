@@ -16,7 +16,6 @@ jobs:
 
       - name: Build for Windows
         run: |
-          .flutter/bin/flutter.bat create --platforms=windows .
           .flutter/bin/flutter.bat build windows --release
 
       - name: Package Executable
