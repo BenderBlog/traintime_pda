@@ -40,7 +40,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: >
-            build/linux/x64/release/debian/watermeter_1.1.0_amd64.deb
+            build/linux/x64/release/debian/watermeter_${{ github.event.inputs.tag_name }}_amd64.deb
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}

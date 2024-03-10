@@ -17,13 +17,13 @@ jobs:
       - run: .flutter/bin/flutter.bat build windows --release
 
       - name: Package Executable
-        run: 7z a -r -sse ..\..\..\..\build\app\app-release.zip *
+        run: 7z a -r -sse ..\..\..\..\..\build\app\watermeter-release-${{ github.event.inputs.tag_name }}-amd64.zip *
         working-directory: build\windows\x64\runner\Release
      
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/app-release.zip,
+          files: build/app/watermeter-release-${{ github.event.inputs.tag_name }}-amd64.zip,
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
