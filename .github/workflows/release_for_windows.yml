@@ -13,17 +13,20 @@ jobs:
       - name: Install Flutter
         run: |
           git submodule update --init --recursive
-      - run: .flutter/bin/flutter.bat create --platforms=windows .
-      - run: .flutter/bin/flutter.bat build windows --release
+
+      - name: Build for Windows
+        run: |
+          .flutter/bin/flutter.bat create --platforms=windows .
+          .flutter/bin/flutter.bat build windows --release
 
       - name: Package Executable
-        run: 7z a -r -sse "..\..\..\..\..\build\app\watermeter-release-amd64.zip" *
+        run: 7z a -r -sse "..\..\..\..\..\build\app\watermeter-windows-release-amd64.zip" *
         working-directory: build\windows\x64\runner\Release
      
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/watermeter-release-amd64.zip
+          files: build/app/watermeter-windows-release-amd64.zip
           prerelease: false
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
