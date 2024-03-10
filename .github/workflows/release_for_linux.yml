@@ -34,7 +34,7 @@ jobs:
           .flutter/bin/flutter build linux --release
 
       - name: Package Executable
-        run: 7z a -r -sse "../../../../../build/app/watermeter-linux-release-amd64.zip" *
+        run: 7z a -r "../../../../../build/app/watermeter-linux-release-amd64.zip" *
         working-directory: build/linux/x64/release/bundle
         
       - name: Release
