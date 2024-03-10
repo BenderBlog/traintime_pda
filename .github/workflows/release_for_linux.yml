@@ -1,4 +1,4 @@
-name: Release for Linux (Debian package)
+name: Release for Linux
 
 on:
   workflow_dispatch:
@@ -32,19 +32,15 @@ jobs:
       - name: Build APP
         run: |
           .flutter/bin/flutter build linux --release
-          .flutter/bin/dart pub global activate flutter_to_debian
-          export PATH="$PATH":"$HOME/.pub-cache/bin":".flutter/bin/"
-          flutter_to_debian
 
-      - name: Get version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
+      - name: Package Executable
+        run: 7z a -r -sse "..\..\..\..\..\build\app\watermeter-linux-release-amd64.zip" *
+        working-directory: build\linux\x64\runner\Release
+        
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: >
-            build/linux/x64/release/debian/watermeter_${{ steps.get_version.outputs.VERSION }}_amd64.deb
+          files: build/app/watermeter-linux-release-amd64.zip
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
