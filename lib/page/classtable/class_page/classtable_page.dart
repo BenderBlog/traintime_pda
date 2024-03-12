@@ -16,6 +16,7 @@ import 'package:watermeter/page/classtable/class_not_arranged/not_arranged_class
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ClassTablePage extends StatefulWidget {
   const ClassTablePage({super.key});
@@ -130,25 +131,43 @@ class _ClassTablePageState extends State<ClassTablePage>
                       break;
                     case 'D':
                       try {
-                        String now = Jiffy.now().format(
-                          pattern: "yyyyMMddTHHmmss",
-                        );
-                        String semester = classTableState.semesterCode;
-                        String tempPath = await getTemporaryDirectory()
-                            .then((value) => value.path);
-                        File file = File(
-                          "$tempPath/classtable-$now-$semester.ics",
-                        );
-                        if (!(await file.exists())) {
-                          await file.create();
+                        String fileName = "classtable-"
+                            "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
+                            "${classTableState.semesterCode}.ics";
+                        if (Platform.isLinux ||
+                            Platform.isMacOS ||
+                            Platform.isWindows) {
+                          String? resultFilePath =
+                              await FilePicker.platform.saveFile(
+                            dialogTitle: "保存日历文件到...",
+                            fileName: fileName,
+                            allowedExtensions: ["ics"],
+                            lockParentWindow: true,
+                          );
+                          if (resultFilePath != null) {
+                            File file = File(resultFilePath);
+                            if (!(await file.exists())) {
+                              await file.create();
+                            }
+                            await file
+                                .writeAsString(classTableState.iCalenderStr);
+                          }
+                        } else {
+                          String tempPath = await getTemporaryDirectory()
+                              .then((value) => value.path);
+                          File file = File("$tempPath/$fileName");
+                          if (!(await file.exists())) {
+                            await file.create();
+                          }
+                          await file
+                              .writeAsString(classTableState.iCalenderStr);
+                          await Share.shareXFiles(
+                            [XFile("$tempPath/$fileName.ics")],
+                            sharePositionOrigin:
+                                box!.localToGlobal(Offset.zero) & box.size,
+                          );
+                          await file.delete();
                         }
-                        await file.writeAsString(classTableState.iCalenderStr);
-                        await Share.shareXFiles(
-                          [XFile("$tempPath/classtable-$now-$semester.ics")],
-                          sharePositionOrigin:
-                              box!.localToGlobal(Offset.zero) & box.size,
-                        );
-                        await file.delete();
                         Fluttertoast.showToast(msg: "应该保存成功");
                       } on FileSystemException {
                         Fluttertoast.showToast(msg: "文件创建失败，保存取消");

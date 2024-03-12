@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 
 const demoBlueModeName = [
@@ -28,7 +29,7 @@ final demoBlue = ThemeData(
     secondaryContainer: const Color.fromRGBO(226, 232, 243, 1),
     onSecondaryContainer: const Color.fromRGBO(49, 78, 122, 1),
   ),
-);
+).useSystemChineseFont(Brightness.light);
 
 final demoBlueDark = ThemeData(
   useMaterial3: true,
@@ -45,4 +46,4 @@ final demoBlueDark = ThemeData(
     secondaryContainer: const Color.fromRGBO(30, 30, 30, 1),
     onSecondaryContainer: const Color.fromRGBO(255, 255, 255, 1),
   ),
-);
+).useSystemChineseFont(Brightness.dark);

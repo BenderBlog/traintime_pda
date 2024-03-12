@@ -107,7 +107,7 @@ class _MyAppState extends State<MyApp> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [
-          Locale('zh', ''),
+          Locale('zh', 'CN'),
         ],
         navigatorKey: alice.getNavigatorKey(),
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
