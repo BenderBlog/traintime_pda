@@ -36,6 +36,13 @@ jobs:
       - name: Package Executable
         run: 7z a -r "../../../../../build/app/watermeter-linux-release-amd64.zip" *
         working-directory: build/linux/x64/release/bundle
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Watermeter_Linux
+          path: build/app/watermeter-linux-release-amd64.zip
+
         
       - name: Release
         uses: softprops/action-gh-release@v1

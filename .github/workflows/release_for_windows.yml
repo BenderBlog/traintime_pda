@@ -21,6 +21,12 @@ jobs:
       - name: Package Executable
         run: 7z a -r -sse "..\..\..\..\..\build\app\watermeter-windows-release-amd64.zip" *
         working-directory: build\windows\x64\runner\Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Watermeter_Windows
+          path: build/app/watermeter-windows-release-amd64.zip
      
       - name: Release
         uses: softprops/action-gh-release@v1
