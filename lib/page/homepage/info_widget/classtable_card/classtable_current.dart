@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
@@ -14,90 +16,112 @@ class ClasstableCurrentTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FixedTimeline.tileBuilder(
-      theme: TimelineThemeData(
-        nodePosition: 0,
-      ),
-      builder: TimelineTileBuilder(
-        itemCount: 3,
-        contentsAlign: ContentsAlign.basic,
-        contentsBuilder: (context, index) => switch (index) {
-          0 => const Padding(
-              padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
-              child: ClasstableCurrentColumn()),
-          1 => const Padding(
-              padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
-              child: ClasstableCurrentColumn(isArrangementMode: true)),
-          _ => Padding(
-              padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-              child: Obx(() {
-                late String toShow;
-                if (remaining <= 0) {
-                  toShow = "之后没有日程了";
-                } else {
-                  toShow = "之后还有 $remaining 个日程";
-                }
-                return Text(
-                  toShow,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                );
-              }),
-            ),
-        },
-        indicatorBuilder: (context, index) => Indicator.widget(
-          position: switch (index) {
-            0 => 0.05, // Current Class
-            1 => 0.05, // Next Class
-            _ => 0.50, // More Class
-          },
-          child: Icon(switch (index) {
-            0 => Icons.timelapse_outlined, // Current Class
-            1 => Icons.schedule_outlined, // Next Class
-            _ => Icons.more_time_outlined, // More Class
-          }),
+    return Obx(
+      () => FixedTimeline.tileBuilder(
+        theme: TimelineThemeData(
+          nodePosition: 0,
         ),
-        startConnectorBuilder: (context, index) {
-          if (index == 0) {
-            return null;
-          }
+        builder: TimelineTileBuilder(
+          itemCount: max(arrangement.length + 1, 3),
+          contentsAlign: ContentsAlign.basic,
+          contentsBuilder: (context, index) => switch (index) {
+            0 => const Padding(
+                padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
+                child: ClasstableCurrentColumn()),
+            1 => const Padding(
+                padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
+                child: ClasstableCurrentColumn(isArrangementMode: true)),
+            2 => Padding(
+                padding: const EdgeInsets.fromLTRB(5, 4, 0, 4),
+                child: Obx(() {
+                  late String toShow;
+                  if (remaining <= 0) {
+                    toShow = "之后没有日程了";
+                  } else {
+                    toShow = "之后还有 $remaining 个日程";
+                  }
+                  return Text(
+                    toShow,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  );
+                }),
+              ),
+            _ => Text(
+                "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")} "
+                "${arrangement[index - 1].name} ${arrangement[index - 1].place}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ).padding(left: 6, vertical: 4),
+          },
+          indicatorBuilder: (context, index) => Indicator.widget(
+            position: index < 2 ? 0.05 : 0.5,
+            child: Icon(
+              switch (index) {
+                0 => Icons.timelapse_outlined, // Current Class
+                1 => Icons.schedule_outlined, // Next Class
+                _ => Icons.more_time_outlined, // More Class
+              },
+              size: index > 2 ? 18 : null,
+            ).padding(horizontal: index > 2 ? 3 : null),
+          ),
+          startConnectorBuilder: (context, index) {
+            if (index == 0) {
+              return null;
+            }
 
-          if (index == 1 && isTomorrow.isTrue) {
-            // Use dashedLine between today and tomorrow
-            return Connector.dashedLine(
+            if (index == 1 && isTomorrow.isTrue) {
+              // Use dashedLine between today and tomorrow
+              return Connector.dashedLine(
+                color: Theme.of(context).colorScheme.primary,
+                gap: 4,
+                thickness: 3,
+              );
+            }
+
+            if (index > 2) {
+              return Connector.solidLine(
+                color: Theme.of(context).colorScheme.primary,
+                thickness: 2,
+              );
+            }
+
+            return Connector.solidLine(
               color: Theme.of(context).colorScheme.primary,
-              gap: 4,
               thickness: 3,
             );
-          }
+          },
+          endConnectorBuilder: (context, index) {
+            if (max<int>(arrangement.length + 1, 3) - 1 == index) {
+              return null;
+            }
 
-          return Connector.solidLine(
-            color: Theme.of(context).colorScheme.primary,
-            thickness: 3,
-          );
-        },
-        endConnectorBuilder: (context, index) {
-          if (index >= 2) {
-            return null;
-          }
+            if (index == 0 && isTomorrow.isTrue) {
+              // Use dashedLine between today and tomorrow
+              return Connector.dashedLine(
+                color: Theme.of(context).colorScheme.primary,
+                gap: 4,
+                thickness: 3,
+              );
+            }
 
-          if (index == 0 && isTomorrow.isTrue) {
-            // Use dashedLine between today and tomorrow
-            return Connector.dashedLine(
+            if (index >= 2) {
+              return Connector.solidLine(
+                color: Theme.of(context).colorScheme.primary,
+                thickness: 2,
+              );
+            }
+
+            return Connector.solidLine(
               color: Theme.of(context).colorScheme.primary,
-              gap: 4,
               thickness: 3,
             );
-          }
-
-          return Connector.solidLine(
-            color: Theme.of(context).colorScheme.primary,
-            thickness: 3,
-          );
-        },
+          },
+        ),
       ),
     );
   }

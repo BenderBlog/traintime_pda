@@ -42,17 +42,13 @@ class LibraryCard extends StatelessWidget {
               ),
               children: [
                 if (borrow_info.state.value == SessionState.fetched) ...[
-                  TextSpan(
-                    text: "${borrow_info.borrowList.length}",
-                    style: const TextStyle(
-                      fontSize: 24,
-                    ),
-                  ),
+                  const TextSpan(text: "目前借书 "),
+                  TextSpan(text: "${borrow_info.borrowList.length}"),
                   const TextSpan(text: " 本"),
                 ] else if (borrow_info.state.value == SessionState.error)
-                  const TextSpan(text: "发生错误")
+                  const TextSpan(text: "获取借书信息发生错误")
                 else
-                  const TextSpan(text: "正在获取")
+                  const TextSpan(text: "正在获取借书信息")
               ],
             ),
           ),

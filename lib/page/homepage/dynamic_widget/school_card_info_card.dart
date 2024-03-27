@@ -67,6 +67,9 @@ class SchoolCardInfoCard extends StatelessWidget {
               children: [
                 if (school_card_session.isInit.value ==
                     SessionState.fetched) ...[
+                  if (school_card_session.money.value
+                      .contains(RegExp(r'[0-9]')))
+                    const TextSpan(text: "校园卡余额 "),
                   TextSpan(
                     text: school_card_session.money.value
                             .contains(RegExp(r'[0-9]'))
@@ -76,12 +79,6 @@ class SchoolCardInfoCard extends StatelessWidget {
                                 .toString()
                             : school_card_session.money.value
                         : school_card_session.money.value,
-                    style: TextStyle(
-                      fontSize: school_card_session.money.value
-                              .contains(RegExp(r'[0-9]'))
-                          ? 24
-                          : 20,
-                    ),
                   ),
                   if (school_card_session.money.value
                       .contains(RegExp(r'[0-9]')))
@@ -89,8 +86,8 @@ class SchoolCardInfoCard extends StatelessWidget {
                 ] else
                   TextSpan(
                     text: school_card_session.isInit.value == SessionState.error
-                        ? "发生错误"
-                        : "正在获取",
+                        ? "获取校园卡信息发生错误"
+                        : "正在获取校园卡信息",
                   ),
               ],
             ),

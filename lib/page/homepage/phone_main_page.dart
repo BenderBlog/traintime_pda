@@ -3,7 +3,6 @@
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -23,7 +22,7 @@ class PhoneMainPage extends StatelessWidget {
   final classCardHeight = 140.0;
 
   final List<Widget> children = const [
-    //SportCard(),
+    ClassTableCard(),
     ElectricityCard(),
     LibraryCard(),
     SchoolCardInfoCard(),
@@ -130,66 +129,17 @@ class PhoneMainPage extends StatelessWidget {
             context: context,
             removeTop: true,
             child: ListView(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 8),
               children: [
                 const HeaderLocator(),
                 const NoticeCard(),
-                Text(
-                  "日程",
-                  style: textStyle(context),
-                ).padding(
-                  left: 20,
-                  top: 10,
-                  right: 0,
-                  bottom: 4,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.030,
-                  ),
-                  child: LayoutGrid(
-                    columnSizes: [1.fr],
-                    rowSizes: const [auto, auto],
-                    children: const [
-                      // NoticeCard(),
-                      ClassTableCard(),
-                    ],
-                  ),
-                ),
-                Text(
-                  "动态信息",
-                  style: textStyle(context),
-                ).padding(
-                  left: 20,
-                  top: 20,
-                  right: 0,
-                  bottom: 4,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.040,
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      double squareSize =
-                          constraints.maxWidth * 0.5; // 正方形的大小为父容器宽度的一半
-                      return LayoutGrid(
-                        columnSizes: [1.fr, 1.fr],
-                        rowSizes: [squareSize.px, squareSize.px, auto, auto],
-                        children: children.map(
-                          (child) {
-                            return AspectRatio(
-                              aspectRatio: 1, // 设置宽高比为1，即正方形
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: child,
-                              ),
-                            );
-                          },
-                        ).toList(),
-                      );
-                    },
-                  ),
+                SizedBox(height: 8),
+                ...children.map(
+                  (child) {
+                    return child.padding(
+                      horizontal: MediaQuery.of(context).size.width * 0.030,
+                    );
+                  },
                 ),
               ],
             ),

@@ -173,7 +173,7 @@ void updateCurrentData() {
         experimentController.status == ExperimentStatus.cache) {
       toAdd.addAll(experimentController.getExperimentOfDay(updateTime));
     }
-    toAdd.removeWhere((element) => updateTime.isAfter(element.endTime));
+    toAdd.removeWhere((element) => !updateTime.isBefore(element.endTime));
   }
 
   toAdd.sort((a, b) => Jiffy.parseFromDateTime(a.startTime)

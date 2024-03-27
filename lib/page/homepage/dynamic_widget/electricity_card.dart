@@ -61,15 +61,11 @@ class ElectricityCard extends StatelessWidget {
               children: electricity_session.electricityInfo.value
                       .contains(RegExp(r'[0-9]'))
                   ? [
+                      const TextSpan(text: "目前电量 "),
                       TextSpan(
-                        text: double.parse(
-                          electricity_session.electricityInfo.value,
-                        ).truncate().toString(),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 28,
-                        ),
-                      ),
+                          text: double.parse(
+                        electricity_session.electricityInfo.value,
+                      ).truncate().toString()),
                       const TextSpan(text: " 度"),
                     ]
                   : [

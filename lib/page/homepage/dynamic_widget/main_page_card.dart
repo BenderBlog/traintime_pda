@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
 
 class MainPageCard extends StatelessWidget {
   final bool isLoad;
@@ -45,76 +46,33 @@ class MainPageCard extends StatelessWidget {
         ? Theme.of(context).colorScheme.onPrimaryContainer
         : Theme.of(context).colorScheme.onSecondaryContainer;
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22), // 这里调整圆角的大小
+    return ListTile(
+      leading: Icon(
+        icon,
+        size: 32,
+        color: colorOnPrimary,
       ),
-      elevation: 0,
-      color: colorPrimary,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      title: infoText,
+      subtitle: Builder(
+        builder: (context) {
+          if (isLoad ||
+              (progress != null && progress! >= 0 && progress! <= 1)) {
+            return Column(
               children: [
-                Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 16,
-                    textBaseline: TextBaseline.alphabetic,
-                    color: colorOnPrimary,
-                    fontWeight: FontWeight.w700,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: isLoad ? null : progress,
+                    backgroundColor: colorLineProgressBG,
+                    color: colorLineProgress,
+                    minHeight: 6,
                   ),
                 ),
-                Icon(
-                  Icons.more_vert,
-                  color: colorOnPrimary,
-                  size: 16,
-                )
+                const SizedBox(height: 6),
               ],
-            ),
-            Expanded(
-              child: Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 52,
-                      color: colorOnPrimary,
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: infoText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (isLoad ||
-                (progress != null && progress! >= 0 && progress! <= 1))
-              Column(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: isLoad ? null : progress,
-                      backgroundColor: colorLineProgressBG,
-                      color: colorLineProgress,
-                      minHeight: 6,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                ],
-              )
-            else
-              const SizedBox(height: 8),
-            DefaultTextStyle.merge(
+            );
+          } else {
+            return DefaultTextStyle.merge(
               style: TextStyle(
                 fontSize: 12,
                 color: colorOnPrimary,
@@ -128,10 +86,10 @@ class MainPageCard extends StatelessWidget {
                     Text("${(progress! * 100).toInt()}%"),
                 ],
               ),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
-    );
+    ).withHomeCardStyle(colorPrimary);
   }
 }
