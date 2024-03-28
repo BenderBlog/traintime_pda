@@ -4,11 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
 
 class SmallFunctionCard extends StatelessWidget {
   final IconData icon;
   final String name;
-  final String description;
   final void Function()? onTap;
   final void Function()? onLongPress;
 
@@ -16,7 +16,6 @@ class SmallFunctionCard extends StatelessWidget {
     super.key,
     required this.icon,
     required this.name,
-    required this.description,
     this.onTap,
     this.onLongPress,
   });
@@ -27,56 +26,34 @@ class SmallFunctionCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
   })  : icon = data.iconData,
-        name = data.name,
-        description = data.description;
+        name = data.name;
 
   @override
   Widget build(BuildContext context) {
     return [
       Icon(
         icon,
-        size: 48,
+        size: 32,
         color: Theme.of(context).colorScheme.onSecondaryContainer,
       ),
-      const SizedBox(width: 6),
-      [
-        Text(
-          name,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+      const SizedBox(height: 4),
+      Text(
+        name,
+        style: TextStyle(
+          fontSize: 14,
+          color: Theme.of(context).colorScheme.primary,
         ),
-        Text(
-          description,
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context)
-                .colorScheme
-                .onSecondaryContainer
-                .withOpacity(0.6),
-          ),
-        ),
-      ].toColumn(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-      )
+      ),
     ]
-        .toRow(
-          mainAxisSize: MainAxisSize.max,
+        .toColumn(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
         )
-        .padding(all: 12)
-        .card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          color: Theme.of(context).colorScheme.secondary,
+        .alignment(
+          Alignment.center,
         )
-        .center()
+        .withHomeCardStyle(
+          Theme.of(context).colorScheme.secondary,
+        )
         .gestures(
           onTap: onTap,
           onLongPress: onLongPress,

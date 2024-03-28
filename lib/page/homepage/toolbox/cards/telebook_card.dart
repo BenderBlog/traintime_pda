@@ -21,7 +21,6 @@ class TeleBookCard extends StatelessWidget {
       },
       icon: MingCuteIcons.mgc_phone_line,
       name: "电话本",
-      description: "校园服务电话",
     );
   }
 }

@@ -57,19 +57,14 @@ class MainPageCard extends StatelessWidget {
         builder: (context) {
           if (isLoad ||
               (progress != null && progress! >= 0 && progress! <= 1)) {
-            return Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: isLoad ? null : progress,
-                    backgroundColor: colorLineProgressBG,
-                    color: colorLineProgress,
-                    minHeight: 6,
-                  ),
-                ),
-                const SizedBox(height: 6),
-              ],
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: isLoad ? null : progress,
+                backgroundColor: colorLineProgressBG,
+                color: colorLineProgress,
+                minHeight: 4,
+              ),
             );
           } else {
             return DefaultTextStyle.merge(

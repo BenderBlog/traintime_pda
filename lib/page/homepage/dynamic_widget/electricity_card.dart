@@ -46,10 +46,6 @@ class ElectricityCard extends StatelessWidget {
       child: Obx(
         () => MainPageCard(
           isLoad: electricity_session.isNotice.value,
-          progress: electricity_session.electricityInfo.value
-                  .contains(RegExp(r'[0-9]'))
-              ? double.parse(electricity_session.electricityInfo.value) / 100.0
-              : null,
           icon: MingCuteIcons.mgc_flash_line,
           text: "电量信息",
           infoText: RichText(

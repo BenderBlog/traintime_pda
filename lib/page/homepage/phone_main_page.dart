@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
@@ -14,6 +15,13 @@ import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
 import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/creative_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/empty_classroom_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/exam_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/experiment_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/score_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/sport_card.dart';
+import 'package:watermeter/page/homepage/toolbox/cards/telebook_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 
 class PhoneMainPage extends StatelessWidget {
@@ -26,6 +34,16 @@ class PhoneMainPage extends StatelessWidget {
     ElectricityCard(),
     LibraryCard(),
     SchoolCardInfoCard(),
+  ];
+
+  final List<Widget> smallFunction = const [
+    ScoreCard(),
+    ExamCard(),
+    EmptyClassroomCard(),
+    ExperimentCard(),
+    SportCard(),
+    TeleBookCard(),
+    CreativeCard(),
   ];
 
   String get _now {
@@ -60,7 +78,7 @@ class PhoneMainPage extends StatelessWidget {
           SliverAppBar(
             centerTitle: false,
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-            expandedHeight: 200,
+            expandedHeight: 120,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: false,
@@ -87,8 +105,8 @@ class PhoneMainPage extends StatelessWidget {
                           ? c.getCurrentWeek(updateTime) >= 0 &&
                                   c.getCurrentWeek(updateTime) <
                                       c.classTableData.semesterLength
-                              ? "第 ${c.getCurrentWeek(updateTime) + 1} 周"
-                              : "假期中"
+                              ? "${Jiffy.parseFromDateTime(updateTime).format(pattern: "M月dd日")} 第 ${c.getCurrentWeek(updateTime) + 1} 周 "
+                              : "${Jiffy.parseFromDateTime(updateTime).format(pattern: "M月dd日")} 假期中"
                           : c.state == ClassTableState.error
                               ? "加载错误"
                               : "正在加载",
@@ -129,18 +147,21 @@ class PhoneMainPage extends StatelessWidget {
             context: context,
             removeTop: true,
             child: ListView(
-              padding: const EdgeInsets.only(bottom: 8),
               children: [
                 const HeaderLocator(),
-                const NoticeCard(),
-                SizedBox(height: 8),
-                ...children.map(
-                  (child) {
-                    return child.padding(
+                [
+                  const NoticeCard(),
+                  ...children,
+                  GridView.count(
+                    crossAxisCount: 4,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: smallFunction,
+                  ),
+                ].toColumn().padding(
+                      vertical: 8,
                       horizontal: MediaQuery.of(context).size.width * 0.030,
-                    );
-                  },
-                ),
+                    )
               ],
             ),
           ),

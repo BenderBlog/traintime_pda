@@ -31,7 +31,6 @@ class SportCard extends StatelessWidget {
       },
       icon: MingCuteIcons.mgc_run_fill,
       name: "体育信息",
-      description: "查看体育成绩",
     );
   }
 }

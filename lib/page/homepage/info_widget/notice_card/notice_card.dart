@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/marquee_widget.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_list.dart';
@@ -56,11 +57,9 @@ class NoticeCard extends StatelessWidget {
             horizontal: 16,
             vertical: 14,
           )
-          .decorated(
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            borderRadius: isPhone(context) ? null : BorderRadius.circular(12),
-          )
-          .paddingAll(isPhone(context) ? 0 : 4),
+          .withHomeCardStyle(
+            Theme.of(context).colorScheme.secondary,
+          ),
     );
   }
 }

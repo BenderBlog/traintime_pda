@@ -21,7 +21,6 @@ class XDUPlanetCard extends StatelessWidget {
       },
       icon: MingCuteIcons.mgc_planet_line,
       name: "博客星球",
-      description: "学习先辈经验",
     );
   }
 }

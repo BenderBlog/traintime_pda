@@ -48,36 +48,12 @@ class ToolBoxView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int crossItems = constraints.minWidth ~/ 160;
-
-    int rowItem(int length) {
-      int rowItem = length ~/ crossItems;
-      if (crossItems * rowItem < length) {
-        rowItem += 1;
-      }
-      return rowItem;
-    }
-
-    List<Widget> grid(String text, List<Widget> list) => [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ).padding(
-            left: 16,
-            top: 8,
-            right: 0,
-            bottom: 0,
-          ),
-          LayoutGrid(
-            columnSizes: repeat(crossItems, [1.fr]),
-            rowSizes: repeat(rowItem(list.length), [auto]),
-            children: list,
-          ).padding(horizontal: 16),
-        ];
+    Widget grid(String text, List<Widget> list) => GridView.count(
+          crossAxisCount: 4,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          children: list,
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -93,9 +69,9 @@ class ToolBoxView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 12),
         children: [
-          ...grid("学习", study),
-          ...grid("服务", service),
-          ...grid("其他", others),
+          grid("学习", study),
+          grid("服务", service),
+          grid("其他", others),
         ],
       ),
     );

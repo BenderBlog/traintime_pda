@@ -26,7 +26,6 @@ class ScoreCard extends StatelessWidget {
       },
       icon: Icons.grading_rounded,
       name: "成绩查询",
-      description: "可计算平均分",
     );
   }
 }
