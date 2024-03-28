@@ -10,18 +10,19 @@ import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
-import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
-import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
-import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/library_card.dart';
+import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/creative_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/empty_classroom_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/exam_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/experiment_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/score_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/sport_card.dart';
-import 'package:watermeter/page/homepage/toolbox/cards/telebook_card.dart';
+import 'package:watermeter/page/homepage/toolbox/creative_card.dart';
+import 'package:watermeter/page/homepage/toolbox/empty_classroom_card.dart';
+import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
+import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
+import 'package:watermeter/page/homepage/toolbox/score_card.dart';
+import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
+import 'package:watermeter/page/homepage/toolbox/telebook_card.dart';
+import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 
 class PhoneMainPage extends StatelessWidget {
@@ -44,6 +45,7 @@ class PhoneMainPage extends StatelessWidget {
     SportCard(),
     TeleBookCard(),
     CreativeCard(),
+    ToolboxCard(),
   ];
 
   String get _now {

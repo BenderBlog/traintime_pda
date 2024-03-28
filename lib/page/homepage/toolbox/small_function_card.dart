@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/toolbox_addresses.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 
 class SmallFunctionCard extends StatelessWidget {
@@ -19,14 +18,6 @@ class SmallFunctionCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
   });
-
-  SmallFunctionCard.fromSchoolAddress({
-    super.key,
-    required WebViewAddresses data,
-    this.onTap,
-    this.onLongPress,
-  })  : icon = data.iconData,
-        name = data.name;
 
   @override
   Widget build(BuildContext context) {

@@ -6,20 +6,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
-import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
-import 'package:watermeter/page/homepage/toolbox/webview.dart';
+import 'package:watermeter/page/toolbox/webview.dart';
 
-class WebViewCard extends StatelessWidget {
+class WebViewListTile extends StatelessWidget {
   final WebViewAddresses data;
-  const WebViewCard({
+  const WebViewListTile({
     super.key,
     required this.data,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SmallFunctionCard.fromSchoolAddress(
-      data: data,
+    return ListTile(
+      leading: Icon(data.iconData),
+      title: Text(data.name),
+      subtitle: Text(data.description),
       onTap: () async {
         if (!Platform.isAndroid) {
           launchUrlString(

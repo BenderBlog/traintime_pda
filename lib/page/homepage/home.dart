@@ -4,12 +4,12 @@
 // Main page of this program.
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
-import 'package:watermeter/page/homepage/toolbox/toolbox_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
@@ -60,9 +60,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     ),
     PageInformation(
       index: 1,
-      name: "小工具",
-      icon: MingCuteIcons.mgc_compass_line,
-      iconChoice: MingCuteIcons.mgc_compass_fill,
+      name: "XDU Planet",
+      icon: MingCuteIcons.mgc_planet_line,
+      iconChoice: MingCuteIcons.mgc_planet_fill,
     ),
     PageInformation(
       index: 2,
@@ -83,9 +83,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       children: [
         const MainPage(),
         LayoutBuilder(
-          builder: (context, constraints) => ToolBoxView(
-            constraints: constraints,
-          ),
+          builder: (context, constraints) => const XDUPlanetPage(),
         ),
         const SettingWindow(),
       ],

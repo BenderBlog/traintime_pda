@@ -11,9 +11,9 @@ import 'package:watermeter/controller/classtable_controller.dart';
 
 import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
 
-import 'package:watermeter/page/homepage/dynamic_widget/electricity_card.dart';
-import 'package:watermeter/page/homepage/dynamic_widget/library_card.dart';
-import 'package:watermeter/page/homepage/dynamic_widget/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/library_card.dart';
+import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_card.dart';
 
 import 'package:watermeter/page/homepage/refresh.dart';
