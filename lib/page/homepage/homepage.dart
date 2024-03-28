@@ -83,7 +83,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    double sideBlankRatio = isPhone(context) ? 0.03 : 0.05;
+    double sideBlankRatio = isPhone(context) ? 0.05 : 0.10;
 
     return Scaffold(
       body: ExtendedNestedScrollView(
@@ -95,7 +95,7 @@ class _MainPageState extends State<MainPage> {
           SliverAppBar(
             centerTitle: false,
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-            expandedHeight: 120,
+            expandedHeight: 160,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: false,
