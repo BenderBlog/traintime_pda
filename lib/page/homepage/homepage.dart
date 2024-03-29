@@ -11,7 +11,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
-import 'package:watermeter/page/homepage/info_widget/classtable_card/classtable_card.dart';
+import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
@@ -178,14 +178,10 @@ class _MainPageState extends State<MainPage> {
                       children: smallFunction,
                     ),
                   ] else ...[
-                    [
-                      const ClassTableCard().flexible(flex: 1),
-                      children
-                          .toColumn(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          )
-                          .flexible(flex: 1)
-                    ].toRow(),
+                    const ClassTableCard(),
+                    children.map((e) => e.flexible(flex: 1)).toList().toRow(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        ),
                     GridView.extent(
                       maxCrossAxisExtent: 96,
                       shrinkWrap: true,

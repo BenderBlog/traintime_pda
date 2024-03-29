@@ -139,6 +139,8 @@ void updateCurrentData() {
 
   List<HomeArrangement> toAdd = [];
   updateTime = DateTime.now();
+  updateTime = DateTime(2024, 03, 28, 08, 30);
+
   log.i(
     "[updateCurrentData]"
     "Update classtable, updateTime: $updateTime, "

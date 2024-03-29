@@ -1,18 +1,22 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:timelines/timelines.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 
-class ClasstableCurrentTimeline extends StatelessWidget {
-  const ClasstableCurrentTimeline({super.key});
+class ClassTableCard extends StatelessWidget {
+  const ClassTableCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +54,86 @@ class ClasstableCurrentTimeline extends StatelessWidget {
                   );
                 }),
               ),
-            _ => Text(
-                "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")} "
-                "${arrangement[index - 1].name} ${arrangement[index - 1].place}",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ).padding(left: 6, vertical: 4),
+            _ => Builder(
+                builder: (context) {
+                  if (isPhone(context)) {
+                    return Text(
+                      "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")} "
+                      "${arrangement[index - 1].name} ${arrangement[index - 1].place}",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ).padding(left: 6, vertical: 4);
+                  } else {
+                    return [
+                      [
+                        Icon(
+                          Icons.book,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          arrangement[index - 1].name,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ].toRow(),
+                      [
+                        Icon(
+                          Icons.person,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          arrangement[index - 1].teacher,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ].toRow(),
+                      [
+                        Icon(
+                          Icons.room,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          arrangement[index - 1].place,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ].toRow(),
+                      [
+                        Icon(
+                          Icons.access_time_filled_outlined,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          "${isTomorrow.isTrue ? "明天 " : ""}"
+                          "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")}-"
+                          "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")}",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ].toRow(),
+                    ]
+                        .toRow(separator: const SizedBox(width: 16))
+                        .padding(left: 6, vertical: 4);
+                  }
+                },
+              )
           },
           indicatorBuilder: (context, index) => Indicator.widget(
             position: index < 2 ? 0.05 : 0.5,
@@ -123,6 +200,28 @@ class ClasstableCurrentTimeline extends StatelessWidget {
           },
         ),
       ),
+    )
+        .paddingDirectional(horizontal: 16, vertical: 14)
+        .withHomeCardStyle(Theme.of(context).colorScheme.secondary)
+        .gestures(
+      onTap: () {
+        final c = Get.find<ClassTableController>();
+        switch (c.state) {
+          case ClassTableState.fetched:
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ClassTableWindow(
+                  currentWeek: c.getCurrentWeek(updateTime),
+                ),
+              ),
+            );
+          case ClassTableState.error:
+            Fluttertoast.showToast(msg: "遇到错误：${c.error}");
+          case ClassTableState.fetching:
+          case ClassTableState.none:
+            Fluttertoast.showToast(msg: "正在获取课表");
+        }
+      },
     );
   }
 }
@@ -199,7 +298,7 @@ class ClasstableCurrentListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (homeArrangement != null) {
-      return [
+      List<Widget> data = [
         [
           Icon(
             Icons.person,
@@ -247,7 +346,10 @@ class ClasstableCurrentListTile extends StatelessWidget {
             ),
           ),
         ].toRow(),
-      ].toColumn();
+      ];
+      return isPhone(context)
+          ? data.toColumn()
+          : data.toRow(separator: const SizedBox(width: 20));
     } else {
       return const SizedBox(height: 30.0);
     }
