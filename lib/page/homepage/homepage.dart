@@ -100,7 +100,8 @@ class _MainPageState extends State<MainPage> {
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: false,
               titlePadding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.sizeOf(context).width * sideBlankRatio,
+                horizontal:
+                    MediaQuery.sizeOf(context).width * sideBlankRatio + 4,
                 vertical: 10,
               ),
               title: GetBuilder<ClassTableController>(
