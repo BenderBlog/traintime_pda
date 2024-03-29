@@ -3,8 +3,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/score/score_compose_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 
 class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class
@@ -47,14 +50,28 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
     return GestureDetector(
       onTap: () {
         /// Score choice window
-        if (widget.isScoreChoice) {
-          setState(() => _isVisible = false);
-          Future.delayed(_duration).then((value) {
+        if (c.controllers.isSelectMod) {
+          if (widget.isScoreChoice) {
+            setState(() => _isVisible = false);
+            Future.delayed(_duration).then((value) {
+              c.setScoreChoiceFromIndex(widget.mark);
+              setState(() => _isVisible = true);
+            });
+          } else {
             c.setScoreChoiceFromIndex(widget.mark);
-            setState(() => _isVisible = true);
-          });
-        } else if (c.controllers.isSelectMod) {
-          c.setScoreChoiceFromIndex(widget.mark);
+          }
+        } else {
+          BothSideSheet.show(
+            context: context,
+            title: "成绩详情",
+            child: ScoreComposeCard(
+              score: c.scoreTable[widget.mark],
+              detail: ScoreSession().getDetail(
+                c.scoreTable[widget.mark].classID,
+                c.scoreTable[widget.mark].semesterCode,
+              ),
+            ),
+          );
         }
       },
       child: AnimatedOpacity(

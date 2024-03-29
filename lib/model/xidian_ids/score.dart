@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// ignore_for_file: non_constant_identifier_names
+
 class Score {
   int mark; // 编号，用于某种计算，从 0 开始
   String name; // 学科名称
@@ -14,6 +16,7 @@ class Score {
   int scoreTypeCode; // 评分方式
   String? level; // 等级
   String? isPassedStr; //是否及格，null 没出分，1 通过 0 没有
+  String? classID; // 教学班序列号
   Score({
     required this.mark,
     required this.name,
@@ -26,6 +29,7 @@ class Score {
     required this.classType,
     required this.scoreStatus,
     this.level,
+    this.classID,
   });
 
   bool? get isPassed {
@@ -103,4 +107,15 @@ class Score {
         }
     }
   }
+}
+
+class ComposeDetail {
+  String content;
+  String ratio;
+  String score;
+  ComposeDetail({
+    required this.content,
+    required this.ratio,
+    required this.score,
+  });
 }
