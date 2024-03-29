@@ -131,11 +131,9 @@ class AboutPage extends StatelessWidget {
                 TextSpan(
                   text: " v${preference.packageInfo.version}\n",
                 ),
-                TextSpan(
-                  text: Platform.isIOS || Platform.isMacOS
-                      ? "Sakurako Edition"
-                      : "Himawari Edition",
-                  style: const TextStyle(fontSize: 16),
+                const TextSpan(
+                  text: "Ceremony of Phoenix Edition",
+                  style: TextStyle(fontSize: 16),
                 ),
               ],
             ),
