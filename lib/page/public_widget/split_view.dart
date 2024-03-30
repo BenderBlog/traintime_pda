@@ -3,8 +3,13 @@
 
 // From https://github.com/TerminalStudio/flutter_split_view/blob/main/lib/flutter_split_view.dart
 // Remove cupertino support...
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:styled_widget/styled_widget.dart';
+import 'package:vector_graphics/vector_graphics.dart';
 
 const _kDefaultWidth = 300.0;
 
@@ -173,7 +178,7 @@ class SplitViewState extends State<SplitView> {
             ),
             if (!(widget.hideDivider == true))
               const VerticalDivider(
-                width: 0,
+                width: 1,
               ),
             Expanded(
               child: ClipRect(
@@ -189,7 +194,27 @@ class SplitViewState extends State<SplitView> {
 
   Widget _buildSecondaryView() {
     if (_pages.length == 1) {
-      return widget.placeholder ?? Container();
+      return widget.placeholder ??
+          Scaffold(
+            body: Builder(builder: (context) {
+              if (Platform.isIOS || Platform.isMacOS) {
+                return Opacity(
+                  opacity: 0.25,
+                  child: Image.asset(
+                    "assets/Icon-App-iTunes-Background.png",
+                  ),
+                ).constrained(maxWidth: 300);
+              } else {
+                return SvgPicture(
+                  const AssetBytesLoader("assets/CP1919.svg.vec"),
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.primary,
+                    BlendMode.srcIn,
+                  ),
+                ).constrained(maxWidth: 300, maxHeight: 500);
+              }
+            }).center(),
+          );
     }
 
     return Navigator(

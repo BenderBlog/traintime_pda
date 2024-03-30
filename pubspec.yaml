@@ -54,8 +54,9 @@ dependencies:
   webview_flutter: ^4.2.2
   package_info_plus: ^4.2.0
   flutter_markdown: ^0.6.17+1
-  flutter_layout_grid: ^2.0.4
+  flutter_svg: ^2.0.10+1
   flutter_staggered_grid_view: ^0.7.0
+  vector_graphics_compiler: ^1.1.11+1
   styled_widget: ^0.4.1
   file_picker: ^6.2.0
   chinese_font_library: ^1.1.0
@@ -76,6 +77,7 @@ dev_dependencies:
   change_app_package_name: ^1.1.0
   pigeon: ^17.0.0
 
+
 flutter_launcher_icons:
   android: true
   ios: true
@@ -94,3 +96,5 @@ flutter:
     - assets/Icon-App-iTunes.png
     - assets/Empty-Cover.jpg
     - assets/icon.png
+    - assets/CP1919.svg.vec
+    - assets/Icon-App-iTunes-Background.png

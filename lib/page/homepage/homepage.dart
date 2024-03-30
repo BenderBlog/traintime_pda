@@ -23,7 +23,6 @@ import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
 import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
-import 'package:watermeter/page/homepage/toolbox/telebook_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 
@@ -55,7 +54,6 @@ class _MainPageState extends State<MainPage> {
     EmptyClassroomCard(),
     ExperimentCard(),
     SportCard(),
-    TeleBookCard(),
     CreativeCard(),
     ToolboxCard(),
   ];

@@ -39,7 +39,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SplitView.material(
       childWidth: 360,
-      placeholder: Placeholder(),
       child: HomePageMaster(),
     );
   }
