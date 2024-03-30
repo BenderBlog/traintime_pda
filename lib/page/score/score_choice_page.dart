@@ -149,21 +149,21 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
               .constrained(maxWidth: 480),
           Expanded(
             child: state.selectedScoreList.isNotEmpty
-                ? AlignedGridView.count(
-                    shrinkWrap: true,
-                    itemCount: state.selectedScoreList.length,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                    ),
-                    crossAxisCount:
-                        MediaQuery.sizeOf(context).width ~/ cardWidth,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    itemBuilder: (context, index) => ScoreInfoCard(
-                      mark: state.selectedScoreList[index].mark,
-                      isScoreChoice: true,
-                    ),
-                  )
+                ? LayoutBuilder(
+                    builder: (context, constraints) => AlignedGridView.count(
+                          shrinkWrap: true,
+                          itemCount: state.selectedScoreList.length,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          crossAxisCount: constraints.maxWidth ~/ cardWidth,
+                          mainAxisSpacing: 4,
+                          crossAxisSpacing: 4,
+                          itemBuilder: (context, index) => ScoreInfoCard(
+                            mark: state.selectedScoreList[index].mark,
+                            isScoreChoice: true,
+                          ),
+                        ))
                 : const Center(
                     child: Text("没有选择该学期的课程计入均分计算"),
                   ),

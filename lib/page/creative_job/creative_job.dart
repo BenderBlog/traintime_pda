@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +12,7 @@ import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/creative_job/creative_job_choice.dart';
 import 'package:watermeter/page/creative_job/creative_job_description.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 
 class CreativeJobView extends StatefulWidget {
@@ -101,6 +104,14 @@ class _CreativeJobViewState extends State<CreativeJobView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Platform.isIOS || Platform.isMacOS
+                ? Icons.arrow_back_ios
+                : Icons.arrow_back,
+          ),
+          onPressed: () => SplitView.of(context).pop(),
+        ),
         title: Row(
           children: [
             Expanded(

@@ -130,16 +130,18 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                   ),
                 ),
               );
-              return AlignedGridView.count(
-                shrinkWrap: true,
-                itemCount: bookList.length,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
+              return LayoutBuilder(
+                builder: (context, constraints) => AlignedGridView.count(
+                  shrinkWrap: true,
+                  itemCount: bookList.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                  crossAxisCount: constraints.maxWidth ~/ 360,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  itemBuilder: (context, index) => bookList[index],
                 ),
-                crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                itemBuilder: (context, index) => bookList[index],
               ).safeArea();
             } else if (isSearching.value) {
               return const Center(child: CircularProgressIndicator());

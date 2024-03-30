@@ -41,7 +41,7 @@ class ClassTableView extends StatefulWidget {
 ///
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
-  late Size mediaQuerySize;
+  late BoxConstraints size;
 
   /// The height of the class card.
   double blockheight(double count) =>
@@ -49,7 +49,7 @@ class _ClassTableViewState extends State<ClassTableView> {
       (widget.constraint.minHeight - midRowHeight) /
       (isPhone(context) ? 48 : 61);
 
-  double get blockwidth => (mediaQuerySize.width - leftRow) / 7;
+  double get blockwidth => (size.maxWidth - leftRow) / 7;
 
   bool _checkIsOverlapping(
     double eStart1,
@@ -246,11 +246,19 @@ class _ClassTableViewState extends State<ClassTableView> {
     }
   }
 
+  void updateSize() => size = ClassTableState.of(context)!.constraints;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     classTableState = ClassTableState.of(context)!.controllers;
-    mediaQuerySize = MediaQuery.of(context).size;
+    updateSize();
+  }
+
+  @override
+  void didUpdateWidget(covariant ClassTableView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateSize();
   }
 
   @override
@@ -275,7 +283,7 @@ class _ClassTableViewState extends State<ClassTableView> {
           .toStack()
           .constrained(
             height: blockheight(60),
-            width: mediaQuerySize.width,
+            width: size.maxWidth,
           )
           .scrollable()
           .expanded(),

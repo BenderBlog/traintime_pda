@@ -1,6 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
-
+/*
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
@@ -24,3 +24,4 @@ class XDUPlanetCard extends StatelessWidget {
     );
   }
 }
+*/

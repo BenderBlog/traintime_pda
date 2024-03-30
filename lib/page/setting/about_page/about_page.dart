@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/page/setting/about_page/easter_egg_page.dart';
 import 'package:watermeter/page/setting/about_page/developer_widget.dart';
 import 'package:watermeter/page/setting/about_page/link_widget.dart';
@@ -217,7 +218,17 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("关于本软件")),
+        appBar: AppBar(
+          title: const Text("关于本软件"),
+          leading: IconButton(
+            icon: Icon(
+              Platform.isIOS || Platform.isMacOS
+                  ? Icons.arrow_back_ios
+                  : Icons.arrow_back,
+            ),
+            onPressed: () => SplitView.of(context).pop(),
+          ),
+        ),
         body: Builder(builder: (context) {
           if (MediaQuery.sizeOf(context).width > 600 &&
               MediaQuery.sizeOf(context).width /

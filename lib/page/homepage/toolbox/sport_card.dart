@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -22,10 +23,8 @@ class SportCard extends StatelessWidget {
           );
         }
         if (context.mounted && isGood) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const SportWindow(),
-            ),
+          SplitView.of(context).setSecondary(
+            const SportWindow(),
           );
         }
       },

@@ -56,16 +56,18 @@ class BorrowListDetail extends StatelessWidget {
     return Scaffold(
       body: Builder(builder: (context) {
         if (borrow_info.borrowList.isNotEmpty) {
-          return AlignedGridView.count(
-            shrinkWrap: true,
-            itemCount: borrowList.length,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
+          return LayoutBuilder(
+            builder: (context, constraints) => AlignedGridView.count(
+              shrinkWrap: true,
+              itemCount: borrowList.length,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+              ),
+              crossAxisCount: constraints.maxWidth ~/ 360,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              itemBuilder: (context, index) => borrowList[index],
             ),
-            crossAxisCount: MediaQuery.sizeOf(context).width ~/ 360,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-            itemBuilder: (context, index) => borrowList[index],
           );
         } else {
           return const Text("目前没有查询到在借图书").center();

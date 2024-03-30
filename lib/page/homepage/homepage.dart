@@ -26,7 +26,6 @@ import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/page/homepage/toolbox/telebook_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -83,8 +82,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    double sideBlankRatio = isPhone(context) ? 0.05 : 0.10;
-
     return Scaffold(
       body: ExtendedNestedScrollView(
         onlyOneScrollInBody: true,
@@ -99,9 +96,8 @@ class _MainPageState extends State<MainPage> {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: false,
-              titlePadding: EdgeInsets.symmetric(
-                horizontal:
-                    MediaQuery.sizeOf(context).width * sideBlankRatio + 4,
+              titlePadding: const EdgeInsets.symmetric(
+                horizontal: 20,
                 vertical: 10,
               ),
               title: GetBuilder<ClassTableController>(
@@ -169,31 +165,17 @@ class _MainPageState extends State<MainPage> {
                 const HeaderLocator(),
                 <Widget>[
                   const NoticeCard(),
-                  if (isPhone(context)) ...[
-                    const ClassTableCard(),
-                    ...children,
-                    GridView.count(
-                      crossAxisCount: 4,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: smallFunction,
-                    ),
-                  ] else ...[
-                    const ClassTableCard(),
-                    children.map((e) => e.flexible(flex: 1)).toList().toRow(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        ),
-                    GridView.extent(
-                      maxCrossAxisExtent: 96,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: smallFunction,
-                    ),
-                  ]
+                  const ClassTableCard(),
+                  ...children,
+                  GridView.extent(
+                    maxCrossAxisExtent: 96,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: smallFunction,
+                  ),
                 ].toColumn().padding(
                       vertical: 8,
-                      horizontal:
-                          MediaQuery.of(context).size.width * sideBlankRatio,
+                      horizontal: 16,
                     )
               ],
             ),

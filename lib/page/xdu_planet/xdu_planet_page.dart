@@ -7,10 +7,12 @@ import 'dart:math';
 
 // import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/xdu_planet/person_page.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class XDUPlanetPage extends StatefulWidget {
@@ -94,13 +96,19 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                       //leading: icon(index),
                       title: Text(snapshot.data!.author[index].name),
                       //subtitle: Text(snapshot.data!.author[index].description),
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => PersonalPage(
-                          person: snapshot.data!.author[index],
-                          //index: keys[index],
-                          //repo: data[keys[index]]!,
+                      onTap: () => SplitView.of(context).setSecondary(
+                        SplitView.material(
+                          breakpoint: 360,
+                          placeholder: Scaffold(
+                            body: const Text("请点进去一个文章").center(),
+                          ),
+                          child: PersonalPage(
+                            person: snapshot.data!.author[index],
+                            //index: keys[index],
+                            //repo: data[keys[index]]!,
+                          ),
                         ),
-                      )),
+                      ),
                     ),
                   ),
                 ),

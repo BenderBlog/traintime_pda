@@ -16,12 +16,14 @@ import 'package:watermeter/repository/preference.dart' as preference;
 class ClassTableState extends InheritedWidget {
   final ClassTableWidgetState controllers;
   final BuildContext parentContext;
+  final BoxConstraints constraints;
 
   const ClassTableState({
     super.key,
     required super.child,
     required this.parentContext,
     required this.controllers,
+    required this.constraints,
   });
 
   static ClassTableState? of(BuildContext context) {

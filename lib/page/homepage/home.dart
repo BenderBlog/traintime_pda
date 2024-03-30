@@ -4,13 +4,13 @@
 // Main page of this program.
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -32,14 +32,28 @@ class PageInformation {
   });
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return const SplitView.material(
+      childWidth: 360,
+      placeholder: Placeholder(),
+      child: HomePageMaster(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class HomePageMaster extends StatefulWidget {
+  const HomePageMaster({super.key});
+
+  @override
+  State<HomePageMaster> createState() => _HomePageMasterState();
+}
+
+class _HomePageMasterState extends State<HomePageMaster>
+    with WidgetsBindingObserver {
   int _selectedIndex = 0;
 
   @override
@@ -201,64 +215,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Row(
-        children: [
-          Visibility(
-            visible: !isPhone(context),
-            child: NavigationRail(
-              backgroundColor: Theme.of(context).colorScheme.background,
-              indicatorColor: Theme.of(context).colorScheme.secondary,
-              elevation: 1,
-              destinations: _destinations
-                  .map(
-                    (e) => NavigationRailDestination(
-                      icon: _selectedIndex == e.index
-                          ? Icon(e.iconChoice)
-                          : Icon(e.icon),
-                      label: Text(e.name),
-                    ),
-                  )
-                  .toList(),
-              labelType: NavigationRailLabelType.all,
-              selectedIndex: _selectedIndex,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-                _controller.jumpToPage(_selectedIndex);
-              },
-            ),
-          ),
-          Expanded(
-            child: _pageView,
-          ),
-        ],
-      ),
-      bottomNavigationBar: isPhone(context)
-          ? NavigationBar(
-              backgroundColor: Theme.of(context).colorScheme.background,
-              indicatorColor: Theme.of(context).colorScheme.secondary,
-              height: 64,
-              destinations: _destinations
-                  .map(
-                    (e) => NavigationDestination(
-                      icon: _selectedIndex == e.index
-                          ? Icon(e.iconChoice)
-                          : Icon(e.icon),
-                      label: e.name,
-                    ),
-                  )
-                  .toList(),
-              selectedIndex: _selectedIndex,
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-                _controller.jumpToPage(_selectedIndex);
-              },
+      body: _pageView,
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        indicatorColor: Theme.of(context).colorScheme.secondary,
+        height: 64,
+        destinations: _destinations
+            .map(
+              (e) => NavigationDestination(
+                icon: _selectedIndex == e.index
+                    ? Icon(e.iconChoice)
+                    : Icon(e.icon),
+                label: e.name,
+              ),
             )
-          : null,
+            .toList(),
+        selectedIndex: _selectedIndex,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          _controller.jumpToPage(_selectedIndex);
+        },
+      ),
     );
   }
 }

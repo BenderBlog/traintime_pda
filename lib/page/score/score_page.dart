@@ -142,16 +142,18 @@ class _ScorePageState extends State<ScorePage> {
               .constrained(maxWidth: 480),
           Builder(builder: (context) {
             if (c.toShow.isNotEmpty) {
-              return MasonryGridView.count(
-                shrinkWrap: true,
-                itemCount: c.toShow.length,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
+              return LayoutBuilder(
+                builder: (context, constraints) => AlignedGridView.count(
+                  shrinkWrap: true,
+                  itemCount: c.toShow.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                  crossAxisCount: constraints.maxWidth ~/ cardWidth,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  itemBuilder: (context, index) => scoreList[index],
                 ),
-                crossAxisCount: MediaQuery.sizeOf(context).width ~/ cardWidth,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                itemBuilder: (context, index) => scoreList[index],
               );
             } else {
               return const Text("未筛查到合请求的记录").center();

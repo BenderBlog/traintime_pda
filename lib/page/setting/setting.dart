@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -83,11 +84,8 @@ class _SettingWindowState extends State<SettingWindow> {
                       title: const Text("关于本程序"),
                       subtitle: Text(
                           '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AboutPage(),
-                        ),
-                      ),
+                      onTap: () =>
+                          SplitView.of(context).setSecondary(const AboutPage()),
                       trailing: const Icon(Icons.navigate_next),
                     ),
                     const Divider(),

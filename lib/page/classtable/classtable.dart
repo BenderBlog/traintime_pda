@@ -9,15 +9,20 @@ import 'package:watermeter/page/classtable/class_page/classtable_page.dart';
 
 class ClassTableWindow extends StatelessWidget {
   final int currentWeek;
+  final BuildContext parentContext;
+  final BoxConstraints constraints;
   const ClassTableWindow({
     super.key,
     required this.currentWeek,
+    required this.parentContext,
+    required this.constraints,
   });
 
   @override
   Widget build(BuildContext context) {
     return ClassTableState(
-      parentContext: context,
+      parentContext: parentContext,
+      constraints: constraints,
       controllers: ClassTableWidgetState(currentWeek: currentWeek),
       child: Navigator(
         onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(

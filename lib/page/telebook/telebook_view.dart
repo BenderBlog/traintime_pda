@@ -1,12 +1,14 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/model/telephone.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/telephone.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -21,6 +23,14 @@ class TeleBookWindow extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("电话本"),
+        leading: IconButton(
+          icon: Icon(
+            Platform.isIOS || Platform.isMacOS
+                ? Icons.arrow_back_ios
+                : Icons.arrow_back,
+          ),
+          onPressed: () => SplitView.of(context).pop(),
+        ),
       ),
       body: DataList(
         list: list,

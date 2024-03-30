@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// The index row of the class table, shows the index of the day and the week.
 class ClassTableDateRow extends StatelessWidget {
@@ -53,9 +54,9 @@ class WeekInfomation extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isToday =
         (time.month == DateTime.now().month && time.day == DateTime.now().day);
-    Size mediaQuerySize = MediaQuery.of(context).size;
+    BoxConstraints size = ClassTableState.of(context)!.constraints;
     return SizedBox(
-      width: (mediaQuerySize.width - leftRow) / 7,
+      width: (size.maxWidth - leftRow) / 7,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

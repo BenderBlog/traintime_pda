@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
@@ -22,10 +23,8 @@ class LibraryCard extends StatelessWidget {
         if (offline) {
           Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const LibraryWindow(),
-            ),
+          SplitView.of(context).setSecondary(
+            const LibraryWindow(),
           );
         }
       },

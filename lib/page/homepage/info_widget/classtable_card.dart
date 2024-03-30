@@ -14,6 +14,7 @@ import 'package:timelines/timelines.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 
 class ClassTableCard extends StatelessWidget {
   const ClassTableCard({super.key});
@@ -208,10 +209,12 @@ class ClassTableCard extends StatelessWidget {
         final c = Get.find<ClassTableController>();
         switch (c.state) {
           case ClassTableState.fetched:
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ClassTableWindow(
+            SplitView.of(context).setSecondary(
+              LayoutBuilder(
+                builder: (context, constraints) => ClassTableWindow(
+                  parentContext: context,
                   currentWeek: c.getCurrentWeek(updateTime),
+                  constraints: constraints,
                 ),
               ),
             );

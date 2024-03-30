@@ -3,9 +3,12 @@
 
 // Library Window.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
 import 'package:watermeter/page/library/search_book_window.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 
 class LibraryWindow extends StatelessWidget {
   const LibraryWindow({super.key});
@@ -17,6 +20,14 @@ class LibraryWindow extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("图书馆信息"),
+          leading: IconButton(
+            icon: Icon(
+              Platform.isIOS || Platform.isMacOS
+                  ? Icons.arrow_back_ios
+                  : Icons.arrow_back,
+            ),
+            onPressed: () => SplitView.of(context).pop(),
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(

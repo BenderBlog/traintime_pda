@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/page/score/score.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
@@ -17,10 +18,8 @@ class ScoreCard extends StatelessWidget {
         if (offline) {
           Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const ScoreWindow(),
-            ),
+          SplitView.of(context).setSecondary(
+            const ScoreWindow(),
           );
         }
       },

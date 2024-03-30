@@ -3,11 +3,14 @@
 
 // School card log list.
 
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
@@ -60,6 +63,14 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("校园卡流水信息"),
+          leading: IconButton(
+            icon: Icon(
+              Platform.isIOS || Platform.isMacOS
+                  ? Icons.arrow_back_ios
+                  : Icons.arrow_back,
+            ),
+            onPressed: () => SplitView.of(context).pop(),
+          ),
         ),
         body: Column(
           children: [
