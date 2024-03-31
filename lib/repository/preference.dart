@@ -3,12 +3,16 @@
 
 // General user setting preference.
 
+import 'package:flutter/widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences prefs;
 late PackageInfo packageInfo;
 
+final GlobalKey<NavigatorState> splitViewKey =
+    GlobalKey<NavigatorState>(debugLabel: "PDASplitKey");
+final GlobalKey leftKey = GlobalKey();
 const String appId = "group.xyz.superbart.xdyou";
 
 enum Preference {

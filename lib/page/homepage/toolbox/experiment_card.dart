@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/experiment/experiment_window.dart';
@@ -29,7 +29,7 @@ class ExperimentCard extends StatelessWidget {
         }
         if (context.mounted && isGood) {
           Get.put(ExperimentController()).get();
-          SplitView.of(context).setSecondary(
+          context.push(
             const ExperimentWindow(),
           );
         }

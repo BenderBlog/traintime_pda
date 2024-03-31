@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
@@ -39,7 +39,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => SplitView.of(context).pop(),
+            onPressed: () => context.pop(),
           ),
           actions: [
             IconButton(

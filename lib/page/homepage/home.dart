@@ -3,8 +3,9 @@
 
 // Main page of this program.
 
+import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,6 +14,7 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
+import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -37,9 +39,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SplitView.material(
-      childWidth: 360,
-      child: HomePageMaster(),
+    return BasedSplitView(
+      navigatorKey: splitViewKey,
+      leftWidget: HomePageMaster(
+        key: leftKey,
+      ),
+      rightPlaceholder: const SplitPagePlaceholder(),
     );
   }
 }

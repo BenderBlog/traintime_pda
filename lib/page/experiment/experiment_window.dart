@@ -8,8 +8,8 @@ import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/experiment/experiment_info_card.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 
@@ -34,7 +34,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 ? Icons.arrow_back_ios
                 : Icons.arrow_back,
           ),
-          onPressed: () => SplitView.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: GetBuilder<ExperimentController>(

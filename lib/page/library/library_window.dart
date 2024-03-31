@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
 import 'package:watermeter/page/library/search_book_window.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 
 class LibraryWindow extends StatelessWidget {
   const LibraryWindow({super.key});
@@ -26,7 +26,7 @@ class LibraryWindow extends StatelessWidget {
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => SplitView.of(context).pop(),
+            onPressed: () => context.pop(),
           ),
           bottom: const TabBar(
             tabs: [

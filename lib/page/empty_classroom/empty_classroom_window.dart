@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_search_window.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
 
 class EmptyClassroomWindow extends StatefulWidget {
@@ -38,7 +38,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                 ? Icons.arrow_back_ios
                 : Icons.arrow_back,
           ),
-          onPressed: () => SplitView.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: FutureBuilder(

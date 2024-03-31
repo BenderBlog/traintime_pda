@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/schoolcard/school_card_window.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
@@ -28,7 +28,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         } else {
           switch (school_card_session.isInit.value) {
             case SessionState.fetched:
-              SplitView.of(context).setSecondary(
+              context.push(
                 const SchoolCardWindow(),
               );
               break;

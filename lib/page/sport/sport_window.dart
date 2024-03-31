@@ -6,7 +6,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/sport/sport_class_window.dart';
 import 'package:watermeter/page/sport/sport_score_window.dart';
 
@@ -25,7 +25,7 @@ class SportWindow extends StatelessWidget {
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => SplitView.of(context).pop(),
+            onPressed: () => context.pop(),
           ),
           title: const Text("体育查询"),
           bottom: const TabBar(

@@ -6,6 +6,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
+import 'package:watermeter/repository/logger.dart';
 
 const _kDefaultWidth = 300.0;
 
@@ -242,7 +243,13 @@ class SplitViewState extends State<SplitView> {
     bool? fullscreenDialog,
   }) {
     _pageConfigs[index] = _PageConfig(
-      child: page,
+      child: NavigatorPopHandler(
+        onPop: () {
+          log.i("Poping");
+          SplitView.of(context).pop();
+        },
+        child: page,
+      ),
       name: title,
       arguments: arguments,
       restorationId: restorationId,

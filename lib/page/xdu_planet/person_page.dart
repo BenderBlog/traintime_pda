@@ -10,9 +10,9 @@ import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/xdu_planet/content_page.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
 
 class PersonalPage extends StatelessWidget {
   final Person person;
@@ -34,7 +34,7 @@ class PersonalPage extends StatelessWidget {
                 : Icons.arrow_back,
           ),
           onPressed: () {
-            SplitView.of(context).pop();
+            context.pop();
           },
         ),
         actions: [
@@ -67,7 +67,7 @@ class PersonalPage extends StatelessWidget {
                   person.article[index].time,
                 ).format(pattern: "yyyy年MM月dd日")}",
               ),
-              onTap: () => SplitView.of(context).push(
+              onTap: () => context.push(
                 ContentPage(
                   article: person.article[index],
                   author: person.name,

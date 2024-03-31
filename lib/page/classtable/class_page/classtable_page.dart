@@ -13,7 +13,7 @@ import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_not_arranged/not_arranged_class_list.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
@@ -75,7 +75,8 @@ class _ClassTablePageState extends State<ClassTablePage>
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => SplitView.of(context).pop(),
+            onPressed: () =>
+                Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
           ),
           actions: [
             if (haveClass)
@@ -225,7 +226,7 @@ class _ClassTablePageState extends State<ClassTablePage>
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => SplitView.of(context).pop(),
+            onPressed: () => context.pop(),
           ),
         ),
         body: const EmptyClasstablePage(),

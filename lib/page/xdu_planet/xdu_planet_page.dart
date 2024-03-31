@@ -9,9 +9,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/xdu_planet/person_page.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class XDUPlanetPage extends StatefulWidget {
@@ -94,7 +94,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     itemBuilder: (context, index) => ListTile(
                         title: Text(snapshot.data!.author[index].name),
                         onTap: () {
-                          return SplitView.of(context).setSecondary(
+                          context.push(
                             PersonalPage(
                               key: ValueKey(snapshot.data!.author[index].name),
                               person: snapshot.data!.author[index],

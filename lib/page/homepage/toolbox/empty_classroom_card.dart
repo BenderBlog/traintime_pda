@@ -5,7 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_window.dart';
@@ -22,7 +22,7 @@ class EmptyClassroomCard extends StatelessWidget {
           if (offline) {
             Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else {
-            SplitView.of(context).setSecondary(
+            context.push(
               const EmptyClassroomWindow(),
             );
           }

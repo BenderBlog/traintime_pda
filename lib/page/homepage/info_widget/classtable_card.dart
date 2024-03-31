@@ -1,7 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
-import 'dart:math';
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -13,8 +13,8 @@ import 'package:jiffy/jiffy.dart';
 import 'package:timelines/timelines.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/public_widget/split_view.dart';
 
 class ClassTableCard extends StatelessWidget {
   const ClassTableCard({super.key});
@@ -209,15 +209,13 @@ class ClassTableCard extends StatelessWidget {
         final c = Get.find<ClassTableController>();
         switch (c.state) {
           case ClassTableState.fetched:
-            SplitView.of(context).setSecondary(
-              LayoutBuilder(
-                builder: (context, constraints) => ClassTableWindow(
-                  parentContext: context,
-                  currentWeek: c.getCurrentWeek(updateTime),
-                  constraints: constraints,
-                ),
+            context.push(LayoutBuilder(
+              builder: (context, constraints) => ClassTableWindow(
+                parentContext: context,
+                currentWeek: c.getCurrentWeek(updateTime),
+                constraints: constraints,
               ),
-            );
+            ));
           case ClassTableState.error:
             Fluttertoast.showToast(msg: "遇到错误：${c.error}");
           case ClassTableState.fetching:
