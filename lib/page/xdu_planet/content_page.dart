@@ -3,6 +3,7 @@
 
 // Content page of XDU Planet.
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/split_view.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class ContentPage extends StatefulWidget {
@@ -32,8 +34,14 @@ class _ContentPageState extends State<ContentPage> {
   late Future<String> content;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    content = PlanetSession().content(widget.article.content);
+  }
+
+  @override
+  void didUpdateWidget(covariant ContentPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
     content = PlanetSession().content(widget.article.content);
   }
 
@@ -42,6 +50,16 @@ class _ContentPageState extends State<ContentPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.article.title),
+        leading: IconButton(
+          icon: Icon(
+            Platform.isIOS || Platform.isMacOS
+                ? Icons.arrow_back_ios
+                : Icons.arrow_back,
+          ),
+          onPressed: () {
+            SplitView.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.link),

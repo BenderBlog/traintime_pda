@@ -7,7 +7,6 @@ import 'dart:math';
 
 // import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -93,23 +92,15 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                   child: ListView.builder(
                     itemCount: snapshot.data?.author.length ?? 0,
                     itemBuilder: (context, index) => ListTile(
-                      //leading: icon(index),
-                      title: Text(snapshot.data!.author[index].name),
-                      //subtitle: Text(snapshot.data!.author[index].description),
-                      onTap: () => SplitView.of(context).setSecondary(
-                        SplitView.material(
-                          breakpoint: 360,
-                          placeholder: Scaffold(
-                            body: const Text("请点进去一个文章").center(),
-                          ),
-                          child: PersonalPage(
-                            person: snapshot.data!.author[index],
-                            //index: keys[index],
-                            //repo: data[keys[index]]!,
-                          ),
-                        ),
-                      ),
-                    ),
+                        title: Text(snapshot.data!.author[index].name),
+                        onTap: () {
+                          return SplitView.of(context).setSecondary(
+                            PersonalPage(
+                              key: ValueKey(snapshot.data!.author[index].name),
+                              person: snapshot.data!.author[index],
+                            ),
+                          );
+                        }),
                   ),
                 ),
               );

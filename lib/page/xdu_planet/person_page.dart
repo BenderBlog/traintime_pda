@@ -3,6 +3,7 @@
 
 // Person page of XDU Planet.
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:jiffy/jiffy.dart';
@@ -12,45 +13,35 @@ import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/xdu_planet/content_page.dart';
 import 'package:watermeter/page/public_widget/split_view.dart';
-//import 'package:watermeter/page/xdu_planet/content_page.dart';
-//import 'package:watermeter/repository/xdu_planet_session.dart';
 
-class PersonalPage extends StatefulWidget {
+class PersonalPage extends StatelessWidget {
   final Person person;
-  //final String index;
-  //final Repo repo;
 
   const PersonalPage({
     super.key,
     required this.person,
-    //required this.index,
-    //required this.repo,
   });
-
-  @override
-  State<PersonalPage> createState() => _PersonalPageState();
-}
-
-class _PersonalPageState extends State<PersonalPage> {
-  /*
-  late Future<TitleList> titleList;
-  @override
-  void initState() {
-    super.initState();
-    titleList = PlanetSession().titleList(widget.index);
-  }
-  */
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.person.name),
+        title: Text(person.name),
+        leading: IconButton(
+          icon: Icon(
+            Platform.isIOS || Platform.isMacOS
+                ? Icons.arrow_back_ios
+                : Icons.arrow_back,
+          ),
+          onPressed: () {
+            SplitView.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.link),
             onPressed: () => launchUrlString(
-              widget.person.uri,
+              person.uri,
               mode: LaunchMode.externalApplication,
             ),
           ),
@@ -66,18 +57,20 @@ class _PersonalPageState extends State<PersonalPage> {
             ),
           ),
           child: ListView.builder(
-            itemCount: widget.person.article.length,
+            itemCount: person.article.length,
             itemBuilder: (context, index) => ListTile(
               title: Text(
-                widget.person.article[index].title,
+                person.article[index].title,
               ),
               subtitle: Text(
-                "发布于：${Jiffy.parseFromDateTime(widget.person.article[index].time).format(pattern: "yyyy年MM月dd日")}",
+                "发布于：${Jiffy.parseFromDateTime(
+                  person.article[index].time,
+                ).format(pattern: "yyyy年MM月dd日")}",
               ),
-              onTap: () => SplitView.of(context).setSecondary(
+              onTap: () => SplitView.of(context).push(
                 ContentPage(
-                  article: widget.person.article[index],
-                  author: widget.person.name,
+                  article: person.article[index],
+                  author: person.name,
                 ),
               ),
             ),
