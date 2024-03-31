@@ -140,10 +140,9 @@ class _ContentPageState extends State<ContentPage> {
                   minWidth: min(
                     MediaQuery.of(context).size.width,
                     sheetMaxWidth - 16,
-                  ))
-              .safeArea();
+                  ));
         },
-      ),
+      ).center().safeArea(),
     );
   }
 }
