@@ -14,7 +14,6 @@ import 'package:timelines/timelines.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class ClassTableCard extends StatelessWidget {
   const ClassTableCard({super.key});
@@ -55,86 +54,15 @@ class ClassTableCard extends StatelessWidget {
                   );
                 }),
               ),
-            _ => Builder(
-                builder: (context) {
-                  if (isPhone(context)) {
-                    return Text(
-                      "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")} "
-                      "${arrangement[index - 1].name} ${arrangement[index - 1].place}",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ).padding(left: 6, vertical: 4);
-                  } else {
-                    return [
-                      [
-                        Icon(
-                          Icons.book,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          arrangement[index - 1].name,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ].toRow(),
-                      [
-                        Icon(
-                          Icons.person,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          arrangement[index - 1].teacher,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ].toRow(),
-                      [
-                        Icon(
-                          Icons.room,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          arrangement[index - 1].place,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ].toRow(),
-                      [
-                        Icon(
-                          Icons.access_time_filled_outlined,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          "${isTomorrow.isTrue ? "明天 " : ""}"
-                          "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")}-"
-                          "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")}",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ].toRow(),
-                    ]
-                        .toRow(separator: const SizedBox(width: 16))
-                        .padding(left: 6, vertical: 4);
-                  }
-                },
-              )
+            _ => Builder(builder: (context) {
+                return Text(
+                  "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")} "
+                  "${arrangement[index - 1].name} ${arrangement[index - 1].place}",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ).padding(left: 6, vertical: 4);
+              })
           },
           indicatorBuilder: (context, index) => Indicator.widget(
             position: index < 2 ? 0.05 : 0.5,
@@ -209,7 +137,7 @@ class ClassTableCard extends StatelessWidget {
         final c = Get.find<ClassTableController>();
         switch (c.state) {
           case ClassTableState.fetched:
-            context.push(LayoutBuilder(
+            context.pushReplacement(LayoutBuilder(
               builder: (context, constraints) => ClassTableWindow(
                 parentContext: context,
                 currentWeek: c.getCurrentWeek(updateTime),
@@ -299,7 +227,7 @@ class ClasstableCurrentListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (homeArrangement != null) {
-      List<Widget> data = [
+      return [
         [
           Icon(
             Icons.person,
@@ -347,10 +275,7 @@ class ClasstableCurrentListTile extends StatelessWidget {
             ),
           ),
         ].toRow(),
-      ];
-      return isPhone(context)
-          ? data.toColumn()
-          : data.toRow(separator: const SizedBox(width: 20));
+      ].toColumn();
     } else {
       return const SizedBox(height: 30.0);
     }

@@ -84,7 +84,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       title: const Text("关于本程序"),
                       subtitle: Text(
                           '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
-                      onTap: () => context.push(const AboutPage()),
+                      onTap: () => context.pushReplacement(const AboutPage()),
                       trailing: const Icon(Icons.navigate_next),
                     ),
                     const Divider(),

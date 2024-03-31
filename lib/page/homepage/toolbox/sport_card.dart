@@ -23,9 +23,7 @@ class SportCard extends StatelessWidget {
           );
         }
         if (context.mounted && isGood) {
-          context.push(
-            const SportWindow(),
-          );
+          context.pushReplacement(const SportWindow());
         }
       },
       icon: MingCuteIcons.mgc_run_fill,

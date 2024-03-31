@@ -19,9 +19,7 @@ class CreativeCard extends StatelessWidget {
         if (offline) {
           Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
-          context.push(
-            const CreativeJobView(),
-          );
+          context.pushReplacement(const CreativeJobView());
         }
       },
       icon: MingCuteIcons.mgc_star_line,

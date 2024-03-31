@@ -3,8 +3,6 @@
 
 // Score Window
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -67,17 +65,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
           );
         }
         return Scaffold(
-          appBar: AppBar(
-            title: const Text("成绩查询"),
-            leading: IconButton(
-              icon: Icon(
-                Platform.isIOS || Platform.isMacOS
-                    ? Icons.arrow_back_ios_new
-                    : Icons.arrow_back,
-              ),
-              onPressed: Navigator.of(context).pop,
-            ),
-          ),
+          appBar: AppBar(title: const Text("成绩查询")),
           body: body,
         );
       },

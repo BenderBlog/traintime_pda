@@ -1,14 +1,11 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/experiment/experiment_info_card.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
@@ -26,17 +23,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("物理实验"),
-        leading: IconButton(
-          icon: Icon(
-            Platform.isIOS || Platform.isMacOS
-                ? Icons.arrow_back_ios
-                : Icons.arrow_back,
-          ),
-          onPressed: () => context.pop(),
-        ),
-      ),
+      appBar: AppBar(title: const Text("物理实验")),
       body: GetBuilder<ExperimentController>(
         builder: (controller) {
           if (controller.status == ExperimentStatus.fetched ||

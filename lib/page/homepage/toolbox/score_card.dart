@@ -18,9 +18,7 @@ class ScoreCard extends StatelessWidget {
         if (offline) {
           Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
-          context.push(
-            const ScoreWindow(),
-          );
+          context.pushReplacement(const ScoreWindow());
         }
       },
       icon: Icons.grading_rounded,

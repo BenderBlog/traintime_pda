@@ -9,6 +9,21 @@ extension BuildContextExt on BuildContext {
       (splitViewKey.currentState ?? Navigator.of(this))
           .push(MaterialPageRoute<T>(builder: (_) => page));
 
+  Future<T?> pushReplacement<T extends Object?>(Widget page) {
+    if (splitViewKey.currentState != null) {
+      return splitViewKey.currentState!.pushAndRemoveUntil(
+        MaterialPageRoute<T>(builder: (_) => page),
+        (route) => route.isFirst && route.isActive,
+      );
+    } else {
+      return Navigator.of(this).pushReplacement(MaterialPageRoute<T>(
+        builder: (_) => page,
+      ));
+    }
+  }
+
+  ///( ?? );
+
   void pop<T extends Object?>([T? result]) => Navigator.pop(this, result);
 
   Future<T?> pushDialog<T>(

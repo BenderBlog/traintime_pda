@@ -67,7 +67,7 @@ class PersonalPage extends StatelessWidget {
                   person.article[index].time,
                 ).format(pattern: "yyyy年MM月dd日")}",
               ),
-              onTap: () => context.push(
+              onTap: () => context.pushReplacement(
                 ContentPage(
                   article: person.article[index],
                   author: person.name,

@@ -3,14 +3,11 @@
 
 // Exam Infomation Interface.
 
-import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
@@ -33,14 +30,6 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
       builder: (c) => Scaffold(
         appBar: AppBar(
           title: const Text("考试安排"),
-          leading: IconButton(
-            icon: Icon(
-              Platform.isIOS || Platform.isMacOS
-                  ? Icons.arrow_back_ios
-                  : Icons.arrow_back,
-            ),
-            onPressed: () => context.pop(),
-          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.more_time),

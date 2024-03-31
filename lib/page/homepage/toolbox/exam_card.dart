@@ -26,11 +26,7 @@ class ExamCard extends StatelessWidget {
             Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else if (c.status == ExamStatus.cache ||
               c.status == ExamStatus.fetched) {
-            context.push(
-              ExamInfoWindow(
-                time: updateTime,
-              ),
-            );
+            context.pushReplacement(ExamInfoWindow(time: updateTime));
           } else if (c.status != ExamStatus.error) {
             Fluttertoast.showToast(msg: "请稍候，正在获取考试信息");
           } else {

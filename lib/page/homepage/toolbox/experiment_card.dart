@@ -29,9 +29,7 @@ class ExperimentCard extends StatelessWidget {
         }
         if (context.mounted && isGood) {
           Get.put(ExperimentController()).get();
-          context.push(
-            const ExperimentWindow(),
-          );
+          context.pushReplacement(const ExperimentWindow());
         }
       },
       icon: MingCuteIcons.mgc_science_line,

@@ -14,9 +14,7 @@ class ToolboxCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SmallFunctionCard(
       onTap: () async {
-        context.push(
-          const ToolBoxPage(),
-        );
+        context.pushReplacement(const ToolBoxPage());
       },
       icon: MingCuteIcons.mgc_tool_line,
       name: "其他功能",

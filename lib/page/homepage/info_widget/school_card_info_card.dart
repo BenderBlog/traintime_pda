@@ -28,9 +28,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         } else {
           switch (school_card_session.isInit.value) {
             case SessionState.fetched:
-              context.push(
-                const SchoolCardWindow(),
-              );
+              context.pushReplacement(const SchoolCardWindow());
               break;
             case SessionState.error:
               ScaffoldMessenger.of(context).showSnackBar(
