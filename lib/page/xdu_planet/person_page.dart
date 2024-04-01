@@ -3,9 +3,7 @@
 
 // Person page of XDU Planet.
 
-import 'dart:io';
 import 'dart:math';
-
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -27,16 +25,6 @@ class PersonalPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(person.name),
-        leading: IconButton(
-          icon: Icon(
-            Platform.isIOS || Platform.isMacOS
-                ? Icons.arrow_back_ios
-                : Icons.arrow_back,
-          ),
-          onPressed: () {
-            context.pop();
-          },
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.link),
@@ -67,7 +55,7 @@ class PersonalPage extends StatelessWidget {
                   person.article[index].time,
                 ).format(pattern: "yyyy年MM月dd日")}",
               ),
-              onTap: () => context.pushReplacement(
+              onTap: () => context.push(
                 ContentPage(
                   article: person.article[index],
                   author: person.name,

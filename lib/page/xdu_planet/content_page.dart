@@ -3,7 +3,6 @@
 
 // Content page of XDU Planet.
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
@@ -50,16 +48,6 @@ class _ContentPageState extends State<ContentPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.article.title),
-        leading: IconButton(
-          icon: Icon(
-            Platform.isIOS || Platform.isMacOS
-                ? Icons.arrow_back_ios
-                : Icons.arrow_back,
-          ),
-          onPressed: () {
-            context.pop();
-          },
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.link),
