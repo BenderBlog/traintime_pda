@@ -24,6 +24,7 @@ import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
+import 'package:watermeter/page/homepage/toolbox/lost_and_found_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 
 class MainPage extends StatefulWidget {
@@ -55,6 +56,7 @@ class _MainPageState extends State<MainPage> {
     ExperimentCard(),
     SportCard(),
     CreativeCard(),
+    LostAndFoundCard(),
     ToolboxCard(),
   ];
 
@@ -89,7 +91,7 @@ class _MainPageState extends State<MainPage> {
         headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
           SliverAppBar(
             centerTitle: false,
-            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+            backgroundColor: Theme.of(context).colorScheme.background,
             expandedHeight: 160,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -151,7 +153,7 @@ class _MainPageState extends State<MainPage> {
             });
           },
           header: PhoenixHeader(
-            skyColor: Theme.of(context).colorScheme.secondaryContainer,
+            skyColor: Theme.of(context).colorScheme.background,
             position: IndicatorPosition.locator,
             safeArea: true,
           ),
