@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -119,8 +118,8 @@ class _MainPageState extends State<MainPage> {
                           ? c.getCurrentWeek(updateTime) >= 0 &&
                                   c.getCurrentWeek(updateTime) <
                                       c.classTableData.semesterLength
-                              ? "${Jiffy.parseFromDateTime(updateTime).format(pattern: "M月dd日")} 第 ${c.getCurrentWeek(updateTime) + 1} 周 "
-                              : "${Jiffy.parseFromDateTime(updateTime).format(pattern: "M月dd日")} 假期中"
+                              ? "${updateTime.month}月${updateTime.day}日 第 ${c.getCurrentWeek(updateTime) + 1} 周 "
+                              : "${updateTime.month}月${updateTime.day}日 假期中"
                           : c.state == ClassTableState.error
                               ? "加载错误"
                               : "正在加载",

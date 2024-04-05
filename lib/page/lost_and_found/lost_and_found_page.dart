@@ -117,7 +117,7 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
                   await showDialog<int>(
                     context: context,
                     builder: (context) => ColumnChooseDialog(
-                      chooseList: ["全部", "只看丢失", "只看寻找"].toList(),
+                      chooseList: choiceList.toList(),
                     ),
                   ).then((value) {
                     if (value != null) {
