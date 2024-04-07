@@ -64,7 +64,12 @@ class ClassDetailCard extends StatelessWidget {
         elevation: 0,
         color: infoColor.shade100,
         child: Container(
-          padding: const EdgeInsets.all(15),
+          padding: EdgeInsets.fromLTRB(
+            15,
+            15,
+            15,
+            timeArrangement.source == Source.user ? 8 : 15,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -119,6 +124,29 @@ class ClassDetailCard extends StatelessWidget {
                   ),
                 ),
               ),
+
+              if (timeArrangement.source == Source.user)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "编辑",
+                          style: TextStyle(
+                            color: infoColor.shade900,
+                          ),
+                        )),
+                    TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "删除",
+                          style: TextStyle(
+                            color: infoColor.shade900,
+                          ),
+                        ))
+                  ],
+                )
             ],
           ),
         ),
