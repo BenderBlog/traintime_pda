@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,11 +10,16 @@ import 'package:url_launcher/url_launcher.dart';
 class EasterEggPage extends StatelessWidget {
   const EasterEggPage({super.key});
 
-  final String url = "https://www.bilibili.com/video/BV1T34y1n7MF/";
+  final String urlApple = "https://www.bilibili.com/video/BV1T34y1n7MF/";
 
-  final String articleUrl = "https://www.bilibili.com/read/cv28967035/";
+  final String urlOthers = "https://www.bilibili.com/video/BV1rK4y187Z2/";
 
-  final String song = '''
+  final String articleUrlApple = "https://www.bilibili.com/read/cv28967035/";
+
+  final String articleUrlOthers =
+      "https://www.bilibili.com/video/BV1tN411v7wD/";
+
+  final String songApple = '''
 Ceremony / New Order & Joy Division
 
 Credit: Ian Curtis, Peter Hook, Stephen Morris & Bernard Sumner, 1981
@@ -52,6 +59,83 @@ Letting me know, forever
 我不在乎钱，我在乎把反动和腐旧全部砸毁！
 ''';
 
+  final String songOthers = '''
+Many too Many / Genesis
+
+Credit: Tony Banks, 1978
+With: Mike Rutherford on Guitar and Phil Collins on Vocal
+From: ...and then there were three...
+
+[第一部分]
+
+Many, too many have stood where I stand
+这里之前有很多人体会孤独
+Many more will stand here too
+之后还会有更多的人
+I think what I find strange is the way you built me up
+我奇怪的你，怎能之前如此亲密
+Then knocked me down again
+然后把我又抛弃了
+
+The part was fun but now it's over
+之前的甜蜜现在已经没了
+Why can't I just leave the stage?
+为啥我死活无法忘怀
+Maybe that's because you securely locked me up
+也许，是你把我安全地锁了起来
+Then threw away the key
+然后扔掉了钥匙
+
+Oh, mama
+Please, would you find the key
+天哪，你不要扔掉钥匙啊
+
+Oh, pretty mama
+Please, won't you let me go free
+求求了，你不想让我自由吗
+
+[过渡段]
+
+I thought I was lucky
+I thought that I'd got it made
+How could I be so blind?
+本以为我多么幸运
+本以为是我导致的
+我怎么迷乱了内心
+
+[第二部分]
+
+You said goodbye on a corner
+你在那个拐角跟我道别
+That I thought led to the straight
+我本以为可以直接离开
+You set me on a firmly laid and simple course
+你让我走上了那条告别的直道
+Then removed the road
+然后你把路拆了
+
+Oh, mama
+Please help me find my way
+天哪，你给我指条明路吧
+
+Oh, pretty mama
+Please lead me through the next day
+求求了，请让我看到明日的朝阳吧
+
+[过渡段]
+
+I thought I was lucky
+Oh, I thought that I'd got it made
+How could I be so blind?
+Oh, no
+本以为我多么幸运
+本以为是我导致的
+我怎么迷乱了内心
+不要再这样了……
+
+你们不要走啊……
+''';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,15 +143,22 @@ Letting me know, forever
       body: [
         TextButton(
           onPressed: () => launchUrl(
-            Uri.parse(url),
+            Uri.parse(
+              Platform.isIOS || Platform.isMacOS ? urlApple : urlOthers,
+            ),
             mode: LaunchMode.externalApplication,
           ),
           child: const Text("听歌时间"),
         ).padding(vertical: 20),
-        Text(song, textAlign: TextAlign.center),
+        Text(Platform.isIOS || Platform.isMacOS ? songApple : songOthers,
+            textAlign: TextAlign.center),
         TextButton(
           onPressed: () => launchUrl(
-            Uri.parse(articleUrl),
+            Uri.parse(
+              Platform.isIOS || Platform.isMacOS
+                  ? articleUrlApple
+                  : articleUrlOthers,
+            ),
             mode: LaunchMode.externalApplication,
           ),
           child: const Text("了解这个乐队吧"),
