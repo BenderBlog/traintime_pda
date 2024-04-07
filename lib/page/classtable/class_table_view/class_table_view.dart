@@ -246,13 +246,27 @@ class _ClassTableViewState extends State<ClassTableView> {
     }
   }
 
+  /// This function will be triggered when user changed class info.
+  void _reload() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void updateSize() => size = ClassTableState.of(context)!.constraints;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     classTableState = ClassTableState.of(context)!.controllers;
+    classTableState.addListener(_reload);
     updateSize();
+  }
+
+  @override
+  void dispose() {
+    classTableState.removeListener(_reload);
+    super.dispose();
   }
 
   @override

@@ -111,10 +111,12 @@ class ClassTableWidgetState with ChangeNotifier {
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    await classTableController.addUserDefinedClass(
-      classDetail,
-      timeArrangement,
-    );
+    await classTableController
+        .addUserDefinedClass(
+          classDetail,
+          timeArrangement,
+        )
+        .then((value) => notifyListeners());
   }
 
   Future<void> editUserDefinedClass(
@@ -122,17 +124,21 @@ class ClassTableWidgetState with ChangeNotifier {
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    await classTableController.editUserDefinedClass(
-      oldTimeArrangment,
-      classDetail,
-      timeArrangement,
-    );
+    await classTableController
+        .editUserDefinedClass(
+          oldTimeArrangment,
+          classDetail,
+          timeArrangement,
+        )
+        .then((value) => notifyListeners());
   }
 
   Future<void> deleteUserDefinedClass(
     TimeArrangement timeArrangement,
   ) async {
-    await classTableController.deleteUserDefinedClass(timeArrangement);
+    await classTableController
+        .deleteUserDefinedClass(timeArrangement)
+        .then((value) => notifyListeners());
   }
 
   /// Generate icalendar file string.

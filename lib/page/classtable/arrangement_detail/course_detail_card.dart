@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
@@ -181,10 +180,7 @@ class ClassDetailCard extends StatelessWidget {
                             await ClassTableState.of(context)!
                                 .controllers
                                 .deleteUserDefinedClass(timeArrangement)
-                                .then((value) {
-                              Navigator.pop(context);
-                              Fluttertoast.showToast(msg: "删除完毕，课表很快就刷新了");
-                            });
+                                .then((value) => Navigator.pop(context));
                           }
                         },
                         child: Text(
