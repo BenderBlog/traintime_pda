@@ -51,6 +51,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl:
+  both_side_sheet: ^1.0.0
   webview_flutter: ^4.2.2
   package_info_plus: ^4.2.0
   flutter_markdown: ^0.6.17+1

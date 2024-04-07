@@ -1,12 +1,12 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:both_side_sheet/both_side_sheet.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
-import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/creative_job/creative_job_choice.dart';
 import 'package:watermeter/page/creative_job/creative_job_description.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
