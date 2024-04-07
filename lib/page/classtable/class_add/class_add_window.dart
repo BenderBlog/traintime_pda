@@ -10,7 +10,8 @@ import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
 class ClassAddWindow extends StatefulWidget {
-  const ClassAddWindow({super.key});
+  final (ClassDetail, TimeArrangement)? toChange;
+  const ClassAddWindow({super.key, this.toChange});
 
   @override
   State<ClassAddWindow> createState() => _ClassAddWindowState();
@@ -19,13 +20,13 @@ class ClassAddWindow extends StatefulWidget {
 class _ClassAddWindowState extends State<ClassAddWindow> {
   late final ClassTableWidgetState controller;
   late List<bool> chosenWeek;
-  TextEditingController classNameController = TextEditingController();
-  TextEditingController teacherNameController = TextEditingController();
-  TextEditingController classRoomController = TextEditingController();
+  late TextEditingController classNameController;
+  late TextEditingController teacherNameController;
+  late TextEditingController classRoomController;
 
-  int week = 1;
-  int start = 1;
-  int stop = 1;
+  late int week;
+  late int start;
+  late int stop;
 
   final double inputFieldVerticalPadding = 4;
   final double horizontalPadding = 10;
@@ -35,12 +36,33 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     controller = ClassTableState.of(context)!.controllers;
-    chosenWeek = List<bool>.generate(
-      controller.semesterLength,
-      (index) => false,
-    );
+    if (widget.toChange == null) {
+      classNameController = TextEditingController();
+      teacherNameController = TextEditingController();
+      classRoomController = TextEditingController();
+      chosenWeek = List<bool>.generate(
+        controller.semesterLength,
+        (index) => false,
+      );
+      week = 1;
+      start = 1;
+      stop = 1;
+    } else {
+      classNameController = TextEditingController(
+        text: widget.toChange!.$1.name,
+      );
+      teacherNameController = TextEditingController(
+        text: widget.toChange!.$2.teacher,
+      );
+      classRoomController = TextEditingController(
+        text: widget.toChange!.$2.classroom,
+      );
+      chosenWeek = widget.toChange!.$2.weekList;
+      week = widget.toChange!.$2.day;
+      start = widget.toChange!.$2.start;
+      stop = widget.toChange!.$2.stop;
+    }
   }
 
   InputDecoration get inputDecoration => InputDecoration(
@@ -71,7 +93,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("添加课程"),
+        title: Text(widget.toChange == null ? "添加课程" : "修改课程"),
         actions: [
           TextButton(
             onPressed: () async {
@@ -79,7 +101,11 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 Fluttertoast.showToast(
                   msg: "必须输入课程名",
                 );
-              } else if ((week > 0 && week <= 7) && (start <= stop)) {
+              } else if (!(week > 0 && week <= 7) || !(start <= stop)) {
+                Fluttertoast.showToast(
+                  msg: "输入的时间不对",
+                );
+              } else if (widget.toChange == null) {
                 await controller
                     .addUserDefinedClass(
                         ClassDetail(name: classNameController.text),
@@ -101,9 +127,27 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                       (value) => Navigator.of(context).pop(),
                     );
               } else {
-                Fluttertoast.showToast(
-                  msg: "输入的时间不对",
-                );
+                await controller
+                    .editUserDefinedClass(
+                        widget.toChange!.$2,
+                        ClassDetail(name: classNameController.text),
+                        TimeArrangement(
+                          source: Source.user,
+                          index: widget.toChange!.$2.index,
+                          teacher: teacherNameController.text.isNotEmpty
+                              ? teacherNameController.text
+                              : null,
+                          classroom: classRoomController.text.isNotEmpty
+                              ? classRoomController.text
+                              : null,
+                          weekList: chosenWeek,
+                          day: week,
+                          start: start,
+                          stop: stop,
+                        ))
+                    .then(
+                      (value) => Navigator.of(context).pop(),
+                    );
               }
             },
             child: const Text("保存"),
@@ -230,43 +274,46 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ),
                   Row(
                     children: [
-                      PageChoose(
+                      WheelChoose(
                         changeBookIdCallBack: (choiceWeek) {
                           setState(() {
                             week = choiceWeek + 1;
                           });
                         },
+                        defaultPage: week - 1,
                         options: List.generate(
                           weekList.length,
-                          (index) => PageChooseOptions(
+                          (index) => WheelChooseOptions(
                             data: index,
                             hint: weekList[index],
                           ),
                         ),
                       ).flexible(),
-                      PageChoose(
+                      WheelChoose(
                         changeBookIdCallBack: (choiceWeek) {
                           setState(() {
                             start = choiceWeek;
                           });
                         },
+                        defaultPage: start - 1,
                         options: List.generate(
                           10,
-                          (index) => PageChooseOptions(
+                          (index) => WheelChooseOptions(
                             data: index + 1,
                             hint: "第 ${index + 1} 节",
                           ),
                         ),
                       ).flexible(),
-                      PageChoose(
+                      WheelChoose(
                         changeBookIdCallBack: (choiceStop) {
                           setState(() {
                             stop = choiceStop;
                           });
                         },
+                        defaultPage: stop - 1,
                         options: List.generate(
                           10,
-                          (index) => PageChooseOptions(
+                          (index) => WheelChooseOptions(
                             data: index + 1,
                             hint: "第 ${index + 1} 节",
                           ),

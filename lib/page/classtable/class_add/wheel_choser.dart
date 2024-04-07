@@ -4,32 +4,29 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
-class PageChooseOptions<T> {
+class WheelChooseOptions<T> {
   T data;
   String hint;
 
-  PageChooseOptions({
+  WheelChooseOptions({
     required this.data,
     required this.hint,
   });
 }
 
-class PageChoose<T> extends StatelessWidget {
+class WheelChoose<T> extends StatelessWidget {
   final ValueChanged<T> changeBookIdCallBack;
-  final List<PageChooseOptions<T>> options;
+  final List<WheelChooseOptions<T>> options;
+  final int defaultPage;
 
   final double heightOfText = 30;
   final double widthOfLine = 1;
 
-  final PageController pagecontroller = PageController(
-    viewportFraction: 1 / 3,
-    initialPage: 0,
-  );
-
-  PageChoose({
+  const WheelChoose({
     super.key,
     required this.changeBookIdCallBack,
     required this.options,
+    this.defaultPage = 0,
   });
 
   @override
@@ -45,7 +42,10 @@ class PageChoose<T> extends StatelessWidget {
             .center(),
         PageView.builder(
           itemCount: options.length,
-          controller: pagecontroller,
+          controller: PageController(
+            viewportFraction: 1 / 3,
+            initialPage: defaultPage,
+          ),
           scrollDirection: Axis.vertical,
           pageSnapping: true,
           physics: const AlwaysScrollableScrollPhysics(),

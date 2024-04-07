@@ -187,7 +187,6 @@ class ClassTableController extends GetxController {
     userDefinedClassData.userDefinedDetail[classDetailIndex].number =
         classDetail.number;
 
-    userDefinedClassData.userDefinedDetail.removeAt(timeArrangement.index);
     userDefinedFile.writeAsStringSync(jsonEncode(
       userDefinedClassData.toJson(),
     ));
