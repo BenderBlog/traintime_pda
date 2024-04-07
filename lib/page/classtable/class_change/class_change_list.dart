@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -103,7 +104,7 @@ class ClassChangeList extends StatelessWidget {
                 "${classChanges[index].type == ChangeType.change ? "\n老师变更: $teacherChange" : ""}",
               ),
             );
-          }),
+          }).constrained(maxWidth: 600).center(),
     );
   }
 }

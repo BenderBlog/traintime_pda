@@ -106,12 +106,24 @@ class ClassTableWidgetState with ChangeNotifier {
         classTableController.classTableData.timeArrangement[index],
       );
 
-  /// Bridge function to add/del user defined class
+  /// Bridge function to add/del/edit user defined class
   Future<void> addUserDefinedClass(
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
     await classTableController.addUserDefinedClass(
+      classDetail,
+      timeArrangement,
+    );
+  }
+
+  Future<void> editUserDefinedClass(
+    TimeArrangement oldTimeArrangment,
+    ClassDetail classDetail,
+    TimeArrangement timeArrangement,
+  ) async {
+    await classTableController.editUserDefinedClass(
+      oldTimeArrangment,
       classDetail,
       timeArrangement,
     );

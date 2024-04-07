@@ -128,8 +128,6 @@ class ClassTableController extends GetxController {
     await updateClassTable();
   }
 
-  /// TODO: Write update user defined data function...
-
   void refreshUserDefinedClass() {
     userDefinedFile = File(
       "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
@@ -152,6 +150,44 @@ class ClassTableController extends GetxController {
     userDefinedClassData.userDefinedDetail.add(classDetail);
     timeArrangement.index = userDefinedClassData.userDefinedDetail.length - 1;
     userDefinedClassData.timeArrangement.add(timeArrangement);
+    userDefinedFile.writeAsStringSync(jsonEncode(
+      userDefinedClassData.toJson(),
+    ));
+    await updateClassTable(isUserDefinedChanged: true);
+  }
+
+  Future<void> editUserDefinedClass(
+    TimeArrangement originalTimeArrangement,
+    ClassDetail classDetail,
+    TimeArrangement timeArrangement,
+  ) async {
+    if (originalTimeArrangement.source != Source.user ||
+        originalTimeArrangement.index != timeArrangement.index) return;
+    int timeArrangementIndex =
+        userDefinedClassData.timeArrangement.indexOf(originalTimeArrangement);
+    userDefinedClassData.timeArrangement[timeArrangementIndex].weekList =
+        timeArrangement.weekList;
+    userDefinedClassData.timeArrangement[timeArrangementIndex].teacher =
+        timeArrangement.teacher;
+    userDefinedClassData.timeArrangement[timeArrangementIndex].day =
+        timeArrangement.day;
+    userDefinedClassData.timeArrangement[timeArrangementIndex].start =
+        timeArrangement.start;
+    userDefinedClassData.timeArrangement[timeArrangementIndex].stop =
+        timeArrangement.stop;
+    userDefinedClassData.timeArrangement[timeArrangementIndex].classroom =
+        timeArrangement.classroom;
+
+    /// Update classDetail
+    int classDetailIndex = originalTimeArrangement.index;
+    userDefinedClassData.userDefinedDetail[classDetailIndex].name =
+        classDetail.name;
+    userDefinedClassData.userDefinedDetail[classDetailIndex].code =
+        classDetail.code;
+    userDefinedClassData.userDefinedDetail[classDetailIndex].number =
+        classDetail.number;
+
+    userDefinedClassData.userDefinedDetail.removeAt(timeArrangement.index);
     userDefinedFile.writeAsStringSync(jsonEncode(
       userDefinedClassData.toJson(),
     ));
