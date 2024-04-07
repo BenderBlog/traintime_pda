@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// A dialog/card shows the class detail / time arrangement.
 class ClassDetailCard extends StatelessWidget {
@@ -138,7 +140,43 @@ class ClassDetailCard extends StatelessWidget {
                           ),
                         )),
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          bool? isContinue = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("是否删除课程信息？"),
+                              content: const Text(
+                                "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！",
+                              ),
+                              actions: [
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('取消'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text('确定'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (context.mounted && isContinue == true) {
+                            await ClassTableState.of(context)!
+                                .controllers
+                                .deleteUserDefinedClass(timeArrangement)
+                                .then((value) {
+                              Navigator.pop(context);
+                              Fluttertoast.showToast(msg: "删除完毕，课表很快就刷新了");
+                            });
+                          }
+                        },
                         child: Text(
                           "删除",
                           style: TextStyle(
