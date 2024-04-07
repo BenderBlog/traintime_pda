@@ -25,13 +25,13 @@ class UserInfo {
 class LostAndFoundInfo {
   final String title;
   final String category;
-  final String position;
+  final String? position;
   final String ftime;
   final String ctime;
   final String? dtime;
   final String content;
   final List<String> picture;
-  final String contact;
+  final String? contact;
   final int status;
   final int type;
   final String? src;
@@ -44,6 +44,14 @@ class LostAndFoundInfo {
       return [];
     } else {
       return (data as List<dynamic>).map((e) => e as String).toList();
+    }
+  }
+
+  String get postitionString {
+    if (position?.isEmpty ?? true) {
+      return "未提供";
+    } else {
+      return position!;
     }
   }
 

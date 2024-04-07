@@ -37,11 +37,12 @@ class NoticeCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       messages[index].title,
-                      overflow: TextOverflow.fade,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                    ),
+                    ).expanded(),
                   ],
                 ),
               )

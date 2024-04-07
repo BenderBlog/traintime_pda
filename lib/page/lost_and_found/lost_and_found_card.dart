@@ -11,6 +11,7 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class LostAndFoundCard extends StatelessWidget {
   final LostAndFoundInfo toUse;
+
   const LostAndFoundCard({
     super.key,
     required this.toUse,
@@ -22,11 +23,13 @@ class LostAndFoundCard extends StatelessWidget {
       title: Text(toUse.title),
       remaining: [ReXCardRemaining(toUse.getType)],
       bottomRow: [
-        Text("时间：${toUse.ftime}\n"),
-        Text("位置：${toUse.position}\n"),
-        Text("详细信息：${toUse.content}\n"),
-        Text("发布人：${toUse.user_info.nickname ?? "未知"}\n"),
-        Text("联系方式：${toUse.contact}\n"),
+        Text.rich(TextSpan(children: [
+          TextSpan(text: "时间：${toUse.ftime}\n"),
+          TextSpan(text: "位置：${toUse.postitionString}\n"),
+          TextSpan(text: "详细信息：${toUse.content}\n"),
+          TextSpan(text: "发布人：${toUse.user_info.nickname ?? "未提供"}\n"),
+          TextSpan(text: "联系方式：${toUse.contact ?? "未提供"}\n"),
+        ])),
         [
           if (toUse.picture.isNotEmpty)
             CachedNetworkImage(
@@ -62,13 +65,13 @@ class LostAndFoundCard extends StatelessWidget {
         bool? confirm = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("您是否想复制这个信息的联系方式？"),
+            title: const Text("复制联系方式？"),
             content: Text.rich(TextSpan(children: [
               TextSpan(text: "时间：${toUse.ftime}\n"),
-              TextSpan(text: "位置：${toUse.position}\n"),
+              TextSpan(text: "位置：${toUse.position ?? "未提供"}\n"),
               TextSpan(text: "详细信息：${toUse.content}\n"),
-              TextSpan(text: "发布人：${toUse.user_info.nickname ?? "未知"}\n"),
-              TextSpan(text: "联系方式：${toUse.contact}\n"),
+              TextSpan(text: "发布人：${toUse.user_info.nickname ?? "未提供"}\n"),
+              TextSpan(text: "联系方式：${toUse.contact ?? "未提供"}\n"),
             ])),
             actions: <Widget>[
               TextButton(
@@ -85,8 +88,8 @@ class LostAndFoundCard extends StatelessWidget {
             ],
           ),
         );
-        if (confirm == true) {
-          Clipboard.setData(ClipboardData(text: toUse.contact)).then(
+        if (confirm == true && toUse.contact != null) {
+          Clipboard.setData(ClipboardData(text: toUse.contact!)).then(
             (value) => Fluttertoast.showToast(msg: "联系方式已经复制"),
           );
         }
