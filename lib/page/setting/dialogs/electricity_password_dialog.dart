@@ -78,7 +78,7 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
               );
               Navigator.of(context).pop();
             } else {
-              showToast(msg: "输入空白!");
+              showToast(context: context, msg: "输入空白!");
             }
           },
         ),

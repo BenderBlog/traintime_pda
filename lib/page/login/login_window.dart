@@ -139,7 +139,7 @@ class _LoginWindowState extends State<LoginWindow> {
                   _idsPasswordController.text.isNotEmpty) {
                 await login();
               } else {
-                showToast(msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
+                showToast(context: context, msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
               }
             },
           ),
@@ -209,18 +209,20 @@ class _LoginWindowState extends State<LoginWindow> {
       pd.close();
       if (mounted) {
         if (e is PasswordWrongException) {
-          showToast(msg: e.msg);
+          showToast(context: context, msg: e.msg);
         } else if (e is LoginFailedException) {
-          showToast(msg: e.msg);
+          showToast(context: context, msg: e.msg);
         } else if (e is DioException) {
           if (e.message == null) {
             if (e.response == null) {
-              showToast(msg: "无法连接到服务器。");
+              showToast(context: context, msg: "无法连接到服务器。");
             } else {
-              showToast(msg: "请求失败，响应状态码：${e.response!.statusCode}。");
+              showToast(
+                  context: context,
+                  msg: "请求失败，响应状态码：${e.response!.statusCode}。");
             }
           } else {
-            showToast(msg: "请求失败。${e.message}");
+            showToast(context: context, msg: "请求失败。${e.message}");
           }
         } else {
           log.w(
@@ -241,6 +243,7 @@ class _LoginWindowState extends State<LoginWindow> {
             ),
           );
           showToast(
+            context: context,
             msg: "未知错误，请联系开发者。",
           );
         }

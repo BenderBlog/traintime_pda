@@ -25,7 +25,7 @@ class NoticeCard extends StatelessWidget {
               builder: (context) => const NoticeList(),
             );
           } else {
-            showToast(msg: "目前没有获取应用公告，请刷新");
+            showToast(context: context, msg: "目前没有获取应用公告，请刷新");
           }
         },
         child: messages.isNotEmpty

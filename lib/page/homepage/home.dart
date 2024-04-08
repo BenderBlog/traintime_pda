@@ -134,7 +134,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   }
 
   void _loginAsync() async {
-    showToast(msg: "登录中，暂时显示缓存数据");
+    showToast(context: context, msg: "登录中，暂时显示缓存数据");
 
     try {
       await update(
@@ -149,7 +149,9 @@ class _HomePageMasterState extends State<HomePageMaster>
       );
     } finally {
       if (loginState == IDSLoginState.success) {
-        showToast(msg: "登录成功");
+        if (mounted) {
+          showToast(context: context, msg: "登录成功");
+        }
       } else if (loginState == IDSLoginState.passwordWrong) {
         await preference.remove(preference.Preference.idsPassword);
 

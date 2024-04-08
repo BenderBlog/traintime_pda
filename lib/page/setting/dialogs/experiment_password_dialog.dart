@@ -83,7 +83,7 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
               );
               Navigator.of(context).pop<bool>(true);
             } else {
-              showToast(msg: "输入空白!");
+              showToast(context: context, msg: "输入空白!");
             }
           },
         ),

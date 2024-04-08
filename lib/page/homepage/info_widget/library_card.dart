@@ -21,7 +21,7 @@ class LibraryCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (offline) {
-          showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
+          showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
           context.pushReplacement(const LibraryWindow());
         }

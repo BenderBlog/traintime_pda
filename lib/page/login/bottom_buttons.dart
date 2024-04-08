@@ -25,7 +25,7 @@ class ButtomButtons extends StatelessWidget {
           child: Text('清除登录缓存', style: _bottomTextStyle),
           onPressed: () {
             NetworkSession().clearCookieJar().then(
-                  (value) => showToast(msg: '清理缓存成功'),
+                  (value) => showToast(context: context, msg: '清理缓存成功'),
                 );
           },
         ),

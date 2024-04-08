@@ -24,7 +24,7 @@ class SchoolCardInfoCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (offline) {
-          showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
+          showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
           switch (school_card_session.isInit.value) {
             case SessionState.fetched:
@@ -43,10 +43,10 @@ class SchoolCardInfoCard extends StatelessWidget {
                 ),
               );
 
-              showToast(msg: "遇到错误，请联系开发者");
+              showToast(context: context, msg: "遇到错误，请联系开发者");
               break;
             default:
-              showToast(msg: "正在获取信息，请稍后再来看");
+              showToast(context: context, msg: "正在获取信息，请稍后再来看");
           }
         }
       },

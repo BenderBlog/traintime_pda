@@ -90,7 +90,7 @@ class LostAndFoundCard extends StatelessWidget {
         );
         if (confirm == true && toUse.contact != null) {
           Clipboard.setData(ClipboardData(text: toUse.contact!)).then(
-            (value) => showToast(msg: "联系方式已经复制"),
+            (value) => showToast(context: context, msg: "联系方式已经复制"),
           );
         }
       },

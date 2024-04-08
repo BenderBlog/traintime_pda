@@ -140,6 +140,7 @@ class _MainPageState extends State<MainPage> {
         body: EasyRefresh(
           onRefresh: () {
             showToast(
+              context: context,
               msg: "请稍候，正在刷新信息",
             );
             update(sliderCaptcha: (String cookieStr) {

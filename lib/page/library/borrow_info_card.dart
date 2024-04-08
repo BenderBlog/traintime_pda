@@ -98,7 +98,7 @@ class BorrowInfoCard extends StatelessWidget {
                   pd.show(msg: "正在续借");
                   LibrarySession().renew(toUse).then((value) {
                     pd.close();
-                    showToast(msg: value);
+                    showToast(context: context, msg: value);
                   });
                 },
               ),

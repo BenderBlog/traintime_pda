@@ -58,7 +58,7 @@ class CaptchaInputDialog extends StatelessWidget {
           child: const Text('提交'),
           onPressed: () async {
             if (_captchaController.text.isEmpty) {
-              showToast(msg: '请输入验证码');
+              showToast(context: context, msg: '请输入验证码');
             } else {
               Navigator.of(context).pop(_captchaController.text);
             }

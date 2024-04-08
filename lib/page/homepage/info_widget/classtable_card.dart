@@ -145,10 +145,10 @@ class ClassTableCard extends StatelessWidget {
               ),
             ));
           case ClassTableState.error:
-            showToast(msg: "遇到错误：${c.error}");
+            showToast(context: context, msg: "遇到错误：${c.error}");
           case ClassTableState.fetching:
           case ClassTableState.none:
-            showToast(msg: "正在获取课表");
+            showToast(context: context, msg: "正在获取课表");
         }
       },
     );

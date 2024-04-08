@@ -168,9 +168,13 @@ class _ClassTablePageState extends State<ClassTablePage>
                           );
                           await file.delete();
                         }
-                        showToast(msg: "应该保存成功");
+                        if (context.mounted) {
+                          showToast(context: context, msg: "应该保存成功");
+                        }
                       } on FileSystemException {
-                        showToast(msg: "文件创建失败，保存取消");
+                        if (context.mounted) {
+                          showToast(context: context, msg: "文件创建失败，保存取消");
+                        }
                       }
                       break;
                   }

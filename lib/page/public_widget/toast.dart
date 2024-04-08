@@ -3,13 +3,18 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
 
-void showToast({required String msg}) {
+void showToast({
+  required BuildContext context,
+  required String msg,
+}) {
   if (Platform.isAndroid || Platform.isIOS) {
     Fluttertoast.showToast(msg: msg);
   } else {
-    Get.snackbar("软件内信息", msg);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+    ));
   }
 }

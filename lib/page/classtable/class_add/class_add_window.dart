@@ -99,10 +99,12 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
             onPressed: () async {
               if (classNameController.text.isEmpty) {
                 showToast(
+                  context: context,
                   msg: "必须输入课程名",
                 );
               } else if (!(week > 0 && week <= 7) || !(start <= stop)) {
                 showToast(
+                  context: context,
                   msg: "输入的时间不对",
                 );
               } else if (widget.toChange == null) {

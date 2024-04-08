@@ -23,12 +23,12 @@ class ExamCard extends StatelessWidget {
       builder: (c) => SmallFunctionCard(
         onTap: () async {
           if (offline) {
-            showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
+            showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else if (c.status == ExamStatus.cache ||
               c.status == ExamStatus.fetched) {
             context.pushReplacement(ExamInfoWindow(time: updateTime));
           } else if (c.status != ExamStatus.error) {
-            showToast(msg: "请稍候，正在获取考试信息");
+            showToast(context: context, msg: "请稍候，正在获取考试信息");
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -38,7 +38,7 @@ class ExamCard extends StatelessWidget {
                 )),
               ),
             );
-            showToast(msg: "遇到错误，请联系开发者");
+            showToast(context: context, msg: "遇到错误，请联系开发者");
           }
         },
         icon: MingCuteIcons.mgc_calendar_line,

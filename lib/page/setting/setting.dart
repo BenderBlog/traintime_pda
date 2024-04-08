@@ -188,7 +188,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         if (value == true &&
                             !preference
                                 .getBool(preference.Preference.decoration)) {
-                          showToast(msg: '你先选个图片罢，就在下面');
+                          showToast(context: context, msg: '你先选个图片罢，就在下面');
                         } else {
                           setState(() {
                             preference.setBool(
@@ -211,11 +211,13 @@ class _SettingWindowState extends State<SettingWindow> {
                               .copySync("${supportPath.path}/decoration.jpg");
                           preference.setBool(
                               preference.Preference.decoration, true);
-                          if (mounted) {
-                            showToast(msg: '设定成功');
+                          if (context.mounted) {
+                            showToast(context: context, msg: '设定成功');
                           }
                         } else {
-                          showToast(msg: '你没有选图片捏');
+                          if (context.mounted) {
+                            showToast(context: context, msg: '你没有选图片捏');
+                          }
                         }
                       }
                     },
@@ -254,7 +256,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               }
                               Get.find<ClassTableController>()
                                   .updateClassTable();
-                              showToast(msg: "已经清除完毕");
+                              showToast(context: context, msg: "已经清除完毕");
                               Navigator.pop(context);
                             },
                             child: const Text('确定'),
@@ -387,8 +389,8 @@ class _SettingWindowState extends State<SettingWindow> {
                                 file.deleteSync();
                               }
 
-                              if (mounted) {
-                                showToast(msg: '缓存已被清除');
+                              if (context.mounted) {
+                                showToast(context: context, msg: '缓存已被清除');
                                 Restart.restartApp();
                               }
                             },
