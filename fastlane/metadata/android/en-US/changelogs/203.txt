@@ -1,0 +1,3 @@
+1. Detail of score.
+2. Redesign of mainpage.
+3. Master-detail page for pad.
