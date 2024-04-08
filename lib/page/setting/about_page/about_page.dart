@@ -72,7 +72,7 @@ class AboutPage extends StatelessWidget {
       "stalomeow",
       "https://avatars.githubusercontent.com/u/47203031",
       "设计：首页时间轴 / 开发：异步登录",
-      "https://note.stalomeow.com/",
+      "https://stalomeow.com",
     ),
     Developer(
       "xeonds",
