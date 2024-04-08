@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -134,7 +134,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   }
 
   void _loginAsync() async {
-    Fluttertoast.showToast(msg: "登录中，暂时显示缓存数据");
+    showToast(msg: "登录中，暂时显示缓存数据");
 
     try {
       await update(
@@ -148,10 +148,8 @@ class _HomePageMasterState extends State<HomePageMaster>
         },
       );
     } finally {
-      Fluttertoast.cancel();
-
       if (loginState == IDSLoginState.success) {
-        Fluttertoast.showToast(msg: "登录成功");
+        showToast(msg: "登录成功");
       } else if (loginState == IDSLoginState.passwordWrong) {
         await preference.remove(preference.Preference.idsPassword);
 

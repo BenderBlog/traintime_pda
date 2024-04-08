@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/lost_and_found.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -90,7 +90,7 @@ class LostAndFoundCard extends StatelessWidget {
         );
         if (confirm == true && toUse.contact != null) {
           Clipboard.setData(ClipboardData(text: toUse.contact!)).then(
-            (value) => Fluttertoast.showToast(msg: "联系方式已经复制"),
+            (value) => showToast(msg: "联系方式已经复制"),
           );
         }
       },

@@ -4,7 +4,7 @@
 // Experiment password dialog.
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as user_perference;
 
 class ExperimentPasswordDialog extends StatefulWidget {
@@ -83,7 +83,7 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
               );
               Navigator.of(context).pop<bool>(true);
             } else {
-              Fluttertoast.showToast(msg: "输入空白!");
+              showToast(msg: "输入空白!");
             }
           },
         ),

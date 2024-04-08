@@ -7,7 +7,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -139,7 +139,7 @@ class _LoginWindowState extends State<LoginWindow> {
                   _idsPasswordController.text.isNotEmpty) {
                 await login();
               } else {
-                Fluttertoast.showToast(msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
+                showToast(msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
               }
             },
           ),
@@ -209,19 +209,18 @@ class _LoginWindowState extends State<LoginWindow> {
       pd.close();
       if (mounted) {
         if (e is PasswordWrongException) {
-          Fluttertoast.showToast(msg: e.msg);
+          showToast(msg: e.msg);
         } else if (e is LoginFailedException) {
-          Fluttertoast.showToast(msg: e.msg);
+          showToast(msg: e.msg);
         } else if (e is DioException) {
           if (e.message == null) {
             if (e.response == null) {
-              Fluttertoast.showToast(msg: "无法连接到服务器。");
+              showToast(msg: "无法连接到服务器。");
             } else {
-              Fluttertoast.showToast(
-                  msg: "请求失败，响应状态码：${e.response!.statusCode}。");
+              showToast(msg: "请求失败，响应状态码：${e.response!.statusCode}。");
             }
           } else {
-            Fluttertoast.showToast(msg: "请求失败。${e.message}");
+            showToast(msg: "请求失败。${e.message}");
           }
         } else {
           log.w(
@@ -241,7 +240,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
           );
-          Fluttertoast.showToast(
+          showToast(
             msg: "未知错误，请联系开发者。",
           );
         }

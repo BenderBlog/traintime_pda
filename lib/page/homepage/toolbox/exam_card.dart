@@ -4,7 +4,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -23,12 +23,12 @@ class ExamCard extends StatelessWidget {
       builder: (c) => SmallFunctionCard(
         onTap: () async {
           if (offline) {
-            Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
+            showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else if (c.status == ExamStatus.cache ||
               c.status == ExamStatus.fetched) {
             context.pushReplacement(ExamInfoWindow(time: updateTime));
           } else if (c.status != ExamStatus.error) {
-            Fluttertoast.showToast(msg: "请稍候，正在获取考试信息");
+            showToast(msg: "请稍候，正在获取考试信息");
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -38,7 +38,7 @@ class ExamCard extends StatelessWidget {
                 )),
               ),
             );
-            Fluttertoast.showToast(msg: "遇到错误，请联系开发者");
+            showToast(msg: "遇到错误，请联系开发者");
           }
         },
         icon: MingCuteIcons.mgc_calendar_line,

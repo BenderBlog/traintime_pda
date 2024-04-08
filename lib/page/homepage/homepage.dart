@@ -3,7 +3,7 @@
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -139,9 +139,8 @@ class _MainPageState extends State<MainPage> {
         ],
         body: EasyRefresh(
           onRefresh: () {
-            Fluttertoast.showToast(
+            showToast(
               msg: "请稍候，正在刷新信息",
-              timeInSecForIosWeb: 1,
             );
             update(sliderCaptcha: (String cookieStr) {
               return Navigator.of(context).push(

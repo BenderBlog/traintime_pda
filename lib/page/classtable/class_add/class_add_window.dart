@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/wheel_choser.dart';
@@ -98,11 +98,11 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
           TextButton(
             onPressed: () async {
               if (classNameController.text.isEmpty) {
-                Fluttertoast.showToast(
+                showToast(
                   msg: "必须输入课程名",
                 );
               } else if (!(week > 0 && week <= 7) || !(start <= stop)) {
-                Fluttertoast.showToast(
+                showToast(
                   msg: "输入的时间不对",
                 );
               } else if (widget.toChange == null) {

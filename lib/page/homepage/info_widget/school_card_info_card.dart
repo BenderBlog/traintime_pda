@@ -3,7 +3,7 @@
 
 import 'dart:math';
 
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
@@ -24,7 +24,7 @@ class SchoolCardInfoCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (offline) {
-          Fluttertoast.showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
+          showToast(msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
           switch (school_card_session.isInit.value) {
             case SessionState.fetched:
@@ -43,10 +43,10 @@ class SchoolCardInfoCard extends StatelessWidget {
                 ),
               );
 
-              Fluttertoast.showToast(msg: "遇到错误，请联系开发者");
+              showToast(msg: "遇到错误，请联系开发者");
               break;
             default:
-              Fluttertoast.showToast(msg: "正在获取信息，请稍后再来看");
+              showToast(msg: "正在获取信息，请稍后再来看");
           }
         }
       },

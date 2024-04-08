@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
@@ -25,7 +25,7 @@ class NoticeCard extends StatelessWidget {
               builder: (context) => const NoticeList(),
             );
           } else {
-            Fluttertoast.showToast(msg: "目前没有获取应用公告，请刷新");
+            showToast(msg: "目前没有获取应用公告，请刷新");
           }
         },
         child: messages.isNotEmpty

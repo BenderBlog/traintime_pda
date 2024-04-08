@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -25,7 +25,7 @@ class ButtomButtons extends StatelessWidget {
           child: Text('清除登录缓存', style: _bottomTextStyle),
           onPressed: () {
             NetworkSession().clearCookieJar().then(
-                  (value) => Fluttertoast.showToast(msg: '清理缓存成功'),
+                  (value) => showToast(msg: '清理缓存成功'),
                 );
           },
         ),

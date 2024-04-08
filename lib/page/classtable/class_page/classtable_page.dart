@@ -3,7 +3,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -168,9 +168,9 @@ class _ClassTablePageState extends State<ClassTablePage>
                           );
                           await file.delete();
                         }
-                        Fluttertoast.showToast(msg: "应该保存成功");
+                        showToast(msg: "应该保存成功");
                       } on FileSystemException {
-                        Fluttertoast.showToast(msg: "文件创建失败，保存取消");
+                        showToast(msg: "文件创建失败，保存取消");
                       }
                       break;
                   }

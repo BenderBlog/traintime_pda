@@ -4,7 +4,7 @@
 // A captcha input dialog.
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 
 class CaptchaInputDialog extends StatelessWidget {
   final TextEditingController _captchaController = TextEditingController();
@@ -58,7 +58,7 @@ class CaptchaInputDialog extends StatelessWidget {
           child: const Text('提交'),
           onPressed: () async {
             if (_captchaController.text.isEmpty) {
-              Fluttertoast.showToast(msg: '请输入验证码');
+              showToast(msg: '请输入验证码');
             } else {
               Navigator.of(context).pop(_captchaController.text);
             }

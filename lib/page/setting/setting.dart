@@ -12,7 +12,7 @@ import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
@@ -188,7 +188,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         if (value == true &&
                             !preference
                                 .getBool(preference.Preference.decoration)) {
-                          Fluttertoast.showToast(msg: '你先选个图片罢，就在下面');
+                          showToast(msg: '你先选个图片罢，就在下面');
                         } else {
                           setState(() {
                             preference.setBool(
@@ -212,10 +212,10 @@ class _SettingWindowState extends State<SettingWindow> {
                           preference.setBool(
                               preference.Preference.decoration, true);
                           if (mounted) {
-                            Fluttertoast.showToast(msg: '设定成功');
+                            showToast(msg: '设定成功');
                           }
                         } else {
-                          Fluttertoast.showToast(msg: '你没有选图片捏');
+                          showToast(msg: '你没有选图片捏');
                         }
                       }
                     },
@@ -254,7 +254,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               }
                               Get.find<ClassTableController>()
                                   .updateClassTable();
-                              Fluttertoast.showToast(msg: "已经清除完毕");
+                              showToast(msg: "已经清除完毕");
                               Navigator.pop(context);
                             },
                             child: const Text('确定'),
@@ -388,7 +388,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               }
 
                               if (mounted) {
-                                Fluttertoast.showToast(msg: '缓存已被清除');
+                                showToast(msg: '缓存已被清除');
                                 Restart.restartApp();
                               }
                             },

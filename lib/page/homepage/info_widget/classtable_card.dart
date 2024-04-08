@@ -3,7 +3,7 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -145,10 +145,10 @@ class ClassTableCard extends StatelessWidget {
               ),
             ));
           case ClassTableState.error:
-            Fluttertoast.showToast(msg: "遇到错误：${c.error}");
+            showToast(msg: "遇到错误：${c.error}");
           case ClassTableState.fetching:
           case ClassTableState.none:
-            Fluttertoast.showToast(msg: "正在获取课表");
+            showToast(msg: "正在获取课表");
         }
       },
     );

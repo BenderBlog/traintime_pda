@@ -6,7 +6,7 @@
 import 'package:both_side_sheet/both_side_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
@@ -98,7 +98,7 @@ class BorrowInfoCard extends StatelessWidget {
                   pd.show(msg: "正在续借");
                   LibrarySession().renew(toUse).then((value) {
                     pd.close();
-                    Fluttertoast.showToast(msg: value);
+                    showToast(msg: value);
                   });
                 },
               ),

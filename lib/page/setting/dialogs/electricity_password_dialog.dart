@@ -4,7 +4,7 @@
 // Electricity password dialog.
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ElectricityPasswordDialog extends StatefulWidget {
@@ -78,7 +78,7 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
               );
               Navigator.of(context).pop();
             } else {
-              Fluttertoast.showToast(msg: "输入空白!");
+              showToast(msg: "输入空白!");
             }
           },
         ),
