@@ -74,6 +74,10 @@ class _LoginWindowState extends State<LoginWindow> {
               iconData: MingCuteIcons.mgc_user_3_fill,
               hintText: "学号",
             ),
+            style: TextStyle(
+              fontSize: _inputFieldFontSize,
+              color: _inputFieldColor,
+            ),
           ).center().padding(horizontal: 12).decorated(
             color: _inputFieldBackgroundColor,
             borderRadius: BorderRadius.circular(roundRadius),
@@ -89,6 +93,10 @@ class _LoginWindowState extends State<LoginWindow> {
           TextField(
             controller: _idsPasswordController,
             obscureText: _couldNotView,
+            style: TextStyle(
+              fontSize: _inputFieldFontSize,
+              color: _inputFieldColor,
+            ),
             decoration: _inputDecoration(
               iconData: MingCuteIcons.mgc_safe_lock_fill,
               hintText: "一站式登录密码",
