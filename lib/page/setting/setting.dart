@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -47,6 +48,21 @@ class _SettingWindowState extends State<SettingWindow> {
             bottom: 8,
           )
           .center();
+
+  void restart() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      Restart.restartApp();
+    } else {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => const AlertDialog(
+          title: Text("请关闭应用"),
+          content: Text("因为技术限制，用户需要自行关闭窗口，然后重新打开应用。"),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
