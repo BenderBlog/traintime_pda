@@ -16,15 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install JDK
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk-headless
-          sudo update-java-alternatives -a
-          java -version
-
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+  
       - name: Install Flutter
         run: |
+          java -version
           git submodule update --init --recursive
 
       - name: Prepare Flutter Dependencies
