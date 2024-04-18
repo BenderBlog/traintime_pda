@@ -1,12 +1,14 @@
-# Traintime PDA
+<div align="center">
+<img src="./assets/icon.png" style="border-radius:10px; margin:10px; width:120px" alt="TrainTime PDA">
+<h1>Traintime PDA</h1>
+
+[![Release downloads](https://img.shields.io/github/downloads/BenderBlog/traintime_pda/total.svg)](https://GitHub.com/BenderBlog/traintime_pda/releases/) ![Android Version](https://img.shields.io/badge/Android%20API-23%2B-green)
 
 Traintime PDA，又称 XDYou，是为西电本科生设计的开源信息查询软件。
 
-临时主页地址：[https://legacy.superbart.top/xdyou.html](https://legacy.superbart.top/xdyou.html)
+[临时主页地址](https://legacy.superbart.top/xdyou.html) / [赞助地址](http://afdian.net/a/benderblog) / [请求设计提升](https://scjspt.xidian.edu.cn/job/203)
 
-赞助地址：[http://afdian.net/a/benderblog](http://afdian.net/a/benderblog)
-
-请求设计提升：[https://scjspt.xidian.edu.cn/job/203](https://scjspt.xidian.edu.cn/job/203)
+</div>
 
 [<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
     alt="Get it on App Store"
