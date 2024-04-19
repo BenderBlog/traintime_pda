@@ -48,7 +48,8 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     Text(
                       "作者：${widget.toUse.author ?? "没有提供"}\n"
                       "ISBN：${widget.toUse.isbn ?? "没有提供"}\n"
-                      "索书号: ${widget.toUse.barCode ?? "没有提供"}\n"
+                      "索书号: ${validateList(widget.toUse.searchCode)}\n"
+                      "编排号码：${validateList(widget.toUse.barCodes)}\n"
                       "描述：${widget.toUse.description ?? "没有提供"}",
                     ),
                   ],
@@ -89,4 +90,12 @@ class _BookDetailCardState extends State<BookDetailCard> {
       ),
     );
   }
+
+  String validateList(List<String>? inputList) {
+  if (inputList == null || inputList.isEmpty) {
+    return "没有提供";
+  }
+  return inputList.first;
+}
+
 }
