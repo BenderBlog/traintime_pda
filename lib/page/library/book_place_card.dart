@@ -23,7 +23,6 @@ class BookPlaceCard extends StatelessWidget {
             Text(toUse.locationName ?? "没有位置信息"),
             Text("书籍状态：${toUse.processType}"),
             Text("书籍编号：${toUse.barCode}"),
-            Text("书籍状态：${toUse.circAttr}"),
           ],
         ),
       ),
