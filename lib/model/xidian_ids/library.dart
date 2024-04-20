@@ -46,7 +46,6 @@ class BookInfo {
   final String? author;
   final String? subject;
   final String? isbn;
-
   final String? description;
   final String bookName;
   final List<EBookItem>? eitems;
@@ -59,7 +58,6 @@ class BookInfo {
   final String? groupCode;
   final List<String>? callNos;
   final List<String>? barCodes;
-  final List<String>? searchCode;
   final List<BookLocation>? items;
 
   const BookInfo({
@@ -77,7 +75,6 @@ class BookInfo {
     this.publisherHouse,
     this.groupCode,
     this.callNos,
-    this.searchCode,
     required this.barCodes,
     this.items,
   });

@@ -64,7 +64,7 @@ class BookInfoCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  "索书号: ${validateList(toUse.searchCode)}",
+                  "索书号: ${toUse.barCode ?? "没有相关信息"}",
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -74,12 +74,4 @@ class BookInfoCard extends StatelessWidget {
       ),
     );
   }
-
-  String validateList(List<String>? inputList) {
-  if (inputList == null || inputList.isEmpty) {
-    return "没有相关信息";
-  }
-  return inputList.first;
-}
-
 }

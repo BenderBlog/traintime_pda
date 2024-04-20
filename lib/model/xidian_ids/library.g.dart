@@ -56,10 +56,6 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       barCodes: (json['barCodes'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-          // 此处在网络不好的时候会出现e为null的情况，此时会在控制台扔出报错，后续需要充分测试
-      searchCode: (json['searchCode'] as List<dynamic>?)
-          ?.map((e)=>e as String)
-          .toList(),
       items: (json['items'] as List<dynamic>?)
           ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -81,7 +77,6 @@ Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{
       'groupCode': instance.groupCode,
       'callNos': instance.callNos,
       'barCodes': instance.barCodes,
-      'searchCode': instance.searchCode,
       'items': instance.items,
     };
 
