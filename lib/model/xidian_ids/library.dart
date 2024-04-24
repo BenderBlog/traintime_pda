@@ -58,6 +58,7 @@ class BookInfo {
   final String? groupCode;
   final List<String>? callNos;
   final List<String>? barCodes;
+  final List<String>? searchCode;
   final List<BookLocation>? items;
 
   const BookInfo({
@@ -75,6 +76,7 @@ class BookInfo {
     this.publisherHouse,
     this.groupCode,
     this.callNos,
+    this.searchCode,
     required this.barCodes,
     this.items,
   });

@@ -56,6 +56,9 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       barCodes: (json['barCodes'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      searchCode: (json['searchCode'] as List<dynamic>?)
+          ?.map((e)=>e as String)
+          .toList(),
       items: (json['items'] as List<dynamic>?)
           ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -77,6 +80,7 @@ Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{
       'groupCode': instance.groupCode,
       'callNos': instance.callNos,
       'barCodes': instance.barCodes,
+      'searchCode': instance.searchCode,
       'items': instance.items,
     };
 
