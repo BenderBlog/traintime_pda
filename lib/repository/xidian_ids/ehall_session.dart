@@ -95,8 +95,7 @@ class EhallSession extends IDSSession {
         "Try to use the $appID.",
       );
       var value = await dioEhall.get(
-        "https://ehall.xidian.edu.cn/appShow",
-        queryParameters: {'appId': appID},
+        "https://ehall.xidian.edu.cn/appShow?appId=$appID",
         options: Options(
           followRedirects: false,
           validateStatus: (status) {
@@ -112,61 +111,100 @@ class EhallSession extends IDSSession {
     });
   }
 
-  /// 学生个人信息  4585275700341858 Unable to use because of xgxt.xidian.edu.cn (学工系统)
-  /// 宿舍学生住宿  4618295887225301
+  /// 学生个人信息  6635601510182122
   Future<void> getInformation() async {
     log.i(
       "[ehall_session][getInformation] "
       "Ready to get the user information.",
     );
-    var firstPost = await useApp("4618295887225301");
-    await dioEhall.get(firstPost).then((value) => value.data);
+
+    String location = await super.checkAndLogin(
+      target:
+          "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do#/wdxx",
+      sliderCaptcha: (p0) async {},
+    );
+    log.i("[ehall_session][useApp] "
+        "Location is $location");
+    var response = await dio.get(
+      location,
+      options: Options(headers: {
+        HttpHeaders.refererHeader:
+            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+        HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+      }),
+    );
+    while (response.headers[HttpHeaders.locationHeader] != null) {
+      location = response.headers[HttpHeaders.locationHeader]![0];
+      log.i(
+        "[ehall_session][useApp] "
+        "Received location: $location.",
+      );
+      response = await dioEhall.get(
+        location,
+        options: Options(headers: {
+          HttpHeaders.refererHeader:
+              "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+          HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+        }),
+      );
+    }
+    await dioEhall.post(
+      "https://xgxt.xidian.edu.cn/xsfw/sys/swpubapp/indexmenu/getAppConfig.do?appId=4585275700341858&appName=jbxxapp",
+      options: Options(headers: {
+        HttpHeaders.refererHeader:
+            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+        HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+      }),
+    );
 
     /// Get information here. resultCode==00000 is successful.
     log.i(
       "[ehall_session][getInformation] "
       "Getting the user information.",
     );
-    var detailed = await dioEhall.post(
-      "https://ehall.xidian.edu.cn/xsfw/sys/xszsapp/commoncall/callQuery/xsjbxxcx-MINE-QUERY.do",
-      data: {
-        "requestParams":
-            "{\"XSBH\":\"${preference.getString(preference.Preference.idsAccount)}\"}",
-        "actionType": "MINE",
-        "actionName": "xsjbxxcx",
-        "dataModelAction": "QUERY",
-      },
-    ).then((value) => value.data);
+    var detailed = await dioEhall
+        .post(
+            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBaseInfo.do",
+            data: "requestParamStr="
+                "{\"XSBH\":\"${preference.getString(preference.Preference.idsAccount)}\"}",
+            options: Options(headers: {
+              HttpHeaders.refererHeader:
+                  "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+              HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+            }))
+        .then(
+          (value) => value.data,
+        );
     log.i(
       "[ehall_session][getInformation] "
       "Storing the user information.",
     );
-    if (detailed["resultCode"] != "00000") {
-      throw GetInformationFailedException(detailed["msg"]);
+    if (detailed["returnCode"] != "#E000000000000") {
+      throw GetInformationFailedException(detailed["description"]);
     } else {
       preference.setString(
         preference.Preference.name,
-        detailed["data"][0]["XM"],
+        detailed["data"]["CZZXM"],
       );
       preference.setString(
         preference.Preference.sex,
-        detailed["data"][0]["XBDM_DISPLAY"],
+        detailed["data"]["XBDM_DISPLAY"],
       );
       preference.setString(
         preference.Preference.execution,
-        detailed["data"][0]["DZ_SYDM_DISPLAY"].toString().replaceAll("·", ""),
+        detailed["data"]["SYDM_DISPLAY"].toString().replaceAll("·", ""),
       );
       preference.setString(
         preference.Preference.institutes,
-        detailed["data"][0]["DZ_DWDM_DISPLAY"],
+        detailed["data"]["DWDM_DISPLAY"],
       );
       preference.setString(
         preference.Preference.subject,
-        detailed["data"][0]["ZYDM_DISPLAY"],
+        detailed["data"]["ZYDM_DISPLAY"],
       );
       preference.setString(
         preference.Preference.dorm,
-        detailed["data"][0]["ZSDZ"],
+        detailed["data"]["ZSDZ"],
       );
     }
 

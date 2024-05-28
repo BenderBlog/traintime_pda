@@ -44,7 +44,7 @@ class ExamController extends GetxController {
     return isFinished
         .map((e) => HomeArrangement(
               name: e.subject,
-              place: "${e.place} ${e.seat}座",
+              place: "${e.place} ${e.seat}",
               startTimeStr: e.startTime.format(pattern: HomeArrangement.format),
               endTimeStr: e.stopTime.format(pattern: HomeArrangement.format),
             ))

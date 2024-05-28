@@ -110,6 +110,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('zh', 'CN'),
         ],
+        debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
         navigatorKey: alice.getNavigatorKey(),
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
