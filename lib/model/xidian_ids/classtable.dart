@@ -80,6 +80,11 @@ class ClassDetail {
       other is ClassDetail &&
       other.runtimeType == runtimeType &&
       name == other.name;
+
+  @override
+  String toString() {
+    return "$name $code $number";
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -116,6 +121,12 @@ class TimeArrangement {
     required this.start,
     required this.stop,
   });
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "$source $index $classroom $teacher";
+  }
 }
 
 @JsonSerializable(explicitToJson: true)

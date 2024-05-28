@@ -286,11 +286,11 @@ class ClassTableFile extends EhallSession {
 
         log.i(
           "[getClasstable][getFromWeb] "
-          "Class change. Teacher changed? ${e.isTeacherChanged}.",
+          "Class change. Teacher changed? ${e.isTeacherChanged}. timeArrangementIndex is $timeArrangementIndex",
         );
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
-          /// Seek for the change entry. Delete the classes moved away.
+          /// Seek for the change entry. Delete the classes moved waay.
           log.i(
             "[getClasstable][getFromWeb] "
             "Original weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
@@ -299,7 +299,7 @@ class ClassTableFile extends EhallSession {
           for (int i in e.originalAffectedWeeksList) {
             log.i(
               "[getClasstable][getFromWeb] "
-              "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
+              "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
             );
             if (preliminaryData
                 .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
@@ -314,6 +314,11 @@ class ClassTableFile extends EhallSession {
             "[getClasstable][getFromWeb] "
             "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
           );
+        }
+
+        if (timeArrangementIndex == indexOriginalTimeArrangementList.first) {
+          timeArrangementIndex = preliminaryData
+              .timeArrangement[indexOriginalTimeArrangementList.first].index;
         }
 
         log.i(

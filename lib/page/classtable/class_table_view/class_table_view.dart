@@ -13,6 +13,7 @@ import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// THe classtable view, the way the the classtable sheet rendered.
@@ -67,6 +68,7 @@ class _ClassTableViewState extends State<ClassTableView> {
     if (index != 0) {
       /// Fetch all class in this range.
       List<ClassOrgainzedData> events = [];
+
       for (final i in classTableState.timeArrangement) {
         if (i.weekList.length > widget.index &&
             i.weekList[widget.index] &&
