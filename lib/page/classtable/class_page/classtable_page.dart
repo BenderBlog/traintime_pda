@@ -162,7 +162,7 @@ class _ClassTablePageState extends State<ClassTablePage>
                           await file
                               .writeAsString(classTableState.iCalenderStr);
                           await Share.shareXFiles(
-                            [XFile("$tempPath/$fileName.ics")],
+                            [XFile("$tempPath/$fileName")],
                             sharePositionOrigin:
                                 box!.localToGlobal(Offset.zero) & box.size,
                           );

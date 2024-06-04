@@ -60,7 +60,7 @@ dependencies:
   vector_graphics: ^1.1.11+1
   vector_graphics_compiler: ^1.1.11+1
   styled_widget: ^0.4.1
-  file_picker: ^6.2.0
+  file_picker: ^8.0.3
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.1
   timelines: ^0.1.0
