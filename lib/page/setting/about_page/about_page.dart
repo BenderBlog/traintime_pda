@@ -54,7 +54,13 @@ class AboutPage extends StatelessWidget {
       "lsy223622 (木生睡不着)",
       "https://shp.qlogo.cn/ttsing/43714034/43714034/100?ts=0",
       "设计：iOS 图标",
-      "https://github.com/lsy223622",
+      "https://lsy223622.com/",
+    ),
+    Developer(
+      "NanCunChild",
+      "https://avatars.githubusercontent.com/u/85873278?v=4",
+      "开发：图书馆搜索功能",
+      "https://github.com/NanCunChild",
     ),
     Developer(
       "ReverierXu",
@@ -131,9 +137,11 @@ class AboutPage extends StatelessWidget {
                 TextSpan(
                   text: " v${preference.packageInfo.version}\n",
                 ),
-                const TextSpan(
-                  text: "Ceremony of Phoenix Edition",
-                  style: TextStyle(fontSize: 16),
+                TextSpan(
+                  text: Platform.isIOS || Platform.isMacOS
+                      ? "Sakura Yuyuko Edition"
+                      : "Rendez-Vous Edition",
+                  style: const TextStyle(fontSize: 16),
                 ),
               ],
             ),
