@@ -185,11 +185,11 @@ void updateCurrentData() {
   arrangement.addAll(toAdd);
   log.i("[updateCurrentData]toAddArrangement: ${toAdd.length}");
 
-  Iterator<HomeArrangement> arr = arrangement.iterator;
   if (isTomorrow.isTrue) {
-    current.value = arr.moveNext() ? arr.current : null;
-    next.value = arr.moveNext() ? arr.current : null;
+    current.value = null;
+    next.value = arrangement.isEmpty ? null : arrangement[0];
   } else {
+    Iterator<HomeArrangement> arr = arrangement.iterator;
     while (arr.moveNext()) {
       log.i(
         "[updateCurrentData] arr.current: ${arr.current.name}",
@@ -231,7 +231,14 @@ void updateCurrentData() {
     } on TypeError {
       current.value = null;
     }
-    next.value = arr.moveNext() ? arr.current : null;
+
+    if (current.value == null) {
+      next.value = arrangement.isEmpty ? null : arrangement[0];
+    } else if (arr.moveNext()) {
+      next.value = arr.current;
+    } else {
+      next.value = null;
+    }
   }
   int len = arrangement.length;
   if (current.value != null) len -= 1;
