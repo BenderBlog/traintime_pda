@@ -5,6 +5,7 @@
 // Thanks xidian-script and libxdauth!
 
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -201,6 +202,8 @@ class ClassTableFile extends EhallSession {
       }
     }
 
+    // Merge change info
+
     if (int.parse(qResult["totalSize"].toString()) > 0) {
       for (var i in qResult["rows"]) {
         preliminaryData.classChanges.add(
@@ -244,6 +247,8 @@ class ClassTableFile extends EhallSession {
       "[getClasstable][getFromWeb] "
       "Dealing class change with ${preliminaryData.classChanges.length} info(s).",
     );
+
+    List<ClassChange> cache = [];
 
     for (var e in preliminaryData.classChanges) {
       /// First, search for the classes.
@@ -317,6 +322,7 @@ class ClassTableFile extends EhallSession {
         }
 
         if (timeArrangementIndex == indexOriginalTimeArrangementList.first) {
+          cache.add(e);
           timeArrangementIndex = preliminaryData
               .timeArrangement[indexOriginalTimeArrangementList.first].index;
         }
@@ -327,6 +333,41 @@ class ClassTableFile extends EhallSession {
           "day: ${e.newWeek}, "
           "startToStop: ${e.newClassRange}, "
           "timeArrangementIndex: $timeArrangementIndex.",
+        );
+
+        bool flag = false;
+        ClassChange? toRemove;
+        log.i("[getClasstable][getFromWeb] cache length = ${cache.length}");
+        for (var f in cache) {
+          //log.i("[getClasstable][getFromWeb]"
+          //    "${f.className} ${f.classCode} ${f.originalClassRange} ${f.originalAffectedWeeksList} ${f.originalWeek}");
+          //log.i("[getClasstable][getFromWeb]"
+          //    "${e.className} ${e.classCode} ${e.newClassRange} ${e.newAffectedWeeksList} ${e.newWeek}");
+          //log.i("[getClasstable][getFromWeb]"
+          //    "${f.className == e.className} ${f.classCode == e.classCode} ${listEquals(f.originalClassRange, e.newClassRange)} ${listEquals(f.originalAffectedWeeksList, e.newAffectedWeeksList)} ${f.originalWeek == e.newWeek}");
+          if (f.className == e.className &&
+              f.classCode == e.classCode &&
+              listEquals(f.originalClassRange, e.newClassRange) &&
+              listEquals(f.originalAffectedWeeksList, e.newAffectedWeeksList) &&
+              f.originalWeek == e.newWeek) {
+            flag = true;
+            toRemove = f;
+            break;
+          }
+        }
+
+        if (flag) {
+          cache.remove(toRemove);
+          log.i(
+            "[getClasstable][getFromWeb] "
+            "Cannot be added",
+          );
+          continue;
+        }
+
+        log.i(
+          "[getClasstable][getFromWeb] "
+          "Can be added",
         );
 
         /// Add classes.
