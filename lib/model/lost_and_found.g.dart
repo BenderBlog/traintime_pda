@@ -25,7 +25,7 @@ LostAndFoundInfo _$LostAndFoundInfoFromJson(Map<String, dynamic> json) =>
       json['ctime'] as String,
       json['dtime'] as String?,
       json['content'] as String,
-      LostAndFoundInfo.parsePicture(json['picture']),
+      (json['picture'] as List<dynamic>).map((e) => e as String).toList(),
       json['contact'] as String?,
       json['status'] as int,
       json['type'] as int,

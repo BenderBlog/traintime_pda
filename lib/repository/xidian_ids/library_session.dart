@@ -3,14 +3,14 @@
 
 // Library session.
 
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 Rx<SessionState> state = SessionState.none.obs;
 RxString error = "".obs;
@@ -23,9 +23,8 @@ int get dued => borrowList.where((element) => element.lendDay < 0).length;
 int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
 
 class LibrarySession extends IDSSession {
-  static int userId = 0;
-  static String userBarcode = "";
   static String token = "";
+  static String groupCode = "";
 
   /* Note 1: Search book pattern, no need to implement.
       POST https://zs.xianmaigu.com/xidian_book/api/search/getSearchBookType.html
@@ -42,6 +41,16 @@ class LibrarySession extends IDSSession {
       Search the book's info does not require login.
       You can use it in SPM class...
   */
+
+  Options get header => Options(
+        headers: {
+          HttpHeaders.cookieHeader: "jwt=$token; jwtHeader=jwtOpacAuth",
+          "groupCode": groupCode.isEmpty ? "undefined" : groupCode,
+          "jwtOpacAuth": token,
+          HttpHeaders.refererHeader: "https://findxidian.libsp.cn/",
+          HttpHeaders.hostHeader: "findxidian.libsp.cn",
+        },
+      )..contentType = "application/json;charset=utf-8";
 
   Future<List<BookInfo>> searchBook(String searchWord, int page) async {
     if (searchWord.isEmpty) return [];
@@ -65,22 +74,18 @@ class LibrarySession extends IDSSession {
   static String bookCover(String isbn) =>
       "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn";
 
-  Future<String> renew(BorrowData toUse) async {
-    return await dio.post(
-      "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/renewBook.html",
-      data: {
-        "libraryId": 5,
-        "userId": userId,
-        "token": token,
-        "cardNumber": preference.getString(preference.Preference.idsAccount),
-        "barNumber": toUse.barcode,
-        "bookName": toUse.title,
-        "isbn": toUse.isbn,
-        "author": toUse.author,
-      },
-    ).then(
-      (value) => value.data["msg"]?.toString() ?? "遇到错误",
-    );
+  Future<String> renew(int loanId) async {
+    return await dio
+        .post(
+          "https://findxidian.libsp.cn/find/lendbook/reNew",
+          data: {
+            "loanIds": [loanId]
+          },
+          options: header,
+        )
+        .then(
+          (value) => value.data["data"]["result"]?.toString() ?? "遇到错误",
+        );
   }
 
   Future<void> getBorrowList() async {
@@ -94,38 +99,35 @@ class LibrarySession extends IDSSession {
 
     try {
       state.value = SessionState.fetching;
-      if (userId == 0 && token == "") {
+      if (token.isEmpty) {
         await initSession();
       }
-      if (userBarcode == "") {
-        userBarcode = await dio.post(
-          "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getUserInfo",
-          data: {
-            "libraryId": 5,
-            "userId": userId,
-            "token": token,
-            "cardNumber":
-                preference.getString(preference.Preference.idsAccount),
-          },
-        ).then(
-          (value) {
-            if (value.data["code"] != 1) {
-              throw NotFetchLibraryException(message: value.data["msg"]);
-            }
-            return value.data["data"]["userBarcode"];
-          },
-        );
+
+      if (groupCode.isEmpty) {
+        groupCode = await dio
+            .post(
+              "https://findxidian.libsp.cn/find/homePage/getGroupCode",
+              data: {"mappingPath": ""},
+              options: header,
+            )
+            .then((value) => value.data["data"]["groupCode"]);
       }
-      var rawData = await dio.post(
-        "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getBorrowList.html",
-        data: {
-          "libraryId": 5,
-          "userId": userId,
-          "token": token,
-          "cardNumber": userBarcode,
-          "page": 1,
-        },
-      ).then((value) => value.data["data"]);
+
+      var rawData = await dio
+          .post(
+            "https://findxidian.libsp.cn/find/loanInfo/loanList",
+            data: {
+              "page": 1,
+              "rows": 999,
+              "searchType": 1,
+              "searchContent": "",
+              "sortType": 0,
+              "startDate": null,
+              "endDate": null
+            },
+            options: header,
+          )
+          .then((value) => value.data["data"]["searchResult"]);
       borrowList.clear();
       borrowList.addAll(List<BorrowData>.generate(
         rawData.length,
@@ -144,9 +146,13 @@ class LibrarySession extends IDSSession {
       "Initalizing Library Session",
     );
     try {
+      token = "";
+      String destinationURL =
+          "https://findxidian.libsp.cn/find/sso/login/xidian/0";
+      dio.get("https://tyrzfw.chaoxing.com/auth/xidian/cas/init?"
+          "isLogout=0&refer=$destinationURL");
       String location = await checkAndLogin(
-        target: "https://mgce.natapp4.cc/api/index/casLoginDo.html?"
-            "libraryId=5&source=xdbb",
+        target: "https://tyrzfw.chaoxing.com/auth/xidian/cas/index",
         sliderCaptcha: (p0) async {},
       );
       var response = await dio.get(location);
@@ -160,24 +166,66 @@ class LibrarySession extends IDSSession {
         response = await dio.get(location);
       }
 
-      RegExp matchJson = RegExp(r'wx.miniProgram.postMessage(.*);');
-      String result = matchJson
-              .firstMatch(response.data)?[0]!
-              .replaceFirst("wx.miniProgram.postMessage(", "")
-              .replaceFirst("data", "\"data\"")
-              .replaceFirst(");", "") ??
-          "";
+      // God damn, it use js to redirect...
+      String toDeal = response.data.toString();
+      String data = RegExp(r'data: "(?<data>.*)",')
+          .firstMatch(toDeal)!
+          .namedGroup("data")!;
+      int time = int.parse(RegExp(r'time: (?<time>[0-9]*),')
+          .firstMatch(toDeal)!
+          .namedGroup("time")!);
+      String enc =
+          RegExp(r'enc: "(?<enc>.*)",').firstMatch(toDeal)!.namedGroup("enc")!;
+      String name = RegExp(r'displayName: "(?<name>.*)",')
+          .firstMatch(toDeal)!
+          .namedGroup("name")!;
+      int userRole = int.parse(RegExp(r'userRole: (?<userRole>[0-9]{1}),')
+          .firstMatch(toDeal)!
+          .namedGroup("userRole")!);
 
-      log.i(
-        "[LibrarySession][initSession] "
-        "Result is $result.",
-      );
+      var isSuccess = await dio.get(
+        "https://tyrzfw.chaoxing.com/auth/xidian/cas/login",
+        queryParameters: {
+          "data": data,
+          "time": time,
+          "enc": enc,
+          "displayName": name,
+          "userRole": userRole,
+          "group1": null,
+          "mobilePhone": null,
+        },
+      ).then((value) => jsonDecode(value.data));
 
-      var toGet = jsonDecode(result);
+      if (!isSuccess["status"]) {
+        throw NotFetchLibraryException(message: "登陆失败: ${isSuccess["status"]}");
+      }
 
-      userId = toGet["data"]["id"];
-      token = toGet["data"]["token"];
+      response = await dio.get(destinationURL, queryParameters: {
+        "data": data,
+        "time": time,
+        "enc": enc,
+      });
+
+      RegExp tokenExp = RegExp(r"jwt=(?<jwt>.*)&");
+
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        token = tokenExp.firstMatch(location)?.namedGroup("jwt") ?? "";
+
+        log.i(
+          "[LibrarySession][initSession] "
+          "Received location: $location.",
+        );
+        response = await dio.get(location, options: header);
+      }
+
+      if (token.isEmpty) {
+        throw NotFetchLibraryException();
+      }
     } catch (e) {
+      if (e is NotFetchLibraryException) {
+        rethrow;
+      }
       throw NotFetchLibraryException();
     }
   }

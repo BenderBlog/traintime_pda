@@ -11,8 +11,9 @@ BorrowData _$BorrowDataFromJson(Map<String, dynamic> json) => BorrowData(
       author: json['author'] as String,
       publisher: json['publisher'] as String,
       isbn: json['isbn'] as String,
-      itemLibCode: json['itemLibCode'] as String,
-      lendDay: json['lendDay'] as int,
+      recordId: json['recordId'] as int,
+      loanId: json['loanId'] as int,
+      itemId: json['itemId'] as int,
       loanDate: json['loanDate'] as String,
       renewDate: json['renewDate'] as String?,
       normReturnDate: json['normReturnDate'] as String,
@@ -26,8 +27,9 @@ Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
       'author': instance.author,
       'publisher': instance.publisher,
       'isbn': instance.isbn,
-      'itemLibCode': instance.itemLibCode,
-      'lendDay': instance.lendDay,
+      'recordId': instance.recordId,
+      'loanId': instance.loanId,
+      'itemId': instance.itemId,
       'loanDate': instance.loanDate,
       'renewDate': instance.renewDate,
       'normReturnDate': instance.normReturnDate,
@@ -53,11 +55,11 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
       groupCode: json['groupCode'] as String?,
       callNos:
           (json['callNos'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      barCodes: (json['barCodes'] as List<dynamic>?)
+      searchCode: (json['searchCode'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      searchCode: (json['searchCode'] as List<dynamic>?)
-          ?.map((e)=>e as String)
+      barCodes: (json['barCodes'] as List<dynamic>?)
+          ?.map((e) => e as String)
           .toList(),
       items: (json['items'] as List<dynamic>?)
           ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))

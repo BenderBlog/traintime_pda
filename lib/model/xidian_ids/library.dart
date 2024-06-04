@@ -3,6 +3,7 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:jiffy/jiffy.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'library.g.dart';
@@ -13,8 +14,9 @@ class BorrowData {
   final String author;
   final String publisher;
   final String isbn;
-  final String itemLibCode;
-  final int lendDay;
+  final int recordId;
+  final int loanId;
+  final int itemId;
   final String loanDate;
   final String? renewDate;
   final String normReturnDate;
@@ -26,14 +28,25 @@ class BorrowData {
     required this.author,
     required this.publisher,
     required this.isbn,
-    required this.itemLibCode,
-    required this.lendDay,
+    required this.recordId,
+    required this.loanId,
+    required this.itemId,
     required this.loanDate,
     this.renewDate,
     required this.normReturnDate,
     required this.loanType,
     required this.barcode,
   });
+
+  int get lendDay {
+    List<String> returnDateArr = normReturnDate.split("-");
+    Jiffy returnDateJiffy = Jiffy.parseFromDateTime(DateTime(
+      int.parse(returnDateArr[0]),
+      int.parse(returnDateArr[1]),
+      int.parse(returnDateArr[2]),
+    ));
+    return returnDateJiffy.diff(Jiffy.now(), unit: Unit.day).toInt();
+  }
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);
