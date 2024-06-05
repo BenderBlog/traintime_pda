@@ -25,7 +25,7 @@ class ClassTableCard extends StatelessWidget {
           nodePosition: 0,
         ),
         builder: TimelineTileBuilder(
-          itemCount: remaining.value > 0 ? 3 : 2,
+          itemCount: remaining.value > 0 ? 3 : next.value != null ? 2 : 1,
           contentsAlign: ContentsAlign.basic,
           contentsBuilder: (context, timelineNodeIndex) =>
               switch (timelineNodeIndex) {
