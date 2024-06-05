@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -328,7 +329,8 @@ class _SettingWindowState extends State<SettingWindow> {
                         context: context,
                         builder: (context) => ChangeSwiftDialog(),
                       ).then((value) {
-                        Get.put(ClassTableController()).updateCurrent();
+                        Get.put(ClassTableController()).update();
+                        updateCurrentData();
                         setState(() {});
                       });
                     },

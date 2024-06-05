@@ -134,6 +134,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   }
 
   void _loginAsync() async {
+    updateCurrentData(); // load cache data
     showToast(context: context, msg: "登录中，暂时显示缓存数据");
 
     try {
