@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -135,7 +136,7 @@ class _SettingWindowState extends State<SettingWindow> {
             //   ),
             // ),
             ReXCard(
-                title: _buildListSubtitle('主题设置'),
+                title: _buildListSubtitle('界面设置'),
                 remaining: const [],
                 bottomRow: Column(children: [
                   ListTile(
@@ -149,6 +150,24 @@ class _SettingWindowState extends State<SettingWindow> {
                             builder: (context) =>
                                 const ChangeBrightnessDialog());
                       }),
+                  ListTile(
+                    title: const Text("简化日程时间轴"),
+                    subtitle: const Text("没有日程时 减少空间占用"),
+                    trailing: Switch(
+                      value: preference.getBool(
+                          preference.Preference.simplifiedClassTimeline),
+                      onChanged: (bool value) {
+                        setState(() {
+                          preference
+                              .setBool(
+                                  preference.Preference.simplifiedClassTimeline,
+                                  value)
+                              .then((value) =>
+                                  ClassTableCard.reloadSettingsFromPref());
+                        });
+                      },
+                    ),
+                  ),
                 ])),
             ReXCard(
               title: _buildListSubtitle('帐号设置'),

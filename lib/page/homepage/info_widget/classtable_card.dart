@@ -13,9 +13,34 @@ import 'package:timelines/timelines.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class ClassTableCard extends StatelessWidget {
   const ClassTableCard({super.key});
+
+  static final RxBool _simplifiedMode =
+      preference.getBool(preference.Preference.simplifiedClassTimeline).obs;
+
+  static void reloadSettingsFromPref() {
+    _simplifiedMode.value =
+        preference.getBool(preference.Preference.simplifiedClassTimeline);
+  }
+
+  int get timelineItemCount {
+    // must use at least 1 rx variable in the calculation
+    // otherwise the Obx() in the build() method will panic
+
+    if (_simplifiedMode.isTrue) {
+      if (remaining.value > 0) {
+        return 3;
+      }
+      if (next.value != null) {
+        return 2;
+      }
+      return 1;
+    }
+    return 3;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +50,7 @@ class ClassTableCard extends StatelessWidget {
           nodePosition: 0,
         ),
         builder: TimelineTileBuilder(
-          itemCount: remaining.value > 0 ? 3 : next.value != null ? 2 : 1,
+          itemCount: timelineItemCount,
           contentsAlign: ContentsAlign.basic,
           contentsBuilder: (context, timelineNodeIndex) =>
               switch (timelineNodeIndex) {
@@ -214,7 +239,7 @@ class ClassTableCardItem extends StatelessWidget {
       infoText = "暂无日程";
     }
 
-    return [
+    List<Widget> columns = [
       Text(
         infoText,
         style: TextStyle(
@@ -223,9 +248,14 @@ class ClassTableCardItem extends StatelessWidget {
           fontWeight: FontWeight.normal,
           color: Theme.of(context).colorScheme.primary,
         ),
-      ).alignment(Alignment.centerLeft).expanded(),
-      if (arr != null) ClassTableCardArrangementDetail(displayArrangement: arr),
+      ).alignment(Alignment.centerLeft).expanded()
     ];
+
+    if (arr != null) {
+      var detail = ClassTableCardArrangementDetail(displayArrangement: arr);
+      columns.addIf(!detail.isContentEmpty, detail);
+    }
+    return columns;
   }
 
   List<Widget> getMoreArrangementsColumns(BuildContext context) {
@@ -266,6 +296,11 @@ class ClassTableCardArrangementDetail extends StatelessWidget {
     super.key,
     required this.displayArrangement,
   });
+
+  bool get isContentEmpty =>
+      displayArrangement.place == null &&
+      displayArrangement.seat == null &&
+      displayArrangement.teacher == null;
 
   @override
   Widget build(BuildContext context) {
