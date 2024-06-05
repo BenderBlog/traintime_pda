@@ -33,9 +33,6 @@ class ClassTableController extends GetxController {
   late ClassTableData classTableData;
   late UserDefinedClassData userDefinedClassData;
 
-  // The start day of the semester.
-  DateTime startDay = DateTime.parse("2022-01-22");
-
   // Get ClassDetail name info
   ClassDetail getClassDetail(TimeArrangement timeArrangementIndex) =>
       classTableData.getClassDetail(timeArrangementIndex);
@@ -205,19 +202,10 @@ class ClassTableController extends GetxController {
     await updateClassTable(isUserDefinedChanged: true);
   }
 
-  void updateCurrent() {
-    if (state != ClassTableState.fetched) return;
-
-    /// Get the start day of the semester. Append offset
-    startDay = DateTime.parse(classTableData.termStartDay).add(
+  /// The start day of the semester.
+  DateTime get startDay {
+    return DateTime.parse(classTableData.termStartDay).add(
         Duration(days: 7 * preference.getInt(preference.Preference.swift)));
-
-    log.i(
-      "[ClassTableController][addUserDefinedClass] "
-      "startDay: $startDay.",
-    );
-
-    update();
   }
 
   Future<void> updateClassTable({
@@ -331,7 +319,7 @@ class ClassTableController extends GetxController {
 
       state = ClassTableState.fetched;
       error = null;
-      updateCurrent();
+      update();
     } catch (e, s) {
       log.w(
         "[ClassTableController][updateClassTable] "
