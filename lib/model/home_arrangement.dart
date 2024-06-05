@@ -13,8 +13,10 @@ class HomeArrangement {
   static const format = 'yyyy-MM-dd HH:mm:ss';
 
   String name;
-  String teacher;
-  String place;
+  String? teacher;
+  String? place;
+  int? seat;
+
   @JsonKey(name: 'start_time')
   String startTimeStr;
   @JsonKey(name: 'end_time')
@@ -22,7 +24,7 @@ class HomeArrangement {
 
   @override
   int get hashCode =>
-      "$name $teacher $place $startTimeStr $endTimeStr".hashCode;
+      "$name $teacher $place $seat $startTimeStr $endTimeStr".hashCode;
 
   DateTime get startTime => DateTime.parse(startTimeStr);
   DateTime get endTime => DateTime.parse(endTimeStr);
@@ -33,17 +35,18 @@ class HomeArrangement {
       other.name == name &&
       other.teacher == teacher &&
       other.place == place &&
+      other.seat == seat &&
       other.startTime == startTime &&
       other.endTime == endTime;
 
   HomeArrangement({
     required this.name,
-    String? teacher,
-    String? place,
     required this.startTimeStr,
     required this.endTimeStr,
-  })  : teacher = teacher ?? "未安排老师",
-        place = place ?? "未找到地点";
+    this.teacher,
+    this.place,
+    this.seat,
+  });
 
   factory HomeArrangement.fromJson(Map<String, dynamic> json) =>
       _$HomeArrangementFromJson(json);

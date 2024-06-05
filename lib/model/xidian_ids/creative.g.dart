@@ -12,10 +12,10 @@ Project _$ProjectFromJson(Map<String, dynamic> json) => Project(
       type: json['type'] as String,
       status: json['status'] as String,
       college: json['college'] as String,
-      limit: json['limit'] as int,
+      limit: (json['limit'] as num).toInt(),
       isPublic: json['isPublic'] as bool,
-      captainID: json['captainID'] as int,
-      id: json['id'] as int,
+      captainID: (json['captainID'] as num).toInt(),
+      id: (json['id'] as num).toInt(),
       createAt: json['createAt'] == null
           ? null
           : DateTime.parse(json['createAt'] as String),
@@ -46,11 +46,11 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job(
       progress: json['progress'] as String,
       reward: json['reward'] as String,
       endTime: DateTime.parse(json['endTime'] as String),
-      exceptNumber: json['exceptNumber'] as int,
-      acceptedNumber: json['acceptedNumber'] as int,
-      projectID: json['projectID'] as int,
+      exceptNumber: (json['exceptNumber'] as num).toInt(),
+      acceptedNumber: (json['acceptedNumber'] as num).toInt(),
+      projectID: (json['projectID'] as num).toInt(),
       project: Project.fromJson(json['project'] as Map<String, dynamic>),
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       createAt: json['createAt'] == null
           ? null
           : DateTime.parse(json['createAt'] as String),

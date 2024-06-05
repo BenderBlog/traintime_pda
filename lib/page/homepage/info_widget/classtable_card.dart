@@ -1,7 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -26,54 +25,33 @@ class ClassTableCard extends StatelessWidget {
           nodePosition: 0,
         ),
         builder: TimelineTileBuilder(
-          itemCount: max(arrangement.length + 1, 3),
+          itemCount: remaining.value > 0 ? 3 : next.value != null ? 2 : 1,
           contentsAlign: ContentsAlign.basic,
-          contentsBuilder: (context, index) => switch (index) {
+          contentsBuilder: (context, timelineNodeIndex) =>
+              switch (timelineNodeIndex) {
             0 => const Padding(
-                padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
-                child: ClasstableCurrentColumn()),
+                padding: EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
+                child: ClassTableCardItem(
+                    displayMode: ClassTableCardItemDisplayMode.current)),
             1 => const Padding(
-                padding: EdgeInsets.fromLTRB(5, 0, 0, 8.0),
-                child: ClasstableCurrentColumn(isArrangementMode: true)),
-            2 => Padding(
-                padding: const EdgeInsets.fromLTRB(5, 4, 0, 4),
-                child: Obx(() {
-                  late String toShow;
-                  if (remaining <= 0) {
-                    toShow = "之后没有日程了";
-                  } else {
-                    toShow = "之后还有 $remaining 个日程";
-                  }
-                  return Text(
-                    toShow,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  );
-                }),
-              ),
-            _ => Builder(builder: (context) {
-                return Text(
-                  "${Jiffy.parseFromDateTime(arrangement[index - 1].startTime).format(pattern: "HH:mm")} "
-                  "${arrangement[index - 1].name} ${arrangement[index - 1].place}",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ).padding(left: 6, vertical: 4);
-              })
+                padding: EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
+                child: ClassTableCardItem(
+                    displayMode: ClassTableCardItemDisplayMode.next)),
+            _ => const Padding(
+                padding: EdgeInsets.fromLTRB(5, 1.5, 0, 10.0),
+                child: ClassTableCardItem(
+                    displayMode: ClassTableCardItemDisplayMode.more)),
           },
           indicatorBuilder: (context, index) => Indicator.widget(
-            position: index < 2 ? 0.05 : 0.5,
+            position: 0,
             child: Icon(
               switch (index) {
                 0 => Icons.timelapse_outlined, // Current Class
                 1 => Icons.schedule_outlined, // Next Class
                 _ => Icons.more_time_outlined, // More Class
               },
-              size: index > 2 ? 18 : null,
-            ).padding(horizontal: index > 2 ? 3 : null),
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           startConnectorBuilder: (context, index) {
             if (index == 0) {
@@ -102,10 +80,6 @@ class ClassTableCard extends StatelessWidget {
             );
           },
           endConnectorBuilder: (context, index) {
-            if (max<int>(arrangement.length + 1, 3) - 1 == index) {
-              return null;
-            }
-
             if (index == 0 && isTomorrow.isTrue) {
               // Use dashedLine between today and tomorrow
               return Connector.dashedLine(
@@ -130,7 +104,7 @@ class ClassTableCard extends StatelessWidget {
         ),
       ),
     )
-        .paddingDirectional(horizontal: 16, vertical: 14)
+        .paddingDirectional(horizontal: 20, vertical: 14)
         .withHomeCardStyle(Theme.of(context).colorScheme.secondary)
         .gestures(
       onTap: () {
@@ -155,129 +129,180 @@ class ClassTableCard extends StatelessWidget {
   }
 }
 
-class ClasstableCurrentColumn extends StatelessWidget {
-  /// Check whether it is the second element.
-  /// For showing the next / following.
-  final bool isArrangementMode;
+enum ClassTableCardItemDisplayMode {
+  current,
+  next,
+  more,
+}
 
-  const ClasstableCurrentColumn({
+class ClassTableCardItem extends StatelessWidget {
+  final ClassTableCardItemDisplayMode displayMode;
+
+  const ClassTableCardItem({
     super.key,
-    this.isArrangementMode = false,
+    required this.displayMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    return [
-      Obx(() {
-        late String text;
-        if (arrangementState.value == ArrangementState.fetched) {
-          if (isArrangementMode) {
-            text = next.value?.name ?? "暂无进一步安排";
-          } else {
-            text = current.value?.name ?? "没有正在进行的日程";
-          }
-        } else if (arrangementState.value == ArrangementState.error) {
-          text = "遇到错误";
-        } else {
-          text = "正在加载";
-        }
-        return Text(
-          text,
+    return Obx(() {
+      List<Widget> columns = [
+        Text(
+          getTimeText(),
           style: TextStyle(
-            fontSize: 20,
+            height: 1.1,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
           ),
-        ).alignment(Alignment.centerLeft).expanded();
-      }),
-      const SizedBox(height: 8.0),
-      Obx(() {
-        if (arrangementState.value == ArrangementState.fetched) {
-          if (isArrangementMode) {
-            return ClasstableCurrentListTile(homeArrangement: next.value);
-          } else {
-            return ClasstableCurrentListTile(homeArrangement: current.value);
-          }
-        } else {
-          return Text(
-            arrangementState.value == ArrangementState.error
-                ? "日程获取失败"
-                : "请耐心等待片刻",
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          );
-        }
-      }),
-    ].toColumn(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-    );
+        ).padding(top: 5).alignment(Alignment.bottomLeft)
+      ];
+
+      switch (displayMode) {
+        case ClassTableCardItemDisplayMode.current:
+        case ClassTableCardItemDisplayMode.next:
+          columns.addAll(getCurrentOrNextArrangementColumns(context));
+        case ClassTableCardItemDisplayMode.more:
+          columns.addAll(getMoreArrangementsColumns(context));
+        default:
+          throw Exception("Unknown displayMode: $displayMode");
+      }
+
+      return columns.toColumn(separator: const SizedBox(height: 4.0));
+    });
+  }
+
+  HomeArrangement? getDisplayArrangement() {
+    switch (displayMode) {
+      case ClassTableCardItemDisplayMode.current:
+        return current.value;
+      case ClassTableCardItemDisplayMode.next:
+        return next.value;
+      default:
+        return null;
+    }
+  }
+
+  String getTimeText() {
+    String timeText = switch (displayMode) {
+      ClassTableCardItemDisplayMode.current => "当前",
+      ClassTableCardItemDisplayMode.next => isTomorrow.isTrue ? "明天" : "稍后",
+      ClassTableCardItemDisplayMode.more => "更多",
+      _ => "未知",
+    };
+
+    HomeArrangement? arr = getDisplayArrangement();
+    if (arr != null) {
+      timeText += " "
+          "${Jiffy.parseFromDateTime(arr.startTime).format(pattern: "HH:mm")} - "
+          "${Jiffy.parseFromDateTime(arr.endTime).format(pattern: "HH:mm")}";
+    }
+    return timeText;
+  }
+
+  List<Widget> getCurrentOrNextArrangementColumns(BuildContext context) {
+    HomeArrangement? arr = getDisplayArrangement();
+
+    late String infoText;
+    if (arr != null) {
+      infoText = arr.name;
+    } else if (arrangementState.value == ArrangementState.error) {
+      infoText = "遇到错误";
+    } else if (arrangementState.value == ArrangementState.fetching) {
+      infoText = "正在加载";
+    } else {
+      infoText = "暂无日程";
+    }
+
+    return [
+      Text(
+        infoText,
+        style: TextStyle(
+          height: 1.1,
+          fontSize: 20,
+          fontWeight: FontWeight.normal,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ).alignment(Alignment.centerLeft).expanded(),
+      if (arr != null) ClassTableCardArrangementDetail(displayArrangement: arr),
+    ];
+  }
+
+  List<Widget> getMoreArrangementsColumns(BuildContext context) {
+    return List<Widget>.generate(remaining.value, (i) {
+      var index = i + arrangement.length - remaining.value;
+
+      return [
+        Text(
+          Jiffy.parseFromDateTime(arrangement[index].startTime).format(pattern: "HH:mm"),
+          style: TextStyle(
+            height: 1.2,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ).alignment(Alignment.topLeft),
+        Text(
+          arrangement[index].name,
+          style: TextStyle(
+            height: 1.1,
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ).alignment(Alignment.topLeft).expanded(),
+      ].toRow(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        separator: const SizedBox(width: 8.0),
+      );
+    });
   }
 }
 
-class ClasstableCurrentListTile extends StatelessWidget {
-  final HomeArrangement? homeArrangement;
-  const ClasstableCurrentListTile({
+class ClassTableCardArrangementDetail extends StatelessWidget {
+  final HomeArrangement displayArrangement;
+
+  const ClassTableCardArrangementDetail({
     super.key,
-    required this.homeArrangement,
+    required this.displayArrangement,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (homeArrangement != null) {
-      return [
-        [
-          Icon(
-            Icons.person,
-            color: Theme.of(context).colorScheme.primary,
-            size: 18,
-          ),
-          const SizedBox(width: 2),
-          Text(
-            homeArrangement!.teacher,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 14,
-            ),
-          ),
-        ].toRow(),
-        [
-          Icon(
-            Icons.room,
-            color: Theme.of(context).colorScheme.primary,
-            size: 18,
-          ),
-          const SizedBox(width: 2),
-          Text(
-            homeArrangement!.place,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 14,
-            ),
-          ),
-        ].toRow(),
-        [
-          Icon(
-            Icons.access_time_filled_outlined,
-            color: Theme.of(context).colorScheme.primary,
-            size: 18,
-          ),
-          const SizedBox(width: 2),
-          Text(
-            "${isTomorrow.isTrue ? "明天 " : ""}"
-            "${Jiffy.parseFromDateTime(homeArrangement!.startTime).format(pattern: "HH:mm")}-"
-            "${Jiffy.parseFromDateTime(homeArrangement!.endTime).format(pattern: "HH:mm")}",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 14,
-            ),
-          ),
-        ].toRow(),
-      ].toColumn();
-    } else {
-      return const SizedBox(height: 30.0);
+    List<Widget> items = [];
+
+    if (displayArrangement.place != null) {
+      items.add(createIconText(context, Icons.room, displayArrangement.place!));
     }
+
+    if (displayArrangement.seat != null) {
+      items.add(createIconText(
+          context, Icons.chair, displayArrangement.seat!.toString()));
+    }
+
+    if (displayArrangement.teacher != null) {
+      items.add(
+          createIconText(context, Icons.person, displayArrangement.teacher!));
+    }
+
+    return items.toRow(separator: const SizedBox(width: 6));
+  }
+
+  static Widget createIconText(
+      BuildContext context, IconData icon, String text) {
+    return [
+      Icon(
+        icon,
+        color: Theme.of(context).colorScheme.primary,
+        size: 18,
+      ),
+      Text(
+        text,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+          fontSize: 14,
+        ),
+      )
+    ].toRow(separator: const SizedBox(width: 2));
   }
 }

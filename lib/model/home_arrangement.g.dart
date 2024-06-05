@@ -9,10 +9,11 @@ part of 'home_arrangement.dart';
 HomeArrangement _$HomeArrangementFromJson(Map<String, dynamic> json) =>
     HomeArrangement(
       name: json['name'] as String,
-      teacher: json['teacher'] as String?,
-      place: json['place'] as String?,
       startTimeStr: json['start_time'] as String,
       endTimeStr: json['end_time'] as String,
+      teacher: json['teacher'] as String?,
+      place: json['place'] as String?,
+      seat: (json['seat'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$HomeArrangementToJson(HomeArrangement instance) =>
@@ -20,6 +21,7 @@ Map<String, dynamic> _$HomeArrangementToJson(HomeArrangement instance) =>
       'name': instance.name,
       'teacher': instance.teacher,
       'place': instance.place,
+      'seat': instance.seat,
       'start_time': instance.startTimeStr,
       'end_time': instance.endTimeStr,
     };
