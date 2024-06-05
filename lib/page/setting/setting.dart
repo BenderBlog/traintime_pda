@@ -150,6 +150,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             builder: (context) =>
                                 const ChangeBrightnessDialog());
                       }),
+                  const Divider(),
                   ListTile(
                     title: const Text("简化日程时间轴"),
                     subtitle: const Text("没有日程时 减少空间占用"),
