@@ -27,12 +27,12 @@ LostAndFoundInfo _$LostAndFoundInfoFromJson(Map<String, dynamic> json) =>
       json['content'] as String,
       (json['picture'] as List<dynamic>).map((e) => e as String).toList(),
       json['contact'] as String?,
-      json['status'] as int,
-      json['type'] as int,
+      (json['status'] as num).toInt(),
+      (json['type'] as num).toInt(),
       json['src'] as String?,
-      json['wxpushnotice'] as int?,
+      (json['wxpushnotice'] as num?)?.toInt(),
       UserInfo.fromJson(json['user_info'] as Map<String, dynamic>),
-      json['sms_record_id'] as int?,
+      (json['sms_record_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$LostAndFoundInfoToJson(LostAndFoundInfo instance) =>
@@ -56,8 +56,8 @@ Map<String, dynamic> _$LostAndFoundInfoToJson(LostAndFoundInfo instance) =>
 
 LostAndFoundList _$LostAndFoundListFromJson(Map<String, dynamic> json) =>
     LostAndFoundList(
-      json['code'] as int,
-      json['count'] as int,
+      (json['code'] as num).toInt(),
+      (json['count'] as num).toInt(),
       json['page'] as String,
       (json['item_list'] as List<dynamic>)
           .map((e) => LostAndFoundInfo.fromJson(e as Map<String, dynamic>))

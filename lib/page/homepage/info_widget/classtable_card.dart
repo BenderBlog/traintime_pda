@@ -27,15 +27,14 @@ class ClassTableCard extends StatelessWidget {
         builder: TimelineTileBuilder(
           itemCount: remaining.value > 0 ? 3 : 2,
           contentsAlign: ContentsAlign.basic,
-          contentsBuilder: (context, timelineNodeIndex) => switch (timelineNodeIndex) {
+          contentsBuilder: (context, timelineNodeIndex) =>
+              switch (timelineNodeIndex) {
             0 => const Padding(
                 padding: EdgeInsets.fromLTRB(5, 0, 0, 10.0),
-                child: ClasstableCurrentColumn()
-              ),
+                child: ClasstableCurrentColumn()),
             1 => const Padding(
                 padding: EdgeInsets.fromLTRB(5, 0, 0, 10.0),
-                child: ClasstableCurrentColumn(isArrangementMode: true)
-              ),
+                child: ClasstableCurrentColumn(isArrangementMode: true)),
             _ => Padding(
                 padding: const EdgeInsets.fromLTRB(5, 4, 0, 10.0),
                 child: List<Widget>.generate(remaining.value, (index) {
@@ -45,11 +44,14 @@ class ClassTableCard extends StatelessWidget {
                     fontWeight: FontWeight.normal,
                     color: Theme.of(context).colorScheme.primary,
                   );
-                  var arrangementIndex = index + arrangement.length - remaining.value;
+                  var arrangementIndex =
+                      index + arrangement.length - remaining.value;
 
                   return [
                     Text(
-                      Jiffy.parseFromDateTime(arrangement[arrangementIndex].startTime).format(pattern: "HH:mm"),
+                      Jiffy.parseFromDateTime(
+                              arrangement[arrangementIndex].startTime)
+                          .format(pattern: "HH:mm"),
                       style: textStyle,
                     ).alignment(Alignment.topLeft),
                     Text(
@@ -231,31 +233,37 @@ class ClasstableCurrentListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> items = [];
+
+    if (homeArrangement.place != null) {
+      items.add(createIconText(context, Icons.room, homeArrangement.place!));
+    }
+
+    if (homeArrangement.seat != null) {
+      items.add(createIconText(context, Icons.chair, homeArrangement.seat!.toString()));
+    }
+
+    if (homeArrangement.teacher != null) {
+      items.add(createIconText(context, Icons.person, homeArrangement.teacher!));
+    }
+
+    return items.toRow(separator: const SizedBox(width: 6));
+  }
+
+  static Widget createIconText(BuildContext context, IconData icon, String text) {
     return [
       Icon(
-        Icons.room,
+        icon,
         color: Theme.of(context).colorScheme.primary,
         size: 18,
       ),
       Text(
-        homeArrangement.place,
+        text,
         style: TextStyle(
           color: Theme.of(context).colorScheme.primary,
           fontSize: 14,
         ),
-      ),
-      Icon(
-        Icons.person,
-        color: Theme.of(context).colorScheme.primary,
-        size: 18,
-      ),
-      Text(
-        homeArrangement.teacher,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.primary,
-          fontSize: 14,
-        ),
-      ),
+      )
     ].toRow(separator: const SizedBox(width: 2));
   }
 }

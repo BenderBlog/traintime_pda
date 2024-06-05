@@ -40,14 +40,14 @@ Map<String, dynamic> _$ClassDetailToJson(ClassDetail instance) =>
 TimeArrangement _$TimeArrangementFromJson(Map<String, dynamic> json) =>
     TimeArrangement(
       source: $enumDecode(_$SourceEnumMap, json['source']),
-      index: json['index'] as int,
+      index: (json['index'] as num).toInt(),
       weekList:
           (json['week_list'] as List<dynamic>).map((e) => e as bool).toList(),
       classroom: json['classroom'] as String?,
       teacher: json['teacher'] as String?,
-      day: json['day'] as int,
-      start: json['start'] as int,
-      stop: json['stop'] as int,
+      day: (json['day'] as num).toInt(),
+      start: (json['start'] as num).toInt(),
+      stop: (json['stop'] as num).toInt(),
     );
 
 Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) {
@@ -79,7 +79,7 @@ const _$SourceEnumMap = {
 
 ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
     ClassTableData(
-      semesterLength: json['semesterLength'] as int? ?? 1,
+      semesterLength: (json['semesterLength'] as num?)?.toInt() ?? 1,
       semesterCode: json['semesterCode'] as String? ?? "",
       termStartDay: json['termStartDay'] as String? ?? "",
       classDetail: (json['classDetail'] as List<dynamic>?)
@@ -128,13 +128,13 @@ ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
       originalTeacherData: json['originalTeacherData'] as String?,
       newTeacherData: json['newTeacherData'] as String?,
       originalClassRange: (json['originalClassRange'] as List<dynamic>)
-          .map((e) => e as int)
+          .map((e) => (e as num).toInt())
           .toList(),
       newClassRange: (json['newClassRange'] as List<dynamic>)
-          .map((e) => e as int)
+          .map((e) => (e as num).toInt())
           .toList(),
-      originalWeek: json['originalWeek'] as int?,
-      newWeek: json['newWeek'] as int?,
+      originalWeek: (json['originalWeek'] as num?)?.toInt(),
+      newWeek: (json['newWeek'] as num?)?.toInt(),
       originalClassroom: json['originalClassroom'] as String?,
       newClassroom: json['newClassroom'] as String?,
     );

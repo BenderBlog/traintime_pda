@@ -97,7 +97,7 @@ class ClassCard extends StatelessWidget {
                             color: color.shade900,
                             fontSize: isPhone(context) ? 10 : 12,
                           ),
-                        ),
+                        ).expanded(),
                         if (data.length > 1)
                           Text(
                             "还有${data.length - 1}个日程",

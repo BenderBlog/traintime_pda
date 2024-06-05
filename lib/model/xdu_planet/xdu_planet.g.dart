@@ -40,7 +40,7 @@ Map<String, dynamic> _$PersonToJson(Person instance) => <String, dynamic>{
 
 XDUPlanetDatabase _$XDUPlanetDatabaseFromJson(Map<String, dynamic> json) =>
     XDUPlanetDatabase(
-      version: json['version'] as int,
+      version: (json['version'] as num).toInt(),
       author: (json['author'] as List<dynamic>)
           .map((e) => Person.fromJson(e as Map<String, dynamic>))
           .toList(),

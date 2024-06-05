@@ -64,8 +64,8 @@ class ClassTableController extends GetxController {
             i.day == updateTime.dateTime.weekday) {
           getArrangement.add(HomeArrangement(
             name: getClassDetail(i).name,
-            teacher: i.teacher ?? "未知",
-            place: i.classroom ?? "未知",
+            teacher: i.teacher,
+            place: i.classroom,
             startTimeStr: Jiffy.parseFromDateTime(DateTime(
               updateTime.year,
               updateTime.month,
