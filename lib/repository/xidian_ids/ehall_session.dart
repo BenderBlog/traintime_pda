@@ -184,7 +184,7 @@ class EhallSession extends IDSSession {
     } else {
       preference.setString(
         preference.Preference.name,
-        detailed["data"]["CZZXM"],
+        detailed["data"]["XM"],
       );
       preference.setString(
         preference.Preference.sex,
