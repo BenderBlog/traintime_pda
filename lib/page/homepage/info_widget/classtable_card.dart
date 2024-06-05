@@ -30,15 +30,15 @@ class ClassTableCard extends StatelessWidget {
           contentsBuilder: (context, timelineNodeIndex) =>
               switch (timelineNodeIndex) {
             0 => const Padding(
-                padding: EdgeInsets.fromLTRB(5, 1, 0, 10.0),
+                padding: EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
                 child: ClassTableCardItem(
                     displayMode: ClassTableCardItemDisplayMode.current)),
             1 => const Padding(
-                padding: EdgeInsets.fromLTRB(5, 1, 0, 10.0),
+                padding: EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
                 child: ClassTableCardItem(
                     displayMode: ClassTableCardItemDisplayMode.next)),
             _ => const Padding(
-                padding: EdgeInsets.fromLTRB(5, 2, 0, 10.0),
+                padding: EdgeInsets.fromLTRB(5, 1.5, 0, 10.0),
                 child: ClassTableCardItem(
                     displayMode: ClassTableCardItemDisplayMode.more)),
           },
