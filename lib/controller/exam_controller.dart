@@ -43,7 +43,7 @@ class ExamController extends GetxController {
     );
     return isFinished
         .map((e) => HomeArrangement(
-              name: e.subject,
+              name: "${e.subject}考试",
               place: e.place,
               seat: e.seat,
               startTimeStr: e.startTime.format(pattern: HomeArrangement.format),
