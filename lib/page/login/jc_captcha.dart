@@ -72,11 +72,13 @@ class SliderCaptchaClientProvider {
     }
 
     // fallback
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => CaptchaWidget(provider: this),
-      ),
-    );
+    if (context.mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CaptchaWidget(provider: this),
+        ),
+      );
+    }
   }
 
   Future<bool> verify(double answer) async {
