@@ -123,11 +123,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       update(
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
-          return Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => CaptchaWidget(cookie: cookieStr),
-            ),
-          );
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
         },
       );
     }
@@ -141,11 +137,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       await update(
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
-          return Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => CaptchaWidget(cookie: cookieStr),
-            ),
-          );
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
         },
       );
     } finally {

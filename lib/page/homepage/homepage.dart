@@ -144,11 +144,7 @@ class _MainPageState extends State<MainPage> {
               msg: "请稍候，正在刷新信息",
             );
             update(sliderCaptcha: (String cookieStr) {
-              return Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CaptchaWidget(cookie: cookieStr),
-                ),
-              );
+              return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
             });
           },
           header: PhoenixHeader(

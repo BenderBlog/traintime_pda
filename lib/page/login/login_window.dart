@@ -187,11 +187,7 @@ class _LoginWindowState extends State<LoginWindow> {
         onResponse: (int number, String status) =>
             pd.update(msg: status, value: number),
         sliderCaptcha: (String cookieStr) {
-          return Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => CaptchaWidget(cookie: cookieStr),
-            ),
-          );
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
         },
       );
       if (!mounted) return;

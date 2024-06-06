@@ -68,6 +68,7 @@ dependencies:
   # Homepage Widget
   home_widget: ^0.4.1
   logger: ^2.0.2+1
+  image: ^4.2.0
 
   
 dev_dependencies:

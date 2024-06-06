@@ -6,93 +6,154 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 
+class Lazy<T> {
+  final T Function() _initializer;
+
+  Lazy(this._initializer);
+
+  T? _value;
+
+  T get value => _value ??= _initializer();
+}
+
 class SliderCaptchaClientProvider {
-  ///Data of the image after decode base64
-  late Uint8List puzzleUnit8List;
+  final String cookie;
+  Dio dio = Dio()..interceptors.add(alice.getDioInterceptor());
 
-  ///Data of the piece after decode base64
-  late Uint8List pieceUnit8List;
+  SliderCaptchaClientProvider({required this.cookie});
 
-  /// Actual size of the image
-  late Size puzzleSize;
+  Uint8List? puzzleData;
+  Uint8List? pieceData;
+  Lazy<Image>? puzzleImage;
+  Lazy<Image>? pieceImage;
 
-  ///Actual size of the piece
-  late Size pieceSize;
+  final double puzzleWidth = 280;
+  final double puzzleHeight = 155;
+  final double pieceWidth = 44;
+  final double pieceHeight = 155;
 
-  ///Image is cut 1 piece
-  Image? puzzleImage;
+  Future<void> updatePuzzle() async {
+    var rsp = await dio.get(
+      "https://ids.xidian.edu.cn/authserver/common/openSliderCaptcha.htl",
+      queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
+      options: Options(headers: {"Cookie": cookie}),
+    );
 
-  ///piece is cut from Image
-  Image? pieceImage;
+    String puzzleBase64 = rsp.data["bigImage"];
+    String pieceBase64 = rsp.data["smallImage"];
+    // double coordinatesY = double.parse(rsp.data["tagWidth"].toString());
 
-  ///The ratio of the image to the actual size of the screen.
-  late double ratio;
+    puzzleData = const Base64Decoder().convert(puzzleBase64);
+    pieceData = const Base64Decoder().convert(pieceBase64);
 
-  ///Init piece base64 type
-  final String puzzleBase64;
-
-  /// Init piece base64 type:
-  final String pieceBase64;
-
-  ///Y coordinate of the puzzle piece.
-  final double coordinatesY;
-
-  late double puzzleWidth = 280;
-
-  late double pieceWidth = 44;
-
-  late double puzzleHeight = 155;
-
-  late double pieceHeight = 155;
-
-  /// Provides Image information from the original base64 data
-  SliderCaptchaClientProvider(
-      this.puzzleBase64, this.pieceBase64, this.coordinatesY) {
-    puzzleUnit8List = const Base64Decoder().convert(puzzleBase64);
-    pieceUnit8List = const Base64Decoder().convert(pieceBase64);
+    puzzleImage = Lazy(() => Image.memory(puzzleData!,
+        width: puzzleWidth, height: puzzleHeight, fit: BoxFit.fitWidth));
+    pieceImage = Lazy(() => Image.memory(pieceData!,
+        width: pieceWidth, height: pieceHeight, fit: BoxFit.fitWidth));
   }
 
-  ///This is the required function to be executed to initialize the values.
-  Future<bool> init() async {
-    puzzleSize = await _getSize(puzzleUnit8List);
-    pieceSize = await _getSize(pieceUnit8List);
-    puzzleImage = Image.memory(
-      puzzleUnit8List,
-      height: puzzleHeight,
-      width: puzzleWidth,
-      fit: BoxFit.fitWidth,
+  Future<void> solve(BuildContext context, {int retryCount = 3}) async {
+    for (int i = 0; i < retryCount; i++) {
+      await updatePuzzle();
+
+      double? answer = _trySolve(puzzleData!, pieceData!);
+      if (answer != null && await verify(answer)) {
+        return;
+      }
+    }
+
+    // fallback
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CaptchaWidget(provider: this),
+      ),
     );
-    pieceImage = Image.memory(
-      pieceUnit8List,
-      width: pieceWidth,
-      height: pieceHeight,
-      fit: BoxFit.fitWidth,
-    );
-    return true;
   }
 
-  /// Actual size of the image in pixels
-  Future<Size> _getSize(Uint8List puzzleUnit8List) async {
-    var image = await decodeImageFromList(puzzleUnit8List);
-    return Size(image.width.toDouble(), image.height.toDouble());
+  Future<bool> verify(double answer) async {
+    dynamic result = await dio.post(
+      "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
+      data:
+          "canvasLength=${(puzzleWidth)}&moveLength=${(answer * puzzleWidth).toInt()}",
+      options: Options(
+        headers: {
+          "Cookie": cookie,
+          HttpHeaders.contentTypeHeader:
+              "application/x-www-form-urlencoded;charset=utf-8",
+          HttpHeaders.accessControlAllowOriginHeader:
+              "https://ids.xidian.edu.cn",
+        },
+      ),
+    );
+    return result.data["errorCode"] == 1;
+  }
+
+  static double? _trySolve(Uint8List puzzleData, Uint8List pieceData) {
+    img.Image? puzzle = img.decodeImage(puzzleData);
+    if (puzzle == null) {
+      return null;
+    }
+
+    img.Image? piece = img.decodeImage(pieceData);
+    if (piece == null) {
+      return null;
+    }
+
+    // note that puzzle and piece have the same height
+
+    int minY = piece.height - 1;
+    int maxY = 0;
+
+    for (var y = 0; y < piece.height; y++) {
+      if (piece.getPixel((piece.width * 0.5).floor(), y).a > 0) {
+        minY = min(minY, y);
+        maxY = max(maxY, y);
+      }
+    }
+
+    for (var x = 1; x < puzzle.width - 1; x++) {
+      int matchCount = 0;
+
+      for (var y = minY; y <= maxY; y++) {
+        var l = _getPixelGrayscale(puzzle.getPixel(x - 1, y));
+        var r = _getPixelGrayscale(puzzle.getPixel(x + 1, y));
+
+        // find edge
+        if ((r - l).abs() > 50) {
+          matchCount++;
+        }
+      }
+
+      if ((matchCount / (maxY - minY + 1.0)) > 0.6) {
+        return x / puzzle.width;
+      }
+    }
+
+    return null;
+  }
+
+  static int _getPixelGrayscale(img.Pixel p) {
+    return (0.2126 * p.r + 0.7152 * p.g + 0.0722 * p.b).round();
   }
 }
 
 class CaptchaWidget extends StatefulWidget {
-  final String cookie;
-
   static double deviation = 5;
+
+  final SliderCaptchaClientProvider provider;
 
   const CaptchaWidget({
     super.key,
-    required this.cookie,
+    required this.provider,
   });
 
   @override
@@ -114,27 +175,9 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
     super.initState();
   }
 
-  Dio dio = Dio()..interceptors.add(alice.getDioInterceptor());
-
   Future<void> updateProvider() async {
     _sliderValue = 0;
-    provider = dio
-        .get(
-      "https://ids.xidian.edu.cn/authserver/common/openSliderCaptcha.htl",
-      queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
-      options: Options(headers: {"Cookie": widget.cookie}),
-    )
-        .then(
-      (value) async {
-        var provider = SliderCaptchaClientProvider(
-          value.data["bigImage"],
-          value.data["smallImage"],
-          double.parse(value.data["tagWidth"].toString()),
-        );
-        await provider.init();
-        return provider;
-      },
-    );
+    provider = widget.provider.updatePuzzle().then((value) => widget.provider);
   }
 
   @override
@@ -160,12 +203,12 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                     alignment: Alignment.center,
                     children: [
                       // 背景图层
-                      snapshot.data!.puzzleImage!,
+                      snapshot.data!.puzzleImage!.value,
                       // 拼图层
                       Positioned(
                         left: _sliderValue * snapshot.data!.puzzleWidth -
                             _offsetValue,
-                        child: snapshot.data!.pieceImage!,
+                        child: snapshot.data!.pieceImage!.value,
                       ),
                     ],
                   ),
@@ -191,28 +234,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                         });
                       },
                       onChangeEnd: (value) async {
-                        /// Can you verify captcha at here
-                        bool result = await dio
-                            .post(
-                          "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
-                          data: "canvasLength=${(snapshot.data!.puzzleWidth)}&"
-                              "moveLength=${(_sliderValue * snapshot.data!.puzzleWidth).toInt()}",
-                          options: Options(
-                            headers: {
-                              "Cookie": widget.cookie,
-                              HttpHeaders.contentTypeHeader:
-                                  "application/x-www-form-urlencoded;charset=utf-8",
-                              HttpHeaders.accessControlAllowOriginHeader:
-                                  "https://ids.xidian.edu.cn",
-                            },
-                          ),
-                        )
-                            .then((value) {
-                          //print((_sliderValue * snapshot.data!.puzzleWidth).toInt().toString());
-                          //print(value.data.toString());
-                          return value.data["errorCode"] == 1;
-                        });
-
+                        bool result = await snapshot.data!.verify(_sliderValue);
                         if (context.mounted) {
                           result
                               ? Navigator.of(context).pop()
