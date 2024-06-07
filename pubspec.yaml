@@ -64,7 +64,8 @@ dependencies:
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.1
   timelines: ^0.1.0
-  based_split_view: ^1.2.0
+  based_split_view: ^1.2.0 
+  pinyin: ^3.3.0
   # Homepage Widget
   home_widget: ^0.4.1
   logger: ^2.0.2+1
