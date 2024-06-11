@@ -42,6 +42,7 @@ jobs:
             ${{ runner.os }}-android-sdk
 
       - name: Set up Android SDK
+        if: steps.cache-android-sdk.outputs.cache-hit == 'true'
         run: |
           echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
