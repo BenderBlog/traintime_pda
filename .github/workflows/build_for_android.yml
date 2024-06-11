@@ -48,6 +48,24 @@ jobs:
           .flutter/bin/flutter config --no-analytics
           .flutter/bin/flutter pub get
 
+      - name: Cache Android SDK
+        id: cache-android-sdk
+        uses: actions/cache@v2
+        with:
+          path: /usr/local/lib/android/sdk
+          key: ${{ runner.os }}-android-sdk
+          restore-keys: |
+            ${{ runner.os }}-android-sdk
+
+      - name: Set up Android SDK
+        run: |
+          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          echo "PATH=$PATH:/usr/local/lib/android/sdk/emulator" >> $GITHUB_ENV
+          echo "PATH=$PATH:/usr/local/lib/android/sdk/tools" >> $GITHUB_ENV
+          echo "PATH=$PATH:/usr/local/lib/android/sdk/tools/bin" >> $GITHUB_ENV
+          echo "PATH=$PATH:/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_ENV
+
       - name: Build APK
         run: |
           .flutter/bin/flutter build apk --split-per-abi
