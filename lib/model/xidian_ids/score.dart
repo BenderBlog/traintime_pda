@@ -3,20 +3,24 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:json_annotation/json_annotation.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Score {
   int mark; // 编号，用于某种计算，从 0 开始
   String name; // 学科名称
   double? score; // 分数
   String semesterCode; // 学年
   double credit; // 学分
+  // DJCJLXDM 01 三级成绩 02 五级成绩 03 两级成绩
   String classStatus; // 课程性质，必修，选修等，
   String classType; // 课程类别
-  // DJCJLXDM 01 三级成绩 02 五级成绩 03 两级成绩
   String scoreStatus; // 修读类型类型，重修重考等
   int scoreTypeCode; // 评分方式
   String? level; // 等级
   String? isPassedStr; //是否及格，null 没出分，1 通过 0 没有
   String? classID; // 教学班序列号
+
   Score({
     required this.mark,
     required this.name,
@@ -107,7 +111,42 @@ class Score {
         }
     }
   }
+
+  factory Score.fromJson(Map<String, dynamic> json) {
+    return Score(
+      mark: json['mark'],
+      name: json['name'],
+      score: (json['score'] as num?)?.toDouble(),
+      semesterCode: json['semesterCode'],
+      credit: (json['credit'] as num).toDouble(),
+      classStatus: json['classStatus'],
+      classType: json['classType'],
+      scoreStatus: json['scoreStatus'],
+      scoreTypeCode: json['scoreTypeCode'],
+      level: json['level'],
+      isPassedStr: json['isPassedStr'],
+      classID: json['classID'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'mark': mark,
+      'name': name,
+      'score': score,
+      'semesterCode': semesterCode,
+      'credit': credit,
+      'classStatus': classStatus,
+      'classType': classType,
+      'scoreStatus': scoreStatus,
+      'scoreTypeCode': scoreTypeCode,
+      'level': level,
+      'isPassedStr': isPassedStr,
+      'classID': classID,
+    };
+  }
 }
+
 
 class ComposeDetail {
   String content;
