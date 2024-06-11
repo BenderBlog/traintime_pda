@@ -20,13 +20,13 @@ class ScoreCard extends StatelessWidget {
         } else {
           final state = context.findAncestorStateOfType<_ScoreWindowState>();
           List<Score>? scores;
-          if (scoreWindowState != null) {
-            final future = scoreWindowState.scoreList;
+          if (state != null) {
+            final future = state.scoreList;
             if (future.connectionState == ConnectionState.done && !future.hasError) {
-              scores = scoresFuture.data;
+              scores = future.data;
             }
           }
-          context.pushReplacement(const ScoreWindow(scores: scores));
+          context.pushReplacement(ScoreWindow(scores: scores));
         }
       },
       icon: Icons.grading_rounded,
