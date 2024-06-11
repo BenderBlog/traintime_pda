@@ -16,10 +16,10 @@ class ScoreWindow extends StatefulWidget {
   const ScoreWindow({super.key, this.scores});
 
   @override
-  State<ScoreWindow> createState() => _ScoreWindowState();
+  State<ScoreWindow> createState() => ScoreWindowState();
 }
 
-class _ScoreWindowState extends State<ScoreWindow> {
+class ScoreWindowState extends State<ScoreWindow> {
   late Future<List<Score>> scoreList;
 
   Navigator _getNavigator(BuildContext context, Widget child) {
@@ -58,7 +58,6 @@ class _ScoreWindowState extends State<ScoreWindow> {
               }),
             );
           } else {
-            _isScoreListLoaded = true;
             return ScoreState.init(
               scoreTable: snapshot.data!,
               context: context,
