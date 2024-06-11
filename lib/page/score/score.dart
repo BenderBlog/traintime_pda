@@ -11,14 +11,15 @@ import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 
 class ScoreWindow extends StatefulWidget {
-  const ScoreWindow({super.key});
+  final List<Score>? scores;
+
+  const ScoreWindow({super.key, this.scores});
 
   @override
   State<ScoreWindow> createState() => _ScoreWindowState();
 }
 
 class _ScoreWindowState extends State<ScoreWindow> {
-  bool _isScoreListLoaded = false;
   late Future<List<Score>> scoreList;
 
   Navigator _getNavigator(BuildContext context, Widget child) {
@@ -30,8 +31,10 @@ class _ScoreWindowState extends State<ScoreWindow> {
   }
 
   void dataInit() {
-    if (!_isScoreListLoaded) {
+    if (widget.scores == null) {
       scoreList = ScoreSession().getScore();
+    } else {
+      scoreList = Future.value(widget.scores);
     }
   }
 
@@ -51,7 +54,6 @@ class _ScoreWindowState extends State<ScoreWindow> {
           if (snapshot.hasError) {
             body = ReloadWidget(
               function: () => setState(() {
-                _isScoreListLoaded = false;
                 dataInit();
               }),
             );
