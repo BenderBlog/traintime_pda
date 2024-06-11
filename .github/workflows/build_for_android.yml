@@ -2,9 +2,9 @@ name: Build for Android
 
 on:
   workflow_call:
-
+  workflow_dispatch:
 jobs:
-  build_apk:
+  build_apk_dev:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
