@@ -35,4 +35,4 @@ jobs:
           if-no-files-found: error
           name: dist_android
           path: |
-            build/app/outputs/flutter-apk/*
+            build/app/outputs/flutter-apk/*arm64*
