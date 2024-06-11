@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/score/score.dart';
@@ -19,15 +18,7 @@ class ScoreCard extends StatelessWidget {
         if (offline) {
           showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
-          final state = context.findAncestorStateOfType<ScoreWindowState>();
-          List<Score>? scores;
-          if (state != null) {
-            final future = state.scoreList;
-            if (future.connectionState == ConnectionState.done && !future.hasError) {
-              scores = future.data;
-            }
-          }
-          context.pushReplacement(ScoreWindow(scores: scores));
+          context.pushReplacement(const ScoreWindow());
         }
       },
       icon: Icons.grading_rounded,
