@@ -18,6 +18,7 @@ class ScoreWindow extends StatefulWidget {
 }
 
 class _ScoreWindowState extends State<ScoreWindow> {
+  bool _isScoreListLoaded = false;
   late Future<List<Score>> scoreList;
 
   Navigator _getNavigator(BuildContext context, Widget child) {
@@ -28,7 +29,11 @@ class _ScoreWindowState extends State<ScoreWindow> {
     );
   }
 
-  void dataInit() => scoreList = ScoreSession().getScore();
+  void dataInit() {
+    if (!_isScoreListLoaded) {
+      scoreList = ScoreSession().getScore();
+    }
+  }
 
   @override
   void initState() {
@@ -46,10 +51,12 @@ class _ScoreWindowState extends State<ScoreWindow> {
           if (snapshot.hasError) {
             body = ReloadWidget(
               function: () => setState(() {
+                _isScoreListLoaded = false;
                 dataInit();
               }),
             );
           } else {
+            _isScoreListLoaded = true;
             return ScoreState.init(
               scoreTable: snapshot.data!,
               context: context,
