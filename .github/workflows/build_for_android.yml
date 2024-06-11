@@ -37,11 +37,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /usr/local/lib/android/sdk
-          key: ${{ runner.os }}-android-sdk-${{ hashFiles('sdk_versions.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-android-sdk
+          key: ${{ runner.os }}-android-sdk
 
-      - name: Set up Android SDK
+      - name: Set up Android SDK Env Vars
         if: steps.cache-android-sdk.outputs.cache-hit == 'true'
         run: |
           echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
@@ -62,10 +60,3 @@ jobs:
           name: dist_android
           path: |
             build/app/outputs/flutter-apk/*arm64*
-
-      - name: Save Android SDK Cache
-        if: always()
-        uses: actions/cache@v2
-        with:
-          path: /usr/local/lib/android/sdk
-          key: ${{ runner.os }}-android-sdk-${{ hashFiles('sdk_versions.txt') }}
