@@ -5,6 +5,8 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+part 'score.g.dart';
+
 @JsonSerializable(explicitToJson: true)
 class Score {
   int mark; // 编号，用于某种计算，从 0 开始
