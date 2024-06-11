@@ -30,8 +30,7 @@ jobs:
       - name: Get Android SDK Versions
         id: get-android-sdk-versions
         run: |
-          SDK_VERSIONS=$(find /usr/local/lib/android/sdk -name "source.properties" -exec cat {} + | grep Pkg.Revision | sort)
-          echo "$SDK_VERSIONS" > sdk_versions.txt
+          find /usr/local/lib/android/sdk -name "source.properties" -exec cat {} + | grep Pkg.Revision | sort > sdk_versions.txt
 
       - name: Cache Android SDK
         id: cache-android-sdk
@@ -46,10 +45,10 @@ jobs:
         run: |
           echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-          echo "PATH=$PATH:/usr/local/lib/android/sdk/emulator" >> $GITHUB_ENV
-          echo "PATH=$PATH:/usr/local/lib/android/sdk/tools" >> $GITHUB_ENV
-          echo "PATH=$PATH:/usr/local/lib/android/sdk/tools/bin" >> $GITHUB_ENV
-          echo "PATH=$PATH:/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_ENV
+          echo "PATH=${{ env.PATH }}:/usr/local/lib/android/sdk/emulator" >> $GITHUB_ENV
+          echo "PATH=${{ env.PATH }}:/usr/local/lib/android/sdk/tools" >> $GITHUB_ENV
+          echo "PATH=${{ env.PATH }}:/usr/local/lib/android/sdk/tools/bin" >> $GITHUB_ENV
+          echo "PATH=${{ env.PATH }}:/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_ENV
 
       - name: Build APK
         run: |
