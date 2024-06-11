@@ -29,7 +29,7 @@ jobs:
 
       - name: Build APK
         run: |
-          .flutter/bin/flutter pub run build_runner build
+          .flutter/bin/flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Upload package
         uses: actions/upload-artifact@v4.3.1
