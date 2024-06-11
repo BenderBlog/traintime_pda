@@ -3,6 +3,7 @@ name: Build for Android
 on:
   workflow_call:
   workflow_dispatch:
+
 jobs:
   build_apk_dev:
     runs-on: ubuntu-latest
@@ -15,8 +16,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Cache Flutter
-        id: cache-flutter
+      - name: Cache Flutter SDK
+        id: cache-flutter-sdk
         uses: actions/cache@v2
         with:
           path: .flutter
@@ -25,7 +26,7 @@ jobs:
             ${{ runner.os }}-flutter-
 
       - name: Install Flutter
-        if: steps.cache-flutter.outputs.cache-hit != 'true'
+        if: steps.cache-flutter-sdk.outputs.cache-hit != 'true'
         run: |
           java -version
           git submodule update --init --recursive
@@ -48,12 +49,18 @@ jobs:
           .flutter/bin/flutter config --no-analytics
           .flutter/bin/flutter pub get
 
+      - name: Get Android SDK Versions
+        id: get-android-sdk-versions
+        run: |
+          SDK_VERSIONS=$(find /usr/local/lib/android/sdk -name "source.properties" -exec cat {} + | grep Pkg.Revision | sort)
+          echo "$SDK_VERSIONS" > sdk_versions.txt
+
       - name: Cache Android SDK
         id: cache-android-sdk
         uses: actions/cache@v2
         with:
           path: /usr/local/lib/android/sdk
-          key: ${{ runner.os }}-android-sdk
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('sdk_versions.txt') }}
           restore-keys: |
             ${{ runner.os }}-android-sdk
 
@@ -77,3 +84,10 @@ jobs:
           name: dist_android
           path: |
             build/app/outputs/flutter-apk/*arm64*
+
+      - name: Save Android SDK Cache
+        if: always()
+        uses: actions/cache@v2
+        with:
+          path: /usr/local/lib/android/sdk
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('sdk_versions.txt') }}
