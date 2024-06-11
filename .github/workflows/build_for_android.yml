@@ -14,13 +14,36 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-  
+
+      - name: Cache Flutter
+        id: cache-flutter
+        uses: actions/cache@v2
+        with:
+          path: .flutter
+          key: ${{ runner.os }}-flutter-${{ hashFiles('flutter/bin/flutter') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
       - name: Install Flutter
+        if: steps.cache-flutter.outputs.cache-hit != 'true'
         run: |
           java -version
           git submodule update --init --recursive
+          .flutter/bin/flutter --version
+
+      - name: Cache Flutter Dependencies
+        id: cache-flutter-dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/pubspec.lock
+            .pub-cache
+          key: ${{ runner.os }}-flutter-dependencies-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-dependencies-
 
       - name: Prepare Flutter Dependencies
+        if: steps.cache-flutter-dependencies.outputs.cache-hit != 'true'
         run: |
           .flutter/bin/flutter config --no-analytics
           .flutter/bin/flutter pub get
