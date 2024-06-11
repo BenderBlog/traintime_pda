@@ -18,7 +18,15 @@ class ScoreCard extends StatelessWidget {
         if (offline) {
           showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
         } else {
-          context.pushReplacement(const ScoreWindow());
+          final state = context.findAncestorStateOfType<_ScoreWindowState>();
+          List<Score>? scores;
+          if (state != null) {
+            final future = state.scoreList;
+            if (future.connectionState == ConnectionState.done && !future.hasError) {
+              scores = future.data;
+            }
+          }
+          context.pushReplacement(ScoreWindow(scores: scores));
         }
       },
       icon: Icons.grading_rounded,
