@@ -1,0 +1,38 @@
+name: Build for Android
+
+on:
+  workflow_call:
+
+jobs:
+  build_apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+  
+      - name: Install Flutter
+        run: |
+          java -version
+          git submodule update --init --recursive
+
+      - name: Prepare Flutter Dependencies
+        run: |
+          .flutter/bin/flutter config --no-analytics
+          .flutter/bin/flutter pub get
+
+      - name: Build APK
+        run: |
+          .flutter/bin/flutter build apk --split-per-abi
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          if-no-files-found: error
+          name: dist_android
+          path: |
+            build/app/outputs/flutter-apk/*
