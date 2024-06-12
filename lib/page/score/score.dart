@@ -75,7 +75,11 @@ class _ScoreWindowState extends State<ScoreWindow> {
 
   Future<void> dataInit() async {
     file = File("${supportPath.path}/${scoreListCacheName}");
-    final list = scoreListCacheLoadEnabled ? (await loadScoreListCache()) : [];
+    List<Score> list = [];
+    if (scoreListCacheLoadEnabled) {
+      scoreList = loadScoreListCache();
+      list = await future;
+    }
     scoreListCacheLoadEnabled = true;
     if (list.isEmpty) {
       log.i(
@@ -89,7 +93,6 @@ class _ScoreWindowState extends State<ScoreWindow> {
         "[ScoreWindow][dataInit] "
         "Loaded scoreList from cache.",
       );
-      scoreList = Future.value(list);
     }
   }
 
