@@ -78,7 +78,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
     List<Score> list = [];
     if (scoreListCacheLoadEnabled) {
       scoreList = loadScoreListCache();
-      list = await future;
+      list = await scoreList;
     }
     scoreListCacheLoadEnabled = true;
     if (list.isEmpty) {
