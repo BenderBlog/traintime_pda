@@ -50,7 +50,8 @@ class _ScoreWindowState extends State<ScoreWindow> {
           "[ScoreWindow][loadScoreListCache] "
           "Cache file effective.",
         );
-        return (jsonDecode(file.readAsStringSync()) as List).map(
+        List<dynamic> data = jsonDecode(file.readAsStringSync());
+        return data.map(
           (s) => Score.fromJson(s as Map<String, dynamic>)
         ).toList();
       }
@@ -64,7 +65,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
 
   void dumpScoreListCache(List<Score> scores) {
     file.writeAsStringSync(
-      jsonEncode(scores.map((s) => s.toJson()).toList())
+      jsonEncode(scores.map((s) => s.toJson()).toList()),
     );
     log.i(
       "[ScoreWindow][dumpScoreListCache] "
@@ -82,8 +83,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
         "Loaded scoreList from ScoreSession.",
       );
       scoreList = ScoreSession().getScore();
-      final list = await scoreList;
-      dumpScoreListCache(list);
+      dumpScoreListCache(await scoreList);
     } else {
       log.i(
         "[ScoreWindow][dataInit] "
@@ -96,8 +96,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
   @override
   void initState() {
     file = File("${supportPath.path}/${scoreListCacheName}");
-    dataInit();
-    super.initState();
+    dataInit().then(() => super.initState());
   }
 
   @override
