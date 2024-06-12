@@ -92,7 +92,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
 
   @override
   void initState() {
-    dataInit().then(() => super.initState())
+    dataInit().then(() => super.initState());
   }
 
   @override
