@@ -3,11 +3,15 @@
 
 // Score Window
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_page.dart';
 import 'package:watermeter/page/score/score_state.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 
@@ -21,6 +25,7 @@ class ScoreWindow extends StatefulWidget {
 class _ScoreWindowState extends State<ScoreWindow> {
   static const scoreListCacheName = "scores.json";
   late Future<List<Score>> scoreList;
+  late File file;
 
   Navigator _getNavigator(BuildContext context, Widget child) {
     return Navigator(
@@ -35,7 +40,6 @@ class _ScoreWindowState extends State<ScoreWindow> {
       "[ScoreWindow][loadScoreListCache] "
       "Path at ${supportPath.path}/$scoreListCacheName.",
     );
-    file = File("${supportPath.path}/$scoreListCacheName");
     if (file.existsSync()) {
       final timeDiff = DateTime.now().difference(
         file.lastModifiedSync()
@@ -43,7 +47,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
       if (timeDiff < 1) {
         log.i(
           "[ScoreWindow][loadScoreListCache] "
-          "Load effective cache file.",
+          "Cache file effective.",
         );
       return jsonDecode(file.readAsStringSync()).map(
         (s) => Score.fromJson(s)
@@ -61,17 +65,27 @@ class _ScoreWindowState extends State<ScoreWindow> {
     file.writeAsStringSync(
       jsonEncode(scores.map((s) => s.toJson()).toList())
     );
+    log.i(
+      "[ScoreWindow][dumpScoreListCache] "
+      "Dumped scoreList to ${supportPath.path}/$scoreListCacheName.",
+    );
   }
 
   Future<void> dataInit async () {
-    final cache = await loadScoreListCache();
-    if (scoreList.isEmpty) {
+    file = File("${supportPath.path}/$scoreListCacheName");
+    final list = await loadScoreListCache();
+    if (list.isEmpty) {
       log.i(
-        "[ScoreWindow][loadScoreListCache] "
-        "Get scores via ScoreSession.",
+        "[ScoreWindow][dataInit] "
+        "Loaded scoreList from ScoreSession.",
       );
-      scoreList = ScoreSession().getScore();
+      list = await ScoreSession().getScore();
+      dumpScoreListCache(list);
     } else {
+      log.i(
+        "[ScoreWindow][dataInit] "
+        "Loaded scoreList from cache.",
+      );
       scoreList = Future.value(cache);
     }
   }
