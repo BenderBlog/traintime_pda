@@ -63,6 +63,12 @@ class AboutPage extends StatelessWidget {
       "https://github.com/NanCunChild",
     ),
     Developer(
+      "Pairman",
+      "https://avatars.githubusercontent.com/u/18365163",
+      "开发：成绩信息缓存功能",
+      "https://github.com/ZCWzy",
+    ),
+    Developer(
       "ReverierXu",
       "https://blog.woooo.tech/img/avatar.png",
       "设计：用于信息展示的 ReX 卡片",
