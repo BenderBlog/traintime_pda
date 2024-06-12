@@ -7,13 +7,20 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 考试成绩 4768574631264620
 class ScoreSession extends EhallSession {
+  static const scoreListCacheName = "scores.json";
+  late File file = File("${supportPath.path}/${scoreListCacheName}");
+  bool isScoreListCacheUsed = false;
+
   /// Must be called after [getScore]!
   /// If bug, just return dummy data.
   Future<List<ComposeDetail>> getDetail(
@@ -86,12 +93,61 @@ class ScoreSession extends EhallSession {
     }
   }
 
+  Future<List<Score>> loadScoreListCache() async {
+    log.i(
+      "[ScoreSession][loadScoreListCache] "
+      "Path at ${supportPath.path}/${scoreListCacheName}.",
+    );
+    if (file.existsSync()) {
+      final timeDiff = DateTime.now().difference(
+        file.lastModifiedSync()
+      ).inHours;
+      if (timeDiff < 6) {
+        log.i(
+          "[ScoreSession][loadScoreListCache] "
+          "Cache file effective.",
+        );
+        List<dynamic> data = jsonDecode(file.readAsStringSync());
+        return data.map(
+          (s) => Score.fromJson(s as Map<String, dynamic>)
+        ).toList();
+      }
+    }
+    log.i(
+      "[ScoreSession][loadScoreListCache] "
+      "Cache file non-existent or ineffective.",
+    );
+    return [];
+  }
+
+  void dumpScoreListCache(List<Score> scores) {
+    file.writeAsStringSync(
+      jsonEncode(scores.map((s) => s.toJson()).toList()),
+    );
+    log.i(
+      "[ScoreWindow][dumpScoreListCache] "
+      "Dumped scoreList to ${supportPath.path}/${scoreListCacheName}.",
+    );
+  }
+
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
+    /// Try retrieving cached scores first.
+    isScoreListCacheUsed = false;
+    toReturn = await loadScoreListCache();
+    if (!toReturn.isEmpty) {
+      log.i(
+        "[ScoreSession][getScore] "
+        "Loaded scores from cache.",
+      );
+      isScoreListCacheUsed = true;
+      return toReturn;
+    }
 
-    /// Get all scores here.
+    /// Otherwise get fresh score data.
     log.i(
-      "[ScoreSession] Start getting the score.",
+      "[ScoreSession][getScore] "
+      "Start getting score data.",
     );
     Map<String, dynamic> querySetting = {
       'name': 'SFYX',
@@ -101,7 +157,8 @@ class ScoreSession extends EhallSession {
     };
 
     log.i(
-      "[ScoreSession] Ready to login the system.",
+      "[ScoreSession][getScore] "
+      "Ready to log into the system.",
     );
     var firstPost = await useApp("4768574631264620");
     log.i(
@@ -110,7 +167,8 @@ class ScoreSession extends EhallSession {
     await dioEhall.get(firstPost);
 
     log.i(
-      "[ScoreSession] Getting the score data.",
+      "[ScoreSession][getScore] "
+      "Getting score data.",
     );
     var getData = await dioEhall.post(
       "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
@@ -123,7 +181,8 @@ class ScoreSession extends EhallSession {
       },
     ).then((value) => value.data);
     log.i(
-      "[ScoreSession] Dealing the score data.",
+      "[ScoreSession][getScore] "
+      "Dealing with the score data.",
     );
     if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
       throw GetScoreFailedException(
@@ -150,6 +209,11 @@ class ScoreSession extends EhallSession {
       ));
       j++;
     }
+    dumpScoreListCache(toReturn);
+    log.i(
+      "[ScoreSession][getScore] "
+      "Cached the score data.",
+    );
     return toReturn;
   }
 }

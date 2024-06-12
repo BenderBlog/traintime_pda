@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/score/score_page.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
@@ -28,7 +29,16 @@ class _ScoreWindowState extends State<ScoreWindow> {
     );
   }
 
-  void dataInit() => scoreList = ScoreSession().getScore();
+  void dataInit() {
+    ScoreSession session = ScoreSession()
+    scoreList = session.getScore();
+    if (session.isScoreListCacheUsed) {
+      showToast(
+        context: context,
+        msg: "已显示缓存成绩信息",
+      );
+    }
+  }
 
   @override
   void initState() {
