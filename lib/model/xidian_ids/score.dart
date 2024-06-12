@@ -14,9 +14,9 @@ class Score {
   double? score; // 分数
   String semesterCode; // 学年
   double credit; // 学分
-  // DJCJLXDM 01 三级成绩 02 五级成绩 03 两级成绩
   String classStatus; // 课程性质，必修，选修等，
   String classType; // 课程类别
+  // DJCJLXDM 01 三级成绩 02 五级成绩 03 两级成绩
   String scoreStatus; // 修读类型类型，重修重考等
   int scoreTypeCode; // 评分方式
   String? level; // 等级
