@@ -38,7 +38,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
   Future<List<Score>> loadScoreListCache() async {
     log.i(
       "[ScoreWindow][loadScoreListCache] "
-      "Path at ${supportPath.path}/$scoreListCacheName.",
+      "Path at ${supportPath.path}/{$scoreListCacheName}.",
     );
     if (file.existsSync()) {
       final timeDiff = DateTime.now().difference(
@@ -67,12 +67,12 @@ class _ScoreWindowState extends State<ScoreWindow> {
     );
     log.i(
       "[ScoreWindow][dumpScoreListCache] "
-      "Dumped scoreList to ${supportPath.path}/$scoreListCacheName.",
+      "Dumped scoreList to ${supportPath.path}/{$scoreListCacheName}.",
     );
   }
 
   Future<void> dataInit async () {
-    file = File("${supportPath.path}/$scoreListCacheName");
+    file = File("${supportPath.path}/{$scoreListCacheName}");
     final list = await loadScoreListCache();
     if (list.isEmpty) {
       log.i(
@@ -86,13 +86,16 @@ class _ScoreWindowState extends State<ScoreWindow> {
         "[ScoreWindow][dataInit] "
         "Loaded scoreList from cache.",
       );
-      scoreList = Future.value(cache);
+      scoreList = Future.value(list);
     }
   }
 
   @override
   void initState() {
-    dataInit().then(() => super.initState());
+    super.initState();
+    dataInit().then((_) {
+      setState(() {});
+    });
   }
 
   @override
