@@ -19,6 +19,7 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 class ScoreSession extends EhallSession {
   static const scoreListCacheName = "scores.json";
   late File file = File("${supportPath.path}/${scoreListCacheName}");
+  bool isScoreListCacheUsed = false;
 
   /// Must be called after [getScore]!
   /// If bug, just return dummy data.
@@ -100,8 +101,8 @@ class ScoreSession extends EhallSession {
     if (file.existsSync()) {
       final timeDiff = DateTime.now().difference(
         file.lastModifiedSync()
-      ).inDays;
-      if (timeDiff < 1) {
+      ).inHours;
+      if (timeDiff < 6) {
         log.i(
           "[ScoreSession][loadScoreListCache] "
           "Cache file effective.",
@@ -132,12 +133,14 @@ class ScoreSession extends EhallSession {
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
     /// Try retrieving cached scores first.
+    isScoreListCacheUsed = false;
     toReturn = await loadScoreListCache();
     if (!toReturn.isEmpty) {
       log.i(
         "[ScoreSession][getScore] "
         "Loaded scores from cache.",
       );
+      isScoreListCacheUsed = true;
       return toReturn;
     }
 
