@@ -3,16 +3,11 @@
 
 // Score Window
 
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_page.dart';
 import 'package:watermeter/page/score/score_state.dart';
-import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 
 class ScoreWindow extends StatefulWidget {
@@ -23,10 +18,7 @@ class ScoreWindow extends StatefulWidget {
 }
 
 class _ScoreWindowState extends State<ScoreWindow> {
-  static const scoreListCacheName = "scores.json";
-  bool scoreListCacheLoadEnabled = true;
   late Future<List<Score>> scoreList;
-  late File file;
 
   Navigator _getNavigator(BuildContext context, Widget child) {
     return Navigator(
@@ -36,70 +28,12 @@ class _ScoreWindowState extends State<ScoreWindow> {
     );
   }
 
-  Future<List<Score>> loadScoreListCache() async {
-    log.i(
-      "[ScoreWindow][loadScoreListCache] "
-      "Path at ${supportPath.path}/${scoreListCacheName}.",
-    );
-    if (file.existsSync()) {
-      final timeDiff = DateTime.now().difference(
-        file.lastModifiedSync()
-      ).inDays;
-      if (timeDiff < 1) {
-        log.i(
-          "[ScoreWindow][loadScoreListCache] "
-          "Cache file effective.",
-        );
-        List<dynamic> data = jsonDecode(file.readAsStringSync());
-        return data.map(
-          (s) => Score.fromJson(s as Map<String, dynamic>)
-        ).toList();
-      }
-    }
-    log.i(
-      "[ScoreWindow][loadScoreListCache] "
-      "Cache file non-existent or ineffective.",
-    );
-    return [];
-  }
-
-  void dumpScoreListCache(List<Score> scores) {
-    file.writeAsStringSync(
-      jsonEncode(scores.map((s) => s.toJson()).toList()),
-    );
-    log.i(
-      "[ScoreWindow][dumpScoreListCache] "
-      "Dumped scoreList to ${supportPath.path}/${scoreListCacheName}.",
-    );
-  }
-
-  Future<void> dataInit() async {
-    file = File("${supportPath.path}/${scoreListCacheName}");
-    List<Score> list = [];
-    if (scoreListCacheLoadEnabled) {
-      scoreList = loadScoreListCache();
-      list = await scoreList;
-    }
-    scoreListCacheLoadEnabled = true;
-    if (list.isEmpty) {
-      log.i(
-        "[ScoreWindow][dataInit] "
-        "Loaded scoreList from ScoreSession.",
-      );
-      scoreList = ScoreSession().getScore();
-      dumpScoreListCache(await scoreList);
-    } else {
-      log.i(
-        "[ScoreWindow][dataInit] "
-        "Loaded scoreList from cache.",
-      );
-    }
-  }
+  void dataInit() => scoreList = ScoreSession().getScore();
 
   @override
   void initState() {
-    file = File("${supportPath.path}/${scoreListCacheName}");
-    dataInit().then(() => super.initState());
+    dataInit();
+    super.initState();
   }
 
   @override
@@ -112,7 +46,6 @@ class _ScoreWindowState extends State<ScoreWindow> {
           if (snapshot.hasError) {
             body = ReloadWidget(
               function: () => setState(() {
-                scoreListCacheLoadEnabled = false;
                 dataInit();
               }),
             );
