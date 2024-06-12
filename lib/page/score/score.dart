@@ -19,6 +19,7 @@ class ScoreWindow extends StatefulWidget {
 }
 
 class _ScoreWindowState extends State<ScoreWindow> {
+  late ScoreSession scoreSession;
   late Future<List<Score>> scoreList;
 
   Navigator _getNavigator(BuildContext context, Widget child) {
@@ -30,14 +31,8 @@ class _ScoreWindowState extends State<ScoreWindow> {
   }
 
   void dataInit() {
-    ScoreSession session = ScoreSession()
-    scoreList = session.getScore();
-    if (session.isScoreListCacheUsed) {
-      showToast(
-        context: context,
-        msg: "已显示缓存成绩信息",
-      );
-    }
+    scoreSession = ScoreSession();
+    scoreList = scoreSession.getScore();
   }
 
   @override
@@ -60,6 +55,12 @@ class _ScoreWindowState extends State<ScoreWindow> {
               }),
             );
           } else {
+            if (scoreSession.isScoreListCacheUsed) {
+              showToast(
+                context: context,
+                msg: "已显示缓存成绩信息",
+              );
+            }
             return ScoreState.init(
               scoreTable: snapshot.data!,
               context: context,
