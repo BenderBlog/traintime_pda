@@ -24,6 +24,7 @@ class ScoreWindow extends StatefulWidget {
 
 class _ScoreWindowState extends State<ScoreWindow> {
   static const scoreListCacheName = "scores.json";
+  bool scoreListCacheLoadEnabled = true;
   late Future<List<Score>> scoreList;
   late File file;
 
@@ -38,7 +39,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
   Future<List<Score>> loadScoreListCache() async {
     log.i(
       "[ScoreWindow][loadScoreListCache] "
-      "Path at ${supportPath.path}/{$scoreListCacheName}.",
+      "Path at ${supportPath.path}/${scoreListCacheName}.",
     );
     if (file.existsSync()) {
       final timeDiff = DateTime.now().difference(
@@ -49,9 +50,9 @@ class _ScoreWindowState extends State<ScoreWindow> {
           "[ScoreWindow][loadScoreListCache] "
           "Cache file effective.",
         );
-      return jsonDecode(file.readAsStringSync()).map(
-        (s) => Score.fromJson(s)
-      ).toList();
+        return (jsonDecode(file.readAsStringSync()) as List).map(
+          (s) => Score.fromJson(s as Map<String, dynamic>)
+        ).toList();
       }
     }
     log.i(
@@ -67,19 +68,21 @@ class _ScoreWindowState extends State<ScoreWindow> {
     );
     log.i(
       "[ScoreWindow][dumpScoreListCache] "
-      "Dumped scoreList to ${supportPath.path}/{$scoreListCacheName}.",
+      "Dumped scoreList to ${supportPath.path}/${scoreListCacheName}.",
     );
   }
 
-  Future<void> dataInit async () {
-    file = File("${supportPath.path}/{$scoreListCacheName}");
-    final list = await loadScoreListCache();
+  Future<void> dataInit() async {
+    file = File("${supportPath.path}/${scoreListCacheName}");
+    final list = scoreListCacheLoadEnabled ? (await loadScoreListCache()) : [];
+    scoreListCacheLoadEnabled = true;
     if (list.isEmpty) {
       log.i(
         "[ScoreWindow][dataInit] "
         "Loaded scoreList from ScoreSession.",
       );
-      list = await ScoreSession().getScore();
+      scoreList = ScoreSession().getScore();
+      final list = await scoreList;
       dumpScoreListCache(list);
     } else {
       log.i(
@@ -92,10 +95,9 @@ class _ScoreWindowState extends State<ScoreWindow> {
 
   @override
   void initState() {
+    file = File("${supportPath.path}/${scoreListCacheName}");
+    dataInit();
     super.initState();
-    dataInit().then((_) {
-      setState(() {});
-    });
   }
 
   @override
@@ -108,6 +110,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
           if (snapshot.hasError) {
             body = ReloadWidget(
               function: () => setState(() {
+                scoreListCacheLoadEnabled = false;
                 dataInit();
               }),
             );
