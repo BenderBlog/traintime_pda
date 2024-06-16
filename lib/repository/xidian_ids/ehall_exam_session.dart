@@ -43,6 +43,8 @@ class ExamSession extends EhallSession {
         );
       }
       var data = value.data["datas"]["wdksap"]["rows"];
+
+      /// Deal with disqualified in advance
       return List<Subject>.generate(
         data.length,
         (index) => Subject.generate(
@@ -50,7 +52,7 @@ class ExamSession extends EhallSession {
           typeStr: data[index]["KSMC"] ?? "未知类型考试",
           time: data[index]["KSSJMS"] ?? "未知考试时间",
           place: data[index]["JASMC"] ?? "尚无安排",
-          seat: int.parse(data[index]["ZWH"] ?? '-1'),
+          seat: data[index]["ZWH"] ?? '未知座位',
         ),
       );
     });

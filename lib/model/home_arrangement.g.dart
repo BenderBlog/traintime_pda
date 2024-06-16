@@ -13,7 +13,7 @@ HomeArrangement _$HomeArrangementFromJson(Map<String, dynamic> json) =>
       endTimeStr: json['end_time'] as String,
       teacher: json['teacher'] as String?,
       place: json['place'] as String?,
-      seat: (json['seat'] as num?)?.toInt(),
+      seat: json['seat'] as String?,
     );
 
 Map<String, dynamic> _$HomeArrangementToJson(HomeArrangement instance) =>

@@ -15,7 +15,7 @@ class HomeArrangement {
   String name;
   String? teacher;
   String? place;
-  int? seat;
+  String? seat;
 
   @JsonKey(name: 'start_time')
   String startTimeStr;
