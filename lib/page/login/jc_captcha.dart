@@ -27,7 +27,7 @@ class Lazy<T> {
 
 class SliderCaptchaClientProvider {
   final String cookie;
-  Dio dio = Dio()..interceptors.add(alice.getDioInterceptor());
+  Dio dio = Dio()..interceptors.add(aliceDioAdapter);
 
   SliderCaptchaClientProvider({required this.cookie});
 

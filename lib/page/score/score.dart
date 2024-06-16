@@ -55,7 +55,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
               }),
             );
           } else {
-            if (scoreSession.isScoreListCacheUsed) {
+            if (ScoreSession.isScoreListCacheUsed) {
               showToast(
                 context: context,
                 msg: "已显示缓存成绩信息",

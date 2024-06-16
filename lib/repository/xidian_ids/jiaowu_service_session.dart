@@ -22,7 +22,7 @@ class JiaowuServiceSession extends IDSSession {
   Dio get authorizationDio => Dio(BaseOptions(headers: {
         HttpHeaders.authorizationHeader: authorization,
       }))
-        ..interceptors.add(alice.getDioInterceptor());
+        ..interceptors.add(aliceDioAdapter);
 
   Future<void> getToken() async {
     String location = await checkAndLogin(

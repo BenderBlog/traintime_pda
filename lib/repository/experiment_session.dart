@@ -14,7 +14,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 class ExperimentSession extends NetworkSession {
   @override
   Dio get dio => Dio()
-    ..interceptors.add(alice.getDioInterceptor())
+    ..interceptors.add(aliceDioAdapter)
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = false
     ..options.responseDecoder = (responseBytes, options, responseBody) async {

@@ -4,6 +4,7 @@
 // General network class.
 
 import 'dart:io';
+import 'package:alice_dio/alice_dio_adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -11,9 +12,8 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:alice/alice.dart';
 
-Alice alice = Alice(
-  showNotification: false,
-);
+AliceDioAdapter aliceDioAdapter = AliceDioAdapter();
+Alice alice = Alice(showNotification: false)..addAdapter(aliceDioAdapter);
 
 late Directory supportPath;
 
@@ -46,7 +46,7 @@ class NetworkSession {
         ),
       )
         ..interceptors.add(CookieManager(cookieJar))
-        ..interceptors.add(alice.getDioInterceptor())
+        ..interceptors.add(aliceDioAdapter)
         ..options.connectTimeout = const Duration(seconds: 10)
         ..options.receiveTimeout = const Duration(seconds: 30)
         ..options.followRedirects = false

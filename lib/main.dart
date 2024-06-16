@@ -17,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/network_session.dart' as repo_general;
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
@@ -112,7 +111,7 @@ class _MyAppState extends State<MyApp> {
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
-        navigatorKey: alice.getNavigatorKey(),
+        navigatorKey: repo_general.alice.getNavigatorKey(),
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
         theme: demoBlue,
         darkTheme: demoBlueDark,

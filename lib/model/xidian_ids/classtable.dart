@@ -123,10 +123,7 @@ class TimeArrangement {
   });
 
   @override
-  String toString() {
-    // TODO: implement toString
-    return "$source $index $classroom $teacher";
-  }
+  String toString() => "$source $index $classroom $teacher";
 }
 
 @JsonSerializable(explicitToJson: true)

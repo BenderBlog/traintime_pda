@@ -11,7 +11,7 @@ import 'package:watermeter/model/message/message.dart';
 
 RxList<NoticeMessage> messages = <NoticeMessage>[].obs;
 
-Dio get dio => Dio()..interceptors.add(alice.getDioInterceptor());
+Dio get dio => Dio()..interceptors.add(aliceDioAdapter);
 
 const url = "https://legacy.superbart.top/traintime_pda_backend";
 
