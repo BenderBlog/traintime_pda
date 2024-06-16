@@ -73,14 +73,15 @@ class ClassOrgainzedData {
     );
   }
 
+  /// Ensure the [Subject.startTime] and [Subject.stopTime] is not NULL!
   factory ClassOrgainzedData.fromSubject(
     MaterialColor color,
     Subject subject,
   ) =>
       ClassOrgainzedData._(
         data: [(subject)],
-        start: subject.startTime.dateTime,
-        stop: subject.stopTime.dateTime,
+        start: subject.startTime!.dateTime,
+        stop: subject.stopTime!.dateTime,
         color: color,
         name: "${subject.subject}${subject.type}",
         place: "${subject.place} ${subject.seat}座",

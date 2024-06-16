@@ -83,7 +83,11 @@ class _ClassTableViewState extends State<ClassTableView> {
       }
 
       for (final i in classTableState.subjects) {
-        int diff = i.startTime
+        if (i.startTime == null || i.stopTime == null) {
+          continue;
+        }
+
+        int diff = i.startTime!
             .diff(Jiffy.parseFromDateTime(classTableState.startDay),
                 unit: Unit.day)
             .toInt();
