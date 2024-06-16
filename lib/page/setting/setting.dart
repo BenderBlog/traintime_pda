@@ -30,6 +30,7 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -404,27 +405,8 @@ class _SettingWindowState extends State<SettingWindow> {
                                 );
                               }
 
-                              /// Clean Classtable cache.
-                              var file = File(
-                                "${supportPath.path}/${ClassTableFile.schoolClassName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-
-                              file = File(
-                                "${supportPath.path}/${ExamController.examDataCacheName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-
-                              file = File(
-                                "${supportPath.path}/${ExperimentController.experimentCacheName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
+                              /// Clean cache.
+                              _removeCache();
 
                               if (context.mounted) {
                                 showToast(context: context, msg: '缓存已被清除');
@@ -472,34 +454,8 @@ class _SettingWindowState extends State<SettingWindow> {
                                 // ignore: empty_catches
                               } on Exception {}
 
-                              /// Clean Classtable cache.
-                              var file = File(
-                                "${supportPath.path}/${ClassTableFile.schoolClassName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-
-                              file = File(
-                                "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-
-                              file = File(
-                                "${supportPath.path}/${ExamController.examDataCacheName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-
-                              file = File(
-                                "${supportPath.path}/${ExperimentController.experimentCacheName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
+                              /// Clean cache.
+                              _removeCache();
 
                               /// Clean user information
                               await preference.prefrenceClear();
@@ -528,5 +484,21 @@ class _SettingWindowState extends State<SettingWindow> {
         ).constrained(maxWidth: 600).center(),
       ),
     );
+  }
+}
+
+void _removeCache() {
+  for (var value in [
+    ClassTableFile.schoolClassName,
+    ExamController.examDataCacheName,
+    ExperimentController.experimentCacheName,
+    ScoreSession.scoreListCacheName
+  ]) {
+    var file = File(
+      "${supportPath.path}/$value",
+    );
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
   }
 }
