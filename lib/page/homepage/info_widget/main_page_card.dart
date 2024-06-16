@@ -37,9 +37,9 @@ class MainPageCard extends StatelessWidget {
         ? Theme.of(context).brightness == Brightness.dark
             ? Theme.of(context)
                 .colorScheme
-                .background
+                .surface
                 .withOpacity(0.9) // 深色模式进度条特判
-            : Theme.of(context).colorScheme.background.withOpacity(0.1)
+            : Theme.of(context).colorScheme.surface.withOpacity(0.1)
         : Theme.of(context).colorScheme.primary.withOpacity(0.1);
 
     final colorLineProgress = isBold == true

@@ -214,7 +214,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       extendBodyBehindAppBar: true,
       body: _pageView,
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         indicatorColor: Theme.of(context).colorScheme.secondary,
         height: 64,
         destinations: _destinations

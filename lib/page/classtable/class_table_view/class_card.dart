@@ -47,13 +47,9 @@ class ClassCard extends StatelessWidget {
                 child: Container(
                   color: color.shade100.withOpacity(0.7),
                   child: TextButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.resolveWith(
-                        (status) => EdgeInsets.zero,
-                      ),
-                      overlayColor: MaterialStateProperty.resolveWith(
-                        (status) => Colors.transparent,
-                      ),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      overlayColor: Colors.transparent,
                     ),
                     onPressed: () {
                       /// The way to show the class info of the period.

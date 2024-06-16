@@ -173,10 +173,8 @@ class _ScorePageState extends State<ScorePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Theme.of(context).primaryColor,
-                      ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: () => c.setScoreChoiceState(ChoiceState.all),
                     child: const Text(
@@ -186,10 +184,8 @@ class _ScorePageState extends State<ScorePage> {
                   ),
                   const SizedBox(width: 12),
                   TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Theme.of(context).primaryColor,
-                      ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: () => c.setScoreChoiceState(ChoiceState.none),
                     child: const Text(
@@ -199,10 +195,8 @@ class _ScorePageState extends State<ScorePage> {
                   ),
                   const SizedBox(width: 12),
                   TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Theme.of(context).primaryColor,
-                      ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: () =>
                         c.setScoreChoiceState(ChoiceState.original),

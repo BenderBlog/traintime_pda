@@ -114,41 +114,10 @@ class Score {
     }
   }
 
-  factory Score.fromJson(Map<String, dynamic> json) {
-    return Score(
-      mark: json['mark'],
-      name: json['name'],
-      score: (json['score'] as num?)?.toDouble(),
-      semesterCode: json['semesterCode'],
-      credit: (json['credit'] as num).toDouble(),
-      classStatus: json['classStatus'],
-      classType: json['classType'],
-      scoreStatus: json['scoreStatus'],
-      scoreTypeCode: json['scoreTypeCode'],
-      level: json['level'],
-      isPassedStr: json['isPassedStr'],
-      classID: json['classID'],
-    );
-  }
+  factory Score.fromJson(Map<String, dynamic> json) => _$ScoreFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'mark': mark,
-      'name': name,
-      'score': score,
-      'semesterCode': semesterCode,
-      'credit': credit,
-      'classStatus': classStatus,
-      'classType': classType,
-      'scoreStatus': scoreStatus,
-      'scoreTypeCode': scoreTypeCode,
-      'level': level,
-      'isPassedStr': isPassedStr,
-      'classID': classID,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ScoreToJson(this);
 }
-
 
 class ComposeDetail {
   String content;

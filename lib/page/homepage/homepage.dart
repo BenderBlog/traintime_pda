@@ -90,7 +90,7 @@ class _MainPageState extends State<MainPage> {
         headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
           SliverAppBar(
             centerTitle: false,
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             expandedHeight: 160,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -144,11 +144,12 @@ class _MainPageState extends State<MainPage> {
               msg: "请稍候，正在刷新信息",
             );
             update(sliderCaptcha: (String cookieStr) {
-              return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
+              return SliderCaptchaClientProvider(cookie: cookieStr)
+                  .solve(context);
             });
           },
           header: PhoenixHeader(
-            skyColor: Theme.of(context).colorScheme.background,
+            skyColor: Theme.of(context).colorScheme.surface,
             position: IndicatorPosition.locator,
             safeArea: true,
           ),

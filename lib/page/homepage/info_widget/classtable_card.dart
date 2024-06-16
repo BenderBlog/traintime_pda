@@ -179,7 +179,7 @@ class ClassTableCard extends StatelessWidget {
 class _ClassTableCardItem extends StatelessWidget {
   final _ClassTableCardItemDescriptor descriptor;
 
-  const _ClassTableCardItem(this.descriptor, {super.key});
+  const _ClassTableCardItem(this.descriptor);
 
   @override
   Widget build(BuildContext context) {
@@ -279,10 +279,7 @@ class _ClassTableCardItem extends StatelessWidget {
 class _ClassTableCardArrangementDetail extends StatelessWidget {
   final HomeArrangement displayArrangement;
 
-  const _ClassTableCardArrangementDetail({
-    super.key,
-    required this.displayArrangement,
-  });
+  const _ClassTableCardArrangementDetail({required this.displayArrangement});
 
   bool get isContentEmpty =>
       displayArrangement.place == null &&

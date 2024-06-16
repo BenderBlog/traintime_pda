@@ -24,7 +24,7 @@ final demoBlue = ThemeData(
     primary: const Color.fromRGBO(49, 78, 122, 1),
     primaryContainer: const Color.fromRGBO(49, 78, 122, 1),
     onPrimaryContainer: const Color.fromRGBO(255, 255, 255, 1),
-    background: const Color.fromRGBO(245, 245, 245, 1),
+    surface: const Color.fromRGBO(245, 245, 245, 1),
     secondary: const Color.fromRGBO(226, 232, 243, 1),
     secondaryContainer: const Color.fromRGBO(226, 232, 243, 1),
     onSecondaryContainer: const Color.fromRGBO(49, 78, 122, 1),
@@ -40,7 +40,7 @@ final demoBlueDark = ThemeData(
     primary: const Color.fromARGB(252, 250, 243, 240),
     primaryContainer: const Color.fromRGBO(17, 40, 64, 1),
     onPrimaryContainer: const Color.fromRGBO(255, 255, 255, 1),
-    background: const Color.fromRGBO(20, 20, 20, 1), // Dark background
+    surface: const Color.fromRGBO(20, 20, 20, 1), // Dark background
     secondary:
         const Color.fromRGBO(30, 30, 30, 1), // Slightly lighter secondary
     secondaryContainer: const Color.fromRGBO(30, 30, 30, 1),

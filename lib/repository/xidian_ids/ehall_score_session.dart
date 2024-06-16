@@ -18,7 +18,7 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 /// 考试成绩 4768574631264620
 class ScoreSession extends EhallSession {
   static const scoreListCacheName = "scores.json";
-  late File file = File("${supportPath.path}/${scoreListCacheName}");
+  late File file = File("${supportPath.path}/$scoreListCacheName");
   bool isScoreListCacheUsed = false;
 
   /// Must be called after [getScore]!
@@ -96,21 +96,20 @@ class ScoreSession extends EhallSession {
   Future<List<Score>> loadScoreListCache() async {
     log.i(
       "[ScoreSession][loadScoreListCache] "
-      "Path at ${supportPath.path}/${scoreListCacheName}.",
+      "Path at ${supportPath.path}/$scoreListCacheName.",
     );
     if (file.existsSync()) {
-      final timeDiff = DateTime.now().difference(
-        file.lastModifiedSync()
-      ).inHours;
+      final timeDiff =
+          DateTime.now().difference(file.lastModifiedSync()).inHours;
       if (timeDiff < 6) {
         log.i(
           "[ScoreSession][loadScoreListCache] "
           "Cache file effective.",
         );
         List<dynamic> data = jsonDecode(file.readAsStringSync());
-        return data.map(
-          (s) => Score.fromJson(s as Map<String, dynamic>)
-        ).toList();
+        return data
+            .map((s) => Score.fromJson(s as Map<String, dynamic>))
+            .toList();
       }
     }
     log.i(
@@ -126,16 +125,17 @@ class ScoreSession extends EhallSession {
     );
     log.i(
       "[ScoreWindow][dumpScoreListCache] "
-      "Dumped scoreList to ${supportPath.path}/${scoreListCacheName}.",
+      "Dumped scoreList to ${supportPath.path}/$scoreListCacheName.",
     );
   }
 
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
+
     /// Try retrieving cached scores first.
     isScoreListCacheUsed = false;
     toReturn = await loadScoreListCache();
-    if (!toReturn.isEmpty) {
+    if (toReturn.isNotEmpty) {
       log.i(
         "[ScoreSession][getScore] "
         "Loaded scores from cache.",
