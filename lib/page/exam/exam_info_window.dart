@@ -47,7 +47,13 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
           if (c.status == ExamStatus.cache || c.status == ExamStatus.fetched) {
             if (c.data.subject.isNotEmpty) {
               return TimelineWidget(
-                isTitle: const [true, false, true, false],
+                isTitle: [
+                  true,
+                  false,
+                  true,
+                  false,
+                  if (c.isDisQualified.isNotEmpty) ...[true, false],
+                ],
                 children: [
                   const TimelineTitle(title: "未完成考试"),
                   Builder(builder: (context) {
@@ -61,6 +67,13 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                       return const ExamInfoCard(title: "所有考试全部完成");
                     }
                   }),
+                  if (c.isDisQualified.isNotEmpty)
+                    const TimelineTitle(title: "无法完成考试"),
+                  if (c.isDisQualified.isNotEmpty)
+                    c.isDisQualified
+                        .map((e) => ExamInfoCard(toUse: e))
+                        .toList()
+                        .toColumn(),
                   const TimelineTitle(title: "已完成考试"),
                   Builder(builder: (context) {
                     final isFinished = c.isFinished(widget.time);

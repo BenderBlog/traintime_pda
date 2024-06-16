@@ -56,6 +56,7 @@ class ExamController extends GetxController {
 
   List<Subject> isFinished(DateTime now) {
     List<Subject> isFinished = List.from(data.subject);
+    // Should remove all disqualified.
     isFinished.removeWhere(
       (element) =>
           element.startTime?.isAfter(
@@ -66,22 +67,29 @@ class ExamController extends GetxController {
     return isFinished;
   }
 
-  // Disqualified counts as not finished.
+  List<Subject> get isDisQualified {
+    List<Subject> isDisQualified = List.from(data.subject);
+    isDisQualified.removeWhere(
+      (element) => element.startTime != null && element.stopTime != null,
+    );
+    return isDisQualified;
+  }
+
   List<Subject> isNotFinished(DateTime now) {
     List<Subject> isNotFinished = List.from(data.subject);
+    // Should remove all disqualified.
     isNotFinished.removeWhere(
       (element) =>
           element.startTime?.isSameOrBefore(
             Jiffy.parseFromDateTime(now),
           ) ??
-          false,
+          true,
     );
     return isNotFinished
       ..sort(
         (a, b) =>
-            // TODO: Do not sure whether it is ok?
-            (a.startTime?.microsecondsSinceEpoch ?? 0) -
-            (b.startTime?.microsecondsSinceEpoch ?? -1),
+            a.startTime!.microsecondsSinceEpoch -
+            b.startTime!.microsecondsSinceEpoch,
       );
   }
 
