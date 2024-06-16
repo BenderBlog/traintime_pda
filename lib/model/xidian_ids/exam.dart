@@ -23,9 +23,9 @@ class Subject {
   @override
   String toString() => "$subject $typeStr $type $time $place $seat\n";
 
-  Jiffy get startTime {
+  Jiffy? get startTime {
     RegExpMatch? match = timeRegExp.firstMatch(time);
-    if (match == null) throw NotImplementedException();
+    if (match == null) return null;
 
     return Jiffy.parseFromDateTime(DateTime(
       int.parse(match.namedGroup('year')!),
@@ -36,9 +36,9 @@ class Subject {
     ));
   }
 
-  Jiffy get stopTime {
+  Jiffy? get stopTime {
     RegExpMatch? match = timeRegExp.firstMatch(time);
-    if (match == null) throw NotImplementedException();
+    if (match == null) return null;
 
     return Jiffy.parseFromDateTime(DateTime(
       int.parse(match.namedGroup('year')!),
@@ -65,23 +65,26 @@ class Subject {
     required int seat,
   }) {
     RegExpMatch? match = timeRegExp.firstMatch(time);
-    if (match == null) throw NotImplementedException();
+    late String startTime, stopTime;
+    if (match != null) {
+      startTime = Jiffy.parseFromDateTime(DateTime(
+        int.parse(match.namedGroup('year')!),
+        int.parse(match.namedGroup('month')!),
+        int.parse(match.namedGroup('day')!),
+        int.parse(match.namedGroup('hour')!),
+        int.parse(match.namedGroup('minute')!),
+      )).format(pattern: "yyyy-MM-dd HH:mm:ss");
 
-    String startTime = Jiffy.parseFromDateTime(DateTime(
-      int.parse(match.namedGroup('year')!),
-      int.parse(match.namedGroup('month')!),
-      int.parse(match.namedGroup('day')!),
-      int.parse(match.namedGroup('hour')!),
-      int.parse(match.namedGroup('minute')!),
-    )).format(pattern: "yyyy-MM-dd HH:mm:ss");
-
-    String stopTime = Jiffy.parseFromDateTime(DateTime(
-      int.parse(match.namedGroup('year')!),
-      int.parse(match.namedGroup('month')!),
-      int.parse(match.namedGroup('day')!),
-      int.parse(match.namedGroup('stopHour')!),
-      int.parse(match.namedGroup('stopMinute')!),
-    )).format(pattern: "yyyy-MM-dd HH:mm:ss");
+      stopTime = Jiffy.parseFromDateTime(DateTime(
+        int.parse(match.namedGroup('year')!),
+        int.parse(match.namedGroup('month')!),
+        int.parse(match.namedGroup('day')!),
+        int.parse(match.namedGroup('stopHour')!),
+        int.parse(match.namedGroup('stopMinute')!),
+      )).format(pattern: "yyyy-MM-dd HH:mm:ss");
+    } else {
+      startTime = stopTime = "取消考试资格:P";
+    }
 
     return Subject(
       subject: subject,

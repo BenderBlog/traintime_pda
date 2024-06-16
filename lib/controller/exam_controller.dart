@@ -35,19 +35,21 @@ class ExamController extends GetxController {
   List<HomeArrangement> getExamOfDate(DateTime now) {
     List<Subject> isFinished = List.from(data.subject);
 
-    isFinished.removeWhere(
-      (element) => !element.startTime.isSame(
-        Jiffy.parseFromDateTime(now),
-        unit: Unit.day,
-      ),
-    );
+    isFinished.removeWhere((element) => !(element.startTime?.isSame(
+          Jiffy.parseFromDateTime(now),
+          unit: Unit.day,
+        ) ??
+        false));
     return isFinished
         .map((e) => HomeArrangement(
               name: "${e.subject}考试",
               place: e.place,
               seat: e.seat,
-              startTimeStr: e.startTime.format(pattern: HomeArrangement.format),
-              endTimeStr: e.stopTime.format(pattern: HomeArrangement.format),
+              startTimeStr:
+                  e.startTime?.format(pattern: HomeArrangement.format) ??
+                      e.startTimeStr,
+              endTimeStr: e.stopTime?.format(pattern: HomeArrangement.format) ??
+                  e.endTimeStr,
             ))
         .toList();
   }
@@ -55,25 +57,31 @@ class ExamController extends GetxController {
   List<Subject> isFinished(DateTime now) {
     List<Subject> isFinished = List.from(data.subject);
     isFinished.removeWhere(
-      (element) => element.startTime.isAfter(
-        Jiffy.parseFromDateTime(now),
-      ),
+      (element) =>
+          element.startTime?.isAfter(
+            Jiffy.parseFromDateTime(now),
+          ) ??
+          true,
     );
     return isFinished;
   }
 
+  // Disqualified counts as not finished.
   List<Subject> isNotFinished(DateTime now) {
     List<Subject> isNotFinished = List.from(data.subject);
     isNotFinished.removeWhere(
-      (element) => element.startTime.isSameOrBefore(
-        Jiffy.parseFromDateTime(now),
-      ),
+      (element) =>
+          element.startTime?.isSameOrBefore(
+            Jiffy.parseFromDateTime(now),
+          ) ??
+          false,
     );
     return isNotFinished
       ..sort(
         (a, b) =>
-            a.startTime.microsecondsSinceEpoch -
-            b.startTime.microsecondsSinceEpoch,
+            // TODO: Do not sure whether it is ok?
+            (a.startTime?.microsecondsSinceEpoch ?? 0) -
+            (b.startTime?.microsecondsSinceEpoch ?? -1),
       );
   }
 
