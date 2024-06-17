@@ -5,6 +5,7 @@
 
 import 'dart:io';
 
+import 'package:catcher/core/catcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -364,6 +365,12 @@ class _SettingWindowState extends State<SettingWindow> {
               remaining: const [],
               bottomRow: Column(
                 children: [
+                  ListTile(
+                    title: Text("测试错误拦截器"),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () => Catcher.sendTestException(),
+                  ),
+                  const Divider(),
                   ListTile(
                     title: const Text('查看网络拦截器和日志'),
                     trailing: const Icon(Icons.navigate_next),

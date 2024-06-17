@@ -70,6 +70,7 @@ dependencies:
   home_widget: ^0.6.0
   logger: ^2.0.2+1
   image: ^4.2.0
+  catcher: ^1.0.0-dev1
 
   
 dev_dependencies:

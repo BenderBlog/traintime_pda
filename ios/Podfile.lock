@@ -1,6 +1,8 @@
 PODS:
   - charset_converter (0.0.1):
     - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
   - DKImagePickerController/Core (4.3.4):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
@@ -37,6 +39,8 @@ PODS:
     - Flutter
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
+    - Flutter
+  - flutter_mailer (0.0.1):
     - Flutter
   - flutter_native_splash (0.0.1):
     - Flutter
@@ -76,9 +80,11 @@ PODS:
 
 DEPENDENCIES:
   - charset_converter (from `.symlinks/plugins/charset_converter/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - home_widget (from `.symlinks/plugins/home_widget/ios`)
@@ -104,12 +110,16 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   charset_converter:
     :path: ".symlinks/plugins/charset_converter/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_mailer:
+    :path: ".symlinks/plugins/flutter_mailer/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
   fluttertoast:
@@ -139,11 +149,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   charset_converter: 215c7b04932ec2b9ba43be96a9bc34afed3e5322
+  device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 09aa5ec1ab24135ccd7a1621c46c84134bfd6655
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
+  flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
   flutter_native_splash: edf599c81f74d093a4daf8e17bd7a018854bc778
   fluttertoast: e9a18c7be5413da53898f660530c56f35edfba9c
   home_widget: 0434835a4c9a75704264feff6be17ea40e0f0d57

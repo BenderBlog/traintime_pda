@@ -3,17 +3,37 @@
 
 // General user setting preference.
 
+import 'package:catcher/catcher.dart';
 import 'package:flutter/widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watermeter/repository/logger.dart';
 
 late SharedPreferences prefs;
 late PackageInfo packageInfo;
 
+final GlobalKey<NavigatorState> debuggerKey =
+    GlobalKey<NavigatorState>(debugLabel: "PDADebuggerKey");
 final GlobalKey<NavigatorState> splitViewKey =
     GlobalKey<NavigatorState>(debugLabel: "PDASplitKey");
 final GlobalKey leftKey = GlobalKey();
 const String appId = "group.xyz.superbart.xdyou";
+
+CatcherOptions catcherOptions = CatcherOptions(
+  PageReportMode(showStackTrace: true),
+  [
+    EmailManualHandler(
+      ["superbart_chen@qq.com"],
+      emailTitle: "PDA 发生故障",
+      emailHeader: "请作者尽快修复",
+    ),
+    ConsoleHandler(),
+  ],
+  localizationOptions: [
+    LocalizationOptions.buildDefaultChineseOptions(),
+  ],
+  logger: PDACatcherLogger(),
+);
 
 enum Preference {
   name(key: "name", type: "String"),
@@ -34,7 +54,8 @@ enum Preference {
   brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
   currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
-  simplifiedClassTimeline(key: "simplifiedClassTimeline", type: "bool"); // 简化日程时间轴
+  simplifiedClassTimeline(
+      key: "simplifiedClassTimeline", type: "bool"); // 简化日程时间轴
 
   const Preference({required this.key, this.type = "String"});
   factory Preference.fromKey(String key) {

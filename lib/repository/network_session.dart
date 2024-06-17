@@ -11,9 +11,13 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:alice/alice.dart';
+import 'package:watermeter/repository/preference.dart';
 
 AliceDioAdapter aliceDioAdapter = AliceDioAdapter();
-Alice alice = Alice(showNotification: false)..addAdapter(aliceDioAdapter);
+Alice alice = Alice(
+  showNotification: false,
+  navigatorKey: debuggerKey,
+)..addAdapter(aliceDioAdapter);
 
 late Directory supportPath;
 

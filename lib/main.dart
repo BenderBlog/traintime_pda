@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:catcher/catcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -70,7 +71,12 @@ void main() async {
     "isFirstLogin: $isFirst",
   );
 
-  runApp(MyApp(isFirst: isFirst));
+  Catcher(
+    rootWidget: MyApp(isFirst: isFirst),
+    debugConfig: preference.catcherOptions,
+    releaseConfig: preference.catcherOptions,
+    navigatorKey: preference.debuggerKey,
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -111,7 +117,7 @@ class _MyAppState extends State<MyApp> {
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
-        navigatorKey: repo_general.alice.getNavigatorKey(),
+        navigatorKey: preference.debuggerKey,
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
         theme: demoBlue,
         darkTheme: demoBlueDark,
@@ -120,6 +126,15 @@ class _MyAppState extends State<MyApp> {
           style: const TextStyle(textBaseline: TextBaseline.ideographic),
           child: widget.isFirst ? const LoginWindow() : const HomePage(),
         ),
+        builder: (context, widget) {
+          Catcher.addDefaultErrorWidget(
+              showStacktrace: true,
+              title: "发生错误",
+              description: "详情如下",
+              maxWidthForSmallMode: 150);
+          if (widget != null) return widget;
+          throw StateError('widget is null');
+        },
       ),
     );
   }

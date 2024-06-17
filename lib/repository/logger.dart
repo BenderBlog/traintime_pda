@@ -3,6 +3,7 @@
 
 import 'dart:developer' as developer;
 import 'package:alice/alice.dart';
+import 'package:catcher/catcher.dart';
 import 'package:logger/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 
@@ -52,3 +53,25 @@ var log = Logger(
   printer: LogfmtPrinter(),
   output: ConsoleOutput(),
 );
+
+class PDACatcherLogger extends CatcherLogger {
+  @override
+  void info(String message) {
+    log.i('Custom Catcher Logger | Info | $message');
+  }
+
+  @override
+  void fine(String message) {
+    log.i('Custom Catcher Logger | Fine | $message');
+  }
+
+  @override
+  void warning(String message) {
+    log.w('Custom Catcher Logger | Warning | $message');
+  }
+
+  @override
+  void severe(String message) {
+    log.e('Custom Catcher Logger | Servere | $message');
+  }
+}
