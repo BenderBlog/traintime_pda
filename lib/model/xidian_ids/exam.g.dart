@@ -13,7 +13,7 @@ Subject _$SubjectFromJson(Map<String, dynamic> json) => Subject(
       startTimeStr: json['startTimeStr'] as String,
       endTimeStr: json['endTimeStr'] as String,
       place: json['place'] as String,
-      seat: json['seat'] as String,
+      seat: json['seat'].toString(),
     );
 
 Map<String, dynamic> _$SubjectToJson(Subject instance) => <String, dynamic>{
