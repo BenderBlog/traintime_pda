@@ -33,6 +33,12 @@ class AboutPage extends StatelessWidget {
       "https://github.com/BrackRat",
     ),
     Developer(
+      "Breezeline",
+      "https://avatars.githubusercontent.com/u/74224286",
+      "支持：无价值无意义的产品经理(他自己的描述)",
+      "mailto:ydzhang.ruc@gmail.com",
+    ),
+    Developer(
       "chitao1234",
       "https://avatars.githubusercontent.com/u/25598632",
       "开发：修复滑块不对齐问题",
@@ -76,9 +82,9 @@ class AboutPage extends StatelessWidget {
     ),
     Developer(
       "Ray (Railgun Edition)",
-      "https://ray.al/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
+      "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
       "设计：开屏画面 / 支持：iOS 开发",
-      "https://ray.al/",
+      "https://raay.xyz/",
     ),
     Developer(
       "stalomeow",
