@@ -195,13 +195,21 @@ data class Subject(
     val seat: String,
 )
 
-val Subject.startTime: Date
-    get() = SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
-        .parse(startTimeStr) ?: Date(1)
+val Subject.startTime: Date?
+    get() = try {
+        SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
+            .parse(startTimeStr)
+    } catch (e: Exception) {
+        null
+    }
 
-val Subject.endTime: Date
-    get() = SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
-        .parse(endTimeStr) ?: Date(1)
+val Subject.endTime: Date?
+    get() = try {
+        SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
+            .parse(endTimeStr)
+    } catch (e: Exception) {
+        null
+    }
 
 val Subject.type: String
     get() = typeStr.run {

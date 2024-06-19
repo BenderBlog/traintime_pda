@@ -243,7 +243,12 @@ class ClassTableItemsFactory(
         val curMonth: Int = curCalendar.month
         val curDay: Int = curCalendar.day
         for (subject in examData.subject) {
-            val targetCalendar = subject.startTime.toCalendar()
+            val startTime = subject.startTime
+            val endTime = subject.endTime
+            if (startTime == null || endTime == null) {
+                continue;
+            }
+            val targetCalendar = subject.startTime!!.toCalendar()
             if (targetCalendar.year == curYear
                 && targetCalendar.month == curMonth
                 && targetCalendar.day == curDay
@@ -251,10 +256,10 @@ class ClassTableItemsFactory(
                 arrangements.add(
                     TimeLineItem(
                         name = subject.subject,
-                        teacher = subject.seat.toString(),
+                        teacher = subject.seat,
                         place = subject.place,
-                        startTime = subject.startTime,
-                        endTime = subject.endTime,
+                        startTime = startTime,
+                        endTime = endTime,
                         start = 0,
                         end = 0,
                         type = Source.EXAM
