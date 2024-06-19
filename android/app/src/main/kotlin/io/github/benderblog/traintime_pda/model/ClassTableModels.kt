@@ -192,16 +192,16 @@ data class Subject(
     @SerializedName("place")
     val place: String,
     @SerializedName("seat")
-    val seat: Int,
+    val seat: String,
 )
 
 val Subject.startTime: Date
     get() = SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
-        .parse(startTimeStr) ?: throw Exception("Can't parse $startTimeStr to Date")
+        .parse(startTimeStr) ?: Date(1)
 
 val Subject.endTime: Date
     get() = SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
-        .parse(endTimeStr) ?: throw Exception("Can't parse $endTimeStr to Date")
+        .parse(endTimeStr) ?: Date(1)
 
 val Subject.type: String
     get() = typeStr.run {

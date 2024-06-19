@@ -22,14 +22,14 @@ class Subject : Codable {
     let endTimeStr : String
     let time : String
     let place : String
-    let seat : Int
+    let seat : String
     
     var startTime : Date {
         get {
             let format : String = "yyyy-MM-dd HH:mm:ss"
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
-            return dateFormatter.date(from: startTimeStr)!
+            return dateFormatter.date(from: startTimeStr) ?? Date(timeIntervalSince1970: 0)
         }
     }
     
@@ -38,7 +38,7 @@ class Subject : Codable {
             let format : String = "yyyy-MM-dd HH:mm:ss"
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
-            return dateFormatter.date(from: endTimeStr)!
+            return dateFormatter.date(from: endTimeStr) ?? Date(timeIntervalSince1970: 0)
         }
     }
     
