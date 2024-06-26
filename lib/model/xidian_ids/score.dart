@@ -53,7 +53,7 @@ class Score {
         default:
           return score!.toInt().toString();
       }
-    } else if (isPassedStr != null) {
+    } else if (isPassedStr == null) {
       return "暂无";
     } else if (isPassedStr!.contains('0')) {
       return "未及格";
