@@ -43,21 +43,26 @@ class Score {
     return isPassedStr == "1";
   }
 
-  bool get isFinish => isPassed != null && score != null;
-
   String get scoreStr {
-    if (!isFinish) {
+    if (score != null) {
+      switch (scoreTypeCode) {
+        case 1:
+        case 3:
+        case 2:
+          return level.toString();
+        default:
+          return score!.toInt().toString();
+      }
+    } else if (isPassedStr != null) {
       return "暂无";
-    }
-    switch (scoreTypeCode) {
-      case 1:
-      case 3:
-      case 2:
-        return level.toString();
-      default:
-        return score!.toInt().toString();
+    } else if (isPassedStr!.contains('0')) {
+      return "未及格";
+    } else {
+      return "及格";
     }
   }
+
+  bool get isFinish => isPassed != null && score != null;
 
   double get gpa {
     if (!isFinish) {
