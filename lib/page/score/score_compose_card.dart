@@ -77,13 +77,13 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
                 [
                   Text(
                     "学分: ${widget.score.credit}",
-                  ).expanded(flex: 3),
+                  ).expanded(flex: 2),
                   Text(
                     "GPA: ${widget.score.gpa}",
                   ).expanded(flex: 3),
                   Text(
                     "成绩: ${widget.score.scoreStr}",
-                  ).expanded(flex: 2),
+                  ).expanded(flex: 3),
                 ].toRow(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 ),
