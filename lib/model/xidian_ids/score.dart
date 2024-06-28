@@ -56,9 +56,9 @@ class Score {
     } else if (isPassedStr == null) {
       return "暂无";
     } else if (isPassedStr!.contains('0')) {
-      return "未及格";
+      return "暂无但未及格";
     } else {
-      return "及格";
+      return "暂无但及格";
     }
   }
 

@@ -98,36 +98,11 @@ class ScoreSession extends EhallSession {
       return [
         ComposeDetail(
           content: "获取详情失败",
-          ratio: "请去查看日志",
-          score: "或者重新进入成绩页面",
+          ratio: "",
+          score: "",
         )
       ];
     }
-  }
-
-  List<Score> loadScoreListCache() {
-    log.i(
-      "[ScoreSession][loadScoreListCache] "
-      "Path at ${supportPath.path}/$scoreListCacheName.",
-    );
-    if (file.existsSync()) {
-      final timeDiff =
-          DateTime.now().difference(file.lastModifiedSync()).inHours;
-      if (timeDiff < 4) {
-        log.i(
-          "[ScoreSession][loadScoreListCache] "
-          "Cache file effective.",
-        );
-        return (jsonDecode(file.readAsStringSync()) as List<dynamic>)
-            .map((s) => Score.fromJson(s as Map<String, dynamic>))
-            .toList();
-      }
-    }
-    log.i(
-      "[ScoreSession][loadScoreListCache] "
-      "Cache file non-existent or ineffective.",
-    );
-    return [];
   }
 
   void dumpScoreListCache(List<Score> scores) {
@@ -152,16 +127,37 @@ class ScoreSession extends EhallSession {
 
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
+    List<Score> cache = [];
+    final timeDiff =
+        DateTime.now().difference(file.lastModifiedSync()).inMinutes;
 
     /// Try retrieving cached scores first.
-    toReturn = loadScoreListCache();
-    if (toReturn.isNotEmpty) {
+    log.i(
+      "[ScoreSession][getScore] "
+      "Path at ${supportPath.path}/$scoreListCacheName.",
+    );
+    if (file.existsSync()) {
+      log.i(
+        "[ScoreSession][getScore] "
+        "Cache file found.",
+      );
+      cache = (jsonDecode(file.readAsStringSync()) as List<dynamic>)
+          .map((s) => Score.fromJson(s as Map<String, dynamic>))
+          .toList();
+    } else {
+      log.i(
+        "[ScoreSession][getScore] "
+        "Cache file non-existent.",
+      );
+    }
+    if (cache.isNotEmpty && timeDiff < 15) {
       isScoreListCacheUsed = true;
       log.i(
         "[ScoreSession][getScore] "
-        "Loaded scores from cache. isScoreListCacheUsed $isScoreListCacheUsed",
+        "Loaded scores from cache. Timediff: $timeDiff."
+        " isScoreListCacheUsed $isScoreListCacheUsed",
       );
-      return toReturn;
+      return cache;
     }
 
     /// Otherwise get fresh score data.
@@ -175,58 +171,71 @@ class ScoreSession extends EhallSession {
       'linkOpt': 'and',
       'builder': 'm_value_equal',
     };
+    try {
+      await _getInSystem();
 
-    await _getInSystem();
-
-    log.i(
-      "[ScoreSession][getScore] "
-      "Getting score data.",
-    );
-    var getData = await dioEhall.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
-      data: {
-        "*json": 1,
-        "querySetting": json.encode(querySetting),
-        "*order": '+XNXQDM,KCH,KXH',
-        'pageSize': 1000,
-        'pageNumber': 1,
-      },
-    ).then((value) => value.data);
-    log.i(
-      "[ScoreSession][getScore] "
-      "Dealing with the score data.",
-    );
-    if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
-      throw GetScoreFailedException(
-        getData['datas']['xscjcx']["extParams"]["msg"],
+      log.i(
+        "[ScoreSession][getScore] "
+        "Getting score data.",
       );
+      var getData = await dioEhall.post(
+        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
+        data: {
+          "*json": 1,
+          "querySetting": json.encode(querySetting),
+          "*order": '+XNXQDM,KCH,KXH',
+          'pageSize': 1000,
+          'pageNumber': 1,
+        },
+      ).then((value) => value.data);
+      log.i(
+        "[ScoreSession][getScore] "
+        "Dealing with the score data.",
+      );
+      if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
+        throw GetScoreFailedException(
+          getData['datas']['xscjcx']["extParams"]["msg"],
+        );
+      }
+      int j = 0;
+      for (var i in getData['datas']['xscjcx']['rows']) {
+        toReturn.add(Score(
+          mark: j,
+          name: i["XSKCM"], // 课程名
+          score: i["ZCJ"], // 总成绩
+          semesterCode: i["XNXQDM"], // 学年学期代码
+          credit: i["XF"], // 学分
+          classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
+          classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
+          scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
+          scoreTypeCode: int.parse(
+            i["DJCJLXDM"],
+          ), // 等级成绩类型，01 三级成绩 02 五级成绩 03 两级成绩
+          level: i["DJCJMC"], // 等级成绩
+          isPassedStr: i["SFJG"], // 是否及格
+          classID: i["JXBID"], // 教学班 ID
+        ));
+        j++;
+      }
+      dumpScoreListCache(toReturn);
+      log.i(
+        "[ScoreSession][getScore] "
+        "Cached the score data.",
+      );
+      return toReturn;
+    } catch (e) {
+      if (cache.isNotEmpty) {
+        isScoreListCacheUsed = true;
+        log.i(
+          "[ScoreSession][getScore] "
+          "Loaded scores from cache. isScoreListCacheUsed "
+          "$isScoreListCacheUsed. Error: $e.",
+        );
+        return cache;
+      } else {
+        rethrow;
+      }
     }
-    int j = 0;
-    for (var i in getData['datas']['xscjcx']['rows']) {
-      toReturn.add(Score(
-        mark: j,
-        name: i["XSKCM"], // 课程名
-        score: i["ZCJ"], // 总成绩
-        semesterCode: i["XNXQDM"], // 学年学期代码
-        credit: i["XF"], // 学分
-        classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
-        classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
-        scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
-        scoreTypeCode: int.parse(
-          i["DJCJLXDM"],
-        ), // 等级成绩类型，01 三级成绩 02 五级成绩 03 两级成绩
-        level: i["DJCJMC"], // 等级成绩
-        isPassedStr: i["SFJG"], // 是否及格
-        classID: i["JXBID"], // 教学班 ID
-      ));
-      j++;
-    }
-    dumpScoreListCache(toReturn);
-    log.i(
-      "[ScoreSession][getScore] "
-      "Cached the score data.",
-    );
-    return toReturn;
   }
 }
 

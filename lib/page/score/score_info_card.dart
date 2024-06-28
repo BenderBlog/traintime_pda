@@ -96,7 +96,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-              ).expanded(flex: 3),
+              ).expanded(flex: 2),
               Text(
                 "GPA ${c.scoreTable[widget.mark].gpa}",
                 style: TextStyle(
@@ -108,7 +108,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-              ).expanded(flex: 2),
+              ).expanded(flex: 3),
             ],
           ),
         ),

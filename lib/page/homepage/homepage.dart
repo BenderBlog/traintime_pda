@@ -66,9 +66,11 @@ class _MainPageState extends State<MainPage> {
 
     if (now.hour >= 11 && now.hour < 14) return "中午好 一切还好吧";
 
-    if (now.hour >= 14 && now.hour < 17) return "下午好 今天如何";
+    if (now.hour >= 14 && now.hour < 18) return "下午好 今天如何";
 
-    return "晚上好 祝你好梦";
+    if (now.hour >= 18 || now.hour == 0) return "晚上好 祝你好梦";
+
+    return "深宵了 我在陪你";
   }
 
   TextStyle textStyle(context) => TextStyle(
