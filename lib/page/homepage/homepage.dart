@@ -23,7 +23,6 @@ import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
-import 'package:watermeter/page/homepage/toolbox/lost_and_found_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 
 class MainPage extends StatefulWidget {
@@ -55,7 +54,6 @@ class _MainPageState extends State<MainPage> {
     ExperimentCard(),
     SportCard(),
     CreativeCard(),
-    LostAndFoundCard(),
     ToolboxCard(),
   ];
 
