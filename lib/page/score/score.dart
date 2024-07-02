@@ -50,6 +50,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             body = ReloadWidget(
+              errorStatus: snapshot.error,
               function: () => setState(() {
                 dataInit();
               }),

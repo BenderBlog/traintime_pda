@@ -128,8 +128,6 @@ class ScoreSession extends EhallSession {
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
     List<Score> cache = [];
-    final timeDiff =
-        DateTime.now().difference(file.lastModifiedSync()).inMinutes;
 
     /// Try retrieving cached scores first.
     log.i(
@@ -137,6 +135,9 @@ class ScoreSession extends EhallSession {
       "Path at ${supportPath.path}/$scoreListCacheName.",
     );
     if (file.existsSync()) {
+      final timeDiff =
+          DateTime.now().difference(file.lastModifiedSync()).inMinutes;
+
       log.i(
         "[ScoreSession][getScore] "
         "Cache file found.",
@@ -144,20 +145,20 @@ class ScoreSession extends EhallSession {
       cache = (jsonDecode(file.readAsStringSync()) as List<dynamic>)
           .map((s) => Score.fromJson(s as Map<String, dynamic>))
           .toList();
+      if (cache.isNotEmpty && timeDiff < 15) {
+        isScoreListCacheUsed = true;
+        log.i(
+          "[ScoreSession][getScore] "
+          "Loaded scores from cache. Timediff: $timeDiff."
+          " isScoreListCacheUsed $isScoreListCacheUsed",
+        );
+        return cache;
+      }
     } else {
       log.i(
         "[ScoreSession][getScore] "
         "Cache file non-existent.",
       );
-    }
-    if (cache.isNotEmpty && timeDiff < 15) {
-      isScoreListCacheUsed = true;
-      log.i(
-        "[ScoreSession][getScore] "
-        "Loaded scores from cache. Timediff: $timeDiff."
-        " isScoreListCacheUsed $isScoreListCacheUsed",
-      );
-      return cache;
     }
 
     /// Otherwise get fresh score data.
