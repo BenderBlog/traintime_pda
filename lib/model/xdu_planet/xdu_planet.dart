@@ -96,12 +96,14 @@ class Article {
   final DateTime time;
   final String content;
   final String url;
+  String? author;
 
   Article({
     required this.title,
     required this.time,
     required this.content,
     required this.url,
+    this.author,
   });
 
   factory Article.fromJson(Map<String, dynamic> json) =>
