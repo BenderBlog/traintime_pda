@@ -7,6 +7,7 @@ import 'dart:math';
 
 // import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -81,7 +82,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                   ),
                   child: () {
                     var articles = snapshot.data!.author
-                        .where((e)=> selected == "全部" || e.name == selected)
+                        .where((e) => selected == "全部" || e.name == selected)
                         .map((e) => e.article
                             .map((f) => Article(
                                 title: f.title,
@@ -173,7 +174,9 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                                   return ListTile(
                                       title: Text(articles[index].title),
                                       subtitle: Text(
-                                          "${articles[index].author} ${articles[index].time}"),
+                                          "${articles[index].author} ${Jiffy.parseFromDateTime(
+                                        articles[index].time,
+                                      ).format(pattern: "yyyy年MM月dd日")}"),
                                       onTap: () {
                                         context.pushReplacement(ContentPage(
                                             article: articles[index],
