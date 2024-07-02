@@ -49,9 +49,18 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               builder: (context) => AlertDialog(
                 title: const Text("XDU Planet 介绍"),
                 content: const Text(
-                  "本服务提供商是西电开源社区的 Planet 服务，查看我们学校同学们的博客。",
+                  "服务提供者是西电开源社区，用于查看我们学校同学们的博客。\n"
+                  "觉得有趣/有用的话，欢迎点点star哦\n\n\n"
+                  "<(=ω=)>",
                 ),
                 actions: [
+                  TextButton(
+                    child: const Text("项目首页"),
+                    onPressed: () => launchUrlString(
+                      "https://github.com/xdlinux/planet",
+                      mode: LaunchMode.externalApplication,
+                    ),
+                  ),
                   TextButton(
                     child: const Text("网页版"),
                     onPressed: () => launchUrlString(
