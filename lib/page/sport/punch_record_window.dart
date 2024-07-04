@@ -194,11 +194,11 @@ class RecordCard extends StatelessWidget {
       bottomRow: Wrap(
         alignment: WrapAlignment.spaceBetween,
         children: [
-          informationWithIcon(Icons.punch_clock,
+          InformationWithIcon(Icons.punch_clock,
               toUse.time.format(pattern: "yyyy-MM-dd HH:mm:ss"), context),
-          informationWithIcon(Icons.place, toUse.machineName, context),
+          InformationWithIcon(Icons.place, toUse.machineName, context),
           if (!toUse.state.contains("成功"))
-            informationWithIcon(
+            InformationWithIcon(
               Icons.error_outline,
               toUse.state,
               context,

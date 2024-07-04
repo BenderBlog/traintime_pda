@@ -28,25 +28,21 @@ class ExamInfoCard extends StatelessWidget {
             bottomRow: Wrap(
               alignment: WrapAlignment.spaceBetween,
               children: [
-                informationWithIcon(
-                  Icons.access_time_filled_rounded,
-                  toUse!.time,
-                  context,
+                InformationWithIcon(
+                  icon: Icons.access_time_filled_rounded,
+                  text: toUse!.time,
                 ),
                 Flex(
                   direction: Axis.horizontal,
                   children: [
-                    informationWithIcon(
-                      Icons.room,
-                      toUse!.place,
-                      context,
+                    InformationWithIcon(
+                      icon: Icons.room,
+                      text: toUse!.place,
                     ).flexible(),
-                    if (toUse!.seat != -1)
-                      informationWithIcon(
-                        Icons.chair,
-                        toUse!.seat.toString(),
-                        context,
-                      ).flexible(),
+                    InformationWithIcon(
+                      icon: Icons.chair,
+                      text: toUse!.seat.toString(),
+                    ).flexible(),
                   ],
                 ),
               ],

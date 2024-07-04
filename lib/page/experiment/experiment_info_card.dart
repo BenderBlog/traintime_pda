@@ -26,36 +26,33 @@ class ExperimentInfoCard extends StatelessWidget {
           ],
           bottomRow: Column(
             children: [
-              informationWithIcon(
-                Icons.access_time_filled_rounded,
-                "${data!.date} ${data!.timeStr}",
-                context,
+              InformationWithIcon(
+                icon: Icons.access_time_filled_rounded,
+                text: "${data!.date} ${data!.timeStr}",
               ),
               Flex(
                 direction: Axis.horizontal,
                 children: [
                   Expanded(
                     flex: 1,
-                    child: informationWithIcon(
-                      Icons.room,
-                      data!.classroom,
-                      context,
+                    child: InformationWithIcon(
+                      icon: Icons.room,
+                      text: data!.classroom,
                     ),
                   ),
                   Expanded(
                     flex: 1,
-                    child: informationWithIcon(
-                      Icons.person,
-                      data!.teacher,
-                      context,
+                    child: InformationWithIcon(
+                      icon: Icons.person,
+                      text: data!.teacher,
                     ),
                   ),
                   Expanded(
                     flex: 1,
-                    child: informationWithIcon(
-                      Icons.book,
-                      data!.reference.isNotEmpty ? data!.reference : "未提供",
-                      context,
+                    child: InformationWithIcon(
+                      icon: Icons.book,
+                      text:
+                          data!.reference.isNotEmpty ? data!.reference : "未提供",
                     ),
                   ),
                 ],

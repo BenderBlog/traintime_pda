@@ -187,19 +187,17 @@ class ArticleCard extends StatelessWidget {
       Flex(
         direction: Axis.horizontal,
         children: [
-          informationWithIcon(
-            Icons.calendar_month,
-            Jiffy.parseFromDateTime(
+          InformationWithIcon(
+            icon: Icons.calendar_month,
+            text: Jiffy.parseFromDateTime(
               article.time,
             ).format(pattern: "yyyy年MM月dd日"),
-            context,
           ).flexible(),
-          informationWithIcon(
-            Icons.access_time,
-            Jiffy.parseFromDateTime(
+          InformationWithIcon(
+            icon: Icons.access_time,
+            text: Jiffy.parseFromDateTime(
               article.time,
             ).format(pattern: "HH:mm:ss"),
-            context,
           ).flexible(),
         ],
       )

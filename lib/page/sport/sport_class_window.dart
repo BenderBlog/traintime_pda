@@ -132,21 +132,18 @@ class SportClassCard extends StatelessWidget {
         if (data.score.contains(RegExp(r'[0-9]'))) ReXCardRemaining(data.score)
       ],
       bottomRow: [
-        informationWithIcon(
-          Icons.access_time_filled_outlined,
-          time,
-          context,
+        InformationWithIcon(
+          icon: Icons.access_time_filled_outlined,
+          text: time,
         ),
         [
-          informationWithIcon(
-            Icons.person,
-            data.teacher,
-            context,
+          InformationWithIcon(
+            icon: Icons.person,
+            text: data.teacher,
           ).flexible(),
-          informationWithIcon(
-            Icons.stadium,
-            data.place,
-            context,
+          InformationWithIcon(
+            icon: Icons.stadium,
+            text: data.place,
           ).flexible(),
         ].toRow(),
       ].toColumn(),

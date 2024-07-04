@@ -80,7 +80,18 @@ class DataList<T> extends StatelessWidget {
   }
 }
 
-Widget informationWithIcon(IconData icon, String text, context) => Row(
+class InformationWithIcon extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const InformationWithIcon({
+    super.key,
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
       children: [
         Icon(
           icon,
@@ -93,6 +104,8 @@ Widget informationWithIcon(IconData icon, String text, context) => Row(
         ),
       ],
     );
+  }
+}
 
 /// Switch page with animation.
 Route createRoute(Widget page) {

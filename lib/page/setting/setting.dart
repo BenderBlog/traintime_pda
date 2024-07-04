@@ -366,7 +366,7 @@ class _SettingWindowState extends State<SettingWindow> {
               bottomRow: Column(
                 children: [
                   ListTile(
-                    title: Text("测试错误拦截器"),
+                    title: const Text("测试错误拦截器"),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () => Catcher.sendTestException(),
                   ),
