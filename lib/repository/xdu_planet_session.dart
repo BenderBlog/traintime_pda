@@ -25,7 +25,9 @@ class PlanetSession extends NetworkSession {
   */
 
   Future<String> content(String dbPath) async {
-    return await dio.get("$base/$dbPath").then((value) => value.data);
+    return await dio
+        .get("$base/${Uri.encodeComponent(dbPath)}")
+        .then((value) => value.data);
   }
 
   Future<XDUPlanetDatabase> repoList() async {
