@@ -8,6 +8,7 @@ import 'dart:math';
 // import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -26,6 +27,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
     with AutomaticKeepAliveClientMixin {
   late Future<XDUPlanetDatabase> repoList;
   String selected = "全部";
+  bool isAll = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -50,7 +52,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                 title: const Text("XDU Planet 介绍"),
                 content: const Text(
                   "服务提供者是西电开源社区，用于查看我们学校同学们的博客。\n"
-                  "觉得有趣/有用的话，欢迎点点star哦\n\n\n"
+                  "觉得有趣/有用的话，欢迎点点star哦\n\n"
                   "<(=ω=)>",
                 ),
                 actions: [
@@ -80,125 +82,68 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             try {
-              return Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
+              List<Article> articles = snapshot.data!.author
+                  .where((e) => selected == "全部" || e.name == selected)
+                  .map((e) => e.article
+                      .map((f) => Article(
+                          title: f.title,
+                          time: f.time,
+                          content: f.content,
+                          url: f.url,
+                          author: e.name))
+                      .toList())
+                  .reduce((a, b) => a + b)
+                ..sort(
+                  (a, b) => b.time.compareTo(a.time),
+                );
+
+              Widget chooseChip(String e) => ChoiceChip(
+                    label: Text(e),
+                    selected: selected == e,
+                    onSelected: (bool newValue) {
+                      setState(() {
+                        selected = e;
+                      });
+                    },
+                  );
+
+              return [
+                ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.5,
+                  ),
+                  children: [
+                    "全部",
+                    ...snapshot.data!.author.map((e) => e.name),
+                  ]
+                      .map(
+                        (e) => chooseChip(e).padding(
+                          vertical: 0,
+                          horizontal: 4,
+                        ),
+                      )
+                      .toList(),
+                ).constrained(maxHeight: 52),
+                DataList(
+                  list: articles,
+                  initFormula: (article) => ArticleCard(
+                    article: article,
+                  ),
+                ).expanded(),
+              ]
+                  .toColumn()
+                  .constrained(
                     maxWidth: sheetMaxWidth - 16,
                     minWidth: min(
                       MediaQuery.of(context).size.width,
                       sheetMaxWidth - 16,
                     ),
-                  ),
-                  child: () {
-                    var articles = snapshot.data!.author
-                        .where((e) => selected == "全部" || e.name == selected)
-                        .map((e) => e.article
-                            .map((f) => Article(
-                                title: f.title,
-                                time: f.time,
-                                content: f.content,
-                                url: f.url,
-                                author: e.name))
-                            .toList())
-                        .reduce((a, b) => a + b);
-                    articles.sort((a, b) => b.time.compareTo(a.time));
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 48,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: () {
-                              var res = snapshot.data!.author
-                                  .map((e) => Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: selected == e.name
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primaryContainer
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .secondaryContainer,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            selected = e.name;
-                                          });
-                                        },
-                                        child: Text(
-                                          e.name,
-                                          style: TextStyle(
-                                              color: selected == e.name
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimaryContainer
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondaryContainer),
-                                        ),
-                                      )))
-                                  .toList();
-                              res.insert(
-                                  0,
-                                  Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: selected == "全部"
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .secondaryContainer,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            selected = "全部";
-                                          });
-                                        },
-                                        child: Text(
-                                          "全部",
-                                          style: TextStyle(
-                                              color: selected == "全部"
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimaryContainer
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondaryContainer),
-                                        ),
-                                      )));
-                              return res;
-                            }(),
-                          ),
-                        ),
-                        Expanded(
-                            child: ListView.builder(
-                                itemCount: articles.length ?? 0,
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                      title: Text(articles[index].title),
-                                      subtitle: Text(
-                                          "${articles[index].author} ${Jiffy.parseFromDateTime(
-                                        articles[index].time,
-                                      ).format(pattern: "yyyy年MM月dd日")}"),
-                                      onTap: () {
-                                        context.pushReplacement(ContentPage(
-                                            article: articles[index],
-                                            author: articles[index].author!));
-                                      });
-                                }))
-                      ],
-                    );
-                  }(),
-                ),
-              );
+                  )
+                  .center();
             } catch (e) {
               return ReloadWidget(
+                errorStatus: e,
                 function: () {
                   setState(() {
                     repoList = PlanetSession().repoList();
@@ -219,6 +164,64 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
           }
         },
       ),
+    );
+  }
+}
+
+class ArticleCard extends StatelessWidget {
+  final Article article;
+  const ArticleCard({
+    super.key,
+    required this.article,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return [
+      TagsBoxes(text: article.author ?? "未知作者"),
+      Text(
+        article.title,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      const SizedBox(height: 4),
+      Flex(
+        direction: Axis.horizontal,
+        children: [
+          informationWithIcon(
+            Icons.calendar_month,
+            Jiffy.parseFromDateTime(
+              article.time,
+            ).format(pattern: "yyyy年MM月dd日"),
+            context,
+          ).flexible(),
+          informationWithIcon(
+            Icons.access_time,
+            Jiffy.parseFromDateTime(
+              article.time,
+            ).format(pattern: "HH:mm:ss"),
+            context,
+          ).flexible(),
+        ],
+      )
+    ]
+        .toColumn(
+          crossAxisAlignment: CrossAxisAlignment.start,
+        )
+        .padding(
+          vertical: 12,
+          horizontal: 14,
+        )
+        .card(
+          elevation: 0,
+          color: Theme.of(context).colorScheme.secondaryContainer,
+        )
+        .gestures(
+      onTap: () {
+        context.pushReplacement(ContentPage(
+          article: article,
+          author: article.author!,
+        ));
+      },
     );
   }
 }

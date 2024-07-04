@@ -1,5 +1,5 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: MPL-2.0 OR MIT
 
 // Useful weights to simplify watermeter programming.
 
@@ -28,7 +28,10 @@ class TagsBoxes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 2,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor ?? Theme.of(context).colorScheme.primary,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
