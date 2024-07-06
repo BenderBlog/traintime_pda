@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Mainpage of XDU Planet.
+// Idea from xenode.
 
-import 'dart:math';
-
-// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -26,6 +24,7 @@ class XDUPlanetPage extends StatefulWidget {
 class _XDUPlanetPageState extends State<XDUPlanetPage>
     with AutomaticKeepAliveClientMixin {
   late Future<XDUPlanetDatabase> repoList;
+
   String selected = "全部";
   bool isAll = false;
 
@@ -41,129 +40,123 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("XDU Planet"),
-        actions: [
-          IconButton(
-            onPressed: () => showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("XDU Planet 介绍"),
-                content: const Text(
-                  "服务提供者是西电开源社区，用于查看我们学校同学们的博客。\n"
-                  "觉得有趣/有用的话，欢迎点点star哦\n\n"
-                  "<(=ω=)>",
-                ),
-                actions: [
-                  TextButton(
-                    child: const Text("项目首页"),
-                    onPressed: () => launchUrlString(
-                      "https://github.com/xdlinux/planet",
-                      mode: LaunchMode.externalApplication,
+    return FutureBuilder<XDUPlanetDatabase>(
+      future: repoList,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          try {
+            List<Article> articles = snapshot.data!.author
+                .where((e) => selected == "全部" || e.name == selected)
+                .map((e) => e.article
+                    .map((f) => Article(
+                        title: f.title,
+                        time: f.time,
+                        content: f.content,
+                        url: f.url,
+                        author: e.name))
+                    .toList())
+                .reduce((a, b) => a + b)
+              ..sort(
+                (a, b) => b.time.compareTo(a.time),
+              );
+
+            Widget chooseChip(String e) => TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: selected == e
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.secondaryContainer,
+                  ),
+                  //selected: selected == e,
+                  onPressed: () {
+                    setState(() => selected = e);
+                  },
+                  child: Text(
+                    e,
+                    style: TextStyle(
+                      color: selected == e
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
                   ),
-                  TextButton(
-                    child: const Text("网页版"),
-                    onPressed: () => launchUrlString(
-                      "https://xdlinux.github.io/planet/",
-                      mode: LaunchMode.externalApplication,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            icon: const Icon(Icons.info),
-          )
-        ],
-      ),
-      body: FutureBuilder<XDUPlanetDatabase>(
-        future: repoList,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            try {
-              List<Article> articles = snapshot.data!.author
-                  .where((e) => selected == "全部" || e.name == selected)
-                  .map((e) => e.article
-                      .map((f) => Article(
-                          title: f.title,
-                          time: f.time,
-                          content: f.content,
-                          url: f.url,
-                          author: e.name))
-                      .toList())
-                  .reduce((a, b) => a + b)
-                ..sort(
-                  (a, b) => b.time.compareTo(a.time),
+                ).padding(
+                  vertical: 0,
+                  horizontal: 4,
                 );
 
-              Widget chooseChip(String e) => ChoiceChip(
-                    label: Text(e),
-                    selected: selected == e,
-                    onSelected: (bool newValue) {
-                      setState(() {
-                        selected = e;
-                      });
-                    },
-                  );
-
-              return [
-                ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.5,
-                  ),
-                  children: [
-                    "全部",
-                    ...snapshot.data!.author.map((e) => e.name),
-                  ]
-                      .map(
-                        (e) => chooseChip(e).padding(
-                          vertical: 0,
-                          horizontal: 4,
+            return Scaffold(
+              appBar: AppBar(
+                title: [
+                  chooseChip("全部"),
+                  const VerticalDivider().padding(vertical: 8),
+                  snapshot.data!.author
+                      .map((e) => e.name)
+                      .map((e) => chooseChip(e))
+                      .toList()
+                      .toRow()
+                      .scrollable(scrollDirection: Axis.horizontal)
+                      .expanded(),
+                  const VerticalDivider().padding(vertical: 8),
+                  IconButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("XDU Planet 介绍"),
+                        content: const Text(
+                          "服务提供者是西电开源社区，用于查看我们学校同学们的博客。\n"
+                          "觉得有趣/有用的话，欢迎点点star哦～\n\n"
+                          "<(=ω=)>",
                         ),
-                      )
-                      .toList(),
-                ).constrained(maxHeight: 52),
-                DataList(
-                  list: articles,
-                  initFormula: (article) => ArticleCard(
-                    article: article,
-                  ),
-                ).expanded(),
-              ]
-                  .toColumn()
-                  .constrained(
-                    maxWidth: sheetMaxWidth - 16,
-                    minWidth: min(
-                      MediaQuery.of(context).size.width,
-                      sheetMaxWidth - 16,
+                        actions: [
+                          TextButton(
+                            child: const Text("项目首页"),
+                            onPressed: () => launchUrlString(
+                              "https://github.com/xdlinux/planet",
+                              mode: LaunchMode.externalApplication,
+                            ),
+                          ),
+                          TextButton(
+                            child: const Text("网页版"),
+                            onPressed: () => launchUrlString(
+                              "https://xdlinux.github.io/planet/",
+                              mode: LaunchMode.externalApplication,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  )
-                  .center();
-            } catch (e) {
-              return ReloadWidget(
-                errorStatus: e,
-                function: () {
-                  setState(() {
-                    repoList = PlanetSession().repoList();
-                  });
-                },
-              );
-            }
-          } else {
-            return const Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('加载中，请稍等 <(=ω=)>'),
-              ],
-            ));
+                    icon: const Icon(Icons.info),
+                  ),
+                ].toRow().constrained(maxHeight: kToolbarHeight),
+              ),
+              body: DataList(
+                list: articles,
+                initFormula: (article) => ArticleCard(
+                  article: article,
+                ),
+              ),
+            );
+          } catch (e) {
+            return ReloadWidget(
+              errorStatus: e,
+              function: () {
+                setState(() {
+                  repoList = PlanetSession().repoList();
+                });
+              },
+            );
           }
-        },
-      ),
+        } else {
+          return const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('加载中，请稍等 <(=ω=)>'),
+            ],
+          ));
+        }
+      },
     );
   }
 }
