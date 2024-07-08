@@ -7,7 +7,6 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -95,37 +94,6 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                       .toRow()
                       .scrollable(scrollDirection: Axis.horizontal)
                       .expanded(),
-                  const VerticalDivider().padding(vertical: 8),
-                  IconButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("XDU Planet 介绍"),
-                        content: const Text(
-                          "服务提供者是西电开源社区，用于查看我们学校同学们的博客。\n"
-                          "觉得有趣/有用的话，欢迎点点star哦～\n\n"
-                          "<(=ω=)>",
-                        ),
-                        actions: [
-                          TextButton(
-                            child: const Text("项目首页"),
-                            onPressed: () => launchUrlString(
-                              "https://github.com/xdlinux/planet",
-                              mode: LaunchMode.externalApplication,
-                            ),
-                          ),
-                          TextButton(
-                            child: const Text("网页版"),
-                            onPressed: () => launchUrlString(
-                              "https://xdlinux.github.io/planet/",
-                              mode: LaunchMode.externalApplication,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    icon: const Icon(Icons.info),
-                  ),
                 ].toRow().constrained(maxHeight: kToolbarHeight),
               ),
               body: DataList(
