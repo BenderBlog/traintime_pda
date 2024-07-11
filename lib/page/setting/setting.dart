@@ -385,7 +385,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       builder: (BuildContext context) => AlertDialog(
                         title: const Text("确认对话框"),
                         content: const Text(
-                          "确定清楚缓存后重启程序？",
+                          "确定清除缓存后重启程序？",
                         ),
                         actions: [
                           TextButton(
