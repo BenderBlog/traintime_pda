@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class EmptyClassroomCard extends StatelessWidget {
             context.pushReplacement(const EmptyClassroomWindow());
           }
         },
+        backgroundColor: RatCard.ratCardBackgroundColor[3],
         icon: MingCuteIcons.mgc_building_2_line,
         name: "空闲教室",
       ),

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/experiment/experiment_window.dart';
@@ -32,6 +33,7 @@ class ExperimentCard extends StatelessWidget {
           context.pushReplacement(const ExperimentWindow());
         }
       },
+      backgroundColor: RatCard.ratCardBackgroundColor[2],
       icon: MingCuteIcons.mgc_science_line,
       name: "物理实验",
     );

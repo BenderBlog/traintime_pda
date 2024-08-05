@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/score/score.dart';
@@ -21,6 +22,7 @@ class ScoreCard extends StatelessWidget {
           context.pushReplacement(const ScoreWindow());
         }
       },
+      backgroundColor: RatCard.ratCardBackgroundColor[0],
       icon: Icons.grading_rounded,
       name: "成绩查询",
     );

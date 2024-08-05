@@ -4,6 +4,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -41,6 +42,7 @@ class ExamCard extends StatelessWidget {
             showToast(context: context, msg: "遇到错误，请联系开发者");
           }
         },
+        backgroundColor: RatCard.ratCardBackgroundColor[1],
         icon: MingCuteIcons.mgc_calendar_line,
         name: "考试安排",
       ),
