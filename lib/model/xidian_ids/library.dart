@@ -38,15 +38,26 @@ class BorrowData {
     required this.barcode,
   });
 
-  int get lendDay {
-    List<String> returnDateArr = normReturnDate.split("-");
-    Jiffy returnDateJiffy = Jiffy.parseFromDateTime(DateTime(
+  Jiffy get loanDateTime {
+    List<String> returnDateArr = loanDate.split("-");
+    return Jiffy.parseFromDateTime(DateTime(
       int.parse(returnDateArr[0]),
       int.parse(returnDateArr[1]),
       int.parse(returnDateArr[2]),
     ));
-    return returnDateJiffy.diff(Jiffy.now(), unit: Unit.day).toInt();
   }
+
+  Jiffy get normReturnDateTime {
+    List<String> returnDateArr = normReturnDate.split("-");
+    return Jiffy.parseFromDateTime(DateTime(
+      int.parse(returnDateArr[0]),
+      int.parse(returnDateArr[1]),
+      int.parse(returnDateArr[2]),
+    ));
+  }
+
+  int get lendDay =>
+      normReturnDateTime.diff(Jiffy.now(), unit: Unit.day).toInt();
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);
