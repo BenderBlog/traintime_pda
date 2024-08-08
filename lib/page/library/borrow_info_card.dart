@@ -44,9 +44,14 @@ class BorrowInfoCard extends StatelessWidget {
           .clipRRect(all: 14)
           .padding(all: 2)
           .decorated(
-            border: Border.all(color: const Color(0xFFE8E8E8), width: 2),
-            borderRadius: const BorderRadius.all(Radius.circular(16)),
-          ),
+              border: Border.all(color: const Color(0xFFE8E8E8), width: 2),
+              borderRadius: const BorderRadius.all(Radius.circular(16)),
+              boxShadow: [
+            const BoxShadow(
+              color: Color(0xFFE8E8E8),
+              blurRadius: 14,
+            ),
+          ]),
       [
         Text(
           '${toUse.title}\n',
@@ -54,7 +59,7 @@ class BorrowInfoCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.start,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),

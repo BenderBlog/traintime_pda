@@ -42,9 +42,14 @@ class BookInfoCard extends StatelessWidget {
           .clipRRect(all: 14)
           .padding(all: 2)
           .decorated(
-            border: Border.all(color: const Color(0xFFE8E8E8), width: 2),
-            borderRadius: const BorderRadius.all(Radius.circular(16)),
-          ),
+              border: Border.all(color: const Color(0xFFE8E8E8), width: 2),
+              borderRadius: const BorderRadius.all(Radius.circular(16)),
+              boxShadow: [
+            const BoxShadow(
+              color: Color(0xFFE8E8E8),
+              blurRadius: 14,
+            ),
+          ]),
       [
         Text(
           '${toUse.bookName}\n',
@@ -52,11 +57,11 @@ class BookInfoCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.start,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 8),
+        //const SizedBox(height: 8),
         Text.rich(
           TextSpan(children: [
             const TextSpan(
@@ -80,6 +85,23 @@ class BookInfoCard extends StatelessWidget {
         ),
         Text.rich(TextSpan(children: [
           const TextSpan(
+            text: "出版社 ",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFBFBFBF),
+            ),
+          ),
+          TextSpan(
+            text: toUse.publisherHouse ?? "没有相关信息",
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ])),
+        Text.rich(TextSpan(children: [
+          const TextSpan(
             text: "索书号 ",
             style: TextStyle(
               fontSize: 14,
@@ -95,7 +117,6 @@ class BookInfoCard extends StatelessWidget {
             ),
           ),
         ])),
-        const SizedBox(height: 8),
         [
           [
             Text.rich(TextSpan(children: [
@@ -146,6 +167,7 @@ class BookInfoCard extends StatelessWidget {
               ),
             ])),
           ].toRow(),
+          /*
           Text.rich(TextSpan(children: [
             TextSpan(
               text: toUse.publishYear?.substring(0, 4) ?? "没有相关信息",
@@ -163,7 +185,8 @@ class BookInfoCard extends StatelessWidget {
               ),
             ),
           ])),
-        ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
+          */
+        ].toRow(mainAxisAlignment: MainAxisAlignment.end),
       ]
           .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
           .center()

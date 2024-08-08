@@ -63,7 +63,13 @@ class LibrarySession extends IDSSession {
         "page": page,
         "searchLocationStatus": 1,
       },
-    ).then((value) => value.data["data"]["list"] ?? []);
+    ).then((value) {
+      if (value.data["data"] != null && value.data["data"]["list"] != null) {
+        return value.data["data"]["list"];
+      } else {
+        return [];
+      }
+    });
 
     return List<BookInfo>.generate(
       rawData.length ?? 0,

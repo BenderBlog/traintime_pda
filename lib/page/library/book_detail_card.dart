@@ -94,6 +94,23 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 ),
                 Text.rich(TextSpan(children: [
                   const TextSpan(
+                    text: "出版社 ",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFBFBFBF),
+                    ),
+                  ),
+                  TextSpan(
+                    text: widget.toUse.publisherHouse ?? "没有相关信息",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ])),
+                Text.rich(TextSpan(children: [
+                  const TextSpan(
                     text: "索书号 ",
                     style: TextStyle(
                       fontSize: 14,
