@@ -81,13 +81,13 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             controller: text,
             decoration: const InputDecoration(
               filled: true,
+              fillColor: Colors.white,
               hintText: "在此搜索",
               isDense: false,
-              contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+              contentPadding: EdgeInsets.symmetric(vertical: 8.0),
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25)),
-                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
             ),
             onChanged: (String text) => search.value = text,
