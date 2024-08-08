@@ -109,6 +109,31 @@ class BookInfo {
       _$BookInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$BookInfoToJson(this);
+
+  int? get canBeBorrowed {
+    if (items == null) {
+      return null;
+    }
+    int toReturn = 0;
+    for (var i in items!) {
+      if (i.processType == "在架") toReturn += 1;
+    }
+    return toReturn;
+  }
+
+  String get searchCodeStr {
+    if (searchCode == null || searchCode!.isEmpty) {
+      return "未提供";
+    }
+    return searchCode!.first;
+  }
+
+  String get barCodesStr {
+    if (barCodes == null || barCodes!.isEmpty) {
+      return "未提供";
+    }
+    return barCodes!.first;
+  }
 }
 
 @JsonSerializable()
