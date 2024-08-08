@@ -61,7 +61,7 @@ class BookInfoCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        //const SizedBox(height: 8),
+        const SizedBox(height: 2),
         Text.rich(
           TextSpan(children: [
             const TextSpan(
