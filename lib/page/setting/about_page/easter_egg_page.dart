@@ -164,12 +164,33 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  final String urlApple = "https://www.bilibili.com/video/BV1LV4y1R7sY/";
+  final String urlApple = "https://www.bilibili.com/video/BV1mN411C7QV/";
 
-  final String urlOthers = "https://www.bilibili.com/video/BV1yk4y127tn/";
+  final String urlOthers = "https://www.bilibili.com/video/BV1mN411C7QV/";
 
   TextEditingController inputController = TextEditingController(
-    text: "Code Powered by arttnba3 & 0xcafec0de",
+    text: '''
+Let us cling together as the years go by,
+Oh my love, my love,
+In the quiet of the night
+Let our candle always burn,
+Let us never lose the lessons we have learned.
+
+手を取り合って このまま行こう
+愛する人よ
+静かな宵に
+光を灯し
+愛しき教えを抱き
+
+让我们随着时间一起手牵手
+我的爱人
+在夜深之时
+我们的光芒永现
+不要忘记来时的荆棘丛生
+
+Brain May and The Queens
+A Day at the Races, 1976
+''',
   );
 
   TextEditingController resultController = TextEditingController();

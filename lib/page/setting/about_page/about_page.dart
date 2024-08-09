@@ -151,8 +151,8 @@ class AboutPage extends StatelessWidget {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Sakura Yuyuko Edition"
-                      : "Rendez-Vous Edition",
+                      ? "Te o toriatte Edition"
+                      : "Let Us Cling Together Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
               ],
