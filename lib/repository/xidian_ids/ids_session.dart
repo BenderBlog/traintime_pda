@@ -61,7 +61,7 @@ class IDSSession extends NetworkSession {
   /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
   /// Padding part is libxduauth's idea.
   String aesEncrypt(String toEnc, String key) {
-    dynamic k = encrypt.Key.fromUtf8(key);
+    encrypt.Key k = encrypt.Key.fromUtf8(key);
     var crypt = encrypt.AES(k, mode: encrypt.AESMode.cbc, padding: null);
 
     /// Start padding

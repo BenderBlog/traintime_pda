@@ -100,7 +100,7 @@ class ElectricitySession extends NetworkSession {
   }
 
   Future<void> updateInformation() async {
-    if (await NetworkSession.isInSchool() == false) {
+    if (await NetworkSession.isInSchool == false) {
       throw NotSchoolNetworkException();
     }
 

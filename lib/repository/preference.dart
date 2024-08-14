@@ -53,9 +53,11 @@ enum Preference {
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
-  currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
+  currentStartDay(key: "currentStartDay", type: "String"), // 当前学期开始日期
   simplifiedClassTimeline(
-      key: "simplifiedClassTimeline", type: "bool"); // 简化日程时间轴
+      key: "simplifiedClassTimeline", type: "bool"), // 简化日程时间轴
+  schoolNetQueryPassword(
+      key: "schoolNetQueryPassword", type: "String"); // 校园网账号密码
 
   const Preference({required this.key, this.type = "String"});
   factory Preference.fromKey(String key) {

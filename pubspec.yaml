@@ -11,6 +11,7 @@ dependencies:
   dio: ^5.0.0
   crypto: ^3.0.2
   encrypt: ^5.0.1
+  pointycastle: ^3.9.1
   alice: ^1.0.0-dev.5
   alice_dio: ^1.0.2
   synchronized: ^3.1.0+1

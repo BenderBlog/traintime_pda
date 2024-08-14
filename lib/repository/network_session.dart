@@ -36,6 +36,8 @@ class NetworkSession {
   );
 
   Future<void> clearCookieJar() => cookieJar.deleteAll();
+  Future<void> clearCookieJarSpecific(String url) =>
+      cookieJar.delete(Uri.parse(url));
 
   @protected
   Dio get dio => Dio(
@@ -57,7 +59,7 @@ class NetworkSession {
         ..options.validateStatus =
             (status) => status != null && status >= 200 && status < 400;
 
-  static Future<bool> isInSchool() async {
+  static Future<bool> get isInSchool async {
     bool isInSchool = false;
     Dio dio = Dio()..options.connectTimeout = const Duration(seconds: 5);
     await dio

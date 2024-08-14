@@ -3,22 +3,19 @@
 
 // A captcha input dialog.
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 
 class CaptchaInputDialog extends StatelessWidget {
   final TextEditingController _captchaController = TextEditingController();
-  final String cookie;
+  final Uint8List image;
 
-  CaptchaInputDialog({super.key, required this.cookie});
+  CaptchaInputDialog({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {
-    NetworkImage cappic = NetworkImage(
-      "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
-      headers: {"Cookie": cookie},
-    );
-
     return AlertDialog(
       title: const Text('请输入验证码'),
       titleTextStyle: const TextStyle(
@@ -29,7 +26,7 @@ class CaptchaInputDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image(image: cappic),
+          Image.memory(image),
           TextField(
             autofocus: true,
             style: const TextStyle(fontSize: 20),
@@ -60,7 +57,7 @@ class CaptchaInputDialog extends StatelessWidget {
             if (_captchaController.text.isEmpty) {
               showToast(context: context, msg: '请输入验证码');
             } else {
-              Navigator.of(context).pop(_captchaController.text);
+              Navigator.of(context).pop<String>(_captchaController.text);
             }
           },
         ),

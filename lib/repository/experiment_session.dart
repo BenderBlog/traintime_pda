@@ -131,7 +131,7 @@ class ExperimentSession extends NetworkSession {
   }
 
   Future<List<ExperimentData>> getData() async {
-    if (await NetworkSession.isInSchool() == false) {
+    if (!await NetworkSession.isInSchool) {
       throw NotSchoolNetworkException;
     }
 
