@@ -39,6 +39,12 @@ class AboutPage extends StatelessWidget {
       "mailto:ydzhang.ruc@gmail.com",
     ),
     Developer(
+      "0xCAFEBABE",
+      "https://blog.hxzzz.asia/usr/uploads/2024/05/1717631110.jpg",
+      "支持：提供彩蛋代码",
+      "https://blog.hxzzz.asia/",
+    ),
+    Developer(
       "chitao1234",
       "https://avatars.githubusercontent.com/u/25598632",
       "开发：修复滑块不对齐问题",
@@ -212,7 +218,8 @@ class AboutPage extends StatelessWidget {
                   "本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。\n\n"
                   "Copyright 2023-Present BenderBlog Rodriguez and contributors. "
                   "The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. "
-                  "If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.",
+                  "If a copy of the MPL was not distributed with this file, "
+                  "You can obtain one at https://mozilla.org/MPL/2.0/.",
             ),
           ),
           if (Platform.isIOS || Platform.isMacOS)
@@ -252,7 +259,9 @@ class AboutPage extends StatelessWidget {
               ]
                   .toColumn(mainAxisAlignment: MainAxisAlignment.end)
                   .flexible(flex: 1),
-              _developerList.scrollable().flexible(flex: 1),
+              [
+                _developerList,
+              ].toColumn().scrollable().flexible(flex: 1),
             ]
                 .toRow(
                   mainAxisAlignment: MainAxisAlignment.center,
