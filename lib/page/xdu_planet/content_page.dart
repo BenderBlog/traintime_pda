@@ -15,8 +15,8 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/xdu_planet/comment_popout.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
-import 'package:watermeter/repository/logger.dart';
 
 class ContentPage extends StatefulWidget {
   final Article article;
@@ -34,21 +34,13 @@ class ContentPage extends StatefulWidget {
 
 class _ContentPageState extends State<ContentPage> {
   late Future<String> _content;
-  late Future<List<XDUPlanetComment>> _comments;
-  final TextEditingController _controller = TextEditingController();
+  late CommentModel _comments;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     _content = PlanetSession().content(widget.article.content);
-    _comments = PlanetSession().getComments(widget.article.id);
-  }
-
-  @override
-  void didUpdateWidget(covariant ContentPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _content = PlanetSession().content(widget.article.content);
-    _comments = PlanetSession().getComments(widget.article.id);
+    _comments = CommentModel(id: widget.article.id);
   }
 
   @override
@@ -117,106 +109,65 @@ class _ContentPageState extends State<ContentPage> {
           },
         ),
         const Divider(),
-        FutureBuilder<List<XDUPlanetComment>>(
-          future: _comments,
-          builder: (context, snapshot) {
-            late Widget list;
-            if (snapshot.connectionState == ConnectionState.done) {
-              try {
-                if (snapshot.data!.isEmpty) {
-                  list = const Text("暂无评论");
-                } else {
-                  list = Column(
-                    children: List.generate(
-                      snapshot.data!.length,
-                      (index) => ListTile(
-                        title: Text(snapshot.data![index].user_id),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(snapshot.data![index].CreatedAt.toString()),
-                            const SizedBox(height: 5),
-                            Text(snapshot.data![index].content),
-                            Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    // 举报按钮功能
-                                  },
-                                  child: const Text('举报'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    // 回复按钮功能
-                                  },
-                                  child: const Text('回复'),
-                                ),
-                              ],
-                            ),
-                          ],
+        ListenableBuilder(
+          listenable: _comments,
+          builder: (BuildContext context, Widget? child) =>
+              FutureBuilder<List<XDUPlanetComment>>(
+            future: _comments.comments,
+            builder: (context, snapshot) {
+              late Widget list;
+              if (snapshot.connectionState == ConnectionState.done) {
+                try {
+                  if (snapshot.data!.isEmpty) {
+                    list = const Text("暂无评论");
+                  } else {
+                    list = Column(
+                      children: List.generate(
+                        snapshot.data!.length,
+                        (index) => ListTile(
+                          title: Text(snapshot.data![index].user_id),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(snapshot.data![index].CreatedAt.toString()),
+                              const SizedBox(height: 5),
+                              Text(snapshot.data![index].content),
+                              Row(
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      // 举报按钮功能
+                                    },
+                                    child: const Text('举报'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      // 回复按钮功能
+                                    },
+                                    child: const Text('回复'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
+                    );
+                  }
+                } catch (e) {
+                  return ReloadWidget(function: _comments.update);
                 }
-              } catch (e) {
-                return ReloadWidget(
-                  function: () {
-                    setState(() {
-                      _comments =
-                          PlanetSession().getComments(widget.article.id);
-                    });
-                  },
-                );
+              } else {
+                return const Text("加载评论中……");
               }
-            } else {
-              return const Text("加载评论中……");
-            }
-            return SelectionArea(
-              child: [
-                list,
-                const Divider(),
-                Padding(
-                  padding: MediaQuery.of(context).viewInsets,
-                  child: [
-                    TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: '输入你的评论...',
-                        border: OutlineInputBorder(),
-                      ),
-                    ).padding(all: 8).expanded(),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      onPressed: () async {
-                        print(_controller.text);
-                        await PlanetSession()
-                            .sendComments(
-                          id: widget.article.id,
-                          content: _controller.text,
-                          userId: "PDA User",
-                          replyto: null,
-                        )
-                            .then((value) {
-                          setState(() {
-                            _controller.text = "";
-                            _comments =
-                                PlanetSession().getComments(widget.article.id);
-                          });
-                        }).onError((e, s) {
-                          log.e(e.toString());
-                          Fluttertoast.showToast(msg: "评论发送失败");
-                        });
-                      },
-                    ),
-                  ].toRow(),
-                )
-              ].toColumn(),
-            );
-          },
+              return SelectionArea(
+                child: list,
+              );
+            },
+          ),
         ),
       ]
-          .toColumn()
+          .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
           .padding(all: 12)
           .constrained(
             maxWidth: sheetMaxWidth - 24,
@@ -227,8 +178,40 @@ class _ContentPageState extends State<ContentPage> {
           )
           .scrollable()
           .safeArea(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          bool? result = await showModalBottomSheet<bool>(
+            context: context,
+            builder: (context) => CommentPopout(id: widget.article.id),
+          );
+          if (result == true) {
+            /// Temporary solution...
+            _comments.update();
+            Fluttertoast.showToast(msg: "评论成功");
+          } else if (result == false) {
+            Fluttertoast.showToast(msg: "评论失败，请去网络查看器和日志查看器查看报错");
+          } else {
+            Fluttertoast.showToast(msg: "没想好要说啥嘛");
+          }
+        },
+        child: const Icon(Icons.comment),
+      ),
     );
   }
 }
 
 class MyWidgetFactory extends WidgetFactory with UrlLauncherFactory {}
+
+class CommentModel with ChangeNotifier {
+  String id;
+  late Future<List<XDUPlanetComment>> comments;
+
+  CommentModel({required this.id}) {
+    update();
+  }
+
+  void update() {
+    comments = PlanetSession().getComments(id);
+    notifyListeners();
+  }
+}
