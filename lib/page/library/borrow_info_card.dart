@@ -25,33 +25,24 @@ class BorrowInfoCard extends StatelessWidget {
         imageUrl: LibrarySession.bookCover(toUse.isbn),
         placeholder: (context, url) => Image.asset(
           "assets/Empty-Cover.jpg",
-          width: 176 * 0.75,
-          height: 250 * 0.75,
-          fit: BoxFit.fill,
+          width: 176 * 0.5,
+          height: 250 * 0.5,
+          fit: BoxFit.fitHeight,
         ),
         errorWidget: (context, url, error) => Image.asset(
           "assets/Empty-Cover.jpg",
-          width: 176 * 0.75,
-          height: 250 * 0.75,
-          fit: BoxFit.fill,
+          width: 176 * 0.5,
+          height: 250 * 0.5,
+          fit: BoxFit.fitHeight,
         ),
-        width: 176 * 0.75,
-        height: 250 * 0.75,
+        width: 176 * 0.5,
+        height: 250 * 0.5,
         fit: BoxFit.fitHeight,
         alignment: Alignment.center,
       )
           //.clipRect(clipper: BookImageClipper())
-          .clipRRect(all: 14)
-          .padding(all: 2)
-          .decorated(
-              border: Border.all(color: const Color(0xFFE8E8E8), width: 2),
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-              boxShadow: [
-            const BoxShadow(
-              color: Color(0xFFE8E8E8),
-              blurRadius: 14,
-            ),
-          ]),
+          .clipRRect(all: 14),
+      const VerticalDivider(),
       [
         Text(
           '${toUse.title}\n',
@@ -63,7 +54,6 @@ class BorrowInfoCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 8),
         [
           Text.rich(TextSpan(children: [
             TextSpan(children: [
@@ -72,7 +62,7 @@ class BorrowInfoCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey,
+                  color: Colors.blueGrey,
                 ),
               ),
               TextSpan(
@@ -88,7 +78,7 @@ class BorrowInfoCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey,
+                color: Colors.blueGrey,
               ),
             ),
           ])),
@@ -111,7 +101,7 @@ class BorrowInfoCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey,
+                color: Colors.blueGrey,
               ),
             ),
             TextSpan(
@@ -126,7 +116,7 @@ class BorrowInfoCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey,
+                color: Colors.blueGrey,
               ),
             ),
           ])),
@@ -151,11 +141,11 @@ class BorrowInfoCard extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: isOverdue ? "天前过期" : "天后",
+              text: isOverdue ? " 天前到期" : " 天后",
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFFBFBFBF),
+                color: Colors.blueGrey,
               ),
             ),
           ]));
@@ -192,17 +182,18 @@ class BorrowInfoCard extends StatelessWidget {
           );
         }),
       ]
-          .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-          .center()
-          .padding(all: 12)
-          .backgroundColor(Colors.white)
-          .clipRRect(topRight: 14, bottomRight: 14)
-          .decorated(boxShadow: [
-        const BoxShadow(
-          color: Color(0xFFE8E8E8),
-          blurRadius: 14,
-        ),
-      ]).expanded()
-    ].toRow().padding(all: 8);
+          .toColumn(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+          )
+          .expanded()
+    ]
+        .toRow()
+        .padding(all: 12)
+        .backgroundColor(
+          Theme.of(context).colorScheme.secondaryContainer,
+        )
+        .clipRRect(all: 16)
+        .padding(all: 4);
   }
 }

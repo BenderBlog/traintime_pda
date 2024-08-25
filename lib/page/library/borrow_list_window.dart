@@ -62,6 +62,7 @@ class BorrowListDetail extends StatelessWidget {
               itemCount: borrowList.length,
               padding: const EdgeInsets.symmetric(
                 horizontal: 8,
+                vertical: 8,
               ),
               crossAxisCount: constraints.maxWidth ~/ 360,
               mainAxisSpacing: 4,
@@ -74,11 +75,12 @@ class BorrowListDetail extends StatelessWidget {
         }
       }),
       bottomNavigationBar: BottomAppBar(
+        height: 40,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "仍在借 ${borrow_info.notDued} 本\n" "已过期 ${borrow_info.dued} 本",
+              "在借 ${borrow_info.borrowList.length} 本，其中已过期 ${borrow_info.dued} 本",
             ),
           ],
         ),

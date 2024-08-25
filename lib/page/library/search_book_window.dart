@@ -81,7 +81,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             controller: text,
             decoration: const InputDecoration(
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Colors.transparent,
               hintText: "在此搜索",
               isDense: false,
               contentPadding: EdgeInsets.symmetric(vertical: 8.0),
