@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class EBookPlaceCard extends StatelessWidget {
   final EBookItem toUse;
@@ -14,18 +14,35 @@ class EBookPlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      child: InfoDetailBox(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("电子产品信息"),
-            Text("位置：${toUse.collectionName}"),
-            Text("URL：${toUse.url}"),
-          ],
+    return [
+      [
+        Icon(
+          Icons.cloud,
+          color: Colors.lightBlue.shade900,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          toUse.collectionName,
+          style: TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
+            color: Colors.lightBlue.shade900,
+          ),
+        ),
+      ].toRow(),
+      const SizedBox(height: 8),
+      Text(
+        "URL：${toUse.url}",
+        style: TextStyle(
+          fontWeight: FontWeight.w400,
+          color: Colors.lightBlue.shade900,
         ),
       ),
-    );
+    ]
+        .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
+        .padding(all: 12)
+        .backgroundColor(Colors.lightBlue.shade200)
+        .clipRRect(all: 12)
+        .padding(vertical: 4);
   }
 }

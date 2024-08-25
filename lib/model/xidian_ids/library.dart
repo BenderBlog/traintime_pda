@@ -38,15 +38,26 @@ class BorrowData {
     required this.barcode,
   });
 
-  int get lendDay {
-    List<String> returnDateArr = normReturnDate.split("-");
-    Jiffy returnDateJiffy = Jiffy.parseFromDateTime(DateTime(
+  Jiffy get loanDateTime {
+    List<String> returnDateArr = loanDate.split("-");
+    return Jiffy.parseFromDateTime(DateTime(
       int.parse(returnDateArr[0]),
       int.parse(returnDateArr[1]),
       int.parse(returnDateArr[2]),
     ));
-    return returnDateJiffy.diff(Jiffy.now(), unit: Unit.day).toInt();
   }
+
+  Jiffy get normReturnDateTime {
+    List<String> returnDateArr = normReturnDate.split("-");
+    return Jiffy.parseFromDateTime(DateTime(
+      int.parse(returnDateArr[0]),
+      int.parse(returnDateArr[1]),
+      int.parse(returnDateArr[2]),
+    ));
+  }
+
+  int get lendDay =>
+      normReturnDateTime.diff(Jiffy.now(), unit: Unit.day).toInt();
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);
@@ -98,6 +109,31 @@ class BookInfo {
       _$BookInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$BookInfoToJson(this);
+
+  int? get canBeBorrowed {
+    if (items == null) {
+      return null;
+    }
+    int toReturn = 0;
+    for (var i in items!) {
+      if (i.processType == "在架") toReturn += 1;
+    }
+    return toReturn;
+  }
+
+  String get searchCodeStr {
+    if (searchCode == null || searchCode!.isEmpty) {
+      return "未提供";
+    }
+    return searchCode!.first;
+  }
+
+  String get barCodesStr {
+    if (barCodes == null || barCodes!.isEmpty) {
+      return "未提供";
+    }
+    return barCodes!.first;
+  }
 }
 
 @JsonSerializable()

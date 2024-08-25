@@ -3,6 +3,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/library/ebook_place_card.dart';
@@ -23,77 +24,182 @@ class BookDetailCard extends StatefulWidget {
 class _BookDetailCardState extends State<BookDetailCard> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-      ),
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.toUse.bookName,
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Divider(color: Colors.transparent),
-                    Text(
-                      "作者：${widget.toUse.author ?? "没有提供"}\n"
-                      "ISBN：${widget.toUse.isbn ?? "没有提供"}\n"
-                      "索书号: ${validateList(widget.toUse.searchCode)}\n"
-                      "编排号码：${validateList(widget.toUse.barCodes)}\n"
-                      "描述：${widget.toUse.description ?? "没有提供"}",
-                    ),
-                  ],
+    return ListView(
+      physics: const ClampingScrollPhysics(),
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            CachedNetworkImage(
+              imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
+              placeholder: (context, url) => Image.asset(
+                "assets/Empty-Cover.jpg",
+                width: 120,
+                height: 150,
+                fit: BoxFit.fill,
+              ),
+              errorWidget: (context, url, error) => Image.asset(
+                "assets/Empty-Cover.jpg",
+                width: 120,
+                height: 150,
+                fit: BoxFit.fill,
+              ),
+              width: 120,
+              height: 150,
+              fit: BoxFit.fitHeight,
+              alignment: Alignment.center,
+            )
+                //.clipRect(clipper: BookImageClipper())
+                .clipRRect(all: 14)
+                .padding(all: 2)
+                .decorated(
+                  border: Border.all(color: const Color(0xFFE8E8E8), width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                )
+                .padding(right: 12),
+            [
+              Text(
+                widget.toUse.bookName,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              CachedNetworkImage(
-                imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
-                errorWidget: (context, url, error) =>
-                    Image.asset("assets/Empty-Cover.jpg"),
-                width: 90,
-                height: 120,
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (widget.toUse.items != null)
-                  ...List.generate(
-                    widget.toUse.items!.length,
-                    (index) => BookPlaceCard(
-                      toUse: widget.toUse.items![index],
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(children: [
+                  const TextSpan(
+                    text: "作者 ",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFBFBFBF),
                     ),
                   ),
-                if (widget.toUse.eitems != null)
-                  ...List.generate(
-                    widget.toUse.eitems!.length,
-                    (index) => EBookPlaceCard(
-                      toUse: widget.toUse.eitems![index],
+                  TextSpan(
+                    text: widget.toUse.author ?? "没有提供",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
-                  )
-              ],
-            ),
+                  ),
+                ]),
+              ),
+              Text.rich(TextSpan(children: [
+                const TextSpan(
+                  text: "出版社 ",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFBFBFBF),
+                  ),
+                ),
+                TextSpan(
+                  text: widget.toUse.publisherHouse ?? "没有相关信息",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ])),
+              Text.rich(TextSpan(children: [
+                const TextSpan(
+                  text: "索书号 ",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFBFBFBF),
+                  ),
+                ),
+                TextSpan(
+                  text: widget.toUse.searchCodeStr,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ])),
+              Text.rich(TextSpan(children: [
+                const TextSpan(
+                  text: "发行时间 ",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFBFBFBF),
+                  ),
+                ),
+                TextSpan(
+                  text: widget.toUse.publishYear ?? "没有相关信息",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ])),
+              Text.rich(TextSpan(children: [
+                const TextSpan(
+                  text: "ISBN ",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFBFBFBF),
+                  ),
+                ),
+                TextSpan(
+                  text: widget.toUse.isbn ?? "没有提供",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ])),
+              Text.rich(TextSpan(children: [
+                const TextSpan(
+                  text: "编排号码 ",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFBFBFBF),
+                  ),
+                ),
+                TextSpan(
+                  text: widget.toUse.barCodesStr,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ])),
+            ]
+                .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
+                .flexible(),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.toUse.items != null)
+                ...List.generate(
+                  widget.toUse.items!.length,
+                  (index) => BookPlaceCard(
+                    toUse: widget.toUse.items![index],
+                  ),
+                ),
+              if (widget.toUse.eitems != null)
+                ...List.generate(
+                  widget.toUse.eitems!.length,
+                  (index) => EBookPlaceCard(
+                    toUse: widget.toUse.eitems![index],
+                  ),
+                )
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
-    String validateList(List<String>? inputList) {
-  if (inputList == null || inputList.isEmpty) {
-    return "没有提供";
-  }
-  return inputList.first;
-}
 }
