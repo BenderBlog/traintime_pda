@@ -155,7 +155,7 @@ class LibrarySession extends IDSSession {
       token = "";
       String destinationURL =
           "https://findxidian.libsp.cn/find/sso/login/xidian/0";
-      dio.get("https://tyrzfw.chaoxing.com/auth/xidian/cas/init?"
+      await dio.get("https://tyrzfw.chaoxing.com/auth/xidian/cas/init?"
           "isLogout=0&refer=$destinationURL");
       String location = await checkAndLogin(
         target: "https://tyrzfw.chaoxing.com/auth/xidian/cas/index",
