@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -27,7 +26,6 @@ class SportCard extends StatelessWidget {
           context.pushReplacement(const SportWindow());
         }
       },
-      backgroundColor: RatCard.ratCardBackgroundColor[4],
       icon: MingCuteIcons.mgc_run_fill,
       name: "体育信息",
     );

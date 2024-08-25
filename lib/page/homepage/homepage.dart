@@ -3,10 +3,6 @@
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:watermeter/model/toolbox_addresses.dart';
-import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
-import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -26,6 +22,7 @@ import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
 import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
+import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 
 class MainPage extends StatefulWidget {
@@ -57,6 +54,7 @@ class _MainPageState extends State<MainPage> {
     ExperimentCard(),
     SportCard(),
     CreativeCard(),
+    ToolboxCard(),
   ];
 
   String get _now {
@@ -165,29 +163,11 @@ class _MainPageState extends State<MainPage> {
                   const NoticeCard(),
                   const ClassTableCard(),
                   ...children,
-                  GridView.count(
+                  GridView.extent(
+                    maxCrossAxisExtent: 96,
                     shrinkWrap: true,
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.8,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      ...smallFunction,
-                      ...List<Widget>.generate(
-                        WebViewAddresses.values.length,
-                        (i) => SmallFunctionCard(
-                          backgroundColor: RatCard.ratCardBackgroundColor[
-                              i % RatCard.ratCardBackgroundColor.length],
-                          icon: WebViewAddresses.values[i].iconData,
-                          name: WebViewAddresses.values[i].name,
-                          onTap: () => launchUrlString(
-                            WebViewAddresses.values[i].url,
-                            mode: LaunchMode.externalApplication,
-                          ),
-                        ),
-                      ),
-                    ],
+                    children: smallFunction,
                   ),
                 ].toColumn().padding(
                       vertical: 8,

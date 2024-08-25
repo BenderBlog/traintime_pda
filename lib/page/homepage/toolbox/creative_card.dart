@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/public_widget/rat_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/creative_job/creative_job.dart';
@@ -16,7 +15,6 @@ class CreativeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SmallFunctionCard(
-      backgroundColor: RatCard.ratCardBackgroundColor[5],
       onTap: () async {
         if (offline) {
           showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
