@@ -1,8 +1,6 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR MIT
 
-// Designer: https://github.com/Reverier-Xu
-
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
