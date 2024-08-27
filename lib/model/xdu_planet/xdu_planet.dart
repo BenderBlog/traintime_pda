@@ -28,9 +28,7 @@ class Article {
 
   Map<String, dynamic> toJson() => _$ArticleToJson(this);
 
-  String get id =>
-      RegExp(r'([0-9]+)_([0-9]+)').firstMatch(content)?.group(0).toString() ??
-      "";
+  String get id => content.replaceAll("db/", "").replaceAll(".txt", "");
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -56,12 +54,10 @@ class Person {
 
 @JsonSerializable(explicitToJson: true)
 class XDUPlanetDatabase {
-  final int version;
   final List<Person> author;
   final DateTime update;
 
   XDUPlanetDatabase({
-    required this.version,
     required this.author,
     required this.update,
   });
@@ -81,6 +77,7 @@ class XDUPlanetComment {
   final String content;
   final String user_id;
   final String reply_to;
+  final String status;
 
   XDUPlanetComment({
     required this.ID,
@@ -90,10 +87,25 @@ class XDUPlanetComment {
     required this.content,
     required this.user_id,
     required this.reply_to,
+    required this.status,
   });
 
   factory XDUPlanetComment.fromJson(Map<String, dynamic> json) =>
       _$XDUPlanetCommentFromJson(json);
 
   Map<String, dynamic> toJson() => _$XDUPlanetCommentToJson(this);
+
+  // 可选值为ok、block、delete、audit，分别表示已通过、已屏蔽、已删除、待审核
+  String get statusStr {
+    switch (status) {
+      case "block":
+        return "被屏蔽";
+      case "delete":
+        return "被删除";
+      case "audit":
+        return "需审核";
+      default:
+        return "";
+    }
+  }
 }

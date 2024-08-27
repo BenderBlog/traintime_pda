@@ -3,13 +3,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
 class CommentPopout extends StatelessWidget {
   final String id;
-  //final String replyTo;
+  final XDUPlanetComment? replyTo;
 
   static String get userIdGenerator {
     // Finalised, do not modify unless spelling problem!
@@ -71,6 +72,7 @@ class CommentPopout extends StatelessWidget {
   CommentPopout({
     super.key,
     required this.id,
+    this.replyTo,
   });
   final TextEditingController _controller = TextEditingController();
 
@@ -81,9 +83,12 @@ class CommentPopout extends StatelessWidget {
       child: [
         TextField(
           controller: _controller,
-          decoration: const InputDecoration(
-            hintText: '发表您的高见:)',
-            border: OutlineInputBorder(),
+          maxLines: 5,
+          decoration: InputDecoration(
+            hintText: replyTo == null
+                ? '发表您的高见:)'
+                : "回复评论 #${replyTo!.ID}：${replyTo!.content}",
+            border: const OutlineInputBorder(),
           ),
         ).padding(all: 8).expanded(),
         IconButton(
@@ -94,7 +99,7 @@ class CommentPopout extends StatelessWidget {
               id: id,
               content: _controller.text,
               userId: CommentPopout.userIdGenerator,
-              replyto: null,
+              replyto: replyTo?.ID.toString(),
             )
                 .then((value) {
               Navigator.of(context).pop(true);

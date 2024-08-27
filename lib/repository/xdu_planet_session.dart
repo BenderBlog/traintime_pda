@@ -25,22 +25,21 @@ class PlanetSession extends NetworkSession {
     required String id,
     required String content,
     required String userId,
-    required String?
-        replyto, // TODO: Clearify whether need empty string as default...
+    required String? replyto,
   }) =>
       dio
           .post("$commentBase/api/v1/comment/$id",
               data: {
-                //"data": {
-                "article_id": id,
                 "content": content,
                 "user_id": userId,
                 "reply_to": replyto ?? "",
-                //},
-                //"article_id": id,
               },
               options: Options(contentType: Headers.jsonContentType))
           .then((value) => value.data.toString());
+
+  Future<void> auditComments({required int id}) => dio
+      .delete("$commentBase/api/v1/comment/$id")
+      .then((value) => value.data.toString());
 
   Future<String> content(String dbPath) => dio
       .get("$base/${Uri.encodeComponent(dbPath)}")

@@ -73,7 +73,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     e,
                     style: TextStyle(
                       color: selected == e
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          ? Theme.of(context).colorScheme.onPrimary
                           : Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
                   ),

@@ -151,12 +151,12 @@ class LibrarySession extends IDSSession {
       "[LibrarySession][initSession] "
       "Initalizing Library Session",
     );
+
+    token = "";
+
     try {
-      token = "";
       String destinationURL =
           "https://findxidian.libsp.cn/find/sso/login/xidian/0";
-      await dio.get("https://tyrzfw.chaoxing.com/auth/xidian/cas/init?"
-          "isLogout=0&refer=$destinationURL");
       String location = await checkAndLogin(
         target: "https://tyrzfw.chaoxing.com/auth/xidian/cas/index",
         sliderCaptcha: (p0) async {},
@@ -228,7 +228,13 @@ class LibrarySession extends IDSSession {
       if (token.isEmpty) {
         throw NotFetchLibraryException();
       }
-    } catch (e) {
+    } catch (e, s) {
+      log.e(
+        "[LibrarySession][initSession] "
+        "Error when initSession \n e: $e\n s: $s",
+        error: e,
+        stackTrace: s,
+      );
       if (e is NotFetchLibraryException) {
         rethrow;
       }

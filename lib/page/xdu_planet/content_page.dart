@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
+import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -121,38 +122,88 @@ class _ContentPageState extends State<ContentPage> {
                   if (snapshot.data!.isEmpty) {
                     list = const Text("暂无评论");
                   } else {
-                    list = Column(
-                      children: List.generate(
-                        snapshot.data!.length,
-                        (index) => ListTile(
-                          title: Text(snapshot.data![index].user_id),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(snapshot.data![index].CreatedAt.toString()),
-                              const SizedBox(height: 5),
-                              Text(snapshot.data![index].content),
-                              Row(
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      // 举报按钮功能
-                                    },
-                                    child: const Text('举报'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      // 回复按钮功能
-                                    },
-                                    child: const Text('回复'),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                    list = List.generate(
+                      snapshot.data!.length,
+                      (index) => ListTile(
+                        title: Text(
+                          "#${snapshot.data![index].ID} "
+                          "${snapshot.data![index].user_id} "
+                          "${snapshot.data![index].statusStr}",
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(Jiffy.parseFromDateTime(
+                              snapshot.data![index].CreatedAt,
+                            ).format(pattern: 'yyyy-MM-dd HH:mm:ss')),
+                            if (snapshot.data![index].reply_to.isNotEmpty)
+                              Builder(builder: (context) {
+                                // No need to think about orelse.
+                                XDUPlanetComment? data =
+                                    snapshot.data!.firstWhereOrNull(
+                                  (element) =>
+                                      element.ID.toString() ==
+                                      snapshot.data![index].reply_to,
+                                );
+                                if (data == null) {
+                                  return Text(
+                                    "回复评论 #${snapshot.data![index].reply_to} 已被举报或删除",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                }
+                                return Text(
+                                  "回复评论 #${snapshot.data![index].ID}：${data.content}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                );
+                              }),
+                            const SizedBox(height: 4),
+                            Text(snapshot.data![index].content),
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () => PlanetSession()
+                                      .auditComments(
+                                    id: snapshot.data![index].ID,
+                                  )
+                                      .then((value) {
+                                    _comments.update();
+                                    Fluttertoast.showToast(msg: "举报成功");
+                                  }).onError((e, _) {
+                                    Fluttertoast.showToast(msg: "举报失败");
+                                  }),
+                                  child: const Text('举报'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    bool? result =
+                                        await showModalBottomSheet<bool>(
+                                      context: context,
+                                      builder: (context) => CommentPopout(
+                                        id: widget.article.id,
+                                        replyTo: snapshot.data![index],
+                                      ),
+                                    );
+                                    if (result == true) {
+                                      /// Temporary solution...
+                                      _comments.update();
+                                      Fluttertoast.showToast(msg: "评论成功");
+                                    } else if (result == false) {
+                                      Fluttertoast.showToast(
+                                          msg: "评论失败，请去网络查看器和日志查看器查看报错");
+                                    } else {
+                                      Fluttertoast.showToast(msg: "没想好要说啥嘛");
+                                    }
+                                  },
+                                  child: const Text('回复'),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    );
+                    ).toColumn();
                   }
                 } catch (e) {
                   return ReloadWidget(function: _comments.update);

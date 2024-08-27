@@ -42,7 +42,6 @@ Map<String, dynamic> _$PersonToJson(Person instance) => <String, dynamic>{
 
 XDUPlanetDatabase _$XDUPlanetDatabaseFromJson(Map<String, dynamic> json) =>
     XDUPlanetDatabase(
-      version: (json['version'] as num).toInt(),
       author: (json['author'] as List<dynamic>)
           .map((e) => Person.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -51,7 +50,6 @@ XDUPlanetDatabase _$XDUPlanetDatabaseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$XDUPlanetDatabaseToJson(XDUPlanetDatabase instance) =>
     <String, dynamic>{
-      'version': instance.version,
       'author': instance.author.map((e) => e.toJson()).toList(),
       'update': instance.update.toIso8601String(),
     };
@@ -65,6 +63,7 @@ XDUPlanetComment _$XDUPlanetCommentFromJson(Map<String, dynamic> json) =>
       content: json['content'] as String,
       user_id: json['user_id'] as String,
       reply_to: json['reply_to'] as String,
+      status: json['status'] as String,
     );
 
 Map<String, dynamic> _$XDUPlanetCommentToJson(XDUPlanetComment instance) =>
@@ -76,4 +75,5 @@ Map<String, dynamic> _$XDUPlanetCommentToJson(XDUPlanetComment instance) =>
       'content': instance.content,
       'user_id': instance.user_id,
       'reply_to': instance.reply_to,
+      'status': instance.status,
     };
