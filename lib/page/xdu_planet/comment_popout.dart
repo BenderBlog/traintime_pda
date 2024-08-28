@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -94,6 +96,12 @@ class CommentPopout extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.send),
           onPressed: () async {
+            if (_controller.text.isEmpty) {
+              Fluttertoast.showToast(msg: "发送信息空白");
+              return;
+            }
+            var pd = ProgressDialog(context: context);
+            pd.show(msg: "正在发送评论");
             await PlanetSession()
                 .sendComments(
               id: id,
@@ -102,9 +110,11 @@ class CommentPopout extends StatelessWidget {
               replyto: replyTo?.ID.toString(),
             )
                 .then((value) {
+              pd.close();
               Navigator.of(context).pop(true);
             }).onError((e, s) {
               log.e(e.toString());
+              pd.close();
               Navigator.of(context).pop(false);
             });
           },

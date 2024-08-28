@@ -6,12 +6,14 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:both_side_sheet/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
@@ -135,7 +137,7 @@ class _ContentPageState extends State<ContentPage> {
                           children: [
                             Text(Jiffy.parseFromDateTime(
                               snapshot.data![index].CreatedAt,
-                            ).format(pattern: 'yyyy-MM-dd HH:mm:ss')),
+                            ).toLocal().format(pattern: 'yyyy-MM-dd HH:mm:ss')),
                             if (snapshot.data![index].reply_to.isNotEmpty)
                               Builder(builder: (context) {
                                 // No need to think about orelse.
@@ -153,26 +155,75 @@ class _ContentPageState extends State<ContentPage> {
                                   );
                                 }
                                 return Text(
-                                  "回复评论 #${snapshot.data![index].ID}：${data.content}",
+                                  "回复评论 #${snapshot.data![index].reply_to}：${data.content}",
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 );
                               }),
                             const SizedBox(height: 4),
-                            Text(snapshot.data![index].content),
+                            Text(
+                              snapshot.data![index].content,
+                              maxLines: 5,
+                              overflow: TextOverflow.ellipsis,
+                            ).gestures(
+                              onTap: () => BothSideSheet.show(
+                                context: context,
+                                title: "#${snapshot.data![index].ID} "
+                                    "${snapshot.data![index].user_id} "
+                                    "${snapshot.data![index].statusStr}",
+                                child: Text(snapshot.data![index].content)
+                                    .safeArea(),
+                              ),
+                            ),
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: () => PlanetSession()
-                                      .auditComments(
-                                    id: snapshot.data![index].ID,
-                                  )
-                                      .then((value) {
-                                    _comments.update();
-                                    Fluttertoast.showToast(msg: "举报成功");
-                                  }).onError((e, _) {
-                                    Fluttertoast.showToast(msg: "举报失败");
-                                  }),
+                                  onPressed: () async {
+                                    if (snapshot.data![index].status != "ok") {
+                                      Fluttertoast.showToast(msg: "本评论已经被举报");
+                                      return;
+                                    }
+                                    bool isConfirm = await showDialog<bool>(
+                                            context: context,
+                                            builder: (BuildContext context) =>
+                                                AlertDialog(
+                                                  title: const Text('确认是否举报'),
+                                                  content: const Text(
+                                                    '三思而后行，确定您想举报吗？举报后该评论会有标签，不一定会删除。',
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: const Text('不举报了'),
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(false),
+                                                    ),
+                                                    TextButton(
+                                                      child: const Text('确认'),
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(true),
+                                                    ),
+                                                  ],
+                                                )) ??
+                                        false;
+                                    if (isConfirm && context.mounted) {
+                                      var pd = ProgressDialog(context: context);
+                                      pd.show(msg: "正在举报评论");
+                                      PlanetSession()
+                                          .auditComments(
+                                        id: snapshot.data![index].ID,
+                                      )
+                                          .then((value) {
+                                        pd.close();
+                                        _comments.update();
+                                        Fluttertoast.showToast(msg: "举报成功");
+                                      }).onError((e, _) {
+                                        pd.close();
+                                        Fluttertoast.showToast(msg: "举报失败");
+                                      });
+                                    }
+                                  },
                                   child: const Text('举报'),
                                 ),
                                 TextButton(

@@ -103,7 +103,7 @@ class XDUPlanetComment {
       case "delete":
         return "被删除";
       case "audit":
-        return "需审核";
+        return "被举报待审核";
       default:
         return "";
     }
