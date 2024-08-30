@@ -33,7 +33,7 @@ dependencies:
   extended_nested_scroll_view: ^6.1.2
   # Others
   url_launcher: ^6.1.6
-  jiffy: ^6.1.0
+  jiffy: ^6.3.1
   auto_size_text: ^3.0.0
   async: ^2.10.0 # For AsyncMemoizer
   graphic: ^2.2.0

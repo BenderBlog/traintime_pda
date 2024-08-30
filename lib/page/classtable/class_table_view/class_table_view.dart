@@ -83,7 +83,11 @@ class _ClassTableViewState extends State<ClassTableView> {
       }
 
       for (final i in classTableState.subjects) {
-        if (i.startTime == null || i.stopTime == null) {
+        if (i.startTime == null ||
+            i.stopTime == null ||
+            i.startTime!.isBefore(Jiffy.parseFromDateTime(
+              classTableState.startDay,
+            ))) {
           continue;
         }
 
