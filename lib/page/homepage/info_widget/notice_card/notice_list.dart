@@ -29,7 +29,7 @@ class NoticeList extends StatelessWidget {
                   context: context,
                   builder: (context) => AlertDialog(
                     title: Text(messages[index].title),
-                    content: Text(messages[index].message),
+                    content: SelectableText(messages[index].message),
                   ),
                 );
               }
