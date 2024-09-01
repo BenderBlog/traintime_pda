@@ -30,7 +30,8 @@ Traintime PDA，又称 XDYou，是为西电本科生设计的开源信息查询�
 10. 双创需求大厅：找学校里的项目。
 11. XDU Planet：查看同学的博客。
 12. 物理实验查看功能。
-13. Android 和 iOS 特有的日程查看桌面小部件。
+13. 失物招领信息查看。
+14. Android 和 iOS 特有的日程查看桌面小部件。
 
 ## 其他特性
 
@@ -54,10 +55,10 @@ Traintime PDA，又称 XDYou，是为西电本科生设计的开源信息查询�
 ## 编译环境
 
 ```bash
-Flutter 3.24.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 5874a72aa4 (10 days ago) • 2024-08-20 16:46:00 -0500
-Engine • revision c9b9d5780d
-Tools • Dart 3.5.1 • DevTools 2.37.2
+Flutter 3.19.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 7482962148 (7 days ago) • 2024-02-27 16:51:22 -0500
+Engine • revision 04817c99c9
+Tools • Dart 3.3.0 • DevTools 2.31.1
 ```
 
 注意：要编译此项目，Dart 编译器必须在 3.0 以上。
