@@ -64,7 +64,7 @@ class AboutPage extends StatelessWidget {
     ),
     Developer(
       "lsy223622 (木生睡不着)",
-      "https://shp.qlogo.cn/ttsing/43714034/43714034/100?ts=0",
+      "https://avatars.githubusercontent.com/u/57913213",
       "设计：iOS 图标",
       "https://lsy223622.com/",
     ),
