@@ -23,7 +23,7 @@ class ClassTableFile extends EhallSession {
     toReturn.semesterCode = qResult["semesterCode"];
     toReturn.termStartDay = qResult["termStartDay"];
 
-    log.i(
+    log.info(
       "[getClasstable][simplifyData] "
       "${toReturn.semesterCode} ${toReturn.termStartDay}",
     );
@@ -72,12 +72,12 @@ class ClassTableFile extends EhallSession {
 
   Future<ClassTableData> get() async {
     Map<String, dynamic> qResult = {};
-    log.i("[getClasstable][getFromWeb] Login the system.");
+    log.info("[getClasstable][getFromWeb] Login the system.");
     String get = await useApp("4770397878132218");
-    log.i("[getClasstable][getFromWeb] Location: $get");
+    log.info("[getClasstable][getFromWeb] Location: $get");
     await dioEhall.post(get);
 
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] "
       "Fetch the semester information.",
     );
@@ -94,7 +94,7 @@ class ClassTableFile extends EhallSession {
       );
     }
 
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] "
       "Fetch the day the semester begin.",
     );
@@ -116,7 +116,7 @@ class ClassTableFile extends EhallSession {
       var userClassFile = File("${supportPath.path}/$userDefinedClassName");
       if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] "
       "Will get $semesterCode which start at $termStartDay.",
     );
@@ -129,13 +129,13 @@ class ClassTableFile extends EhallSession {
       },
     ).then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
-      log.w(
+      log.warning(
         "[getClasstable][getFromWeb] "
         "extParams: ${qResult['extParams']['msg']} isNotPublish: "
         "${qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
       );
       if (qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")) {
-        log.w(
+        log.warning(
           "[getClasstable][getFromWeb] "
           "extParams: ${qResult['extParams']['msg']} isNotPublish: "
           "Classtable not released.",
@@ -149,7 +149,7 @@ class ClassTableFile extends EhallSession {
       }
     }
 
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] "
       "Preliminary storage...",
     );
@@ -164,7 +164,7 @@ class ClassTableFile extends EhallSession {
       },
     ).then((value) => value.data['datas']['cxxsllsywpk']);
 
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] $notOnTable",
     );
     qResult["notArranged"] = notOnTable["rows"];
@@ -172,7 +172,7 @@ class ClassTableFile extends EhallSession {
     ClassTableData preliminaryData = simplifyData(qResult);
 
     /// Deal with the class change.
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] "
       "Deal with the class change...",
     );
@@ -186,7 +186,7 @@ class ClassTableFile extends EhallSession {
       },
     ).then((value) => value.data['datas']['xsdkkc']);
     if (qResult['extParams']['code'] != 1) {
-      log.w(
+      log.warning(
         "[getClasstable][getFromWeb] ${qResult['extParams']['msg']}",
       );
     }
@@ -243,7 +243,7 @@ class ClassTableFile extends EhallSession {
       }
     }
 
-    log.i(
+    log.info(
       "[getClasstable][getFromWeb] "
       "Dealing class change with ${preliminaryData.classChanges.length} info(s).",
     );
@@ -261,7 +261,7 @@ class ClassTableFile extends EhallSession {
       }
 
       /// Second, find the all time arrangement related to the class.
-      log.i(
+      log.info(
         "[getClasstable][getFromWeb] "
         "Class change related to class detail index $indexClassDetailList.",
       );
@@ -280,7 +280,7 @@ class ClassTableFile extends EhallSession {
       }
 
       /// Third, search for the time arrangements, seek for the truth.
-      log.i(
+      log.info(
         "[getClasstable][getFromWeb] "
         "Class change related to time arrangement index $indexOriginalTimeArrangementList.",
       );
@@ -289,20 +289,20 @@ class ClassTableFile extends EhallSession {
         /// Give a value to the
         int timeArrangementIndex = indexOriginalTimeArrangementList.first;
 
-        log.i(
+        log.info(
           "[getClasstable][getFromWeb] "
           "Class change. Teacher changed? ${e.isTeacherChanged}. timeArrangementIndex is $timeArrangementIndex",
         );
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
           /// Seek for the change entry. Delete the classes moved waay.
-          log.i(
+          log.info(
             "[getClasstable][getFromWeb] "
             "Original weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
             "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
           );
           for (int i in e.originalAffectedWeeksList) {
-            log.i(
+            log.info(
               "[getClasstable][getFromWeb] "
               "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
             );
@@ -315,7 +315,7 @@ class ClassTableFile extends EhallSession {
             }
           }
 
-          log.i(
+          log.info(
             "[getClasstable][getFromWeb] "
             "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
           );
@@ -327,7 +327,7 @@ class ClassTableFile extends EhallSession {
               .timeArrangement[indexOriginalTimeArrangementList.first].index;
         }
 
-        log.i(
+        log.info(
           "[getClasstable][getFromWeb] "
           "New week: ${e.newAffectedWeeks}, "
           "day: ${e.newWeek}, "
@@ -337,13 +337,13 @@ class ClassTableFile extends EhallSession {
 
         bool flag = false;
         ClassChange? toRemove;
-        log.i("[getClasstable][getFromWeb] cache length = ${cache.length}");
+        log.info("[getClasstable][getFromWeb] cache length = ${cache.length}");
         for (var f in cache) {
-          //log.i("[getClasstable][getFromWeb]"
+          //log.info("[getClasstable][getFromWeb]"
           //    "${f.className} ${f.classCode} ${f.originalClassRange} ${f.originalAffectedWeeksList} ${f.originalWeek}");
-          //log.i("[getClasstable][getFromWeb]"
+          //log.info("[getClasstable][getFromWeb]"
           //    "${e.className} ${e.classCode} ${e.newClassRange} ${e.newAffectedWeeksList} ${e.newWeek}");
-          //log.i("[getClasstable][getFromWeb]"
+          //log.info("[getClasstable][getFromWeb]"
           //    "${f.className == e.className} ${f.classCode == e.classCode} ${listEquals(f.originalClassRange, e.newClassRange)} ${listEquals(f.originalAffectedWeeksList, e.newAffectedWeeksList)} ${f.originalWeek == e.newWeek}");
           if (f.className == e.className &&
               f.classCode == e.classCode &&
@@ -358,14 +358,14 @@ class ClassTableFile extends EhallSession {
 
         if (flag) {
           cache.remove(toRemove);
-          log.i(
+          log.info(
             "[getClasstable][getFromWeb] "
             "Cannot be added",
           );
           continue;
         }
 
-        log.i(
+        log.info(
           "[getClasstable][getFromWeb] "
           "Can be added",
         );
@@ -384,7 +384,7 @@ class ClassTableFile extends EhallSession {
           ),
         );
       } else if (e.type == ChangeType.patch) {
-        log.i(
+        log.info(
           "[getClasstable][getFromWeb] "
           "Class patch.",
         );
@@ -403,21 +403,21 @@ class ClassTableFile extends EhallSession {
           ),
         );
       } else {
-        log.i(
+        log.info(
           "[getClasstable][getFromWeb] "
           "Class stop.",
         );
 
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
-          log.i(
+          log.info(
             "[getClasstable][getFromWeb] "
             "Original weeklist "
             "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
             "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
           );
           for (int i in e.originalAffectedWeeksList) {
-            log.i(
+            log.info(
               "[getClasstable][getFromWeb] "
               "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
             );
@@ -427,7 +427,7 @@ class ClassTableFile extends EhallSession {
                   .weekList[i] = false;
             }
           }
-          log.i(
+          log.info(
             "[getClasstable][getFromWeb] "
             "New weeklist "
             "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",

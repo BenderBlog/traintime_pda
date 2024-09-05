@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:catcher/catcher.dart';
+import 'package:catcher_2/catcher_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -30,7 +30,7 @@ void main() async {
   // Make sure the library is initialized.
   WidgetsFlutterBinding.ensureInitialized();
 
-  log.i(
+  log.info(
     "Traintime PDA Codebase is written by BenderBlog Rodriguez and contributors",
   );
 
@@ -41,7 +41,7 @@ void main() async {
   // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
   final data = WidgetsBinding.instance.platformDispatcher.views.first;
 
-  log.i(
+  log.info(
     "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} "
     "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
   );
@@ -67,11 +67,11 @@ void main() async {
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
   bool isFirst = username.isEmpty || password.isEmpty;
-  log.i(
+  log.info(
     "isFirstLogin: $isFirst",
   );
 
-  Catcher(
+  Catcher2(
     rootWidget: MyApp(isFirst: isFirst),
     debugConfig: preference.catcherOptions,
     releaseConfig: preference.catcherOptions,
@@ -127,7 +127,7 @@ class _MyAppState extends State<MyApp> {
           child: widget.isFirst ? const LoginWindow() : const HomePage(),
         ),
         builder: (context, widget) {
-          Catcher.addDefaultErrorWidget(
+          Catcher2.addDefaultErrorWidget(
               showStacktrace: true,
               title: "发生错误",
               description: "详情如下",

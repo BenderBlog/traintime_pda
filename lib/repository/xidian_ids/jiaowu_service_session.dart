@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
-import 'package:watermeter/repository/network_session.dart';
 
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -22,7 +21,7 @@ class JiaowuServiceSession extends IDSSession {
   Dio get authorizationDio => Dio(BaseOptions(headers: {
         HttpHeaders.authorizationHeader: authorization,
       }))
-        ..interceptors.add(aliceDioAdapter);
+        ..interceptors.add(logDioAdapter);
 
   Future<void> getToken() async {
     String location = await checkAndLogin(
@@ -38,7 +37,7 @@ class JiaowuServiceSession extends IDSSession {
 
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.i(
+      log.info(
         "[JiaowuServiceSession][getToken] "
         "Received location: $location.",
       );
@@ -77,7 +76,7 @@ class JiaowuServiceSession extends IDSSession {
   Future<List<Score>> getScore() async {
     List<Score> toReturn = [];
 
-    log.i(
+    log.info(
       "[JiaowuServiceSession][getScore] "
       "Getting the score data.",
     );
@@ -117,14 +116,14 @@ class JiaowuServiceSession extends IDSSession {
   /// Default fetch the current semester's exam.
   /*
   Future<ExamData> getExam() async {
-    log.i(
+    log.info(
       "[JiaowuServiceSession][getExam] "
       "Getting the exam data.",
     );
     await useService("exam");
 
     /// Choose the first period...
-    log.i(
+    log.info(
       "[JiaowuServiceSession][getExam] "
       "Seek for the semesters.",
     );
@@ -138,7 +137,7 @@ class JiaowuServiceSession extends IDSSession {
     });
 
     /// If failed, it is more likely that no exam has arranged.
-    log.i(
+    log.info(
       "[JiaowuServiceSession][getExam] "
       "My exam arrangemet $semester.",
     );
@@ -197,7 +196,7 @@ class JiaowuServiceSession extends IDSSession {
   /// Fetch the buildings for empty classroom.
   Future<List<EmptyClassroomPlace>> getBuildingList() async {
     List<EmptyClassroomPlace> toReturn = [];
-    log.i(
+    log.info(
       "[JiaowuServiceSession][getBuildingList] "
       "Getting the empty classroom.",
     );

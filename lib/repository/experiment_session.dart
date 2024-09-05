@@ -14,7 +14,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 class ExperimentSession extends NetworkSession {
   @override
   Dio get dio => Dio()
-    ..interceptors.add(aliceDioAdapter)
+    ..interceptors.add(logDioAdapter)
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = false
     ..options.responseDecoder = (responseBytes, options, responseBody) async {
@@ -84,13 +84,13 @@ class ExperimentSession extends NetworkSession {
       }
     }
 
-    log.d(
+    log.debug(
       "[experiment_session][getData] "
       "$selectInfo will be remembered...",
     );
 
     if (selectInfo[subject] != selectInfo.values.first) {
-      log.d(
+      log.debug(
         "[experiment_session][getData] "
         "${selectInfo[subject]} ferching...",
       );
@@ -141,7 +141,7 @@ class ExperimentSession extends NetworkSession {
       throw NoExperimentPasswordException;
     }
 
-    log.d(
+    log.debug(
       "[experiment_session][getData] "
       "Get login in experiment_session.",
     );
@@ -176,13 +176,13 @@ class ExperimentSession extends NetworkSession {
 
     cookieStr = "";
 
-    log.d(
+    log.debug(
       "[experiment_session][getData] "
       "Start fetching data.",
     );
 
     for (String i in loginResponse.headers[HttpHeaders.setCookieHeader] ?? []) {
-      log.d(
+      log.debug(
         "[experiment_session][getData] "
         "Cookie $i.",
       );
@@ -196,7 +196,7 @@ class ExperimentSession extends NetworkSession {
       }
     }
 
-    log.d(
+    log.debug(
       "[experiment_session][getData] "
       "Cookie is $cookieStr.",
     );
@@ -220,7 +220,7 @@ class ExperimentSession extends NetworkSession {
             ?.getElementsByTagName('tr') ??
         [];
 
-    log.d(
+    log.debug(
       "[experiment_session][getData] "
       "Data have ${expInfo.length}.",
     );
@@ -229,7 +229,7 @@ class ExperimentSession extends NetworkSession {
     for (var i in expInfo) {
       var expTds = i.getElementsByTagName('td');
       if (expTds.isEmpty) continue;
-      log.d(
+      log.debug(
         "[experiment_session][getData] "
         "expTds have ${expTds.length}.",
       );

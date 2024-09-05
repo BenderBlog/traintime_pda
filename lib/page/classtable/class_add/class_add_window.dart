@@ -125,9 +125,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                           start: start,
                           stop: stop,
                         ))
-                    .then(
-                      (value) => Navigator.of(context).pop(),
-                    );
+                    .then((value) {
+                  if (context.mounted) Navigator.of(context).pop();
+                });
               } else {
                 await controller
                     .editUserDefinedClass(
@@ -147,9 +147,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                           start: start,
                           stop: stop,
                         ))
-                    .then(
-                      (value) => Navigator.of(context).pop(),
-                    );
+                    .then((value) {
+                  if (context.mounted) Navigator.of(context).pop();
+                });
               }
             },
             child: const Text("保存"),

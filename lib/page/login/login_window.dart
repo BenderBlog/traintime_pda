@@ -169,12 +169,12 @@ class _LoginWindowState extends State<LoginWindow> {
 
     try {
       await ses.clearCookieJar();
-      log.w(
+      log.warning(
         "[login_window][login] "
         "Have cleared login state.",
       );
     } on Exception {
-      log.w(
+      log.warning(
         "[login_window][login] "
         "No clear state.",
       );
@@ -229,7 +229,7 @@ class _LoginWindowState extends State<LoginWindow> {
             showToast(context: context, msg: "请求失败。${e.message}");
           }
         } else {
-          log.w(
+          log.warning(
             "[login_window][login] "
             "Login failed with error: \n$e\nStacktrace is:\n$s",
           );

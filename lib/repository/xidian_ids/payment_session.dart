@@ -19,18 +19,13 @@ Future<void> update() async {
     owe.value = "正在获取欠费";
     await PaymentSession().getOwe();
   } on DioException {
-    log.i(
+    log.info(
       "[PaymentSession][update] "
       "Network error",
     );
     owe.value = "欠费信息网络故障";
   } catch (e, s) {
-    log.w(
-      "[PaymentSession][update] "
-      "Fetch failed with exception.",
-      error: e,
-      stackTrace: s,
-    );
+    log.handle(e, s);
     owe.value = "欠费程序故障";
   }
 }
@@ -56,14 +51,14 @@ class PaymentSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        log.i(
+        log.info(
           "[PaymentSession][getOwe] "
           "Received location: $location.",
         );
         response = await dio.get(location);
       }
       var nextStop = getTransfer.firstMatch(response.data);
-      log.i(
+      log.info(
         "[PaymentSession][getOwe] "
         "getTransfer: ${nextStop![0]!}.",
       );
@@ -106,12 +101,7 @@ class PaymentSession extends IDSSession {
         }
       });
     } catch (e, s) {
-      log.w(
-        "[PaymentSession][getOwe] "
-        "Fetch failed with exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       owe.value = "目前欠款无法查询";
     }
   }

@@ -35,7 +35,7 @@ class EhallSession extends IDSSession {
     var response = await dioEhall.get(
       "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
     );
-    log.i(
+    log.info(
       "[ehall_session][isLoggedIn] "
       "Ehall isLoggedin: ${response.data["hasLogin"]}",
     );
@@ -59,7 +59,7 @@ class EhallSession extends IDSSession {
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.i(
+      log.info(
         "[ehall_session][loginEhall] "
         "Received location: $location",
       );
@@ -70,7 +70,7 @@ class EhallSession extends IDSSession {
 
   Future<String> useApp(String appID) async {
     return await _ehallLock.synchronized(() async {
-      log.i(
+      log.info(
         "[ehall_session][useApp] "
         "Ready to use the app $appID. Try to Login.",
       );
@@ -83,14 +83,14 @@ class EhallSession extends IDSSession {
         var response = await dio.get(location);
         while (response.headers[HttpHeaders.locationHeader] != null) {
           location = response.headers[HttpHeaders.locationHeader]![0];
-          log.i(
+          log.info(
             "[ehall_session][useApp] "
             "Received location: $location.",
           );
           response = await dioEhall.get(location);
         }
       }
-      log.i(
+      log.info(
         "[ehall_session][useApp] "
         "Try to use the $appID.",
       );
@@ -103,7 +103,7 @@ class EhallSession extends IDSSession {
           },
         ),
       );
-      log.i(
+      log.info(
         "[ehall_session][useApp] "
         "Transfer address: ${value.headers['location']![0]}.",
       );
@@ -113,7 +113,7 @@ class EhallSession extends IDSSession {
 
   /// 学生个人信息  6635601510182122
   Future<void> getInformation() async {
-    log.i(
+    log.info(
       "[ehall_session][getInformation] "
       "Ready to get the user information.",
     );
@@ -123,7 +123,7 @@ class EhallSession extends IDSSession {
           "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do#/wdxx",
       sliderCaptcha: (p0) async {},
     );
-    log.i("[ehall_session][useApp] "
+    log.info("[ehall_session][useApp] "
         "Location is $location");
     var response = await dio.get(
       location,
@@ -135,7 +135,7 @@ class EhallSession extends IDSSession {
     );
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.i(
+      log.info(
         "[ehall_session][useApp] "
         "Received location: $location.",
       );
@@ -158,7 +158,7 @@ class EhallSession extends IDSSession {
     );
 
     /// Get information here. resultCode==00000 is successful.
-    log.i(
+    log.info(
       "[ehall_session][getInformation] "
       "Getting the user information.",
     );
@@ -175,7 +175,7 @@ class EhallSession extends IDSSession {
         .then(
           (value) => value.data,
         );
-    log.i(
+    log.info(
       "[ehall_session][getInformation] "
       "Storing the user information.",
     );
@@ -208,7 +208,7 @@ class EhallSession extends IDSSession {
       );
     }
 
-    log.i(
+    log.info(
       "[ehall_session][getInformation] "
       "Get the semester information.",
     );
@@ -224,7 +224,7 @@ class EhallSession extends IDSSession {
       semesterCode,
     );
 
-    log.i(
+    log.info(
       "[ehall_session][getInformation] "
       "Get the day the semester begin.",
     );

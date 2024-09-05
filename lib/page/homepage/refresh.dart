@@ -55,14 +55,14 @@ Future<void> _comboLogin({
   } on PasswordWrongException {
     loginState = IDSLoginState.passwordWrong;
 
-    log.w(
+    log.warning(
       "[_comboLogin] "
       "Combo login failed! Because your password is wrong.",
     );
   } catch (e, s) {
     loginState = IDSLoginState.fail;
 
-    log.w(
+    log.warning(
       "[_comboLogin] "
       "Combo login failed! Because of the following error: "
       "$e\nThe stack of the error is: \n$s",
@@ -97,7 +97,7 @@ Future<void> update({
         await c.get();
       }),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
-      log.i(
+      log.info(
         "[homepage Update]"
         "Update failed with following exception: $error\n"
         "$stackTrace",
@@ -113,7 +113,7 @@ Future<void> update({
 
 /// Originally updateOnAppResumed
 void updateCurrentData() {
-  log.i(
+  log.info(
     "[updateCurrentData]"
     "Updating current data. ${arrangementState.value}",
   );
@@ -140,7 +140,7 @@ void updateCurrentData() {
   List<HomeArrangement> toAdd = [];
   updateTime = DateTime.now();
 
-  log.i(
+  log.info(
     "[updateCurrentData]"
     "Update classtable, updateTime: $updateTime, "
     "isTomorrow: ${classTableController.isTomorrow(updateTime)} "
@@ -183,7 +183,7 @@ void updateCurrentData() {
 
   arrangement.clear();
   arrangement.addAll(toAdd);
-  log.i("[updateCurrentData]toAddArrangement: ${toAdd.length}");
+  log.info("[updateCurrentData]toAddArrangement: ${toAdd.length}");
 
   if (isTomorrow.isTrue) {
     current.value = null;
@@ -191,7 +191,7 @@ void updateCurrentData() {
   } else {
     Iterator<HomeArrangement> arr = arrangement.iterator;
     while (arr.moveNext()) {
-      log.i(
+      log.info(
         "[updateCurrentData] arr.current: ${arr.current.name}",
       );
 
@@ -245,7 +245,7 @@ void updateCurrentData() {
   if (next.value != null) len -= 1;
   remaining.value = len;
 
-  log.i(
+  log.info(
     "[updateCurrentData]current: ${current.value?.name}, "
     "next: ${next.value?.name}, remaining: ${remaining.value}",
   );

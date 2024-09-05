@@ -107,7 +107,7 @@ class ExperimentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    log.i(
+    log.info(
       "[ExamController][onInit] "
       "Path at ${supportPath.path}.",
     );
@@ -115,7 +115,7 @@ class ExperimentController extends GetxController {
     bool isExist = file.existsSync();
 
     if (isExist) {
-      log.i(
+      log.info(
         "[ExamController][onInit] "
         "Init from cache.",
       );
@@ -140,7 +140,7 @@ class ExperimentController extends GetxController {
     ExperimentStatus previous = status;
     status = ExperimentStatus.fetching;
     update();
-    log.i(
+    log.info(
       "[ExperimentController][get] "
       "Fetching data from Internet.",
     );
@@ -149,48 +149,33 @@ class ExperimentController extends GetxController {
       status = ExperimentStatus.fetched;
       error = "";
     } on NoExperimentPasswordException {
-      log.w(
+      log.warning(
         "[ExperimentController][get] "
         "Do not find experiment password",
       );
       error = "没有物理实验密码";
     } on NotSchoolNetworkException {
-      log.w(
+      log.warning(
         "[ExperimentController][get] "
         "Not in school exception",
       );
       error = "非校园网，无法获取数据";
     } on LoginFailedException catch (e, s) {
-      log.w(
-        "[ExperimentController][get] "
-        "LoginFailed Exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       if (e.msg != null && e.msg!.isNotEmpty) {
         error = e.msg!;
       } else {
         error = "登录失败";
       }
     } on DioException catch (e, s) {
-      log.w(
-        "[ExperimentController][get] "
-        "Network exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
-      log.w(
-        "[ExperimentController][get] "
-        "Exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       error = "遇到错误:$e";
     } finally {
       if (status == ExperimentStatus.fetched) {
-        log.i(
+        log.info(
           "[ExperimentController][get] "
           "Store to cache.",
         );
@@ -203,17 +188,12 @@ class ExperimentController extends GetxController {
               fileName: experimentCacheName,
               data: jsonEncode(data),
             ));
-            log.i(
+            log.info(
               "[ExperimentController][get] "
               "ios Save to public place status: $result.",
             );
           } catch (e, s) {
-            log.w(
-              "[ExperimentController][get] "
-              "ios Save to public place failed with error: ",
-              error: e,
-              stackTrace: s,
-            );
+            log.handle(e, s);
           }
         }
       } else if (previous == ExperimentStatus.cache) {

@@ -245,7 +245,7 @@ class SplitViewState extends State<SplitView> {
     _pageConfigs[index] = _PageConfig(
       child: NavigatorPopHandler(
         onPop: () {
-          log.i("Poping");
+          log.info("Poping");
           SplitView.of(context).pop();
         },
         child: page,

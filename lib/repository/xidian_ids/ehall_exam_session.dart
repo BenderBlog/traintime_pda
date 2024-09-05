@@ -21,7 +21,7 @@ class ExamSession extends EhallSession {
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)
     /// If failed, it is more likely that no exam has arranged.
-    log.i(
+    log.info(
       "[ExamFile][getExam] "
       "My exam arrangemet $semester",
     );

@@ -22,7 +22,7 @@ class CreativeServiceSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        log.i(
+        log.info(
           "[CreativeServiceSession][initSession] "
           "Received location: $location.",
         );
@@ -30,7 +30,7 @@ class CreativeServiceSession extends IDSSession {
       }
       String urlReceived = "${response.realUri}";
       String ticket = RegExp(r'ST\S+').firstMatch(urlReceived)![0]!;
-      log.i(
+      log.info(
         "[CreativeServiceSession][initSession] "
         "Received ticket: $ticket.",
       );
@@ -49,7 +49,7 @@ class CreativeServiceSession extends IDSSession {
         },
       );
 
-      log.i(
+      log.info(
         "[CreativeServiceSession][initSession] "
         "Received isLogin: $isLogin.",
       );

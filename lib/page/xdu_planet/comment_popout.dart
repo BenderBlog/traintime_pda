@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xdu_planet_session.dart';
@@ -97,7 +97,7 @@ class CommentPopout extends StatelessWidget {
           icon: const Icon(Icons.send),
           onPressed: () async {
             if (_controller.text.isEmpty) {
-              Fluttertoast.showToast(msg: "发送信息空白");
+              showToast(context: context, msg: "发送信息空白");
               return;
             }
             var pd = ProgressDialog(context: context);
@@ -110,12 +110,16 @@ class CommentPopout extends StatelessWidget {
               replyto: replyTo?.ID.toString(),
             )
                 .then((value) {
-              pd.close();
-              Navigator.of(context).pop(true);
+              if (context.mounted) {
+                pd.close();
+                Navigator.of(context).pop(true);
+              }
             }).onError((e, s) {
-              log.e(e.toString());
-              pd.close();
-              Navigator.of(context).pop(false);
+              if (context.mounted) {
+                log.error(e.toString());
+                pd.close();
+                Navigator.of(context).pop(false);
+              }
             });
           },
         ),

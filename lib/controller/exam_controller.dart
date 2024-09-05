@@ -96,7 +96,7 @@ class ExamController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    log.i(
+    log.info(
       "[ExamController][onInit] "
       "Path at ${supportPath.path}.",
     );
@@ -104,7 +104,7 @@ class ExamController extends GetxController {
     bool isExist = file.existsSync();
 
     if (isExist) {
-      log.i(
+      log.info(
         "[ExamController][onInit] "
         "Init from cache.",
       );
@@ -123,7 +123,7 @@ class ExamController extends GetxController {
 
   Future<void> get() async {
     ExamStatus previous = status;
-    log.i(
+    log.info(
       "[ExamController][get] "
       "Fetching data from Internet.",
     );
@@ -133,23 +133,13 @@ class ExamController extends GetxController {
       status = ExamStatus.fetched;
       error = "";
     } on DioException catch (e, s) {
-      log.w(
-        "[ExamController][get] "
-        "Network exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
     } catch (e, s) {
-      log.w(
-        "[ExamController][get] "
-        "Exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
     } finally {
       if (status == ExamStatus.fetched) {
-        log.i(
+        log.info(
           "[ExamController][get] "
           "Store to cache.",
         );
@@ -164,17 +154,12 @@ class ExamController extends GetxController {
               fileName: "ExamFile.json",
               data: jsonEncode(data.toJson()),
             ));
-            log.i(
+            log.info(
               "[ExamController][get] "
               "ios Save to public place status: $result.",
             );
           } catch (e, s) {
-            log.w(
-              "[ExamController][get] "
-              "ios Save to public place failed with error: ",
-              error: e,
-              stackTrace: s,
-            );
+            log.handle(e, s);
           }
         }
       } else if (previous == ExamStatus.cache) {

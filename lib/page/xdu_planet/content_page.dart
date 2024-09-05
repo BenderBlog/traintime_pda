@@ -9,7 +9,6 @@ import 'dart:math';
 import 'package:both_side_sheet/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
@@ -18,6 +17,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/xdu_planet/comment_popout.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
 
@@ -179,8 +179,12 @@ class _ContentPageState extends State<ContentPage> {
                               children: [
                                 TextButton(
                                   onPressed: () async {
-                                    if (snapshot.data![index].status != "ok") {
-                                      Fluttertoast.showToast(msg: "本评论已经被举报");
+                                    if (snapshot.data![index].status != "ok" &&
+                                        context.mounted) {
+                                      showToast(
+                                        context: context,
+                                        msg: "本评论已经被举报",
+                                      );
                                       return;
                                     }
                                     bool isConfirm = await showDialog<bool>(
@@ -217,10 +221,20 @@ class _ContentPageState extends State<ContentPage> {
                                           .then((value) {
                                         pd.close();
                                         _comments.update();
-                                        Fluttertoast.showToast(msg: "举报成功");
+                                        if (context.mounted) {
+                                          showToast(
+                                            context: context,
+                                            msg: "举报成功",
+                                          );
+                                        }
                                       }).onError((e, _) {
                                         pd.close();
-                                        Fluttertoast.showToast(msg: "举报失败");
+                                        if (context.mounted) {
+                                          showToast(
+                                            context: context,
+                                            msg: "举报失败",
+                                          );
+                                        }
                                       });
                                     }
                                   },
@@ -236,15 +250,25 @@ class _ContentPageState extends State<ContentPage> {
                                         replyTo: snapshot.data![index],
                                       ),
                                     );
-                                    if (result == true) {
-                                      /// Temporary solution...
-                                      _comments.update();
-                                      Fluttertoast.showToast(msg: "评论成功");
-                                    } else if (result == false) {
-                                      Fluttertoast.showToast(
-                                          msg: "评论失败，请去网络查看器和日志查看器查看报错");
-                                    } else {
-                                      Fluttertoast.showToast(msg: "没想好要说啥嘛");
+                                    if (context.mounted) {
+                                      if (result == true) {
+                                        /// Temporary solution...
+                                        _comments.update();
+                                        showToast(
+                                          context: context,
+                                          msg: "评论成功",
+                                        );
+                                      } else if (result == false) {
+                                        showToast(
+                                          context: context,
+                                          msg: "评论失败，请去网络查看器和日志查看器查看报错",
+                                        );
+                                      } else {
+                                        showToast(
+                                          context: context,
+                                          msg: "没想好要说啥嘛",
+                                        );
+                                      }
                                     }
                                   },
                                   child: const Text('回复'),
@@ -286,14 +310,22 @@ class _ContentPageState extends State<ContentPage> {
             context: context,
             builder: (context) => CommentPopout(id: widget.article.id),
           );
-          if (result == true) {
-            /// Temporary solution...
-            _comments.update();
-            Fluttertoast.showToast(msg: "评论成功");
-          } else if (result == false) {
-            Fluttertoast.showToast(msg: "评论失败，请去网络查看器和日志查看器查看报错");
-          } else {
-            Fluttertoast.showToast(msg: "没想好要说啥嘛");
+          if (context.mounted) {
+            if (result == true) {
+              /// Temporary solution...
+              _comments.update();
+              showToast(
+                context: context,
+                msg: "评论成功",
+              );
+            } else if (result == false) {
+              showToast(
+                context: context,
+                msg: "评论失败，请去网络查看器和日志查看器查看报错",
+              );
+            } else {
+              showToast(context: context, msg: "没想好要说啥嘛");
+            }
           }
         },
         child: const Icon(Icons.comment),

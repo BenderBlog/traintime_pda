@@ -3,7 +3,7 @@
 
 // General user setting preference.
 
-import 'package:catcher/catcher.dart';
+import 'package:catcher_2/catcher_2.dart';
 import 'package:flutter/widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +19,7 @@ final GlobalKey<NavigatorState> splitViewKey =
 final GlobalKey leftKey = GlobalKey();
 const String appId = "group.xyz.superbart.xdyou";
 
-CatcherOptions catcherOptions = CatcherOptions(
+Catcher2Options catcherOptions = Catcher2Options(
   PageReportMode(showStackTrace: true),
   [
     EmailManualHandler(
@@ -32,7 +32,7 @@ CatcherOptions catcherOptions = CatcherOptions(
   localizationOptions: [
     LocalizationOptions.buildDefaultChineseOptions(),
   ],
-  logger: PDACatcherLogger(),
+  logger: PDACatcher2Logger(),
 );
 
 enum Preference {

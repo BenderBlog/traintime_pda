@@ -39,12 +39,12 @@ class ScoreSession extends EhallSession {
 
     try {
       List<ComposeDetail> toReturn = [];
-      log.i(
+      log.info(
         "[ScoreSession][getDetail] isScoreListCacheUsed $isScoreListCacheUsed.",
       );
 
       if (isScoreListCacheUsed) {
-        log.i(
+        log.info(
           "[ScoreSession][getDetail] Cache detected, need login.",
         );
 
@@ -91,7 +91,7 @@ class ScoreSession extends EhallSession {
 
       return toReturn;
     } catch (e, s) {
-      log.i(
+      log.info(
         "[ScoreSession] Fetch detail error: $e $s.",
       );
 
@@ -107,19 +107,19 @@ class ScoreSession extends EhallSession {
 
   void dumpScoreListCache(List<Score> scores) {
     file.writeAsStringSync(jsonEncode(scores));
-    log.i(
+    log.info(
       "[ScoreWindow][dumpScoreListCache] "
       "Dumped scoreList to ${supportPath.path}/$scoreListCacheName.",
     );
   }
 
   Future<void> _getInSystem() async {
-    log.i(
+    log.info(
       "[ScoreSession][_getInSystem] "
       "Ready to log into the system.",
     );
     var firstPost = await useApp("4768574631264620");
-    log.i(
+    log.info(
       "[ScoreSession] First post: $firstPost.",
     );
     await dioEhall.get(firstPost);
@@ -130,7 +130,7 @@ class ScoreSession extends EhallSession {
     List<Score> cache = [];
 
     /// Try retrieving cached scores first.
-    log.i(
+    log.info(
       "[ScoreSession][getScore] "
       "Path at ${supportPath.path}/$scoreListCacheName.",
     );
@@ -138,7 +138,7 @@ class ScoreSession extends EhallSession {
       final timeDiff =
           DateTime.now().difference(file.lastModifiedSync()).inMinutes;
 
-      log.i(
+      log.info(
         "[ScoreSession][getScore] "
         "Cache file found.",
       );
@@ -147,7 +147,7 @@ class ScoreSession extends EhallSession {
           .toList();
       if (cache.isNotEmpty && timeDiff < 15) {
         isScoreListCacheUsed = true;
-        log.i(
+        log.info(
           "[ScoreSession][getScore] "
           "Loaded scores from cache. Timediff: $timeDiff."
           " isScoreListCacheUsed $isScoreListCacheUsed",
@@ -155,14 +155,14 @@ class ScoreSession extends EhallSession {
         return cache;
       }
     } else {
-      log.i(
+      log.info(
         "[ScoreSession][getScore] "
         "Cache file non-existent.",
       );
     }
 
     /// Otherwise get fresh score data.
-    log.i(
+    log.info(
       "[ScoreSession][getScore] "
       "Start getting score data.",
     );
@@ -175,7 +175,7 @@ class ScoreSession extends EhallSession {
     try {
       await _getInSystem();
 
-      log.i(
+      log.info(
         "[ScoreSession][getScore] "
         "Getting score data.",
       );
@@ -189,7 +189,7 @@ class ScoreSession extends EhallSession {
           'pageNumber': 1,
         },
       ).then((value) => value.data);
-      log.i(
+      log.info(
         "[ScoreSession][getScore] "
         "Dealing with the score data.",
       );
@@ -219,7 +219,7 @@ class ScoreSession extends EhallSession {
         j++;
       }
       dumpScoreListCache(toReturn);
-      log.i(
+      log.info(
         "[ScoreSession][getScore] "
         "Cached the score data.",
       );
@@ -227,7 +227,7 @@ class ScoreSession extends EhallSession {
     } catch (e) {
       if (cache.isNotEmpty) {
         isScoreListCacheUsed = true;
-        log.i(
+        log.info(
           "[ScoreSession][getScore] "
           "Loaded scores from cache. isScoreListCacheUsed "
           "$isScoreListCacheUsed. Error: $e.",

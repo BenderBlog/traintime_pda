@@ -7,12 +7,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/message/message.dart';
 
 RxList<NoticeMessage> messages = <NoticeMessage>[].obs;
 
-Dio get dio => Dio()..interceptors.add(aliceDioAdapter);
+Dio get dio => Dio()..interceptors.add(logDioAdapter);
 
 const url = "https://legacy.superbart.top/traintime_pda_backend";
 

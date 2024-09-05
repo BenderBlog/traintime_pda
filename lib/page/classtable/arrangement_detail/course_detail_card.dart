@@ -180,7 +180,9 @@ class ClassDetailCard extends StatelessWidget {
                             await ClassTableState.of(context)!
                                 .controllers
                                 .deleteUserDefinedClass(timeArrangement)
-                                .then((value) => Navigator.pop(context));
+                                .then((value) {
+                              if (context.mounted) Navigator.pop(context);
+                            });
                           }
                         },
                         child: Text(

@@ -5,10 +5,11 @@
 
 import 'dart:io';
 
-import 'package:catcher/core/catcher.dart';
+import 'package:catcher_2/catcher_2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -368,13 +369,13 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                     title: const Text("测试错误拦截器"),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () => Catcher.sendTestException(),
+                    onTap: () => Catcher2.sendTestException(),
                   ),
                   const Divider(),
                   ListTile(
                     title: const Text('查看网络拦截器和日志'),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () => alice.showInspector(),
+                    onTap: () => context.push(TalkerScreen(talker: log)),
                   ),
                   const Divider(),
                   ListTile(
@@ -406,7 +407,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               try {
                                 await NetworkSession().clearCookieJar();
                               } on PathNotFoundException {
-                                log.d(
+                                log.debug(
                                   "[setting][ClearAllCache]"
                                   "No cookies.",
                                 );

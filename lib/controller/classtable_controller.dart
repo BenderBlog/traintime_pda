@@ -88,7 +88,7 @@ class ClassTableController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    log.i(
+    log.info(
       "[ClassTableController][onInit] "
       "Init classtable file.",
     );
@@ -97,7 +97,7 @@ class ClassTableController extends GetxController {
     );
     bool classTableFileisExist = classTableFile.existsSync();
     if (classTableFileisExist) {
-      log.i(
+      log.info(
         "[ClassTableController][onInit] "
         "Init from cache.",
       );
@@ -106,14 +106,14 @@ class ClassTableController extends GetxController {
       ));
       state = ClassTableState.fetched;
     } else {
-      log.i(
+      log.info(
         "[ClassTableController][onInit] "
         "Init from empty.",
       );
       classTableData = ClassTableData();
     }
 
-    log.i(
+    log.info(
       "[ClassTableController][onInit] "
       "Init user defined file.",
     );
@@ -215,7 +215,7 @@ class ClassTableController extends GetxController {
     state = ClassTableState.fetching;
     error = null;
     try {
-      log.i(
+      log.info(
         "[ClassTableController][updateClassTable] "
         "Start fetching the classtable.",
       );
@@ -227,7 +227,7 @@ class ClassTableController extends GetxController {
           DateTime.now().difference(classTableFile.lastModifiedSync()).inDays <=
               2;
 
-      log.i(
+      log.info(
         "[ClassTableController][updateClassTable]"
         "Cache file exist: $classTableFileIsExist.\n"
         "Is not need refresh cache: $isNotNeedRefreshCache\n"
@@ -250,12 +250,7 @@ class ClassTableController extends GetxController {
           toUse.timeArrangement.addAll(userDefinedClassData.timeArrangement);
           classTableData = toUse;
         } catch (e, s) {
-          log.w(
-            "[ClassTableController][updateClassTable] "
-            "Fetch error with exception.",
-            error: e,
-            stackTrace: s,
-          );
+          log.handle(e, s);
           if (classTableFileIsExist) {
             classTableData = ClassTableData.fromJson(jsonDecode(
               classTableFile.readAsStringSync(),
@@ -280,17 +275,12 @@ class ClassTableController extends GetxController {
             fileName: "ClassTable.json",
             data: jsonEncode(classTableData.toJson()),
           ));
-          log.i(
+          log.info(
             "[ClassTableController][updateClassTable] "
             "ios ClassTable.json save to public place status: $data.",
           );
         } catch (e, s) {
-          log.w(
-            "[ClassTableController][updateClassTable] "
-            "ios ClassTable.json save to public place failed with error: ",
-            error: e,
-            stackTrace: s,
-          );
+          log.handle(e, s);
         }
         try {
           bool data = await api.saveToGroupId(FileToGroupID(
@@ -298,17 +288,12 @@ class ClassTableController extends GetxController {
             fileName: "WeekSwift.txt",
             data: preference.getInt(preference.Preference.swift).toString(),
           ));
-          log.i(
+          log.info(
             "[ClassTableController][updateClassTable] "
             "ios WeekSwift.txt save to public place status: $data.",
           );
         } catch (e, s) {
-          log.w(
-            "[ClassTableController][updateClassTable] "
-            "ios WeekSwift.txt save to public place failed with error: ",
-            error: e,
-            stackTrace: s,
-          );
+          log.handle(e, s);
         }
         HomeWidget.updateWidget(
           iOSName: "ClasstableWidget",
@@ -321,12 +306,7 @@ class ClassTableController extends GetxController {
       error = null;
       update();
     } catch (e, s) {
-      log.w(
-        "[ClassTableController][updateClassTable] "
-        "updateClassTable failed",
-        error: e,
-        stackTrace: s,
-      );
+      log.warning(e, s);
       state = ClassTableState.error;
       error = e.toString();
     }

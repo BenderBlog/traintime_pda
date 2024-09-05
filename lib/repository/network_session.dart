@@ -4,20 +4,12 @@
 // General network class.
 
 import 'dart:io';
-import 'package:alice_dio/alice_dio_adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
-import 'package:alice/alice.dart';
-import 'package:watermeter/repository/preference.dart';
-
-AliceDioAdapter aliceDioAdapter = AliceDioAdapter();
-Alice alice = Alice(
-  showNotification: false,
-  navigatorKey: debuggerKey,
-)..addAdapter(aliceDioAdapter);
+import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
 
@@ -50,7 +42,7 @@ class NetworkSession {
         ),
       )
         ..interceptors.add(CookieManager(cookieJar))
-        ..interceptors.add(aliceDioAdapter)
+        ..interceptors.add(logDioAdapter)
         ..options.connectTimeout = const Duration(seconds: 10)
         ..options.receiveTimeout = const Duration(seconds: 30)
         ..options.followRedirects = false

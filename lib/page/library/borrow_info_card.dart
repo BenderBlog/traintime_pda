@@ -167,8 +167,13 @@ class BorrowInfoCard extends StatelessWidget {
                 ProgressDialog pd = ProgressDialog(context: context);
                 pd.show(msg: "正在续借");
                 LibrarySession().renew(toUse.loanId).then((value) {
-                  pd.close();
-                  showToast(context: context, msg: value);
+                  if (context.mounted) {
+                    pd.close();
+                    showToast(
+                      context: context,
+                      msg: value,
+                    );
+                  }
                 });
               }
             },

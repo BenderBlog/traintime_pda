@@ -42,7 +42,7 @@ class SportSession {
       punchData.value.score.value = getStore["data"][0]["score"];
       //String termId = await getTermID();
 
-      log.i(
+      log.info(
         "[SportSession][getPunch] "
         "Ready to fetch all punch info.",
       );
@@ -67,7 +67,7 @@ class SportSession {
         punchData.value.allTime.value = punchData.value.all.length;
       });
 
-      log.i(
+      log.info(
         "[SportSession][getPunch] "
         "Ready to fetch successful punch info.",
       );
@@ -96,28 +96,28 @@ class SportSession {
     } on NoPasswordException {
       punchData.value.situation.value = "没密码";
     } on LoginFailedException catch (e, s) {
-      log.w(
+      log.warning(
         "[SportSession][getPunch] LoginFailedException",
         error: e,
         stackTrace: s,
       );
       punchData.value.situation.value = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e, s) {
-      log.w(
+      log.warning(
         "[SportSession][getPunch] SemesterFailedException",
         error: e,
         stackTrace: s,
       );
       punchData.value.situation.value = "查询失败";
     } on DioException catch (e, s) {
-      log.w(
+      log.warning(
         "[SportSession][getPunch] NetWorkExceptions",
         error: e,
         stackTrace: s,
       );
       punchData.value.situation.value = "网络故障";
     } catch (e, s) {
-      log.w(
+      log.warning(
         "[SportSession][getPunch] Exception",
         error: e,
         stackTrace: s,
@@ -131,7 +131,7 @@ class SportSession {
 
   Future<void> getScore() async {
     sportScore.value.situation = "正在获取";
-    log.i(
+    log.info(
       "[SportSession][getScore]"
       "Ready to get sport score.",
     );
@@ -185,32 +185,16 @@ class SportSession {
     } on NoPasswordException {
       toReturn.situation = "没密码";
     } on LoginFailedException catch (e, s) {
-      log.w(
-        "[SportSession][getScore] LoginFailedException",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e, s) {
-      log.w(
-        "[SportSession][getScore] SemesterFailedException",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = "查询失败";
     } on DioException catch (e, s) {
-      log.w(
-        "[SportSession][getScore] NetworkException",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = "网络故障";
     } catch (e, s) {
-      log.w(
-        "[SportSession][getScore] Exception",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = "未知故障";
     } finally {
       sportScore.value = toReturn;
@@ -219,7 +203,7 @@ class SportSession {
 
   Future<void> getClass() async {
     sportClass.value.situation = "正在获取";
-    log.i(
+    log.info(
       "[SportSession][getClass]"
       "Ready to get latest class.",
     );
@@ -258,43 +242,23 @@ class SportSession {
             type: i["type"],
           ));
         } catch (e, s) {
-          log.w(
-            "[SportSession][getClass] Exception, will continue. $s",
-            error: e,
-            stackTrace: s,
-          );
+          log.handle(e, s);
           continue;
         }
       }
     } on NoPasswordException {
       toReturn.situation = "没密码";
     } on LoginFailedException catch (e, s) {
-      log.w(
-        "[SportSession][getClass] LoginFailedException",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
     } on SemesterFailedException catch (e, s) {
-      log.w(
-        "[SportSession][getClass] SemesterFailedException",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = "查询失败";
     } on DioException catch (e, s) {
-      log.w(
-        "[SportSession][getClass] NetworkException",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = "网络故障";
     } catch (e, s) {
-      log.w(
-        "[SportSession][getClass] Exception $s",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       toReturn.situation = "未知故障: $e at\n$s";
     } finally {
       sportClass.value = toReturn;
@@ -367,7 +331,7 @@ awb4B45zUwIDAQAB
       contentType: Headers.formUrlEncodedContentType,
     ));
     toReturn.interceptors.add(CookieManager(sportCookieJar));
-    toReturn.interceptors.add(aliceDioAdapter);
+    toReturn.interceptors.add(logDioAdapter);
     return toReturn;
   }
 
@@ -387,7 +351,7 @@ awb4B45zUwIDAQAB
       throw NoPasswordException();
     }
     if (userId.isNotEmpty && token.isNotEmpty) {
-      log.i(
+      log.info(
         "[SportSession][login]"
         "Already login.",
       );

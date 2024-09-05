@@ -38,7 +38,7 @@ class IDSSession extends NetworkSession {
     ..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          log.i(
+          log.info(
             "[IDSSession][OfflineCheckInspector]"
             "Offline status: $offline",
           );
@@ -110,7 +110,7 @@ class IDSSession extends NetworkSession {
     required Future<void> Function(String) sliderCaptcha,
   }) async {
     return await _idslock.synchronized(() async {
-      log.i(
+      log.info(
         "[IDSSession][checkAndLogin] "
         "Ready to get $target.",
       );
@@ -118,7 +118,7 @@ class IDSSession extends NetworkSession {
         "https://ids.xidian.edu.cn/authserver/login",
         queryParameters: {'service': target},
       );
-      log.i(
+      log.info(
         "[IDSSession][checkAndLogin] "
         "Received: $data.",
       );
@@ -131,7 +131,7 @@ class IDSSession extends NetworkSession {
         var page = parse(data.data ?? "");
         var form = page.getElementsByTagName("form")
           ..removeWhere((element) => element.id != "continue");
-        log.i(
+        log.info(
           "[IDSSession][login] "
           "form: $form.",
         );
@@ -174,7 +174,7 @@ class IDSSession extends NetworkSession {
     /// Get the login webpage.
     if (onResponse != null) {
       onResponse(10, "准备获取登录网页");
-      log.i(
+      log.info(
         "[IDSSession][login] "
         "Ready to get the login webpage.",
       );
@@ -201,7 +201,7 @@ class IDSSession extends NetworkSession {
     for (var i in cookie) {
       cookieStr += "${i.name}=${i.value}; ";
     }
-    log.i(
+    log.info(
       "[IDSSession][login] "
       "cookie: $cookieStr.",
     );
@@ -213,7 +213,7 @@ class IDSSession extends NetworkSession {
     String keys = form
         .firstWhere((element) => element.id == "pwdEncryptSalt")
         .attributes["value"]!;
-    log.i(
+    log.info(
       "[IDSSession][login] "
       "encrypt key: $keys.",
     );
@@ -271,7 +271,7 @@ class IDSSession extends NetworkSession {
         return data.headers[HttpHeaders.locationHeader]![0];
       } else {
         /// Check whether need continue.
-        log.i(
+        log.info(
           "[IDSSession][login] "
           "data: ${(data.data as String).length}.",
         );
@@ -281,7 +281,7 @@ class IDSSession extends NetworkSession {
           ..removeWhere(
             (element) => element.id != "continue",
           );
-        log.i(
+        log.info(
           "[IDSSession][login] "
           "form: $form.",
         );

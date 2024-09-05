@@ -113,7 +113,7 @@ class _HomePageMasterState extends State<HomePageMaster>
     );
     WidgetsBinding.instance.addObserver(this);
     message.checkMessage();
-    log.i(
+    log.info(
       "[home][BackgroundFetchFromHome]"
       "Current loginstate: $loginState, if none will _loginAsync.",
     );

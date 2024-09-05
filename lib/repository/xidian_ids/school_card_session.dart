@@ -79,7 +79,7 @@ class SchoolCardSession extends IDSSession {
   }
 
   Future<void> initSession() async {
-    log.i(
+    log.info(
       "[SchoolCardSession][initSession] "
       "Current State: ${isInit.value}",
     );
@@ -88,7 +88,7 @@ class SchoolCardSession extends IDSSession {
     }
     try {
       isInit.value = SessionState.fetching;
-      log.i(
+      log.info(
         "[SchoolCardSession][initSession] "
         "Fetching...",
       );
@@ -97,7 +97,7 @@ class SchoolCardSession extends IDSSession {
       );
       while (response.headers[HttpHeaders.locationHeader] != null) {
         String location = response.headers[HttpHeaders.locationHeader]![0];
-        log.i(
+        log.info(
           "[SchoolCardSession][initSession] "
           "Received location: $location.",
         );

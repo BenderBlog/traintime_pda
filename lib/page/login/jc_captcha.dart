@@ -13,7 +13,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/logger.dart';
 
 class Lazy<T> {
   final T Function() _initializer;
@@ -27,7 +27,7 @@ class Lazy<T> {
 
 class SliderCaptchaClientProvider {
   final String cookie;
-  Dio dio = Dio()..interceptors.add(aliceDioAdapter);
+  Dio dio = Dio()..interceptors.add(logDioAdapter);
 
   SliderCaptchaClientProvider({required this.cookie});
 

@@ -23,24 +23,14 @@ Future<void> update() async {
     electricityInfo.value = "非校园网";
     isNotice.value = false;
   } on DioException catch (e, s) {
-    log.w(
-      "[electricity_session][update] "
-      "Network Error.",
-      error: e,
-      stackTrace: s,
-    );
+    log.handle(e, s);
     electricityInfo.value = "网络故障";
     isNotice.value = false;
   } on NotFoundException {
     electricityInfo.value = "查询失败";
     isNotice.value = false;
   } catch (e, s) {
-    log.w(
-      "[electricity_session][update] "
-      "Exception: ",
-      error: e,
-      stackTrace: s,
-    );
+    log.handle(e, s);
     electricityInfo.value = "程序故障";
     isNotice.value = false;
   }
@@ -166,7 +156,7 @@ class ElectricitySession extends NetworkSession {
     for (int i = nameArray.length - 1; i >= 0; --i) {
       if (nameArray[i][0]!.contains("电表")) {
         electricityInfo.value = dataArray[i][0]!.replaceAll("剩余量：", "");
-        log.d(
+        log.debug(
           "[electricity_session][update] "
           "electricity value: ${electricityInfo.value}.",
         );

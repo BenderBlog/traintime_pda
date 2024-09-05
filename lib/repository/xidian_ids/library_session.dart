@@ -98,7 +98,7 @@ class LibrarySession extends IDSSession {
     if (state.value == SessionState.fetching) {
       return;
     }
-    log.i(
+    log.info(
       "[LibrarySession][getBorrowList] "
       "Getting borrow list",
     );
@@ -147,7 +147,7 @@ class LibrarySession extends IDSSession {
   }
 
   Future<void> initSession() async {
-    log.i(
+    log.info(
       "[LibrarySession][initSession] "
       "Initalizing Library Session",
     );
@@ -165,7 +165,7 @@ class LibrarySession extends IDSSession {
 
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        log.i(
+        log.info(
           "[LibrarySession][initSession] "
           "Received location: $location.",
         );
@@ -218,7 +218,7 @@ class LibrarySession extends IDSSession {
         location = response.headers[HttpHeaders.locationHeader]![0];
         token = tokenExp.firstMatch(location)?.namedGroup("jwt") ?? "";
 
-        log.i(
+        log.info(
           "[LibrarySession][initSession] "
           "Received location: $location.",
         );
@@ -229,12 +229,7 @@ class LibrarySession extends IDSSession {
         throw NotFetchLibraryException();
       }
     } catch (e, s) {
-      log.e(
-        "[LibrarySession][initSession] "
-        "Error when initSession \n e: $e\n s: $s",
-        error: e,
-        stackTrace: s,
-      );
+      log.handle(e, s);
       if (e is NotFetchLibraryException) {
         rethrow;
       }
