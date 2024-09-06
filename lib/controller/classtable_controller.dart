@@ -194,8 +194,12 @@ class ClassTableController extends GetxController {
     TimeArrangement timeArrangement,
   ) async {
     if (timeArrangement.source != Source.user) return;
+    int tempIndex = timeArrangement.index;
     userDefinedClassData.timeArrangement.remove(timeArrangement);
     userDefinedClassData.userDefinedDetail.removeAt(timeArrangement.index);
+    for (var i in userDefinedClassData.timeArrangement) {
+      if (i.index >= tempIndex) i.index -= 1;
+    }
     userDefinedFile.writeAsStringSync(jsonEncode(
       userDefinedClassData.toJson(),
     ));
