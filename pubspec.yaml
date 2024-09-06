@@ -22,7 +22,7 @@ dependencies:
   share_plus: ^10.0.1
   # Deal with html
   html: ^0.15.4
-  charset_converter: ^2.2.0
+  charset_converter: ^2.2.1
   # Setting
   settings_ui: ^2.0.2
   # Homepage

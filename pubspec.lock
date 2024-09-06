@@ -205,10 +205,10 @@ packages:
     dependency: "direct main"
     description:
       name: charset_converter
-      sha256: eebf818b83552a84fc9f0d2ee7bdd151b36d10548be1c8205bb65295107c5c89
+      sha256: "46006a8753d2cc4f57f4e42b14f9b049f63395818312c1d225f66b20b0233be1"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.2.1"
   checked_yaml:
     dependency: transitive
     description:
