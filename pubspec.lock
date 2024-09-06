@@ -81,14 +81,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  both_side_sheet:
-    dependency: "direct main"
-    description:
-      name: both_side_sheet
-      sha256: "420bd462240d2c4379a53e6ba6344730cb981be4eecaf8889be8dc7272470124"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   build:
     dependency: transitive
     description:

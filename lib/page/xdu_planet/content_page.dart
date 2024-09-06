@@ -6,7 +6,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:both_side_sheet/both_side_sheet.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';

@@ -1,7 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
-import 'package:both_side_sheet/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -9,6 +8,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
 /// The card in [classSubRow], metioned in [ClassTableView].
