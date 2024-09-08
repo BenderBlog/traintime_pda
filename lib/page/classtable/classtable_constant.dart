@@ -13,8 +13,11 @@ const weekButtonHorizontalPadding = 2.0;
 const double leftRow = 26;
 
 /// The height of the top row.
-const topRowHeightBig = 100.0;
+const topRowHeightBig = 96.0;
 const topRowHeightSmall = 50.0;
+
+/// Change page time in milliseconds.
+const changePageTime = 200;
 
 /// The height of the middle row.
 const midRowHeight = 54.0;
@@ -29,4 +32,4 @@ List<String> weekList = [
   '周日',
 ];
 
-String pageTitle = "我的课表";
+String pageTitle = "我的日程表";

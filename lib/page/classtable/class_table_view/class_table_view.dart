@@ -1,9 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -13,7 +11,6 @@ import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/themes/color_seed.dart';
 
 /// THe classtable view, the way the the classtable sheet rendered.
 class ClassTableView extends StatefulWidget {
@@ -51,132 +48,14 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   double get blockwidth => (size.maxWidth - leftRow) / 7;
 
-  bool _checkIsOverlapping(
-    double eStart1,
-    double eEnd1,
-    double eStart2,
-    double eEnd2,
-  ) =>
-      (eStart1 >= eStart2 && eStart1 < eEnd2) ||
-      (eEnd1 > eStart2 && eEnd1 <= eEnd2) ||
-      (eStart2 >= eStart1 && eStart2 < eEnd1) ||
-      (eEnd2 > eStart1 && eEnd2 <= eEnd1);
-
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(int index) {
     if (index != 0) {
-      /// Fetch all class in this range.
-      List<ClassOrgainzedData> events = [];
-
-      for (final i in classTableState.timeArrangement) {
-        if (i.weekList.length > widget.index &&
-            i.weekList[widget.index] &&
-            i.day == index) {
-          events.add(ClassOrgainzedData.fromTimeArrangement(
-            i,
-            colorList[i.index % colorList.length],
-            classTableState
-                .getClassDetail(classTableState.timeArrangement.indexOf(i))
-                .name,
-          ));
-        }
-      }
-
-      for (final i in classTableState.subjects) {
-        if (i.startTime == null ||
-            i.stopTime == null ||
-            i.startTime!.isBefore(Jiffy.parseFromDateTime(
-              classTableState.startDay,
-            ))) {
-          continue;
-        }
-
-        int diff = i.startTime!
-            .diff(Jiffy.parseFromDateTime(classTableState.startDay),
-                unit: Unit.day)
-            .toInt();
-
-        if (diff ~/ 7 == widget.index && diff % 7 + 1 == index) {
-          events.add(ClassOrgainzedData.fromSubject(
-            colorList[classTableState.subjects.indexOf(i) % colorList.length],
-            i,
-          ));
-        }
-      }
-
-      for (final i in classTableState.experiments) {
-        int diff = Jiffy.parseFromDateTime(i.time[0])
-            .diff(Jiffy.parseFromDateTime(classTableState.startDay),
-                unit: Unit.day)
-            .toInt();
-
-        if (diff ~/ 7 == widget.index && diff % 7 + 1 == index) {
-          events.add(ClassOrgainzedData.fromExperiment(
-            colorList[
-                classTableState.experiments.indexOf(i) % colorList.length],
-            i,
-          ));
-        }
-      }
-
-      /// Sort it with the ascending order of start time.
-      events.sort((a, b) => a.start.compareTo(b.start));
-
-      /// The arrangement to use
-      List<ClassOrgainzedData> arrangedEvents = [];
       List<Widget> thisRow = [];
-
-      for (final event in events) {
-        final startTime = event.start;
-        final endTime = event.stop;
-
-        var eventIndex = -1;
-        final arrangeEventLen = arrangedEvents.length;
-
-        for (var i = 0; i < arrangeEventLen; i++) {
-          final arrangedEventStart = arrangedEvents[i].start;
-          final arrangedEventEnd = arrangedEvents[i].stop;
-
-          if (_checkIsOverlapping(
-              arrangedEventStart, arrangedEventEnd, startTime, endTime)) {
-            eventIndex = i;
-            break;
-          }
-        }
-
-        if (eventIndex == -1) {
-          arrangedEvents.add(event);
-        } else {
-          final arrangedEventData = arrangedEvents[eventIndex];
-
-          final arrangedEventStart = arrangedEventData.start;
-          final arrangedEventEnd = arrangedEventData.stop;
-
-          final startDuration = math.min(startTime, arrangedEventStart);
-          final endDuration = math.max(endTime, arrangedEventEnd);
-
-          bool shouldNew = (event.stop - event.start) >=
-              (arrangedEventData.stop - arrangedEventData.start);
-
-          final top = startDuration;
-          // TODO: check whether it is good.
-          final bottom = endDuration;
-
-          final newEvent = ClassOrgainzedData(
-            start: top,
-            stop: bottom,
-            data: [
-              ...arrangedEventData.data,
-              ...event.data,
-            ],
-            color: shouldNew ? event.color : arrangedEventData.color,
-            name: shouldNew ? event.name : arrangedEventData.name,
-            place: shouldNew ? event.place : arrangedEventData.place,
-          );
-
-          arrangedEvents[eventIndex] = newEvent;
-        }
-      }
+      List<ClassOrgainzedData> arrangedEvents = classTableState.getArrangement(
+        weekIndex: widget.index,
+        dayIndex: index,
+      );
 
       /// Choice the day and render it!
       for (var i in arrangedEvents) {

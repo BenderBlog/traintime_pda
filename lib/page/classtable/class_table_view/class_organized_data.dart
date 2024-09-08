@@ -14,6 +14,15 @@ class ClassOrgainzedData {
 
   /// The time range of each block is not even in exam
   /// or experiment, so use double...
+  ///
+  /// Classtable blanks below per blocks.
+  ///  * Morning 1-4 each 5 blocks.
+  ///  * Noon break 3 blocks
+  ///  * Afternoon 5-8 each 5 blocks.
+  ///  * Supper time 3 blocks.
+  ///  * Evening time 9-11 each 5 blocks.
+  /// Total 61 parts, 49 as phone divider.
+  ///
   late final double start;
   late final double stop;
 
