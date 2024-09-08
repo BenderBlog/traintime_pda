@@ -103,8 +103,8 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
                           break;
                         case 3:
                           start = 33;
-                          stop = 46;
-                          isOccupied = i.stop > 33.0 && i.stop <= 46.0;
+                          stop = 43;
+                          isOccupied = i.stop > 33.0 && i.stop <= 43.0;
                           break;
                         case 4:
                           start = 46;
