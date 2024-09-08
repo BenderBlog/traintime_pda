@@ -9,6 +9,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/page/creative_job/creative_job_choice.dart';
 import 'package:watermeter/page/creative_job/creative_job_description.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/creative_service_session.dart';
 
@@ -177,9 +178,17 @@ class _CreativeJobViewState extends State<CreativeJobView> {
               : isSearching.value
                   ? const Center(child: CircularProgressIndicator())
                   : jobs.isNotEmpty
-                      ? const Center(child: Text("没有结果"))
-                      : const Center(
-                          child: Text("请在上面的搜索框中搜索"),
+                      ? const EmptyListView(text: "没有搜索到结果")
+                      : const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search,
+                              size: 96,
+                            ),
+                            Divider(color: Colors.transparent),
+                            Text("请在上面搜索框搜索"),
+                          ],
                         ),
         ),
       ),

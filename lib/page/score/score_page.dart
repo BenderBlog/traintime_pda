@@ -8,6 +8,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/score/score_choice_page.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -82,8 +83,8 @@ class _ScorePageState extends State<ScorePage> {
                   fillColor: Colors.grey.withOpacity(0.2),
                   filled: true,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 14,
+                    vertical: 10,
                   ),
                   hintText: "搜索成绩记录",
                   hintStyle: const TextStyle(fontSize: 14),
@@ -156,7 +157,7 @@ class _ScorePageState extends State<ScorePage> {
                 ),
               );
             } else {
-              return const Text("未筛查到合请求的记录").center();
+              return const EmptyListView(text: "未筛查到合请求的记录");
             }
           }).safeArea().expanded(),
         ],

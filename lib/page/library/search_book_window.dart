@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as search_book;
 import 'package:watermeter/model/xidian_ids/library.dart';
@@ -146,10 +147,18 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             } else if (isSearching.value) {
               return const Center(child: CircularProgressIndicator());
             } else if (search.value.isNotEmpty) {
-              return const Center(child: Text("没有结果"));
+              return const EmptyListView(text: "没有结果");
             } else {
-              return const Center(
-                child: Text("请在上面的搜索框中搜索"),
+              return const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.search,
+                    size: 96,
+                  ),
+                  Divider(color: Colors.transparent),
+                  Text("请在上面搜索框搜索"),
+                ],
               );
             }
           }),

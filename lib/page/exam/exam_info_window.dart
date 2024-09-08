@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
@@ -89,7 +90,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                 ],
               ).safeArea();
             } else {
-              return const Center(child: Text("没有考试安排"));
+              return const EmptyListView(text: "目前没有考试安排");
             }
           } else if (c.status == ExamStatus.error) {
             return Center(child: Text(c.error.toString()));

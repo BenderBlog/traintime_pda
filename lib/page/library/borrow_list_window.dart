@@ -7,6 +7,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
@@ -71,7 +72,7 @@ class BorrowListDetail extends StatelessWidget {
             ),
           );
         } else {
-          return const Text("目前没有查询到在借图书").center();
+          return const EmptyListView(text: "目前没有查询到在借图书\n不借书就要变成上面的小呆瓜咯");
         }
       }),
       bottomNavigationBar: BottomAppBar(
