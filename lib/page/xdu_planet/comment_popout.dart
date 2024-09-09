@@ -1,6 +1,9 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -102,11 +105,13 @@ class CommentPopout extends StatelessWidget {
             }
             var pd = ProgressDialog(context: context);
             pd.show(msg: "正在发送评论");
+            var hashedUid = md5.convert(utf8.encode(
+                "${pref.getString(pref.Preference.idsAccount)}#${pref.getString(pref.Preference.name)}"));
             await PlanetSession()
                 .sendComments(
               id: id,
               content: _controller.text,
-              userId: CommentPopout.userIdGenerator,
+              userId: hashedUid.toString(),
               replyto: replyTo?.ID.toString(),
             )
                 .then((value) {
