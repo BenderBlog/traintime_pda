@@ -103,7 +103,7 @@ Map<String, List<String>> abstractTable = {
   'xiao': ['🏫'],
   'hei': ['👨🏿'],
   'kong': ['🈳'],
-  'guan': ['📴'],
+  'guan': ['📴', '🧪'],
   'qing': ['🌤'],
   'dong': ['🕳'],
   'yao': ['💊'],
@@ -132,6 +132,14 @@ Map<String, List<String>> abstractTable = {
   'dui': ['√'],
   'liang': ['②'],
   'ren': ['🧑'],
+  'dan': ['🥚'],
+  'lu': ['🦌'],
+  'dian': ['⚡'],
+  'zhuan': ['🧱'],
+  'bing': ['🧊'],
+  'gui': ['👻'],
+  'xiong': ['🐻'],
+  'kun': ['😪'],
 };
 
 Map<String, String> abstractTableMulti = {
@@ -151,6 +159,7 @@ Map<String, String> abstractTableMulti = {
   '豆腐': '🧈',
   '网安大楼': '🌃',
   '小丑': '🤡',
+  '击剑': '🤺',
   'rx': '↱χ',
   'RX': '↱χ',
   'Rx': '↱χ',
