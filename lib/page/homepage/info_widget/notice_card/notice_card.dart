@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/homepage/info_widget/notice_card/notice_page.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -20,10 +22,14 @@ class NoticeCard extends StatelessWidget {
       () => GestureDetector(
         onTap: () {
           if (messages.isNotEmpty) {
-            showDialog(
-              context: context,
-              builder: (context) => const NoticeList(),
-            );
+            if (!isPhone(context)) {
+              context.pushReplacement(const NoticePage());
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) => const NoticeList(),
+              );
+            }
           } else {
             showToast(context: context, msg: "目前没有获取应用公告，请刷新");
           }
