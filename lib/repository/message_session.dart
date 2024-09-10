@@ -32,7 +32,7 @@ Future<void> checkMessage() => messageLock.synchronized(() async {
               ),
             );
         file.writeAsStringSync(jsonEncode(toAdd));
-      } on Exception {
+      } catch (e) {
         if (isExist) {
           toAdd = jsonDecode(file.readAsStringSync());
         } else {

@@ -98,12 +98,10 @@ class _HomePageMasterState extends State<HomePageMaster>
     _controller = PageController();
     _pageView = PageView(
       controller: _controller,
-      children: [
-        const MainPage(),
-        LayoutBuilder(
-          builder: (context, constraints) => const XDUPlanetPage(),
-        ),
-        const SettingWindow(),
+      children: const [
+        MainPage(),
+        XDUPlanetPage(),
+        SettingWindow(),
       ],
       onPageChanged: (int index) {
         setState(() {

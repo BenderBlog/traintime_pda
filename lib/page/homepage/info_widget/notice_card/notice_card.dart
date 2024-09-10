@@ -25,7 +25,7 @@ class NoticeCard extends StatelessWidget {
             if (!isPhone(context)) {
               context.pushReplacement(const NoticePage());
             } else {
-              showDialog(
+              showModalBottomSheet(
                 context: context,
                 builder: (context) => const NoticeList(),
               );
