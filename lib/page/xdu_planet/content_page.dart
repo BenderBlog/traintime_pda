@@ -65,7 +65,8 @@ class _ContentPageState extends State<ContentPage> {
             .replaceAll("&#39;", "'")
             .replaceAll("&amp;", "\\&")
             .replaceAll("\\begin{align}", "")
-            .replaceAll("\\end{align}", "");
+            .replaceAll("\\end{align}", "")
+            .replaceAll("\$", "\\\$");
         return "${match.group(1)}$parseMiddle${match.group(1)}";
       },
     );
@@ -275,9 +276,9 @@ class _ContentPageState extends State<ContentPage> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    bool? result =
-                                        await showModalBottomSheet<bool>(
+                                    bool? result = await showDialog<bool>(
                                       context: context,
+                                      barrierDismissible: false,
                                       builder: (context) => CommentPopout(
                                         id: widget.article.id,
                                         replyTo: snapshot.data![index],
@@ -319,9 +320,7 @@ class _ContentPageState extends State<ContentPage> {
               } else {
                 return const Text("加载评论中……");
               }
-              return SelectionArea(
-                child: list,
-              );
+              return SelectionArea(child: list);
             },
           ),
         ),
@@ -335,12 +334,14 @@ class _ContentPageState extends State<ContentPage> {
               sheetMaxWidth - 24,
             ),
           )
+          .center()
           .scrollable()
           .safeArea(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          bool? result = await showModalBottomSheet<bool>(
+          bool? result = await showDialog<bool>(
             context: context,
+            barrierDismissible: false,
             builder: (context) => CommentPopout(id: widget.article.id),
           );
           if (context.mounted) {

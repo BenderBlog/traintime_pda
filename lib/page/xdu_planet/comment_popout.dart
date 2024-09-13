@@ -1,12 +1,11 @@
 // Copyright 2024 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:convert';
+//import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
+//import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -22,56 +21,35 @@ class CommentPopout extends StatelessWidget {
     List<String> name = [
       "Homer",
       "Bart",
+      "Cirno",
       "Rael",
       "Richard",
+      "Lily",
+      "Yuyuko",
       "Rick",
       "David",
+      "Alice",
       "Tony",
-      "Louis",
-      "Luis",
-      "Antonio",
-      "Anthony",
+      "Flandre",
       "Margaret",
       "Maggie",
+      "Koishi",
       "Leela",
       "Amy",
       "Liz",
       "Michelle",
+      "JKTrigger",
       "Elisabeth",
       "Isabel",
-      "Cindy",
-      "Katherine",
-      "Kate",
-      "Rodriguez",
-      "Simpson",
-      "Fry",
-      "Carter",
-      "Lennon",
-      "McDonald",
-      "Starmer",
-      "Hackett",
-      "Anderson",
-      "Johnson",
-      "Harrison",
-      "Murray",
-    ];
-
-    // Finalized, do not modify unless spelling problem!
-    List<String> nameTouhou = [
-      "Alice",
+      "Chillet",
       "Marisa",
-      "Lily",
-      "Yuyuko",
       "Patchouli",
-      "Flandre",
       "Reimu",
     ];
 
     int account = int.parse(pref.getString(pref.Preference.idsAccount));
-    int lastNumer = account % 1000;
 
-    if (lastNumer % 25 == 0) return nameTouhou[lastNumer % nameTouhou.length];
-    return name[lastNumer % name.length];
+    return name[account % 1000 % name.length];
   }
 
   CommentPopout({
@@ -83,21 +61,27 @@ class CommentPopout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: MediaQuery.of(context).viewInsets,
-      child: [
-        TextField(
-          controller: _controller,
-          maxLines: 5,
-          decoration: InputDecoration(
-            hintText: replyTo == null
-                ? '发表您的高见:)'
-                : "回复评论 #${replyTo!.ID}：${replyTo!.content}",
-            border: const OutlineInputBorder(),
-          ),
-        ).padding(all: 8).expanded(),
-        IconButton(
-          icon: const Icon(Icons.send),
+    return AlertDialog(
+      title: const Text('评论该篇文章'),
+      content: TextField(
+        controller: _controller,
+        maxLines: 5,
+        decoration: InputDecoration(
+          hintText: replyTo == null
+              ? '发表您的高见:)'
+              : "回复评论 #${replyTo!.ID}：${replyTo!.content}",
+          border: const OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: const Text('取消'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: const Text('发送'),
           onPressed: () async {
             if (_controller.text.isEmpty) {
               showToast(context: context, msg: "发送信息空白");
@@ -105,13 +89,13 @@ class CommentPopout extends StatelessWidget {
             }
             var pd = ProgressDialog(context: context);
             pd.show(msg: "正在发送评论");
-            var hashedUid = md5.convert(utf8.encode(
-                "${pref.getString(pref.Preference.idsAccount)}#${pref.getString(pref.Preference.name)}"));
+            //var hashedUid = md5.convert(utf8.encode(
+            //    "${pref.getString(pref.Preference.idsAccount)}#${pref.getString(pref.Preference.name)}"));
             await PlanetSession()
                 .sendComments(
               id: id,
               content: _controller.text,
-              userId: hashedUid.toString(),
+              userId: userIdGenerator, //hashedUid.toString(),
               replyto: replyTo?.ID.toString(),
             )
                 .then((value) {
@@ -128,7 +112,7 @@ class CommentPopout extends StatelessWidget {
             });
           },
         ),
-      ].toRow().padding(horizontal: 12, top: 15).safeArea(),
+      ],
     );
   }
 }
