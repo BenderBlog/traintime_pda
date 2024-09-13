@@ -5,7 +5,6 @@
 // Idea from xenode.
 
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -150,15 +149,11 @@ class ArticleCard extends StatelessWidget {
         children: [
           InformationWithIcon(
             icon: Icons.calendar_month,
-            text: Jiffy.parseFromDateTime(
-              article.time,
-            ).format(pattern: "yyyy年MM月dd日"),
+            text: article.articleTime.format(pattern: "yyyy年MM月dd日"),
           ).flexible(),
           InformationWithIcon(
             icon: Icons.access_time,
-            text: Jiffy.parseFromDateTime(
-              article.time,
-            ).format(pattern: "HH:mm:ss"),
+            text: article.articleTime.format(pattern: "HH:mm:ss"),
           ).flexible(),
         ],
       )

@@ -4,12 +4,14 @@
 // Content page of XDU Planet.
 
 import 'dart:async';
-import 'dart:math';
+import 'dart:math' show min;
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_latex/flutter_markdown_latex.dart';
+import 'package:markdown/markdown.dart' as md;
 
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
+import 'package:html2md/html2md.dart' as html2md;
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -46,6 +48,30 @@ class _ContentPageState extends State<ContentPage> {
     _comments = CommentModel(id: widget.article.id);
   }
 
+  String? content(String? content) {
+    if (content == null) return null;
+    List<String> split = content.split('<hr />');
+    RegExp latexStuff = RegExp(r'(\$+)((?:(?!\1)[\s\S])*)\1');
+    String tail = split.last.replaceAllMapped(
+      latexStuff,
+      (match) {
+        if (match.group(2) == null) return "";
+        String parseMiddle = match
+            .group(2)!
+            .replaceAll(RegExp(r'<br(.*)>'), "")
+            .replaceAll("&lt;", "<")
+            .replaceAll("&gt;", ">")
+            .replaceAll("&quot;", "\"")
+            .replaceAll("&#39;", "'")
+            .replaceAll("&amp;", "\\&")
+            .replaceAll("\\begin{align}", "")
+            .replaceAll("\\end{align}", "");
+        return "${match.group(1)}$parseMiddle${match.group(1)}";
+      },
+    );
+    return html2md.convert(tail).replaceAll(r"\\", r'\');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,15 +94,22 @@ class _ContentPageState extends State<ContentPage> {
             late Widget addon;
             if (snapshot.connectionState == ConnectionState.done) {
               try {
-                addon = HtmlWidget(
-                  snapshot.data ??
+                addon = MarkdownBody(
+                  selectable: true,
+                  builders: {
+                    'latex': LatexElementBuilder(),
+                  },
+                  extensionSet: md.ExtensionSet(
+                    [LatexBlockSyntax()],
+                    [LatexInlineSyntax()],
+                  ),
+                  data: content(snapshot.data) ??
                       '''
-  <h3>遇到错误</h3>
-  <p>
-    文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。
-  </p>
+  ### 遇到错误
+  
+  文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。
+  
 ''',
-                  factoryBuilder: () => MyWidgetFactory(),
                 );
               } catch (e) {
                 return ReloadWidget(
@@ -101,7 +134,7 @@ class _ContentPageState extends State<ContentPage> {
                     ),
                     TextSpan(
                       text: "\n${widget.author} - "
-                          "${Jiffy.parseFromDateTime(widget.article.time).format(pattern: "yyyy年MM月dd日 HH:mm")}",
+                          "${widget.article.articleTime.format(pattern: "yyyy年MM月dd日 HH:mm")}",
                     ),
                   ]),
                 ),
@@ -333,8 +366,6 @@ class _ContentPageState extends State<ContentPage> {
     );
   }
 }
-
-class MyWidgetFactory extends WidgetFactory with UrlLauncherFactory {}
 
 class CommentModel with ChangeNotifier {
   String id;
