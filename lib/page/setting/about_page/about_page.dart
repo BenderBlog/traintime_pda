@@ -63,10 +63,10 @@ class AboutPage extends StatelessWidget {
       "https://space.bilibili.com/49892391/",
     ),
     Developer(
-      "hhzm",
+      "hhzm (闪电豹猫)",
       "https://avatars.githubusercontent.com/u/19224718",
       "支持：提供彩蛋代码",
-      "https://www.cnblogs.com/hhzm",
+      "https://hhzm.win/",
     ),
     Developer(
       "lsy223622 (木生睡不着)",
