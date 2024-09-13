@@ -28,27 +28,17 @@ class ChangeSwiftDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('课程偏移设置'),
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
       content: TextField(
         autofocus: true,
-        style: const TextStyle(fontSize: 20),
         controller: _getNumberController,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*'))
         ],
-        decoration: InputDecoration(
+        maxLines: 1,
+        decoration: const InputDecoration(
           hintText: "请在此输入数字",
-          fillColor: Colors.grey.withOpacity(0.4),
-          filled: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide.none,
-          ),
+          border: OutlineInputBorder(),
         ),
       ),
       actions: <Widget>[
@@ -75,8 +65,6 @@ class ChangeSwiftDialog extends StatelessWidget {
           },
         ),
       ],
-      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
     );
   }
 }

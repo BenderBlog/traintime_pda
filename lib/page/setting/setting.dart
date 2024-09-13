@@ -164,10 +164,13 @@ class _SettingWindowState extends State<SettingWindow> {
                         setState(() {
                           preference
                               .setBool(
-                                  preference.Preference.simplifiedClassTimeline,
-                                  value)
-                              .then((value) =>
-                                  ClassTableCard.reloadSettingsFromPref());
+                                preference.Preference.simplifiedClassTimeline,
+                                value,
+                              )
+                              .then(
+                                (value) =>
+                                    ClassTableCard.reloadSettingsFromPref(),
+                              );
                         });
                       },
                     ),
@@ -183,6 +186,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
+                          barrierDismissible: false,
                           context: context,
                           builder: (context) => const SportPasswordDialog(),
                         );
@@ -193,6 +197,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
+                          barrierDismissible: false,
                           context: context,
                           builder: (context) =>
                               const ExperimentPasswordDialog(),
@@ -206,6 +211,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       onTap: () {
                         showDialog(
                           context: context,
+                          barrierDismissible: false,
                           builder: (context) =>
                               const ElectricityPasswordDialog(),
                         );
@@ -343,12 +349,13 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                     title: const Text('课程偏移设置'),
                     subtitle: Text(
-                      '正数错后开学日期 负数提前开学日期 '
+                      '正数错后开学日期 负数提前开学日期\n'
                       '目前为 ${preference.getInt(preference.Preference.swift)}',
                     ),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
+                        barrierDismissible: false,
                         context: context,
                         builder: (context) => ChangeSwiftDialog(),
                       ).then((value) {

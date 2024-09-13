@@ -34,24 +34,13 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('修改电费帐号密码'),
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
       content: TextField(
         autofocus: true,
-        style: const TextStyle(fontSize: 20),
         controller: _sportPasswordController,
         obscureText: _couldView,
         decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(0.4),
-          filled: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           hintText: "请在此输入密码",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide.none,
-          ),
+          border: const OutlineInputBorder(),
           suffixIcon: IconButton(
               icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
@@ -83,8 +72,6 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
           },
         ),
       ],
-      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
     );
   }
 }
