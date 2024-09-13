@@ -63,6 +63,12 @@ class AboutPage extends StatelessWidget {
       "https://space.bilibili.com/49892391/",
     ),
     Developer(
+      "hhzm",
+      "https://avatars.githubusercontent.com/u/19224718",
+      "支持：提供彩蛋代码",
+      "https://www.cnblogs.com/hhzm",
+    ),
+    Developer(
       "lsy223622 (木生睡不着)",
       "https://avatars.githubusercontent.com/u/57913213",
       "设计：iOS 图标",
