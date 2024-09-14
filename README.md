@@ -55,10 +55,10 @@ Traintime PDA，又称 XDYou，是为西电本科生设计的开源信息查询�
 ## 编译环境
 
 ```bash
-Flutter 3.24.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 5874a72aa4 (2 weeks ago) • 2024-08-20 16:46:00 -0500
-Engine • revision c9b9d5780d
-Tools • Dart 3.5.1 • DevTools 2.37.2
+Flutter 3.24.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 2663184aa7 (3 days ago) • 2024-09-11 16:27:48 -0500
+Engine • revision 36335019a8
+Tools • Dart 3.5.3 • DevTools 2.37.3
 ```
 
 注意：要编译此项目，Dart 编译器必须在 3.0 以上。
