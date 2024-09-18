@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/library/ebook_place_card.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class BookDetailCard extends StatefulWidget {
@@ -48,6 +50,13 @@ class _BookDetailCardState extends State<BookDetailCard> {
               height: 150,
               fit: BoxFit.fitHeight,
               alignment: Alignment.center,
+              errorListener: (e) {
+                if (e is DioException) {
+                  log.info('Error with Internet error...');
+                } else {
+                  log.info('Image Exception is: ${e.runtimeType}');
+                }
+              },
             )
                 //.clipRect(clipper: BookImageClipper())
                 .clipRRect(all: 14)

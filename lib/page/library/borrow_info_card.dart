@@ -4,11 +4,13 @@
 // Library borrow card.
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class BorrowInfoCard extends StatelessWidget {
@@ -39,6 +41,13 @@ class BorrowInfoCard extends StatelessWidget {
         height: 250 * 0.5,
         fit: BoxFit.fitHeight,
         alignment: Alignment.center,
+        errorListener: (e) {
+          if (e is DioException) {
+            log.info('Error with Internet error...');
+          } else {
+            log.info('Image Exception is: ${e.runtimeType}');
+          }
+        },
       )
           //.clipRect(clipper: BookImageClipper())
           .clipRRect(all: 14),
