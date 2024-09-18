@@ -12,6 +12,8 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class ExamInfoWindow extends StatefulWidget {
   final DateTime time;
@@ -27,8 +29,15 @@ class ExamInfoWindow extends StatefulWidget {
 class _ExamInfoWindowState extends State<ExamInfoWindow> {
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ExamController>(
-      builder: (c) => Scaffold(
+    return GetBuilder<ExamController>(builder: (c) {
+      if (offline && c.status == ExamStatus.cache) {
+        showToast(
+          context: context,
+          msg: "已显示缓存考试安排信息",
+        );
+      }
+
+      return Scaffold(
         appBar: AppBar(
           title: const Text("考试安排"),
           actions: [
@@ -98,7 +107,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
             return const Center(child: CircularProgressIndicator());
           }
         }),
-      ),
-    );
+      );
+    });
   }
 }

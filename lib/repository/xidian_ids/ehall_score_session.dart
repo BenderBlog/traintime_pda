@@ -18,8 +18,10 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 /// 考试成绩 4768574631264620
 class ScoreSession extends EhallSession {
   static const scoreListCacheName = "scores.json";
-  late File file = File("${supportPath.path}/$scoreListCacheName");
+  static File file = File("${supportPath.path}/$scoreListCacheName");
   static bool isScoreListCacheUsed = false;
+
+  static bool get isCacheExist => file.existsSync();
 
   /// Must be called after [getScore]!
   /// If bug, just return dummy data.

@@ -22,13 +22,12 @@ class ExamCard extends StatelessWidget {
     return GetBuilder<ExamController>(
       builder: (c) => SmallFunctionCard(
         onTap: () async {
-          if (offline) {
-            showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
-          } else if (c.status == ExamStatus.cache ||
-              c.status == ExamStatus.fetched) {
+          if (c.status == ExamStatus.cache || c.status == ExamStatus.fetched) {
             context.pushReplacement(ExamInfoWindow(time: updateTime));
           } else if (c.status != ExamStatus.error) {
             showToast(context: context, msg: "请稍候，正在获取考试信息");
+          } else if (offline) {
+            showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

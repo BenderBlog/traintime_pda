@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/score/score.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
 
@@ -15,8 +16,8 @@ class ScoreCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SmallFunctionCard(
       onTap: () {
-        if (offline) {
-          showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
+        if (offline && !ScoreSession.isCacheExist) {
+          showToast(context: context, msg: "脱机状态且无缓存成绩数据，无法访问");
         } else {
           context.pushReplacement(const ScoreWindow());
         }
