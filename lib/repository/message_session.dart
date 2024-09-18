@@ -34,7 +34,11 @@ Future<void> checkMessage() => messageLock.synchronized(() async {
         file.writeAsStringSync(jsonEncode(toAdd));
       } catch (e) {
         if (isExist) {
-          toAdd = jsonDecode(file.readAsStringSync());
+          List data = jsonDecode(file.readAsStringSync());
+          toAdd = List<NoticeMessage>.generate(
+            data.length,
+            (index) => NoticeMessage.fromJson(data[index]),
+          );
         } else {
           toAdd = [];
         }
