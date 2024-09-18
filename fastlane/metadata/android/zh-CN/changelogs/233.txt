@@ -1,0 +1,15 @@
+1. 紧急修复由于数据结构变化导致的报错问题。
+2. 图书馆图片加载不出来将不会报错。
+
+1.3.0 版本变化
+
+1. 成绩缓存功能 @Pairman
+2. 部分成绩查看失败（因为上课次数不够导致取消考试资格）@BenderBlog
+3. Android 小部件修复 @Xiue233 & iOS 小部件修复 @BenderBlog
+4. 优化查看成绩功能 @BenderBlog
+5. 大量 XDU-Planet 优化 @xeonds @NanCunChild 
+6. 图书馆卡片重新设计 @BrackRat 图书馆接口改进 @BenderBlog
+7. 通知小部件重新设计 @xeonds 
+8. 新彩蛋页面 @0xcafebabe @wtflmao 
+9. 升级拦截器和日志记录插件和 Flutter 版本 @BenderBlog
+10. 课程表顶栏重新设计 @BenderBlog

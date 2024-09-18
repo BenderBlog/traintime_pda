@@ -14,7 +14,6 @@ The XDYou app in the Apple App Store have the same codebase as this.
  - Other tools such as call for repairing, school email, etc.
  - Shuangchuang (Innovation and Entrepreneurship) project query.
  - XDU Planet: Look around the blogs of your schoolmates.
- - Lost and Found Info.
- - Homepage arrangement widget
+ - Homepage widget.
 
 If you got some idea about it, contact me freely.
