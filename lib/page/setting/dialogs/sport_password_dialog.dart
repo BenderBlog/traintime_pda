@@ -15,6 +15,9 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
 
   bool _couldView = true;
 
+  // 用于标识是否通过返回按钮关闭
+  // bool _wasDismissedViaBackButton = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,10 +37,10 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pop<bool>(false);
-        return false; // Prevent default pop behavior
+    return PopScope(
+      onPopInvoked: (popInvokedCallback) {
+        // _wasDismissedViaBackButton = true;
+        popInvokedCallback; // 允许导航器继续处理返回操作
       },
       child: AlertDialog(
         title: const Text('修改体育系统密码'),
@@ -62,7 +65,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
           TextButton(
             child: const Text('取消'),
             onPressed: () {
-              Navigator.of(context).pop<bool>(false);
+              Navigator.of(context).pop<bool>(false); // 返回 false
             },
           ),
           TextButton(
@@ -73,9 +76,9 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
                   user_perference.Preference.sportPassword,
                   _sportPasswordController.text,
                 );
-                if(context.mounted){
-                  Navigator.of(context).pop<bool>(true);
-                }   
+                if (context.mounted) {
+                  Navigator.of(context).pop<bool>(true); // 返回 true
+                }
               } else {
                 showToast(context: context, msg: "输入空白!");
               }
