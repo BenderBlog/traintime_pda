@@ -19,7 +19,7 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   void initState() {
     super.initState();
     String initialText =
-        user_perference.getString(user_perference.Preference.sportPassword) ?? '';
+        user_perference.getString(user_perference.Preference.sportPassword);
     _sportPasswordController.text = initialText;
     _sportPasswordController.selection = TextSelection.fromPosition(
       TextPosition(offset: initialText.length),
@@ -69,11 +69,13 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
             child: const Text('提交'),
             onPressed: () async {
               if (_sportPasswordController.text.isNotEmpty) {
-                user_perference.setString(
+                await user_perference.setString(
                   user_perference.Preference.sportPassword,
                   _sportPasswordController.text,
                 );
-                Navigator.of(context).pop<bool>(true);
+                if(context.mounted){
+                  Navigator.of(context).pop<bool>(true);
+                }   
               } else {
                 showToast(context: context, msg: "输入空白!");
               }
