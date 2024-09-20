@@ -132,13 +132,13 @@ class AboutPage extends StatelessWidget {
     ),
     Link(
       icon: Icon(Icons.code),
-      name: "代码",
+      name: "开源代码",
       url: "https://github.com/BenderBlog/traintime_pda",
     ),
     Link(
       icon: Icon(Icons.redeem),
       name: "给我捐款",
-      url: "https://afdian.net/a/benderblog",
+      url: "https://afdian.com/a/benderblog",
     ),
   ];
 
