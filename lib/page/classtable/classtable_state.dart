@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -50,6 +51,9 @@ class ClassTableWidgetState with ChangeNotifier {
   final ClassTableController classTableController = Get.find();
   final ExamController examController = Get.find();
   final ExperimentController experimentController = Get.find();
+
+  /// Partner class info (if there is)
+  final ClassTableData? partnerClass;
 
   /// The length of the semester, the amount of the class table.
   int get semesterLength => classTableController.classTableData.semesterLength;
@@ -169,7 +173,12 @@ class ClassTableWidgetState with ChangeNotifier {
     return "${toReturn}END:VCALENDAR";
   }
 
-  ClassTableWidgetState({required this.currentWeek}) {
+  String get ercStr => jsonEncode(classTableController.classTableData);
+
+  ClassTableWidgetState({
+    required this.currentWeek,
+    this.partnerClass,
+  }) {
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {

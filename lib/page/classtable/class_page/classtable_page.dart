@@ -213,6 +213,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       value: 'D',
                       child: Text("生成日历文件"),
                     ),
+                    const PopupMenuItem<String>(
+                      value: 'E',
+                      child: Text("生成共享课表文件"),
+                    ),
                   ],
                   onSelected: (String action) async {
                     final box = context.findRenderObject() as RenderBox?;
@@ -245,10 +249,17 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         );
                         break;
                       case 'D':
+                      case 'E':
                         try {
                           String fileName = "classtable-"
                               "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
-                              "${classTableState.semesterCode}.ics";
+                              "${classTableState.semesterCode}";
+                          if (action == 'D') {
+                            fileName += ".ics";
+                          } else {
+                            fileName +=
+                                "-${preference.getString(preference.Preference.idsAccount)}.erc";
+                          }
                           if (Platform.isLinux ||
                               Platform.isMacOS ||
                               Platform.isWindows) {
@@ -256,7 +267,9 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                 await FilePicker.platform.saveFile(
                               dialogTitle: "保存日历文件到...",
                               fileName: fileName,
-                              allowedExtensions: ["ics"],
+                              allowedExtensions: [
+                                if (action == 'D') "ics" else "erc"
+                              ],
                               lockParentWindow: true,
                             );
                             if (resultFilePath != null) {
@@ -264,8 +277,13 @@ class _ClassTablePageState extends State<ClassTablePage> {
                               if (!(await file.exists())) {
                                 await file.create();
                               }
-                              await file
-                                  .writeAsString(classTableState.iCalenderStr);
+                              if (action == "D") {
+                                await file.writeAsString(
+                                    classTableState.iCalenderStr);
+                              } else {
+                                await file
+                                    .writeAsString(classTableState.ercStr);
+                              }
                             }
                           } else {
                             String tempPath = await getTemporaryDirectory()
@@ -274,8 +292,12 @@ class _ClassTablePageState extends State<ClassTablePage> {
                             if (!(await file.exists())) {
                               await file.create();
                             }
-                            await file
-                                .writeAsString(classTableState.iCalenderStr);
+                            if (action == "D") {
+                              await file
+                                  .writeAsString(classTableState.iCalenderStr);
+                            } else {
+                              await file.writeAsString(classTableState.ercStr);
+                            }
                             await Share.shareXFiles(
                               [XFile("$tempPath/$fileName")],
                               sharePositionOrigin:
