@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -52,9 +54,6 @@ class ClassTableWidgetState with ChangeNotifier {
   final ExamController examController = Get.find();
   final ExperimentController experimentController = Get.find();
 
-  /// Partner class info (if there is)
-  final ClassTableData? partnerClass;
-
   /// The length of the semester, the amount of the class table.
   int get semesterLength => classTableController.classTableData.semesterLength;
 
@@ -64,38 +63,35 @@ class ClassTableWidgetState with ChangeNotifier {
   /// The offset append to start day of the week.
   final int offset = preference.getInt(preference.Preference.swift);
 
-  /// The class details.
-  List<ClassDetail> get classDetail =>
-      classTableController.classTableData.classDetail;
-
-  /// The classes without time arrangements.
-  List<NotArrangementClassDetail> get notArranged =>
-      classTableController.classTableData.notArranged;
-
-  /// The time arrangements of the class details, use with [classDetail].
-  List<TimeArrangement> get timeArrangement =>
-      classTableController.classTableData.timeArrangement;
-
-  /// The class change data.
-  List<ClassChange> get classChange =>
-      classTableController.classTableData.classChanges;
-
-  /// The day the semester start, used to calculate the first day of the week.
-  DateTime get startDay =>
-      Jiffy.parse(classTableController.classTableData.termStartDay).dateTime;
-
-  /// The currentWeek.
-  final int currentWeek;
-
-  /// The exam list.
-  List<Subject> get subjects => examController.data.subject;
-
-  /// The experiment list.
-  List<ExperimentData> get experiments => experimentController.data;
-
   ///*****************************///
   /// Following are dynamic data. ///
   /// ****************************///
+
+  /// Partner class info (if there is)
+  ClassTableData? partnerClass;
+  List<Subject>? partnerSubjects;
+  List<ExperimentData>? partnerExperiment;
+
+  /// Render partner code.
+  bool _isPartner = false;
+
+  set isPartner(bool isPartner) {
+    if (isPartner &&
+        (partnerClass == null ||
+            partnerSubjects == null ||
+            partnerExperiment == null)) {
+      return;
+    }
+    _isPartner = isPartner;
+    notifyListeners();
+  }
+
+  bool get isPartner => _isPartner;
+
+  bool get havePartner =>
+      partnerClass != null &&
+      partnerSubjects != null &&
+      partnerExperiment != null;
 
   /// Current showing week.
   int _chosenWeek = 0;
@@ -107,6 +103,41 @@ class ClassTableWidgetState with ChangeNotifier {
   }
 
   int get chosenWeek => _chosenWeek;
+
+  /// The class details.
+  List<ClassDetail> get classDetail => isPartner
+      ? partnerClass!.classDetail
+      : classTableController.classTableData.classDetail;
+
+  /// The classes without time arrangements.
+  List<NotArrangementClassDetail> get notArranged => isPartner
+      ? partnerClass!.notArranged
+      : classTableController.classTableData.notArranged;
+
+  /// The time arrangements of the class details, use with [classDetail].
+  List<TimeArrangement> get timeArrangement => isPartner
+      ? partnerClass!.timeArrangement
+      : classTableController.classTableData.timeArrangement;
+
+  /// The class change data.
+  List<ClassChange> get classChange => isPartner
+      ? partnerClass!.classChanges
+      : classTableController.classTableData.classChanges;
+
+  /// The day the semester start, used to calculate the first day of the week.
+  DateTime get startDay =>
+      Jiffy.parse(classTableController.classTableData.termStartDay).dateTime;
+
+  /// The currentWeek.
+  final int currentWeek;
+
+  /// The exam list.
+  List<Subject> get subjects =>
+      isPartner ? partnerSubjects! : examController.data.subject;
+
+  /// The experiment list.
+  List<ExperimentData> get experiments =>
+      isPartner ? partnerExperiment! : experimentController.data;
 
   /// Get class detail by prividing index of timearrangement
   ClassDetail getClassDetail(int index) =>
@@ -146,6 +177,46 @@ class ClassTableWidgetState with ChangeNotifier {
           .deleteUserDefinedClass(timeArrangement)
           .then((value) => notifyListeners());
 
+  /// Update partner class info
+  void updatePartnerClass() {
+    var file = File("${supportPath.path}/darling.erc.json");
+    if (!file.existsSync()) {
+      throw Exception("File not found.");
+    }
+    final data = jsonDecode(file.readAsStringSync());
+    if (semesterCode.compareTo(data["classtable"]["semesterCode"].toString()) !=
+        0) {
+      throw NotSameSemesterException(
+        msg: "Not the same semester. This semester: $semesterCode. "
+            "Input source: ${data["classtable"]["semesterCode"]}."
+            "This partner classtable is going to be deleted.",
+      );
+    }
+    partnerClass = ClassTableData.fromJson(data["classtable"]);
+    partnerSubjects = List.generate(
+      data["exam"].length,
+      (i) => Subject.fromJson(data["exam"][i]),
+    );
+    partnerExperiment = List.generate(
+      data["experiment"].length,
+      (i) => ExperimentData.fromJson(data["experiment"][i]),
+    );
+    notifyListeners();
+  }
+
+  /// Delete partner class info
+  void deletePartnerClass() {
+    var file = File("${supportPath.path}/darling.erc.json");
+    if (!file.existsSync()) {
+      throw Exception("File not found.");
+    }
+    file.deleteSync();
+    partnerClass = null;
+    partnerSubjects = null;
+    partnerExperiment = null;
+    notifyListeners();
+  }
+
   /// Generate icalendar file string.
   String get iCalenderStr {
     String toReturn = "BEGIN:VCALENDAR\n";
@@ -173,7 +244,13 @@ class ClassTableWidgetState with ChangeNotifier {
     return "${toReturn}END:VCALENDAR";
   }
 
-  String get ercStr => jsonEncode(classTableController.classTableData);
+  /// Generate shared class data.
+  /// Eliot Ray Classtable (Format)
+  String get ercStr => jsonEncode({
+        "classtable": classTableController.classTableData,
+        "exam": examController.data.subject,
+        "experiment": experimentController.data,
+      });
 
   ClassTableWidgetState({
     required this.currentWeek,
@@ -185,6 +262,11 @@ class ClassTableWidgetState with ChangeNotifier {
       _chosenWeek = semesterLength - 1;
     } else {
       _chosenWeek = currentWeek;
+    }
+    try {
+      updatePartnerClass();
+    } catch (e) {
+      deletePartnerClass();
     }
   }
 
@@ -311,4 +393,9 @@ class ClassTableWidgetState with ChangeNotifier {
 
     return arrangedEvents;
   }
+}
+
+class NotSameSemesterException implements Exception {
+  final String msg;
+  NotSameSemesterException({required this.msg});
 }

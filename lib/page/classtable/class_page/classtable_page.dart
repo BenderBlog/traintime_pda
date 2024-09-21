@@ -16,6 +16,7 @@ import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.da
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
@@ -181,7 +182,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
     if (haveClass) {
       return Scaffold(
           appBar: AppBar(
-            title: const Text("日程表"),
+            title: Text(classTableState.isPartner ? "搭子的日程表" : "日程表"),
             leading: IconButton(
               icon: Icon(
                 Platform.isIOS || Platform.isMacOS
@@ -193,6 +194,16 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       .pop(),
             ),
             actions: [
+              if (classTableState.havePartner)
+                IconButton(
+                  onPressed: () =>
+                      classTableState.isPartner = !classTableState.isPartner,
+                  icon: Icon(
+                    classTableState.isPartner
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                  ),
+                ),
               if (haveClass)
                 PopupMenuButton<String>(
                   itemBuilder: (BuildContext context) =>
@@ -205,18 +216,28 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       value: 'B',
                       child: Text("查看课程安排调整信息"),
                     ),
-                    const PopupMenuItem<String>(
-                      value: 'C',
-                      child: Text("添加课程信息"),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'D',
-                      child: Text("生成日历文件"),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'E',
-                      child: Text("生成共享课表文件"),
-                    ),
+                    if (!classTableState.isPartner) ...[
+                      const PopupMenuItem<String>(
+                        value: 'C',
+                        child: Text("添加课程信息"),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'D',
+                        child: Text("生成日历文件"),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'E',
+                        child: Text("生成共享课表文件"),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'F',
+                        child: Text("导入共享课表文件"),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'G',
+                        child: Text("删除共享课表文件"),
+                      ),
+                    ],
                   ],
                   onSelected: (String action) async {
                     final box = context.findRenderObject() as RenderBox?;
@@ -314,6 +335,78 @@ class _ClassTablePageState extends State<ClassTablePage> {
                           }
                         }
                         break;
+                      case 'F':
+                        FilePickerResult? result =
+                            await FilePicker.platform.pickFiles(
+                          type: FileType.any,
+                        );
+                        if (context.mounted) {
+                          if (result != null) {
+                            if (!result.files.single.path!.endsWith(".erc")) {
+                              showToast(
+                                context: context,
+                                msg: "文件扩展名不是erc，无法导入",
+                              );
+                              return;
+                            }
+                            File(result.files.single.path!).copySync(
+                              "${supportPath.path}/darling.erc.json",
+                            );
+                            try {
+                              classTableState.updatePartnerClass();
+                            } catch (error, stacktrace) {
+                              log.error(
+                                "Error occured while importing partner class.",
+                                error,
+                                stacktrace,
+                              );
+                              showToast(
+                                context: context,
+                                msg: '好像导入文件有点问题:P',
+                              );
+                              return;
+                            }
+                            showToast(
+                              context: context,
+                              msg: '导入成功',
+                            );
+                          } else {
+                            if (context.mounted) {
+                              showToast(
+                                context: context,
+                                msg: '导入失败',
+                              );
+                            }
+                          }
+                        }
+                      case 'G':
+                        bool? isDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("确认对话框"),
+                            content: const Text("确定要清除共享课表吗？"),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text("取消"),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text("确定"),
+                              )
+                            ],
+                          ),
+                        );
+
+                        if (context.mounted && isDelete == true) {
+                          classTableState.deletePartnerClass();
+                          showToast(
+                            context: context,
+                            msg: '删除共享课表成功',
+                          );
+                        }
                     }
                   },
                 ),

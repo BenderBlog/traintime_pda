@@ -7,6 +7,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 final log = TalkerFlutter.init();
 final logDioAdapter = TalkerDioLogger(
+  talker: log,
   settings: const TalkerDioLoggerSettings(
     printRequestHeaders: true,
     printResponseHeaders: true,

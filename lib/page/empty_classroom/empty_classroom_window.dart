@@ -34,10 +34,11 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
               return ReloadWidget(
+                errorStatus: snapshot.error,
                 function: () => setState(() {
                   places = JiaowuServiceSession().getBuildingList();
                 }),
-              ).expanded();
+              );
             } else {
               return EmptyClassroomSearchWindow(
                 places: snapshot.data!,
