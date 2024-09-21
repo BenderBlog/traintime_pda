@@ -49,9 +49,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
     setState(() => isTopRowLocked = true);
     Future.wait(
       [
-        rowControl.animateTo(
-          (weekButtonWidth + 2 * weekButtonHorizontalPadding) *
-              classTableState.chosenWeek,
+        rowControl.animateToPage(
+          classTableState.chosenWeek,
           curve: Curves.easeInOut,
           duration: const Duration(milliseconds: changePageTime),
         ),
@@ -84,7 +83,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
     rowControl = PageController(
       initialPage: classTableState.chosenWeek,
       viewportFraction: (weekButtonWidth + 2 * weekButtonHorizontalPadding) /
-          MediaQuery.sizeOf(context).width,
+          ClassTableState.of(context)!.constraints.minWidth,
       keepPage: true,
     );
 
@@ -130,8 +129,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
           bottom: 4,
         ),
         child: PageView.builder(
+          padEnds: false,
           controller: rowControl,
-          physics: const ClampingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemCount: classTableState.semesterLength,
           itemBuilder: (BuildContext context, int index) {
