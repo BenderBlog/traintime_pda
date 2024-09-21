@@ -30,7 +30,7 @@ class ClassTablePage extends StatefulWidget {
 
 class _ClassTablePageState extends State<ClassTablePage> {
   /// Check whether listener is pushed...
-  bool isPushedListener = false;
+  //bool isPushedListener = false;
 
   /// A lock of the week choice row.
   /// When locked, choiceWeek cannot be changed.
@@ -88,10 +88,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
     );
 
     /// Let controllers listen to the currentWeek's change.
-    if (isPushedListener == false) {
-      classTableState.addListener(_switchPage);
-      isPushedListener = true;
-    }
+    // if (isPushedListener == false) {
+    classTableState.addListener(_switchPage);
+    //  isPushedListener = true;
+    //}
 
     /// Init the background.
     File image = File("${supportPath.path}/decoration.jpg");
@@ -131,6 +131,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
         child: PageView.builder(
           padEnds: false,
           controller: rowControl,
+          physics: const ClampingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemCount: classTableState.semesterLength,
           itemBuilder: (BuildContext context, int index) {

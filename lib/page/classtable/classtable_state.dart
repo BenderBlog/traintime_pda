@@ -40,6 +40,7 @@ class ClassTableState extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant ClassTableState oldWidget) {
+    controllers.chosenWeek = oldWidget.controllers.chosenWeek;
     return controllers.chosenWeek != oldWidget.controllers.chosenWeek;
   }
 }
@@ -99,7 +100,9 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Change chosen week.
   set chosenWeek(int chosenWeek) {
-    _chosenWeek = chosenWeek;
+    if (chosenWeek != _chosenWeek) {
+      _chosenWeek = chosenWeek;
+    }
     notifyListeners();
   }
 
