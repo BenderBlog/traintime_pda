@@ -15,6 +15,7 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
@@ -265,8 +266,10 @@ class ClassTableWidgetState with ChangeNotifier {
     }
     try {
       updatePartnerClass();
-    } catch (e) {
+    } on NotSameSemesterException {
       deletePartnerClass();
+    } on Exception {
+      log.info("No partner classtable present...");
     }
   }
 
