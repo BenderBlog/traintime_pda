@@ -14,7 +14,7 @@ import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
 
 class SportCard extends StatelessWidget {
   const SportCard({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return SmallFunctionCard(
@@ -22,9 +22,10 @@ class SportCard extends StatelessWidget {
         bool isGood = true;
         if (preference.getString(preference.Preference.sportPassword).isEmpty) {
           isGood = await showDialog<bool>(
-            context: context,
-            builder: (context) => const SportPasswordDialog(),
-          ) ?? false; // 当返回值为 null 时，设置 isGood 为 false
+                context: context,
+                builder: (context) => const SportPasswordDialog(),
+              ) ??
+              false; // 当返回值为 null 时，设置 isGood 为 false
         }
         if (context.mounted && isGood) {
           context.pushReplacement(const SportWindow());

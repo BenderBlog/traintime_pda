@@ -23,11 +23,12 @@ class ExperimentCard extends StatelessWidget {
             .getString(preference.Preference.experimentPassword)
             .isEmpty) {
           isGood = await showDialog(
-            context: context,
-            builder: (context) => const ExperimentPasswordDialog(),
-          );
+                context: context,
+                builder: (context) => const ExperimentPasswordDialog(),
+              ) ??
+              false;
         }
-        if (context.mounted && isGood) {
+        if (context.mounted && isGood == true) {
           Get.put(ExperimentController()).get();
           context.pushReplacement(const ExperimentWindow());
         }
