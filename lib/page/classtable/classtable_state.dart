@@ -145,11 +145,14 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Get class detail by prividing index of timearrangement
   ClassDetail getClassDetail(int index) =>
-      classTableController.classTableData.getClassDetail(
-        classTableController.classTableData.timeArrangement[index],
+      (isPartner ? partnerClass! : classTableController.classTableData)
+          .getClassDetail(
+        (isPartner ? partnerClass! : classTableController.classTableData)
+            .timeArrangement[index],
       );
 
   /// Bridge function to add/del/edit user defined class
+  /// Only main classtable support it!
   Future<void> addUserDefinedClass(
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
