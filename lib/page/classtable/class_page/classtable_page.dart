@@ -272,6 +272,20 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       case 'D':
                       case 'E':
                         try {
+                          await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("请不要随意分享"),
+                              content: const Text(
+                                  "导出文件包括你的个人信息，请不要随意跟别人分享，或者发在大群里。"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text("确定"),
+                                )
+                              ],
+                            ),
+                          );
                           String fileName = "classtable-"
                               "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
                               "${classTableState.semesterCode}";
@@ -336,24 +350,48 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         }
                         break;
                       case 'F':
+                        if (classTableState.havePartner) {
+                          bool? confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("确认对话框"),
+                              content: const Text("目前有搭子课表数据，是否要覆盖？"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text("取消"),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text("确定"),
+                                )
+                              ],
+                            ),
+                          );
+                          if (context.mounted && confirm != true) {
+                            return;
+                          }
+                        }
+
                         FilePickerResult? result =
                             await FilePicker.platform.pickFiles(
                           type: FileType.any,
                         );
                         if (context.mounted) {
                           if (result != null) {
-                            if (!result.files.single.path!.endsWith(".erc")) {
-                              showToast(
-                                context: context,
-                                msg: "文件扩展名不是erc，无法导入",
-                              );
-                              return;
-                            }
-                            File(result.files.single.path!).copySync(
-                              "${supportPath.path}/darling.erc.json",
-                            );
+                            String source = File(result.files.single.path!)
+                                .readAsStringSync();
                             try {
-                              classTableState.updatePartnerClass();
+                              bool isSuccess =
+                                  classTableState.decodePartnerClass(source).$4;
+                              if (isSuccess) {
+                                File(result.files.single.path!).copySync(
+                                  "${supportPath.path}/darling.erc.json",
+                                );
+                                classTableState.updatePartnerClass();
+                              }
                             } catch (error, stacktrace) {
                               log.error(
                                 "Error occured while importing partner class.",

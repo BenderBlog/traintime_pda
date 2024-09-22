@@ -184,13 +184,12 @@ class ClassTableWidgetState with ChangeNotifier {
           .deleteUserDefinedClass(timeArrangement)
           .then((value) => notifyListeners());
 
-  /// Update partner class info
-  void updatePartnerClass() {
-    var file = File("${supportPath.path}/darling.erc.json");
-    if (!file.existsSync()) {
-      throw Exception("File not found.");
-    }
-    final data = jsonDecode(file.readAsStringSync());
+  /// Decode Partner String info
+  (ClassTableData, List<Subject>, List<ExperimentData>, bool)
+      decodePartnerClass(
+    String source,
+  ) {
+    final data = jsonDecode(source);
     if (semesterCode.compareTo(data["classtable"]["semesterCode"].toString()) !=
         0) {
       throw NotSameSemesterException(
@@ -199,15 +198,28 @@ class ClassTableWidgetState with ChangeNotifier {
             "This partner classtable is going to be deleted.",
       );
     }
-    partnerClass = ClassTableData.fromJson(data["classtable"]);
-    partnerSubjects = List.generate(
-      data["exam"].length,
-      (i) => Subject.fromJson(data["exam"][i]),
+    return (
+      ClassTableData.fromJson(data["classtable"]),
+      List.generate(
+        data["exam"].length,
+        (i) => Subject.fromJson(data["exam"][i]),
+      ),
+      List.generate(
+        data["experiment"].length,
+        (i) => ExperimentData.fromJson(data["experiment"][i]),
+      ),
+      true,
     );
-    partnerExperiment = List.generate(
-      data["experiment"].length,
-      (i) => ExperimentData.fromJson(data["experiment"][i]),
-    );
+  }
+
+  /// Update partner class info
+  void updatePartnerClass() {
+    var file = File("${supportPath.path}/darling.erc.json");
+    if (!file.existsSync()) throw Exception("File not found.");
+    final data = decodePartnerClass(file.readAsStringSync());
+    partnerClass = data.$1;
+    partnerSubjects = data.$2;
+    partnerExperiment = data.$3;
     notifyListeners();
   }
 
