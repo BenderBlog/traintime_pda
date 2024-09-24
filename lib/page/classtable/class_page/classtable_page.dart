@@ -110,7 +110,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
     );
     super.didChangeDependencies();
 
-    log.info("Partner File Position: ${classTableState.partnerFilePosition}");
+    log.info(
+      "Partner File Position in state: "
+      "${classTableState.partnerFilePosition}",
+    );
     if (classTableState.partnerFilePosition != null) {
       importPartnerData(url: classTableState.partnerFilePosition);
     }
@@ -184,6 +187,11 @@ class _ClassTablePageState extends State<ClassTablePage> {
       classTableState.classDetail.isNotEmpty;
 
   Future<void> importPartnerData({String? url}) async {
+    log.info(
+      "classTableState.havePartner in importPartnerData: "
+      "${classTableState.havePartner}",
+    );
+
     if (classTableState.havePartner) {
       bool? confirm = await showDialog<bool>(
         context: context,
@@ -225,7 +233,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
         Content content = await ContentResolver.resolveContent(result);
         source = utf8.decode(content.data.toList());
       } else {
-        source = File(result!).readAsStringSync();
+        source = File.fromUri(Uri.parse(result!)).readAsStringSync();
       }
     } catch (e) {
       if (mounted) {

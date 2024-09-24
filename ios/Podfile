@@ -32,6 +32,11 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  # Share Extension is name of Extension which you created which is in this case 'Share Extension'
+  target 'PartnerShareExtension' do
+    inherit! :search_paths
+  end
   target 'RunnerTests' do
     inherit! :search_paths
   end

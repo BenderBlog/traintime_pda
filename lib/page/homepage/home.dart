@@ -117,7 +117,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       },
     );
     WidgetsBinding.instance.addObserver(this);
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       void onData(List<SharedMediaFile> value) {
         log.info("Input data: ${value.first.path}");
 
@@ -248,7 +248,7 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   @override
   void dispose() {
-    if (Platform.isAndroid) _intentSub.cancel();
+    if (Platform.isAndroid || Platform.isIOS) _intentSub.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

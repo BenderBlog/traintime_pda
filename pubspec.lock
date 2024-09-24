@@ -1040,10 +1040,11 @@ packages:
   receive_sharing_intent:
     dependency: "direct main"
     description:
-      name: receive_sharing_intent
-      sha256: f127989f8662ea15e193bd1e10605e5a0ab6bb92dffd51f3ce002feb0ce24c93
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "95b9aebe30fac8872e728c5490099358760b0a99"
+      url: "https://github.com/ilzc/receive_sharing_intent"
+    source: git
     version: "1.8.0"
   restart_app:
     dependency: "direct main"
