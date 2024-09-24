@@ -2,9 +2,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Main page of this program.
+import 'dart:io';
+import 'dart:async';
 
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -89,7 +96,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       iconChoice: MingCuteIcons.mgc_user_2_fill,
     ),
   ];
-
+  late StreamSubscription _intentSub;
   late PageController _controller;
   late PageView _pageView;
   @override
@@ -110,6 +117,45 @@ class _HomePageMasterState extends State<HomePageMaster>
       },
     );
     WidgetsBinding.instance.addObserver(this);
+    if (Platform.isAndroid) {
+      void onData(List<SharedMediaFile> value) {
+        log.info("Input data: ${value.first.path}");
+
+        if (Uri.tryParse(value.first.path) == null) {
+          showToast(context: context, msg: "导入路径不存在:P");
+          ReceiveSharingIntent.instance.reset();
+          return;
+        }
+        log.info("Partner File Position: ${value.first.path}");
+
+        final c = Get.find<ClassTableController>();
+        if (c.state == ClassTableState.fetched) {
+          context.pushReplacement(LayoutBuilder(
+            builder: (context, constraints) => ClassTableWindow(
+              parentContext: context,
+              currentWeek: c.getCurrentWeek(updateTime),
+              constraints: constraints,
+              partnerFilePosition: value.first.path,
+            ),
+          ));
+        }
+
+        ReceiveSharingIntent.instance.reset();
+      }
+
+      // Listen to media sharing coming from outside the app while the app is in the memory.
+      _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen(onData,
+          onError: (error, stacktrace) {
+        log.error("getIntentDataStream error.", error, stacktrace);
+      });
+      // Get the media sharing coming from outside the app while the app is closed.
+      ReceiveSharingIntent.instance
+          .getInitialMedia()
+          .then(onData)
+          .catchError((err, stacktrace) {
+        log.error("getIntentDataStream error.", err, stacktrace);
+      });
+    }
     message.checkMessage();
     log.info(
       "[home][BackgroundFetchFromHome]"
@@ -202,6 +248,7 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   @override
   void dispose() {
+    if (Platform.isAndroid) _intentSub.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

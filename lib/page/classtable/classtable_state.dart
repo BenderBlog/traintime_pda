@@ -41,6 +41,7 @@ class ClassTableState extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant ClassTableState oldWidget) {
     controllers.chosenWeek = oldWidget.controllers.chosenWeek;
+    controllers.partnerClass = null;
     return controllers.chosenWeek != oldWidget.controllers.chosenWeek;
   }
 }
@@ -68,6 +69,9 @@ class ClassTableWidgetState with ChangeNotifier {
   ///*****************************///
   /// Following are dynamic data. ///
   /// ****************************///
+
+  /// An inputed partner classtable...
+  final String? partnerFilePosition;
 
   /// Partner class info (if there is)
   ClassTableData? partnerClass;
@@ -272,6 +276,7 @@ class ClassTableWidgetState with ChangeNotifier {
       });
 
   ClassTableWidgetState({
+    this.partnerFilePosition,
     required this.currentWeek,
     this.partnerClass,
   }) {

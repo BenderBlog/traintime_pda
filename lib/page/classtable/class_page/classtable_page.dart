@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
+import 'dart:convert';
+import 'package:content_resolver/content_resolver.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -106,8 +108,12 @@ class _ClassTablePageState extends State<ClassTablePage> {
             )
           : null,
     );
-
     super.didChangeDependencies();
+
+    log.info("Partner File Position: ${classTableState.partnerFilePosition}");
+    if (classTableState.partnerFilePosition != null) {
+      importPartnerData(url: classTableState.partnerFilePosition);
+    }
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -176,6 +182,88 @@ class _ClassTablePageState extends State<ClassTablePage> {
   bool get haveClass =>
       classTableState.timeArrangement.isNotEmpty &&
       classTableState.classDetail.isNotEmpty;
+
+  Future<void> importPartnerData({String? url}) async {
+    if (classTableState.havePartner) {
+      bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("确认对话框"),
+          content: const Text("目前有搭子课表数据，是否要覆盖？"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("取消"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("确定"),
+            )
+          ],
+        ),
+      );
+      if (context.mounted && confirm != true) {
+        return;
+      }
+    }
+
+    String? result = url ??
+        await FilePicker.platform
+            .pickFiles(type: FileType.any)
+            .then((value) => value?.files.single.path);
+
+    if (mounted && result == null) {
+      showToast(
+        context: context,
+        msg: '未发现导入文件',
+      );
+    }
+
+    String source = "";
+    try {
+      if (Platform.isAndroid && result!.startsWith("content://")) {
+        Content content = await ContentResolver.resolveContent(result);
+        source = utf8.decode(content.data.toList());
+      } else {
+        source = File(result!).readAsStringSync();
+      }
+    } catch (e) {
+      if (mounted) {
+        showToast(
+          context: context,
+          msg: '导入文件失败',
+        );
+        log.error("Import partner classtable error.", e);
+        return;
+      }
+    }
+
+    if (mounted) {
+      try {
+        bool isSuccess = classTableState.decodePartnerClass(source).$4;
+        if (isSuccess) {
+          File("${supportPath.path}/darling.erc.json")
+              .writeAsStringSync(source);
+          classTableState.updatePartnerClass();
+        }
+      } catch (error, stacktrace) {
+        log.error(
+          "Error occured while importing partner class.",
+          error,
+          stacktrace,
+        );
+        showToast(
+          context: context,
+          msg: '好像导入文件有点问题:P',
+        );
+        return;
+      }
+      showToast(
+        context: context,
+        msg: '导入成功',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -350,73 +438,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         }
                         break;
                       case 'F':
-                        if (classTableState.havePartner) {
-                          bool? confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text("确认对话框"),
-                              content: const Text("目前有搭子课表数据，是否要覆盖？"),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text("取消"),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: const Text("确定"),
-                                )
-                              ],
-                            ),
-                          );
-                          if (context.mounted && confirm != true) {
-                            return;
-                          }
-                        }
-
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles(
-                          type: FileType.any,
-                        );
-                        if (context.mounted) {
-                          if (result != null) {
-                            String source = File(result.files.single.path!)
-                                .readAsStringSync();
-                            try {
-                              bool isSuccess =
-                                  classTableState.decodePartnerClass(source).$4;
-                              if (isSuccess) {
-                                File(result.files.single.path!).copySync(
-                                  "${supportPath.path}/darling.erc.json",
-                                );
-                                classTableState.updatePartnerClass();
-                              }
-                            } catch (error, stacktrace) {
-                              log.error(
-                                "Error occured while importing partner class.",
-                                error,
-                                stacktrace,
-                              );
-                              showToast(
-                                context: context,
-                                msg: '好像导入文件有点问题:P',
-                              );
-                              return;
-                            }
-                            showToast(
-                              context: context,
-                              msg: '导入成功',
-                            );
-                          } else {
-                            if (context.mounted) {
-                              showToast(
-                                context: context,
-                                msg: '导入失败',
-                              );
-                            }
-                          }
-                        }
+                        await importPartnerData();
                       case 'G':
                         bool? isDelete = await showDialog<bool>(
                           context: context,

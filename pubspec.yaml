@@ -63,15 +63,17 @@ dependencies:
   based_split_view: ^1.2.0
   disclosure: ^2.2.0 
   pinyin: ^3.3.0
+  content_resolver: ^0.3.1
   # Homepage Widget
   home_widget: ^0.6.0
   image: ^4.2.0
   catcher_2: ^2.0.0
+  receive_sharing_intent: ^1.8.0
   # XDU Planet
   flutter_widget_from_html_core: any
   fwfh_cached_network_image: ^0.14.3
   fwfh_url_launcher: ^0.9.1
-  latext: ^0.4.1  
+  latext: ^0.4.1
 
 dev_dependencies:
   flutter_test:

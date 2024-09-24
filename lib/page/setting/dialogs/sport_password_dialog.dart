@@ -11,7 +11,8 @@ class SportPasswordDialog extends StatefulWidget {
 
 class _SportPasswordDialogState extends State<SportPasswordDialog> {
   /// Sport Password Text Editing Controller
-  final TextEditingController _sportPasswordController = TextEditingController();
+  final TextEditingController _sportPasswordController =
+      TextEditingController();
 
   bool _couldView = true;
 
@@ -38,10 +39,6 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (popInvokedCallback) {
-        // _wasDismissedViaBackButton = true;
-        popInvokedCallback; // 允许导航器继续处理返回操作
-      },
       child: AlertDialog(
         title: const Text('修改体育系统密码'),
         content: TextField(

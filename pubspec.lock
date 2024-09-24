@@ -257,6 +257,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  content_resolver:
+    dependency: "direct main"
+    description:
+      name: content_resolver
+      sha256: "190cfc226655ac102384f8b28a41618d01a879bb578324510e8384efed9c1b80"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   convert:
     dependency: transitive
     description:
@@ -1029,6 +1037,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  receive_sharing_intent:
+    dependency: "direct main"
+    description:
+      name: receive_sharing_intent
+      sha256: f127989f8662ea15e193bd1e10605e5a0ab6bb92dffd51f3ce002feb0ce24c93
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.8.0"
   restart_app:
     dependency: "direct main"
     description:
