@@ -18,6 +18,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_organized_data
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
@@ -69,9 +70,6 @@ class ClassTableWidgetState with ChangeNotifier {
   ///*****************************///
   /// Following are dynamic data. ///
   /// ****************************///
-
-  /// An inputed partner classtable...
-  final String? partnerFilePosition;
 
   /// Partner class info (if there is)
   ClassTableData? partnerClass;
@@ -218,7 +216,7 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Update partner class info
   void updatePartnerClass() {
-    var file = File("${supportPath.path}/darling.erc.json");
+    var file = File("${supportPath.path}/${ClassTableFile.partnerClassName}");
     if (!file.existsSync()) throw Exception("File not found.");
     final data = decodePartnerClass(file.readAsStringSync());
     partnerClass = data.$1;
@@ -229,7 +227,7 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Delete partner class info
   void deletePartnerClass() {
-    var file = File("${supportPath.path}/darling.erc.json");
+    var file = File("${supportPath.path}/${ClassTableFile.partnerClassName}");
     if (!file.existsSync()) {
       throw Exception("File not found.");
     }
@@ -276,7 +274,6 @@ class ClassTableWidgetState with ChangeNotifier {
       });
 
   ClassTableWidgetState({
-    this.partnerFilePosition,
     required this.currentWeek,
     this.partnerClass,
   }) {
@@ -419,9 +416,4 @@ class ClassTableWidgetState with ChangeNotifier {
 
     return arrangedEvents;
   }
-}
-
-class NotSameSemesterException implements Exception {
-  final String msg;
-  NotSameSemesterException({required this.msg});
 }

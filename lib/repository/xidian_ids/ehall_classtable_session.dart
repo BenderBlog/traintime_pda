@@ -16,6 +16,7 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 class ClassTableFile extends EhallSession {
   static const schoolClassName = "ClassTable.json";
   static const userDefinedClassName = "UserClass.json";
+  static const partnerClassName = "darling.erc.json";
 
   ClassTableData simplifyData(Map<String, dynamic> qResult) {
     ClassTableData toReturn = ClassTableData();
@@ -438,4 +439,9 @@ class ClassTableFile extends EhallSession {
 
     return preliminaryData;
   }
+}
+
+class NotSameSemesterException implements Exception {
+  final String msg;
+  NotSameSemesterException({required this.msg});
 }

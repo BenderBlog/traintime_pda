@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
-import 'dart:convert';
-import 'package:content_resolver/content_resolver.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -22,6 +20,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
 
 class ClassTablePage extends StatefulWidget {
   const ClassTablePage({super.key});
@@ -109,14 +108,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
           : null,
     );
     super.didChangeDependencies();
-
-    log.info(
-      "Partner File Position in state: "
-      "${classTableState.partnerFilePosition}",
-    );
-    if (classTableState.partnerFilePosition != null) {
-      importPartnerData(url: classTableState.partnerFilePosition);
-    }
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -186,7 +177,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
       classTableState.timeArrangement.isNotEmpty &&
       classTableState.classDetail.isNotEmpty;
 
-  Future<void> importPartnerData({String? url}) async {
+  Future<void> importPartnerData() async {
     log.info(
       "classTableState.havePartner in importPartnerData: "
       "${classTableState.havePartner}",
@@ -215,10 +206,9 @@ class _ClassTablePageState extends State<ClassTablePage> {
       }
     }
 
-    String? result = url ??
-        await FilePicker.platform
-            .pickFiles(type: FileType.any)
-            .then((value) => value?.files.single.path);
+    String? result = await FilePicker.platform
+        .pickFiles(type: FileType.any)
+        .then((value) => value?.files.single.path);
 
     if (mounted && result == null) {
       showToast(
@@ -227,30 +217,12 @@ class _ClassTablePageState extends State<ClassTablePage> {
       );
     }
 
-    String source = "";
-    try {
-      if (Platform.isAndroid && result!.startsWith("content://")) {
-        Content content = await ContentResolver.resolveContent(result);
-        source = utf8.decode(content.data.toList());
-      } else {
-        source = File.fromUri(Uri.parse(result!)).readAsStringSync();
-      }
-    } catch (e) {
-      if (mounted) {
-        showToast(
-          context: context,
-          msg: '导入文件失败',
-        );
-        log.error("Import partner classtable error.", e);
-        return;
-      }
-    }
-
     if (mounted) {
       try {
+        String source = File.fromUri(Uri.parse(result!)).readAsStringSync();
         bool isSuccess = classTableState.decodePartnerClass(source).$4;
         if (isSuccess) {
-          File("${supportPath.path}/darling.erc.json")
+          File("${supportPath.path}/${ClassTableFile.partnerClassName}")
               .writeAsStringSync(source);
           classTableState.updatePartnerClass();
         }

@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Main page of this program.
+import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
 import 'package:based_split_view/based_split_view.dart';
+import 'package:content_resolver/content_resolver.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/page/classtable/classtable.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -21,7 +21,9 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart';
+import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -116,9 +118,10 @@ class _HomePageMasterState extends State<HomePageMaster>
         });
       },
     );
+
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid || Platform.isIOS) {
-      void onData(List<SharedMediaFile> value) {
+      Future<void> onData(List<SharedMediaFile> value) async {
         log.info("Input data: ${value.first.path}");
 
         if (Uri.tryParse(value.first.path) == null) {
@@ -130,14 +133,100 @@ class _HomePageMasterState extends State<HomePageMaster>
 
         final c = Get.find<ClassTableController>();
         if (c.state == ClassTableState.fetched) {
-          context.pushReplacement(LayoutBuilder(
-            builder: (context, constraints) => ClassTableWindow(
-              parentContext: context,
-              currentWeek: c.getCurrentWeek(updateTime),
-              constraints: constraints,
-              partnerFilePosition: value.first.path,
-            ),
-          ));
+          File file =
+              File("${supportPath.path}/${ClassTableFile.partnerClassName}");
+
+          log.info(
+            "Partner file exists: "
+            "${file.existsSync()}",
+          );
+
+          if (file.existsSync()) {
+            bool? confirm = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text("确认对话框"),
+                content: const Text("目前有搭子课表数据，是否要覆盖？"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("取消"),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text("确定"),
+                  )
+                ],
+              ),
+            );
+            if (context.mounted && confirm != true) {
+              return;
+            }
+          }
+          String source = "";
+          try {
+            if (Platform.isAndroid &&
+                value.first.path.startsWith("content://")) {
+              Content content =
+                  await ContentResolver.resolveContent(value.first.path);
+              source = utf8.decode(content.data.toList());
+            } else {
+              source =
+                  File.fromUri(Uri.parse(value.first.path)).readAsStringSync();
+            }
+          } catch (e) {
+            if (mounted) {
+              showToast(
+                context: context,
+                msg: '导入文件失败',
+              );
+              log.error("Import partner classtable error.", e);
+              return;
+            }
+          }
+
+          if (mounted) {
+            try {
+              final data = jsonDecode(source);
+
+              String semesterCode = Get.put(
+                ClassTableController(),
+              ).classTableData.semesterCode;
+
+              if (semesterCode.compareTo(
+                      data["classtable"]["semesterCode"].toString()) !=
+                  0) {
+                throw NotSameSemesterException(
+                  msg: "Not the same semester. This semester: $semesterCode. "
+                      "Input source: ${data["classtable"]["semesterCode"]}."
+                      "This partner classtable is going to be deleted.",
+                );
+              }
+              File(
+                "${supportPath.path}/${ClassTableFile.partnerClassName}",
+              ).writeAsStringSync(source);
+            } catch (error, stacktrace) {
+              log.error(
+                "Error occured while importing partner class.",
+                error,
+                stacktrace,
+              );
+              showToast(
+                context: context,
+                msg: '好像导入文件有点问题:P',
+              );
+              return;
+            }
+            showToast(
+              context: context,
+              msg: '导入成功，如果打开了课表页面请重新打开',
+            );
+          }
+        } else {
+          showToast(
+            context: context,
+            msg: "还没加载课程表，等会再来吧……",
+          );
         }
 
         ReceiveSharingIntent.instance.reset();

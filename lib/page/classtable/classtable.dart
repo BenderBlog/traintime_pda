@@ -11,13 +11,11 @@ class ClassTableWindow extends StatelessWidget {
   final int currentWeek;
   final BuildContext parentContext;
   final BoxConstraints constraints;
-  final String? partnerFilePosition;
   const ClassTableWindow({
     super.key,
     required this.currentWeek,
     required this.parentContext,
     required this.constraints,
-    this.partnerFilePosition,
   });
 
   @override
@@ -27,7 +25,6 @@ class ClassTableWindow extends StatelessWidget {
       constraints: constraints,
       controllers: ClassTableWidgetState(
         currentWeek: currentWeek,
-        partnerFilePosition: partnerFilePosition,
       ),
       child: Navigator(
         onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(
