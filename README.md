@@ -14,11 +14,11 @@ Traintime PDA，又称 XDYou，是为西电本科生设计的开源信息查询�
     alt="Get it on App Store"
     height="80">](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)[<img src="https://raw.githubusercontent.com/f-droid/artwork/master/badge/get-it-on-zh-cn.svg"
     alt="Get it on F-Droid"
-    height="80">](https://f-droid.org/packages/io.github.benderblog.traintime_pda)
+    height="80">](https://fdroid.gitlab.io/fdroid-website/zh_Hans/packages/io.github.benderblog.traintime_pda/)
 
 ## 特性概览
 
-1. 查看日程表，包括课程信息，考试信息。顺便把你偶像的图片设成背景。
+1. 查看日程表：包括课程信息，考试信息。顺便把你偶像的图片设成背景。(以及导入你对象的课表，写完真虐心啊)
 2. 查看体育信息：体育课程信息和体测成绩记录。(打卡机在人世间完成了一个轮回)
 3. 查看宿舍电量，也许顺手交了电费。
 4. 查看成绩，包括可以自行选择科目计算均分。(本程序首创)
@@ -30,8 +30,7 @@ Traintime PDA，又称 XDYou，是为西电本科生设计的开源信息查询�
 10. 双创需求大厅：找学校里的项目。
 11. XDU Planet：查看同学的博客。
 12. 物理实验查看功能。
-13. 失物招领信息查看。
-14. Android 和 iOS 特有的日程查看桌面小部件。
+13. Android 和 iOS 特有的日程查看桌面小部件。
 
 ## 其他特性
 
@@ -63,7 +62,13 @@ Tools • Dart 3.5.3 • DevTools 2.37.3
 
 注意：要编译此项目，Dart 编译器必须在 3.0 以上。
 
-还有，本代码附带 XDYou 的图标，该图标仅作为标识 iOS 授权者编译版本而使用。
+## 授权信息
+
+本程序源代码按照 MPLv2 授权，部分文件有 MIT / Apache-2.0 授权。
+
+本代码库附带 XDYou 的图标和开屏图，该图标和开屏图仅作为标识 iOS 授权者编译版本而使用。
+
+编译产物中，Android 和其他平台产物称为 Traintime PDA，为自由软件。iOS 平台产物称为 XDYou，由于附带 XDYou 图标和开屏图，不允许非授权者以 XDYou 名义分发。
 
 ## 感谢名单
 
