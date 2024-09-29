@@ -59,16 +59,18 @@ class SliderCaptchaClientProvider {
         width: pieceWidth, height: pieceHeight, fit: BoxFit.fitWidth));
   }
 
-  Future<void> solve(BuildContext context, {int retryCount = 3}) async {
+  Future<void> solve(BuildContext context, {int retryCount = 20}) async {
     for (int i = 0; i < retryCount; i++) {
       await updatePuzzle();
-
       double? answer = _trySolve(puzzleData!, pieceData!);
       if (answer != null && await verify(answer)) {
+        log.info("Parse captcha $i time(s), success.");
         return;
       }
+      log.info("Parse captcha $i time(s), failure.");
     }
 
+    log.info("$retryCount failures, fallback to user input.");
     // fallback
     if (context.mounted) {
       await Navigator.of(context).push(
