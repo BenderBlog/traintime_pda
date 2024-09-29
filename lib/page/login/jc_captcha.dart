@@ -1,7 +1,6 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MIT
 
-// http://thispage.tech:9680/jclee1995/flutter-jc-captcha/-/blob/master/lib/src/captcha_plugin_cn.dart
 // https://juejin.cn/post/7284608063914622995
 
 import 'dart:convert';
@@ -118,73 +117,71 @@ class SliderCaptchaClientProvider {
     var widthW = xR - xL;
     var heightW = yB - yT;
     var widthG = puzzle.width - piece.width + widthW - 1;
-    var gray = img.grayscale(puzzle);
 
-    var template = img.grayscale(
-        img.copyCrop(piece, x: xL, y: yT, width: widthW, height: heightW));
-    var meanT = _calculateMean(template);
-    var templateN = _normalizeImage(template, meanT);
+    var meanT = _calculateMean(piece, xL, yT, widthW, heightW);
+    var templateN = _normalizeImage(piece, xL, yT, widthW, heightW, meanT);
 
     double nccMax = 0;
     int xMax = 0;
-
-    for (int x = 0; x <= widthG - widthW; x += 2) {
-      var window =
-          img.copyCrop(gray, x: x, y: yT, width: widthW, height: heightW);
-      var meanW = _calculateMean(window);
-      var ncc = _calculateNCC(window, templateN, meanW);
+    for (int x = xL + 1; x < widthG - widthW; x += 2) {
+      var meanW = _calculateMean(puzzle, x, yT, widthW, heightW);
+      var ncc = _calculateNCC(puzzle, x, yT, widthW, heightW, templateN, meanW);
       if (ncc > nccMax) {
         nccMax = ncc;
         xMax = x;
       }
     }
 
-    return xMax / puzzle.width;
+    return (xMax - xL - 1) / puzzle.width;
   }
 
   static List<int> _findAlphaBoundingBox(img.Image image) {
-    int left = image.width, top = image.height, right = 0, bottom = 0;
+    int xL = image.width, yT = image.height, xR = 0, yB = 0;
     for (int y = 0; y < image.height; y++) {
       for (int x = 0; x < image.width; x++) {
-        if (image.getPixel(x, y).a.round() != 255) continue;
-        if (x < left) left = x;
-        if (y < top) top = y;
-        if (x > right) right = x;
-        if (y > bottom) bottom = y;
+        if (image.getPixel(x, y).a != 255) continue;
+        if (x < xL) xL = x;
+        if (y < yT) yT = y;
+        if (x > xR) xR = x;
+        if (y > yB) yB = y;
       }
     }
-    return [left, top, right, bottom];
+    return [xL, yT, xR, yB];
   }
 
-  static double _calculateMean(img.Image image) {
-    double total = 0;
-    for (int y = 0; y < image.height; y++) {
-      for (int x = 0; x < image.width; x++) {
-        total += image.getPixel(x, y).luminance;
+  static double _calculateMean(
+      img.Image image, int x, int y, int width, int height) {
+    double sum = 0;
+    for (int _y = y; _y < y + height; _y++) {
+      for (int _x = x; _x < x + width; _x++) {
+        sum += image.getPixel(_x, _y).luminance;
       }
     }
-    return total / (image.width * image.height);
+    return sum / (width * height);
   }
 
-  static List<double> _normalizeImage(img.Image image, double mean) {
-    var normalized = List<double>.filled(image.width * image.height, 0);
-    for (int y = 0; y < image.height; y++) {
-      for (int x = 0; x < image.width; x++) {
-        normalized[y * image.width + x] = image.getPixel(x, y).luminance - mean;
+  static List<double> _normalizeImage(
+      img.Image image, int x, int y, int width, int height, double mean) {
+    var normalized = List<double>.filled(width * height, 0);
+    for (int _y = 0; _y < height; _y++) {
+      for (int _x = 0; _x < width; _x++) {
+        normalized[_y * width + _x] =
+            image.getPixel(_x + x, _y + y).luminance - mean;
       }
     }
     return normalized;
   }
 
-  static double _calculateNCC(
-      img.Image window, List<double> template, double meanW) {
-    var sumWt = 0.0;
-    var sumWw = 0.0;
-    for (int y = 0; y < window.height; y++) {
-      for (int x = 0; x < window.width; x++) {
-        var w = window.getPixel(x, y).luminance - meanW;
-        var t = template[y * window.width + x];
-        sumWt += w * t;
+  static double _calculateNCC(img.Image window, int x, int y, int width,
+      int height, List<double> template, double meanW) {
+    double sumWt = 0;
+    double sumWw = 0;
+    var iT = template.iterator;
+    for (int _y = y; _y < y + height; _y++) {
+      for (int _x = x; _x < x + width; _x++) {
+        iT.moveNext();
+        double w = window.getPixel(_x, _y).luminance - meanW;
+        sumWt += w * iT.current;
         sumWw += w * w;
       }
     }
