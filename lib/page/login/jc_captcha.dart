@@ -6,7 +6,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -99,52 +98,97 @@ class SliderCaptchaClientProvider {
     return result.data["errorCode"] == 1;
   }
 
-  static double? _trySolve(Uint8List puzzleData, Uint8List pieceData) {
+  static double? _trySolve(Uint8List puzzleData, Uint8List pieceData,
+      {int border = 24}) {
     img.Image? puzzle = img.decodeImage(puzzleData);
     if (puzzle == null) {
       return null;
     }
-
     img.Image? piece = img.decodeImage(pieceData);
     if (piece == null) {
       return null;
     }
 
-    // note that puzzle and piece have the same height
+    var bbox = _findAlphaBoundingBox(piece);
+    int xL = bbox[0] + border;
+    int yT = bbox[1] + border;
+    int xR = bbox[2] - border;
+    int yB = bbox[3] - border;
 
-    int minY = piece.height - 1;
-    int maxY = 0;
+    var widthW = xR - xL;
+    var heightW = yB - yT;
+    var widthG = puzzle.width - piece.width + widthW - 1;
+    var gray = img.grayscale(puzzle);
 
-    for (var y = 0; y < piece.height; y++) {
-      if (piece.getPixel((piece.width * 0.5).floor(), y).a > 0) {
-        minY = min(minY, y);
-        maxY = max(maxY, y);
+    var template = img.grayscale(
+        img.copyCrop(piece, x: xL, y: yT, width: widthW, height: heightW));
+    var meanT = _calculateMean(template);
+    var templateN = _normalizeImage(template, meanT);
+
+    double nccMax = 0;
+    int xMax = 0;
+
+    for (int x = 0; x <= widthG - widthW; x += 2) {
+      var window =
+          img.copyCrop(gray, x: x, y: yT, width: widthW, height: heightW);
+      var meanW = _calculateMean(window);
+      var ncc = _calculateNCC(window, templateN, meanW);
+      if (ncc > nccMax) {
+        nccMax = ncc;
+        xMax = x;
       }
     }
 
-    for (var x = 1; x < puzzle.width - 1; x++) {
-      int matchCount = 0;
-
-      for (var y = minY; y <= maxY; y++) {
-        var l = _getPixelGrayscale(puzzle.getPixel(x - 1, y));
-        var r = _getPixelGrayscale(puzzle.getPixel(x + 1, y));
-
-        // find edge
-        if ((r - l).abs() > 50) {
-          matchCount++;
-        }
-      }
-
-      if ((matchCount / (maxY - minY + 1.0)) > 0.6) {
-        return x / puzzle.width;
-      }
-    }
-
-    return null;
+    return xMax.toDouble();
   }
 
-  static int _getPixelGrayscale(img.Pixel p) {
-    return (0.2126 * p.r + 0.7152 * p.g + 0.0722 * p.b).round();
+  static List<int> _findAlphaBoundingBox(img.Image image) {
+    int left = image.width, top = image.height, right = 0, bottom = 0;
+    for (int y = 0; y < image.height; y++) {
+      for (int x = 0; x < image.width; x++) {
+        if (image.getPixel(x, y).a.round() != 255) continue;
+        if (x < left) left = x;
+        if (y < top) top = y;
+        if (x > right) right = x;
+        if (y > bottom) bottom = y;
+      }
+    }
+    return [left, top, right, bottom];
+  }
+
+  static double _calculateMean(img.Image image) {
+    double total = 0;
+    for (int y = 0; y < image.height; y++) {
+      for (int x = 0; x < image.width; x++) {
+        total += image.getPixel(x, y).luminance;
+      }
+    }
+    return total / (image.width * image.height);
+  }
+
+  static List<double> _normalizeImage(img.Image image, double mean) {
+    var normalized = List<double>.filled(image.width * image.height, 0);
+    for (int y = 0; y < image.height; y++) {
+      for (int x = 0; x < image.width; x++) {
+        normalized.add(image.getPixel(x, y).luminance - mean);
+      }
+    }
+    return normalized;
+  }
+
+  static double _calculateNCC(
+      img.Image window, List<double> template, double meanW) {
+    var sumWt = 0.0;
+    var sumWw = 0.0;
+    for (int y = 0; y < window.height; y++) {
+      for (int x = 0; x < window.width; x++) {
+        var w = window.getPixel(x, y).luminance - meanW;
+        var t = template[y * window.width + x];
+        sumWt += w * t;
+        sumWw += w * w;
+      }
+    }
+    return sumWt / sumWw;
   }
 }
 
