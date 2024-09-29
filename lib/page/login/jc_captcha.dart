@@ -64,7 +64,7 @@ class SliderCaptchaClientProvider {
     for (int i = 0; i < retryCount; i++) {
       await updatePuzzle();
 
-      double answer = _trySolve(puzzleData!, pieceData!);
+      double? answer = _trySolve(puzzleData!, pieceData!);
       if (answer != null && await verify(answer)) {
         return;
       }
@@ -98,7 +98,7 @@ class SliderCaptchaClientProvider {
     return result.data["errorCode"] == 1;
   }
 
-  static double _trySolve(Uint8List puzzleData, Uint8List pieceData,
+  static double? _trySolve(Uint8List puzzleData, Uint8List pieceData,
       {int border = 24}) {
     img.Image? puzzle = img.decodeImage(puzzleData);
     if (puzzle == null) {
