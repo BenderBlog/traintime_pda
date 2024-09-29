@@ -83,7 +83,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "Pairman",
       "https://avatars.githubusercontent.com/u/18365163",
-      "开发：成绩信息缓存功能",
+      "开发：成绩缓存功能和优化滑块算法",
       "https://github.com/Pairman",
     ),
     Developer(
