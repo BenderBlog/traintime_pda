@@ -170,7 +170,7 @@ class SliderCaptchaClientProvider {
     var normalized = List<double>.filled(image.width * image.height, 0);
     for (int y = 0; y < image.height; y++) {
       for (int x = 0; x < image.width; x++) {
-        normalized.add(image.getPixel(x, y).luminance - mean);
+        normalized[y * window.width + x] = image.getPixel(x, y).luminance - mean;
       }
     }
     return normalized;
