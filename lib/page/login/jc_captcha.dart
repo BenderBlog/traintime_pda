@@ -99,7 +99,7 @@ class SliderCaptchaClientProvider {
   }
 
   static double? _trySolve(Uint8List puzzleData, Uint8List pieceData,
-      {int border = 8}) {
+      {int border = 24}) {
     img.Image? puzzle = img.decodeImage(puzzleData);
     if (puzzle == null) {
       return null;
