@@ -76,6 +76,8 @@ dependencies:
   fwfh_cached_network_image: ^0.14.3
   fwfh_url_launcher: ^0.9.1
   latext: ^0.4.1
+  permission_handler: ^11.3.1
+  device_info_plus: ^10.1.2
 
 dev_dependencies:
   flutter_test:

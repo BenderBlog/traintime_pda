@@ -26,6 +26,7 @@ import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
@@ -248,8 +249,14 @@ class _SettingWindowState extends State<SettingWindow> {
                     title: const Text('课表背景图选择'),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () async {
-                      FilePickerResult? result = await FilePicker.platform
-                          .pickFiles(type: FileType.image);
+                      FilePickerResult? result;
+                      try {
+                        result = await pickFile(type: FileType.image);
+                      } on MissingStoragePermissionException {
+                        if (context.mounted) {
+                          showToast(context: context, msg: "未获取存储权限，无法读取文件");
+                        }
+                      }
                       if (mounted) {
                         if (result != null) {
                           File(result.files.single.path!)

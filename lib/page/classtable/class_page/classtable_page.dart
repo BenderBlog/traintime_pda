@@ -18,6 +18,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
@@ -206,15 +207,18 @@ class _ClassTablePageState extends State<ClassTablePage> {
       }
     }
 
-    String? result = await FilePicker.platform
-        .pickFiles(type: FileType.any)
-        .then((value) => value?.files.single.path);
+    String? result = "";
 
-    if (mounted && result == null) {
-      showToast(
-        context: context,
-        msg: '未发现导入文件',
-      );
+    try {
+      result = await pickFile().then((value) => value?.files.single.path ?? "");
+      if (mounted && result.isEmpty) {
+        showToast(
+          context: context,
+          msg: '未发现导入文件',
+        );
+      }
+    } on MissingStoragePermissionException {
+      if (mounted) showToast(context: context, msg: "未获取存储权限，无法读取文件");
     }
 
     if (mounted) {
