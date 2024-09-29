@@ -25,4 +25,12 @@ jobs:
 
       - name: Build for Android
         run: |
-          .flutter/bin/flutter build apk --split-per-abi
+          .flutter/bin/flutter build apk --target-platform=android-arm64
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          if-no-files-found: error
+          name: dist_android
+          path: |
+            build/app/outputs/flutter-apk/*.apk
