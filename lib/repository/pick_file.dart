@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Ref. https://github.com/acterglobal/a3/pull/2183/
+// Must detect permission...
 
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -22,6 +23,8 @@ Future<FilePickerResult?> pickFile({
       }
     }
   }
+  // Ref. https://github.com/miguelpruivo/flutter_file_picker/issues/1584
+  // Disable compression:P
   return await FilePicker.platform.pickFiles(
     type: type,
     compressionQuality: 0,
