@@ -185,7 +185,7 @@ class SliderCaptchaClientProvider {
         sumWw += w * w;
       }
     }
-    return sumWt / sumWw;
+    return sumWt / (sumWw + 0.000001);
   }
 }
 
