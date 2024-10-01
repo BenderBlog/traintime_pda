@@ -168,9 +168,9 @@ class SliderCaptchaClientProvider {
   static double _calculateSum(
       img.Image image, int x, int y, int width, int height) {
     double sum = 0;
-    for (var _y = y; _y < y + height; _y++) {
-      for (var _x = x; _x < x + width; _x++) {
-        sum += image.getPixel(_x, _y).luminance;
+    for (var yy = y; yy < y + height; yy++) {
+      for (var xx = x; xx < x + width; xx++) {
+        sum += image.getPixel(xx, yy).luminance;
       }
     }
     return sum;
@@ -184,9 +184,9 @@ class SliderCaptchaClientProvider {
   static List<double> _normalizeImage(
       img.Image image, int x, int y, int width, int height, double mean) {
     return [
-      for (var _y = 0; _y < height; _y++)
-        for (var _x = 0; _x < width; _x++)
-          image.getPixel(_x + x, _y + y).luminance - mean
+      for (var yy = 0; yy < height; yy++)
+        for (var xx = 0; xx < width; xx++)
+          image.getPixel(xx + x, yy + y).luminance - mean
     ];
   }
 
@@ -195,10 +195,10 @@ class SliderCaptchaClientProvider {
     double sumWt = 0;
     double sumWw = 0;
     var iT = template.iterator;
-    for (var _y = y; _y < y + height; _y++) {
-      for (var _x = x; _x < x + width; _x++) {
+    for (var yy = y; yy < y + height; yy++) {
+      for (var xx = x; xx < x + width; xx++) {
         iT.moveNext();
-        var w = window.getPixel(_x, _y).luminance - meanW;
+        var w = window.getPixel(xx, yy).luminance - meanW;
         sumWt += w * iT.current;
         sumWw += w * w;
       }
