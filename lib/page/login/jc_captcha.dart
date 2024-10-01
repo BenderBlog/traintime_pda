@@ -192,8 +192,7 @@ class SliderCaptchaClientProvider {
 
   static double _calculateNCC(img.Image window, int x, int y, int width,
       int height, List<double> template, double meanW) {
-    double sumWt = 0;
-    double sumWw = 0;
+    double sumWt = 0, sumWw = 0.000001;
     var iT = template.iterator;
     for (var yy = y; yy < y + height; yy++) {
       for (var xx = x; xx < x + width; xx++) {
@@ -203,7 +202,7 @@ class SliderCaptchaClientProvider {
         sumWw += w * w;
       }
     }
-    return sumWt / (sumWw + 0.000001);
+    return sumWt / sumWw;
   }
 }
 
