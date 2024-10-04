@@ -10,6 +10,7 @@ import 'dart:ui';
 import 'package:catcher_2/catcher_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -103,7 +104,19 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
-        localizationsDelegates: const [
+        localizationsDelegates: [
+          FlutterI18nDelegate(
+            translationLoader: FileTranslationLoader(
+              fallbackFile: "zh_CN",
+              useCountryCode: true,
+            ),
+            missingTranslationHandler: (key, locale) {
+              log.info(
+                "--- Missing Key: $key, "
+                "languageCode: ${locale?.languageCode ?? "unknown"}",
+              );
+            },
+          ),
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

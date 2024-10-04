@@ -1,0 +1,565 @@
+# EasyRefresh 下拉插件的玩意
+drag_text: "上拉请求更多"
+ready_text: "正在加载......"
+processing_text: "正在加载......"
+processed_text: "请求成功"
+noMore_text: "数据没有更多"
+failed_text: "数据获取失败更多"
+
+# 公共组件
+choose_semester: "选择学期"
+error_detected: "Ouch! 发生错误啦"
+click_to_refresh: "点我刷新"
+
+# 取消和确定
+cancel: "取消"
+confirm: "确定"
+
+# controller/model 里面可能需要给用户展示的
+network_error: "网络错误，可能是没联网，可能是学校服务器出现了故障:-P"
+error_detect: "遇到错误: {e}"
+query_failed: "查询失败"
+not_school_network: "没有在校园网环境"
+experiment_controller:
+    no_password: "没有物理实验密码"
+    login_failed: "登录失败"
+cancel_exam: "取消考试资格:P"
+electricity_session:
+    fetching: "正在获取"
+    not_school_network: "非校园网"
+    network_problem: "网络故障"
+    query_failed: "查询失败"
+    program_crash: "程序故障"
+login_process:
+    ready_page: "准备获取登录网页"
+    get_encrypt: "获取密码加密密钥"
+    ready_login: "准备登录"
+    slider: "滑块验证"
+    after_process: "登录后处理"
+    failed: "登录失败，响应状态码：{statusCode}"
+# TODO: ehall_exam_session data
+
+# main.dart 里面 Catcher 插件字符串
+catcher:
+    error_detected: "发生错误"
+    error_description: "详情如下"
+
+# 登录界面
+login:
+    identity_number: "学号"
+    password: "一站式登录密码"
+    login: "登录"
+    incorrect_password_pattern: "用户名或密码不符合要求，学号必须 11 位且密码非空"
+    on_login_progress: "正在登录学校一站式"
+    complete_login: "登录成功"
+    failed_login_cannot_connect_to_server: "无法连接到服务器"
+    failed_login_with_code: "请求失败，响应状态码：{code}"
+    failed_login_with_message: "请求失败，报错信息：{message}"
+    failed_login_other: "未知错误，请联系开发者"
+    bottom_buttons:
+        clear_cache: "清除登录缓存"
+        complete_clear_cache: "清理缓存成功"
+        see_inspector: "查看网络交互"
+    captcha_window:
+        title: "请输入验证码"
+        hint: "输入验证码"
+        message_on_empty: "请输入验证码"
+    slider:
+        title: "服务器认证服务"
+
+# 日程表/课程表
+classtable:
+    weekday:
+        monday: "周一"
+        tuesday: "周二"
+        wednesday: "周三"
+        thursday: "周四"
+        friday: "周五"
+        saturday: "周六"
+        sunday: "周日"
+    partner_classtable:
+        override_dialog:
+            title: "确认对话框"
+            message: "目前有搭子课表数据，是否要覆盖？"
+        message:
+            no_file: "未发现导入文件"
+            no_permission: "未获取存储权限，无法读取文件"
+            problem: "好像导入文件有点问题:P"
+            success: "导入成功"
+        share_dialog:
+            title: "请不要随意分享"
+            hint: "导出文件包括你的个人信息，请不要随意跟别人分享，或者发在大群里。"
+        save_dialog:
+            title: "保存日历文件到..."
+            success_message: "应该保存成功"
+            failure_message: "文件创建失败，保存取消"
+        delete_dialog:
+            title: "确认对话框"
+            message: "确定要清除共享课表吗？"
+            success_message: "删除共享课表成功"
+    page_title: "我的日程表"
+    partner_page_title: "搭子的日程表"
+    popup_menu:
+        not_arranged: "查看未安排课程信息"
+        class_changed: "查看课程安排调整信息"
+        add_class: "添加课程信息"
+        generate_ical: "生成日历文件"
+        generate_partner_file: "生成共享课表文件"
+        import_partner_file: "导入共享课表文件"
+        delete_partner_file: "删除共享课表文件"
+    class_change_page:
+        title: "课程调整"
+        empty_message: "目前没有调课信息"
+        teacher_change: "从{previous_teacher}变为{new_teacher}"
+        no_teacher_change: "教师信息没有改变"
+        change_class_message: 调课信息，从第{originalAffectedWeeks}周
+            星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
+            调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的
+            {newClassRangeStart}-{newClassRangeStop}节，{newClassroom}教室上课
+        patch_class_message: 补课信息，从第{newAffectedWeeksListStr}周
+            星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，
+            {newClassroom}补课
+        stop_class_message: 停课信息，第{originalAffectedWeeks}周
+            星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
+            {originalClassroom}停课
+        class_info: "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}"
+    not_arranged_page:
+        title: "没有时间安排的科目"
+        empty_message: "目前全部课程均有时间安排"
+        content: "编号: {classCode} | {classNumber} 班\n老师: {teacher}"
+    empty_class_message: "{semester_code} 学期没有课程"
+    week_title: "第{week}周"
+    noon_break: "午休"
+    supper_break: "晚休"
+    class_card:
+        title: "日程信息"
+        unknown_classroom: "未知教室"
+        remains_hint: "还有{remain_count}个日程"
+    class_add:
+        add_class_title: "添加课程"
+        change_class_title: "修改课程"
+        class_name_empty_message: "必须输入课程名"
+        wrong_time_message: "输入的时间不对"
+        save_button: "保存"
+        input_classname_hint: "课程名字(必填)"
+        input_teacher_hint: "老师姓名(选填)"
+        input_classroom_hint: "教室位置(选填)"
+        input_week_hint: "选择上课周次"
+        input_time_hint: "选择上课时间"
+        input_time_weekday_hint: "上课周次"
+        input_start_time_hint: "上课时间段"
+        input_end_time_hint: "下课时间段"
+        wheel_choose_hint: "第 {index} 节"
+    course_detail_card:
+        class_number_string: "{number} 班"
+        unknown_teacher: "老师未定"
+        unknown_place: "地点未定"
+        class_period: "{start}-${stop}节"
+        edit: "编辑"
+        delete: "删除"
+        delete_confirm_dialog:
+            title: "是否删除课程信息？"
+            content: "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！"
+
+# 双创信息
+creative_job:
+    search_hint: "搜索需求"
+    choice_type: "选择种类"
+    position_type: "职位类型"
+    no_result: "没有搜索到结果"
+    please_search: "请在上面搜索框搜索"
+    query_for_person: "招募 {exceptNumber} 人 · "
+    end_time: "截止日期 {end_time}"
+    complete_choosing: "选择完毕"
+    creative_job_description:
+        title: "工作详情"
+        browser_hint: "*如果用户感兴趣，请按右上角的按钮在浏览器中打开*"
+        job_description_title: 岗位描述
+        reward_title: 工作回报
+        progress_title: 项目进度
+        no_description: 没有描述
+
+# 空闲教室
+empty_classroom:
+    title: "空闲教室"
+    date: "日期 {date}"
+    building: "教学楼 {building}"
+    search_hint: "教室名称或者教室代码"
+    classroom: "教室"
+
+# 考试信息
+exam:
+    title: "考试安排"
+    cache_hint: "已显示缓存考试安排信息"
+    not_finished: "未完成考试"
+    all_finished: "所有考试全部完成"
+    unable_to_exam: "无法完成考试"
+    finished: "已完成考试"
+    none_finished: "一门还没考呢"
+    no_exam_arrangement: "目前没有考试安排"
+    no_arrangement:
+        title: "目前无安排考试的科目"
+        all_arranged: "目前所有科目均已安排考试"
+        subtitle: "编号: {id}"
+
+# 物理实验
+experiment:
+    title: "物理实验"
+    ongoing: "正在进行实验"
+    not_finished: "未完成实验"
+    all_finished: "所有实验全部完成"
+    finished: "已完成实验"
+    score_sum: "目前分数总和：{sum}"
+    none_finished: "目前没有已经完成的实验"
+    not_provided: "未提供"
+
+# 主页
+homepage:
+    time_string:
+        morning: "早上好 准备出发"
+        before_noon: "上午好 祝万事如意"
+        at_noon: "中午好 一切还好吧"
+        afternoon: "下午好 今天如何"
+        night: "晚上好 祝你好梦"
+        midnight: "深宵了 我在陪你"
+    loading: "正在加载"
+    load_error: "加载错误"
+    on_holiday: "假期中"
+    on_weekday: "第 ${c.getCurrentWeek(updateTime) + 1} 周"
+    loading_message: "请稍候，正在刷新信息"
+    homepage: "主页"
+    xdu_planet: "博客星球"
+    setting: "设置"
+    input_partner_data:
+        route_not_exist: "导入路径不存在:P"
+        failed_get_file: "导入文件失败"
+        failed_import: 好像导入文件有点问题:P
+        success_message: "导入成功，如果打开了课表页面请重新打开"
+        not_loaded: "还没加载课程表，等会再来吧……"
+        confirm_dialog:
+            title: "确认对话框"
+            content: "目前有搭子课表数据，是否要覆盖？"
+    login_message: "登录中，暂时显示缓存数据"
+    successful_login_message: "登录成功"
+    password_wrong_dialog:
+        title: "用户名或密码有误"
+        content: "是否重启应用后手动登录？"
+        confirm: "确认"
+        denial: "否，进入离线模式"
+    offline_mode_dialog:
+        title: 统一认证服务离线模式开启
+        content: 无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。
+            成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。
+            如有不便，敬请谅解。
+        message: "脱机模式下，一站式相关功能全部禁止使用"
+    notice_card:
+        empty_notice: "目前没有获取应用公告，请刷新"
+        no_notice_avaliable: "没有获取应用公告"
+        notice_list_title: "应用信息"
+        open_url: "访问该链接"
+        notice_page_title: "通知列表"
+    class_table_card:
+        current: "当前"
+        tomorrow: "明天"
+        later: "稍后"
+        more: "更多"
+        error_message: "遇到错误：{error}"
+        fetching_message: "正在获取课表"
+        error_infoText: "遇到错误"
+        fetching_infoText: "正在加载"
+        no_arrangement_infoText: "暂无日程"
+    electricity_card:
+        title: "电量信息"
+        current_electricity: "目前电量 "
+        kwh: " 度"
+        dialog:
+            title: "水电信息"
+            content: 电费帐号：{account}
+                电量信息：{electricityInfo.value}
+                {electricityInfo}
+                欠费信息：{owe_value}
+                长按可以重新加载，有欠费一般代表水费
+            confirm: "确定"
+    library_card:
+        title: "图书借阅"
+        current_borrow: "目前借书 "
+        unit_of_book: " 本"
+        error_occured: "获取借书信息发生错误"
+        fetching: "正在获取借书信息"
+        no_return: "目前没有待归还书籍"
+        need_return: "待归还{borrow_info.dued}本书籍"
+        no_info: "目前无法获取信息"
+        fetching_info: "正在查询信息中"
+    school_card_info_card:
+        error_toast: "遇到错误，请联系开发者"
+        fetching_toast: "正在获取信息，请稍后再来看"
+        bill: "流水"
+        balance: "校园卡余额 "
+        unit: " 元"
+        error_occured: "获取校园卡信息发生错误"
+        fetching: "正在获取校园卡信息"
+        bottom_text_success: "查询一卡通流水"
+        no_info: "目前无法获取信息"
+        fetching_info: "正在查询信息中"
+    toolbox:
+        creative: "双创竞赛"
+        empty_classroom: "空闲教室"
+        exam: "考试安排"
+        experiment: "物理实验"
+        score: "成绩查询"
+        sport: "体育信息"
+        toolbox: "其他功能"
+        score_cannot_reach: "脱机状态且无缓存成绩数据，无法访问"
+        exam_fetching: "请稍候，正在获取考试信息"
+        exam_error: "遇到错误，请联系开发者"
+
+# 图书馆
+library:
+    title: "图书馆信息"
+    borrow_state_title: "借书状态"
+    search_book_title: "查询藏书"
+    not_provided: "没有相关信息"
+    author: "作者 "
+    publish_house: "出版社 "
+    call_number: "索书号 "
+    publish_date: "发行时间 "
+    isbn: "ISBN"
+    arrangement_code: "编排号码 "
+    avaliable_borrow: "可借"
+    storage: "馆藏"
+    on_shelve: "在架"
+    book_code: "书籍编号：{barCode}"
+    due_date: " 到期"
+    borrow_str: " 借阅"
+    after_due_date: " 天前到期"
+    before_due_date: " 天后"
+    can_be_renewable: "续借"
+    cannot_be_renewable: "不可续借"
+    renewing: "正在续借"
+    empty_borrow_list: "目前没有查询到在借图书\n不借书就要变成上面的小呆瓜咯"
+    borrow_list_info: "在借 {borrowListLength} 本，其中已过期 {duedLength} 本"
+    search_book_window:
+    search_here: "在此搜索"
+    book_detail: "书籍详细信息"
+    no_result: "没有结果"
+    please_search: "请在上面搜索框搜索"
+
+# 校园卡流水
+school_card_window:
+    title: "校园卡流水信息"
+    income: "支出 {income}"
+    expense: "收入 {expense}"
+    select_range: "选择日期：从 {startDay} 到 {endDay}"
+    store_name: "商户名称"
+    balance: "金额"
+    time_with_sum: "时间(共{sum}元)"
+
+# 成绩
+score:
+    title: "成绩查询"
+    cache_message: "已显示缓存成绩信息"
+    # TODO：string in eval detected
+    all_semester: "所有学期"
+    chosen_semester: "学期 {chosen}"
+    all_type: "所有类型"
+    chosen_type: "类型 {type}"
+    score_choice:
+        title: "成绩单"
+        search_hint: "搜索成绩记录"
+        empty_list: "没有选择该学期的课程计入均分计算"
+        sum_dialog:
+            title: "小总结"
+            content: 所有科目的GPA：{gpa_all}
+                所有科目的均分：{avg_all}
+                所有科目的学分：{credit_all}
+                未通过科目：{unpassed}
+                公共选修课已经修得学分：{not_core_credit}
+                本程序提供的数据仅供参考，开发者对其准确性不负责
+    score_compose_card:
+        no_detail: "未提供详情信息"
+        fetching: "正在获取"
+        credit: "学分"
+        gpa: "GPA"
+        score: "成绩"
+    score_info_card:
+        title: "成绩详情"
+        original_course: "初修"
+        failed: "[挂] "
+        credit: "学分 {credit}"
+        gpa: "GPA {gpa}"
+        score: "成绩 {score}"
+    score_page:
+        title: "成绩查询"
+        search_hint: "搜索成绩记录"
+        no_record: "未筛查到合请求的记录"
+        select_all: "全选"
+        select_nothing: "全不选"
+        reset_select: "重置选择"
+        # 也许没用
+        CET-4: "国家英语四级"
+        CET-6: "国家英语六级"
+
+# 设置
+setting:
+    # 最顶部
+    about: "关于"
+    about_this_program: "关于本程序"
+    version: "版本号：{version_code}"
+    user_info: "用户信息"
+    # 界面设置
+    ui_setting: "界面设置"
+    brightness_setting: "设置深浅色"
+    simplify_timeline: "简化日程时间轴"
+    simplify_timeline_description: "没有日程时 减少空间占用"
+    # 账号设置
+    account_setting: "界面设置"
+    sport_password_setting: "体育系统密码设置"
+    experiment_password_setting: "物理实验系统密码设置"
+    electricity_password_setting: "电费帐号密码设置"
+    electricity_password_description: "非 123456 请设置"
+    # 课表相关设置
+    classtable_setting: "课表相关设置"
+    background: "开启课表背景图"
+    no_background: "你先选个图片罢，就在下面"
+    choose_background: "课表背景图选择"
+    no_permission: "未获取存储权限，无法读取文件"
+    successful_setting: "设定成功"
+    failure_setting: "你没有选图片捏"
+    clear_user_class: "清除所有用户添加课程"
+    clear_user_class_dialog:
+        title: "确认对话框"
+        content: "是否要清除所有用户添加课程？这个功能对从学校获取的日程没有影响。"
+        clear: "已经清除完毕"
+    class_refresh: "强制刷新课表"
+    class_refresh_dialog:
+        title: "确认对话框"
+        content: "是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。"
+    class_swift: "课程偏移设置"
+    class_swift_description: "正数错后开学日期 负数提前开学日期\n目前为 {swift}"
+    # 缓存登录设置
+    core_setting: "缓存登录设置"
+    check_catcher: "测试错误拦截器"
+    check_logger: "查看网络拦截器和日志"
+    clear_and_restart: "清除缓存后重启"
+    clear_and_restart_dialog:
+        title: "确认对话框"
+        content: "确定清除缓存后重启程序？"
+        cleaning: "正在清理缓存"
+        clear: "缓存已被清除"
+    logout: "退出登录并重启应用"
+    logout_dialog:
+        title: "确认对话框"
+        content: "确定退出登录？你的所有数据将会被彻底删除！"
+        logging_out: "正在退出登录"
+    need_close_dialog:
+        title: "请关闭应用"
+        need_restart_d: "因为技术限制，用户需要自行关闭窗口，然后重新打开应用。"
+    # 剩下乱七八糟的窗口
+    change_brightness_dialog:
+        title: "颜色设置"
+        follow_setting: "跟随系统"
+        day_mode: "白天模式"
+        night_mode: "黑夜模式"
+    change_swift_dialog:
+        title: "课程偏移设置"
+        input_hint: "请在此输入数字"
+    change_password_dialog:
+        title: "修改电费帐号密码"
+        input_hint: "请在此输入密码"
+        blank_input: "输入空白!"
+    easter_egg_page:
+        title: "你找到了彩蛋"
+        encrypt: "加密上面的文本"
+        listen: "听歌时间"
+    about_page:
+        benderblog: "主要开发者，iOS 小部件编写和拼接"
+        bellssgit: "支持：最佳&最久故障反馈者"
+        brackrat: "设计：主页，登录页，配色，iOS 小部件等"
+        breezeline: "支持：无价值无意义的产品经理(他自己的描述)"
+        cafebabe: “支持：提供彩蛋代码"
+        chitao1234: "开发：修复滑块不对齐问题"
+        dimole: "支持：辅助修复滑块问题"
+        elitewars: "设计：体育成绩页面"
+        hhzm: "支持：提供彩蛋代码"
+        lsy223622: "设计：iOS 图标"
+        nancuncloud: "开发：图书馆搜索功能"
+        pairman: "开发：成绩缓存功能和优化滑块算法"
+        reverierxu: "设计：用于信息展示的 ReX 卡片"
+        ray: "设计：开屏画面 / 支持：iOS 开发"
+        stalomeow: "设计：首页时间轴 / 开发：异步登录"
+        xeonds: "设计：设置页面 / 开发：XDU Planet"
+        xiue233: "开发：Android 小部件和拼接"
+        zcwzy: "开发：修复丁香电费 / 支持：研究生版本开发"
+        homepage: "主页"
+        code: "开源代码"
+        donate: "给我捐款"
+        know_more: "知道更多"
+        copyright_notice:
+            本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
+            代码按照 Mozilla Public License, v. 2.0 授权。
+            本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
+            Copyright 2023-Present BenderBlog Rodriguez and contributors.
+            The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+            If a copy of the MPL was not distributed with this file,
+            You can obtain one at https://mozilla.org/MPL/2.0/.
+        beian: "备案号"
+        sign_android: "安卓签名"
+        title: "关于本软件"
+
+# 体育查询
+sport:
+    fetching: "正在获取"
+    error: "坏事: {situation}"
+    title: "体育查询"
+    class_info: "课程信息"
+    test_score: "体测成绩"
+    # TODO: change sport score to support i18n
+    total_score: "四年总分"
+    semester: "{year} 第{gradeType}"
+    subject: "项目"
+    data: "数据"
+    score: "分数"
+    passed: "及格"
+    score_string: "{score}分"
+
+# 其他功能
+toolbox:
+    title: "其他功能"
+    payment: "缴费系统"
+    payment_description: "电费该交了吧"
+    repair: "后勤报修"
+    repair_description: "不要漏水断网"
+    reserve: "空间预约"
+    reserve_description: "找个地方打牌"
+    mobile: "移动门户"
+    mobile_description: "请假专用门户"
+    network: "网络查询"
+    network_description: "希望永不收费"
+    physics: "物理计算"
+    physics_description: "希望操作顺利"
+    discover: "睿思导航"
+    discover_description: "补充其他功能"
+
+# XDU Planet
+xdu_planet:
+    # TODO：string in eval detected
+    all: "全部"
+    loading: "加载中，请稍等 <(=ω=)>"
+    unknown_author: "未知作者"
+    load_failed: "文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。"
+    no_comment: "暂无评论"
+    reply_audit: "回复评论 #{reply_to} 已被举报或删除"
+    reply: "回复评论 #{reply_to}：{content}"
+    have_been_audit: "本评论已经被举报"
+    audit: "举报"
+    confirm_audit_dialog:
+        title: "确认是否举报"
+        content: "三思而后行，确定您想举报吗？举报后该评论会有标签，不一定会删除。"
+        ongoing: "正在举报评论"
+        failed: "举报失败"
+        success: "举报成功"
+    comment: "回复"
+    comment_success: "评论成功"
+    comment_failed: "评论失败，请去网络查看器和日志查看器查看报错"
+    comment_canceled: "没想好要说啥嘛"
+    comment_loading: "加载评论中……"
