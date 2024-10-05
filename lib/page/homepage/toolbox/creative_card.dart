@@ -23,7 +23,7 @@ class CreativeCard extends StatelessWidget {
         }
       },
       icon: MingCuteIcons.mgc_star_line,
-      name: "双创竞赛",
+      nameKey: "homepage.toolbox.creative",
     );
   }
 }

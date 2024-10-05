@@ -1,3 +1,6 @@
+# Copyright 2024 BenderBlog Rodriguez and contributors.
+# SPDX-License-Identifier: MPL-2.0
+
 # EasyRefresh 下拉插件的玩意
 drag_text: "上拉请求更多"
 ready_text: "正在加载......"
@@ -12,6 +15,7 @@ error_detected: "Ouch! 发生错误啦"
 click_to_refresh: "点我刷新"
 
 # 取消和确定
+confirm_title: "确认对话框"
 cancel: "取消"
 confirm: "确定"
 
@@ -78,17 +82,14 @@ classtable:
         saturday: "周六"
         sunday: "周日"
     partner_classtable:
-        override_dialog:
-            title: "确认对话框"
-            message: "目前有搭子课表数据，是否要覆盖？"
-        message:
-            no_file: "未发现导入文件"
-            no_permission: "未获取存储权限，无法读取文件"
-            problem: "好像导入文件有点问题:P"
-            success: "导入成功"
+        override_dialog: "目前有搭子课表数据，是否要覆盖？"
+        no_file: "未发现导入文件"
+        no_permission: "未获取存储权限，无法读取文件"
+        problem: "好像导入文件有点问题:P"
+        success: "导入成功"
         share_dialog:
             title: "请不要随意分享"
-            hint: "导出文件包括你的个人信息，请不要随意跟别人分享，或者发在大群里。"
+            content: "导出文件包括你的个人信息，请不要随意跟别人分享，或者发在大群里。"
         save_dialog:
             title: "保存日历文件到..."
             success_message: "应该保存成功"
@@ -112,6 +113,13 @@ classtable:
         empty_message: "目前没有调课信息"
         teacher_change: "从{previous_teacher}变为{new_teacher}"
         no_teacher_change: "教师信息没有改变"
+        1: '一'
+        2: '二'
+        3: '三'
+        4: '四'
+        5: '五'
+        6: '六'
+        7: '日'
         change_class_message: 调课信息，从第{originalAffectedWeeks}周
             星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
             调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的
@@ -122,7 +130,7 @@ classtable:
         stop_class_message: 停课信息，第{originalAffectedWeeks}周
             星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
             {originalClassroom}停课
-        class_info: "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}"
+        class_info: "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}\n{teacherChange}"
     not_arranged_page:
         title: "没有时间安排的科目"
         empty_message: "目前全部课程均有时间安排"
@@ -154,12 +162,11 @@ classtable:
         class_number_string: "{number} 班"
         unknown_teacher: "老师未定"
         unknown_place: "地点未定"
-        class_period: "{start}-${stop}节"
+        class_period: "{start}-{stop}节"
         edit: "编辑"
         delete: "删除"
-        delete_confirm_dialog:
-            title: "是否删除课程信息？"
-            content: "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！"
+        delete_title: "是否删除课程信息？"
+        delete_content: "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！"
 
 # 双创信息
 creative_job:

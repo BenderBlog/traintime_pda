@@ -34,7 +34,7 @@ class ExperimentCard extends StatelessWidget {
         }
       },
       icon: MingCuteIcons.mgc_science_line,
-      name: "物理实验",
+      nameKey: "homepage.toolbox.experiment",
     );
   }
 }

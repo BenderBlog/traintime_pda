@@ -3,6 +3,9 @@
 
 // These are some constant used in the class table.
 
+import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
+
 /// The width of the button.
 const weekButtonWidth = 74.0;
 
@@ -22,14 +25,20 @@ const changePageTime = 200;
 /// The height of the middle row.
 const midRowHeight = 54.0;
 
-List<String> weekList = [
-  '周一',
-  '周二',
-  '周三',
-  '周四',
-  '周五',
-  '周六',
-  '周日',
-];
+String getWeekString(BuildContext context, int index) {
+  List<String> weekList = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
+  return FlutterI18n.translate(
+    context,
+    "classtable.weekday.${weekList[index]}",
+  );
+}
 
 String pageTitle = "我的日程表";

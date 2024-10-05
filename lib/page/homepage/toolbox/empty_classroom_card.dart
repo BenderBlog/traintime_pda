@@ -26,7 +26,7 @@ class EmptyClassroomCard extends StatelessWidget {
           }
         },
         icon: MingCuteIcons.mgc_building_2_line,
-        name: "空闲教室",
+        nameKey: "homepage.toolbox.empty_classroom",
       ),
     );
   }

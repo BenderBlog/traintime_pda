@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -99,18 +100,20 @@ class _ClassTableViewState extends State<ClassTableView> {
           child: Text.rich(
             TextSpan(children: [
               if (indexOfChar == -1)
-                const TextSpan(
-                  text: "午休",
-                  style: TextStyle(
-                    fontSize: 12,
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "classtable.noon_break",
                   ),
+                  style: const TextStyle(fontSize: 12),
                 )
               else if (indexOfChar == -2)
-                const TextSpan(
-                  text: "晚饭",
-                  style: TextStyle(
-                    fontSize: 12,
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "classtable.supper_break",
                   ),
+                  style: const TextStyle(fontSize: 12),
                 )
               else ...[
                 TextSpan(text: "${indexOfChar + 1}\n"),

@@ -23,7 +23,7 @@ class ScoreCard extends StatelessWidget {
         }
       },
       icon: Icons.grading_rounded,
-      name: "成绩查询",
+      nameKey: "homepage.toolbox.score",
     );
   }
 }

@@ -2,19 +2,20 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 
 class SmallFunctionCard extends StatelessWidget {
   final IconData icon;
-  final String name;
+  final String nameKey;
   final void Function()? onTap;
   final void Function()? onLongPress;
 
   const SmallFunctionCard({
     super.key,
     required this.icon,
-    required this.name,
+    required this.nameKey,
     this.onTap,
     this.onLongPress,
   });
@@ -29,7 +30,10 @@ class SmallFunctionCard extends StatelessWidget {
       ),
       const SizedBox(height: 4),
       Text(
-        name,
+        FlutterI18n.translate(
+          context,
+          nameKey,
+        ),
         style: TextStyle(
           fontSize: 14,
           color: Theme.of(context).colorScheme.primary,

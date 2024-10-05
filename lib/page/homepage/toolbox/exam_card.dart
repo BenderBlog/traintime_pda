@@ -41,7 +41,7 @@ class ExamCard extends StatelessWidget {
           }
         },
         icon: MingCuteIcons.mgc_calendar_line,
-        name: "考试安排",
+        nameKey: "homepage.toolbox.exam",
       ),
     );
   }
