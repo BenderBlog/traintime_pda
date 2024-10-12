@@ -59,7 +59,7 @@ class SliderCaptchaClientProvider {
         width: pieceWidth, height: pieceHeight, fit: BoxFit.fitWidth));
   }
 
-  Future<void> solve(BuildContext context, {int retryCount = 20}) async {
+  Future<void> solve(BuildContext? context, {int retryCount = 20}) async {
     for (int i = 0; i < retryCount; i++) {
       await updatePuzzle();
       double? answer = _trySolve(puzzleData!, pieceData!);
@@ -72,13 +72,14 @@ class SliderCaptchaClientProvider {
 
     log.info("$retryCount failures, fallback to user input.");
     // fallback
-    if (context.mounted) {
+    if (context != null && context.mounted) {
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => CaptchaWidget(provider: this),
         ),
       );
     }
+    throw CaptchaSolveFailedException();
   }
 
   Future<bool> verify(double answer) async {
@@ -314,3 +315,5 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
     );
   }
 }
+
+class CaptchaSolveFailedException implements Exception {}

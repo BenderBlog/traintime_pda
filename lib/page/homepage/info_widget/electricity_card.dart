@@ -5,10 +5,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
-import 'package:watermeter/repository/electricity_session.dart'
-    as electricity_session;
-import 'package:watermeter/repository/xidian_ids/payment_session.dart'
-    as owe_session;
+import 'package:watermeter/repository/xidian_ids/payment_session.dart';
 
 class ElectricityCard extends StatelessWidget {
   const ElectricityCard({super.key});
@@ -24,10 +21,10 @@ class ElectricityCard extends StatelessWidget {
             children: [
               Obx(
                 () => Text(
-                  "电费帐号：${electricity_session.ElectricitySession.electricityAccount()}\n"
-                  "电量信息：${electricity_session.electricityInfo.value}"
-                  "${electricity_session.electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
-                  "欠费信息：${owe_session.owe.value}\n"
+                  "电费帐号：${PaymentSession.electricityAccount()}\n"
+                  "电量信息：${electricityInfo.value}"
+                  "${electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
+                  "欠费信息：${owe.value}\n"
                   "长按可以重新加载，有欠费一般代表水费",
                 ),
               ).paddingSymmetric(horizontal: 24),
@@ -39,13 +36,10 @@ class ElectricityCard extends StatelessWidget {
           ),
         );
       },
-      onLongPress: () {
-        electricity_session.update();
-        owe_session.update();
-      },
+      onLongPress: () => update(),
       child: Obx(
         () => MainPageCard(
-          isLoad: electricity_session.isNotice.value,
+          isLoad: isNotice.value,
           icon: MingCuteIcons.mgc_flash_line,
           text: "电量信息",
           infoText: RichText(
@@ -54,25 +48,24 @@ class ElectricityCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
                 fontSize: 20,
               ),
-              children: electricity_session.electricityInfo.value
-                      .contains(RegExp(r'[0-9]'))
+              children: electricityInfo.value.contains(RegExp(r'[0-9]'))
                   ? [
                       const TextSpan(text: "目前电量 "),
                       TextSpan(
                           text: double.parse(
-                        electricity_session.electricityInfo.value,
+                        electricityInfo.value,
                       ).truncate().toString()),
                       const TextSpan(text: " 度"),
                     ]
                   : [
                       TextSpan(
-                        text: electricity_session.electricityInfo.value,
+                        text: electricityInfo.value,
                       ),
                     ],
             ),
           ),
           bottomText: Text(
-            owe_session.owe.value,
+            owe.value,
             overflow: TextOverflow.ellipsis,
           ),
         ),

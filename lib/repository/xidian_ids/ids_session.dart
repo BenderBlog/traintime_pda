@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -248,7 +249,11 @@ class IDSSession extends NetworkSession {
       queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
     );
 
-    await sliderCaptcha(cookieStr);
+    try {
+      await sliderCaptcha(cookieStr);
+    } on CaptchaSolveFailedException {
+      throw const LoginFailedException(msg: "验证码校验失败");
+    }
 
     /// Post login request.
     if (onResponse != null) {

@@ -12,10 +12,9 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
-import 'package:watermeter/repository/electricity_session.dart' as electricity;
-import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/payment_session.dart'
-    as owe_session;
+    as electricity;
+import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -105,7 +104,6 @@ Future<void> update({
       updateCurrentData();
     }),
     electricity.update(),
-    owe_session.update(),
     borrow_info.LibrarySession().getBorrowList(),
     school_card_session.SchoolCardSession().initSession(),
   ]);
