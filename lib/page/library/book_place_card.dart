@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
@@ -29,7 +30,11 @@ class BookPlaceCard extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          toUse.locationName ?? "没有位置信息",
+          toUse.locationName ??
+              FlutterI18n.translate(
+                context,
+                "library.not_provided",
+              ),
           style: TextStyle(
             fontWeight: FontWeight.w400,
             fontSize: 16,
@@ -41,7 +46,17 @@ class BookPlaceCard extends StatelessWidget {
       ].toRow(),
       const SizedBox(height: 8),
       Text(
-        "书籍编号：${toUse.barCode}",
+        FlutterI18n.translate(
+          context,
+          "library.book_code",
+          translationParams: {
+            "barCode": toUse.barCode ??
+                FlutterI18n.translate(
+                  context,
+                  "library.not_provided",
+                ),
+          },
+        ),
         style: TextStyle(
           fontWeight: FontWeight.w400,
           color: toUse.processType == "在架"

@@ -111,4 +111,6 @@ flutter:
     - assets/icon.png
     - assets/CP1919.svg.vec
     - assets/Icon-App-iTunes-Background.png
-    - assets/flutter_i18n/
+    - assets/flutter_i18n/zh_CN.yaml
+    - assets/flutter_i18n/zh_TW.yaml
+    - assets/flutter_i18n/zh_SG.json

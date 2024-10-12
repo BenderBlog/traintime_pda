@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/score/score.dart';
@@ -17,7 +18,13 @@ class ScoreCard extends StatelessWidget {
     return SmallFunctionCard(
       onTap: () {
         if (offline && !ScoreSession.isCacheExist) {
-          showToast(context: context, msg: "脱机状态且无缓存成绩数据，无法访问");
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "homepage.toolbox.score_cannot_reach",
+            ),
+          );
         } else {
           context.pushReplacement(const ScoreWindow());
         }

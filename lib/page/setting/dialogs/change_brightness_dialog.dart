@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Change app brightness.
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:watermeter/themes/demo_blue.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -19,8 +19,26 @@ class ChangeBrightnessDialog extends StatefulWidget {
 class _ChangeBrightnessDialogState extends State<ChangeBrightnessDialog> {
   @override
   Widget build(BuildContext context) {
+    List<String> demoBlueModeName = [
+      FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.follow_setting",
+      ),
+      FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.day_mode",
+      ),
+      FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.night_mode",
+      ),
+    ];
+
     return AlertDialog(
-      title: const Text('颜色设置'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.title",
+      )),
       titleTextStyle: TextStyle(
         fontSize: 20,
         color: Theme.of(context).colorScheme.onSurface,
@@ -49,7 +67,10 @@ class _ChangeBrightnessDialogState extends State<ChangeBrightnessDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('改完了'),
+          child: Text(FlutterI18n.translate(
+            context,
+            "confirm",
+          )),
           onPressed: () {
             Navigator.pop(context);
           },

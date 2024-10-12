@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,13 @@ class EmptyClassroomCard extends StatelessWidget {
       builder: (c) => SmallFunctionCard(
         onTap: () async {
           if (offline) {
-            showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.offline_mode",
+              ),
+            );
           } else {
             context.pushReplacement(const EmptyClassroomWindow());
           }

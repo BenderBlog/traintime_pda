@@ -1,115 +1,90 @@
-# Copyright 2024 BenderBlog Rodriguez and contributors.
-# SPDX-License-Identifier: MPL-2.0
-
 drag_text: 👆拉🌤求更多
-ready_text: 正♻️⛽♻️......
-processing_text: 正♻️⛽♻️......
-processed_text: 🌤求❌功
-noMore_text: 📖🍊没👉更多
-failed_text: 🐀🍊获取Ⅹ败更多
+ready_text: 正♻️🏠♻️......
+processing_text: 正♻️➕♻️......
+processed_text: 🌤求×功
+no_more_text: 📕🍊没🈶更多
+failed_text: 🐀🍊获取⑩败更多
 choose_semester: 选择学🚴🏿
-error_detected: ⭕️uch! 发🔊错🈚️啦
+error_detected: 0uch! 发🔊错🈚️啦
 click_to_refresh: 点👴刷新
 confirm_title: 确认对🌸框
 cancel: 取🏫
 confirm: 确定
-network_error: 网络错🈚️，可能⑩没联网，可能🪨学🏫服🈚️Ⅶ➗️🧵🤣故障:-P
+network_error: 网络错🈚️，可能💩没联网，可能💩学🏫服🈚️Ⅶ➗️🧵🤣故障:-P
 error_detect: '遇🔪错🈚️: {e}'
-query_failed: 查询Ⅹ败
+query_failed: 查询💩败
 not_school_network: 没👉♻️🏫园网环🚨
 experiment_controller:
-  no_password: 没🈶🈚️理⑩验密🤱🏻
-  login_failed: 🛋️录Ⅹ败
-cancel_exam: 取🏫考💩资格:P
+  no_password: 没🈶🈚️理🪨验密🤱🏻
+  login_failed: 🟰录💩败
+cancel_exam: 取🏫考🪨资格:P
 electricity_session:
   fetching: 正♻️获取
   not_school_network: 💴🏫园网
   network_problem: 网络故障
-  query_failed: 查询💩败
+  query_failed: 查询🪨败
   program_crash: ×序故障
 login_process:
-  ready_page: 准备获取🟰录网页
-  get_encrypt: 获取密🤱🏻⛽密密💊
-  ready_login: 准备🟰录
+  ready_page: 准备获取🛋️录网页
+  get_encrypt: 获取密🤱🏻＋密密💊
+  ready_login: 准备🛋️录
   slider: 🌸块验证
-  after_process: 🟰录🐒➗️理
+  after_process: 🟰录🐒÷理
   failed: 🟰录💩败，🐘应状态🤱🏻：{statusCode}
-catcher:
-  error_detected: 发🔊错🈚️
-  error_description: 🐘🌤🧴👇
-login:
-  identity_number: 学号
-  password: ①站💩🟰录密🤱🏻
-  login: 🟰录
-  incorrect_password_pattern: 用🐅名或密🤱🏻⛔符⚛️💊求，学号🖊须 11 位且密🤱🏻💴🈳
-  on_login_progress: 正♻️🛋️录学🏫Ⅰ站⑩
-  complete_login: 🛋️录❌功
-  failed_login_cannot_connect_to_server: 🈚️法连接🔪服🈚️Ⅶ
-  failed_login_with_code: 🌤求💩败，🐘应状态🤱🏻：{code}
-  failed_login_with_message: 🌤求Ⅹ败，报错信息：{message}
-  failed_login_other: 未☞错🈚️，🌤联系🔓发者
-  bottom_buttons:
-    clear_cache: 🌤➗️🟰录缓存
-    complete_clear_cache: 🌤理缓存❌功
-    see_inspector: 查👀网络🦵🐅
-  captcha_window:
-    title: 🌤🐀🧴验证🤱🏻
-    hint: 📖🧴验证🤱🏻
-    message_on_empty: 🌤🐀🧴验证🤱🏻
-  slider:
-    title: 服🈚️⑦认证服🈚️
+catcher_detected: 发🔊错🈚️
+catcher_description: 🐘🌤🧴👇
 classtable:
   weekday:
-    monday: 周Ⅰ
+    monday: 周🥻
     tuesday: 周Ⅱ
-    wednesday: 周③
-    thursday: 周④
+    wednesday: 周🥪
+    thursday: 周☠️
     friday: 周🈚️
-    saturday: 周⑥
+    saturday: 周Ⅵ
     sunday: 周日
   partner_classtable:
-    override_dialog: 🤱🏻前🈶🐘子课⌚📕🍊，Ⅹ否💊覆盖❓
+    override_dialog: 🤱🏻前👉🐘子课⌚📖🍊，⑩否💊覆盖❓
     no_file: 未发🧵🔪🧴文➖
     no_permission: 未获取存➗️权🧵，🈚️法读取文➖
     problem: 好🐘🔪🧴文➖🈶点问题:P
     success: 🔪🧴×功
     share_dialog:
-      title: 🌤🖐🏻💊随🥻分🐘
-      content: 🔪➗️文➖包括你🉐个人信息，🌤⛔💊随①跟别人分🐘，或者发♻️🐘群里。
+      title: 🌤🖐🏻💊随①分🐘
+      content: 🔪➗️文➖包括你🉐个人信息，🌤🚫💊随➖跟别人分🐘，或者发♻️🐘群里。
     save_dialog:
       title: 保存日历文➖🔪...
-      success_message: 应该保存❌功
-      failure_message: 文➖创➖⑩败，保存取🏫
+      success_message: 应该保存×功
+      failure_message: 文➖创➖💩败，保存取🏫
     delete_dialog:
       title: 确认对🌸框
-      message: 确定💊🌤➗️共🐘课⌚🤱🏻❓
-      success_message: 删➗️共🐘课⌚✖功
-  page_title: 👴🉐日❌⌚
+      message: 确定💊🌤÷共🐘课⌚🤱🏻❓
+      success_message: 删➗️共🐘课⌚×功
+  page_title: 👴🉐日×⌚
   partner_page_title: 🐘子🉐日×⌚
   popup_menu:
     not_arranged: 查👀未安排课✖信息
-    class_changed: 查👀课×安排调整信息
+    class_changed: 查👀课❌安排调整信息
     add_class: 添＋课×信息
     generate_ical: 🔊×日历文➖
     generate_partner_file: 🔊❌共🐘课⌚文➖
     import_partner_file: 🔪🧴共🐘课⌚文➖
-    delete_partner_file: 删➗️共🐘课⌚文➖
+    delete_partner_file: 删÷共🐘课⌚文➖
   class_change_page:
-    title: 课×调整
-    empty_message: 🤱🏻前没👉调课信息
+    title: 课✖调整
+    empty_message: 🤱🏻前没🈶调课信息
     teacher_change: 从{new_teacher}变为{new_teacher}
-    no_teacher_change: 🔈Ⅹ信息没👉改变
-    1: 🥻
+    no_teacher_change: 🎺💩信息没👉改变
+    1: ①
     2: 👂🏻
-    3: 📐
-    4: Ⅳ
+    3: ③
+    4: ④
     5: 🈚️
-    6: Ⅵ
+    6: ⑥
     7: 日
-    change_class_message: 调课信息，从第{newClassroom}周 星Ⅶ{newClassroom}🉐{newClassroom}-{newClassroom}节
-      调整为第{newClassroom}周星🚴🏿{newClassroom}🉐 {newClassroom}-{newClassroom}节，{newClassroom}🎺Ⅹ👆课
-    patch_class_message: ⛔课信息，从第{newClassroom}周 星🚴🏿{newClassroom}🉐{newClassroom}-{newClassroom}节，
-      {newClassroom}🖐🏻课
+    change_class_message: 调课信息，从第{newClassroom}周 星⑦{newClassroom}🉐{newClassroom}-{newClassroom}节
+      调整为第{newClassroom}周星🚴🏿{newClassroom}🉐 {newClassroom}-{newClassroom}节，{newClassroom}🔈⑩👆课
+    patch_class_message: 🚫课信息，从第{newClassroom}周 星⑦{newClassroom}🉐{newClassroom}-{newClassroom}节，
+      {newClassroom}⛔课
     stop_class_message: 停课信息，第{originalClassroom}周 星🚴🏿{originalClassroom}🉐{originalClassroom}-{originalClassroom}节
       {originalClassroom}停课
     class_info: '编号: {teacherChange} | {teacherChange} 班
@@ -118,130 +93,124 @@ classtable:
 
       {teacherChange}'
   not_arranged_page:
-    title: 没🈶⑩➖安排🉐科🤱🏻
-    empty_message: 🤱🏻前全⛔课×均👉🪨➖安排
+    title: 没👉Ⅹ➖安排🉐科🤱🏻
+    empty_message: 🤱🏻前全🖐🏻课❌均🈶⑩➖安排
     content: '编号: {teacher} | {teacher} 班
 
       老🪨: {teacher}'
-  empty_class_message: '{semester_code} 学🚴🏿没👉课✖'
+  empty_class_message: '{semester_code} 学🚴🏿没🈶课✖'
   week_title: 第{week}周
   noon_break: 🈚️休
   supper_break: 晚休
   class_card:
-    title: 日×信息
-    unknown_classroom: 未🈯🦵⑩
-    remains_hint: 还👉{remain_count}个日❌
+    title: 日✖信息
+    unknown_classroom: 未🧻🗣💩
+    remains_hint: 还🈶{remain_count}个日×
   class_add:
-    add_class_title: 添＋课×
-    change_class_title: 修改课❌
-    class_name_empty_message: 🖊须📖🧴课❌名
-    wrong_time_message: 📖🧴🉐Ⅹ➖🖐🏻对
+    add_class_title: 添➕课×
+    change_class_title: 修改课×
+    class_name_empty_message: 🖊须🐀🧴课×名
+    wrong_time_message: 📖🧴🉐💩➖⛔对
     save_button: 保存
-    input_classname_hint: 课✖名字(🖊填)
-    input_teacher_hint: 老Ⅹ姓名(选填)
-    input_classroom_hint: 🗣Ⅹ位☞(选填)
+    input_classname_hint: 课×名字(🖊填)
+    input_teacher_hint: 老⑩姓名(选填)
+    input_classroom_hint: 🗣🪨位📃(选填)
     input_week_hint: 选择👆课周次
-    input_time_hint: 选择👆课💩➖
+    input_time_hint: 选择👆课🪨➖
     input_time_weekday_hint: 👆课周次
-    input_start_time_hint: 👆课⑩➖段
-    input_end_time_hint: 👇课Ⅹ➖段
+    input_start_time_hint: 👆课💩➖段
+    input_end_time_hint: 👇课🪨➖段
     wheel_choose_hint: 第 {index} 节
   course_detail_card:
     class_number_string: '{number} 班'
-    unknown_teacher: 老⑩未定
+    unknown_teacher: 老🪨未定
     unknown_place: 地点未定
     class_period: '{stop}-{stop}节'
     edit: 编✈️
-    delete: 删÷
-    delete_title: 💩否删➗️课×信息❓
-    delete_content: 🔒👉📴于这个课🉐信息都🩶被删÷，课⌚👆📴于这🚪课🉐信息将⛔复存♻️！
+    delete: 删➗️
+    delete_title: 🪨否删➗️课✖信息❓
+    delete_content: 🔒🈶📴于这个课🉐信息都🩶被删÷，课⌚👆📴于这🚪课🉐信息将⛔复存♻️！
 creative_job:
   search_hint: 搜🔒需求
   choice_type: 选择🀄️类
-  position_type: 🧻位类型
-  no_result: 没👉搜🔒🔪结🍎
+  position_type: ☞位类型
+  no_result: 没🈶搜🔒🔪结🍎
   please_search: 🌤♻️👆面搜🔒框搜🔒
   query_for_person: '招🤱🏻 {exceptNumber} 人 · '
-  end_time: 截☞日⑦ {end_time}
+  end_time: 截🈯日⑦ {endTime}
   complete_choosing: 选择完🖊
-  creative_job_description:
-    title: 工👈🐘🌤
-    browser_hint: '*🧴🍎用🐅感兴趣，🌤按🈶👆🦵🉐按🐂♻️Ⅵ览🚴🏿🀄️🐘🔓*'
-    job_description_title: 岗位描📕
-    reward_title: 工👈🩶报
-    progress_title: 🐘🤱🏻进度
-    no_description: 没🈶描🐀
+  job_description: 工👈🐘🌤
+  browser_hint: 🧴🍎用🐅感兴趣，🌤按👉👆🗣🉐按🐂♻️⑥览🚴🏿🀄️🐘🔓
+  job_description_title: 岗位描🐀
+  reward_title: 工👈🩶报
+  progress_title: 🐘🤱🏻进度
+  no_description: 没👉描🐀
 empty_classroom:
-  title: 🈳🧵🗣⑩
-  date: 日Ⅶ {date}
+  title: 🈳🧵🗣💩
+  date: 日⑦ {date}
   building: 🎺学楼 {building}
-  search_hint: 🗣🪨名✖或者🎺Ⅹ代🤱🏻
-  classroom: 🦵🪨
+  search_hint: 🦵💩名×或者🗣💩代🤱🏻
+  classroom: 🦵⑩
 exam:
   title: 考🪨安排
-  cache_hint: 🥻🧵⑩缓存考⑩安排信息
-  not_finished: 未完❌考💩
-  all_finished: 🔒🈶考⑩全⛔完❌
-  unable_to_exam: 🈚️法完✖考Ⅹ
-  finished: ①完❌考💩
-  none_finished: ①🚪还没考呢
-  no_exam_arrangement: 🤱🏻前没👉考💩安排
+  cache_hint: 🥻🧵🪨缓存考💩安排信息
+  not_finished: 未完✖考⑩
+  all_finished: 🔒🈶考⑩全🖐🏻完✖
+  unable_to_exam: 🈚️法完❌考⑩
+  finished: ➖完❌考Ⅹ
+  none_finished: 🥻🚪还没考呢
+  no_exam_arrangement: 🤱🏻前没🈶考🪨安排
   no_arrangement:
-    title: 🤱🏻前🈚️安排考💩🉐科🤱🏻
-    all_arranged: 🤱🏻前🔒👉科🤱🏻均①安排考⑩
+    title: 🤱🏻前🈚️安排考🪨🉐科🤱🏻
+    all_arranged: 🤱🏻前🔒🈶科🤱🏻均➖安排考⑩
     subtitle: '编号: {id}'
 experiment:
-  title: 🈚️理Ⅹ验
-  ongoing: 正♻️进行⑩验
+  title: 🈚️理🪨验
+  ongoing: 正♻️进行Ⅹ验
   not_finished: 未完✖⑩验
-  all_finished: 🔒🈶💩验全🖐🏻完❌
-  finished: ➖完×Ⅹ验
-  score_sum: 🤱🏻前分📖总⚛️：{sum}
-  none_finished: 🤱🏻前没👉Ⅰ🚨完❌🉐⑩验
+  all_finished: 🔒🈶Ⅹ验全🚫完❌
+  finished: Ⅰ完❌💩验
+  score_sum: 🤱🏻前分🐀总⚛️：{sum}
+  none_finished: 🤱🏻前没🈶➖🚨完❌🉐⑩验
   not_provided: 未提供
 homepage:
   time_string:
-    morning: 早👆好 准备÷发
-    before_noon: 👆🈚️好 🐖万💩🧴🥻
-    at_noon: 🀄️🈚️好 Ⅰ切还好⑧
+    morning: 早👆好 准备➗️发
+    before_noon: 👆🈚️好 🐖万Ⅹ🧴Ⅰ
+    at_noon: 🀄️🈚️好 ①切还好⑧
     afternoon: 👇🈚️好 今天🧴⚛️
     night: 晚👆好 🐖你好梦
     midnight: 深🏫🤣 👴♻️陪你
   loading: 正♻️🏠♻️
   load_error: ⛽♻️错🈚️
-  on_holiday: ➕Ⅶ🀄️
-  on_weekday: 第 ${c.getCurrentWeek(updateTime) + 1} 周
+  on_holiday: ＋🚴🏿🀄️
+  on_weekday: 第 ${current} 周
   loading_message: 🌤稍🐒，正♻️刷新信息
   homepage: 🐖页
-  xdu_planet: 博客星球
-  setting: 🐍☞
+  planet: 博客星球
+  setting: 🐍🧻
   input_partner_data:
-    route_not_exist: 🔪🧴路🚨⛔存♻️:P
-    failed_get_file: 🔪🧴文➖🪨败
+    route_not_exist: 🔪🧴路🚨🚫存♻️:P
+    failed_get_file: 🔪🧴文➖Ⅹ败
     failed_import: 好🐘🔪🧴文➖👉点问题:P
-    success_message: 🔪🧴✖功，🧴🍎🐘🔓🤣课⌚页面🌤🀄️新🐘🔓
-    not_loaded: 还没➕♻️课❌⌚，🟰🩶♻️来Ⅷ……
-    confirm_dialog:
-      title: 确认对🌸框
-      content: 🤱🏻前👉🐘子课⌚📖🍊，⑩否💊覆盖❓
-  login_message: 🛋️录🀄️，暂Ⅹ🧵⑩缓存📖🍊
-  successful_login_message: 🛋️录❌功
-  password_wrong_dialog:
-    title: 用🐅名或密🤱🏻🈶🈚️
-    content: Ⅹ否🀄️🚴🏿应用🐒🖐🏻🕳🟰录❓
-    confirm: 确认
-    denial: 否，进🧴离🧵👺🪨
-  offline_mode_dialog:
-    title: 统①认证服🈚️离🧵👺Ⅹ🔓Ⅶ
-    content: 🈚️法连接🔪统Ⅰ认证服🈚️服🈚️🚴🏿，🔒🈶⚛️Ⅶ🐘📴🉐服🈚️暂💩🖐🏻可用。 ❌✈️查询，考⑩信息查询，欠💴查询，🏫园卡查询📴🖊。课⌚🧵⑩缓存📕🍊。⑦他功能暂🚫📻影🐘。
-      🧴🈶🖐🏻便，🚨🌤谅解。
-    message: 脱✈️👺⑩👇，🥻站💩🐘📴功能全🖐🏻禁🈯Ⅹ用
+    success_message: 🔪🧴×功，🧴🍎🐘🔓🤣课⌚页面🌤🀄️新🐘🔓
+    not_loaded: 还没⛽♻️课❌⌚，🟰🩶♻️来⑧……
+    confirm_content: 🤱🏻前👉🐘子课⌚📕🍊，Ⅹ否💊覆盖❓
+  login_message: 🛋️录🀄️，暂💩🧵🪨缓存📖🍊
+  successful_login_message: 🟰录❌功
+  password_wrong_title: 用🐅名或密🤱🏻🈶🈚️
+  password_wrong_content: ⑩否🀄️🚴🏿应用🐒🖐🏻🕳🛋️录❓
+  password_wrong_denial: 否，进🧴离🧵👺🪨
+  offline_mode_title: 统Ⅰ认证服🈚️离🧵👺Ⅹ🔓Ⅶ
+  offline_mode_content: 🈚️法连接🔪统Ⅰ认证服🈚️服🈚️🚴🏿，🔒🈶⚛️Ⅶ🐘📴🉐服🈚️暂🪨🖐🏻可用。 ×✈️查询，考💩信息查询，欠💴查询，🏫园卡查询📴🖊。课⌚🧵⑩缓存🐀🍊。Ⅶ他功能暂🚫🖐🏻影🐘。
+    🧴🈶🖐🏻便，🚨🌤谅解。
+  offline_mode: 脱✈️👺Ⅹ👇，➖站Ⅹ🐘📴功能全🖐🏻禁📃🪨用
   notice_card:
     empty_notice: 🤱🏻前没🈶获取应用公⛏，🌤刷新
-    no_notice_avaliable: 没👉获取应用公⛏
+    no_notice_avaliable: 没🈶获取应用公⛏
     notice_list_title: 应用信息
     open_url: ◻️问该链接
-    notice_page_title: 通🧻列⌚
+    notice_page_title: 通🈯列⌚
   class_table_card:
     current: 当前
     tomorrow: 明天
@@ -250,269 +219,291 @@ homepage:
     error_message: 遇🔪错🈚️：{error}
     fetching_message: 正♻️获取课⌚
     error_infoText: 遇🔪错🈚️
-    fetching_infoText: 正♻️＋♻️
+    fetching_infoText: 正♻️⛽♻️
     no_arrangement_infoText: 暂🈚️日×
   electricity_card:
     title: 电量信息
     current_electricity: '🤱🏻前电量 '
     kwh: ' 度'
-    dialog:
-      title: 水电信息
-      content: 电💴帐号：{owe_value} 电量信息：{owe_value} {owe_value} 欠💴信息：{owe_value} 长按可Ⅰ🀄️新🏠♻️，👉欠💴Ⅰ般代⌚水💴
-      confirm: 确定
+    dialog_title: 水电信息
+    dialog_content: 电💴帐号：{owe_value} 电量信息：{owe_value} {owe_value} 欠💴信息：{owe_value}
+      长按可🥻🀄️新➕♻️，👉欠💴Ⅰ般代⌚水💴
   library_card:
     title: 🐇📕借阅
-    current_borrow: '🤱🏻前借🐀 '
-    unit_of_book: ' 📕'
-    error_occured: 获取借🐀信息发🔊错🈚️
+    current_borrow: '🤱🏻前借📕 '
+    unit_of_book: ' 📖'
+    error_occured: 获取借📖信息发🔊错🈚️
     fetching: 正♻️获取借📕信息
     no_return: 🤱🏻前没👉待归还🐀🐔
-    need_return: 待归还{borrow_info.dued}📖🐀🐔
+    need_return: 待归还{dued}📖📕✈️
     no_info: 🤱🏻前🈚️法获取信息
     fetching_info: 正♻️查询信息🀄️
   school_card_info_card:
     error_toast: 遇🔪错🈚️，🌤联系🔓发者
     fetching_toast: 正♻️获取信息，🌤稍🐒♻️来👀
-    bill: ⑥水
+    bill: Ⅵ水
     balance: '🏫园卡余额 '
     unit: ' 元'
     error_occured: 获取🏫园卡信息发🔊错🈚️
     fetching: 正♻️获取🏫园卡信息
-    bottom_text_success: 查询Ⅰ卡通⑥水
+    bottom_text_success: 查询➖卡通Ⅵ水
     no_info: 🤱🏻前🈚️法获取信息
     fetching_info: 正♻️查询信息🀄️
   toolbox:
     creative: 双创🚨赛
-    empty_classroom: 🈳🧵🎺💩
-    exam: 考Ⅹ安排
+    empty_classroom: 🈳🧵🗣🪨
+    exam: 考💩安排
     experiment: 🈚️理💩验
-    score: ×🐔查询
+    score: ✖🐔查询
     sport: 体育信息
-    toolbox: 🚴🏿他功能
-    score_cannot_reach: 脱✈️状态且🈚️缓存×✈️📖🍊，🈚️法◻️问
-    exam_fetching: 🌤稍🐒，正♻️获取考⑩信息
+    toolbox: Ⅶ他功能
+    score_cannot_reach: 脱✈️状态且🈚️缓存✖✈️🐀🍊，🈚️法◻️问
+    exam_fetching: 🌤稍🐒，正♻️获取考Ⅹ信息
     exam_error: 遇🔪错🈚️，🌤联系🔓发者
 library:
-  title: 🐇📕📴信息
-  borrow_state_title: 借🐀状态
+  title: 🐇🐀📴信息
+  borrow_state_title: 借📖状态
   search_book_title: 查询藏🐀
-  not_provided: 没👉🐘📴信息
+  not_provided: 未提供🐘📴信息
   author: '👈者 '
   publish_house: '➗️版🐍 '
-  call_number: '🔒📖号 '
-  publish_date: '发行💩➖ '
-  isbn: 1SBN
+  call_number: '🔒📕号 '
+  publish_date: '发行🪨➖ '
+  isbn: I5BN
   arrangement_code: '编排号🤱🏻 '
   avaliable_borrow: 可借
   storage: 📴藏
   on_shelve: ♻️🏠
-  book_code: 🐀✈️编号：{barCode}
-  due_date: ' 🔪🚴🏿'
+  book_code: 📖🐔编号：{barCode}
+  due_date: ' 🔪Ⅶ'
   borrow_str: ' 借阅'
-  after_due_date: ' 天前🔪⑦'
+  after_due_date: ' 天前🔪Ⅶ'
   before_due_date: ' 天🐒'
   can_be_renewable: 续借
-  cannot_be_renewable: 🚫可续借
+  cannot_be_renewable: 🖐🏻可续借
   renewing: 正♻️续借
-  empty_borrow_list: '🤱🏻前没👉查询🔪♻️借🐇📖
+  empty_borrow_list: '🤱🏻前没👉查询🔪♻️借🐇🐀
 
-    🚫借🐀🍷💊变❌👆面🉐🏫呆瓜咯'
-  borrow_list_info: ♻️借 {duedLength} 📖，⑦🀄️①🍎🚴🏿 {duedLength} 📖
+    ⛔借📕Ⅸ💊变❌👆面🉐🏫呆瓜咯'
+  borrow_list_info: ♻️借 {dued} 📕，🚴🏿🀄️①🍎🚴🏿 {dued} 📕
   search_book_window: null
   search_here: ♻️此搜🔒
-  book_detail: 📖✈️🐘细信息
-  no_result: 没👉结🍎
+  book_detail: 🐀🐔🐘细信息
+  no_result: 没🈶结🍎
   please_search: 🌤♻️👆面搜🔒框搜🔒
+login:
+  identity_number: 学号
+  password: ➖站⑩🟰录密🤱🏻
+  login: 🛋️录
+  incorrect_password_pattern: 用🐅名或密🤱🏻🖐🏻符⚛️💊求，学号🖊须 11 位且密🤱🏻💴🈳
+  on_login_progress: 正♻️🛋️录学🏫➖站💩
+  complete_login: 🛋️录❌功
+  failed_login_cannot_connect_to_server: 🈚️法连接🔪服🈚️🚴🏿
+  failed_login_with_code: 🌤求🪨败，🐘应状态🤱🏻：{code}
+  failed_login_with_message: 🌤求⑩败，报错信息：{message}
+  failed_login_other: 未📃错🈚️，🌤联系🔓发者
+  clear_cache: 🌤➗️🛋️录缓存
+  complete_clear_cache: 🌤理缓存❌功
+  see_inspector: 查👀网络🦵🐅
+  captcha_window:
+    title: 🌤📖🧴验证🤱🏻
+    hint: 📕🧴验证🤱🏻
+    message_on_empty: 🌤📕🧴验证🤱🏻
+  slider_title: 服🈚️Ⅶ认证服🈚️
 school_card_window:
   title: 🏫园卡Ⅵ水信息
-  income: ☞➗️ {income}
-  expense: 📻🧴 {expense}
-  select_range: 选择日🚴🏿：从 {endDay} 🔪 {endDay}
+  income: 🧻÷ {income}
+  expense: 🖐🏻🧴 {expense}
+  select_range: 选择日⑦：从 {endDay} 🔪 {endDay}
   store_name: 👆🐅名✖
   balance: 金额
-  time_with_sum: 🪨➖(共{sum}元)
+  time_with_sum: ⑩➖(共{sum}元)
 score:
-  title: ❌✈️查询
-  cache_message: Ⅰ🧵💩缓存✖🐔信息
-  all_semester: 🔒👉学🚴🏿
-  chosen_semester: 学⑦ {chosen}
+  title: ×✈️查询
+  cache_message: ①🧵🪨缓存✖✈️信息
+  all_semester: 🔒🈶学Ⅶ
+  chosen_semester: 学🚴🏿 {chosen}
   all_type: 🔒🈶类型
   chosen_type: 类型 {type}
   score_choice:
-    title: ×✈️单
-    search_hint: 搜🔒❌🐔✈️录
-    empty_list: 没👉选择该学⑦🉐课❌✈️🧴均分✈️🍋
+    title: ×🐔单
+    search_hint: 搜🔒❌✈️✈️录
+    empty_list: 没🈶选择该学Ⅶ🉐课❌🐔🧴均分✈️🍋
     sum_dialog:
       title: 🏫总结
-      content: 🔒👉科🤱🏻🉐9P4：{not_core_credit} 🔒🈶科🤱🏻🉐均分：{not_core_credit} 🔒🈶科🤱🏻🉐学分：{not_core_credit}
-        未通🍎科🤱🏻：{not_core_credit} 公共选修课①🚨修🉐学分：{not_core_credit} 📖×序提供🉐📖🍊仅供参考，🔓发者对🚴🏿准确性🖐🏻负责
+      content: 🔒🈶科🤱🏻🉐9P4：{not_core_credit} 🔒👉科🤱🏻🉐均分：{not_core_credit} 🔒🈶科🤱🏻🉐学分：{not_core_credit}
+        未通🍎科🤱🏻：{not_core_credit} 公共选修课①🚨修🉐学分：{not_core_credit} 📖❌序提供🉐📖🍊仅供参考，🔓发者对Ⅶ准确性⛔负责
   score_compose_card:
     no_detail: 未提供🐘🌤信息
     fetching: 正♻️获取
     credit: 学分
     gpa: 9P4
-    score: ✖✈️
+    score: ✖🐔
   score_info_card:
-    title: ×✈️🐘🌤
+    title: ❌🐔🐘🌤
     original_course: ➗️修
     failed: '[挂] '
     credit: 学分 {credit}
     gpa: 9P4 {gpa}
-    score: ✖🐔 {score}
+    score: ❌✈️ {score}
   score_page:
-    title: ×✈️查询
-    search_hint: 搜🔒×🐔🐔录
-    no_record: 未筛查🔪⚛️🌤求🉐✈️录
+    title: ×🐔查询
+    search_hint: 搜🔒×✈️✈️录
+    no_record: 未筛查🔪⚛️🌤求🉐🐔录
     select_all: 全选
     select_nothing: 全⛔选
-    reset_select: 🀄️🧻选择
-    CET-4: 🍎⛽英语Ⅳ🐔
+    reset_select: 🀄️☞选择
+    CET-4: 🍎➕英语Ⅳ✈️
     CET-6: 🍎🏠英语⑥✈️
 setting:
   about: 📴于
-  about_this_program: 📴于📖✖序
-  version: 版📖号：{version_code}
+  about_this_program: 📴于📕✖序
+  version: 版📕号：{version_code}
   user_info: 用🐅信息
   ui_setting: 界面🐍📃
   brightness_setting: 🐍📃深浅色
-  simplify_timeline: ➖🌸日✖⑩➖轴
-  simplify_timeline_description: 没🈶日✖⑩ ➖少🈳➖占用
-  account_setting: 界面🐍🧻
-  sport_password_setting: 体育系统密🤱🏻🐍☞
-  experiment_password_setting: 🈚️理⑩验系统密🤱🏻🐍🧻
-  electricity_password_setting: 电💴帐号密🤱🏻🐍🧻
-  electricity_password_description: 💴 123456 🌤🐍🧻
-  classtable_setting: 课⌚🐘📴🐍☞
+  simplify_timeline: ➖🌸日×🪨➖轴
+  simplify_timeline_description: 没👉日×🪨 ➖少🈳➖占用
+  account_setting: 账号🐍☞
+  sport_password_setting: 体育系统密🤱🏻🐍🧻
+  experiment_password_setting: 🈚️理💩验系统密🤱🏻🐍☞
+  electricity_password_setting: 电💴帐号密🤱🏻🐍📃
+  electricity_password_description: 💴 123456 🌤🐍🈯
+  classtable_setting: 课⌚🐘📴🐍📃
   background: 🔓🚴🏿课⌚背🚨🐇
-  no_background: 你🧵选个🐇片👨🏻，Ⅸ♻️👇面
+  no_background: 你🧵选个🐇片Ⅷ，⑨♻️👇面
   choose_background: 课⌚背🚨🐇选择
   no_permission: 未获取存➗️权🧵，🈚️法读取文➖
   successful_setting: 🐍定❌功
   failure_setting: 你没🈶选🐇片捏
-  clear_user_class: 🌤➗️🔒👉用🐅添🏠课❌
+  clear_user_class: 🌤➗️🔒👉用🐅添⛽课✖
   clear_user_class_dialog:
     title: 确认对🌸框
-    content: 💩否💊🌤÷🔒👉用🐅添⛽课❌❓这个功能对从学🏫获取🉐日×没🈶影🐘。
-    clear: ①🚨🌤➗️完🖊
+    content: Ⅹ否💊🌤➗️🔒🈶用🐅添➕课❌❓这个功能对从学🏫获取🉐日×没🈶影🐘。
+    clear: ➖🚨🌤➗️完🖊
   class_refresh: 强🧻刷新课⌚
   class_refresh_dialog:
     title: 确认对🌸框
-    content: 🪨否💊强🈯刷新课⌚❓同①🐒，将🩶从学🏫①站🪨🐒端🀄️新获取课⌚，耗💩🩶🖊🎺⑨。
-  class_swift: 课✖偏🥻🐍🈯
-  class_swift_description: '正📖错🐒🔓学日🚴🏿 负🐀提前🔓学日⑦
+    content: 🪨否💊强☞刷新课⌚❓同①🐒，将🩶从学🏫➖站Ⅹ🐒端🀄️新获取课⌚，耗🪨🩶🖊🎺Ⅸ。
+  class_swift: 课✖偏①🐍📃
+  class_swift_description: '正📕错🐒🔓学日⑦ 负🐀提前🔓学日⑦
 
     🤱🏻前为 {swift}'
-  core_setting: 缓存🟰录🐍📃
-  check_catcher: 🚻🪨错🈚️拦截Ⅶ
-  check_logger: 查👀网络拦截🚴🏿⚛️日☞
-  clear_and_restart: 🌤÷缓存🐒🀄️⑦
+  core_setting: 缓存🛋️录🐍🈯
+  check_catcher: 🚻💩错🈚️拦截Ⅶ
+  check_logger: 查👀网络拦截🚴🏿⚛️日🧻
+  clear_and_restart: 🌤➗️缓存🐒🀄️Ⅶ
   clear_and_restart_dialog:
     title: 确认对🌸框
-    content: 确定🌤➗️缓存🐒🀄️⑦×序❓
+    content: 确定🌤➗️缓存🐒🀄️Ⅶ×序❓
     cleaning: 正♻️🌤理缓存
-    clear: 缓存Ⅰ被🌤➗️
-  logout: 退➗️🛋️录并🀄️Ⅶ应用
+    clear: 缓存①被🌤➗️
+  logout: 退÷🛋️录并🀄️⑦应用
   logout_dialog:
     title: 确认对🌸框
-    content: 确定退÷🛋️录❓你🉐🔒👉📖🍊将🩶被彻底删➗️！
-    logging_out: 正♻️退÷🟰录
+    content: 确定退÷🟰录❓你🉐🔒🈶📖🍊将🩶被彻底删÷！
+    logging_out: 正♻️退➗️🛋️录
   need_close_dialog:
     title: 🌤📴🖊应用
-    need_restart_d: 因为✈️📕🧵☞，用🐅需💊自行📴🖊窗口，🔥🐒🀄️新🐘🔓应用。
+    content: 因为🐔🐀🧵☞，用🐅需💊自行📴🖊窗口，🔥🐒🀄️新🐘🔓应用。
   change_brightness_dialog:
-    title: 颜色🐍☞
+    title: 颜色🐍🈯
     follow_setting: 跟随系统
     day_mode: 白天👺⑩
-    night_mode: 👨🏿夜👺🪨
+    night_mode: 👨🏿夜👺Ⅹ
   change_swift_dialog:
-    title: 课❌偏🥻🐍☞
-    input_hint: 🌤♻️此🐀🧴📕字
+    title: 课❌偏🥻🐍🧻
+    input_hint: 🌤♻️此📕🧴📖字
+  change_electricity_title: 修改电💴帐号密🤱🏻
+  change_experiment_title: 修改🈚️理💩验账号密🤱🏻
+  change_sport_title: 修改体育系统账号密🤱🏻
   change_password_dialog:
-    title: 修改电💴帐号密🤱🏻
-    input_hint: 🌤♻️此📖🧴密🤱🏻
+    input_hint: 🌤♻️此📕🧴密🤱🏻
     blank_input: 🐀🧴🈳白!
   easter_egg_page:
-    title: 你找🔪🤣👎蛋
-    encrypt: 🏠密👆面🉐文📕
-    listen: 听歌🪨➖
+    title: 你找🔪🤣🥬蛋
+    encrypt: ➕密👆面🉐文📕
+    listen: 听歌Ⅹ➖
   about_page:
-    benderblog: 🐖💊🔓发者，105 🏫🚫➖编写⚛️拼接
-    bellssgit: ☞持：最⛽&最Ⅸ故障反馈者
-    brackrat: 🐍✈️：🐖页，🟰录页，配色，1OS 🏫⛔➖🛋️
-    breezeline: 📃持：🈚️➕☞🈚️➖Ⅰ🉐产品🚨理(他自🐔🉐描🐀)
-    cafebabe: “🈯持：提供👎蛋代🤱🏻"
-    chitao1234: 🔓发：修复🌸块🖐🏻对⑦问题
-    dimole: 🈯持：辅🐖修复🌸块问题
-    elitewars: 🐍🐔：体育✖🐔页面
-    hhzm: ☞持：提供🥬蛋代🤱🏻
+    benderblog: 🐖💊🔓发者，1⭕️5 🏫🖐🏻➖编写⚛️拼接
+    bellssgit: ☞持：最➕&最Ⅸ故障反馈者
+    brackrat: 🐍🐔：🐖页，🟰录页，配色，iO5 🏫🖐🏻➖🛋️
+    breezeline: 🈯持：🈚️➕🧻🈚️①Ⅰ🉐产品🚨理(他自✈️🉐描📖)
+    cafebabe: “☞持：提供🥬蛋代🤱🏻"
+    chitao1234: 🔓发：修复🌸块🚫对⑦问题
+    dimole: ☞持：辅🐖修复🌸块问题
+    elitewars: 🐍✈️：体育×🐔页面
+    godhu777777: 📃持：繁体🀄️文转换代🤱🏻⚛️👎蛋代🤱🏻
+    hancl777: 📃持：繁体🀄️文转换代🤱🏻
+    hhzm: 🧻持：提供👎蛋代🤱🏻
     lsy223622: 🐍✈️：1⭕️5 🐇⌚
-    nancuncloud: 🔓发：🐇🐀📴搜🔒功能
-    pairman: 🔓发：✖🐔缓存功能⚛️👉🌸🌸块🍋法
+    nancunchild: 🔓发：🐇📖📴搜🔒功能
+    pairman: 🔓发：×🐔缓存功能⚛️🈶🌸🌸块🍋法
     reverierxu: 🐍✈️：用于信息展💩🉐 R3X 卡片
-    ray: 🐍🐔：🔓屏🌸面 / 🧻持：i⭕️5 🔓发
-    stalomeow: 🐍✈️：📻页⑩➖轴 / 🔓发：①⛔🛋️录
-    xeonds: 🐍🐔：🐍☞页面 / 🔓发：XDU Pl4n37
-    xiue233: 🔓发：Andro1d 🏫🚫➖⚛️拼接
-    zcwzy: 🔓发：修复丁🐘电💴 / 🈯持：研⑨🔊版📖🔓发
+    ray: 🐍🐔：🔓屏🌸面 / ☞持：10S 发行👆 & 🐘子课⌚
+    shadowyingyi: 🧻持：两次鸽子公🀄️号宣传
+    stalomeow: 🐍🐔：🖐🏻页💩➖轴 / 🔓发：①🖐🏻🛋️录
+    xeonds: 🐍✈️：🐍📃页面 / 🔓发：XDU P14n37
+    xiue233: 🔓发：Andr01d 🏫🚫➖⚛️拼接
+    zcwzy: 🔓发：修复丁🐘电💴 / 📃持：研🍷🔊版📖🔓发
     homepage: 🐖页
     code: 🔓源代🤱🏻
-    donate: 给👴捐款
     know_more: 📃🔪更多
-    copyright_notice: 📕软➖拷贝✈️于 7ra1n7ime_pda 代🤱🏻（或❌ wa73rm373r 代🤱🏻）编①， 代🤱🏻按照 M⭕️z1114
-      Pub11c 11c3n53, v. 2.0 🖐🏻权。 📖✖序⚛️西安电子科🐔🐘学，体🪨能服🈚️，🐀蜗，电⌚🟰服🈚️🈚️📴。 C⭕️pyr1gh7 2023-Pr353nt
-      B3nd3rB1⭕️9 R0dr19u3z 4nd c0n7r1bu7⭕️r5. 7h3 5ourc3 Cod3 F0rm is 5ubj3c7 t0
-      th3 7erm5 0f 7h3 M0z1114 Pub11c Lic3n53, v. 2.0. 1f 4 c⭕️py ⭕️f 7h3 MP1 w45
-      n0t d1s7r1bu73d w17h 7h15 fi13, Y0u can 0b74in 0n3 4t h77ps://moz11l4.0r9/MP1/2.0/.
+    copyright_notice: 📖软➖拷贝🐔于 tr41n71m3_pd4 代🤱🏻（或× w473rme73r 代🤱🏻）编🥻， 代🤱🏻按照 M⭕️z11l4
+      Pub1ic 1ic3ns3, v. 2.0 📻权。 📕×序⚛️西安电子科✈️🐘学，体⑩能服🈚️，🐀蜗，电⌚🛋️服🈚️🈚️📴。 C⭕️pyr19h7 2023-Pr353n7
+      B3nd3rB1⭕️9 R⭕️dr1gu3z and c⭕️n7r1bu7ors. 7h3 5ourc3 Code Form 15 5ubj3c7 to
+      7h3 73rm5 of 7h3 Moz1l14 Pub11c 11c3n53, v. 2.0. 1f 4 copy ⭕️f 7h3 MP1 w45 n07
+      d157r1bu73d wi7h 7hi5 fi13, Y⭕️u c4n 0b741n ⭕️n3 47 h77ps://m⭕️z1l1a.or9/MP1/2.0/.
     beian: 备案号
     sign_android: 安卓签名
     title: 📴于📕软➖
 sport:
   fetching: 正♻️获取
-  error: '坏🪨: {situation}'
+  error: '坏💩: {situation}'
   title: 体育查询
-  class_info: 课❌信息
-  test_score: 体🚻❌✈️
-  total_score: 似年总分
+  class_info: 课✖信息
+  test_score: 体🚻❌🐔
+  total_score: Ⅳ年总分
   semester: '{gradeType} 第{gradeType}'
   subject: 🐘🤱🏻
-  data: 📖🍊
+  data: 📕🍊
   score: 分📖
   passed: ✈️格
   score_string: '{score}分'
 toolbox:
-  title: ⑦他功能
+  title: 🚴🏿他功能
   payment: 🔈💴系统
-  payment_description: 电💴该🦵🤣👨🏻
+  payment_description: 电💴该🗣🤣Ⅷ
   repair: 🐒勤报修
   repair_description: ⛔💊漏水断网
   reserve: 🈳➖预约
   reserve_description: 找个地◻️🐘牌
-  mobile: ➖🕳🚪🐅
-  mobile_description: 🌤⛽专用🚪🐅
+  mobile: Ⅰ🕳🚪🐅
+  mobile_description: 🌤🏠专用🚪🐅
   network: 网络查询
-  network_description: 希望永🚫🖐🏻💴
-  physics: 🈚️理🐔🍋
+  network_description: 希望永🚫📻💴
+  physics: 🈚️理✈️🍋
   physics_description: 希望🌿👈顺利
-  discover: 睿④🔪航
-  discover_description: 🖐🏻🏄‍⑦他功能
+  discover: 睿似🔪航
+  discover_description: 🚫🏄‍Ⅶ他功能
 xdu_planet:
   all: 全⛔
-  loading: ⛽♻️🀄️，🌤稍🛋️ <(=ω=)>
-  unknown_author: 未🧻👈者
-  load_failed: 文章＋♻️Ⅹ败，🧴👉需💊可➖点🐔🈶👆◻️🉐按🐂♻️⑥览🚴🏿里🐘🔓。
+  loading: 🏠♻️🀄️，🌤稍🟰 <(=ω=)>
+  unknown_author: 未☞👈者
+  load_failed: 文章➕♻️💩败，🧴🈶需💊可Ⅰ点✈️👉👆◻️🉐按🐂♻️⑥览⑦里🐘🔓。
   no_comment: 暂🈚️评论
-  reply_audit: '🩶复评论 #{reply_to} Ⅰ被🍊报或删➗️'
+  reply_audit: '🩶复评论 #{reply_to} Ⅰ被🍊报或删÷'
   reply: '🩶复评论 #{content}：{content}'
   have_been_audit: 📖评论🥻🚨被🍊报
   audit: 🍊报
   confirm_audit_dialog:
-    title: 确认💩否🍊报
-    content: 📐ⅣⅡ🐒行，确定您🐘🍊报🤱🏻❓🍊报🐒该评论🩶👉⌚签，🚫➖定🩶删➗️。
+    title: 确认Ⅹ否🍊报
+    content: 🌂似Ⅱ🐒行，确定您🐘🍊报🤱🏻❓🍊报🐒该评论🩶👉⌚签，🖐🏻🥻定🩶删÷。
     ongoing: 正♻️🍊报评论
     failed: 🍊报🪨败
     success: 🍊报×功
   comment: 🩶复
-  comment_success: 评论❌功
-  comment_failed: 评论Ⅹ败，🌤去网络查👀🚴🏿⚛️日📃查👀Ⅶ查👀报错
+  comment_success: 评论✖功
+  comment_failed: 评论🪨败，🌤去网络查👀Ⅶ⚛️日☞查👀Ⅶ查👀报错
   comment_canceled: 没🐘好💊🗣啥🤱🏻
-  comment_loading: ➕♻️评论🀄️……
+  comment_loading: 🏠♻️评论🀄️……

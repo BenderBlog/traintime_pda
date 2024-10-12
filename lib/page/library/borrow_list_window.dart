@@ -3,6 +3,7 @@
 
 // Borrow list, shows the user's borrowlist.
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -72,7 +73,12 @@ class BorrowListDetail extends StatelessWidget {
             ),
           );
         } else {
-          return const EmptyListView(text: "目前没有查询到在借图书\n不借书就要变成上面的小呆瓜咯");
+          return EmptyListView(
+            text: FlutterI18n.translate(
+              context,
+              "library.empty_borrow_list",
+            ),
+          );
         }
       }),
       bottomNavigationBar: BottomAppBar(
@@ -80,8 +86,12 @@ class BorrowListDetail extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "在借 ${borrow_info.borrowList.length} 本，其中已过期 ${borrow_info.dued} 本",
+            I18nText(
+              "library.borrow_list_info",
+              translationParams: {
+                "borrow": borrow_info.borrowList.length.toString(),
+                "dued": borrow_info.dued.toString(),
+              },
             ),
           ],
         ),

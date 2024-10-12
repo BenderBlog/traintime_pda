@@ -1,4 +1,5 @@
 import yaml
+import json
 import pypinyin
 from collections import OrderedDict
 from copy import deepcopy
@@ -217,7 +218,8 @@ def modify_yaml(filename: str):
 
     # 将修改后的数据保存在新的YAML文件，保持原本的顺序
     with open(f"modified_{filename}", 'w', encoding='utf-8') as file:
-        yaml.dump(modified_data, file, allow_unicode=True, Dumper=OrderedDumper)
+        json.dump(modified_data, file)
+        #yaml.dump(modified_data, file, allow_unicode=True, Dumper=OrderedDumper)
 
     print(f"Modified YAML saved as 'modified_{filename}'")
 

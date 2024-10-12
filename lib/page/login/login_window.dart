@@ -6,6 +6,7 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -72,7 +73,7 @@ class _LoginWindowState extends State<LoginWindow> {
             controller: _idsAccountController,
             decoration: _inputDecoration(
               iconData: MingCuteIcons.mgc_user_3_fill,
-              hintText: "学号",
+              hintText: FlutterI18n.translate(context, "login.identity_number"),
             ),
             style: TextStyle(
               fontSize: _inputFieldFontSize,
@@ -99,7 +100,7 @@ class _LoginWindowState extends State<LoginWindow> {
             ),
             decoration: _inputDecoration(
               iconData: MingCuteIcons.mgc_safe_lock_fill,
-              hintText: "一站式登录密码",
+              hintText: FlutterI18n.translate(context, "login.password"),
               suffixIcon: IconButton(
                 icon: Icon(
                   _couldNotView ? Icons.visibility : Icons.visibility_off,
@@ -147,7 +148,13 @@ class _LoginWindowState extends State<LoginWindow> {
                   _idsPasswordController.text.isNotEmpty) {
                 await login();
               } else {
-                showToast(context: context, msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "login.incorrect_password_pattern",
+                  ),
+                );
               }
             },
           ),
@@ -160,10 +167,18 @@ class _LoginWindowState extends State<LoginWindow> {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
-      msg: '正在登录学校一站式',
+      msg: FlutterI18n.translate(
+        context,
+        "login.on_login_progress",
+      ),
       max: 100,
       hideValue: true,
-      completed: Completed(completedMsg: "登录成功"),
+      completed: Completed(
+        completedMsg: FlutterI18n.translate(
+          context,
+          "login.complete_login",
+        ),
+      ),
     );
     EhallSession ses = EhallSession();
 
@@ -219,14 +234,36 @@ class _LoginWindowState extends State<LoginWindow> {
         } else if (e is DioException) {
           if (e.message == null) {
             if (e.response == null) {
-              showToast(context: context, msg: "无法连接到服务器。");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "login.failed_login_cannot_connect_to_server",
+                ),
+              );
             } else {
               showToast(
-                  context: context,
-                  msg: "请求失败，响应状态码：${e.response!.statusCode}。");
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "login.failed_login_with_code",
+                  translationParams: {
+                    "code": e.response!.statusCode.toString()
+                  },
+                ),
+              );
             }
           } else {
-            showToast(context: context, msg: "请求失败。${e.message}");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "login.failed_login_with_message",
+                translationParams: {
+                  "message": e.message.toString(),
+                },
+              ),
+            );
           }
         } else {
           log.warning(
@@ -248,7 +285,10 @@ class _LoginWindowState extends State<LoginWindow> {
           );
           showToast(
             context: context,
-            msg: "未知错误，请联系开发者。",
+            msg: FlutterI18n.translate(
+              context,
+              "login.failed_login_other",
+            ),
           );
         }
       }

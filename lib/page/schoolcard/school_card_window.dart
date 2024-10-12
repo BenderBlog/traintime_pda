@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // School card log list.
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
@@ -30,9 +31,17 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
       sumUp += double.parse(element.money);
     }
     if (sumUp.isLowerThan(0)) {
-      return "支出 ${(sumUp * -1).toStringAsFixed(2)}";
+      return FlutterI18n.translate(
+        context,
+        "school_card_window.income",
+        translationParams: {"income": (sumUp * -1).toStringAsFixed(2)},
+      );
     } else {
-      return "收入 ${sumUp.toStringAsFixed(2)}";
+      return FlutterI18n.translate(
+        context,
+        "school_card_window.expense",
+        translationParams: {"expense": sumUp.toStringAsFixed(2)},
+      );
     }
   }
 
@@ -57,7 +66,12 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("校园卡流水信息")),
+        appBar: AppBar(
+          title: Text(FlutterI18n.translate(
+            context,
+            "school_card_window.title",
+          )),
+        ),
         body: Column(
           children: [
             TextButton(
@@ -65,10 +79,14 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                 backgroundColor:
                     Theme.of(context).colorScheme.secondaryContainer,
               ),
-              child: Text(
-                "选择日期：从 ${Jiffy.parseFromDateTime(timeRange[0]!).format(pattern: "yyyy-MM-dd")} "
-                "到 ${Jiffy.parseFromDateTime(timeRange[1]!).format(pattern: "yyyy-MM-dd")}",
-              ),
+              child: Text(FlutterI18n.translate(
+                  context, "school_card_window.select_range",
+                  translationParams: {
+                    "startDay": Jiffy.parseFromDateTime(timeRange[0]!)
+                        .format(pattern: "yyyy-MM-dd"),
+                    "endDay": Jiffy.parseFromDateTime(timeRange[1]!)
+                        .format(pattern: "yyyy-MM-dd"),
+                  })),
               onPressed: () async {
                 await showCalendarDatePicker2Dialog(
                   context: context,
@@ -104,22 +122,36 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                       columnSpacing: 0,
                       horizontalMargin: 6,
                       columns: [
-                        const DataColumn2(
+                        DataColumn2(
                           size: ColumnSize.S,
                           label: Center(
-                            child: Text('商户名称'),
+                            child: Text(FlutterI18n.translate(
+                              context,
+                              "school_card_window.store_name",
+                            )),
                           ),
                         ),
-                        const DataColumn2(
+                        DataColumn2(
                           size: ColumnSize.S,
                           label: Center(
-                            child: Text('金额'),
+                            child: Text(FlutterI18n.translate(
+                              context,
+                              "school_card_window.balance",
+                            )),
                           ),
                         ),
                         DataColumn2(
                           size: ColumnSize.L,
                           label: Center(
-                            child: Text('时间(共${moneySunUp(snapshot.data!)}元)'),
+                            child: Text(
+                              FlutterI18n.translate(
+                                context,
+                                "school_card_window.balance",
+                                translationParams: {
+                                  "sum": moneySunUp(snapshot.data!)
+                                },
+                              ),
+                            ),
                           ),
                         ),
                       ],

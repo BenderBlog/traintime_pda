@@ -4,12 +4,6 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 
-const demoBlueModeName = [
-  "跟随系统",
-  "白天模式",
-  "黑夜模式",
-];
-
 const demoBlueModeMap = {
   0: ThemeMode.system,
   1: ThemeMode.light,

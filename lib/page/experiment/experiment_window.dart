@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
@@ -23,7 +24,14 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("物理实验")),
+      appBar: AppBar(
+        title: Text(
+          FlutterI18n.translate(
+            context,
+            "experiment.title",
+          ),
+        ),
+      ),
       body: GetBuilder<ExperimentController>(
         builder: (controller) {
           if (controller.status == ExperimentStatus.fetched ||
@@ -45,7 +53,12 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
               ],
               children: [
                 if (doing.isNotEmpty) ...[
-                  const TimelineTitle(title: "正在进行实验"),
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "experiment.ongoing",
+                    ),
+                  ),
                   Column(
                     children: List.generate(
                       doing.length,
@@ -55,7 +68,12 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                     ),
                   ),
                 ],
-                const TimelineTitle(title: "未完成实验"),
+                TimelineTitle(
+                  title: FlutterI18n.translate(
+                    context,
+                    "experiment.not_finished",
+                  ),
+                ),
                 unDone.isNotEmpty
                     ? Column(
                         children: List.generate(
@@ -65,12 +83,26 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                           ),
                         ),
                       )
-                    : const TimelineTitle(
-                        title: "所有实验全部完成",
+                    : TimelineTitle(
+                        title: FlutterI18n.translate(
+                          context,
+                          "experiment.all_finished",
+                        ),
                       ),
-                const TimelineTitle(title: "已完成实验"),
+                TimelineTitle(
+                  title: FlutterI18n.translate(
+                    context,
+                    "experiment.finished",
+                  ),
+                ),
                 ExperimentInfoCard(
-                  title: "目前分数总和：${controller.sum}",
+                  title: FlutterI18n.translate(
+                    context,
+                    "experiment.score_sum",
+                    translationParams: {
+                      "sum": controller.sum.toString(),
+                    },
+                  ),
                 ),
                 done.isNotEmpty
                     ? Column(
@@ -81,8 +113,11 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                           ),
                         ),
                       )
-                    : const TimelineTitle(
-                        title: "目前没有已经完成的实验",
+                    : TimelineTitle(
+                        title: FlutterI18n.translate(
+                          context,
+                          "experiment.none_finished",
+                        ),
                       ),
               ],
             ).safeArea();

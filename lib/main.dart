@@ -109,6 +109,7 @@ class _MyAppState extends State<MyApp> {
             translationLoader: FileTranslationLoader(
               fallbackFile: "zh_CN",
               useCountryCode: true,
+              forcedLocale: const Locale('zh_CN'),
             ),
             missingTranslationHandler: (key, locale) {
               log.info(
@@ -122,7 +123,9 @@ class _MyAppState extends State<MyApp> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [
+          Locale('zh', 'TW'),
           Locale('zh', 'CN'),
+          Locale('zh', 'SG'), // CFBB Lang Alternative
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
