@@ -18,6 +18,9 @@ var isNotice = true.obs;
 
 Future<void> update() async {
   try {
+    isNotice.value = true;
+    electricityInfo.value = "正在获取";
+    owe.value = "正在获取欠费";
     await PaymentSession().loginPayment().then((value) => Future.wait([
           Future(() async {
             try {

@@ -185,32 +185,135 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  final String urlApple = "https://www.bilibili.com/video/BV1mN411C7QV/";
+  // Babe I am leaving you, for myself...
+  // God damn, where's my babe
+  final String urlApple = "https://www.bilibili.com/video/BV1Td8ceJEFb/";
 
-  final String urlOthers = "https://www.bilibili.com/video/BV1mN411C7QV/";
+  final String urlOthers = "https://www.bilibili.com/video/BV1HN411Y7Ct?p=7";
 
   TextEditingController inputController = TextEditingController(
-    text: '''
-Let us cling together as the years go by,
-Oh my love, my love,
-In the quiet of the night
-Let our candle always burn,
-Let us never lose the lessons we have learned.
+    text: Platform.isIOS
+        ? '''
+for myself...
 
-手を取り合って このまま行こう
-愛する人よ
-静かな宵に
-光を灯し
-愛しき教えを抱き
+[Verse 1]
+Babe, baby, baby, I'm gonna leave you
+I said baby, you know I'm gonna leave you
+I'll leave you when the summertime
+Leave you when the summer comes a-rollin'
+Leave you when the summer comes along
 
-让我们随着时间一起手牵手
-我的爱人
-在夜深之时
-我们的光芒永现
-不要忘记来时的荆棘丛生
+我的宝贝，我将在夏季结束之时离开你
 
-Brain May and The Queens
-A Day at the Races, 1976
+[Verse 2]
+Babe, babe, babe, babe, babe, babe, baby
+Baby, I wanna leave you
+I ain't joking' woman, I've got to ramble
+Oh, yeah, baby, baby, I believin'
+We really got to ramble (I can hear it callin' me)
+I can hear it callin' me the way it used to do
+I can hear it callin' me back home
+
+我要去探求未知，他跟往常一样让我回到之前
+
+[Bridge]
+Oh, babe, I'm gonna leave you
+Oh, baby, you know
+I've really got to leave you
+Oh, I can hear it callin' me
+I said don't you hear it callin' me the way it used to do?
+Ooohh
+
+我听到他让我回到之前了，你听不到吗
+
+[Verse 3]
+I know, I know, I know I never, never, never, never, never
+Gonna leave you, babe
+But I got to go away from this place
+I've got to quit you, yeah
+Oh, baby, baby, baby, baby, baby, baby, baby
+Oh, don't you hear it callin' me?
+
+我真的一点 一点 一点都不想离开你啊
+但我真的要走了，那催促声你听不到吗
+
+Woman, woman, I know, I know
+It feels good to have you back again
+And I know that one day, baby
+It's gonna really grow, yes it is
+We gonna go walkin' through the park
+Every day
+
+我明白，我们俩还会再见，在春天万物复苏的时候
+到那时，我们再不分开的样子多好啊
+
+Come what may, every day, oh
+My, my, my, my, my, my babe
+I'm gonna leave you, go away
+
+每天不分开，但我现在不得不离开你了啊
+
+[Bridge]
+Oh, I miss you, baby
+It was really, really good
+You made me happy every single day
+But now, I've got to go away
+Ooh, oh, oh
+
+我已经怀念你，每天你是我的光
+但我必须得走了
+
+[Outro]
+Baby, baby, baby
+That's when it's callin' me
+I said that's when it's callin' me
+Back home
+
+宝贝啊 宝贝啊 这就是催促我回到之前的 声音啊
+
+Babe I’m Gonna Leave You
+by Anne Bredon
+arranged by Jimmy Page and Robert Plant
+from Led Zeppelin, 1969
+
+Ray and Elliot are thinking privately about pulling Partner Classtable request for my program since July, 2024.
+'''
+        : '''
+And may you never lay your head down
+Without a hand to hold
+May you never make your bed out in the cold
+
+You’re just like a great strong brother of mine
+You know that I love you true
+And you never talk dirty behind my back
+And I know that there’s those that do
+
+Oh please won’t you, please won’t you
+Bear it in mind
+Love is a lesson to learn in our time
+Now please won’t you, please won’t you
+Bear it in mind for me
+
+请你不要在无人支持时低下头颅
+愿你不要孤身一人
+你就像我坚强的哥哥
+我真的爱你
+有人在背后说我的坏话
+而你从不
+
+
+请你不要忘记
+爱是你我生命中的必修课
+不
+请你不要 请你不要 请你不要忘记
+请你
+牢记在心
+
+John Martyn, covered by Eric Clapton
+Slowhand, 1977
+
+Translated by Ray (Elliot Edition)
+Ray and Elliot are thinking privately about pulling Partner Classtable request for my program since July, 2024.
 ''',
   );
 
@@ -282,6 +385,15 @@ A Day at the Races, 1976
               mode: LaunchMode.externalApplication,
             ),
             child: const Text("听歌时间"),
+          ),
+          TextButton(
+            onPressed: () => launchUrl(
+              Uri.parse(
+                Platform.isIOS || Platform.isMacOS ? urlOthers : urlApple,
+              ),
+              mode: LaunchMode.externalApplication,
+            ),
+            child: const Text("听另一首歌"),
           ),
         ].toRow(mainAxisAlignment: MainAxisAlignment.center),
         const SizedBox(height: 8),

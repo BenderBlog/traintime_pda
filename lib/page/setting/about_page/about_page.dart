@@ -63,6 +63,18 @@ class AboutPage extends StatelessWidget {
       "https://space.bilibili.com/49892391/",
     ),
     Developer(
+      "GodHu777777",
+      "https://avatars.githubusercontent.com/u/111997394",
+      "支持：繁体中文转换代码和彩蛋代码（多语言仍在开发）",
+      "https://github.com/GodHu777777",
+    ),
+    Developer(
+      "Hancl777",
+      "https://avatars.githubusercontent.com/u/74408609",
+      "支持：繁体中文转换代码（多语言仍在开发）",
+      "https://github.com/Hancl777",
+    ),
+    Developer(
       "hhzm (闪电豹猫)",
       "https://avatars.githubusercontent.com/u/19224718",
       "支持：提供彩蛋代码",
@@ -93,10 +105,16 @@ class AboutPage extends StatelessWidget {
       "https://blog.woooo.tech/",
     ),
     Developer(
-      "Ray (Railgun Edition)",
+      "Ray (Elliot Edition)",
       "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
-      "设计：开屏画面 / 支持：iOS 开发",
+      "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表",
       "https://raay.xyz/",
+    ),
+    Developer(
+      "shadowyingyi",
+      "https://avatars.githubusercontent.com/u/42831635",
+      "支持：两次鸽子公众号宣传",
+      "https://github.com/shadowyingyi",
     ),
     Developer(
       "stalomeow",
@@ -163,8 +181,8 @@ class AboutPage extends StatelessWidget {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Te o toriatte Edition"
-                      : "Let Us Cling Together Edition",
+                      ? "Babe I'm Gonna Leave You Edition"
+                      : "May You Never Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
               ],
