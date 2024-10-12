@@ -59,7 +59,11 @@ Future<void> update() async {
         ]));
   } catch (e, s) {
     log.handle(e, s);
-    electricityInfo.value = "程序故障";
+    if (e is NeedInfoException) {
+      electricityInfo.value = "需要在缴费平台完善信息";
+    } else {
+      electricityInfo.value = "程序故障";
+    }
     owe.value = "目前欠款无法查询";
     isNotice.value = false;
     return;
@@ -157,12 +161,13 @@ class PaymentSession extends IDSSession {
     return dio.post(
       "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
       data: {
-        "p_Userid": electricityAccount(),
+        "p_Userid": "2003150519",
         "p_Password": password,
         "factorycode": factorycode,
       },
     ).then(
       (value) {
+        if (value.isRedirect) throw NeedInfoException();
         var decodeData = jsonDecode(value.data);
         return (
           decodeData["roomList"][0].toString().split('@')[0],
@@ -212,3 +217,5 @@ class PaymentSession extends IDSSession {
 }
 
 class NotFoundException implements Exception {}
+
+class NeedInfoException implements Exception {}
