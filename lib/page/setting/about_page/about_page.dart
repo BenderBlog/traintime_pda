@@ -63,6 +63,12 @@ class AboutPage extends StatelessWidget {
       "https://space.bilibili.com/49892391/",
     ),
     Developer(
+      "Elliot",
+      "https://img.moegirl.org.cn/common/thumb/6/64/Hirasawa_yui_1.jpg/800px-Hirasawa_yui_1.jpg",
+      "开发：情侣课表功能开发指导",
+      "https://www.bilibili.com/bangumi/play/ss1172/",
+    ),
+    Developer(
       "GodHu777777",
       "https://avatars.githubusercontent.com/u/111997394",
       "支持：繁体中文转换代码和彩蛋代码（多语言仍在开发）",
@@ -77,7 +83,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "hhzm (闪电豹猫)",
       "https://avatars.githubusercontent.com/u/19224718",
-      "支持：提供彩蛋代码",
+      "支持：提供彩蛋代码 / 开发：电费查询账号计算",
       "https://hhzm.win/",
     ),
     Developer(
@@ -107,7 +113,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "Ray (Elliot Edition)",
       "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
-      "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表",
+      "设计：开屏画面 / 支持：iOS 发行商 / 开发：情侣课表功能开发指导",
       "https://raay.xyz/",
     ),
     Developer(

@@ -224,7 +224,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
     if (mounted) {
       try {
         String source = File.fromUri(Uri.parse(result!)).readAsStringSync();
-        bool isSuccess = classTableState.decodePartnerClass(source).$4;
+        bool isSuccess = classTableState.decodePartnerClass(source).$5;
         if (isSuccess) {
           File("${supportPath.path}/${ClassTableFile.partnerClassName}")
               .writeAsStringSync(source);
@@ -254,7 +254,11 @@ class _ClassTablePageState extends State<ClassTablePage> {
     if (haveClass) {
       return Scaffold(
           appBar: AppBar(
-            title: Text(classTableState.isPartner ? "搭子的日程表" : "日程表"),
+            title: Text(
+              classTableState.isPartner
+                  ? "${classTableState.partnerName}的日程表"
+                  : "日程表",
+            ),
             leading: IconButton(
               icon: Icon(
                 Platform.isIOS || Platform.isMacOS
@@ -358,29 +362,93 @@ class _ClassTablePageState extends State<ClassTablePage> {
                               ],
                             ),
                           );
-                          String fileName = "classtable-"
-                              "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
-                              "${classTableState.semesterCode}";
-                          if (action == 'D') {
-                            fileName += ".ics";
-                          } else {
-                            fileName +=
-                                "-${preference.getString(preference.Preference.idsAccount)}.erc";
-                          }
-                          if (Platform.isLinux ||
-                              Platform.isMacOS ||
-                              Platform.isWindows) {
-                            String? resultFilePath =
-                                await FilePicker.platform.saveFile(
-                              dialogTitle: "保存日历文件到...",
-                              fileName: fileName,
-                              allowedExtensions: [
-                                if (action == 'D') "ics" else "erc"
-                              ],
-                              lockParentWindow: true,
-                            );
-                            if (resultFilePath != null) {
-                              File file = File(resultFilePath);
+                          if (context.mounted) {
+                            String fileName = "classtable-"
+                                "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
+                                "${classTableState.semesterCode}";
+                            String sweetheartName = "";
+                            if (action == 'D') {
+                              fileName += ".ics";
+                            } else {
+                              TextEditingController controller =
+                                  TextEditingController();
+                              sweetheartName = await showDialog<String>(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                            title: const Text('输入对方显示该课表的名称'),
+                                            content: TextField(
+                                              autofocus: true,
+                                              controller: controller,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              maxLines: 1,
+                                              decoration: const InputDecoration(
+                                                hintText: "在此输入，否则为 Sweetheart",
+                                                border: OutlineInputBorder(),
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text('我就这一个甜心'),
+                                                onPressed: () async {
+                                                  Navigator.of(context).pop(
+                                                    null,
+                                                  );
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text('提交'),
+                                                onPressed: () async {
+                                                  if (controller.text.isEmpty) {
+                                                    showToast(
+                                                      context: context,
+                                                      msg: "输入空白!",
+                                                    );
+                                                  } else {
+                                                    Navigator.of(context).pop(
+                                                      controller.text,
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          )) ??
+                                  "Sweetheart";
+
+                              if (context.mounted) {
+                                fileName += "-$sweetheartName.erc";
+                              }
+                            }
+                            if (Platform.isLinux ||
+                                Platform.isMacOS ||
+                                Platform.isWindows) {
+                              String? resultFilePath =
+                                  await FilePicker.platform.saveFile(
+                                dialogTitle: "保存日历文件到...",
+                                fileName: fileName,
+                                allowedExtensions: [
+                                  if (action == 'D') "ics" else "erc"
+                                ],
+                                lockParentWindow: true,
+                              );
+                              if (resultFilePath != null) {
+                                File file = File(resultFilePath);
+                                if (!(await file.exists())) {
+                                  await file.create();
+                                }
+                                if (action == "D") {
+                                  await file.writeAsString(
+                                      classTableState.iCalenderStr);
+                                } else {
+                                  await file.writeAsString(
+                                    classTableState.ercStr(sweetheartName),
+                                  );
+                                }
+                              }
+                            } else {
+                              String tempPath = await getTemporaryDirectory()
+                                  .then((value) => value.path);
+                              File file = File("$tempPath/$fileName");
                               if (!(await file.exists())) {
                                 await file.create();
                               }
@@ -388,29 +456,17 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                 await file.writeAsString(
                                     classTableState.iCalenderStr);
                               } else {
-                                await file
-                                    .writeAsString(classTableState.ercStr);
+                                await file.writeAsString(
+                                  classTableState.ercStr(sweetheartName),
+                                );
                               }
+                              await Share.shareXFiles(
+                                [XFile("$tempPath/$fileName")],
+                                sharePositionOrigin:
+                                    box!.localToGlobal(Offset.zero) & box.size,
+                              );
+                              await file.delete();
                             }
-                          } else {
-                            String tempPath = await getTemporaryDirectory()
-                                .then((value) => value.path);
-                            File file = File("$tempPath/$fileName");
-                            if (!(await file.exists())) {
-                              await file.create();
-                            }
-                            if (action == "D") {
-                              await file
-                                  .writeAsString(classTableState.iCalenderStr);
-                            } else {
-                              await file.writeAsString(classTableState.ercStr);
-                            }
-                            await Share.shareXFiles(
-                              [XFile("$tempPath/$fileName")],
-                              sharePositionOrigin:
-                                  box!.localToGlobal(Offset.zero) & box.size,
-                            );
-                            await file.delete();
                           }
                           if (context.mounted) {
                             showToast(context: context, msg: "应该保存成功");

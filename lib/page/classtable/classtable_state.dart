@@ -42,8 +42,12 @@ class ClassTableState extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant ClassTableState oldWidget) {
     controllers.chosenWeek = oldWidget.controllers.chosenWeek;
-    controllers.partnerClass = null;
-    return controllers.chosenWeek != oldWidget.controllers.chosenWeek;
+    controllers.partnerClass = oldWidget.controllers.partnerClass;
+    controllers.partnerSubjects = oldWidget.controllers.partnerSubjects;
+    controllers.partnerExperiment = oldWidget.controllers.partnerExperiment;
+    controllers.partnerName = oldWidget.controllers.partnerName;
+    controllers.isPartner = oldWidget.controllers.isPartner;
+    return true;
   }
 }
 
@@ -75,6 +79,7 @@ class ClassTableWidgetState with ChangeNotifier {
   ClassTableData? partnerClass;
   List<Subject>? partnerSubjects;
   List<ExperimentData>? partnerExperiment;
+  String? partnerName;
 
   /// Render partner code.
   bool _isPartner = false;
@@ -187,7 +192,7 @@ class ClassTableWidgetState with ChangeNotifier {
           .then((value) => notifyListeners());
 
   /// Decode Partner String info
-  (ClassTableData, List<Subject>, List<ExperimentData>, bool)
+  (String, ClassTableData, List<Subject>, List<ExperimentData>, bool)
       decodePartnerClass(
     String source,
   ) {
@@ -201,6 +206,7 @@ class ClassTableWidgetState with ChangeNotifier {
       );
     }
     return (
+      data["name"] ?? "Sweetheart",
       ClassTableData.fromJson(data["classtable"]),
       List.generate(
         data["exam"].length,
@@ -219,9 +225,11 @@ class ClassTableWidgetState with ChangeNotifier {
     var file = File("${supportPath.path}/${ClassTableFile.partnerClassName}");
     if (!file.existsSync()) throw Exception("File not found.");
     final data = decodePartnerClass(file.readAsStringSync());
-    partnerClass = data.$1;
-    partnerSubjects = data.$2;
-    partnerExperiment = data.$3;
+    partnerName = data.$1;
+    partnerClass = data.$2;
+    partnerSubjects = data.$3;
+    partnerExperiment = data.$4;
+
     notifyListeners();
   }
 
@@ -266,8 +274,9 @@ class ClassTableWidgetState with ChangeNotifier {
   }
 
   /// Generate shared class data.
-  /// Eliot Ray Classtable (Format)
-  String get ercStr => jsonEncode({
+  /// Elliot Ray Classtable (Format)
+  String ercStr(String name) => jsonEncode({
+        "name": name,
         "classtable": classTableController.classTableData,
         "exam": examController.data.subject,
         "experiment": experimentController.data,
