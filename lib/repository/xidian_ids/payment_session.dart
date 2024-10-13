@@ -79,8 +79,9 @@ class PaymentSession extends IDSSession {
   /// The way to get the electricity number.
   /// Refrence here: https://see.xidian.edu.cn/html/news/9179.html
   static String electricityAccount() {
+    String rawDormLocation = preference.getString(preference.Preference.dorm);
     List<RegExpMatch> nums = RegExp(r"[0-9]+")
-        .allMatches(preference.getString(preference.Preference.dorm))
+        .allMatches(rawDormLocation)
         .toList();
     // 校区，默认南校区
     String accountA = "2";
@@ -121,6 +122,23 @@ class PaymentSession extends IDSSession {
     if ([13, 15].contains(building)) {
       accountC = "01";
       accountD = nums[2][0]!.toString().padLeft(4, "1");
+    }
+    // 南校区19-21#公寓不分区，C段编码默认为01；D段首位编码默认为层号
+    if ([19, 20, 21].contains(building)) {
+      // 区号
+      accountC = "01";
+      // 宿舍号
+      accountD = nums[3][0]!.toString().padLeft(4, nums[2][0]!.toString());      }
+      // 南校区18#分北楼和南楼两栋，北楼C段为20，南楼C段为10;
+      // D段首位编码默认为层号
+    if ([18].contains(building)) {
+      if (rawDormLocation.contains("南楼")) {
+        accountC = "10";
+      } else {
+        accountC = "20";
+      }
+      // 宿舍号
+      accountD = nums[3][0]!.toString().padLeft(4, nums[2][0]!.toString());
     }
 
     return accountA + accountB + accountC + accountD;
