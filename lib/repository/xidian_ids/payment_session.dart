@@ -271,7 +271,7 @@ class PaymentSession extends IDSSession {
     return dio.post(
       "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
       data: {
-        "p_Userid": "2003150519",
+        "p_Userid": electricityAccount(),
         "p_Password": password,
         "factorycode": factorycode,
       },
@@ -318,7 +318,7 @@ class PaymentSession extends IDSSession {
         if (decodeData["returncode"] == "ERROR" &&
             decodeData["returnmsg"] == "电费厂家返回xml消息体异常") {
           owe.value = "目前无需清缴欠费";
-        } else if (int.parse(decodeData["dueTotal"]) > 0) {
+        } else if (double.parse(decodeData["dueTotal"]) > 0.0) {
           owe.value = "待清缴${decodeData["dueTotal"]}元欠费";
         } else {
           owe.value = "目前欠款无法查询";
