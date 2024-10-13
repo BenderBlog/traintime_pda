@@ -55,7 +55,9 @@ enum Preference {
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
   currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
   simplifiedClassTimeline(
-      key: "simplifiedClassTimeline", type: "bool"); // 简化日程时间轴
+    key: "simplifiedClassTimeline",
+    type: "bool",
+  ); // 简化日程时间轴
 
   const Preference({required this.key, this.type = "String"});
   factory Preference.fromKey(String key) {

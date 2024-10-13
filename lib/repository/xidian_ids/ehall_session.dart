@@ -112,7 +112,9 @@ class EhallSession extends IDSSession {
   }
 
   /// 学生个人信息  6635601510182122
-  Future<void> getInformation() async {
+  /// Return phone info for electricity. set onlyPhone to avoid update
+  /// personal info.
+  Future<String> getInformation({bool onlyPhone = false}) async {
     log.info(
       "[ehall_session][getInformation] "
       "Ready to get the user information.",
@@ -179,66 +181,70 @@ class EhallSession extends IDSSession {
       "[ehall_session][getInformation] "
       "Storing the user information.",
     );
-    if (detailed["returnCode"] != "#E000000000000") {
-      throw GetInformationFailedException(detailed["description"]);
-    } else {
-      preference.setString(
-        preference.Preference.name,
-        detailed["data"]["XM"],
+    if (onlyPhone == false) {
+      if (detailed["returnCode"] != "#E000000000000") {
+        throw GetInformationFailedException(detailed["description"]);
+      } else {
+        preference.setString(
+          preference.Preference.name,
+          detailed["data"]["XM"],
+        );
+        preference.setString(
+          preference.Preference.sex,
+          detailed["data"]["XBDM_DISPLAY"],
+        );
+        preference.setString(
+          preference.Preference.execution,
+          detailed["data"]["SYDM_DISPLAY"].toString().replaceAll("·", ""),
+        );
+        preference.setString(
+          preference.Preference.institutes,
+          detailed["data"]["DWDM_DISPLAY"],
+        );
+        preference.setString(
+          preference.Preference.subject,
+          detailed["data"]["ZYDM_DISPLAY"],
+        );
+        preference.setString(
+          preference.Preference.dorm,
+          detailed["data"]["ZSDZ"],
+        );
+      }
+
+      log.info(
+        "[ehall_session][getInformation] "
+        "Get the semester information.",
       );
+      String get = await useApp("4770397878132218");
+      await dioEhall.post(get);
+      String semesterCode = await dioEhall
+          .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+          )
+          .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
       preference.setString(
-        preference.Preference.sex,
-        detailed["data"]["XBDM_DISPLAY"],
+        preference.Preference.currentSemester,
+        semesterCode,
       );
-      preference.setString(
-        preference.Preference.execution,
-        detailed["data"]["SYDM_DISPLAY"].toString().replaceAll("·", ""),
+
+      log.info(
+        "[ehall_session][getInformation] "
+        "Get the day the semester begin.",
       );
+      String termStartDay = await dioEhall.post(
+        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+        data: {
+          'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
+          'XQ': semesterCode.split('-')[2]
+        },
+      ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
       preference.setString(
-        preference.Preference.institutes,
-        detailed["data"]["DWDM_DISPLAY"],
-      );
-      preference.setString(
-        preference.Preference.subject,
-        detailed["data"]["ZYDM_DISPLAY"],
-      );
-      preference.setString(
-        preference.Preference.dorm,
-        detailed["data"]["ZSDZ"],
+        preference.Preference.currentStartDay,
+        termStartDay,
       );
     }
 
-    log.info(
-      "[ehall_session][getInformation] "
-      "Get the semester information.",
-    );
-    String get = await useApp("4770397878132218");
-    await dioEhall.post(get);
-    String semesterCode = await dioEhall
-        .post(
-          "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-        )
-        .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    preference.setString(
-      preference.Preference.currentSemester,
-      semesterCode,
-    );
-
-    log.info(
-      "[ehall_session][getInformation] "
-      "Get the day the semester begin.",
-    );
-    String termStartDay = await dioEhall.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-      data: {
-        'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
-        'XQ': semesterCode.split('-')[2]
-      },
-    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    preference.setString(
-      preference.Preference.currentStartDay,
-      termStartDay,
-    );
+    return detailed["data"]["SJH"];
   }
 }
 

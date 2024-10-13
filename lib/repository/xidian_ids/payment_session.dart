@@ -10,6 +10,7 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 var owe = "".obs;
@@ -61,6 +62,8 @@ Future<void> update() async {
     log.handle(e, s);
     if (e is NeedInfoException) {
       electricityInfo.value = "需要在缴费平台完善信息";
+    } else if (e is NotInitalizedException) {
+      electricityInfo.value = e.msg;
     } else {
       electricityInfo.value = "程序故障";
     }
@@ -158,22 +161,48 @@ class PaymentSession extends IDSSession {
 
     await dio.get(nextStop[0]!.replaceAll('"', ""));
 
-    return dio.post(
+    var value = await dio.post(
       "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
       data: {
-        "p_Userid": "2003150519",
+        "p_Userid": electricityAccount(),
         "p_Password": password,
         "factorycode": factorycode,
       },
-    ).then(
-      (value) {
-        if (value.isRedirect) throw NeedInfoException();
-        var decodeData = jsonDecode(value.data);
-        return (
-          decodeData["roomList"][0].toString().split('@')[0],
-          decodeData["liveid"].toString(),
+    );
+    if ((value.statusCode ?? 0) >= 300 && (value.statusCode ?? 0) < 400) {
+      log.info(
+        "[PaymentSession][getOwe] "
+        "Newbee detected.",
+      );
+      await dio.post(value.headers["location"]![0]).then((value) async {
+        await dio.post(
+          "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
+          data: {
+            "tel": await EhallSession().getInformation(onlyPhone: true),
+            "email": "${preference.getString(preference.Preference.idsAccount)}"
+                "@stu.mail.xidian.edu.cn",
+          },
+          options: Options(contentType: Headers.jsonContentType),
         );
-      },
+      }).then((value) async {
+        value = await dio.post(
+          "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
+          data: {
+            "p_Userid": electricityAccount(),
+            "p_Password": password,
+            "factorycode": factorycode,
+          },
+        );
+      });
+    }
+
+    var decodeData = jsonDecode(value.data);
+    if (decodeData["returncode"] == "ERROR") {
+      throw NotInitalizedException(decodeData["returnmsg"]);
+    }
+    return (
+      decodeData["roomList"][0].toString().split('@')[0],
+      decodeData["liveid"].toString(),
     );
   }
 
@@ -219,3 +248,8 @@ class PaymentSession extends IDSSession {
 class NotFoundException implements Exception {}
 
 class NeedInfoException implements Exception {}
+
+class NotInitalizedException implements Exception {
+  final String msg;
+  const NotInitalizedException(this.msg);
+}
