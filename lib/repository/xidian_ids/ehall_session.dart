@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -78,7 +79,8 @@ class EhallSession extends IDSSession {
         String location = await super.checkAndLogin(
           target: "https://ehall.xidian.edu.cn/login?"
               "service=https://ehall.xidian.edu.cn/new/index.html",
-          sliderCaptcha: (p0) async {},
+          sliderCaptcha: (String cookieStr) =>
+              SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
         );
         var response = await dio.get(location);
         while (response.headers[HttpHeaders.locationHeader] != null) {
@@ -123,7 +125,8 @@ class EhallSession extends IDSSession {
     String location = await super.checkAndLogin(
       target:
           "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do#/wdxx",
-      sliderCaptcha: (p0) async {},
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
     );
     log.info("[ehall_session][useApp] "
         "Location is $location");
@@ -209,6 +212,10 @@ class EhallSession extends IDSSession {
           preference.Preference.dorm,
           detailed["data"]["ZSDZ"],
         );
+        preference.setBool(
+          preference.Preference.role,
+          detailed["data"]["XSLBDM"] == "2",
+        );
       }
 
       log.info(
@@ -244,7 +251,7 @@ class EhallSession extends IDSSession {
       );
     }
 
-    return detailed["data"]["SJH"];
+    return detailed["data"]["SJH"] ?? "02981891206";
   }
 }
 

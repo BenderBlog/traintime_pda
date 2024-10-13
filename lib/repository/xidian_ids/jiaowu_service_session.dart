@@ -5,6 +5,7 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 
@@ -30,7 +31,8 @@ class JiaowuServiceSession extends IDSSession {
           "index%3Fappid%3D200190304164516885%26redirect%3Dhttps%253A%252F%252F"
           "ehall.xidian.edu.cn%252Fjwmobile%252Fauth%252Findex%26state%3DSTATE"
           "%26qrcode%3D1&from=wap",
-      sliderCaptcha: (p0) async {},
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
     );
 
     var response = await dio.get(location);
