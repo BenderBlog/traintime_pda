@@ -132,8 +132,8 @@ class PaymentSession extends IDSSession {
         accountC = "01";
         accountD = nums[2][0]!.toString().padLeft(4, "1");
       }
-      // 南校区19-21#公寓不分区，C段编码默认为01；D段首位编码默认为层号
-      if ([19, 20, 21].contains(building)) {
+      // 南校区19-22#公寓不分区，C段编码默认为01；D段首位编码默认为层号
+      if ([19, 20, 21, 22].contains(building)) {
         // 区号
         accountC = "01";
         // 宿舍号
