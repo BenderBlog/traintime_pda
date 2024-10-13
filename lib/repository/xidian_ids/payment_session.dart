@@ -137,7 +137,7 @@ class PaymentSession extends IDSSession {
         // 区号
         accountC = "01";
         // 宿舍号
-        accountD = nums[3][0]!.toString().padLeft(4, nums[2][0]!.toString());
+        accountD = nums[2][0]!.toString().padLeft(4, nums[1][0]!.toString());
       }
       // 南校区18#分北楼和南楼两栋，北楼C段为20，南楼C段为10;
       // D段首位编码默认为层号
@@ -148,7 +148,7 @@ class PaymentSession extends IDSSession {
           accountC = "20";
         }
         // 宿舍号
-        accountD = nums[3][0]!.toString().padLeft(4, nums[2][0]!.toString());
+        accountD = nums[2][0]!.toString().padLeft(4, nums[1][0]!.toString());
       }
     } else {
       // 北校区公寓的情况
