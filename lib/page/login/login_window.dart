@@ -6,6 +6,7 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -281,7 +282,12 @@ class _LoginWindowState extends State<LoginWindow> {
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AppIconWidget(),
+                  const AppIconWidget().gestures(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const AboutPage()),
+                    ),
+                  ),
                   const SizedBox(
                     width: 48,
                   ),
@@ -292,9 +298,16 @@ class _LoginWindowState extends State<LoginWindow> {
               )
             : Column(
                 children: [
-                  const AppIconWidget().padding(
-                    vertical: kToolbarHeight * 0.75,
-                  ),
+                  const AppIconWidget()
+                      .padding(
+                        vertical: kToolbarHeight * 0.75,
+                      )
+                      .gestures(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => const AboutPage()),
+                        ),
+                      ),
                   contentColumn(),
                 ],
               ).center(),

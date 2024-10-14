@@ -53,7 +53,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "Dimole",
       "https://avatars.githubusercontent.com/u/24828354",
-      "支持：辅助修复滑块问题",
+      "开发支持：辅助修复滑块问题",
       "https://github.com/Dimole",
     ),
     Developer(
@@ -65,31 +65,31 @@ class AboutPage extends StatelessWidget {
     Developer(
       "Elliot",
       "https://img.moegirl.org.cn/common/thumb/6/64/Hirasawa_yui_1.jpg/800px-Hirasawa_yui_1.jpg",
-      "开发：情侣课表功能开发指导",
+      "开发支持：情侣课表功能开发指导",
       "https://www.bilibili.com/bangumi/play/ss1172/",
     ),
     Developer(
       "GodHu777777",
       "https://avatars.githubusercontent.com/u/111997394",
-      "支持：繁体中文转换代码和彩蛋代码（多语言仍在开发）",
+      "开发支持：繁体中文转换代码和彩蛋代码（多语言仍在开发）",
       "https://github.com/GodHu777777",
     ),
     Developer(
       "Hancl777",
       "https://avatars.githubusercontent.com/u/74408609",
-      "支持：繁体中文转换代码（多语言仍在开发）",
+      "开发支持：繁体中文转换代码（多语言仍在开发）",
       "https://github.com/Hancl777",
     ),
     Developer(
       "hhzm (闪电豹猫)",
       "https://avatars.githubusercontent.com/u/19224718",
-      "支持：提供彩蛋代码 / 开发：电费查询账号计算",
+      "开发支持：提供彩蛋代码，电费查询账号计算",
       "https://hhzm.win/",
     ),
     Developer(
       "lsy223622 (木生睡不着)",
       "https://avatars.githubusercontent.com/u/57913213",
-      "设计：iOS 图标",
+      "设计：iOS 图标 / 支持：冠名 XDYou for iOS",
       "https://lsy223622.com/",
     ),
     Developer(
@@ -107,13 +107,19 @@ class AboutPage extends StatelessWidget {
     Developer(
       "ReverierXu",
       "https://blog.woooo.tech/img/avatar.png",
-      "设计：用于信息展示的 ReX 卡片",
+      "设计：用于信息展示的 ReX 卡片 / 开发支持：研究生课表",
       "https://blog.woooo.tech/",
+    ),
+    Developer(
+      "Rrrilac",
+      "https://avatars.githubusercontent.com/u/128341096",
+      "开发支持：电费查询",
+      "https://github.com/Rrrilac",
     ),
     Developer(
       "Ray (Elliot Edition)",
       "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
-      "设计：开屏画面 / 支持：iOS 发行商 / 开发：情侣课表功能开发指导",
+      "设计：开屏画面 / 支持：iOS 发行商 / 开发支持：情侣课表功能开发指导",
       "https://raay.xyz/",
     ),
     Developer(
@@ -143,7 +149,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "ZCWzy",
       "https://avatars.githubusercontent.com/u/87163986",
-      "开发：修复丁香电费 / 支持：研究生版本开发",
+      "开发：修复丁香电费 / 开发支持：研究生版本开发",
       "https://github.com/ZCWzy",
     ),
   ];
@@ -298,15 +304,13 @@ class AboutPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                 )
                 .constrained(maxWidth: 800)
-                .center()
-                .safeArea();
+                .center();
           } else {
             return [_title(context), _developerList, _moreList(context)]
                 .toColumn(mainAxisAlignment: MainAxisAlignment.center)
                 .scrollable()
                 .constrained(maxWidth: 600)
-                .center()
-                .safeArea();
+                .center();
           }
         }));
   }

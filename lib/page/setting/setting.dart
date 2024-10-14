@@ -5,7 +5,6 @@
 
 import 'dart:io';
 
-import 'package:catcher_2/catcher_2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -71,440 +70,427 @@ class _SettingWindowState extends State<SettingWindow> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: Platform.isIOS || Platform.isMacOS
-                        ? "XDYou"
-                        : 'Traintime PDA',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+    return Scaffold(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: Platform.isIOS || Platform.isMacOS
+                      ? "XDYou"
+                      : 'Traintime PDA',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const TextSpan(
-                    text: '\nWritten by BenderBlog Rodriguez and contributors',
-                  ),
-                ],
-              ),
-            ).padding(horizontal: 8.0),
-            // 功能1
-            const SizedBox(height: 20),
-            ReXCard(
-                title: _buildListSubtitle('关于'),
-                remaining: const [],
-                bottomRow: Column(
-                  children: [
-                    ListTile(
-                      title: const Text("关于本程序"),
-                      subtitle: Text(
-                          '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
-                      onTap: () => context.pushReplacement(const AboutPage()),
-                      trailing: const Icon(Icons.navigate_next),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('用户信息'),
-                      subtitle: Text(
-                        "${preference.getString(preference.Preference.name)} ${preference.getString(preference.Preference.execution)}\n"
-                        "${preference.getString(preference.Preference.institutes)} ${preference.getString(preference.Preference.subject)}",
-                      ),
-                    ),
-                  ],
-                )),
-            const SizedBox(height: 20),
-            // ReXCard(
-            //   title: _buildListSubtitle('颜色设置'),
-            //   remaining: [],
-            //   bottomRow: Column(
-            //     children: [
-            //       ListTile(
-            //           title: const Text('设置程序主题色'),
-            //           subtitle: Text(ColorSeed
-            //               .values[
-            //                   preference.getInt(preference.Preference.color)]
-            //               .label),
-            //           onTap: () {
-            //             showDialog(
-            //               context: context,
-            //               builder: (context) => const ChangeColorDialog(),
-            //             );
-            //           }),
-            //     ],
-            //   ),
-            // ),
-            ReXCard(
-                title: _buildListSubtitle('界面设置'),
-                remaining: const [],
-                bottomRow: Column(children: [
-                  ListTile(
-                      title: const Text('设置深浅色'),
-                      subtitle: Text(demoBlueModeName[
-                          preference.getInt(preference.Preference.brightness)]),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) =>
-                                const ChangeBrightnessDialog());
-                      }),
-                  const Divider(),
-                  ListTile(
-                    title: const Text("简化日程时间轴"),
-                    subtitle: const Text("没有日程时 减少空间占用"),
-                    trailing: Switch(
-                      value: preference.getBool(
-                          preference.Preference.simplifiedClassTimeline),
-                      onChanged: (bool value) {
-                        setState(() {
-                          preference
-                              .setBool(
-                                preference.Preference.simplifiedClassTimeline,
-                                value,
-                              )
-                              .then(
-                                (value) =>
-                                    ClassTableCard.reloadSettingsFromPref(),
-                              );
-                        });
-                      },
-                    ),
-                  ),
-                ])),
-            ReXCard(
-              title: _buildListSubtitle('帐号设置'),
-              remaining: const [],
-              bottomRow: Column(
-                children: [
-                  ListTile(
-                      title: const Text('体育系统密码设置'),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => const SportPasswordDialog(),
-                        );
-                      }),
-                  const Divider(),
-                  ListTile(
-                      title: const Text('物理实验系统密码设置'),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) =>
-                              const ExperimentPasswordDialog(),
-                        );
-                      }),
-                  const Divider(),
-                  ListTile(
-                      title: const Text('电费帐号密码设置'),
-                      subtitle: const Text('非 123456 请设置'),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) =>
-                              const ElectricityPasswordDialog(),
-                        );
-                      }),
-                ],
-              ),
+                ),
+                const TextSpan(
+                  text: '\nWritten by BenderBlog Rodriguez and contributors',
+                ),
+              ],
             ),
-            ReXCard(
-              title: _buildListSubtitle('课表相关设置'),
+          ).padding(horizontal: 8.0),
+          // 功能1
+          const SizedBox(height: 20),
+          ReXCard(
+              title: _buildListSubtitle('关于'),
               remaining: const [],
               bottomRow: Column(
                 children: [
                   ListTile(
-                    title: const Text("开启课表背景图"),
-                    trailing: Switch(
-                      value:
-                          preference.getBool(preference.Preference.decorated),
-                      onChanged: (bool value) {
-                        if (value == true &&
-                            !preference
-                                .getBool(preference.Preference.decoration)) {
-                          showToast(context: context, msg: '你先选个图片罢，就在下面');
-                        } else {
-                          setState(() {
-                            preference.setBool(
-                                preference.Preference.decorated, value);
-                          });
-                        }
-                      },
-                    ),
+                    title: const Text("关于本程序"),
+                    subtitle: Text(
+                        '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
+                    onTap: () => context.pushReplacement(const AboutPage()),
+                    trailing: const Icon(Icons.navigate_next),
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text('课表背景图选择'),
+                    title: const Text('用户信息'),
+                    subtitle: Text(
+                      "${preference.getString(preference.Preference.name)} ${preference.getString(preference.Preference.execution)}\n"
+                      "${preference.getString(preference.Preference.institutes)} ${preference.getString(preference.Preference.subject)}",
+                    ),
+                  ),
+                ],
+              )),
+          const SizedBox(height: 20),
+          // ReXCard(
+          //   title: _buildListSubtitle('颜色设置'),
+          //   remaining: [],
+          //   bottomRow: Column(
+          //     children: [
+          //       ListTile(
+          //           title: const Text('设置程序主题色'),
+          //           subtitle: Text(ColorSeed
+          //               .values[
+          //                   preference.getInt(preference.Preference.color)]
+          //               .label),
+          //           onTap: () {
+          //             showDialog(
+          //               context: context,
+          //               builder: (context) => const ChangeColorDialog(),
+          //             );
+          //           }),
+          //     ],
+          //   ),
+          // ),
+          ReXCard(
+              title: _buildListSubtitle('界面设置'),
+              remaining: const [],
+              bottomRow: Column(children: [
+                ListTile(
+                    title: const Text('设置深浅色'),
+                    subtitle: Text(demoBlueModeName[
+                        preference.getInt(preference.Preference.brightness)]),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () async {
-                      FilePickerResult? result;
-                      try {
-                        result = await pickFile(type: FileType.image);
-                      } on MissingStoragePermissionException {
-                        if (context.mounted) {
-                          showToast(context: context, msg: "未获取存储权限，无法读取文件");
-                        }
-                      }
-                      if (mounted) {
-                        if (result != null) {
-                          File(result.files.single.path!)
-                              .copySync("${supportPath.path}/decoration.jpg");
-                          preference.setBool(
-                              preference.Preference.decoration, true);
-                          if (context.mounted) {
-                            showToast(context: context, msg: '设定成功');
-                          }
-                        } else {
-                          if (context.mounted) {
-                            showToast(context: context, msg: '你没有选图片捏');
-                          }
-                        }
-                      }
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => const ChangeBrightnessDialog());
+                    }),
+                const Divider(),
+                ListTile(
+                  title: const Text("简化日程时间轴"),
+                  subtitle: const Text("没有日程时 减少空间占用"),
+                  trailing: Switch(
+                    value: preference
+                        .getBool(preference.Preference.simplifiedClassTimeline),
+                    onChanged: (bool value) {
+                      setState(() {
+                        preference
+                            .setBool(
+                              preference.Preference.simplifiedClassTimeline,
+                              value,
+                            )
+                            .then(
+                              (value) =>
+                                  ClassTableCard.reloadSettingsFromPref(),
+                            );
+                      });
                     },
                   ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text("清除所有用户添加课程"),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: const Text("确认对话框"),
-                        content: const Text(
-                          "是否要清除所有用户添加课程？"
-                          "这个功能对从学校获取的日程没有影响。",
-                        ),
-                        actions: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('取消'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              var file = File(
-                                "${supportPath.path}/"
-                                "${ClassTableFile.userDefinedClassName}",
-                              );
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-                              Get.find<ClassTableController>()
-                                  .updateClassTable();
-                              showToast(context: context, msg: "已经清除完毕");
-                              Navigator.pop(context);
-                            },
-                            child: const Text('确定'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text("强制刷新课表"),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: const Text("确认对话框"),
-                        content: const Text(
-                          "是否要强制刷新课表？同意后，"
-                          "将会从学校一站式后端重新获取课表，耗时会比较久。",
-                        ),
-                        actions: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('取消'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Get.put(ClassTableController())
-                                  .updateClassTable(isForce: true);
-                              Navigator.pop(context);
-                            },
-                            child: const Text('确定'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text('课程偏移设置'),
-                    subtitle: Text(
-                      '正数错后开学日期 负数提前开学日期\n'
-                      '目前为 ${preference.getInt(preference.Preference.swift)}',
-                    ),
+                ),
+              ])),
+          ReXCard(
+            title: _buildListSubtitle('帐号设置'),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
+                ListTile(
+                    title: const Text('体育系统密码设置'),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
                         barrierDismissible: false,
                         context: context,
-                        builder: (context) => ChangeSwiftDialog(),
-                      ).then((value) {
-                        Get.put(ClassTableController()).update();
-                        updateCurrentData();
-                        setState(() {});
-                      });
+                        builder: (context) => const SportPasswordDialog(),
+                      );
+                    }),
+                const Divider(),
+                ListTile(
+                    title: const Text('物理实验系统密码设置'),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => const ExperimentPasswordDialog(),
+                      );
+                    }),
+                const Divider(),
+                ListTile(
+                    title: const Text('电费帐号密码设置'),
+                    subtitle: const Text('非 123456 请设置'),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => const ElectricityPasswordDialog(),
+                      );
+                    }),
+              ],
+            ),
+          ),
+          ReXCard(
+            title: _buildListSubtitle('课表相关设置'),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
+                ListTile(
+                  title: const Text("开启课表背景图"),
+                  trailing: Switch(
+                    value: preference.getBool(preference.Preference.decorated),
+                    onChanged: (bool value) {
+                      if (value == true &&
+                          !preference
+                              .getBool(preference.Preference.decoration)) {
+                        showToast(context: context, msg: '你先选个图片罢，就在下面');
+                      } else {
+                        setState(() {
+                          preference.setBool(
+                              preference.Preference.decorated, value);
+                        });
+                      }
                     },
                   ),
-                ],
-              ),
-            ),
-            ReXCard(
-              title: _buildListSubtitle('缓存登录设置'),
-              remaining: const [],
-              bottomRow: Column(
-                children: [
-                  ListTile(
-                    title: const Text("测试错误拦截器"),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => Catcher2.sendTestException(),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text('查看网络拦截器和日志'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => context.push(TalkerScreen(talker: log)),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text('清除缓存后重启'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: const Text("确认对话框"),
-                        content: const Text(
-                          "确定清除缓存后重启程序？",
-                        ),
-                        actions: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('取消'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              ProgressDialog pd =
-                                  ProgressDialog(context: context);
-                              pd.show(msg: "正在清理缓存");
-                              try {
-                                await NetworkSession().clearCookieJar();
-                              } on PathNotFoundException {
-                                log.debug(
-                                  "[setting][ClearAllCache]"
-                                  "No cookies.",
-                                );
-                              }
-
-                              /// Clean cache.
-                              _removeCache();
-
-                              if (context.mounted) {
-                                showToast(context: context, msg: '缓存已被清除');
-                                Restart.restartApp();
-                              }
-                            },
-                            child: const Text('确定'),
-                          ),
-                        ],
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text('课表背景图选择'),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () async {
+                    FilePickerResult? result;
+                    try {
+                      result = await pickFile(type: FileType.image);
+                    } on MissingStoragePermissionException {
+                      if (context.mounted) {
+                        showToast(context: context, msg: "未获取存储权限，无法读取文件");
+                      }
+                    }
+                    if (mounted) {
+                      if (result != null) {
+                        File(result.files.single.path!)
+                            .copySync("${supportPath.path}/decoration.jpg");
+                        preference.setBool(
+                            preference.Preference.decoration, true);
+                        if (context.mounted) {
+                          showToast(context: context, msg: '设定成功');
+                        }
+                      } else {
+                        if (context.mounted) {
+                          showToast(context: context, msg: '你没有选图片捏');
+                        }
+                      }
+                    }
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text("清除所有用户添加课程"),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text("确认对话框"),
+                      content: const Text(
+                        "是否要清除所有用户添加课程？"
+                        "这个功能对从学校获取的日程没有影响。",
                       ),
+                      actions: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            var file = File(
+                              "${supportPath.path}/"
+                              "${ClassTableFile.userDefinedClassName}",
+                            );
+                            if (file.existsSync()) {
+                              file.deleteSync();
+                            }
+                            Get.find<ClassTableController>().updateClassTable();
+                            showToast(context: context, msg: "已经清除完毕");
+                            Navigator.pop(context);
+                          },
+                          child: const Text('确定'),
+                        ),
+                      ],
                     ),
                   ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text('退出登录并重启应用'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: const Text("确认对话框"),
-                        content: const Text(
-                          "确定退出登录？你的所有数据将会被彻底删除！",
-                        ),
-                        actions: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('取消'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              ProgressDialog pd =
-                                  ProgressDialog(context: context);
-                              pd.show(msg: '正在退出登录');
-
-                              /// Clean Cookie
-                              try {
-                                await NetworkSession().clearCookieJar();
-                                // I don't care.
-                                // ignore: empty_catches
-                              } on Exception {}
-
-                              /// Clean cache.
-                              _removeCache();
-
-                              /// Clean user information
-                              await preference.prefrenceClear();
-
-                              /// Theme back to default
-                              ThemeController toChange =
-                                  Get.put(ThemeController());
-                              toChange.onUpdate();
-
-                              /// Restart app
-                              if (mounted) {
-                                pd.close();
-                                Restart.restartApp();
-                              }
-                            },
-                            child: const Text('确定'),
-                          ),
-                        ],
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text("强制刷新课表"),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text("确认对话框"),
+                      content: const Text(
+                        "是否要强制刷新课表？同意后，"
+                        "将会从学校一站式后端重新获取课表，耗时会比较久。",
                       ),
+                      actions: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Get.put(ClassTableController())
+                                .updateClassTable(isForce: true);
+                            Navigator.pop(context);
+                          },
+                          child: const Text('确定'),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text('课程偏移设置'),
+                  subtitle: Text(
+                    '正数错后开学日期 负数提前开学日期\n'
+                    '目前为 ${preference.getInt(preference.Preference.swift)}',
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => ChangeSwiftDialog(),
+                    ).then((value) {
+                      Get.put(ClassTableController()).update();
+                      updateCurrentData();
+                      setState(() {});
+                    });
+                  },
+                ),
+              ],
             ),
-          ],
-        ).constrained(maxWidth: 600).center(),
-      ),
+          ),
+          ReXCard(
+            title: _buildListSubtitle('缓存登录设置'),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
+                ListTile(
+                  title: const Text('查看网络拦截器和日志'),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => context.push(TalkerScreen(talker: log)),
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text('清除缓存后重启'),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text("确认对话框"),
+                      content: const Text(
+                        "确定清除缓存后重启程序？",
+                      ),
+                      actions: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            ProgressDialog pd =
+                                ProgressDialog(context: context);
+                            pd.show(msg: "正在清理缓存");
+                            try {
+                              await NetworkSession().clearCookieJar();
+                            } on PathNotFoundException {
+                              log.debug(
+                                "[setting][ClearAllCache]"
+                                "No cookies.",
+                              );
+                            }
+
+                            /// Clean cache.
+                            _removeCache();
+
+                            if (context.mounted) {
+                              showToast(context: context, msg: '缓存已被清除');
+                              Restart.restartApp();
+                            }
+                          },
+                          child: const Text('确定'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text('退出登录并重启应用'),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text("确认对话框"),
+                      content: const Text(
+                        "确定退出登录？你的所有数据将会被彻底删除！",
+                      ),
+                      actions: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            ProgressDialog pd =
+                                ProgressDialog(context: context);
+                            pd.show(msg: '正在退出登录');
+
+                            /// Clean Cookie
+                            try {
+                              await NetworkSession().clearCookieJar();
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
+
+                            /// Clean cache.
+                            _removeCache();
+
+                            /// Clean user information
+                            await preference.prefrenceClear();
+
+                            /// Theme back to default
+                            ThemeController toChange =
+                                Get.put(ThemeController());
+                            toChange.onUpdate();
+
+                            /// Restart app
+                            if (mounted) {
+                              pd.close();
+                              Restart.restartApp();
+                            }
+                          },
+                          child: const Text('确定'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ).constrained(maxWidth: 600).center(),
     );
   }
 }

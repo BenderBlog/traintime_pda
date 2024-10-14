@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
@@ -523,12 +524,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 ),
                 child: _topView(),
               ),
-              Expanded(
-                child: DecoratedBox(
-                  decoration: decoration,
-                  child: _classTablePage(),
-                ),
-              ),
+              DecoratedBox(
+                decoration: decoration,
+                child: _classTablePage(),
+              ).expanded(),
             ],
           ));
     } else {
