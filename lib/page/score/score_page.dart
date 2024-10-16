@@ -14,6 +14,7 @@ import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
+import 'package:watermeter/repository/preference.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -63,10 +64,11 @@ class _ScorePageState extends State<ScorePage> {
         ),
         title: const Text("成绩查询"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calculate),
-            onPressed: () => c.setScoreChoiceMod(),
-          ),
+          if (!getBool(Preference.role))
+            IconButton(
+              icon: const Icon(Icons.calculate),
+              onPressed: () => c.setScoreChoiceMod(),
+            ),
         ],
       ),
       body: Column(

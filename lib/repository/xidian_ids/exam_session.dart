@@ -9,13 +9,13 @@ import 'dart:io';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 考试安排 4768687067472349
 class ExamSession extends EhallSession {
   Future<ExamData> getExamYjspt() async {
-    String semester = "20231";
+    String semester = pref.getString(pref.Preference.currentSemester);
 
     String? location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/*default/index.do",
@@ -37,7 +37,7 @@ class ExamSession extends EhallSession {
         "querySetting": '''[
           {"name":"XNXQDM","caption":"学年学期代码","builder":"equal","linkOpt":"AND","value":"$semester"},
           {"name":"SFFBKSAP","caption":"是否发布考试安排","builder":"equal","linkOpt":"AND","value":"1"},
-          {"name":"XH","caption":"学号","builder":"equal","linkOpt":"AND","value":"${preference.getString(preference.Preference.idsAccount)}"},
+          {"name":"XH","caption":"学号","builder":"equal","linkOpt":"AND","value":"${pref.getString(pref.Preference.idsAccount)}"},
           {"name":"KSAPWID","caption":"考试安排WID","builder":"notEqual","linkOpt":"AND","value":null}]''',
         "pageSize": 1000,
         "pageNumber": 1,
@@ -68,8 +68,7 @@ class ExamSession extends EhallSession {
     var firstPost = await useApp("4768687067472349");
     await dioEhall.get(firstPost);
 
-    String semester =
-        preference.getString(preference.Preference.currentSemester);
+    String semester = pref.getString(pref.Preference.currentSemester);
 
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)

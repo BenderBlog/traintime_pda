@@ -9,6 +9,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -50,7 +51,11 @@ class ScoreSession extends EhallSession {
           "[ScoreSession][getDetail] Cache detected, need login.",
         );
 
-        await _getInSystem();
+        var firstPost = await useApp("4768574631264620");
+        log.info(
+          "[ScoreSession] First post: $firstPost.",
+        );
+        await dioEhall.get(firstPost);
       }
 
       var response = await dio.post(
@@ -115,9 +120,70 @@ class ScoreSession extends EhallSession {
     );
   }
 
-  Future<void> _getInSystem() async {
+  Future<List<Score>> getScoreFromYjspt() async {
+    List<Score> toReturn = [];
+
+    log.info("[ScoreSession][getScoreFromYjspt] Ready to login the system.");
+    String? location = await checkAndLogin(
+      target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdcjapp/*default/index.do",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+    );
+
+    while (location != null) {
+      var response = await dio.get(location);
+      log.info("[ExamFile][getScoreFromYjspt] Received location: $location.");
+      location = response.headers[HttpHeaders.locationHeader]?[0];
+    }
+
+    log.info("[ScoreSession][getScoreFromYjspt] Getting the score data.");
+    var getData = await dio.post(
+      "https://yjspt.xidian.edu.cn/gsapp/sys/wdcjapp/modules/wdcj/xscjcx.do",
+      data: {
+        "querySetting": [],
+        'pageSize': 1000,
+        'pageNumber': 1,
+      },
+    ).then((value) => value.data);
+
+    log.info("[ScoreSession][getScoreFromYjspt] Dealing the score data.");
+    if (getData["datas"]["xscjcx"]["extParams"]["code"] != 1) {
+      throw GetScoreFailedException(
+          getData['datas']['xscjcx']["extParams"]["msg"]);
+    }
+    int j = 0;
+    for (var i in getData['datas']['xscjcx']['rows']) {
+      toReturn.add(Score(
+        mark: j,
+        name: "${i["KCMC"]}",
+        score: i["DYBFZCJ"],
+        semesterCode: i["XNXQDM_DISPLAY"],
+        credit: i["XF"],
+        classStatus: i["KCLBMC"],
+        scoreTypeCode: int.parse(i["CJFZDM"]),
+        level: i["CJFZDM"] != "0" ? i["CJXSZ"] : null,
+        isPassedStr: i["SFJG"].toString(),
+        classID: i["KCDM"],
+        classType: i['KCLBMC'],
+        scoreStatus: i["KSXZDM_DISPLAY"],
+      ));
+      j++;
+    }
+    return toReturn;
+  }
+
+  Future<List<Score>> getScoreFromEhall() async {
+    List<Score> toReturn = [];
+
+    /// Otherwise get fresh score data.
+    Map<String, dynamic> querySetting = {
+      'name': 'SFYX',
+      'value': '1',
+      'linkOpt': 'and',
+      'builder': 'm_value_equal',
+    };
     log.info(
-      "[ScoreSession][_getInSystem] "
+      "[ScoreSession][getScoreFromEhall] "
       "Ready to log into the system.",
     );
     var firstPost = await useApp("4768574631264620");
@@ -125,6 +191,51 @@ class ScoreSession extends EhallSession {
       "[ScoreSession] First post: $firstPost.",
     );
     await dioEhall.get(firstPost);
+
+    log.info(
+      "[ScoreSession][getScoreFromEhall] "
+      "Getting score data.",
+    );
+    var getData = await dioEhall.post(
+      "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
+      data: {
+        "*json": 1,
+        "querySetting": json.encode(querySetting),
+        "*order": '+XNXQDM,KCH,KXH',
+        'pageSize': 1000,
+        'pageNumber': 1,
+      },
+    ).then((value) => value.data);
+    log.info(
+      "[ScoreSession][getScoreFromEhall] "
+      "Dealing with the score data.",
+    );
+    if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
+      throw GetScoreFailedException(
+        getData['datas']['xscjcx']["extParams"]["msg"],
+      );
+    }
+    int j = 0;
+    for (var i in getData['datas']['xscjcx']['rows']) {
+      toReturn.add(Score(
+        mark: j,
+        name: i["XSKCM"], // 课程名
+        score: i["ZCJ"], // 总成绩
+        semesterCode: i["XNXQDM"], // 学年学期代码
+        credit: i["XF"], // 学分
+        classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
+        classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
+        scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
+        scoreTypeCode: int.parse(
+          i["DJCJLXDM"],
+        ), // 等级成绩类型，01 三级成绩 02 五级成绩 03 两级成绩
+        level: i["DJCJMC"], // 等级成绩
+        isPassedStr: i["SFJG"], // 是否及格
+        classID: i["JXBID"], // 教学班 ID
+      ));
+      j++;
+    }
+    return toReturn;
   }
 
   Future<List<Score>> getScore() async {
@@ -168,58 +279,11 @@ class ScoreSession extends EhallSession {
       "[ScoreSession][getScore] "
       "Start getting score data.",
     );
-    Map<String, dynamic> querySetting = {
-      'name': 'SFYX',
-      'value': '1',
-      'linkOpt': 'and',
-      'builder': 'm_value_equal',
-    };
-    try {
-      await _getInSystem();
 
-      log.info(
-        "[ScoreSession][getScore] "
-        "Getting score data.",
-      );
-      var getData = await dioEhall.post(
-        "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
-        data: {
-          "*json": 1,
-          "querySetting": json.encode(querySetting),
-          "*order": '+XNXQDM,KCH,KXH',
-          'pageSize': 1000,
-          'pageNumber': 1,
-        },
-      ).then((value) => value.data);
-      log.info(
-        "[ScoreSession][getScore] "
-        "Dealing with the score data.",
-      );
-      if (getData['datas']['xscjcx']["extParams"]["code"] != 1) {
-        throw GetScoreFailedException(
-          getData['datas']['xscjcx']["extParams"]["msg"],
-        );
-      }
-      int j = 0;
-      for (var i in getData['datas']['xscjcx']['rows']) {
-        toReturn.add(Score(
-          mark: j,
-          name: i["XSKCM"], // 课程名
-          score: i["ZCJ"], // 总成绩
-          semesterCode: i["XNXQDM"], // 学年学期代码
-          credit: i["XF"], // 学分
-          classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
-          classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
-          scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
-          scoreTypeCode: int.parse(
-            i["DJCJLXDM"],
-          ), // 等级成绩类型，01 三级成绩 02 五级成绩 03 两级成绩
-          level: i["DJCJMC"], // 等级成绩
-          isPassedStr: i["SFJG"], // 是否及格
-          classID: i["JXBID"], // 教学班 ID
-        ));
-        j++;
-      }
+    try {
+      toReturn = pref.getBool(pref.Preference.role)
+          ? await getScoreFromYjspt()
+          : await getScoreFromEhall();
       dumpScoreListCache(toReturn);
       log.info(
         "[ScoreSession][getScore] "
