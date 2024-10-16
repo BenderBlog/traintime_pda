@@ -15,7 +15,6 @@ import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -540,7 +539,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => context.pop(),
+            onPressed: () =>
+                Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
           ),
         ),
         body: const EmptyClasstablePage(),
