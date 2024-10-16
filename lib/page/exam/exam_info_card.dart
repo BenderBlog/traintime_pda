@@ -39,10 +39,11 @@ class ExamInfoCard extends StatelessWidget {
                       icon: Icons.room,
                       text: toUse!.place,
                     ).flexible(),
-                    InformationWithIcon(
-                      icon: Icons.chair,
-                      text: toUse!.seat.toString(),
-                    ).flexible(),
+                    if (toUse!.seat != null)
+                      InformationWithIcon(
+                        icon: Icons.chair,
+                        text: toUse!.seat.toString(),
+                      ).flexible(),
                   ],
                 ),
               ],

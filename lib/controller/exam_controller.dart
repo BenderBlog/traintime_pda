@@ -128,7 +128,9 @@ class ExamController extends GetxController {
     );
     try {
       status = ExamStatus.fetching;
-      data = await ExamSession().getExam();
+      data = preference.getBool(preference.Preference.role)
+          ? await ExamSession().getExamYjspt()
+          : await ExamSession().getExamEhall();
       status = ExamStatus.fetched;
       error = "";
     } on DioException catch (e, s) {

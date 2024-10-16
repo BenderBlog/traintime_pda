@@ -93,7 +93,8 @@ class ClassOrgainzedData {
         stop: subject.stopTime!.dateTime,
         color: color,
         name: "${subject.subject}${subject.type}",
-        place: "${subject.place} ${subject.seat}座",
+        place: "${subject.place} "
+            "${subject.seat == null ? "" : "${subject.seat}座"}",
       );
 
   factory ClassOrgainzedData.fromExperiment(

@@ -4,14 +4,67 @@
 // The exam source.
 // Thanks xidian-script and libxdauth!
 
+import 'dart:io';
+
 import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 考试安排 4768687067472349
 class ExamSession extends EhallSession {
-  Future<ExamData> getExam() async {
+  Future<ExamData> getExamYjspt() async {
+    String semester = "20231";
+
+    String? location = await checkAndLogin(
+      target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/*default/index.do",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+    );
+
+    while (location != null) {
+      var response = await dio.get(location);
+      log.info("[ExamFile][getExamYjspt] Received location: $location.");
+      location = response.headers[HttpHeaders.locationHeader]?[0];
+    }
+
+    /// wdksap 我的考试安排
+    log.info("[ExamFile][getExamYjspt] My exam arrangemet $semester");
+    var data = await dio.post(
+      "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/modules/ksxxck/wdksxxcx.do",
+      queryParameters: {
+        "querySetting": '''[
+          {"name":"XNXQDM","caption":"学年学期代码","builder":"equal","linkOpt":"AND","value":"$semester"},
+          {"name":"SFFBKSAP","caption":"是否发布考试安排","builder":"equal","linkOpt":"AND","value":"1"},
+          {"name":"XH","caption":"学号","builder":"equal","linkOpt":"AND","value":"${preference.getString(preference.Preference.idsAccount)}"},
+          {"name":"KSAPWID","caption":"考试安排WID","builder":"notEqual","linkOpt":"AND","value":null}]''',
+        "pageSize": 1000,
+        "pageNumber": 1,
+      },
+    ).then((value) => value.data["datas"]["wdksxxcx"]["rows"]);
+
+    List<Subject> subject = [];
+
+    if (data != null) {
+      for (var i in data) {
+        subject.add(Subject.generate(
+          subject: i["KCMC"],
+          typeStr: i["KSLXDM_DISPLAY"],
+          time: i["KSSJMS"],
+          place: i["JASMC"],
+          seat: null,
+        ));
+      }
+    }
+
+    return ExamData(
+      subject: subject,
+      toBeArranged: [],
+    );
+  }
+
+  Future<ExamData> getExamEhall() async {
     var firstPost = await useApp("4768687067472349");
     await dioEhall.get(firstPost);
 

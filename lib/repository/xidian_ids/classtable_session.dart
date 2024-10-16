@@ -122,13 +122,13 @@ class ClassTableFile extends EhallSession {
 
     if (data['code'] != "0") {
       log.warning(
-        "[getClasstable][getEhall] "
+        "[getClasstable][getYjspt] "
         "extParams: ${data['extParams']['msg']} isNotPublish: "
         "${data['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
       );
       if (data['extParams']['msg'].toString().contains("查询学年学期的课程未发布")) {
         log.warning(
-          "[getClasstable][getEhall] "
+          "[getClasstable][getYjspt] "
           "extParams: ${data['extParams']['msg']} isNotPublish: "
           "Classtable not released.",
         );

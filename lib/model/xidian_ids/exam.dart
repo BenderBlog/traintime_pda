@@ -14,7 +14,7 @@ class Subject {
   String endTimeStr;
   String time;
   String place;
-  String seat;
+  String? seat;
 
   static RegExp timeRegExp = RegExp(
     r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})',
@@ -62,7 +62,7 @@ class Subject {
     required String typeStr,
     required String time,
     required String place,
-    required String seat,
+    String? seat,
   }) {
     RegExpMatch? match = timeRegExp.firstMatch(time);
     late String startTime, stopTime;
