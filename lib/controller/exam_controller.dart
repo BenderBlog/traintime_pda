@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_exam_session.dart';
+import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 enum ExamStatus {

@@ -13,7 +13,7 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 enum ClassTableState {
   fetching,

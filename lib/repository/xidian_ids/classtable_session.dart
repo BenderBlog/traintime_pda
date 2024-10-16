@@ -134,7 +134,7 @@ class ClassTableFile extends EhallSession {
         );
         return ClassTableData(
           semesterCode: semesterCode,
-          termStartDay: "", // indicate no class occured...
+          termStartDay: termStartDay, // indicate no class occured...
         );
       } else {
         throw Exception("${data['extParams']['msg']}");

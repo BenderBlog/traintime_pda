@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/score/score_compose_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
+import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
 class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class

@@ -10,67 +10,70 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 var owe = "".obs;
 var electricityInfo = "".obs;
 var isNotice = true.obs;
 
 Future<void> update() async {
-  try {
-    isNotice.value = true;
-    electricityInfo.value = "正在获取";
-    owe.value = "正在获取欠费";
-    await PaymentSession().loginPayment().then((value) => Future.wait([
-          Future(() async {
-            try {
-              isNotice.value = true;
-              electricityInfo.value = "正在获取";
-              await PaymentSession().getElectricity(value);
-              isNotice.value = false;
-            } on DioException catch (e, s) {
-              log.handle(e, s);
-              electricityInfo.value = "网络故障";
-              isNotice.value = false;
-            } on NotFoundException {
-              electricityInfo.value = "查询失败";
-              isNotice.value = false;
-            } catch (e, s) {
-              log.handle(e, s);
-              electricityInfo.value = "程序故障";
-              isNotice.value = false;
-            }
-          }),
-          Future(() async {
-            try {
-              owe.value = "正在获取欠费";
-              await PaymentSession().getOwe(value);
-            } on DioException {
-              log.info(
-                "[PaymentSession][update] "
-                "Network error",
-              );
-              owe.value = "欠费信息网络故障";
-            } catch (e, s) {
-              log.handle(e, s);
-              owe.value = "目前欠款无法查询";
-            }
-          })
-        ]));
-  } catch (e, s) {
+  isNotice.value = true;
+  electricityInfo.value = "正在获取";
+  owe.value = "正在获取欠费";
+  await PaymentSession()
+      .loginPayment()
+      .then((value) => Future.wait([
+            Future(() async {
+              try {
+                isNotice.value = true;
+                electricityInfo.value = "正在获取";
+                await PaymentSession().getElectricity(value);
+                isNotice.value = false;
+              } on DioException catch (e, s) {
+                log.handle(e, s);
+                electricityInfo.value = "网络故障";
+                isNotice.value = false;
+              } on NotFoundException {
+                electricityInfo.value = "查询失败";
+                isNotice.value = false;
+              } catch (e, s) {
+                log.handle(e, s);
+                electricityInfo.value = "查询故障";
+                isNotice.value = false;
+              }
+            }),
+            Future(() async {
+              try {
+                owe.value = "正在获取欠费";
+                await PaymentSession().getOwe(value);
+              } on DioException {
+                log.info(
+                  "[PaymentSession][update] "
+                  "Network error",
+                );
+                owe.value = "欠费信息网络故障";
+              } catch (e, s) {
+                log.handle(e, s);
+                owe.value = "目前欠款无法查询";
+              }
+            })
+          ]))
+      .catchError((e, s) {
     log.handle(e, s);
-    if (e is NeedInfoException) {
+    if (NeedInfoException().toString().contains(e.toString())) {
       electricityInfo.value = "需要在缴费平台完善信息";
-    } else if (e is NotInitalizedException) {
+    } else if ("NotInitalizedException".contains(e.toString())) {
       electricityInfo.value = e.msg;
+    } else if (NoAccountInfoException().toString().contains(e.toString())) {
+      electricityInfo.value = "需要填写电费账号";
     } else {
       electricityInfo.value = "程序故障";
     }
     owe.value = "目前欠款无法查询";
     isNotice.value = false;
-    return;
-  }
+    return [null];
+  });
 }
 
 class PaymentSession extends IDSSession {
@@ -83,9 +86,10 @@ class PaymentSession extends IDSSession {
   /// Refrence here: https://see.xidian.edu.cn/html/news/9179.html
   static String electricityAccount() {
     String rawDormLocation = preference.getString(preference.Preference.dorm);
-    List<RegExpMatch> nums = RegExp(r"[0-9]+")
-        .allMatches(rawDormLocation)
-        .toList();
+    if (rawDormLocation.isEmpty) throw NoAccountInfoException;
+    if (RegExp(r'^\d+$').hasMatch(rawDormLocation)) return rawDormLocation;
+    List<RegExpMatch> nums =
+        RegExp(r"[0-9]+").allMatches(rawDormLocation).toList();
     // 校区
     String accountA = "";
     if (rawDormLocation.contains("北校区")) {
@@ -202,16 +206,15 @@ class PaymentSession extends IDSSession {
       }
       // 北校区 4,94-98# 的情况
       if ([4, 94, 95, 96, 97, 98].contains(building)) {
-          // C 段首位编码为 0，第二位按层编码；D 段按房间号编码，首位补 0
-          // 层号即区号
-          accountC = nums[1][0]!.toString().padLeft(2, "0");
-          // 宿舍号
-          accountD = nums[2][0]!.toString().padLeft(4, "0");
+        // C 段首位编码为 0，第二位按层编码；D 段按房间号编码，首位补 0
+        // 层号即区号
+        accountC = nums[1][0]!.toString().padLeft(2, "0");
+        // 宿舍号
+        accountD = nums[2][0]!.toString().padLeft(4, "0");
       }
       // 北校区包括 16-17# 公寓在内的其余楼号，一般具有单元划分
       // 则 C 段按单元门编码，前补 0；D 段按房间号编码，前补 0
-      if ([16, 17].contains(building) ||
-          (accountC == "" && accountD == "")) {
+      if ([16, 17].contains(building) || (accountC == "" && accountD == "")) {
         // 单元号即区号
         accountC = nums[1][0]!.toString().padLeft(2, "0");
         // 宿舍号，这样获取保准能用
@@ -223,8 +226,8 @@ class PaymentSession extends IDSSession {
       int room = int.parse(accountD.toString());
       if ([4, 24, 49, 51, 55].contains(building)) {
         // 上述楼号的非以下房间不存在南北院电费账号冲突，无需识别码
-        if (!([101, 102, 203, 204, 305, 306, 407, 408,
-          509, 510].contains(room))) {
+        if (!([101, 102, 203, 204, 305, 306, 407, 408, 509, 510]
+            .contains(room))) {
           accountE = "";
         }
       }
@@ -284,11 +287,18 @@ class PaymentSession extends IDSSession {
         "[PaymentSession][getOwe] "
         "Newbee detected.",
       );
+      bool isPostGraduate =
+          await PersonalInfoSession().checkWhetherPostgraduate();
+
       await dio.post(value.headers["location"]![0]).then((value) async {
         await dio.post(
           "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
           data: {
-            "tel": await EhallSession().getInformation(onlyPhone: true),
+            "tel": isPostGraduate
+                ? await PersonalInfoSession()
+                    .getInformationFromYjspt(onlyPhone: true)
+                : await PersonalInfoSession()
+                    .getInformationEhall(onlyPhone: true),
             "email": "${preference.getString(preference.Preference.idsAccount)}"
                 "@stu.mail.xidian.edu.cn",
           },
@@ -363,3 +373,5 @@ class NotInitalizedException implements Exception {
   final String msg;
   const NotInitalizedException(this.msg);
 }
+
+class NoAccountInfoException implements Exception {}

@@ -14,6 +14,7 @@ import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -31,8 +32,8 @@ import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -200,6 +201,19 @@ class _SettingWindowState extends State<SettingWindow> {
                         builder: (context) => const ExperimentPasswordDialog(),
                       );
                     }),
+                if (preference.getBool(preference.Preference.role)) ...[
+                  const Divider(),
+                  ListTile(
+                      title: const Text('电费账号设置'),
+                      trailing: const Icon(Icons.navigate_next),
+                      onTap: () {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) => ElectricityAccountDialog(),
+                        );
+                      }),
+                ],
                 const Divider(),
                 ListTile(
                     title: const Text('电费帐号密码设置'),

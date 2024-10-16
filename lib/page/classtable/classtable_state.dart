@@ -18,7 +18,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_organized_data
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
@@ -197,8 +197,15 @@ class ClassTableWidgetState with ChangeNotifier {
     String source,
   ) {
     final data = jsonDecode(source);
-    if (semesterCode.compareTo(data["classtable"]["semesterCode"].toString()) !=
-        0) {
+    var yearEqual = semesterCode.substring(0, 4).compareTo(
+            data["classtable"]["semesterCode"].toString().substring(0, 4)) !=
+        0;
+    var lastEqual = semesterCode.substring(semesterCode.length - 1).compareTo(
+            data["classtable"]["semesterCode"]
+                .toString()
+                .substring(semesterCode.length - 1)) !=
+        0;
+    if (yearEqual || lastEqual) {
       throw NotSameSemesterException(
         msg: "Not the same semester. This semester: $semesterCode. "
             "Input source: ${data["classtable"]["semesterCode"]}."
@@ -206,7 +213,7 @@ class ClassTableWidgetState with ChangeNotifier {
       );
     }
     return (
-      data["name"] ?? "Sweetheart",
+      data["name"] ?? "Sweetie",
       ClassTableData.fromJson(data["classtable"]),
       List.generate(
         data["exam"].length,

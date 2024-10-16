@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
+import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/payment_session.dart';
 
 class ElectricityCard extends StatelessWidget {
@@ -14,27 +16,38 @@ class ElectricityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        showDialog(
-          context: context,
-          builder: (context) => SimpleDialog(
-            title: const Text("水电信息"),
-            children: [
-              Obx(
-                () => Text(
-                  "电费帐号：${PaymentSession.electricityAccount()}\n"
-                  "电量信息：${electricityInfo.value}"
-                  "${electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
-                  "欠费信息：${owe.value}\n"
-                  "长按可以重新加载，有欠费一般代表水费",
-                ),
-              ).paddingSymmetric(horizontal: 24),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("确定"),
-              ).paddingSymmetric(horizontal: 24),
-            ],
-          ),
-        );
+        if (prefs.getString(prefs.Preference.dorm).isEmpty) {
+          showDialog(
+            context: context,
+            builder: (context) => ElectricityAccountDialog(),
+          ).then((value) {
+            if (prefs.getString(prefs.Preference.dorm).isNotEmpty) {
+              update();
+            }
+          });
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => SimpleDialog(
+              title: const Text("水电信息"),
+              children: [
+                Obx(
+                  () => Text(
+                    "电费帐号：${PaymentSession.electricityAccount()}\n"
+                    "电量信息：${electricityInfo.value}"
+                    "${electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
+                    "欠费信息：${owe.value}\n"
+                    "长按可以重新加载，有欠费一般代表水费",
+                  ),
+                ).paddingSymmetric(horizontal: 24),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("确定"),
+                ).paddingSymmetric(horizontal: 24),
+              ],
+            ),
+          );
+        }
       },
       onLongPress: () => update(),
       child: Obx(

@@ -19,6 +19,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
+import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({super.key});
@@ -201,7 +202,14 @@ class _LoginWindowState extends State<LoginWindow> {
           preference.Preference.idsPassword,
           _idsPasswordController.text,
         );
-        await ses.getInformation();
+
+        bool isPostGraduate = await ses.checkWhetherPostgraduate();
+        if (isPostGraduate) {
+          await PersonalInfoSession().getInformationFromYjspt();
+        } else {
+          await PersonalInfoSession().getInformationEhall();
+        }
+
         if (mounted) {
           if (pd.isOpen()) pd.close();
           Navigator.of(context).pushReplacement(

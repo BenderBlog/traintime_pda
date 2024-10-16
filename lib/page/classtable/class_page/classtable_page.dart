@@ -22,7 +22,7 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ClassTablePage extends StatefulWidget {
   const ClassTablePage({super.key});
@@ -384,7 +384,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                                   TextInputType.number,
                                               maxLines: 1,
                                               decoration: const InputDecoration(
-                                                hintText: "在此输入，否则为 Sweetheart",
+                                                hintText: "在此输入，否则为 Sweetie",
                                                 border: OutlineInputBorder(),
                                               ),
                                             ),
@@ -414,7 +414,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                               ),
                                             ],
                                           )) ??
-                                  "Sweetheart";
+                                  "Sweetie";
 
                               if (context.mounted) {
                                 fileName += "-$sweetheartName.erc";

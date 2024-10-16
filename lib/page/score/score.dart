@@ -9,7 +9,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/score/score_page.dart';
 import 'package:watermeter/page/score/score_state.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
+import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
 class ScoreWindow extends StatefulWidget {
   const ScoreWindow({super.key});

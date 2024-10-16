@@ -23,7 +23,7 @@ import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
