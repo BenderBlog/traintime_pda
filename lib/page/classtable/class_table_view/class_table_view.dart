@@ -184,7 +184,7 @@ class _ClassTableViewState extends State<ClassTableView> {
       ]
           .toStack()
           .constrained(
-            height: widget.constraint.minHeight - midRowHeight,
+            height: blockheight(61),
             width: size.maxWidth,
           )
           .scrollable()
