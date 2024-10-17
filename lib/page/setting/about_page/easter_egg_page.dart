@@ -262,10 +262,18 @@ And may you never lay your head down
 Without a hand to hold
 May you never make your bed out in the cold
 
+请你不要在无人支持时低下头颅
+愿你不要孤身一人
+
 You’re just like a great strong brother of mine
 You know that I love you true
 And you never talk dirty behind my back
 And I know that there’s those that do
+
+你就像我坚强的哥哥
+我真的爱你
+有人在背后说我的坏话
+而你从不
 
 Oh please won’t you, please won’t you
 Bear it in mind
@@ -273,23 +281,13 @@ Love is a lesson to learn in our time
 Now please won’t you, please won’t you
 Bear it in mind for me
 
-请你不要在无人支持时低下头颅
-愿你不要孤身一人
-你就像我坚强的哥哥
-我真的爱你
-有人在背后说我的坏话
-而你从不
-
-
 请你不要忘记
 爱是你我生命中的必修课
-不
 请你不要 请你不要 请你不要忘记
-请你
-牢记在心
+请你牢记在心
 
 John Martyn, covered by Eric Clapton
-Slowhand, 1977
+from Slowhand, 1977
 
 Translated by Ray (Elliot Edition)
 Ray and Elliot are thinking privately about pulling Partner Classtable request for my program since July, 2024.
