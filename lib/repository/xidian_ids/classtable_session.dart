@@ -146,7 +146,7 @@ class ClassTableFile extends EhallSession {
         );
         return ClassTableData(
           semesterCode: semesterCode,
-          termStartDay: termStartDay, // indicate no class occured...
+          termStartDay: termStartDay,
         );
       } else {
         throw Exception("${data['extParams']['msg']}");
@@ -236,7 +236,7 @@ class ClassTableFile extends EhallSession {
           if (arrangements.last.isEmpty || arrangements.last.last == j - 1) {
             arrangements.last.add(j);
           } else {
-            arrangements.add([]);
+            arrangements.add([j]);
           }
         }
 
