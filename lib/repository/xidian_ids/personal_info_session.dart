@@ -71,7 +71,7 @@ class PersonalInfoSession extends EhallSession {
     if (onlyPhone == false) {
       preference.setString(
         preference.Preference.name,
-        detailed["jcxx"]]["XM"]
+        detailed["jcxx"]["XM"]
             .toString()
             .replaceAll(RegExp("[0-9]|-"), ""),
       );
