@@ -219,7 +219,6 @@ class ClassTableFile extends EhallSession {
         int id = getCourseId(j);
         if (!entries.any((k) => k == id)) entries.add(id);
       }
-
       for (var j in entries) {
         List<TimeArrangement> result = List<TimeArrangement>.from(data)
           ..removeWhere((item) => getCourseId(item) != j)
@@ -230,14 +229,18 @@ class ClassTableFile extends EhallSession {
         }.toList()
           ..sort();
 
+        log.info(arrangementsProto);
+
         List<List<int>> arrangements = [[]];
         for (var j in arrangementsProto) {
-          if (arrangements.last.isEmpty || arrangements.last.last == i - 1) {
+          if (arrangements.last.isEmpty || arrangements.last.last == j - 1) {
             arrangements.last.add(j);
           } else {
             arrangements.add([]);
           }
         }
+
+        log.info(arrangements);
 
         for (var j in arrangements) {
           newStuff.add(TimeArrangement(
