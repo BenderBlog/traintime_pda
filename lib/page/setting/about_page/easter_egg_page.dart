@@ -185,96 +185,75 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  // Babe I am leaving you, for myself...
-  // God damn, where's my babe
-  final String urlApple = "https://www.bilibili.com/video/BV1Td8ceJEFb/";
+  final String urlApple = "https://www.bilibili.com/video/BV1wN4y1L7Ut";
 
   final String urlOthers = "https://www.bilibili.com/video/BV1HN411Y7Ct?p=7";
 
   TextEditingController inputController = TextEditingController(
     text: Platform.isIOS
         ? '''
-for myself...
-
 [Verse 1]
-Babe, baby, baby, I'm gonna leave you
-I said baby, you know I'm gonna leave you
-I'll leave you when the summertime
-Leave you when the summer comes a-rollin'
-Leave you when the summer comes along
+Let it roll across the floor
+Through the hall and out the door
+To the fountain of perpetual mirth
+Let it roll for all it's worth
 
-我的宝贝，我将在夏季结束之时离开你
+我们穿过大堂而去
+穿过大厅，出门而去
+向着永远充满欢乐的源头前进
+为了欢乐，我们一起前进
 
 [Verse 2]
-Babe, babe, babe, babe, babe, babe, baby
-Baby, I wanna leave you
-I ain't joking' woman, I've got to ramble
-Oh, yeah, baby, baby, I believin'
-We really got to ramble (I can hear it callin' me)
-I can hear it callin' me the way it used to do
-I can hear it callin' me back home
+Find me where ye echo lays
+Lose ye bodies in the maze
+See the Lord and all the mouths he feeds
+Let it roll among the weeds
 
-我要去探求未知，他跟往常一样让我回到之前
+在回声中找到我
+你在迷宫中迷失
+看到上天和芸芸众生
+我们穿过草丛而去
 
-[Bridge]
-Oh, babe, I'm gonna leave you
-Oh, baby, you know
-I've really got to leave you
-Oh, I can hear it callin' me
-I said don't you hear it callin' me the way it used to do?
-Ooohh
+[Chorus]
+Let it roll
 
-我听到他让我回到之前了，你听不到吗
+我们继续前进吧
+
+(Sir Frankie Crisp
+Oh, Sir Frankie Crisp
+Oh, Sir Frankie Crisp
+Oh, Sir Frankie Crisp)
 
 [Verse 3]
-I know, I know, I know I never, never, never, never, never
-Gonna leave you, babe
-But I got to go away from this place
-I've got to quit you, yeah
-Oh, baby, baby, baby, baby, baby, baby, baby
-Oh, don't you hear it callin' me?
+Let it roll down through the caves
+Ye long walks of Coole and Shades
+Through ye woode, here may ye rest awhile
+Handkerchiefs to match your tie
 
-我真的一点 一点 一点都不想离开你啊
-但我真的要走了，那催促声你听不到吗
+我们继续穿过洞穴
+从阴凉中走过
+在树丛下，他休息了一下
+拿出手帕擦擦汗
 
-Woman, woman, I know, I know
-It feels good to have you back again
-And I know that one day, baby
-It's gonna really grow, yes it is
-We gonna go walkin' through the park
-Every day
+[Chorus]
+Let it roll...
 
-我明白，我们俩还会再见，在春天万物复苏的时候
-到那时，我们再不分开的样子多好啊
+我们继续前进吧
 
-Come what may, every day, oh
-My, my, my, my, my, my babe
-I'm gonna leave you, go away
+[Verse 4]
+Fools illusions everywhere
+Joan and Molly sweeps the stairs
+Eyes are shining full of inner light
+Let it roll into the night
 
-每天不分开，但我现在不得不离开你了啊
+街上都是麻木的人
+小明和小红在擦楼梯
+在夜晚他们的眼睛很明亮
+我们在这夜晚中前进吧
 
-[Bridge]
-Oh, I miss you, baby
-It was really, really good
-You made me happy every single day
-But now, I've got to go away
-Ooh, oh, oh
-
-我已经怀念你，每天你是我的光
-但我必须得走了
-
-[Outro]
-Baby, baby, baby
-That's when it's callin' me
-I said that's when it's callin' me
-Back home
-
-宝贝啊 宝贝啊 这就是催促我回到之前的 声音啊
-
-Babe I’m Gonna Leave You
-by Anne Bredon
-arranged by Jimmy Page and Robert Plant
-from Led Zeppelin, 1969
+Ballad of Sir Frankie Crisp (Let It Roll)
+by George Harrison
+from All Things Must Pass, 1970
 
 Ray and Elliot are thinking privately about pulling Partner Classtable request for my program since July, 2024.
 '''

@@ -145,8 +145,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
             onPressed: () async {
-              if (_idsAccountController.text.length == 11 &&
-                  _idsPasswordController.text.isNotEmpty) {
+              if (_idsPasswordController.text.isNotEmpty) {
                 await login();
               } else {
                 showToast(context: context, msg: '用户名或密码不符合要求，学号必须 11 位且密码非空');
