@@ -193,9 +193,20 @@ class _HomePageMasterState extends State<HomePageMaster>
                 ClassTableController(),
               ).classTableData.semesterCode;
 
-              if (semesterCode.compareTo(
-                      data["classtable"]["semesterCode"].toString()) !=
-                  0) {
+              var yearNotEqual = semesterCode.substring(0, 4).compareTo(
+                      data["classtable"]["semesterCode"]
+                          .toString()
+                          .substring(0, 4)) !=
+                  0;
+              var lastNotEqual = semesterCode
+                      .substring(semesterCode.length - 1)
+                      .compareTo(data["classtable"]["semesterCode"]
+                          .toString()
+                          .substring(
+                            data["classtable"]["semesterCode"].length - 1,
+                          )) !=
+                  0;
+              if (yearNotEqual || lastNotEqual) {
                 throw NotSameSemesterException(
                   msg: "Not the same semester. This semester: $semesterCode. "
                       "Input source: ${data["classtable"]["semesterCode"]}."

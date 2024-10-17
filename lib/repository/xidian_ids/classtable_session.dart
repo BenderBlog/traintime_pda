@@ -114,7 +114,19 @@ class ClassTableFile extends EhallSession {
     int weekDay = now.weekday - 1;
     String termStartDay = Jiffy.parseFromDateTime(now)
         .add(weeks: 1 - int.parse(currentWeek), days: -weekDay)
-        .format(pattern: "yyyy-MM-dd");
+        .format(pattern: "yyyy-MM-dd HH:mm:ss");
+
+    if (preference.getString(preference.Preference.currentStartDay) !=
+        termStartDay) {
+      preference.setString(
+        preference.Preference.currentStartDay,
+        termStartDay,
+      );
+
+      /// New semenster, user defined class is useless.
+      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      if (userClassFile.existsSync()) userClassFile.deleteSync();
+    }
 
     Map<String, dynamic> data = await dio.post(classInfoURL, data: {
       "XNXQDM": semesterCode,
@@ -213,25 +225,35 @@ class ClassTableFile extends EhallSession {
           ..removeWhere((item) => getCourseId(item) != j)
           ..sort((a, b) => a.start - b.start);
 
-        List<int> arrangements = {
+        List<int> arrangementsProto = {
           for (var i in result) ...[i.start, i.stop]
         }.toList()
           ..sort();
 
-        /// May be bug here, since I do not secure that
-        /// [arrangements] is continus, may like [1,2,4,5]...
-        newStuff.add(TimeArrangement(
-          source: Source.school,
-          index: i,
-          classroom: result.first.classroom,
-          teacher: result.first.teacher,
-          weekList: result.first.weekList,
-          day: result.first.day,
-          start: arrangements.first,
-          stop: arrangements.last,
-        ));
+        List<List<int>> arrangements = [[]];
+        for (var j in arrangementsProto) {
+          if (arrangements.last.isEmpty || arrangements.last.last == i - 1) {
+            arrangements.last.add(j);
+          } else {
+            arrangements.add([]);
+          }
+        }
+
+        for (var j in arrangements) {
+          newStuff.add(TimeArrangement(
+            source: Source.school,
+            index: i,
+            classroom: result.first.classroom,
+            teacher: result.first.teacher,
+            weekList: result.first.weekList,
+            day: result.first.day,
+            start: j.first,
+            stop: j.last,
+          ));
+        }
       }
     }
+
     toReturn.timeArrangement = newStuff;
 
     for (var i in qResult["notArranged"]) {

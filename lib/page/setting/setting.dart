@@ -504,7 +504,7 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
         ],
-      ).constrained(maxWidth: 600).center(),
+      ).constrained(maxWidth: 600).center().safeArea(top: true),
     );
   }
 }

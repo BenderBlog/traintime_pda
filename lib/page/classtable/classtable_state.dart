@@ -197,15 +197,16 @@ class ClassTableWidgetState with ChangeNotifier {
     String source,
   ) {
     final data = jsonDecode(source);
-    var yearEqual = semesterCode.substring(0, 4).compareTo(
+    var yearNotEqual = semesterCode.substring(0, 4).compareTo(
             data["classtable"]["semesterCode"].toString().substring(0, 4)) !=
         0;
-    var lastEqual = semesterCode.substring(semesterCode.length - 1).compareTo(
-            data["classtable"]["semesterCode"]
-                .toString()
-                .substring(semesterCode.length - 1)) !=
+    var lastNotEqual = semesterCode
+            .substring(semesterCode.length - 1)
+            .compareTo(data["classtable"]["semesterCode"].toString().substring(
+                  data["classtable"]["semesterCode"].length - 1,
+                )) !=
         0;
-    if (yearEqual || lastEqual) {
+    if (yearNotEqual || lastNotEqual) {
       throw NotSameSemesterException(
         msg: "Not the same semester. This semester: $semesterCode. "
             "Input source: ${data["classtable"]["semesterCode"]}."
