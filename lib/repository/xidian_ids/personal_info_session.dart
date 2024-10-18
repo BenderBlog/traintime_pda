@@ -70,12 +70,6 @@ class PersonalInfoSession extends EhallSession {
     );
     if (onlyPhone == false) {
       preference.setString(
-        preference.Preference.name,
-        detailed["performance"][0]["CONTENT"][0]["CAPTION"]
-            .toString()
-            .replaceAll(RegExp("[0-9]|-"), ""),
-      );
-      preference.setString(
         preference.Preference.execution,
         detailed["performance"][0]["CONTENT"][4]["CAPTION"],
       );
