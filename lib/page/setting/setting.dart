@@ -267,8 +267,8 @@ class _SettingWindowState extends State<SettingWindow> {
                     }
                     if (mounted) {
                       if (result != null) {
-                        File(result.files.single.path!)
-                            .copySync("${supportPath.path}/decoration.jpg");
+                        File(result.files.single.path!).copySync(
+                            "${supportPath.path}/${ClassTableFile.decorationName}");
                         preference.setBool(
                             preference.Preference.decoration, true);
                         if (context.mounted) {
@@ -477,8 +477,8 @@ class _SettingWindowState extends State<SettingWindow> {
                               // ignore: empty_catches
                             } on Exception {}
 
-                            /// Clean cache.
-                            _removeCache();
+                            /// Clean all.
+                            _removeAll();
 
                             /// Clean user information
                             await preference.prefrenceClear();
@@ -512,6 +512,25 @@ class _SettingWindowState extends State<SettingWindow> {
 void _removeCache() {
   for (var value in [
     ClassTableFile.schoolClassName,
+    ExamController.examDataCacheName,
+    ExperimentController.experimentCacheName,
+    ScoreSession.scoreListCacheName
+  ]) {
+    var file = File(
+      "${supportPath.path}/$value",
+    );
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+  }
+}
+
+void _removeAll() {
+  for (var value in [
+    ClassTableFile.schoolClassName,
+    ClassTableFile.userDefinedClassName,
+    ClassTableFile.partnerClassName,
+    ClassTableFile.decorationName,
     ExamController.examDataCacheName,
     ExperimentController.experimentCacheName,
     ScoreSession.scoreListCacheName

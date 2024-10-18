@@ -96,7 +96,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
     //}
 
     /// Init the background.
-    File image = File("${supportPath.path}/decoration.jpg");
+    File image = File("${supportPath.path}/${ClassTableFile.decorationName}");
     decoration = BoxDecoration(
       image: (preference.getBool(preference.Preference.decorated) &&
               image.existsSync())

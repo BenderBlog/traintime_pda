@@ -19,6 +19,7 @@ class ClassTableFile extends EhallSession {
   static const schoolClassName = "ClassTable.json";
   static const userDefinedClassName = "UserClass.json";
   static const partnerClassName = "darling.erc.json";
+  static const decorationName = "decoration.jpg";
 
   ClassTableData simplifyData(Map<String, dynamic> qResult) {
     ClassTableData toReturn = ClassTableData();
