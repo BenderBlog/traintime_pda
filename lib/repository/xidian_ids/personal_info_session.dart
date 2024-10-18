@@ -70,10 +70,6 @@ class PersonalInfoSession extends EhallSession {
     );
     if (onlyPhone == false) {
       preference.setString(
-        preference.Preference.name,
-        detailed["jcxx"]["XM"],
-      );
-      preference.setString(
         preference.Preference.execution,
         detailed["performance"][0]["CONTENT"][4]["CAPTION"],
       );
