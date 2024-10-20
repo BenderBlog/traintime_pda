@@ -2,18 +2,20 @@
 
 The XDYou app in the Apple App Store have the same codebase as this.
 
- - View classtable with exam arrangement and experiment arrangement, also set your idol as the background.
+ - Both undergraduates and postgraduates are supported.
+ - View classtable with exam arrangement and experiment arrangement, also set your idol as the background, or exchange the classtable with your sweetie.
  - View sport related data: sport class detail and test score. (Punch machine will be sorely missed)
- - Check your dorm's electricity balance and (maybe) pay your electricty fee.
- - View your grade and easily calculate GPA and average score by choosing the subjects. 
+ - Check your dorm's electricity balance and (maybe) pay your electricty fee. (Postgraduates shall enter the electricity account manually)
+ - View your grade and easily calculate GPA and average score by choosing the subjects. (Postgraduates cannot count your GPA and average score, sry)
  - View the exam schedule by semester.
  - View the due time of the borrowed books and query the details of the books in the library.
  - View the bill you spent in the cafeteria.
- - Empty classroom check.
+ - Empty classroom check. (Not avaliable for postgraduates)
  - Physics experiment schedule check and output to iCalendar.
  - Other tools such as call for repairing, school email, etc.
  - Shuangchuang (Innovation and Entrepreneurship) project query.
  - XDU Planet: Look around the blogs of your schoolmates.
+ - Physics experiment check.
  - Homepage widget.
 
 If you got some idea about it, contact me freely.

@@ -1,1 +1,1 @@
-Free and Open Source data assistant for XDU undergraduate.
+Open Source data assistant for XDU students.

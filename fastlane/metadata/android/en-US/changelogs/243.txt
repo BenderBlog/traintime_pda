@@ -1,0 +1,23 @@
+Check github release for more detail.
+
+1. The electricity balance is back! Thanks @Rrrilac and @hhzm.
+2. I managed to get data from postgraduate system, however, it is not stable...
+3. A software upgrade notice is implemented.
+4. @Pairman speeded up login.
+5. @Nancuncloud fixed a bug related to dialog.
+
+Also feauring a short story:
+
+Once upon a time, there's a 'Hard Lovin' Man called Ray, whose understand the power of the Railgun called 'Flight of the Rat. 
+
+Once after a battle with a 'Bloodsucker, he was tired as a high school student. He discovered a Purple Rat in the Square Forest.
+
+Unknown her name, "She like a sweet potato, like my Rat gun. Just call her Sweet Purple Potato Ball, idk...", he thought. And he brought her to his home(maybe?)
+
+The rat is clever, actually she is a angle named Elliot. We don't know why her soul inside a rat. Forgive me, I am drunked.
+
+She knows he is the 'Child of the Time. They may argue, may laugh. In my opinion, she lighten Ray's seemly colorless life.
+
+Don't know how time flies, she made he faster in running, attacking. With the power of the 'Rat gun', he become the threating 'Speed King.
+
+6. Partner classtable. Inspired by @Elliot and @Ray(Elliot Edition).
