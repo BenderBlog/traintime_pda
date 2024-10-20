@@ -65,7 +65,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "Elliot",
       "https://img.moegirl.org.cn/common/thumb/6/64/Hirasawa_yui_1.jpg/800px-Hirasawa_yui_1.jpg",
-      "开发支持：情侣课表功能开发指导",
+      "开发支持：搭子课表功能开发指导",
       "https://www.bilibili.com/bangumi/play/ss1172/",
     ),
     Developer(
@@ -119,7 +119,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "Ray (Elliot Edition)",
       "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
-      "设计：开屏画面 / 支持：iOS 发行商 / 开发支持：情侣课表功能开发指导",
+      "设计：开屏画面 / 支持：iOS 发行商 / 开发支持：搭子课表功能开发指导",
       "https://raay.xyz/",
     ),
     Developer(
@@ -193,7 +193,7 @@ class AboutPage extends StatelessWidget {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Babe I'm Gonna Leave You Edition"
+                      ? "Let It Roll Edition"
                       : "May You Never Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
