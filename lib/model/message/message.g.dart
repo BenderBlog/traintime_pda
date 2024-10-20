@@ -9,18 +9,20 @@ part of 'message.dart';
 UpdateMessage _$UpdateMessageFromJson(Map<String, dynamic> json) =>
     UpdateMessage(
       code: json['code'] as String,
-      change:
-          (json['change'] as List<dynamic>).map((e) => e as String).toList(),
+      update:
+          (json['update'] as List<dynamic>).map((e) => e as String).toList(),
       ioslink: json['ioslink'] as String,
       github: json['github'] as String,
+      fdroid: json['fdroid'] as String,
     );
 
 Map<String, dynamic> _$UpdateMessageToJson(UpdateMessage instance) =>
     <String, dynamic>{
       'code': instance.code,
-      'change': instance.change,
+      'update': instance.update,
       'ioslink': instance.ioslink,
       'github': instance.github,
+      'fdroid': instance.fdroid,
     };
 
 NoticeMessage _$NoticeMessageFromJson(Map<String, dynamic> json) =>

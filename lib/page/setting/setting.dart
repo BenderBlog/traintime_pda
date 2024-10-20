@@ -15,6 +15,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -26,6 +27,7 @@ import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
@@ -109,6 +111,48 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                   ListTile(
+                    title: const Text("检查软件更新"),
+                    subtitle: Obx(
+                      () => Text(
+                        '最新版本: ${updateMessage.value?.code ?? "等待获取"}',
+                      ),
+                    ),
+                    onTap: () {
+                      ProgressDialog pd = ProgressDialog(context: context);
+                      pd.show(msg: '正在获取更新信息');
+                      checkUpdate().then((value) async {
+                        pd.close();
+                        if (context.mounted) {
+                          if (value && updateMessage.value != null) {
+                            await showDialog(
+                              context: context,
+                              builder: (context) => Obx(
+                                () => UpdateDialog(
+                                  updateMessage: updateMessage.value!,
+                                ),
+                              ),
+                            );
+                          } else {
+                            showToast(
+                              context: context,
+                              msg: "目前您运行的是最新稳定版",
+                            );
+                          }
+                        }
+                      }, onError: (e, s) {
+                        pd.close();
+                        if (context.mounted) {
+                          showToast(
+                            context: context,
+                            msg: "获取更新信息失败",
+                          );
+                        }
+                      });
+                    },
+                    trailing: const Icon(Icons.navigate_next),
+                  ),
+                  const Divider(),
+                  ListTile(
                     title: const Text('用户信息'),
                     subtitle: Text(
                       "${preference.getString(preference.Preference.name)} ${preference.getString(preference.Preference.execution)}\n"
@@ -176,31 +220,34 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
               ])),
           ReXCard(
-            title: _buildListSubtitle('帐号设置'),
+            title: _buildListSubtitle('账号设置'),
             remaining: const [],
             bottomRow: Column(
               children: [
-                ListTile(
-                    title: const Text('体育系统密码设置'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => const SportPasswordDialog(),
-                      );
-                    }),
-                const Divider(),
-                ListTile(
-                    title: const Text('物理实验系统密码设置'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => const ExperimentPasswordDialog(),
-                      );
-                    }),
+                if (!preference.getBool(preference.Preference.role)) ...[
+                  ListTile(
+                      title: const Text('体育系统密码设置'),
+                      trailing: const Icon(Icons.navigate_next),
+                      onTap: () {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) => const SportPasswordDialog(),
+                        );
+                      }),
+                  const Divider(),
+                  ListTile(
+                      title: const Text('物理实验系统密码设置'),
+                      trailing: const Icon(Icons.navigate_next),
+                      onTap: () {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) =>
+                              const ExperimentPasswordDialog(),
+                        );
+                      }),
+                ],
                 if (preference.getBool(preference.Preference.role)) ...[
                   const Divider(),
                   ListTile(

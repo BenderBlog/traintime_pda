@@ -8,15 +8,17 @@ part 'message.g.dart';
 @JsonSerializable(explicitToJson: true)
 class UpdateMessage {
   final String code;
-  final List<String> change;
+  final List<String> update;
   final String ioslink;
   final String github;
+  final String fdroid;
 
   UpdateMessage({
     required this.code,
-    required this.change,
+    required this.update,
     required this.ioslink,
     required this.github,
+    required this.fdroid,
   });
 
   factory UpdateMessage.fromJson(Map<String, dynamic> json) =>

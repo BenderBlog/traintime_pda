@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
+import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -21,6 +22,7 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
@@ -257,6 +259,9 @@ class _HomePageMasterState extends State<HomePageMaster>
       });
     }
     message.checkMessage();
+    message.checkUpdate().then((value) {
+      if (value) _showUpdateNotice();
+    });
     log.info(
       "[home][BackgroundFetchFromHome]"
       "Current loginstate: $loginState, if none will _loginAsync.",
@@ -321,6 +326,21 @@ class _HomePageMasterState extends State<HomePageMaster>
       } else {
         _showOfflineModeNotice();
       }
+    }
+  }
+
+  void _showUpdateNotice() {
+    if (updateMessage.value != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await showDialog(
+          context: context,
+          builder: (context) => Obx(
+            () => UpdateDialog(
+              updateMessage: updateMessage.value!,
+            ),
+          ),
+        );
+      });
     }
   }
 
