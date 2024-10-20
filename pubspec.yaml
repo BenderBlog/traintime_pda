@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.4.0-dev+24
+version: 1.4.0+24
 
 environment:
   sdk: ">=3.0.0"
@@ -61,7 +61,7 @@ dependencies:
   ming_cute_icons: ^0.0.1
   timelines: ^0.1.0
   based_split_view: ^1.2.0
-  disclosure: ^2.2.0 
+  disclosure: ^2.2.0
   pinyin: ^3.3.0
   content_resolver: ^0.3.1
   # Homepage Widget
@@ -88,7 +88,6 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   change_app_package_name: ^1.1.0
   pigeon: ^20.0.1
-
 
 flutter_launcher_icons:
   android: true
