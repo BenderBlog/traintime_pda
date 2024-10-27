@@ -11,21 +11,17 @@ class AppIconWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (Platform.isIOS || Platform.isMacOS)
-        ? ClipRRect(
-            borderRadius: BorderRadius.all(
-              Radius.circular(29 * size / 120),
-            ),
-            child: Image.asset(
-              "assets/Icon-App-iTunes.png",
-              width: size,
-              height: size,
-            ),
-          )
-        : Image.asset(
-            "assets/icon.png",
-            width: size,
-            height: size,
-          );
+    return ClipRRect(
+      borderRadius: BorderRadius.all(
+        Radius.circular(29 * size / 120),
+      ),
+      child: Image.asset(
+        (Platform.isIOS || Platform.isMacOS)
+            ? "assets/Icon-App-iTunes.png"
+            : "assets/icon.png",
+        width: size,
+        height: size,
+      ),
+    );
   }
 }

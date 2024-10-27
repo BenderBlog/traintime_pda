@@ -89,7 +89,7 @@ class AboutPage extends StatelessWidget {
     Developer(
       "lsy223622 (木生睡不着)",
       "https://avatars.githubusercontent.com/u/57913213",
-      "设计：iOS 图标 / 支持：冠名 XDYou for iOS",
+      "设计：iOS 和 Android 图标 / 支持：冠名 XDYou for iOS",
       "https://lsy223622.com/",
     ),
     Developer(
