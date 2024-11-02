@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -23,15 +24,32 @@ class ButtomButtons extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: [
         TextButton(
-          child: Text('清除登录缓存', style: _bottomTextStyle),
+          child: Text(
+            FlutterI18n.translate(context, "login.clear_cache"),
+            style: _bottomTextStyle,
+          ),
           onPressed: () {
             NetworkSession().clearCookieJar().then((value) {
-              if (context.mounted) showToast(context: context, msg: '清理缓存成功');
+              if (context.mounted) {
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "login.complete_clear_cache",
+                  ),
+                );
+              }
             });
           },
         ),
         TextButton(
-          child: Text('查看网络交互', style: _bottomTextStyle),
+          child: Text(
+            FlutterI18n.translate(
+              context,
+              "login.see_inspector",
+            ),
+            style: _bottomTextStyle,
+          ),
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => TalkerScreen(talker: log),

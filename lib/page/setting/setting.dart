@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
@@ -63,9 +64,15 @@ class _SettingWindowState extends State<SettingWindow> {
       showDialog(
         barrierDismissible: false,
         context: context,
-        builder: (context) => const AlertDialog(
-          title: Text("请关闭应用"),
-          content: Text("因为技术限制，用户需要自行关闭窗口，然后重新打开应用。"),
+        builder: (context) => AlertDialog(
+          title: Text(FlutterI18n.translate(
+            context,
+            "setting.need_close_dialog.title",
+          )),
+          content: Text(FlutterI18n.translate(
+            context,
+            "setting.need_close_dialog.content",
+          )),
         ),
       );
     }
@@ -73,6 +80,20 @@ class _SettingWindowState extends State<SettingWindow> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> demoBlueModeName = [
+      FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.follow_setting",
+      ),
+      FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.day_mode",
+      ),
+      FlutterI18n.translate(
+        context,
+        "setting.change_brightness_dialog.night_mode",
+      ),
+    ];
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -153,37 +174,38 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text('用户信息'),
-                    subtitle: Text(
-                      "${preference.getString(preference.Preference.name)} ${preference.getString(preference.Preference.execution)}\n"
-                      "${preference.getString(preference.Preference.institutes)} ${preference.getString(preference.Preference.subject)}",
+                    title: Text(FlutterI18n.translate(
+                      context,
+                      "setting.simplify_timeline",
+                    )),
+                    subtitle: Text(FlutterI18n.translate(
+                      context,
+                      "setting.simplify_timeline_description",
+                    )),
+                    trailing: Switch(
+                      value: preference.getBool(
+                          preference.Preference.simplifiedClassTimeline),
+                      onChanged: (bool value) {
+                        setState(() {
+                          preference
+                              .setBool(
+                                preference.Preference.simplifiedClassTimeline,
+                                value,
+                              )
+                              .then(
+                                (value) =>
+                                    ClassTableCard.reloadSettingsFromPref(),
+                              );
+                        });
+                      },
                     ),
                   ),
-                ],
+                ])),
+            ReXCard(
+              title: _buildListSubtitle(FlutterI18n.translate(
+                context,
+                "setting.account_setting",
               )),
-          const SizedBox(height: 20),
-          // ReXCard(
-          //   title: _buildListSubtitle('颜色设置'),
-          //   remaining: [],
-          //   bottomRow: Column(
-          //     children: [
-          //       ListTile(
-          //           title: const Text('设置程序主题色'),
-          //           subtitle: Text(ColorSeed
-          //               .values[
-          //                   preference.getInt(preference.Preference.color)]
-          //               .label),
-          //           onTap: () {
-          //             showDialog(
-          //               context: context,
-          //               builder: (context) => const ChangeColorDialog(),
-          //             );
-          //           }),
-          //     ],
-          //   ),
-          // ),
-          ReXCard(
-              title: _buildListSubtitle('界面设置'),
               remaining: const [],
               bottomRow: Column(children: [
                 ListTile(
@@ -226,7 +248,10 @@ class _SettingWindowState extends State<SettingWindow> {
               children: [
                 if (!preference.getBool(preference.Preference.role)) ...[
                   ListTile(
-                      title: const Text('体育系统密码设置'),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.sport_password_setting",
+                      )),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
@@ -237,7 +262,10 @@ class _SettingWindowState extends State<SettingWindow> {
                       }),
                   const Divider(),
                   ListTile(
-                      title: const Text('物理实验系统密码设置'),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.experiment_password_setting",
+                      )),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
@@ -251,7 +279,14 @@ class _SettingWindowState extends State<SettingWindow> {
                 if (preference.getBool(preference.Preference.role)) ...[
                   const Divider(),
                   ListTile(
-                      title: const Text('电费账号设置'),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.electricity_password_setting",
+                      )),
+                      subtitle: Text(FlutterI18n.translate(
+                        context,
+                        "setting.electricity_password_description",
+                      )),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
                         showDialog(
@@ -474,10 +509,8 @@ class _SettingWindowState extends State<SettingWindow> {
                                 "No cookies.",
                               );
                             }
-
                             /// Clean cache.
                             _removeCache();
-
                             if (context.mounted) {
                               showToast(context: context, msg: '缓存已被清除');
                               Restart.restartApp();
@@ -534,16 +567,19 @@ class _SettingWindowState extends State<SettingWindow> {
                             ThemeController toChange =
                                 Get.put(ThemeController());
                             toChange.onUpdate();
-
-                            /// Restart app
-                            if (mounted) {
-                              pd.close();
-                              Restart.restartApp();
-                            }
-                          },
-                          child: const Text('确定'),
-                        ),
-                      ],
+                              /// Restart app
+                              if (mounted) {
+                                pd.close();
+                                Restart.restartApp();
+                              }
+                            },
+                            child: Text(FlutterI18n.translate(
+                              context,
+                              "confirm",
+                            )),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

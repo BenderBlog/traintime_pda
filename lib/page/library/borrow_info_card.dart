@@ -6,6 +6,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -82,9 +83,12 @@ class BorrowInfoCard extends StatelessWidget {
                 ),
               )
             ]),
-            const TextSpan(
-              text: " 借阅",
-              style: TextStyle(
+            TextSpan(
+              text: FlutterI18n.translate(
+                context,
+                "library.borrow_str",
+              ),
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Colors.blueGrey,
@@ -120,9 +124,12 @@ class BorrowInfoCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const TextSpan(
-              text: " 到期",
-              style: TextStyle(
+            TextSpan(
+              text: FlutterI18n.translate(
+                context,
+                "library.due_date",
+              ),
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Colors.blueGrey,
@@ -150,7 +157,15 @@ class BorrowInfoCard extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: isOverdue ? " 天前到期" : " 天后",
+              text: isOverdue
+                  ? FlutterI18n.translate(
+                      context,
+                      "library.after_due_date",
+                    )
+                  : FlutterI18n.translate(
+                      context,
+                      "library.before_due_date",
+                    ),
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -159,7 +174,15 @@ class BorrowInfoCard extends StatelessWidget {
             ),
           ]));
           final button = Text(
-            isOverdue ? "不可续借" : "续借",
+            isOverdue
+                ? FlutterI18n.translate(
+                    context,
+                    "library.cannot_be_renewable",
+                  )
+                : FlutterI18n.translate(
+                    context,
+                    "library.can_be_renewable",
+                  ),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
               fontWeight: FontWeight.w600,
@@ -174,7 +197,12 @@ class BorrowInfoCard extends StatelessWidget {
             onTap: () {
               if (!isOverdue) {
                 ProgressDialog pd = ProgressDialog(context: context);
-                pd.show(msg: "正在续借");
+                pd.show(
+                  msg: FlutterI18n.translate(
+                    context,
+                    "library.renewing",
+                  ),
+                );
                 LibrarySession().renew(toUse.loanId).then((value) {
                   if (context.mounted) {
                     pd.close();

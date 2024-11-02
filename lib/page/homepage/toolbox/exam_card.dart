@@ -4,6 +4,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -25,9 +26,21 @@ class ExamCard extends StatelessWidget {
           if (c.status == ExamStatus.cache || c.status == ExamStatus.fetched) {
             context.pushReplacement(ExamInfoWindow(time: updateTime));
           } else if (c.status != ExamStatus.error) {
-            showToast(context: context, msg: "请稍候，正在获取考试信息");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.toolbox.exam_fetching",
+              ),
+            );
           } else if (offline) {
-            showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.offline_mode",
+              ),
+            );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -37,11 +50,17 @@ class ExamCard extends StatelessWidget {
                 )),
               ),
             );
-            showToast(context: context, msg: "遇到错误，请联系开发者");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.toolbox.exam_error",
+              ),
+            );
           }
         },
         icon: MingCuteIcons.mgc_calendar_line,
-        name: "考试安排",
+        nameKey: "homepage.toolbox.exam",
       ),
     );
   }

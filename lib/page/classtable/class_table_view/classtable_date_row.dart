@@ -61,7 +61,7 @@ class WeekInfomation extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            weekList[time.weekday - 1],
+            getWeekString(context, time.weekday - 1),
             style: const TextStyle(
               fontSize: 14,
               color: Colors.black87,

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -22,11 +23,19 @@ class ClassChangeList extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("课程调整"),
+        title: Text(FlutterI18n.translate(
+          context,
+          "classtable.class_change_page.title",
+        )),
       ),
       body: Builder(builder: (context) {
         if (classChanges.isEmpty) {
-          return const EmptyListView(text: "目前没有调课信息");
+          return EmptyListView(
+            text: FlutterI18n.translate(
+              context,
+              "classtable.class_change_page.empty_message",
+            ),
+          );
         }
 
         return ListView.builder(
@@ -38,11 +47,18 @@ class ClassChangeList extends StatelessWidget {
               if (classChanges[index].type != ChangeType.stop) {
                 if (toShow.isTeacherChanged &&
                     classChanges[index].newTeacher != null) {
-                  teacherChange +=
-                      "从${classChanges[index].originalTeacher ?? "没有信息"}"
-                      "变为${classChanges[index].originalNewTeacher}";
+                  teacherChange += FlutterI18n.translate(
+                      context, "classtable.class_change_page.teacher_change",
+                      translationParams: {
+                        "previous_teacher":
+                            classChanges[index].originalTeacher ?? "没有信息",
+                        "new_teacher": classChanges[index].originalNewTeacher!,
+                      });
                 } else {
-                  teacherChange += "没有改变";
+                  teacherChange += FlutterI18n.translate(
+                    context,
+                    "classtable.class_change_page.no_teacher_change",
+                  );
                 }
               }
 
@@ -66,50 +82,71 @@ class ClassChangeList extends StatelessWidget {
                 }
               }
 
-              String chineseWeekChar(int? week) {
-                switch (week) {
-                  case 1:
-                    return '一';
-                  case 2:
-                    return '二';
-                  case 3:
-                    return '三';
-                  case 4:
-                    return '四';
-                  case 5:
-                    return '五';
-                  case 6:
-                    return '六';
-                  case 7:
-                    return '日';
-                  default:
-                    return ' ';
-                }
-              }
+              String weekChar(int? week) => FlutterI18n.translate(
+                    context,
+                    week != null ? "classtable.class_change_page.$week" : "",
+                  );
 
               String classChange = "";
               switch (toShow.type) {
                 case ChangeType.change:
-                  classChange +=
-                      "调课信息，从第$originalAffectedWeeksStr周星期${chineseWeekChar(toShow.originalWeek)}的${toShow.originalClassRange[0]}-${toShow.originalClassRange[1]}节"
-                      "调整为第$newAffectedWeeksListStr周星期${chineseWeekChar(toShow.newWeek)}的${toShow.newClassRange[0]}-${toShow.newClassRange[1]}节，${toShow.newClassroom}教室上课";
+                  classChange += FlutterI18n.translate(context,
+                      "classtable.class_change_page.change_class_message",
+                      translationParams: {
+                        "originalAffectedWeeks": originalAffectedWeeksStr,
+                        "weekChar_originalWeek": weekChar(toShow.originalWeek),
+                        "originalClassRangeStart":
+                            toShow.originalClassRange[0].toString(),
+                        "originalClassRangeEnd":
+                            toShow.originalClassRange[1].toString(),
+                        "newAffectedWeeksListStr": newAffectedWeeksListStr,
+                        "weekChar_newWeek": weekChar(toShow.newWeek),
+                        "newClassRangeStart":
+                            toShow.newClassRange[0].toString(),
+                        "newClassRangeStop": toShow.newClassRange[1].toString(),
+                        "newClassroom": toShow.newClassroom.toString(),
+                      });
                   break;
                 case ChangeType.patch:
-                  classChange +=
-                      "补课信息，从第$newAffectedWeeksListStr周星期${chineseWeekChar(toShow.newWeek)}的${toShow.newClassRange[0]}-${toShow.newClassRange[1]}节，${toShow.newClassroom}补课";
+                  classChange += FlutterI18n.translate(context,
+                      "classtable.class_change_page.patch_class_message",
+                      translationParams: {
+                        "newAffectedWeeksListStr": newAffectedWeeksListStr,
+                        "weekChar_newWeek": weekChar(toShow.newWeek),
+                        "newClassRangeStart":
+                            toShow.newClassRange[0].toString(),
+                        "newClassRangeStop": toShow.newClassRange[1].toString(),
+                        "newClassroom": toShow.newClassroom.toString(),
+                      });
                   break;
                 case ChangeType.stop:
-                  classChange +=
-                      "停课信息，第$originalAffectedWeeksStr周星期${chineseWeekChar(toShow.originalWeek)}的${toShow.originalClassRange[0]}-${toShow.originalClassRange[1]}节，${toShow.originalClassroom}停课";
+                  classChange += FlutterI18n.translate(context,
+                      "classtable.class_change_page.stop_class_message",
+                      translationParams: {
+                        "originalAffectedWeeks": originalAffectedWeeksStr,
+                        "weekChar_originalWeek": weekChar(toShow.originalWeek),
+                        "originalClassRangeStart":
+                            toShow.originalClassRange[0].toString(),
+                        "originalClassRangeEnd":
+                            toShow.originalClassRange[1].toString(),
+                      });
                   break;
               }
 
               return ListTile(
                 title: Text(toShow.className),
                 subtitle: Text(
-                  "编号: ${classChanges[index].classCode} | ${classChanges[index].classNumber} 班\n"
-                  "安排变更：$classChange"
-                  "${classChanges[index].type == ChangeType.change ? "\n老师变更: $teacherChange" : ""}",
+                  FlutterI18n.translate(
+                      context, "classtable.class_change_page.class_info",
+                      translationParams: {
+                        "classCode": classChanges[index].classCode,
+                        "classNumber": classChanges[index].classNumber,
+                        "classChange": classChange,
+                        "teacherChange":
+                            classChanges[index].type == ChangeType.change
+                                ? "老师变更: $teacherChange"
+                                : "",
+                      }),
                 ),
               );
             }).constrained(maxWidth: 600);

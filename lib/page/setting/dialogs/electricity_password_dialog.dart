@@ -4,6 +4,7 @@
 // Electricity password dialog.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -33,42 +34,60 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('修改电费帐号密码'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "setting.change_electricity_title",
+      )),
       content: TextField(
         autofocus: true,
         controller: _sportPasswordController,
         obscureText: _couldView,
         decoration: InputDecoration(
-          hintText: "请在此输入密码",
+          hintText: FlutterI18n.translate(
+            context,
+            "setting.change_password_dialog.input_hint",
+          ),
           border: const OutlineInputBorder(),
           suffixIcon: IconButton(
-              icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _couldView = !_couldView;
-                });
-              }),
+            icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => _couldView = !_couldView),
+          ),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('取消'),
+          child: Text(
+            FlutterI18n.translate(
+              context,
+              "cancel",
+            ),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: const Text('提交'),
+          child: Text(
+            FlutterI18n.translate(
+              context,
+              "confirm",
+            ),
+          ),
           onPressed: () async {
-            if (_sportPasswordController.text.isNotEmpty) {
-              preference.setString(
-                preference.Preference.electricityPassword,
-                _sportPasswordController.text,
+            if (_sportPasswordController.text.isEmpty) {
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "setting.change_password_dialog.blank_input",
+                ),
               );
-              Navigator.of(context).pop();
-            } else {
-              showToast(context: context, msg: "输入空白!");
             }
+            preference.setString(
+              preference.Preference.electricityPassword,
+              _sportPasswordController.text,
+            );
+            Navigator.of(context).pop();
           },
         ),
       ],

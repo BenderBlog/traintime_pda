@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 
 class CategoryChoiceView extends StatefulWidget {
@@ -34,7 +35,10 @@ class _CategoryChoiceViewState extends State<CategoryChoiceView> {
           onPressed: () {
             Navigator.pop(context, (categoryChoiced, subTags));
           },
-          child: const Text("选择完毕"),
+          child: Text(FlutterI18n.translate(
+            context,
+            "creative_job.complete_choosing",
+          )),
         ),
         ...List.generate(
           skill.keys.toList().length,
