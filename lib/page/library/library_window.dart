@@ -3,6 +3,7 @@
 
 // Library Window.
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
 import 'package:watermeter/page/library/search_book_window.dart';
 
@@ -15,14 +16,20 @@ class LibraryWindow extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("图书馆信息"),
-          bottom: const TabBar(
+          title: Text(FlutterI18n.translate(context, "library.title")),
+          bottom: TabBar(
             tabs: [
               Tab(
-                text: "借书状态",
+                text: FlutterI18n.translate(
+                  context,
+                  "library.borrow_state_title",
+                ),
               ),
               Tab(
-                text: "查询藏书",
+                text: FlutterI18n.translate(
+                  context,
+                  "library.search_book_title",
+                ),
               ),
             ],
           ),

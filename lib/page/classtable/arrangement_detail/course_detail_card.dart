@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
@@ -77,7 +78,13 @@ class ClassDetailCard extends StatelessWidget {
             children: [
               Text(
                 "${classDetail.name}"
-                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${classDetail.number} 班" : ""}",
+                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${FlutterI18n.translate(
+                    context,
+                    "classtable.course_detail_card.class_number_string",
+                    translationParams: {
+                      "number": classDetail.number.toString(),
+                    },
+                  )}" : ""}",
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -90,14 +97,22 @@ class ClassDetailCard extends StatelessWidget {
                   Flexible(
                     child: CustomListTile(
                       icon: Icons.person,
-                      str: timeArrangement.teacher ?? "老师未定",
+                      str: timeArrangement.teacher ??
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.course_detail_card.unknown_teacher",
+                          ),
                       infoColor: infoColor,
                     ),
                   ),
                   Flexible(
                     child: CustomListTile(
                       icon: Icons.room,
-                      str: timeArrangement.classroom ?? "地点未定",
+                      str: timeArrangement.classroom ??
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.course_detail_card.unknown_place",
+                          ),
                       infoColor: infoColor,
                     ),
                   ),
@@ -105,8 +120,11 @@ class ClassDetailCard extends StatelessWidget {
               ),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
-                str: "${weekList[timeArrangement.day - 1]}"
-                    "${timeArrangement.start}-${timeArrangement.stop}节 "
+                str: "${getWeekString(context, timeArrangement.day - 1)}"
+                    "${FlutterI18n.translate(context, "classtable.course_detail_card.class_period", translationParams: {
+                      "start": timeArrangement.start.toString(),
+                      "stop": timeArrangement.stop.toString(),
+                    })} "
                     "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
                 infoColor: infoColor,
               ),
@@ -143,7 +161,10 @@ class ClassDetailCard extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          "编辑",
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.course_detail_card.edit",
+                          ),
                           style: TextStyle(
                             color: infoColor.shade900,
                           ),
@@ -153,10 +174,14 @@ class ClassDetailCard extends StatelessWidget {
                           bool? isContinue = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text("是否删除课程信息？"),
-                              content: const Text(
-                                "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！",
-                              ),
+                              title: Text(FlutterI18n.translate(
+                                context,
+                                "classtable.course_detail_card.delete_title",
+                              )),
+                              content: Text(FlutterI18n.translate(
+                                context,
+                                "classtable.course_detail_card.delete_content",
+                              )),
                               actions: [
                                 TextButton(
                                   style: TextButton.styleFrom(
@@ -186,7 +211,10 @@ class ClassDetailCard extends StatelessWidget {
                           }
                         },
                         child: Text(
-                          "删除",
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.course_detail_card.delete",
+                          ),
                           style: TextStyle(
                             color: infoColor.shade900,
                           ),

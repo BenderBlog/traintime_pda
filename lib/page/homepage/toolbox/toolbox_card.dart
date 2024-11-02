@@ -17,7 +17,7 @@ class ToolboxCard extends StatelessWidget {
         context.pushReplacement(const ToolBoxPage());
       },
       icon: MingCuteIcons.mgc_tool_line,
-      name: "其他功能",
+      nameKey: "homepage.toolbox.toolbox",
     );
   }
 }

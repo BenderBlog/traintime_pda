@@ -46,9 +46,6 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_localizations:
-    sdk: flutter
-  intl:
   package_info_plus: ^8.0.0
   flutter_markdown: ^0.7.2
   flutter_svg: ^2.0.10+1
@@ -77,7 +74,12 @@ dependencies:
   fwfh_url_launcher: ^0.9.1
   latext: ^0.4.1
   permission_handler: ^11.3.1
+  # internationalized
   device_info_plus: ^10.1.2
+  flutter_i18n: ^0.36.2
+  flutter_localizations:
+    sdk: flutter
+  intl:
 
 dev_dependencies:
   flutter_test:
@@ -109,3 +111,7 @@ flutter:
     - assets/icon.png
     - assets/CP1919.svg.vec
     - assets/Icon-App-iTunes-Background.png
+    - assets/flutter_i18n/zh_CN.yaml
+    - assets/flutter_i18n/zh_TW.yaml
+    - assets/flutter_i18n/zh_SG.json
+

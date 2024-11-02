@@ -3,6 +3,7 @@
 
 // Exam Infomation Interface.
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -33,13 +34,19 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
       if (offline && c.status == ExamStatus.cache) {
         showToast(
           context: context,
-          msg: "已显示缓存考试安排信息",
+          msg: FlutterI18n.translate(
+            context,
+            "exam.cache_hint",
+          ),
         );
       }
 
       return Scaffold(
         appBar: AppBar(
-          title: const Text("考试安排"),
+          title: Text(FlutterI18n.translate(
+            context,
+            "exam.title",
+          )),
           actions: [
             IconButton(
               icon: const Icon(Icons.more_time),
@@ -65,7 +72,12 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                   if (c.isDisQualified.isNotEmpty) ...[true, false],
                 ],
                 children: [
-                  const TimelineTitle(title: "未完成考试"),
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "exam.not_finished",
+                    ),
+                  ),
                   Builder(builder: (context) {
                     final isNotFinished = c.isNotFinished(widget.time);
                     if (isNotFinished.isNotEmpty) {
@@ -74,17 +86,32 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                           .toList()
                           .toColumn();
                     } else {
-                      return const ExamInfoCard(title: "所有考试全部完成");
+                      return ExamInfoCard(
+                        title: FlutterI18n.translate(
+                          context,
+                          "exam.all_finished",
+                        ),
+                      );
                     }
                   }),
                   if (c.isDisQualified.isNotEmpty)
-                    const TimelineTitle(title: "无法完成考试"),
+                    TimelineTitle(
+                      title: FlutterI18n.translate(
+                        context,
+                        "exam.unable_to_exam",
+                      ),
+                    ),
                   if (c.isDisQualified.isNotEmpty)
                     c.isDisQualified
                         .map((e) => ExamInfoCard(toUse: e))
                         .toList()
                         .toColumn(),
-                  const TimelineTitle(title: "已完成考试"),
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "exam.finished",
+                    ),
+                  ),
                   Builder(builder: (context) {
                     final isFinished = c.isFinished(widget.time);
                     if (isFinished.isNotEmpty) {
@@ -93,13 +120,23 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                           .toList()
                           .toColumn();
                     } else {
-                      return const ExamInfoCard(title: "一门还没考呢");
+                      return ExamInfoCard(
+                        title: FlutterI18n.translate(
+                          context,
+                          "exam.none_finished",
+                        ),
+                      );
                     }
                   }),
                 ],
               ).safeArea();
             } else {
-              return const EmptyListView(text: "目前没有考试安排");
+              return EmptyListView(
+                text: FlutterI18n.translate(
+                  context,
+                  "exam.no_exam_arrangement",
+                ),
+              );
             }
           } else if (c.status == ExamStatus.error) {
             return Center(child: Text(c.error.toString()));

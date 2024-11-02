@@ -4,6 +4,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
@@ -79,16 +80,23 @@ class _BookDetailCardState extends State<BookDetailCard> {
               const SizedBox(height: 8),
               Text.rich(
                 TextSpan(children: [
-                  const TextSpan(
-                    text: "作者 ",
-                    style: TextStyle(
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "library.author",
+                    ),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFFBFBFBF),
                     ),
                   ),
                   TextSpan(
-                    text: widget.toUse.author ?? "没有提供",
+                    text: widget.toUse.author ??
+                        FlutterI18n.translate(
+                          context,
+                          "library.not_provided",
+                        ),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -97,16 +105,23 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 ]),
               ),
               Text.rich(TextSpan(children: [
-                const TextSpan(
-                  text: "出版社 ",
-                  style: TextStyle(
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "library.publish_house",
+                  ),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFBFBFBF),
                   ),
                 ),
                 TextSpan(
-                  text: widget.toUse.publisherHouse ?? "没有相关信息",
+                  text: widget.toUse.publisherHouse ??
+                      FlutterI18n.translate(
+                        context,
+                        "library.not_provided",
+                      ),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -114,9 +129,12 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 ),
               ])),
               Text.rich(TextSpan(children: [
-                const TextSpan(
-                  text: "索书号 ",
-                  style: TextStyle(
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "library.call_number",
+                  ),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFBFBFBF),
@@ -131,16 +149,23 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 ),
               ])),
               Text.rich(TextSpan(children: [
-                const TextSpan(
-                  text: "发行时间 ",
-                  style: TextStyle(
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "library.publish_date",
+                  ),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFBFBFBF),
                   ),
                 ),
                 TextSpan(
-                  text: widget.toUse.publishYear ?? "没有相关信息",
+                  text: widget.toUse.publishYear ??
+                      FlutterI18n.translate(
+                        context,
+                        "library.not_provided",
+                      ),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -148,16 +173,23 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 ),
               ])),
               Text.rich(TextSpan(children: [
-                const TextSpan(
-                  text: "ISBN ",
-                  style: TextStyle(
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "library.isbn",
+                  ),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFBFBFBF),
                   ),
                 ),
                 TextSpan(
-                  text: widget.toUse.isbn ?? "没有提供",
+                  text: widget.toUse.isbn ??
+                      FlutterI18n.translate(
+                        context,
+                        "library.not_provided",
+                      ),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -165,9 +197,12 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 ),
               ])),
               Text.rich(TextSpan(children: [
-                const TextSpan(
-                  text: "编排号码 ",
-                  style: TextStyle(
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "library.arrangement_code",
+                  ),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFBFBFBF),

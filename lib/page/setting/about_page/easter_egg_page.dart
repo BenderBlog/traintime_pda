@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pinyin/pinyin.dart';
@@ -185,6 +186,7 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
+
   final String urlApple = "https://www.bilibili.com/video/BV1wN4y1L7Ut";
 
   final String urlOthers = "https://www.bilibili.com/video/BV1HN411Y7Ct?p=7";
@@ -349,7 +351,14 @@ Don't know how time flies, she made he faster in running, attacking. With the po
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("你找到了彩蛋")),
+      appBar: AppBar(
+        title: Text(
+          FlutterI18n.translate(
+            context,
+            "setting.easter_egg_page.title",
+          ),
+        ),
+      ),
       body: [
         const SizedBox(height: 16.0),
         TextFormField(
@@ -373,7 +382,10 @@ Don't know how time flies, she made he faster in running, attacking. With the po
         [
           TextButton(
             onPressed: onSubmitted,
-            child: const Text("加密上面的文本"),
+            child: Text(FlutterI18n.translate(
+              context,
+              "setting.easter_egg_page.encrypt",
+            )),
           ),
           TextButton(
             onPressed: () => launchUrl(
@@ -382,7 +394,10 @@ Don't know how time flies, she made he faster in running, attacking. With the po
               ),
               mode: LaunchMode.externalApplication,
             ),
-            child: const Text("听歌时间"),
+            child: Text(FlutterI18n.translate(
+              context,
+              "setting.easter_egg_page.listen",
+            )),
           ),
           TextButton(
             onPressed: () => launchUrl(

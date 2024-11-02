@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ChangeSwiftDialog extends StatelessWidget {
@@ -27,7 +28,10 @@ class ChangeSwiftDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('课程偏移设置'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "setting.change_swift_dialog.title",
+      )),
       content: TextField(
         autofocus: true,
         controller: _getNumberController,
@@ -36,20 +40,21 @@ class ChangeSwiftDialog extends StatelessWidget {
           FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*'))
         ],
         maxLines: 1,
-        decoration: const InputDecoration(
-          hintText: "请在此输入数字",
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          hintText: FlutterI18n.translate(
+            context,
+            "setting.change_swift_dialog.input_hint",
+          ),
+          border: const OutlineInputBorder(),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('取消'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          child: Text(FlutterI18n.translate(context, "cancel")),
+          onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-          child: const Text('提交'),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
             if (_getNumberController.text.isEmpty) {
               await preference.setInt(preference.Preference.swift, 0);
