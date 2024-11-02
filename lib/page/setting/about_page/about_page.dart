@@ -251,7 +251,7 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Babe I'm Gonna Leave You Edition"
+                      ? "Let It Roll Edition"
                       : "May You Never Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
@@ -376,15 +376,13 @@ class _AboutPageState extends State<AboutPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                 )
                 .constrained(maxWidth: 800)
-                .center()
-                .safeArea();
+                .center();
           } else {
             return [_title(context), _developerList, _moreList(context)]
                 .toColumn(mainAxisAlignment: MainAxisAlignment.center)
                 .scrollable()
                 .constrained(maxWidth: 600)
-                .center()
-                .safeArea();
+                .center();
           }
         }));
   }

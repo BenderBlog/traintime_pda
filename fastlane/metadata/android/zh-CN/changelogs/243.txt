@@ -1,0 +1,6 @@
+1. 搭子课表 @Elliot @Ray(Elliot Edition)
+2. 研究生系统适配(可能不稳定) @BenderBlog
+3. 修复弹出窗口可能被报错 @Nancuncloud
+4. 升级滑块通过率 @Pairman
+5. 新电费欠费查询 @Rrrilac @hhzm
+6. 软件更新通知 @BenderBlog

@@ -6,6 +6,8 @@
 
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -17,6 +19,7 @@ class ClassTableFile extends EhallSession {
   static const schoolClassName = "ClassTable.json";
   static const userDefinedClassName = "UserClass.json";
   static const partnerClassName = "darling.erc.json";
+  static const decorationName = "decoration.jpg";
 
   ClassTableData simplifyData(Map<String, dynamic> qResult) {
     ClassTableData toReturn = ClassTableData();
@@ -71,15 +74,211 @@ class ClassTableFile extends EhallSession {
     return toReturn;
   }
 
-  Future<ClassTableData> get() async {
+  Future<ClassTableData> getYjspt() async {
     Map<String, dynamic> qResult = {};
-    log.info("[getClasstable][getFromWeb] Login the system.");
+
+    const semesterCodeURL =
+        "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/kfdxnxqcx.do";
+    const classInfoURL =
+        "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/xspkjgcx.do";
+    const notArrangedInfoURL =
+        "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/xswsckbkc.do";
+
+    log.info("[getClasstable][getYjspt] Login the system.");
+    String? location = await checkAndLogin(
+      target: "https://yjspt.xidian.edu.cn/gsapp/"
+          "sys/wdkbapp/*default/index.do#/xskcb",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+    );
+
+    while (location != null) {
+      var response = await dio.get(location);
+      log.info("[getClasstable][getYjspt] Received location: $location.");
+      location = response.headers[HttpHeaders.locationHeader]?[0];
+    }
+
+    /// AKA xnxqdm as [startyear][period] eg 20242 as
+    var semesterCode = await dio
+        .post(semesterCodeURL)
+        .then((value) => value.data["datas"]["kfdxnxqcx"]["rows"][0]["WID"]);
+
+    DateTime now = DateTime.now();
+    var currentWeek = await dio.post(
+      'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
+      data: {'day': Jiffy.parseFromDateTime(now).format(pattern: "yyyyMMdd")},
+    ).then((value) => value.data);
+    currentWeek = RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])![0]!;
+    log.info(
+      "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
+    );
+    int weekDay = now.weekday - 1;
+    String termStartDay = Jiffy.parseFromDateTime(now)
+        .add(weeks: 1 - int.parse(currentWeek), days: -weekDay)
+        .format(pattern: "yyyy-MM-dd HH:mm:ss");
+
+    if (preference.getString(preference.Preference.currentStartDay) !=
+        termStartDay) {
+      preference.setString(
+        preference.Preference.currentStartDay,
+        termStartDay,
+      );
+
+      /// New semenster, user defined class is useless.
+      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      if (userClassFile.existsSync()) userClassFile.deleteSync();
+    }
+
+    Map<String, dynamic> data = await dio.post(classInfoURL, data: {
+      "XNXQDM": semesterCode,
+    }).then((response) => response.data);
+
+    if (data['code'] != "0") {
+      log.warning(
+        "[getClasstable][getYjspt] "
+        "extParams: ${data['extParams']['msg']} isNotPublish: "
+        "${data['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
+      );
+      if (data['extParams']['msg'].toString().contains("查询学年学期的课程未发布")) {
+        log.warning(
+          "[getClasstable][getYjspt] "
+          "extParams: ${data['extParams']['msg']} isNotPublish: "
+          "Classtable not released.",
+        );
+        return ClassTableData(
+          semesterCode: semesterCode,
+          termStartDay: termStartDay,
+        );
+      } else {
+        throw Exception("${data['extParams']['msg']}");
+      }
+    }
+
+    qResult["rows"] = data["datas"]["xspkjgcx"]["rows"];
+
+    var notOnTable = await dio.post(
+      notArrangedInfoURL,
+      data: {
+        'XNXQDM': semesterCode,
+        'XH': preference.getString(preference.Preference.idsAccount),
+      },
+    ).then((value) => value.data['datas']['xswsckbkc']);
+    qResult["notArranged"] = notOnTable["rows"];
+
+    ClassTableData toReturn = ClassTableData();
+    toReturn.semesterCode = semesterCode;
+    toReturn.termStartDay = termStartDay;
+
+    log.info(
+      "[getClasstable][getYjspt] "
+      "${toReturn.semesterCode} ${toReturn.termStartDay}",
+    );
+
+    for (var i in qResult["rows"]) {
+      var toDeal = ClassDetail(
+        name: i["KCMC"],
+        code: i["KCDM"],
+      );
+      if (!toReturn.classDetail.contains(toDeal)) {
+        toReturn.classDetail.add(toDeal);
+      }
+
+      toReturn.timeArrangement.add(
+        TimeArrangement(
+          source: Source.school,
+          index: toReturn.classDetail.indexOf(toDeal),
+          start: i["KSJCDM"],
+          teacher: i["JSXM"],
+          stop: i["JSJCDM"],
+          day: int.parse(i["XQ"].toString()),
+          weekList: List<bool>.generate(
+            i["ZCBH"].toString().length,
+            (index) => i["ZCBH"].toString()[index] == "1",
+          ),
+          classroom: i["JASMC"],
+        ),
+      );
+
+      if (i["ZCBH"].toString().length > toReturn.semesterLength) {
+        toReturn.semesterLength = i["ZCBH"].toString().length;
+      }
+    }
+
+    // Post deal here
+    List<TimeArrangement> newStuff = [];
+    int getCourseId(TimeArrangement i) =>
+        "${i.weekList}-${i.day}-${i.classroom}".hashCode;
+
+    for (var i = 0; i < toReturn.classDetail.length; ++i) {
+      List<TimeArrangement> data =
+          List<TimeArrangement>.from(toReturn.timeArrangement)
+            ..removeWhere((item) => item.index != i);
+      List<int> entries = [];
+      //Map<int, List<TimeArrangement>> toAdd = {};
+
+      for (var j in data) {
+        int id = getCourseId(j);
+        if (!entries.any((k) => k == id)) entries.add(id);
+      }
+      for (var j in entries) {
+        List<TimeArrangement> result = List<TimeArrangement>.from(data)
+          ..removeWhere((item) => getCourseId(item) != j)
+          ..sort((a, b) => a.start - b.start);
+
+        List<int> arrangementsProto = {
+          for (var i in result) ...[i.start, i.stop]
+        }.toList()
+          ..sort();
+
+        log.info(arrangementsProto);
+
+        List<List<int>> arrangements = [[]];
+        for (var j in arrangementsProto) {
+          if (arrangements.last.isEmpty || arrangements.last.last == j - 1) {
+            arrangements.last.add(j);
+          } else {
+            arrangements.add([j]);
+          }
+        }
+
+        log.info(arrangements);
+
+        for (var j in arrangements) {
+          newStuff.add(TimeArrangement(
+            source: Source.school,
+            index: i,
+            classroom: result.first.classroom,
+            teacher: result.first.teacher,
+            weekList: result.first.weekList,
+            day: result.first.day,
+            start: j.first,
+            stop: j.last,
+          ));
+        }
+      }
+    }
+
+    toReturn.timeArrangement = newStuff;
+
+    for (var i in qResult["notArranged"]) {
+      toReturn.notArranged.add(NotArrangementClassDetail(
+        name: i["KCMC"],
+        code: i["KCDM"],
+      ));
+    }
+
+    return toReturn;
+  }
+
+  Future<ClassTableData> getEhall() async {
+    Map<String, dynamic> qResult = {};
+    log.info("[getClasstable][getEhall] Login the system.");
     String get = await useApp("4770397878132218");
-    log.info("[getClasstable][getFromWeb] Location: $get");
+    log.info("[getClasstable][getEhall] Location: $get");
     await dioEhall.post(get);
 
     log.info(
-      "[getClasstable][getFromWeb] "
+      "[getClasstable][getEhall] "
       "Fetch the semester information.",
     );
     String semesterCode = await dioEhall
@@ -96,7 +295,7 @@ class ClassTableFile extends EhallSession {
     }
 
     log.info(
-      "[getClasstable][getFromWeb] "
+      "[getClasstable][getEhall] "
       "Fetch the day the semester begin.",
     );
     String termStartDay = await dioEhall.post(
@@ -118,7 +317,7 @@ class ClassTableFile extends EhallSession {
       if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
     log.info(
-      "[getClasstable][getFromWeb] "
+      "[getClasstable][getEhall] "
       "Will get $semesterCode which start at $termStartDay.",
     );
 
@@ -131,13 +330,13 @@ class ClassTableFile extends EhallSession {
     ).then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
       log.warning(
-        "[getClasstable][getFromWeb] "
+        "[getClasstable][getEhall] "
         "extParams: ${qResult['extParams']['msg']} isNotPublish: "
         "${qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")}",
       );
       if (qResult['extParams']['msg'].toString().contains("查询学年学期的课程未发布")) {
         log.warning(
-          "[getClasstable][getFromWeb] "
+          "[getClasstable][getEhall] "
           "extParams: ${qResult['extParams']['msg']} isNotPublish: "
           "Classtable not released.",
         );
@@ -151,7 +350,7 @@ class ClassTableFile extends EhallSession {
     }
 
     log.info(
-      "[getClasstable][getFromWeb] "
+      "[getClasstable][getEhall] "
       "Preliminary storage...",
     );
     qResult["semesterCode"] = semesterCode;
@@ -166,7 +365,7 @@ class ClassTableFile extends EhallSession {
     ).then((value) => value.data['datas']['cxxsllsywpk']);
 
     log.info(
-      "[getClasstable][getFromWeb] $notOnTable",
+      "[getClasstable][getEhall] $notOnTable",
     );
     qResult["notArranged"] = notOnTable["rows"];
 
@@ -174,7 +373,7 @@ class ClassTableFile extends EhallSession {
 
     /// Deal with the class change.
     log.info(
-      "[getClasstable][getFromWeb] "
+      "[getClasstable][getEhall] "
       "Deal with the class change...",
     );
 
@@ -188,7 +387,7 @@ class ClassTableFile extends EhallSession {
     ).then((value) => value.data['datas']['xsdkkc']);
     if (qResult['extParams']['code'] != 1) {
       log.warning(
-        "[getClasstable][getFromWeb] ${qResult['extParams']['msg']}",
+        "[getClasstable][getEhall] ${qResult['extParams']['msg']}",
       );
     }
 
@@ -245,7 +444,7 @@ class ClassTableFile extends EhallSession {
     }
 
     log.info(
-      "[getClasstable][getFromWeb] "
+      "[getClasstable][getEhall] "
       "Dealing class change with ${preliminaryData.classChanges.length} info(s).",
     );
 
@@ -263,7 +462,7 @@ class ClassTableFile extends EhallSession {
 
       /// Second, find the all time arrangement related to the class.
       log.info(
-        "[getClasstable][getFromWeb] "
+        "[getClasstable][getEhall] "
         "Class change related to class detail index $indexClassDetailList.",
       );
       List<int> indexOriginalTimeArrangementList = [];
@@ -282,7 +481,7 @@ class ClassTableFile extends EhallSession {
 
       /// Third, search for the time arrangements, seek for the truth.
       log.info(
-        "[getClasstable][getFromWeb] "
+        "[getClasstable][getEhall] "
         "Class change related to time arrangement index $indexOriginalTimeArrangementList.",
       );
 
@@ -291,20 +490,20 @@ class ClassTableFile extends EhallSession {
         int timeArrangementIndex = indexOriginalTimeArrangementList.first;
 
         log.info(
-          "[getClasstable][getFromWeb] "
+          "[getClasstable][getEhall] "
           "Class change. Teacher changed? ${e.isTeacherChanged}. timeArrangementIndex is $timeArrangementIndex",
         );
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
           /// Seek for the change entry. Delete the classes moved waay.
           log.info(
-            "[getClasstable][getFromWeb] "
+            "[getClasstable][getEhall] "
             "Original weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
             "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
           );
           for (int i in e.originalAffectedWeeksList) {
             log.info(
-              "[getClasstable][getFromWeb] "
+              "[getClasstable][getEhall] "
               "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
             );
             if (preliminaryData
@@ -317,7 +516,7 @@ class ClassTableFile extends EhallSession {
           }
 
           log.info(
-            "[getClasstable][getFromWeb] "
+            "[getClasstable][getEhall] "
             "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
           );
         }
@@ -329,7 +528,7 @@ class ClassTableFile extends EhallSession {
         }
 
         log.info(
-          "[getClasstable][getFromWeb] "
+          "[getClasstable][getEhall] "
           "New week: ${e.newAffectedWeeks}, "
           "day: ${e.newWeek}, "
           "startToStop: ${e.newClassRange}, "
@@ -338,7 +537,7 @@ class ClassTableFile extends EhallSession {
 
         bool flag = false;
         ClassChange? toRemove;
-        log.info("[getClasstable][getFromWeb] cache length = ${cache.length}");
+        log.info("[getClasstable][getEhall] cache length = ${cache.length}");
         for (var f in cache) {
           //log.info("[getClasstable][getFromWeb]"
           //    "${f.className} ${f.classCode} ${f.originalClassRange} ${f.originalAffectedWeeksList} ${f.originalWeek}");
@@ -360,14 +559,14 @@ class ClassTableFile extends EhallSession {
         if (flag) {
           cache.remove(toRemove);
           log.info(
-            "[getClasstable][getFromWeb] "
+            "[getClasstable][getEhall] "
             "Cannot be added",
           );
           continue;
         }
 
         log.info(
-          "[getClasstable][getFromWeb] "
+          "[getClasstable][getEhall] "
           "Can be added",
         );
 
@@ -386,7 +585,7 @@ class ClassTableFile extends EhallSession {
         );
       } else if (e.type == ChangeType.patch) {
         log.info(
-          "[getClasstable][getFromWeb] "
+          "[getClasstable][getEhall] "
           "Class patch.",
         );
 
@@ -405,21 +604,21 @@ class ClassTableFile extends EhallSession {
         );
       } else {
         log.info(
-          "[getClasstable][getFromWeb] "
+          "[getClasstable][getEhall] "
           "Class stop.",
         );
 
         for (int indexOriginalTimeArrangement
             in indexOriginalTimeArrangementList) {
           log.info(
-            "[getClasstable][getFromWeb] "
+            "[getClasstable][getEhall] "
             "Original weeklist "
             "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
             "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
           );
           for (int i in e.originalAffectedWeeksList) {
             log.info(
-              "[getClasstable][getFromWeb] "
+              "[getClasstable][getEhall] "
               "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
             );
             if (preliminaryData
@@ -429,7 +628,7 @@ class ClassTableFile extends EhallSession {
             }
           }
           log.info(
-            "[getClasstable][getFromWeb] "
+            "[getClasstable][getEhall] "
             "New weeklist "
             "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
           );

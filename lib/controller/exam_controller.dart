@@ -11,9 +11,8 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
-import 'package:watermeter/repository/electricity_session.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_exam_session.dart';
+import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 enum ExamStatus {
@@ -129,7 +128,9 @@ class ExamController extends GetxController {
     );
     try {
       status = ExamStatus.fetching;
-      data = await ExamSession().getExam();
+      data = preference.getBool(preference.Preference.role)
+          ? await ExamSession().getExamYjspt()
+          : await ExamSession().getExamEhall();
       status = ExamStatus.fetched;
       error = "";
     } on DioException catch (e, s) {

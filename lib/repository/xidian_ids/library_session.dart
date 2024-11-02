@@ -6,6 +6,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
@@ -159,7 +160,8 @@ class LibrarySession extends IDSSession {
           "https://findxidian.libsp.cn/find/sso/login/xidian/0";
       String location = await checkAndLogin(
         target: "https://tyrzfw.chaoxing.com/auth/xidian/cas/index",
-        sliderCaptcha: (p0) async {},
+        sliderCaptcha: (String cookieStr) =>
+            SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
       );
       var response = await dio.get(location);
 

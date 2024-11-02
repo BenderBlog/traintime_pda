@@ -37,11 +37,11 @@ Catcher2Options catcherOptions = Catcher2Options(
 
 enum Preference {
   name(key: "name", type: "String"),
-  sex(key: "sex", type: "String"),
+  //sex(key: "sex", type: "String"),
   execution(key: "execution", type: "String"), // 书院
   institutes(key: "institutes", type: "String"), // 学院
   subject(key: "subject", type: "String"), // 专业
-  dorm(key: "dorm", type: "String"), // 宿舍
+  dorm(key: "dorm", type: "String"), // 宿舍，如为纯数字即为电费账号
   idsAccount(key: "idsAccount", type: "String"), // 一站式帐号
   idsPassword(key: "idsPassword", type: "String"), // 一站式密码
   sportPassword(key: "sportPassword", type: "String"), // 体育系统密码
@@ -54,8 +54,11 @@ enum Preference {
   brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
   currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
+  role(key: "role", type: "bool"), // 是否为研究生
   simplifiedClassTimeline(
-      key: "simplifiedClassTimeline", type: "bool"); // 简化日程时间轴
+    key: "simplifiedClassTimeline",
+    type: "bool",
+  ); // 简化日程时间轴
 
   const Preference({required this.key, this.type = "String"});
   factory Preference.fromKey(String key) {

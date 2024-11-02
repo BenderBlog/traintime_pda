@@ -18,7 +18,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_organized_data
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
@@ -42,8 +42,12 @@ class ClassTableState extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant ClassTableState oldWidget) {
     controllers.chosenWeek = oldWidget.controllers.chosenWeek;
-    controllers.partnerClass = null;
-    return controllers.chosenWeek != oldWidget.controllers.chosenWeek;
+    controllers.partnerClass = oldWidget.controllers.partnerClass;
+    controllers.partnerSubjects = oldWidget.controllers.partnerSubjects;
+    controllers.partnerExperiment = oldWidget.controllers.partnerExperiment;
+    controllers.partnerName = oldWidget.controllers.partnerName;
+    controllers.isPartner = oldWidget.controllers.isPartner;
+    return true;
   }
 }
 
@@ -75,6 +79,7 @@ class ClassTableWidgetState with ChangeNotifier {
   ClassTableData? partnerClass;
   List<Subject>? partnerSubjects;
   List<ExperimentData>? partnerExperiment;
+  String? partnerName;
 
   /// Render partner code.
   bool _isPartner = false;
@@ -187,13 +192,21 @@ class ClassTableWidgetState with ChangeNotifier {
           .then((value) => notifyListeners());
 
   /// Decode Partner String info
-  (ClassTableData, List<Subject>, List<ExperimentData>, bool)
+  (String, ClassTableData, List<Subject>, List<ExperimentData>, bool)
       decodePartnerClass(
     String source,
   ) {
     final data = jsonDecode(source);
-    if (semesterCode.compareTo(data["classtable"]["semesterCode"].toString()) !=
-        0) {
+    var yearNotEqual = semesterCode.substring(0, 4).compareTo(
+            data["classtable"]["semesterCode"].toString().substring(0, 4)) !=
+        0;
+    var lastNotEqual = semesterCode
+            .substring(semesterCode.length - 1)
+            .compareTo(data["classtable"]["semesterCode"].toString().substring(
+                  data["classtable"]["semesterCode"].length - 1,
+                )) !=
+        0;
+    if (yearNotEqual || lastNotEqual) {
       throw NotSameSemesterException(
         msg: "Not the same semester. This semester: $semesterCode. "
             "Input source: ${data["classtable"]["semesterCode"]}."
@@ -201,6 +214,7 @@ class ClassTableWidgetState with ChangeNotifier {
       );
     }
     return (
+      data["name"] ?? "Sweetie",
       ClassTableData.fromJson(data["classtable"]),
       List.generate(
         data["exam"].length,
@@ -219,9 +233,11 @@ class ClassTableWidgetState with ChangeNotifier {
     var file = File("${supportPath.path}/${ClassTableFile.partnerClassName}");
     if (!file.existsSync()) throw Exception("File not found.");
     final data = decodePartnerClass(file.readAsStringSync());
-    partnerClass = data.$1;
-    partnerSubjects = data.$2;
-    partnerExperiment = data.$3;
+    partnerName = data.$1;
+    partnerClass = data.$2;
+    partnerSubjects = data.$3;
+    partnerExperiment = data.$4;
+
     notifyListeners();
   }
 
@@ -266,8 +282,9 @@ class ClassTableWidgetState with ChangeNotifier {
   }
 
   /// Generate shared class data.
-  /// Eliot Ray Classtable (Format)
-  String get ercStr => jsonEncode({
+  /// Elliot Ray Classtable (Format)
+  String ercStr(String name) => jsonEncode({
+        "name": name,
         "classtable": classTableController.classTableData,
         "exam": examController.data.subject,
         "experiment": experimentController.data,

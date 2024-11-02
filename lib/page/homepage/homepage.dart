@@ -3,6 +3,7 @@
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -24,6 +25,7 @@ import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/preference.dart' as prefs;
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -47,14 +49,16 @@ class _MainPageState extends State<MainPage> {
     SchoolCardInfoCard(),
   ];
 
-  final List<Widget> smallFunction = const [
-    ScoreCard(),
-    ExamCard(),
-    EmptyClassroomCard(),
-    ExperimentCard(),
-    SportCard(),
-    CreativeCard(),
-    ToolboxCard(),
+  final List<Widget> smallFunction = [
+    const ScoreCard(),
+    const ExamCard(),
+    if (prefs.getBool(prefs.Preference.role) == false) ...[
+      const EmptyClassroomCard(),
+      const ExperimentCard(),
+      const SportCard(),
+    ],
+    const CreativeCard(),
+    const ToolboxCard(),
   ];
 
   String get _now {
@@ -161,6 +165,22 @@ class _MainPageState extends State<MainPage> {
                 const HeaderLocator(),
                 <Widget>[
                   const NoticeCard(),
+                  if (prefs.getBool(prefs.Preference.role))
+                    Text(
+                      "研究生功能测试中，可能不稳定！",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    )
+                        .center()
+                        .constrained(height: 30)
+                        .paddingDirectional(
+                          horizontal: 16,
+                          vertical: 14,
+                        )
+                        .withHomeCardStyle(
+                          Theme.of(context).colorScheme.secondary,
+                        ),
                   const ClassTableCard(),
                   ...children,
                   GridView.extent(

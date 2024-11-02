@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/score/score_statics.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class ScoreState extends InheritedWidget {
   /// Static data.
@@ -146,9 +145,7 @@ class ScoreState extends InheritedWidget {
             return true;
           },
         ),
-        chosenSemester: preference.getString(
-          preference.Preference.currentSemester,
-        ),
+        chosenSemester: "",
       ),
       semester: semester,
       statuses: statuses,

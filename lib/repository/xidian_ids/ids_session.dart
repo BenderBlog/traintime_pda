@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -248,7 +249,11 @@ class IDSSession extends NetworkSession {
       queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
     );
 
-    await sliderCaptcha(cookieStr);
+    try {
+      await sliderCaptcha(cookieStr);
+    } on CaptchaSolveFailedException {
+      throw const LoginFailedException(msg: "验证码校验失败");
+    }
 
     /// Post login request.
     if (onResponse != null) {
@@ -318,6 +323,35 @@ class IDSSession extends NetworkSession {
         rethrow;
       }
     }
+  }
+
+  Future<bool> checkWhetherPostgraduate() async {
+    String location = await checkAndLogin(
+      target: "https://yjspt.xidian.edu.cn/gsapp"
+          "/sys/yjsemaphome/portal/index.do",
+      sliderCaptcha: (cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+    );
+    var response = await dio.get(location);
+    while (response.headers[HttpHeaders.locationHeader] != null) {
+      location = response.headers[HttpHeaders.locationHeader]![0];
+      log.info(
+        "[checkWhetherPostgraduate] Received location: $location",
+      );
+      response = await dio.get(location);
+    }
+
+    bool toReturn = await dio
+        .post("https://yjspt.xidian.edu.cn/gsapp"
+            "/sys/yjsemaphome/modules/pubWork/getCanVisitAppList.do")
+        .then((value) => value.data["res"] != null);
+
+    preference.setBool(
+      preference.Preference.role,
+      toReturn,
+    );
+
+    return toReturn;
   }
 }
 

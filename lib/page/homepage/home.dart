@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
+import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -21,9 +22,10 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/message_session.dart' as message;
+import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -197,14 +199,38 @@ class _HomePageMasterState extends State<HomePageMaster>
             String semesterCode = Get.put(
               ClassTableController(),
             ).classTableData.semesterCode;
-
-            if (semesterCode
-                    .compareTo(data["classtable"]["semesterCode"].toString()) !=
-                0) {
-              throw NotSameSemesterException(
-                msg: "Not the same semester. This semester: $semesterCode. "
-                    "Input source: ${data["classtable"]["semesterCode"]}."
-                    "This partner classtable is going to be deleted.",
+              var yearNotEqual = semesterCode.substring(0, 4).compareTo(
+                      data["classtable"]["semesterCode"]
+                          .toString()
+                          .substring(0, 4)) !=
+                  0;
+              var lastNotEqual = semesterCode
+                      .substring(semesterCode.length - 1)
+                      .compareTo(data["classtable"]["semesterCode"]
+                          .toString()
+                          .substring(
+                            data["classtable"]["semesterCode"].length - 1,
+                          )) !=
+                  0;
+              if (yearNotEqual || lastNotEqual) {
+                throw NotSameSemesterException(
+                  msg: "Not the same semester. This semester: $semesterCode. "
+                      "Input source: ${data["classtable"]["semesterCode"]}."
+                      "This partner classtable is going to be deleted.",
+                );
+              }
+              File(
+                "${supportPath.path}/${ClassTableFile.partnerClassName}",
+              ).writeAsStringSync(source);
+            } catch (error, stacktrace) {
+              log.error(
+                "Error occured while importing partner class.",
+                error,
+                stacktrace,
+              );
+              showToast(
+                context: context,
+                msg: '好像导入文件有点问题:P',
               );
             }
             File(
@@ -245,6 +271,9 @@ class _HomePageMasterState extends State<HomePageMaster>
       });
     }
     message.checkMessage();
+    message.checkUpdate().then((value) {
+      if (value) _showUpdateNotice();
+    });
     log.info(
       "[home][BackgroundFetchFromHome]"
       "Current loginstate: $loginState, if none will _loginAsync.",
@@ -309,6 +338,21 @@ class _HomePageMasterState extends State<HomePageMaster>
       } else {
         _showOfflineModeNotice();
       }
+    }
+  }
+
+  void _showUpdateNotice() {
+    if (updateMessage.value != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await showDialog(
+          context: context,
+          builder: (context) => Obx(
+            () => UpdateDialog(
+              updateMessage: updateMessage.value!,
+            ),
+          ),
+        );
+      });
     }
   }
 

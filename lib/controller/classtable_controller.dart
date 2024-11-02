@@ -13,7 +13,7 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 enum ClassTableState {
   fetching,
@@ -248,7 +248,10 @@ class ClassTableController extends GetxController {
             .addAll(userDefinedClassData.timeArrangement);
       } else {
         try {
-          var toUse = await ClassTableFile().get();
+          bool isPostGraduate = preference.getBool(preference.Preference.role);
+          var toUse = isPostGraduate
+              ? await ClassTableFile().getYjspt()
+              : await ClassTableFile().getEhall();
           classTableFile.writeAsStringSync(jsonEncode(toUse.toJson()));
           toUse.userDefinedDetail = userDefinedClassData.userDefinedDetail;
           toUse.timeArrangement.addAll(userDefinedClassData.timeArrangement);

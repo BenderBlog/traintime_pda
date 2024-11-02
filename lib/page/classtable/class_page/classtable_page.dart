@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
@@ -15,14 +16,13 @@ import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ClassTablePage extends StatefulWidget {
   const ClassTablePage({super.key});
@@ -97,7 +97,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
     //}
 
     /// Init the background.
-    File image = File("${supportPath.path}/decoration.jpg");
+    File image = File("${supportPath.path}/${ClassTableFile.decorationName}");
     decoration = BoxDecoration(
       image: (preference.getBool(preference.Preference.decorated) &&
               image.existsSync())
@@ -242,7 +242,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
     if (mounted) {
       try {
         String source = File.fromUri(Uri.parse(result!)).readAsStringSync();
-        bool isSuccess = classTableState.decodePartnerClass(source).$4;
+        bool isSuccess = classTableState.decodePartnerClass(source).$5;
         if (isSuccess) {
           File("${supportPath.path}/${ClassTableFile.partnerClassName}")
               .writeAsStringSync(source);
@@ -416,34 +416,93 @@ class _ClassTablePageState extends State<ClassTablePage> {
                               ],
                             ),
                           );
-                          String fileName = "classtable-"
-                              "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
-                              "${classTableState.semesterCode}";
-                          if (action == 'D') {
-                            fileName += ".ics";
-                          } else {
-                            fileName +=
-                                "-${preference.getString(preference.Preference.idsAccount)}.erc";
-                          }
-                          if ((Platform.isLinux ||
-                                  Platform.isMacOS ||
-                                  Platform.isWindows) &&
-                              context.mounted) {
-                            String title = FlutterI18n.translate(
-                              context,
-                              "classtable.partner_classtable.save_dialog.title",
-                            );
-                            String? resultFilePath =
-                                await FilePicker.platform.saveFile(
-                              dialogTitle: title,
-                              fileName: fileName,
-                              allowedExtensions: [
-                                if (action == 'D') "ics" else "erc"
-                              ],
-                              lockParentWindow: true,
-                            );
-                            if (resultFilePath != null) {
-                              File file = File(resultFilePath);
+                          if (context.mounted) {
+                            String fileName = "classtable-"
+                                "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
+                                "${classTableState.semesterCode}";
+                            String sweetheartName = "";
+                            if (action == 'D') {
+                              fileName += ".ics";
+                            } else {
+                              TextEditingController controller =
+                                  TextEditingController();
+                              sweetheartName = await showDialog<String>(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                            title: const Text('输入对方显示该课表的名称'),
+                                            content: TextField(
+                                              autofocus: true,
+                                              controller: controller,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              maxLines: 1,
+                                              decoration: const InputDecoration(
+                                                hintText: "在此输入，否则为 Sweetie",
+                                                border: OutlineInputBorder(),
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text('我就这一个甜心'),
+                                                onPressed: () async {
+                                                  Navigator.of(context).pop(
+                                                    null,
+                                                  );
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text('提交'),
+                                                onPressed: () async {
+                                                  if (controller.text.isEmpty) {
+                                                    showToast(
+                                                      context: context,
+                                                      msg: "输入空白!",
+                                                    );
+                                                  } else {
+                                                    Navigator.of(context).pop(
+                                                      controller.text,
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          )) ??
+                                  "Sweetie";
+
+                              if (context.mounted) {
+                                fileName += "-$sweetheartName.erc";
+                              }
+                            }
+                            if (Platform.isLinux ||
+                                Platform.isMacOS ||
+                                Platform.isWindows) {
+                              String? resultFilePath =
+                                  await FilePicker.platform.saveFile(
+                                dialogTitle: "保存日历文件到...",
+                                fileName: fileName,
+                                allowedExtensions: [
+                                  if (action == 'D') "ics" else "erc"
+                                ],
+                                lockParentWindow: true,
+                              );
+                              if (resultFilePath != null) {
+                                File file = File(resultFilePath);
+                                if (!(await file.exists())) {
+                                  await file.create();
+                                }
+                                if (action == "D") {
+                                  await file.writeAsString(
+                                      classTableState.iCalenderStr);
+                                } else {
+                                  await file.writeAsString(
+                                    classTableState.ercStr(sweetheartName),
+                                  );
+                                }
+                              }
+                            } else {
+                              String tempPath = await getTemporaryDirectory()
+                                  .then((value) => value.path);
+                              File file = File("$tempPath/$fileName");
                               if (!(await file.exists())) {
                                 await file.create();
                               }
@@ -451,29 +510,17 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                 await file.writeAsString(
                                     classTableState.iCalenderStr);
                               } else {
-                                await file
-                                    .writeAsString(classTableState.ercStr);
+                                await file.writeAsString(
+                                  classTableState.ercStr(sweetheartName),
+                                );
                               }
+                              await Share.shareXFiles(
+                                [XFile("$tempPath/$fileName")],
+                                sharePositionOrigin:
+                                    box!.localToGlobal(Offset.zero) & box.size,
+                              );
+                              await file.delete();
                             }
-                          } else {
-                            String tempPath = await getTemporaryDirectory()
-                                .then((value) => value.path);
-                            File file = File("$tempPath/$fileName");
-                            if (!(await file.exists())) {
-                              await file.create();
-                            }
-                            if (action == "D") {
-                              await file
-                                  .writeAsString(classTableState.iCalenderStr);
-                            } else {
-                              await file.writeAsString(classTableState.ercStr);
-                            }
-                            await Share.shareXFiles(
-                              [XFile("$tempPath/$fileName")],
-                              sharePositionOrigin:
-                                  box!.localToGlobal(Offset.zero) & box.size,
-                            );
-                            await file.delete();
                           }
                           if (context.mounted) {
                             showToast(
@@ -561,12 +608,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 ),
                 child: _topView(),
               ),
-              Expanded(
-                child: DecoratedBox(
-                  decoration: decoration,
-                  child: _classTablePage(),
-                ),
-              ),
+              DecoratedBox(
+                decoration: decoration,
+                child: _classTablePage(),
+              ).expanded(),
             ],
           ));
     } else {
@@ -582,7 +627,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
                   ? Icons.arrow_back_ios
                   : Icons.arrow_back,
             ),
-            onPressed: () => context.pop(),
+            onPressed: () =>
+                Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
           ),
         ),
         body: const EmptyClasstablePage(),

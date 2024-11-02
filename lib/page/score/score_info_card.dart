@@ -7,7 +7,8 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/score/score_compose_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_score_session.dart';
+import 'package:watermeter/repository/preference.dart';
+import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
 class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class
@@ -60,7 +61,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
           } else {
             c.setScoreChoiceFromIndex(widget.mark);
           }
-        } else {
+        } else if (!getBool(Preference.role)) {
           BothSideSheet.show(
             context: context,
             title: "成绩详情",

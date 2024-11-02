@@ -8,9 +8,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class EhallSession extends IDSSession {
   static final _ehallLock = Lock();
@@ -78,7 +78,8 @@ class EhallSession extends IDSSession {
         String location = await super.checkAndLogin(
           target: "https://ehall.xidian.edu.cn/login?"
               "service=https://ehall.xidian.edu.cn/new/index.html",
-          sliderCaptcha: (p0) async {},
+          sliderCaptcha: (String cookieStr) =>
+              SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
         );
         var response = await dio.get(location);
         while (response.headers[HttpHeaders.locationHeader] != null) {
@@ -109,136 +110,6 @@ class EhallSession extends IDSSession {
       );
       return value.headers['location']![0];
     });
-  }
-
-  /// 学生个人信息  6635601510182122
-  Future<void> getInformation() async {
-    log.info(
-      "[ehall_session][getInformation] "
-      "Ready to get the user information.",
-    );
-
-    String location = await super.checkAndLogin(
-      target:
-          "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do#/wdxx",
-      sliderCaptcha: (p0) async {},
-    );
-    log.info("[ehall_session][useApp] "
-        "Location is $location");
-    var response = await dio.get(
-      location,
-      options: Options(headers: {
-        HttpHeaders.refererHeader:
-            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-        HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-      }),
-    );
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[ehall_session][useApp] "
-        "Received location: $location.",
-      );
-      response = await dioEhall.get(
-        location,
-        options: Options(headers: {
-          HttpHeaders.refererHeader:
-              "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-          HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-        }),
-      );
-    }
-    await dioEhall.post(
-      "https://xgxt.xidian.edu.cn/xsfw/sys/swpubapp/indexmenu/getAppConfig.do?appId=4585275700341858&appName=jbxxapp",
-      options: Options(headers: {
-        HttpHeaders.refererHeader:
-            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-        HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-      }),
-    );
-
-    /// Get information here. resultCode==00000 is successful.
-    log.info(
-      "[ehall_session][getInformation] "
-      "Getting the user information.",
-    );
-    var detailed = await dioEhall
-        .post(
-            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBaseInfo.do",
-            data: "requestParamStr="
-                "{\"XSBH\":\"${preference.getString(preference.Preference.idsAccount)}\"}",
-            options: Options(headers: {
-              HttpHeaders.refererHeader:
-                  "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-              HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-            }))
-        .then(
-          (value) => value.data,
-        );
-    log.info(
-      "[ehall_session][getInformation] "
-      "Storing the user information.",
-    );
-    if (detailed["returnCode"] != "#E000000000000") {
-      throw GetInformationFailedException(detailed["description"]);
-    } else {
-      preference.setString(
-        preference.Preference.name,
-        detailed["data"]["XM"],
-      );
-      preference.setString(
-        preference.Preference.sex,
-        detailed["data"]["XBDM_DISPLAY"],
-      );
-      preference.setString(
-        preference.Preference.execution,
-        detailed["data"]["SYDM_DISPLAY"].toString().replaceAll("·", ""),
-      );
-      preference.setString(
-        preference.Preference.institutes,
-        detailed["data"]["DWDM_DISPLAY"],
-      );
-      preference.setString(
-        preference.Preference.subject,
-        detailed["data"]["ZYDM_DISPLAY"],
-      );
-      preference.setString(
-        preference.Preference.dorm,
-        detailed["data"]["ZSDZ"],
-      );
-    }
-
-    log.info(
-      "[ehall_session][getInformation] "
-      "Get the semester information.",
-    );
-    String get = await useApp("4770397878132218");
-    await dioEhall.post(get);
-    String semesterCode = await dioEhall
-        .post(
-          "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-        )
-        .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    preference.setString(
-      preference.Preference.currentSemester,
-      semesterCode,
-    );
-
-    log.info(
-      "[ehall_session][getInformation] "
-      "Get the day the semester begin.",
-    );
-    String termStartDay = await dioEhall.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-      data: {
-        'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
-        'XQ': semesterCode.split('-')[2]
-      },
-    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    preference.setString(
-      preference.Preference.currentStartDay,
-      termStartDay,
-    );
   }
 }
 

@@ -49,11 +49,12 @@ class ExamDetailCard extends StatelessWidget {
                   str: subject.place,
                   infoColor: infoColor,
                 ).flexible(),
-                CustomListTile(
-                  icon: Icons.chair,
-                  str: subject.seat.toString(),
-                  infoColor: infoColor,
-                ).flexible(),
+                if (subject.seat != null)
+                  CustomListTile(
+                    icon: Icons.chair,
+                    str: subject.seat.toString(),
+                    infoColor: infoColor,
+                  ).flexible(),
               ].toRow(),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,

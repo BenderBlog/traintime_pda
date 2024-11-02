@@ -37,7 +37,7 @@ class DeveloperWidget extends StatelessWidget {
         minLeadingWidth: 0,
         contentPadding: EdgeInsets.zero,
         leading: CachedNetworkImage(
-          fit: BoxFit.fill,
+          fit: BoxFit.fitHeight,
           imageUrl: developer.imageUrl,
         ).clipOval().constrained(
               width: 48,
