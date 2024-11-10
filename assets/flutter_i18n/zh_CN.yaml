@@ -75,7 +75,7 @@ classtable:
             message: "确定要清除共享课表吗？"
             success_message: "删除共享课表成功"
     page_title: "我的日程表"
-    partner_page_title: "搭子的日程表"
+    partner_page_title: "{partner_name}的日程表"
     popup_menu:
         not_arranged: "查看未安排课程信息"
         class_changed: "查看课程安排调整信息"
@@ -89,18 +89,18 @@ classtable:
         empty_message: "目前没有调课信息"
         teacher_change: "从{previous_teacher}变为{new_teacher}"
         no_teacher_change: "教师信息没有改变"
-        1: "一"
-        2: "二"
-        3: "三"
-        4: "四"
-        5: "五"
-        6: "六"
-        7: "日"
+        "1": "一"
+        "2": "二"
+        "3": "三"
+        "4": "四"
+        "5": "五"
+        "6": "六"
+        "7": "日"
         change_class_message: 调课信息，从第{originalAffectedWeeks}周
             星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
             调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的
             {newClassRangeStart}-{newClassRangeStop}节，{newClassroom}教室上课
-        patch_class_message: 补课信息，从第{newAffectedWeeksListStr}周
+        patch_class_message: 补课信息，第{newAffectedWeeksListStr}周
             星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，
             {newClassroom}补课
         stop_class_message: 停课信息，第{originalAffectedWeeks}周
@@ -474,22 +474,26 @@ setting:
         bellssgit: "支持：最佳&最久故障反馈者"
         brackrat: "设计：主页，登录页，配色，iOS 小部件等"
         breezeline: "支持：无价值无意义的产品经理(他自己的描述)"
-        cafebabe: “支持：提供彩蛋代码"
+        cafebabe: "支持：提供彩蛋代码"
         chitao1234: "开发：修复滑块不对齐问题"
-        dimole: "支持：辅助修复滑块问题"
+        dimole: "开发支持：辅助修复滑块问题"
         elitewars: "设计：体育成绩页面"
+        elliot: "开发指导：情侣课表功能开发指导"
         godhu777777: "支持：繁体中文转换代码和彩蛋代码"
         hancl777: "支持：繁体中文转换代码"
-        hhzm: "支持：提供彩蛋代码"
-        lsy223622: "设计：iOS 图标"
+        hhzm: "开发：电费查询账号计算"
+        lhx-666-cool: "支持：Windows 和 Linux 构建脚本"
+        lsy223622: "设计：iOS 和 Android 图标 / 支持：冠名 XDYou"
         nancunchild: "开发：图书馆搜索功能"
         pairman: "开发：成绩缓存功能和优化滑块算法"
-        reverierxu: "设计：用于信息展示的 ReX 卡片"
-        ray: "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表"
+        reverierxu: "设计：用于信息展示的 ReX 卡片 / 开发支持：研究生课表"
+        rrrilac: "开发支持：电费查询"
+        ray: "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表 / 开发指导：情侣课表功能开发指导"
         shadowyingyi: "支持：两次鸽子公众号宣传"
         stalomeow: "设计：首页时间轴 / 开发：异步登录"
         xeonds: "设计：设置页面 / 开发：XDU Planet"
         xiue233: "开发：Android 小部件和拼接"
+        wirsbf: "开发：修复调课未按预期进行"
         zcwzy: "开发：修复丁香电费 / 支持：研究生版本开发"
         homepage: "主页"
         code: "开源代码"

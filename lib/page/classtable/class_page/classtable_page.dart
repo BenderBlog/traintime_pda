@@ -280,9 +280,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
           appBar: AppBar(
             title: Text(classTableState.isPartner
                 ? FlutterI18n.translate(
-                    context,
-                    "classtable.partner_page_title",
-                  )
+                    context, "classtable.partner_page_title",
+                    translationParams: {
+                        "partner_name": classTableState.partnerName ?? "Sweetie"
+                      })
                 : FlutterI18n.translate(
                     context,
                     "classtable.page_title",

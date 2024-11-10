@@ -95,6 +95,15 @@ class _AboutPageState extends State<AboutPage> {
           "https://space.bilibili.com/49892391/",
         ),
         Developer(
+          "Elliot",
+          "https://img.moegirl.org.cn/common/thumb/6/64/Hirasawa_yui_1.jpg/800px-Hirasawa_yui_1.jpg",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.elliot",
+          ),
+          "https://www.bilibili.com/bangumi/play/ss1172/",
+        ),
+        Developer(
           "GodHu777777",
           "https://avatars.githubusercontent.com/u/111997394",
           FlutterI18n.translate(
@@ -120,6 +129,15 @@ class _AboutPageState extends State<AboutPage> {
             "setting.about_page.hhzm",
           ),
           "https://hhzm.win/",
+        ),
+        Developer(
+          "lhx-666-cool",
+          "https://avatars.githubusercontent.com/u/63273792",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.lhx-666-cool",
+          ),
+          "https://github.com/lhx-666-cool/",
         ),
         Developer(
           "lsy223622 (木生睡不着)",
@@ -156,6 +174,15 @@ class _AboutPageState extends State<AboutPage> {
             "setting.about_page.reverierxu",
           ),
           "https://blog.woooo.tech/",
+        ),
+        Developer(
+          "Rrrilac",
+          "https://avatars.githubusercontent.com/u/128341096",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.rrrilac",
+          ),
+          "https://github.com/Rrrilac",
         ),
         Developer(
           "Ray (Elliot Edition)",
@@ -195,10 +222,19 @@ class _AboutPageState extends State<AboutPage> {
         ),
         Developer(
           "Xiue233",
-          "https://xiue233.github.io/images/avatar.png",
+          "https://avatars.githubusercontent.com/u/30972246",
           FlutterI18n.translate(
             context,
             "setting.about_page.xiue233",
+          ),
+          "https://xiue233.github.io/",
+        ),
+        Developer(
+          "wirsbf",
+          "https://avatars.githubusercontent.com/u/144008530",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.wirsbf",
           ),
           "https://xiue233.github.io/",
         ),

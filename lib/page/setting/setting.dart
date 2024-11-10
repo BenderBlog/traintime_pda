@@ -37,7 +37,6 @@ import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
-import 'package:watermeter/themes/demo_blue.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -121,87 +120,86 @@ class _SettingWindowState extends State<SettingWindow> {
           ReXCard(
               title: _buildListSubtitle('关于'),
               remaining: const [],
-              bottomRow: Column(
-                children: [
-                  ListTile(
-                    title: const Text("关于本程序"),
-                    subtitle: Text(
-                        '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
-                    onTap: () => context.pushReplacement(const AboutPage()),
-                    trailing: const Icon(Icons.navigate_next),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: const Text("检查软件更新"),
-                    subtitle: Obx(
-                      () => Text(
-                        '最新版本: ${updateMessage.value?.code ?? "等待获取"}',
-                      ),
+              bottomRow: Column(children: [
+                ListTile(
+                  title: const Text("关于本程序"),
+                  subtitle: Text(
+                      '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
+                  onTap: () => context.pushReplacement(const AboutPage()),
+                  trailing: const Icon(Icons.navigate_next),
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text("检查软件更新"),
+                  subtitle: Obx(
+                    () => Text(
+                      '最新版本: ${updateMessage.value?.code ?? "等待获取"}',
                     ),
-                    onTap: () {
-                      ProgressDialog pd = ProgressDialog(context: context);
-                      pd.show(msg: '正在获取更新信息');
-                      checkUpdate().then((value) async {
-                        pd.close();
-                        if (context.mounted) {
-                          if (value && updateMessage.value != null) {
-                            await showDialog(
-                              context: context,
-                              builder: (context) => Obx(
-                                () => UpdateDialog(
-                                  updateMessage: updateMessage.value!,
-                                ),
+                  ),
+                  onTap: () {
+                    ProgressDialog pd = ProgressDialog(context: context);
+                    pd.show(msg: '正在获取更新信息');
+                    checkUpdate().then((value) async {
+                      pd.close();
+                      if (context.mounted) {
+                        if (value && updateMessage.value != null) {
+                          await showDialog(
+                            context: context,
+                            builder: (context) => Obx(
+                              () => UpdateDialog(
+                                updateMessage: updateMessage.value!,
                               ),
-                            );
-                          } else {
-                            showToast(
-                              context: context,
-                              msg: "目前您运行的是最新稳定版",
-                            );
-                          }
-                        }
-                      }, onError: (e, s) {
-                        pd.close();
-                        if (context.mounted) {
+                            ),
+                          );
+                        } else {
                           showToast(
                             context: context,
-                            msg: "获取更新信息失败",
+                            msg: "目前您运行的是最新稳定版",
                           );
                         }
+                      }
+                    }, onError: (e, s) {
+                      pd.close();
+                      if (context.mounted) {
+                        showToast(
+                          context: context,
+                          msg: "获取更新信息失败",
+                        );
+                      }
+                    });
+                  },
+                  trailing: const Icon(Icons.navigate_next),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.simplify_timeline",
+                  )),
+                  subtitle: Text(FlutterI18n.translate(
+                    context,
+                    "setting.simplify_timeline_description",
+                  )),
+                  trailing: Switch(
+                    value: preference
+                        .getBool(preference.Preference.simplifiedClassTimeline),
+                    onChanged: (bool value) {
+                      setState(() {
+                        preference
+                            .setBool(
+                              preference.Preference.simplifiedClassTimeline,
+                              value,
+                            )
+                            .then(
+                              (value) =>
+                                  ClassTableCard.reloadSettingsFromPref(),
+                            );
                       });
                     },
-                    trailing: const Icon(Icons.navigate_next),
                   ),
-                  const Divider(),
-                  ListTile(
-                    title: Text(FlutterI18n.translate(
-                      context,
-                      "setting.simplify_timeline",
-                    )),
-                    subtitle: Text(FlutterI18n.translate(
-                      context,
-                      "setting.simplify_timeline_description",
-                    )),
-                    trailing: Switch(
-                      value: preference.getBool(
-                          preference.Preference.simplifiedClassTimeline),
-                      onChanged: (bool value) {
-                        setState(() {
-                          preference
-                              .setBool(
-                                preference.Preference.simplifiedClassTimeline,
-                                value,
-                              )
-                              .then(
-                                (value) =>
-                                    ClassTableCard.reloadSettingsFromPref(),
-                              );
-                        });
-                      },
-                    ),
-                  ),
-                ])),
-            ReXCard(
+                ),
+              ])),
+          ReXCard(
               title: _buildListSubtitle(FlutterI18n.translate(
                 context,
                 "setting.account_setting",
@@ -509,6 +507,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                 "No cookies.",
                               );
                             }
+
                             /// Clean cache.
                             _removeCache();
                             if (context.mounted) {
@@ -567,19 +566,19 @@ class _SettingWindowState extends State<SettingWindow> {
                             ThemeController toChange =
                                 Get.put(ThemeController());
                             toChange.onUpdate();
-                              /// Restart app
-                              if (mounted) {
-                                pd.close();
-                                Restart.restartApp();
-                              }
-                            },
-                            child: Text(FlutterI18n.translate(
-                              context,
-                              "confirm",
-                            )),
-                          ),
-                        ],
-                      ),
+
+                            /// Restart app
+                            if (mounted) {
+                              pd.close();
+                              Restart.restartApp();
+                            }
+                          },
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "confirm",
+                          )),
+                        ),
+                      ],
                     ),
                   ),
                 ),

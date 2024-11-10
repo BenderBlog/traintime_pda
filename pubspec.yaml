@@ -113,5 +113,5 @@ flutter:
     - assets/Icon-App-iTunes-Background.png
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
-    - assets/flutter_i18n/zh_SG.json
+#    - assets/flutter_i18n/zh_SG.json
 

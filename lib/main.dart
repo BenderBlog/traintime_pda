@@ -107,9 +107,9 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: [
           FlutterI18nDelegate(
             translationLoader: FileTranslationLoader(
-              fallbackFile: "zh_CN",
+              fallbackFile: "zh_TW",
               useCountryCode: true,
-              forcedLocale: const Locale('zh_CN'),
+              forcedLocale: const Locale('zh_TW'),
             ),
             missingTranslationHandler: (key, locale) {
               log.info(
@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('zh', 'TW'),
           Locale('zh', 'CN'),
-          Locale('zh', 'SG'), // CFBB Lang Alternative
+          //Locale('zh', 'SG'), // CFBB Lang Alternative
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
