@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -24,7 +25,11 @@ class ClassTableDateRow extends StatelessWidget {
       color: Colors.grey.shade200.withOpacity(0.75),
       child: Row(children: [
         Text(
-          "${dateList.first.month}\n月",
+          FlutterI18n.translate(
+            context,
+            "classtable.month",
+            translationParams: {"month": dateList.first.month.toString()},
+          ),
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 14,

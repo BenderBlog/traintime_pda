@@ -412,7 +412,10 @@ class _ClassTablePageState extends State<ClassTablePage> {
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(context).pop(),
-                                  child: const Text("确定"),
+                                  child: Text(FlutterI18n.translate(
+                                    context,
+                                    "confirm",
+                                  )),
                                 )
                               ],
                             ),
@@ -430,21 +433,33 @@ class _ClassTablePageState extends State<ClassTablePage> {
                               sweetheartName = await showDialog<String>(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                            title: const Text('输入对方显示该课表的名称'),
+                                            title: Text(FlutterI18n.translate(
+                                              context,
+                                              "classtable.partner_classtable.name_dialog.title",
+                                            )),
                                             content: TextField(
                                               autofocus: true,
                                               controller: controller,
                                               keyboardType:
                                                   TextInputType.number,
                                               maxLines: 1,
-                                              decoration: const InputDecoration(
-                                                hintText: "在此输入，否则为 Sweetie",
-                                                border: OutlineInputBorder(),
+                                              decoration: InputDecoration(
+                                                hintText: FlutterI18n.translate(
+                                                  context,
+                                                  "classtable.partner_classtable.name_dialog.hint",
+                                                ),
+                                                border:
+                                                    const OutlineInputBorder(),
                                               ),
                                             ),
                                             actions: <Widget>[
                                               TextButton(
-                                                child: const Text('我就这一个甜心'),
+                                                child: Text(
+                                                  FlutterI18n.translate(
+                                                    context,
+                                                    "classtable.partner_classtable.name_dialog.cancel",
+                                                  ),
+                                                ),
                                                 onPressed: () async {
                                                   Navigator.of(context).pop(
                                                     null,
@@ -452,12 +467,21 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                                 },
                                               ),
                                               TextButton(
-                                                child: const Text('提交'),
+                                                child: Text(
+                                                  FlutterI18n.translate(
+                                                    context,
+                                                    "classtable.partner_classtable.name_dialog.accept",
+                                                  ),
+                                                ),
                                                 onPressed: () async {
                                                   if (controller.text.isEmpty) {
                                                     showToast(
                                                       context: context,
-                                                      msg: "输入空白!",
+                                                      msg:
+                                                          FlutterI18n.translate(
+                                                        context,
+                                                        "classtable.partner_classtable.name_dialog.blank_input",
+                                                      ),
                                                     );
                                                   } else {
                                                     Navigator.of(context).pop(
@@ -474,12 +498,16 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                 fileName += "-$sweetheartName.erc";
                               }
                             }
-                            if (Platform.isLinux ||
-                                Platform.isMacOS ||
-                                Platform.isWindows) {
+                            if ((Platform.isLinux ||
+                                    Platform.isMacOS ||
+                                    Platform.isWindows) &&
+                                context.mounted) {
                               String? resultFilePath =
                                   await FilePicker.platform.saveFile(
-                                dialogTitle: "保存日历文件到...",
+                                dialogTitle: FlutterI18n.translate(
+                                  context,
+                                  "classtable.partner_classtable.save_dialog.title",
+                                ),
                                 fileName: fileName,
                                 allowedExtensions: [
                                   if (action == 'D') "ics" else "erc"

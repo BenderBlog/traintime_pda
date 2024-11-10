@@ -40,5 +40,3 @@ String getWeekString(BuildContext context, int index) {
     "classtable.weekday.${weekList[index]}",
   );
 }
-
-String pageTitle = "我的日程表";

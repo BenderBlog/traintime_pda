@@ -45,7 +45,11 @@ class NotArrangedClassList extends StatelessWidget {
                   translationParams: {
                     "classCode": notArranged[index].code ?? "",
                     "classNumber": notArranged[index].number ?? "",
-                    "teacher": notArranged[index].teacher ?? "没有数据",
+                    "teacher": notArranged[index].teacher ??
+                        FlutterI18n.translate(
+                          context,
+                          "no_info",
+                        ),
                   },
                 ),
               ),

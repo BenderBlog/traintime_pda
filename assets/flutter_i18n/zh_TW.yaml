@@ -31,6 +31,7 @@ login_process:
   slider: 滑塊驗證
   after_process: 登入後處理
   failed: 登入失敗，響應狀態碼：{statusCode}
+no_info: 沒有資訊
 catcher_detected: 發生錯誤
 catcher_description: 詳情如下
 classtable:
@@ -57,8 +58,14 @@ classtable:
       failure_message: 檔案建立失敗，儲存取消
     delete_dialog:
       title: 確認對話方塊
-      message: 確定要清除共享課表嗎？
-      success_message: 刪除共享課表成功
+      message: 確定要清除搭子課表嗎？
+      success_message: 刪除搭子課表成功
+    name_dialog:
+      title: 輸入對方顯示該課表的名稱
+      hint: 在此輸入，否則為 Sweetie
+      cancel: 我就這一個甜心
+      accept: 提交
+      blank_input: 輸入空白!
   page_title: 我的日程表
   partner_page_title: '{partner_name}的日程表'
   popup_menu:
@@ -72,7 +79,7 @@ classtable:
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課資訊
-    teacher_change: 從{previous_teacher}變為{new_teacher}
+    teacher_change: 教師變更：從{previous_teacher}變為{new_teacher}
     no_teacher_change: 教師資訊沒有改變
     '1': 一
     '2': 二
@@ -102,6 +109,9 @@ classtable:
   week_title: 第{week}周
   noon_break: 午休
   supper_break: 晚休
+  month: '{month}
+
+    月'
   class_card:
     title: 日程資訊
     unknown_classroom: 未知教室

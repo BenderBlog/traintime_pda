@@ -192,11 +192,17 @@ class ClassDetailCard extends StatelessWidget {
                                   ),
                                   onPressed: () =>
                                       Navigator.pop(context, false),
-                                  child: const Text('取消'),
+                                  child: Text(FlutterI18n.translate(
+                                    context,
+                                    "cancel",
+                                  )),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('确定'),
+                                  child: Text(FlutterI18n.translate(
+                                    context,
+                                    "confirm",
+                                  )),
                                 ),
                               ],
                             ),

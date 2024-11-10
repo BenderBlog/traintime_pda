@@ -51,7 +51,8 @@ class ClassChangeList extends StatelessWidget {
                       context, "classtable.class_change_page.teacher_change",
                       translationParams: {
                         "previous_teacher":
-                            classChanges[index].originalTeacher ?? "没有信息",
+                            classChanges[index].originalTeacher ??
+                                FlutterI18n.translate(context, "no_info"),
                         "new_teacher": classChanges[index].originalNewTeacher!,
                       });
                 } else {
@@ -144,7 +145,7 @@ class ClassChangeList extends StatelessWidget {
                         "classChange": classChange,
                         "teacherChange":
                             classChanges[index].type == ChangeType.change
-                                ? "老师变更: $teacherChange"
+                                ? teacherChange
                                 : "",
                       }),
                 ),

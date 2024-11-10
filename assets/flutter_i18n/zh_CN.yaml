@@ -43,6 +43,8 @@ login_process:
     failed: "登录失败，响应状态码：{statusCode}"
 # TODO: ehall_exam_session data
 
+no_info: "没有信息"
+
 # main.dart 里面 Catcher 插件字符串
 catcher_detected: "发生错误"
 catcher_description: "详情如下"
@@ -72,8 +74,14 @@ classtable:
             failure_message: "文件创建失败，保存取消"
         delete_dialog:
             title: "确认对话框"
-            message: "确定要清除共享课表吗？"
-            success_message: "删除共享课表成功"
+            message: "确定要清除搭子课表吗？"
+            success_message: "删除搭子课表成功"
+        name_dialog:
+            title: "输入对方显示该课表的名称"
+            hint: "在此输入，否则为 Sweetie"
+            cancel: "我就这一个甜心"
+            accept: "提交"
+            blank_input: "输入空白!"
     page_title: "我的日程表"
     partner_page_title: "{partner_name}的日程表"
     popup_menu:
@@ -87,7 +95,7 @@ classtable:
     class_change_page:
         title: "课程调整"
         empty_message: "目前没有调课信息"
-        teacher_change: "从{previous_teacher}变为{new_teacher}"
+        teacher_change: "教师变更：从{previous_teacher}变为{new_teacher}"
         no_teacher_change: "教师信息没有改变"
         "1": "一"
         "2": "二"
@@ -115,6 +123,7 @@ classtable:
     week_title: "第{week}周"
     noon_break: "午休"
     supper_break: "晚休"
+    month: "{month}\n月"
     class_card:
         title: "日程信息"
         unknown_classroom: "未知教室"
