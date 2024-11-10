@@ -10,7 +10,8 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
+import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class EmptyClassroomSearchWindow extends StatefulWidget {
   final List<EmptyClassroomPlace> places;
@@ -35,6 +36,8 @@ class _EmptyClassroomSearchWindowState
   late DateTime time;
 
   SessionState state = SessionState.none;
+  String semesterCode =
+      preference.getString(preference.Preference.currentSemester);
 
   List<EmptyClassroomData> get data {
     List<EmptyClassroomData> toReturn = [];
@@ -48,9 +51,11 @@ class _EmptyClassroomSearchWindowState
     try {
       state = SessionState.fetching;
       fetchedData.clear();
-      fetchedData.addAll(await JiaowuServiceSession().searchEmptyClassroomData(
+      fetchedData.addAll(await EmptyClassroomSession().searchData(
         buildingCode: chosen.code,
         date: Jiffy.parseFromDateTime(time).format(pattern: "yyyy-MM-dd"),
+        semesterRange: semesterCode.substring(0, 9),
+        semesterPart: semesterCode[semesterCode.length - 1],
       ));
       state = SessionState.fetched;
     } catch (e) {

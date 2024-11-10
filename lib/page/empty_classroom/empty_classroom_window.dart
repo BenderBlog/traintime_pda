@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_search_window.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/repository/xidian_ids/jiaowu_service_session.dart';
+import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
 
 class EmptyClassroomWindow extends StatefulWidget {
   const EmptyClassroomWindow({super.key});
@@ -22,7 +22,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   @override
   void initState() {
     super.initState();
-    places = JiaowuServiceSession().getBuildingList();
+    places = EmptyClassroomSession().getBuildingList();
   }
 
   @override
@@ -44,7 +44,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
               return ReloadWidget(
                 errorStatus: snapshot.error,
                 function: () => setState(() {
-                  places = JiaowuServiceSession().getBuildingList();
+                  places = EmptyClassroomSession().getBuildingList();
                 }),
               );
             } else {

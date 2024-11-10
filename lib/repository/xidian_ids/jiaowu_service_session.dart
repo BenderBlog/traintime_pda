@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Super class contains Score, Exam and empty classroom.
-
+// Unstable API so comment off...
+/*
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -271,3 +272,4 @@ class GetExamFailedException implements Exception {
   @override
   String toString() => msg;
 }
+*/
