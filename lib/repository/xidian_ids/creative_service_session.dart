@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Creative School Service Session, related to Jichuang Studio
-
+// Remove the useless func, but session will be saved...
+/*
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -106,3 +107,4 @@ class NotFetchJobException implements Exception {
   @override
   String toString() => msg;
 }
+*/

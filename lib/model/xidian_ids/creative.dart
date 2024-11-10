@@ -1,6 +1,9 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// Creative School Service Response Model, related to Jichuang Studio
+// Remove the useless func, but model will be saved...
+/*
 import 'package:json_annotation/json_annotation.dart';
 
 part 'creative.g.dart';
@@ -121,3 +124,4 @@ const skill = {
     "其他",
   ],
 };
+*/
