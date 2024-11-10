@@ -80,10 +80,33 @@ class _EmptyClassroomSearchWindowState
     super.didChangeDependencies();
   }
 
-  Widget getIcon(bool isUsed) => Icon(
-        Icons.flag,
-        color: isUsed ? Colors.red : Colors.transparent,
-      ).center();
+  Widget getIcon(bool isUsed, {int? index}) => Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: isUsed
+              ? Colors.transparent
+              : Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: index != null
+            ? Text(
+                index.toString(),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isUsed
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onPrimary,
+                ),
+              ).center()
+            : null,
+      ).decorated(
+        border: Border.all(
+          width: 2,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        borderRadius: BorderRadius.circular(6),
+      );
 
   void chooseBuilding() => showDialog(
         context: context,
@@ -118,83 +141,99 @@ class _EmptyClassroomSearchWindowState
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Wrap(
-          alignment: WrapAlignment.start,
-          children: [
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: colorScheme.secondaryContainer,
-              ),
-              onPressed: () async {
-                await showCalendarDatePicker2Dialog(
-                  context: context,
-                  config: CalendarDatePicker2WithActionButtonsConfig(
-                    calendarType: CalendarDatePicker2Type.single,
-                    selectedDayHighlightColor: colorScheme.primary,
-                  ),
-                  dialogSize: const Size(325, 400),
-                  value: [time],
-                  borderRadius: BorderRadius.circular(14),
-                ).then((value) {
-                  if (value?.length == 1 && value?[0] != null) {
-                    setState(() {
-                      time = value![0]!;
-                      updateData();
-                    });
-                  }
-                });
-              },
-              child: Text(FlutterI18n.translate(
+        [
+          TextField(
+            controller: text,
+            autofocus: false,
+            style: const TextStyle(fontSize: 14),
+            decoration: InputDecoration(
+              hintText: FlutterI18n.translate(
                 context,
-                "empty_classroom.date",
-                translationParams: {
-                  "date": Jiffy.parseFromDateTime(time)
-                      .format(pattern: "yyyy-MM-dd")
+                "empty_classroom.search_hint",
+              ),
+              isDense: false,
+              contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+              prefixIcon: const Icon(Icons.search),
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+            ),
+            onSubmitted: (String text) => setState(() {}),
+          ).padding(bottom: 8),
+          [
+            [
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: colorScheme.secondaryContainer,
+                ),
+                onPressed: () async {
+                  await showCalendarDatePicker2Dialog(
+                    context: context,
+                    config: CalendarDatePicker2WithActionButtonsConfig(
+                      calendarType: CalendarDatePicker2Type.single,
+                      selectedDayHighlightColor: colorScheme.primary,
+                    ),
+                    dialogSize: const Size(325, 400),
+                    value: [time],
+                    borderRadius: BorderRadius.circular(14),
+                  ).then((value) {
+                    if (value?.length == 1 && value?[0] != null) {
+                      setState(() {
+                        time = value![0]!;
+                        updateData();
+                      });
+                    }
+                  });
                 },
-              )),
-            ).padding(right: 8),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: colorScheme.secondaryContainer,
-              ),
-              onPressed: () {
-                setState(() {
-                  text.clear();
-                });
-                chooseBuilding();
-              },
-              child: Text(FlutterI18n.translate(
-                context,
-                "empty_classroom.building",
-                translationParams: {"building": chosen.name},
-              )),
-            ),
-            TextField(
-              controller: text,
-              autofocus: false,
-              style: const TextStyle(fontSize: 14),
-              decoration: InputDecoration(
-                isDense: true,
-                fillColor: Colors.grey.withOpacity(0.2),
-                filled: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                hintText: FlutterI18n.translate(
+                child: Text(FlutterI18n.translate(
                   context,
-                  "empty_classroom.search_hint",
+                  "empty_classroom.date",
+                  translationParams: {
+                    "date": Jiffy.parseFromDateTime(time)
+                        .format(pattern: "yyyy-MM-dd")
+                  },
+                )),
+              ).padding(right: 8),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: colorScheme.secondaryContainer,
                 ),
-                hintStyle: const TextStyle(fontSize: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  borderSide: BorderSide.none,
-                ),
+                onPressed: () {
+                  setState(() {
+                    text.clear();
+                  });
+                  chooseBuilding();
+                },
+                child: Text(FlutterI18n.translate(
+                  context,
+                  "empty_classroom.building",
+                  translationParams: {"building": chosen.name},
+                )),
               ),
-              onSubmitted: (String text) => setState(() {}),
-            ),
-          ],
-        ).padding(horizontal: 14, top: 8, bottom: 6).constrained(maxWidth: 480),
+            ].toRow(),
+            [
+              [
+                getIcon(true),
+                const SizedBox(width: 4.0),
+                Text(FlutterI18n.translate(
+                  context,
+                  "empty_classroom.occupied",
+                )),
+              ].toRow().padding(right: 8.0),
+              [
+                getIcon(false),
+                const SizedBox(width: 4.0),
+                Text(FlutterI18n.translate(
+                  context,
+                  "empty_classroom.empty",
+                )),
+              ].toRow(),
+            ].toRow(),
+          ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
+        ]
+            .toColumn()
+            .padding(horizontal: 14, top: 8, bottom: 6)
+            .constrained(maxWidth: 480),
         if (state == SessionState.fetching)
           const CircularProgressIndicator().center().expanded()
         else if (state == SessionState.error)
@@ -205,38 +244,28 @@ class _EmptyClassroomSearchWindowState
           ).expanded()
         else
           DataTable2(
+            dividerThickness: 0,
             columnSpacing: 0,
             horizontalMargin: 6,
+            headingRowHeight: 0,
             columns: [
               DataColumn2(
-                label: Center(
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "empty_classroom.classroom",
-                    ),
-                  ),
-                ),
-                size: ColumnSize.L,
-              ),
-              const DataColumn2(
-                label: Center(child: Text('1-2')),
+                label: Text(FlutterI18n.translate(
+                  context,
+                  "empty_classroom.classroom",
+                )).center(),
                 size: ColumnSize.S,
               ),
-              const DataColumn2(
-                label: Center(child: Text('3-4')),
-                size: ColumnSize.S,
+              DataColumn2(
+                label: const Text('1-4').center(),
+                size: ColumnSize.M,
               ),
-              const DataColumn2(
-                label: Center(child: Text('5-6')),
-                size: ColumnSize.S,
+              DataColumn2(
+                label: const Text('5-8').center(),
+                size: ColumnSize.M,
               ),
-              const DataColumn2(
-                label: Center(child: Text('7-8')),
-                size: ColumnSize.S,
-              ),
-              const DataColumn2(
-                label: Center(child: Text('9-10')),
+              DataColumn2(
+                label: const Text('9-10').center(),
                 size: ColumnSize.S,
               ),
             ],
@@ -244,29 +273,34 @@ class _EmptyClassroomSearchWindowState
               data.length,
               (index) => DataRow(
                 cells: [
-                  DataCell(
-                    Center(
-                      child: Text(
-                        data[index].name,
-                        textAlign: TextAlign.center,
-                      ),
+                  DataCell(Text(
+                    data[index].name,
+                    textAlign: TextAlign.center,
+                  ).center()),
+                  DataCell(Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 4.0,
+                    children: List.generate(
+                      4,
+                      (i) => getIcon(data[index].isUsed[i], index: i + 1),
                     ),
-                  ),
-                  DataCell(
-                    getIcon(data[index].isUsed1To2),
-                  ),
-                  DataCell(
-                    getIcon(data[index].isUsed3To4),
-                  ),
-                  DataCell(
-                    getIcon(data[index].isUsed5To6),
-                  ),
-                  DataCell(
-                    getIcon(data[index].isUsed7To8),
-                  ),
-                  DataCell(
-                    getIcon(data[index].isUsed9To10),
-                  ),
+                  ).center()),
+                  DataCell(Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 4.0,
+                    children: List.generate(
+                      4,
+                      (i) => getIcon(data[index].isUsed[i + 4], index: i + 5),
+                    ),
+                  ).center()),
+                  DataCell(Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 4.0,
+                    children: List.generate(
+                      2,
+                      (i) => getIcon(data[index].isUsed[i + 8], index: i + 9),
+                    ),
+                  ).center()),
                 ],
               ),
             ),

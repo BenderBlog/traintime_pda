@@ -51,8 +51,8 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> smallFunction = [
     const ScoreCard(),
     const ExamCard(),
+    const EmptyClassroomCard(),
     if (prefs.getBool(prefs.Preference.role) == false) ...[
-      const EmptyClassroomCard(),
       const ExperimentCard(),
       const SportCard(),
     ],

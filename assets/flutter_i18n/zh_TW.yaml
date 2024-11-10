@@ -161,6 +161,8 @@ empty_classroom:
   building: 教學樓 {building}
   search_hint: 教室名稱或者教室程式碼
   classroom: 教室
+  empty: 空閒
+  occupied: 佔用
 exam:
   title: 考試安排
   cache_hint: 已顯示快取考試安排資訊

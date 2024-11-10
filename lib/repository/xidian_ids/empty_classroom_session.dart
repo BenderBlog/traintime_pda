@@ -111,16 +111,11 @@ class EmptyClassroomSession extends EhallSession {
           EmptyClassroomData(
             name:
                 i["JASMC"].toString().replaceAll('(', "\n").replaceAll(')', ""),
-            isUsed1To2: i["JC1"].toString().contains("1_") ||
-                i["JC2"].toString().contains("1_"),
-            isUsed3To4: i["JC3"].toString().contains("1_") ||
-                i["JC4"].toString().contains("1_"),
-            isUsed5To6: i["JC5"].toString().contains("1_") ||
-                i["JC6"].toString().contains("1_"),
-            isUsed7To8: i["JC7"].toString().contains("1_") ||
-                i["JC8"].toString().contains("1_"),
-            isUsed9To10: i["JC9"].toString().contains("1_") ||
-                i["JC10"].toString().contains("1_"),
+            isUsed: List.generate(
+              10,
+              (index) => i["JC$index"].toString().contains("1_"),
+              growable: false,
+            ),
           ),
         );
       }

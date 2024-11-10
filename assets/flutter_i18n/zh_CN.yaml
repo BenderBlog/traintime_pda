@@ -177,6 +177,8 @@ empty_classroom:
     building: "教学楼 {building}"
     search_hint: "教室名称或者教室代码"
     classroom: "教室"
+    empty: "空闲"
+    occupied: "占用"
 
 # 考试信息
 exam:
