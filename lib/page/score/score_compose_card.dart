@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 
-class ScoreComposeCard extends StatefulWidget {
+class ScoreComposeCard extends StatelessWidget {
   final Score score;
   final Future<List<ComposeDetail>> detail;
   const ScoreComposeCard({
@@ -17,19 +18,23 @@ class ScoreComposeCard extends StatefulWidget {
   });
 
   @override
-  State<ScoreComposeCard> createState() => _ScoreComposeCardState();
-}
-
-class _ScoreComposeCardState extends State<ScoreComposeCard> {
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ComposeDetail>>(
-      future: widget.detail,
+      future: detail,
       builder: (context, snapshot) {
         late Widget info;
         if (snapshot.hasData) {
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            info = const InfoDetailBox(child: Center(child: Text("未提供详情信息")));
+            info = InfoDetailBox(
+              child: Center(
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "score.score_compose_card.no_detail",
+                  ),
+                ),
+              ),
+            );
           } else {
             TableRow scoreDetail(ComposeDetail i) {
               return TableRow(
@@ -63,26 +68,53 @@ class _ScoreComposeCardState extends State<ScoreComposeCard> {
             );
           }
         } else if (snapshot.hasError) {
-          info = const InfoDetailBox(child: Center(child: Text("未获取详情信息")));
+          info = InfoDetailBox(
+            child: Center(
+              child: Text(
+                FlutterI18n.translate(
+                  context,
+                  "score.score_compose_card.no_detail",
+                ),
+              ),
+            ),
+          );
         } else {
-          info = const InfoDetailBox(child: Center(child: Text("正在获取")));
+          info = InfoDetailBox(
+            child: Center(
+              child: Text(
+                FlutterI18n.translate(
+                  context,
+                  "score.score_compose_card.fetching",
+                ),
+              ),
+            ),
+          );
         }
         return ListView(
           physics: const NeverScrollableScrollPhysics(),
           children: [
             ReXCard(
-              title: Text(widget.score.name),
-              remaining: [ReXCardRemaining(widget.score.semesterCode)],
+              title: Text(score.name),
+              remaining: [ReXCardRemaining(score.semesterCode)],
               bottomRow: [
                 [
                   Text(
-                    "学分: ${widget.score.credit}",
+                    "${FlutterI18n.translate(
+                      context,
+                      "score.score_compose_card.credit",
+                    )}: ${score.credit}",
                   ).expanded(flex: 2),
                   Text(
-                    "GPA: ${widget.score.gpa}",
+                    "${FlutterI18n.translate(
+                      context,
+                      "score.score_compose_card.gpa",
+                    )}: ${score.gpa}",
                   ).expanded(flex: 3),
                   Text(
-                    "成绩: ${widget.score.scoreStr}",
+                    "${FlutterI18n.translate(
+                      context,
+                      "score.score_compose_card.score",
+                    )}: ${score.scoreStr}",
                   ).expanded(flex: 3),
                 ].toRow(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

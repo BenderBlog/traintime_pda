@@ -4,6 +4,7 @@
 // Score Window
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -59,7 +60,10 @@ class _ScoreWindowState extends State<ScoreWindow> {
             if (ScoreSession.isScoreListCacheUsed) {
               showToast(
                 context: context,
-                msg: "已显示缓存成绩信息",
+                msg: FlutterI18n.translate(
+                  context,
+                  "score.cache_message",
+                ),
               );
             }
             return ScoreState.init(
@@ -77,7 +81,14 @@ class _ScoreWindowState extends State<ScoreWindow> {
           );
         }
         return Scaffold(
-          appBar: AppBar(title: const Text("成绩查询")),
+          appBar: AppBar(
+            title: Text(
+              FlutterI18n.translate(
+                context,
+                "score.title",
+              ),
+            ),
+          ),
           body: body,
         );
       },

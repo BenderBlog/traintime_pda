@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -64,7 +65,10 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         } else if (!getBool(Preference.role)) {
           BothSideSheet.show(
             context: context,
-            title: "成绩详情",
+            title: FlutterI18n.translate(
+              context,
+              "score.score_info_card.title",
+            ),
             child: ScoreComposeCard(
               score: c.scoreTable[widget.mark],
               detail: ScoreSession().getDetail(
@@ -79,40 +83,48 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
         child: ReXCard(
-          opacity: cardOpacity,
-          title: Text.rich(TextSpan(children: [
-            if (c.scoreTable[widget.mark].scoreStatus != "初修")
-              TextSpan(text: "${c.scoreTable[widget.mark].scoreStatus} "),
-            if (c.scoreTable[widget.mark].isPassed == false)
-              const TextSpan(text: "[挂] "),
-            TextSpan(text: c.scoreTable[widget.mark].name)
-          ])),
-          remaining: [
-            ReXCardRemaining(c.scoreTable[widget.mark].classStatus),
-          ],
-          bottomRow: Row(
-            children: [
-              Text(
-                "学分 ${c.scoreTable[widget.mark].credit}",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+            opacity: cardOpacity,
+            title: Text.rich(TextSpan(children: [
+              // TODO: Backend-return Data, unable to change at the moment...
+              if (c.scoreTable[widget.mark].scoreStatus != "初修")
+                TextSpan(text: "${c.scoreTable[widget.mark].scoreStatus} "),
+              if (c.scoreTable[widget.mark].isPassed == false)
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "score.score_info_card.failed",
+                  ),
                 ),
-              ).expanded(flex: 2),
-              Text(
-                "GPA ${c.scoreTable[widget.mark].gpa}",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ).expanded(flex: 3),
-              Text(
-                "成绩 ${c.scoreTable[widget.mark].scoreStr}",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ).expanded(flex: 3),
+              TextSpan(text: c.scoreTable[widget.mark].name)
+            ])),
+            remaining: [
+              ReXCardRemaining(c.scoreTable[widget.mark].classStatus),
             ],
-          ),
-        ),
+            bottomRow: DefaultTextStyle(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              child: [
+                Text(
+                  "${FlutterI18n.translate(
+                    context,
+                    "score.score_compose_card.credit",
+                  )}: ${c.scoreTable[widget.mark].credit}",
+                ).expanded(flex: 2),
+                Text(
+                  "${FlutterI18n.translate(
+                    context,
+                    "score.score_compose_card.gpa",
+                  )}: ${c.scoreTable[widget.mark].gpa}",
+                ).expanded(flex: 3),
+                Text(
+                  "${FlutterI18n.translate(
+                    context,
+                    "score.score_compose_card.score",
+                  )}: ${c.scoreTable[widget.mark].scoreStr}",
+                ).expanded(flex: 3),
+              ].toRow(),
+            )),
       ),
     );
   }

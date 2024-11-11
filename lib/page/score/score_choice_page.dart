@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
@@ -35,18 +36,31 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
   Future<void> scoreInfoDialog(context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('小总结'),
+          title: Text(FlutterI18n.translate(
+            context,
+            "score.score_choice.sum_dialog_title",
+          )),
           content: Text(
-            "所有科目的GPA：${state.evalAvg(true, isGPA: true).toStringAsFixed(3)}\n"
-            "所有科目的均分：${state.evalAvg(true).toStringAsFixed(2)}\n"
-            "所有科目的学分：${state.evalCredit(true).toStringAsFixed(2)}\n"
-            "未通过科目：${state.unPassed}\n"
-            "公共选修课已经修得学分：${state.notCoreClass}\n"
-            "本程序提供的数据仅供参考，开发者对其准确性不负责",
+            FlutterI18n.translate(
+              context,
+              "score.score_choice.sum_dialog_content",
+              translationParams: {
+                "gpa_all": state.evalAvg(true, isGPA: true).toStringAsFixed(3),
+                "avg_all": state.evalAvg(true).toStringAsFixed(2),
+                "credit_all": state.evalCredit(true).toStringAsFixed(2),
+                "unpassed": state.unPassed.isEmpty
+                    ? FlutterI18n.translate(context, "score.all_passed")
+                    : state.unPassed,
+                "not_core_credit": state.notCoreClass.toString(),
+              },
+            ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text("确定"),
+              child: Text(FlutterI18n.translate(
+                context,
+                "confirm",
+              )),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
@@ -65,7 +79,10 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
           ),
           onPressed: Navigator.of(context).pop,
         ),
-        title: const Text("成绩单"),
+        title: Text(FlutterI18n.translate(
+          context,
+          "score.score_choice.title",
+        )),
         actions: [
           IconButton(
             onPressed: () => scoreInfoDialog(context),
@@ -90,7 +107,10 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                     horizontal: 12,
                     vertical: 6,
                   ),
-                  hintText: "搜索成绩记录",
+                  hintText: FlutterI18n.translate(
+                    context,
+                    "score.score_choice.search_hint",
+                  ),
                   hintStyle: const TextStyle(fontSize: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
@@ -108,7 +128,7 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                   await showDialog<int>(
                     context: context,
                     builder: (context) => ColumnChooseDialog(
-                      chooseList: ["所有学期", ...state.semester],
+                      chooseList: ["score.all_semester", ...state.semester],
                     ),
                   ).then((value) {
                     if (value != null) {
@@ -117,9 +137,17 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                     }
                   });
                 },
-                child: Text(
-                  "学期 ${state.controllers.chosenSemesterInScoreChoice == "" ? "所有学期" : state.controllers.chosenSemesterInScoreChoice}",
-                ),
+                child: Text(FlutterI18n.translate(
+                    context, "score.chosen_semester",
+                    translationParams: {
+                      "chosen":
+                          state.controllers.chosenSemesterInScoreChoice == ""
+                              ? FlutterI18n.translate(
+                                  context,
+                                  "score.all_semester",
+                                )
+                              : state.controllers.chosenSemesterInScoreChoice,
+                    })),
               ).padding(right: 4),
               TextButton(
                 style: TextButton.styleFrom(
@@ -130,7 +158,8 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                   await showDialog<int>(
                     context: context,
                     builder: (context) => ColumnChooseDialog(
-                      chooseList: ["所有类型", ...state.statuses].toList(),
+                      chooseList:
+                          ["score.all_type", ...state.statuses].toList(),
                     ),
                   ).then((value) {
                     if (value != null) {
@@ -139,9 +168,15 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                     }
                   });
                 },
-                child: Text(
-                  "类型 ${state.controllers.chosenStatusInScoreChoice == "" ? "所有类型" : state.controllers.chosenStatusInScoreChoice}",
-                ),
+                child: Text(FlutterI18n.translate(context, "score.chosen_type",
+                    translationParams: {
+                      "type": state.controllers.chosenStatusInScoreChoice == ""
+                          ? FlutterI18n.translate(
+                              context,
+                              "score.all_type",
+                            )
+                          : state.controllers.chosenStatusInScoreChoice,
+                    })),
               ),
             ],
           )
@@ -164,9 +199,11 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
                             isScoreChoice: true,
                           ),
                         ))
-                : const Center(
-                    child: Text("没有选择该学期的课程计入均分计算"),
-                  ),
+                : Center(
+                    child: Text(FlutterI18n.translate(
+                    context,
+                    "score.score_choice.empty_list",
+                  ))),
           )
         ],
       ),
@@ -175,7 +212,7 @@ class _ScoreChoicePageState extends State<ScoreChoicePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              state.bottomInfo,
+              state.bottomInfo(context),
               textScaler: const TextScaler.linear(1.2),
             ),
           ],

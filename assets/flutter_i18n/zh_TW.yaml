@@ -330,9 +330,15 @@ school_card_window:
   store_name: 商戶名稱
   balance: 金額
   time_with_sum: 時間(共{sum}元)
+  no_record: 未查詢到記錄，請修改日期後重試
 score:
-  title: 成績查詢
   cache_message: 已顯示快取成績資訊
+  summary: '目前選中科目 {chosen}  總計學分 {credit}
+
+    均分 {avg} GPA {gpa}
+
+    '
+  all_passed: 所有科目均已透過
   all_semester: 所有學期
   chosen_semester: 學期 {chosen}
   all_type: 所有型別
@@ -341,10 +347,20 @@ score:
     title: 成績單
     search_hint: 搜尋成績記錄
     empty_list: 沒有選擇該學期的課程計入均分計算
-    sum_dialog:
-      title: 小總結
-      content: 所有科目的GPA：{gpa_all} 所有科目的均分：{avg_all} 所有科目的學分：{credit_all} 未透過科目：{unpassed}
-        公共選修課已經修得學分：{not_core_credit} 本程式提供的資料僅供參考，開發者對其準確性不負責
+    sum_dialog_title: 小總結
+    sum_dialog_content: '所有科目的GPA：{gpa_all}
+
+      所有科目的均分：{avg_all}
+
+      所有科目的學分：{credit_all}
+
+      未透過科目：{unpassed}
+
+      公共選修課已經修得學分：{not_core_credit}
+
+      本程式提供的資料僅供參考，開發者對其準確性不負責"
+
+      '
   score_compose_card:
     no_detail: 未提供詳情資訊
     fetching: 正在獲取

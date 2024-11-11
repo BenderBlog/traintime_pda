@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,10 @@ class _ScorePageState extends State<ScorePage> {
           ),
           onPressed: Navigator.of(c.context).pop,
         ),
-        title: const Text("成绩查询"),
+        title: Text(FlutterI18n.translate(
+          context,
+          "score.score_page.title",
+        )),
         actions: [
           if (!getBool(Preference.role))
             IconButton(
@@ -88,7 +92,10 @@ class _ScorePageState extends State<ScorePage> {
                     horizontal: 14,
                     vertical: 10,
                   ),
-                  hintText: "搜索成绩记录",
+                  hintText: FlutterI18n.translate(
+                    context,
+                    "score.score_page.search_hint",
+                  ),
                   hintStyle: const TextStyle(fontSize: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
@@ -106,7 +113,8 @@ class _ScorePageState extends State<ScorePage> {
                   await showDialog<int>(
                     context: context,
                     builder: (context) => ColumnChooseDialog(
-                      chooseList: ["所有学期", ...c.semester].toList(),
+                      chooseList:
+                          ["score.all_semester", ...c.semester].toList(),
                     ),
                   ).then((value) {
                     if (value != null) {
@@ -114,9 +122,16 @@ class _ScorePageState extends State<ScorePage> {
                     }
                   });
                 },
-                child: Text(
-                  "学期 ${c.controllers.chosenSemester == "" ? "所有学期" : c.controllers.chosenSemester}",
-                ),
+                child: Text(FlutterI18n.translate(
+                    context, "score.chosen_semester",
+                    translationParams: {
+                      "chosen": c.controllers.chosenSemester == ""
+                          ? FlutterI18n.translate(
+                              context,
+                              "score.all_semester",
+                            )
+                          : c.controllers.chosenSemester,
+                    })),
               ).padding(right: 8),
               TextButton(
                 style: TextButton.styleFrom(
@@ -127,7 +142,7 @@ class _ScorePageState extends State<ScorePage> {
                   await showDialog<int>(
                     context: context,
                     builder: (context) => ColumnChooseDialog(
-                      chooseList: ["所有类型", ...c.statuses].toList(),
+                      chooseList: ["score.all_type", ...c.statuses].toList(),
                     ),
                   ).then((value) {
                     if (value != null) {
@@ -135,9 +150,15 @@ class _ScorePageState extends State<ScorePage> {
                     }
                   });
                 },
-                child: Text(
-                  "类型 ${c.controllers.chosenStatus == "" ? "所有类型" : c.controllers.chosenStatus}",
-                ),
+                child: Text(FlutterI18n.translate(context, "score.chosen_type",
+                    translationParams: {
+                      "type": c.controllers.chosenStatus == ""
+                          ? FlutterI18n.translate(
+                              context,
+                              "score.all_type",
+                            )
+                          : c.controllers.chosenStatus,
+                    })),
               ),
             ],
           )
@@ -159,7 +180,12 @@ class _ScorePageState extends State<ScorePage> {
                 ),
               );
             } else {
-              return const EmptyListView(text: "未筛查到合请求的记录");
+              return EmptyListView(
+                text: FlutterI18n.translate(
+                  context,
+                  "score.score_page.no_record",
+                ),
+              );
             }
           }).safeArea().expanded(),
         ],
@@ -180,9 +206,12 @@ class _ScorePageState extends State<ScorePage> {
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: () => c.setScoreChoiceState(ChoiceState.all),
-                    child: const Text(
-                      "全选",
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "score.score_page.select_all",
+                      ),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -191,9 +220,12 @@ class _ScorePageState extends State<ScorePage> {
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: () => c.setScoreChoiceState(ChoiceState.none),
-                    child: const Text(
-                      "全不选",
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "score.score_page.select_nothing",
+                      ),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -203,9 +235,12 @@ class _ScorePageState extends State<ScorePage> {
                     ),
                     onPressed: () =>
                         c.setScoreChoiceState(ChoiceState.original),
-                    child: const Text(
-                      "重置选择",
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "score.score_page.reset_select",
+                      ),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   )
                 ],
@@ -213,7 +248,7 @@ class _ScorePageState extends State<ScorePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(c.bottomInfo),
+                  Text(c.bottomInfo(context)),
                   FloatingActionButton(
                     elevation: 0.0,
                     highlightElevation: 0.0,

@@ -3,6 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/score/score_statics.dart';
 
@@ -100,12 +101,15 @@ class ScoreState extends InheritedWidget {
     return whatever;
   }
 
-  String get unPassed => unPassedSet.isEmpty ? "没有" : unPassedSet.join(",");
+  String get unPassed => unPassedSet.isEmpty ? "" : unPassedSet.join(",");
 
-  String get bottomInfo =>
-      "目前选中科目 ${getSelectedScoreList.length}  总计学分 ${evalCredit(false).toStringAsFixed(2)}\n"
-      "均分 ${evalAvg(false).toStringAsFixed(2)}  "
-      "GPA ${evalAvg(false, isGPA: true).toStringAsFixed(2)}  ";
+  String bottomInfo(context) =>
+      FlutterI18n.translate(context, "score.summary", translationParams: {
+        "chosen": getSelectedScoreList.length.toString(),
+        "credit": evalCredit(false).toStringAsFixed(2),
+        "avg": evalAvg(false).toStringAsFixed(2),
+        "gpa": evalAvg(false, isGPA: true).toStringAsFixed(2)
+      });
 
   double get notCoreClass {
     double toReturn = 0.0;

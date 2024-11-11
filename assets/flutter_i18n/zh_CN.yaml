@@ -360,11 +360,15 @@ school_card_window:
     store_name: "商户名称"
     balance: "金额"
     time_with_sum: "时间(共{sum}元)"
+    no_record: "未查询到记录，请修改日期后重试"
 
 # 成绩
 score:
-    title: "成绩查询"
     cache_message: "已显示缓存成绩信息"
+    summary: |
+        目前选中科目 {chosen}  总计学分 {credit}
+        均分 {avg} GPA {gpa}
+    all_passed: "所有科目均已通过"
     # TODO：string in eval detected
     all_semester: "所有学期"
     chosen_semester: "学期 {chosen}"
@@ -374,14 +378,14 @@ score:
         title: "成绩单"
         search_hint: "搜索成绩记录"
         empty_list: "没有选择该学期的课程计入均分计算"
-        sum_dialog:
-            title: "小总结"
-            content: 所有科目的GPA：{gpa_all}
-                所有科目的均分：{avg_all}
-                所有科目的学分：{credit_all}
-                未通过科目：{unpassed}
-                公共选修课已经修得学分：{not_core_credit}
-                本程序提供的数据仅供参考，开发者对其准确性不负责
+        sum_dialog_title: "小总结"
+        sum_dialog_content: |
+            所有科目的GPA：{gpa_all}
+            所有科目的均分：{avg_all}
+            所有科目的学分：{credit_all}
+            未通过科目：{unpassed}
+            公共选修课已经修得学分：{not_core_credit}
+            本程序提供的数据仅供参考，开发者对其准确性不负责
     score_compose_card:
         no_detail: "未提供详情信息"
         fetching: "正在获取"
