@@ -84,8 +84,8 @@ class _EmptyClassroomSearchWindowState
   }
 
   Widget getIcon(bool isUsed, {int? index}) => Container(
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         decoration: BoxDecoration(
           color: isUsed
               ? Colors.transparent
