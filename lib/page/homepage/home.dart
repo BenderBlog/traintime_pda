@@ -260,7 +260,7 @@ class _HomePageMasterState extends State<HomePageMaster>
     }
     message.checkMessage();
     message.checkUpdate().then((value) {
-      if (value) _showUpdateNotice();
+      if (value ?? false) _showUpdateNotice();
     });
     log.info(
       "[home][BackgroundFetchFromHome]"

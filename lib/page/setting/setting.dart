@@ -142,7 +142,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     checkUpdate().then((value) async {
                       pd.close();
                       if (context.mounted) {
-                        if (value && updateMessage.value != null) {
+                        if ((value ?? false) && updateMessage.value != null) {
                           await showDialog(
                             context: context,
                             builder: (context) => Obx(
@@ -154,7 +154,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         } else {
                           showToast(
                             context: context,
-                            msg: "目前您运行的是最新稳定版",
+                            msg: value == null ? "目前您在运行测试版" : "目前您运行的是最新稳定版",
                           );
                         }
                       }
@@ -169,34 +169,6 @@ class _SettingWindowState extends State<SettingWindow> {
                     });
                   },
                   trailing: const Icon(Icons.navigate_next),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.simplify_timeline",
-                  )),
-                  subtitle: Text(FlutterI18n.translate(
-                    context,
-                    "setting.simplify_timeline_description",
-                  )),
-                  trailing: Switch(
-                    value: preference
-                        .getBool(preference.Preference.simplifiedClassTimeline),
-                    onChanged: (bool value) {
-                      setState(() {
-                        preference
-                            .setBool(
-                              preference.Preference.simplifiedClassTimeline,
-                              value,
-                            )
-                            .then(
-                              (value) =>
-                                  ClassTableCard.reloadSettingsFromPref(),
-                            );
-                      });
-                    },
-                  ),
                 ),
               ])),
           ReXCard(
@@ -273,9 +245,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               const ExperimentPasswordDialog(),
                         );
                       }),
-                ],
-                if (preference.getBool(preference.Preference.role)) ...[
-                  const Divider(),
+                ] else ...[
                   ListTile(
                       title: Text(FlutterI18n.translate(
                         context,
