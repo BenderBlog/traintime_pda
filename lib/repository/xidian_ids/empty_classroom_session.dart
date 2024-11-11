@@ -113,7 +113,7 @@ class EmptyClassroomSession extends EhallSession {
                 i["JASMC"].toString().replaceAll('(', "\n").replaceAll(')', ""),
             isUsed: List.generate(
               10,
-              (index) => i["JC$index"].toString().contains("1_"),
+              (index) => i["JC${index + 1}"].toString().contains("1_"),
               growable: false,
             ),
           ),

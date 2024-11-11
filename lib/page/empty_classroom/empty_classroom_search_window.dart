@@ -9,6 +9,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -51,15 +52,17 @@ class _EmptyClassroomSearchWindowState
     try {
       state = SessionState.fetching;
       fetchedData.clear();
+      int startYear = int.parse(semesterCode.substring(0, 4));
       fetchedData.addAll(await EmptyClassroomSession().searchData(
         buildingCode: chosen.code,
         date: Jiffy.parseFromDateTime(time).format(pattern: "yyyy-MM-dd"),
-        semesterRange: semesterCode.substring(0, 9),
+        semesterRange: "$startYear-${startYear + 1}",
         semesterPart: semesterCode[semesterCode.length - 1],
       ));
       state = SessionState.fetched;
-    } catch (e) {
+    } catch (e, s) {
       state = SessionState.error;
+      log.error("Error occured while fetching empty classroom.", e, s);
     }
     if (mounted) {
       setState(() {});
@@ -211,25 +214,27 @@ class _EmptyClassroomSearchWindowState
                 )),
               ),
             ].toRow(),
+          ]
+              .toRow(mainAxisAlignment: MainAxisAlignment.center)
+              .padding(bottom: 8),
+          [
             [
-              [
-                getIcon(true),
-                const SizedBox(width: 4.0),
-                Text(FlutterI18n.translate(
-                  context,
-                  "empty_classroom.occupied",
-                )),
-              ].toRow().padding(right: 8.0),
-              [
-                getIcon(false),
-                const SizedBox(width: 4.0),
-                Text(FlutterI18n.translate(
-                  context,
-                  "empty_classroom.empty",
-                )),
-              ].toRow(),
+              getIcon(true),
+              const SizedBox(width: 4.0),
+              Text(FlutterI18n.translate(
+                context,
+                "empty_classroom.occupied",
+              )),
+            ].toRow().padding(right: 8.0),
+            [
+              getIcon(false),
+              const SizedBox(width: 4.0),
+              Text(FlutterI18n.translate(
+                context,
+                "empty_classroom.empty",
+              )),
             ].toRow(),
-          ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
+          ].toRow(mainAxisAlignment: MainAxisAlignment.center),
         ]
             .toColumn()
             .padding(horizontal: 14, top: 8, bottom: 6)
@@ -276,6 +281,7 @@ class _EmptyClassroomSearchWindowState
                   DataCell(Text(
                     data[index].name,
                     textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ).center()),
                   DataCell(Wrap(
                     alignment: WrapAlignment.center,
