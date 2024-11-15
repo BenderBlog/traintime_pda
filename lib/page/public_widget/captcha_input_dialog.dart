@@ -3,23 +3,23 @@
 
 // A captcha input dialog.
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 
 class CaptchaInputDialog extends StatelessWidget {
   final TextEditingController _captchaController = TextEditingController();
-  final String cookie;
+  final List<int> image;
 
-  CaptchaInputDialog({super.key, required this.cookie});
+  CaptchaInputDialog({
+    super.key,
+    required this.image,
+  });
 
   @override
   Widget build(BuildContext context) {
-    NetworkImage cappic = NetworkImage(
-      "https://ids.xidian.edu.cn/authserver/getCaptcha.htl",
-      headers: {"Cookie": cookie},
-    );
-
     return AlertDialog(
       title: Text(FlutterI18n.translate(
         context,
@@ -33,7 +33,8 @@ class CaptchaInputDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image(image: cappic),
+          Image.memory(Uint8List.fromList(image)),
+          const SizedBox(height: 16),
           TextField(
             autofocus: true,
             style: const TextStyle(fontSize: 20),

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/payment_session.dart';
@@ -22,7 +23,12 @@ class ElectricityCard extends StatelessWidget {
             builder: (context) => ElectricityAccountDialog(),
           ).then((value) {
             if (prefs.getString(prefs.Preference.dorm).isNotEmpty) {
-              update();
+              update(
+                captchaFunction: (image) => showDialog<String>(
+                  context: context,
+                  builder: (context) => CaptchaInputDialog(image: image),
+                ).then((value) => value ?? ""),
+              );
             }
           });
         } else {
@@ -49,7 +55,12 @@ class ElectricityCard extends StatelessWidget {
           );
         }
       },
-      onLongPress: () => update(),
+      onLongPress: () => update(
+        captchaFunction: (image) => showDialog<String>(
+          context: context,
+          builder: (context) => CaptchaInputDialog(image: image),
+        ).then((value) => value ?? ""),
+      ),
       child: Obx(
         () => MainPageCard(
           isLoad: isNotice.value,

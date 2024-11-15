@@ -145,10 +145,12 @@ class _MainPageState extends State<MainPage> {
               context: context,
               msg: "请稍候，正在刷新信息",
             );
-            update(sliderCaptcha: (String cookieStr) {
-              return SliderCaptchaClientProvider(cookie: cookieStr)
-                  .solve(context);
-            });
+            update(
+                context: context,
+                sliderCaptcha: (String cookieStr) {
+                  return SliderCaptchaClientProvider(cookie: cookieStr)
+                      .solve(context);
+                });
           },
           header: PhoenixHeader(
             skyColor: Theme.of(context).colorScheme.surface,

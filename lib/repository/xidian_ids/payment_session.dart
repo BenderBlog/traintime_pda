@@ -6,6 +6,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:encrypt/encrypt.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -17,12 +18,14 @@ var owe = "".obs;
 var electricityInfo = "".obs;
 var isNotice = true.obs;
 
-Future<void> update() async {
+Future<void> update({
+  required Future<String> Function(List<int>) captchaFunction,
+}) async {
   isNotice.value = true;
   electricityInfo.value = "正在获取";
   owe.value = "正在获取欠费";
   await PaymentSession()
-      .loginPayment()
+      .loginPayment(captchaFunction: captchaFunction)
       .then((value) => Future.wait([
             Future(() async {
               try {
@@ -78,6 +81,13 @@ Future<void> update() async {
 
 class PaymentSession extends IDSSession {
   final factorycode = "E003";
+  final pubKey = """-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCa1ILSkh
+0rYX5iONLlpN8AuM2fS5gqYM85c8NDkEB501FiBNIo+NA5P
+RMmNqUEySiX0alK9xiCw+ZUQLpc4cmnF3DlXti5KGiV4ilL
+qF/80xkHCnLcdXzbEtoEgBvyZsusgeBfmyK2tzpkwh12Gac
+xh5zeF9usFgtdabgACU/cQIDAQAB
+-----END PUBLIC KEY-----""";
   RegExp getTransfer = RegExp(
     r'"http://payment.xidian.edu.cn/NetWorkUI/(.*?)"',
   );
@@ -242,8 +252,16 @@ class PaymentSession extends IDSSession {
     return accountA + accountB + accountC + accountD + accountE;
   }
 
+  /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
+  String rsaEncrypt(String toEnc) {
+    dynamic publicKey = RSAKeyParser().parse(pubKey);
+    return Encrypter(RSA(publicKey: publicKey)).encrypt(toEnc).base64;
+  }
+
   /// Password, addressid, liveid
-  Future<(String, String)> loginPayment() async {
+  Future<(String, String)> loginPayment({
+    required Future<String> Function(List<int>) captchaFunction,
+  }) async {
     /// Get electricity password
     String password = preference.getString(
       preference.Preference.electricityPassword,
@@ -274,11 +292,23 @@ class PaymentSession extends IDSSession {
 
     await dio.get(nextStop[0]!.replaceAll('"', ""));
 
+    // New stuff, captcha code...
+    var picture = await dio
+        .get(
+          "https://payment.xidian.edu.cn/NetWorkUI/authImage",
+          options: Options(responseType: ResponseType.bytes),
+        )
+        .then((data) => data.data);
+    String checkCode = await captchaFunction(picture);
+
+    log.info("[PaymentSession][getOwe] checkcode is $checkCode");
+
     var value = await dio.post(
       "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
       data: {
-        "p_Userid": electricityAccount(),
-        "p_Password": password,
+        "p_Userid": rsaEncrypt(electricityAccount()),
+        "p_Password": rsaEncrypt(password),
+        "checkCode": rsaEncrypt(checkCode),
         "factorycode": factorycode,
       },
     );

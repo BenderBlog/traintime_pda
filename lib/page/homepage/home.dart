@@ -270,6 +270,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       _loginAsync();
     } else {
       update(
+        context: context,
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
@@ -284,6 +285,7 @@ class _HomePageMasterState extends State<HomePageMaster>
 
     try {
       await update(
+        context: context,
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);

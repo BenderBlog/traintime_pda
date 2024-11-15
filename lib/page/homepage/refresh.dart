@@ -3,9 +3,11 @@
 
 // Refresh formula for homepage.
 
+import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
+import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -71,6 +73,7 @@ Future<void> _comboLogin({
 
 Future<void> update({
   bool forceRetryLogin = false,
+  required context,
   required Future<void> Function(String) sliderCaptcha,
 }) async {
   // Update data
@@ -103,7 +106,11 @@ Future<void> update({
       );
       updateCurrentData();
     }),
-    electricity.update(),
+    electricity.update(
+        captchaFunction: (image) => showDialog<String>(
+              context: context,
+              builder: (context) => CaptchaInputDialog(image: image),
+            ).then((value) => value ?? "")),
     borrow_info.LibrarySession().getBorrowList(),
     school_card_session.SchoolCardSession().initSession(),
   ]);
