@@ -112,6 +112,9 @@ classtable:
   month: '{month}
 
     月'
+  no_class: '本週暫無安排
+
+    Concept by LichtYy'
   class_card:
     title: 日程資訊
     unknown_classroom: 未知教室
@@ -358,7 +361,7 @@ score:
 
       公共選修課已經修得學分：{not_core_credit}
 
-      本程式提供的資料僅供參考，開發者對其準確性不負責"
+      本程式提供的資料僅供參考，開發者對其準確性不負責
 
       '
   score_compose_card:
@@ -461,11 +464,12 @@ setting:
     chitao1234: 開發：修復滑塊不對齊問題
     dimole: 開發支援：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
-    elliot: 開發指導：情侶課表功能開發指導
-    godhu777777: 支援：繁體中文轉換程式碼和彩蛋程式碼
-    hancl777: 支援：繁體中文轉換程式碼
+    elliot: 國際化(Pending)：軟體英語翻譯 / 開發指導：情侶課表功能開發指導
+    godhu777777: 國際化(Pending)：繁體中文轉換程式碼和彩蛋程式碼
+    hancl777: 國際化(Pending)：繁體中文轉換程式碼
     hhzm: 開發：電費查詢賬號計算
     lhx-666-cool: 支援：Windows 和 Linux 構建指令碼
+    lichtyy: 設計(Pending)：空白頁面貼圖
     lsy223622: 設計：iOS 和 Android 圖示 / 支援：冠名 XDYou
     nancunchild: 開發：圖書館搜尋功能
     pairman: 開發：成績快取功能和最佳化滑塊演算法
@@ -477,7 +481,7 @@ setting:
     xeonds: 設計：設定頁面 / 開發：XDU Planet
     xiue233: 開發：Android 小部件和拼接
     wirsbf: 開發：修復調課未按預期進行
-    zcwzy: 開發：修復丁香電費 / 支援：研究生版本開發
+    zcwzy: 開發：修復丁香電費 / 開發支援：研究生版本開發 / 設計(Pending)：空白頁面貼圖
     homepage: 主頁
     code: 開原始碼
     know_more: 知道更多

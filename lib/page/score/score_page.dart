@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 // Main window for score.
 
-import 'dart:io';
-
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -55,12 +53,7 @@ class _ScorePageState extends State<ScorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(
-            Platform.isIOS || Platform.isMacOS
-                ? Icons.arrow_back_ios_new
-                : Icons.arrow_back,
-          ),
+        leading: BackButton(
           onPressed: Navigator.of(c.context).pop,
         ),
         title: Text(FlutterI18n.translate(

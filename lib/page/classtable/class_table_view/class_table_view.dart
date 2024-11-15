@@ -50,23 +50,39 @@ class _ClassTableViewState extends State<ClassTableView> {
   double get blockwidth => (size.maxWidth - leftRow) / 7;
 
   /// The class table are divided into 8 rows, the leftest row is the index row.
-  List<Widget> classSubRow(int index) {
-    if (index != 0) {
+  List<Widget> classSubRow(bool isRest) {
+    if (isRest) {
       List<Widget> thisRow = [];
-      List<ClassOrgainzedData> arrangedEvents = classTableState.getArrangement(
-        weekIndex: widget.index,
-        dayIndex: index,
-      );
+      for (var index = 1; index <= 7; ++index) {
+        List<ClassOrgainzedData> arrangedEvents =
+            classTableState.getArrangement(
+          weekIndex: widget.index,
+          dayIndex: index,
+        );
 
-      /// Choice the day and render it!
-      for (var i in arrangedEvents) {
-        /// Generate the row.
-        thisRow.add(Positioned(
-          top: blockheight(i.start),
-          height: blockheight(i.stop - i.start),
-          left: leftRow + blockwidth * (index - 1),
-          width: blockwidth,
-          child: ClassCard(detail: i),
+        /// Choice the day and render it!
+        for (var i in arrangedEvents) {
+          /// Generate the row.
+          thisRow.add(Positioned(
+            top: blockheight(i.start),
+            height: blockheight(i.stop - i.start),
+            left: leftRow + blockwidth * (index - 1),
+            width: blockwidth,
+            child: ClassCard(detail: i),
+          ));
+        }
+      }
+
+      if (thisRow.isEmpty) {
+        thisRow.add(Center(
+          child: Column(
+            children: [
+              SizedBox(height: blockheight(8)),
+              Image.asset("assets/Classtable-Empty.png"),
+              const SizedBox(height: 20),
+              Text(FlutterI18n.translate(context, "classtable.no_class")),
+            ],
+          ),
         ));
       }
 
@@ -178,12 +194,12 @@ class _ClassTableViewState extends State<ClassTableView> {
 
       /// The rest of the table.
       [
-        classSubRow(0)
+        classSubRow(false)
             .toColumn()
             .decorated(color: Colors.grey.shade200.withOpacity(0.75))
             .constrained(width: leftRow)
             .positioned(left: 0),
-        for (int i in List.generate(7, (i) => i + 1)) ...classSubRow(i),
+        ...classSubRow(true),
       ]
           .toStack()
           .constrained(

@@ -288,12 +288,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                     context,
                     "classtable.page_title",
                   )),
-            leading: IconButton(
-              icon: Icon(
-                Platform.isIOS || Platform.isMacOS
-                    ? Icons.arrow_back_ios
-                    : Icons.arrow_back,
-              ),
+            leading: BackButton(
               onPressed: () =>
                   Navigator.of(ClassTableState.of(context)!.parentContext)
                       .pop(),
