@@ -39,10 +39,11 @@ class ElectricityCard extends StatelessWidget {
               children: [
                 Obx(
                   () => Text(
+                    "是否为缓存：${isCache}\n"
+                    "上次更新时间：${electricityInfo.value.fetchDay}\n"
                     "电费帐号：${PaymentSession.electricityAccount()}\n"
-                    "电量信息：${electricityInfo.value}"
-                    "${electricityInfo.value.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
-                    "欠费信息：${owe.value}\n"
+                    "电量信息：${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
+                    "欠费信息：${electricityInfo.value.owe}\n"
                     "长按可以重新加载，有欠费一般代表水费",
                   ),
                 ).paddingSymmetric(horizontal: 24),
@@ -63,7 +64,7 @@ class ElectricityCard extends StatelessWidget {
       ),
       child: Obx(
         () => MainPageCard(
-          isLoad: isNotice.value,
+          isLoad: isLoad.value,
           icon: MingCuteIcons.mgc_flash_line,
           text: "电量信息",
           infoText: RichText(
@@ -72,24 +73,24 @@ class ElectricityCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
                 fontSize: 20,
               ),
-              children: electricityInfo.value.contains(RegExp(r'[0-9]'))
+              children: electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
                   ? [
                       const TextSpan(text: "目前电量 "),
                       TextSpan(
                           text: double.parse(
-                        electricityInfo.value,
+                        electricityInfo.value.remain,
                       ).truncate().toString()),
                       const TextSpan(text: " 度"),
                     ]
                   : [
                       TextSpan(
-                        text: electricityInfo.value,
+                        text: electricityInfo.value.remain,
                       ),
                     ],
             ),
           ),
           bottomText: Text(
-            owe.value,
+            electricityInfo.value.owe,
             overflow: TextOverflow.ellipsis,
           ),
         ),

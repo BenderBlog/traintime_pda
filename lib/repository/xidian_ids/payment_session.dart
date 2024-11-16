@@ -7,81 +7,136 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
-var owe = "".obs;
-var electricityInfo = "".obs;
-var isNotice = true.obs;
+var electricityInfo = ElectricityInfo.empty(DateTime.now()).obs;
+var isCache = false.obs;
+var isLoad = false.obs;
+
+extension IsToday on DateTime {
+  bool get isToday {
+    DateTime now = DateTime.now();
+    return year == now.year && month == now.month && day == now.day;
+  }
+}
 
 Future<void> update({
   required Future<String> Function(List<int>) captchaFunction,
 }) async {
-  isNotice.value = true;
-  electricityInfo.value = "正在获取";
-  owe.value = "正在获取欠费";
+  isLoad.value = true;
+  isCache.value = false;
+  electricityInfo.value.fetchDay = DateTime.now();
+
+  late ElectricityInfo cache;
+  bool canUseCache = false;
+
+  if (PaymentSession.isCacheExist) {
+    try {
+      cache = ElectricityInfo.fromJson(
+        jsonDecode(PaymentSession.file.readAsStringSync()),
+      );
+      canUseCache = true;
+    } catch (e, s) {
+      log.handle(e, s);
+      canUseCache = false;
+    }
+  }
+
+  if (canUseCache && cache.fetchDay.isToday) {
+    electricityInfo.value = cache;
+    isCache.value = true;
+    isLoad.value = false;
+    return;
+  }
+
   await PaymentSession()
       .loginPayment(captchaFunction: captchaFunction)
-      .then((value) => Future.wait([
-            Future(() async {
-              try {
-                isNotice.value = true;
-                electricityInfo.value = "正在获取";
-                await PaymentSession().getElectricity(value);
-                isNotice.value = false;
-              } on DioException catch (e, s) {
-                log.handle(e, s);
-                electricityInfo.value = "网络故障";
-                isNotice.value = false;
-              } on NotFoundException {
-                electricityInfo.value = "查询失败";
-                isNotice.value = false;
-              } catch (e, s) {
-                log.handle(e, s);
-                electricityInfo.value = "查询故障";
-                isNotice.value = false;
-              }
-            }),
-            Future(() async {
-              try {
-                owe.value = "正在获取欠费";
-                await PaymentSession().getOwe(value);
-              } on DioException {
-                log.info(
-                  "[PaymentSession][update] "
-                  "Network error",
-                );
-                owe.value = "欠费信息网络故障";
-              } catch (e, s) {
-                log.handle(e, s);
-                owe.value = "目前欠款无法查询";
-              }
-            })
-          ]))
-      .catchError((e, s) {
-    log.handle(e, s);
-    if (NeedInfoException().toString().contains(e.toString())) {
-      electricityInfo.value = "需要在缴费平台完善信息";
-    } else if ("NotInitalizedException".contains(e.toString())) {
-      electricityInfo.value = e.msg;
-    } else if (NoAccountInfoException().toString().contains(e.toString())) {
-      electricityInfo.value = "需要填写电费账号";
-    } else {
-      electricityInfo.value = "程序故障";
-    }
-    owe.value = "目前欠款无法查询";
-    isNotice.value = false;
-    return [null];
-  });
+      .then(
+        (value) => Future.wait([
+          Future(() async {
+            try {
+              electricityInfo.value.remain =
+                  "electricity_status.remain_fetching";
+              await PaymentSession().getElectricity(value);
+            } on DioException catch (e, s) {
+              log.handle(e, s);
+              electricityInfo.value.remain =
+                  "electricity_status.remain_network_issue";
+            } on NotFoundException {
+              electricityInfo.value.remain =
+                  "electricity_status.remain_not_found";
+            } catch (e, s) {
+              log.handle(e, s);
+              electricityInfo.value.remain =
+                  "electricity_status.remain_other_issue";
+            }
+          }),
+          Future(() async {
+            try {
+              electricityInfo.value.owe = "electricity_status.owe_fetching";
+              await PaymentSession().getOwe(value);
+            } on DioException {
+              log.info(
+                "[PaymentSession][update] "
+                "Network error",
+              );
+              electricityInfo.value.owe = "electricity_status.owe_issue";
+            } catch (e, s) {
+              log.handle(e, s);
+              electricityInfo.value.owe = "electricity_status.owe_not_found";
+            }
+          })
+        ]).then((value) async {
+          if (PaymentSession.isCacheExist) {
+            await PaymentSession.file.create();
+          }
+          PaymentSession.file.writeAsStringSync(
+            jsonEncode(electricityInfo.value.toJson()),
+          );
+        }),
+      )
+      .catchError(
+    (e, s) {
+      log.handle(e, s);
+      if (canUseCache) {
+        electricityInfo.value = cache;
+        isCache.value = true;
+        isLoad.value = false;
+        return;
+      }
+
+      if (NeedInfoException().toString().contains(e.toString())) {
+        electricityInfo.value.remain = "electricity_status.need_more_info";
+      } else if ("NotInitalizedException".contains(e.toString())) {
+        electricityInfo.value.remain = e.msg;
+      } else if (NoAccountInfoException().toString().contains(e.toString())) {
+        electricityInfo.value.remain = "electricity_status.need_account";
+      } else {
+        electricityInfo.value.remain = "electricity_status.other_issue";
+      }
+      if (electricityInfo.value.owe == "electricity_status.owe_fetching") {
+        electricityInfo.value.owe = "electricity_status.owe_issue_unable";
+      }
+    },
+  );
+  isLoad.value = false;
 }
 
 class PaymentSession extends IDSSession {
-  final factorycode = "E003";
-  final pubKey = """-----BEGIN PUBLIC KEY-----
+  static const factorycode = "E003";
+  static const electricityCache = "Electricity.json";
+  static File file = File("${supportPath.path}/$electricityCache");
+
+  static bool get isCacheExist => file.existsSync();
+
+  static const pubKey = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCa1ILSkh
 0rYX5iONLlpN8AuM2fS5gqYM85c8NDkEB501FiBNIo+NA5P
 RMmNqUEySiX0alK9xiCw+ZUQLpc4cmnF3DlXti5KGiV4ilL
@@ -369,7 +424,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
         if (decodeData["returnmsg"] == "连接超时") {
           double balance = double.parse(
               decodeData["rtmeterInfo"]["Result"]["Meter"]["RemainQty"]);
-          electricityInfo.value = balance.toString();
+          electricityInfo.value.remain = balance.toString();
         } else {
           throw NotFoundException();
         }
@@ -386,11 +441,12 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
         var decodeData = jsonDecode(value.data);
         if (decodeData["returncode"] == "ERROR" &&
             decodeData["returnmsg"] == "电费厂家返回xml消息体异常") {
-          owe.value = "目前无需清缴欠费";
+          electricityInfo.value.owe = "electricity_status.owe_no_need";
         } else if (double.parse(decodeData["dueTotal"]) > 0.0) {
-          owe.value = "待清缴${decodeData["dueTotal"]}元欠费";
+          electricityInfo.value.owe =
+              "electricity_status.owe_need_pay ${decodeData["dueTotal"]}";
         } else {
-          owe.value = "目前欠款无法查询";
+          electricityInfo.value.owe = "electricity_status.owe_issue_unable";
         }
       });
 }

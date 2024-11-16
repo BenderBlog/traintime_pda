@@ -584,3 +584,20 @@ xdu_planet:
     comment_failed: "评论失败，请去网络查看器和日志查看器查看报错"
     comment_canceled: "没想好要说啥嘛"
     comment_loading: "加载评论中……"
+
+# 电费状态
+electricity_status:
+    pending: "等待获取"
+    remain_fetching: "正在获取"
+    remain_network_issue: "网络故障"
+    remain_not_found: "查询失败"
+    remain_other_issue: "查询故障"
+    owe_fetching: "正在获取欠费"
+    owe_issue: "欠费信息网络故障"
+    owe_not_found: "目前欠款无法查询"
+    owe_no_need: "目前无需清缴欠费"
+    owe_need_pay: "待清缴 {due} 元欠费"
+    owe_issue_unable: "目前欠款无法查询"
+    need_more_info: "需要在缴费平台完善信息"
+    need_account: "需要填写电费账号"
+    other_issue: "程序故障"

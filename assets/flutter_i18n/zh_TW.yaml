@@ -543,3 +543,18 @@ xdu_planet:
   comment_failed: 評論失敗，請去網路檢視器和日誌檢視器檢視報錯
   comment_canceled: 沒想好要說啥嘛
   comment_loading: 載入評論中……
+electricity_status:
+  pending: 等待獲取
+  remain_fetching: 正在獲取
+  remain_network_issue: 網路故障
+  remain_not_found: 查詢失敗
+  remain_other_issue: 查詢故障
+  owe_fetching: 正在獲取欠費
+  owe_issue: 欠費資訊網路故障
+  owe_not_found: 目前欠款無法查詢
+  owe_no_need: 目前無需清繳欠費
+  owe_need_pay: 待清繳 {due} 元欠費
+  owe_issue_unable: 目前欠款無法查詢
+  need_more_info: 需要在繳費平臺完善資訊
+  need_account: 需要填寫電費賬號
+  other_issue: 程式故障
