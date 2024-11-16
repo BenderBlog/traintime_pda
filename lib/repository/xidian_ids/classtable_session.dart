@@ -403,7 +403,6 @@ class ClassTableFile extends EhallSession {
     }
 
     // Merge change info
-
     if (int.parse(qResult["totalSize"].toString()) > 0) {
       for (var i in qResult["rows"]) {
         preliminaryData.classChanges.add(
@@ -449,192 +448,219 @@ class ClassTableFile extends EhallSession {
     );
 
     List<ClassChange> cache = [];
+    List<ClassChange> toDeal =
+        List<ClassChange>.from(preliminaryData.classChanges);
 
-    for (var e in preliminaryData.classChanges) {
-      /// First, search for the classes.
-      /// Due to the unstability of the api, a list is introduced.
-      List<int> indexClassDetailList = [];
-      for (int i = 0; i < preliminaryData.classDetail.length; ++i) {
-        if (preliminaryData.classDetail[i].code == e.classCode) {
-          indexClassDetailList.add(i);
-        }
-      }
-
-      /// Second, find the all time arrangement related to the class.
-      log.info(
-        "[getClasstable][getEhall] "
-        "Class change related to class detail index $indexClassDetailList.",
-      );
-      List<int> indexOriginalTimeArrangementList = [];
-      for (var currentClassIndex in indexClassDetailList) {
-        for (int i = 0; i < preliminaryData.timeArrangement.length; ++i) {
-          if (preliminaryData.timeArrangement[i].index == currentClassIndex &&
-              preliminaryData.timeArrangement[i].day == e.originalWeek &&
-              preliminaryData.timeArrangement[i].start ==
-                  e.originalClassRange[0] &&
-              preliminaryData.timeArrangement[i].stop ==
-                  e.originalClassRange[1]) {
-            indexOriginalTimeArrangementList.add(i);
+    while (toDeal.isNotEmpty) {
+      List<int> toBeRemovedIndex = [];
+      for (var e in toDeal) {
+        /// First, search for the classes.
+        /// Due to the unstability of the api, a list is introduced.
+        /// This must have an answer, otherwise there's a potato in the school's server.
+        List<int> indexClassDetailList = [];
+        for (int i = 0; i < preliminaryData.classDetail.length; ++i) {
+          if (preliminaryData.classDetail[i].code == e.classCode) {
+            indexClassDetailList.add(i);
           }
         }
-      }
-
-      /// Third, search for the time arrangements, seek for the truth.
-      log.info(
-        "[getClasstable][getEhall] "
-        "Class change related to time arrangement index $indexOriginalTimeArrangementList.",
-      );
-
-      if (e.type == ChangeType.change) {
-        /// Give a value to the
-        int timeArrangementIndex = indexOriginalTimeArrangementList.first;
-
         log.info(
           "[getClasstable][getEhall] "
-          "Class change. Teacher changed? ${e.isTeacherChanged}. timeArrangementIndex is $timeArrangementIndex",
-        );
-        for (int indexOriginalTimeArrangement
-            in indexOriginalTimeArrangementList) {
-          /// Seek for the change entry. Delete the classes moved waay.
-          log.info(
-            "[getClasstable][getEhall] "
-            "Original weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
-            "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
-          );
-          for (int i in e.originalAffectedWeeksList) {
-            log.info(
-              "[getClasstable][getEhall] "
-              "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
-            );
-            if (preliminaryData
-                .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
-              preliminaryData.timeArrangement[indexOriginalTimeArrangement]
-                  .weekList[i] = false;
-              timeArrangementIndex = preliminaryData
-                  .timeArrangement[indexOriginalTimeArrangement].index;
-            }
-          }
-
-          log.info(
-            "[getClasstable][getEhall] "
-            "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
-          );
-        }
-
-        if (timeArrangementIndex == indexOriginalTimeArrangementList.first) {
-          cache.add(e);
-          timeArrangementIndex = preliminaryData
-              .timeArrangement[indexOriginalTimeArrangementList.first].index;
-        }
-
-        log.info(
-          "[getClasstable][getEhall] "
-          "New week: ${e.newAffectedWeeks}, "
-          "day: ${e.newWeek}, "
-          "startToStop: ${e.newClassRange}, "
-          "timeArrangementIndex: $timeArrangementIndex.",
+          "Class change related to class index $indexClassDetailList.",
         );
 
-        bool flag = false;
-        ClassChange? toRemove;
-        log.info("[getClasstable][getEhall] cache length = ${cache.length}");
-        for (var f in cache) {
-          //log.info("[getClasstable][getFromWeb]"
-          //    "${f.className} ${f.classCode} ${f.originalClassRange} ${f.originalAffectedWeeksList} ${f.originalWeek}");
-          //log.info("[getClasstable][getFromWeb]"
-          //    "${e.className} ${e.classCode} ${e.newClassRange} ${e.newAffectedWeeksList} ${e.newWeek}");
-          //log.info("[getClasstable][getFromWeb]"
-          //    "${f.className == e.className} ${f.classCode == e.classCode} ${listEquals(f.originalClassRange, e.newClassRange)} ${listEquals(f.originalAffectedWeeksList, e.newAffectedWeeksList)} ${f.originalWeek == e.newWeek}");
-          if (f.className == e.className &&
-              f.classCode == e.classCode &&
-              listEquals(f.originalClassRange, e.newClassRange) &&
-              listEquals(f.originalAffectedWeeksList, e.newAffectedWeeksList) &&
-              f.originalWeek == e.newWeek &&
-              f.originalTeacherData == e.newTeacherData) {
-            flag = true;
-            toRemove = f;
-            break;
-          }
-        }
-
-        if (flag) {
-          cache.remove(toRemove);
+        /// Then, if patch, find the class and add one
+        if (e.type == ChangeType.patch) {
           log.info(
             "[getClasstable][getEhall] "
-            "Cannot be added",
+            "Class patch.",
           );
+
+          /// Add classes.
+          preliminaryData.timeArrangement.add(
+            TimeArrangement(
+              source: Source.school,
+              index: indexClassDetailList.first,
+              weekList: e.newAffectedWeeks!,
+              day: e.newWeek!,
+              start: e.newClassRange[0],
+              stop: e.newClassRange[1],
+              classroom: e.newClassroom ?? e.originalClassroom,
+              teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
+            ),
+          );
+          toBeRemovedIndex.add(toDeal.indexOf(e));
           continue;
         }
 
+        /// Otherwise, find the all time arrangement related to the class.
         log.info(
           "[getClasstable][getEhall] "
-          "Can be added",
+          "Class change related to class detail index $indexClassDetailList.",
         );
-
-        /// Add classes.
-        preliminaryData.timeArrangement.add(
-          TimeArrangement(
-            source: Source.school,
-            index: timeArrangementIndex,
-            weekList: e.newAffectedWeeks!,
-            day: e.newWeek!,
-            start: e.newClassRange[0],
-            stop: e.newClassRange[1],
-            classroom: e.newClassroom ?? e.originalClassroom,
-            teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
-          ),
-        );
-      } else if (e.type == ChangeType.patch) {
-        log.info(
-          "[getClasstable][getEhall] "
-          "Class patch.",
-        );
-
-        /// Add classes.
-        preliminaryData.timeArrangement.add(
-          TimeArrangement(
-            source: Source.school,
-            index: indexClassDetailList.first,
-            weekList: e.newAffectedWeeks!,
-            day: e.newWeek!,
-            start: e.newClassRange[0],
-            stop: e.newClassRange[1],
-            classroom: e.newClassroom ?? e.originalClassroom,
-            teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
-          ),
-        );
-      } else {
-        log.info(
-          "[getClasstable][getEhall] "
-          "Class stop.",
-        );
-
-        for (int indexOriginalTimeArrangement
-            in indexOriginalTimeArrangementList) {
-          log.info(
-            "[getClasstable][getEhall] "
-            "Original weeklist "
-            "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
-            "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
-          );
-          for (int i in e.originalAffectedWeeksList) {
-            log.info(
-              "[getClasstable][getEhall] "
-              "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
-            );
-            if (preliminaryData
-                .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
-              preliminaryData.timeArrangement[indexOriginalTimeArrangement]
-                  .weekList[i] = false;
+        List<int> indexOriginalTimeArrangementList = [];
+        for (var currentClassIndex in indexClassDetailList) {
+          for (int i = 0; i < preliminaryData.timeArrangement.length; ++i) {
+            if (preliminaryData.timeArrangement[i].index == currentClassIndex &&
+                preliminaryData.timeArrangement[i].day == e.originalWeek &&
+                preliminaryData.timeArrangement[i].start ==
+                    e.originalClassRange[0] &&
+                preliminaryData.timeArrangement[i].stop ==
+                    e.originalClassRange[1]) {
+              indexOriginalTimeArrangementList.add(i);
             }
           }
+        }
+
+        /// Third, search for the time arrangements, seek for the truth.
+        log.info(
+          "[getClasstable][getEhall] "
+          "Class change related to time arrangement index $indexOriginalTimeArrangementList.",
+        );
+
+        /// If empty, wait for the next turn...
+        if (indexOriginalTimeArrangementList.isEmpty) continue;
+
+        if (e.type == ChangeType.change) {
+          int timeArrangementIndex = indexOriginalTimeArrangementList.first;
+
           log.info(
             "[getClasstable][getEhall] "
-            "New weeklist "
-            "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
+            "Class change. Teacher changed? ${e.isTeacherChanged}. timeArrangementIndex is $timeArrangementIndex",
           );
+          for (int indexOriginalTimeArrangement
+              in indexOriginalTimeArrangementList) {
+            /// Seek for the change entry. Delete the classes moved waay.
+            log.info(
+              "[getClasstable][getEhall] "
+              "Original weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
+              "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
+            );
+            for (int i in e.originalAffectedWeeksList) {
+              log.info(
+                "[getClasstable][getEhall] "
+                "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
+              );
+              if (preliminaryData
+                  .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
+                preliminaryData.timeArrangement[indexOriginalTimeArrangement]
+                    .weekList[i] = false;
+                timeArrangementIndex = preliminaryData
+                    .timeArrangement[indexOriginalTimeArrangement].index;
+              }
+            }
+
+            log.info(
+              "[getClasstable][getEhall] "
+              "New weeklist ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
+            );
+          }
+
+          if (timeArrangementIndex == indexOriginalTimeArrangementList.first) {
+            cache.add(e);
+            timeArrangementIndex = preliminaryData
+                .timeArrangement[indexOriginalTimeArrangementList.first].index;
+          }
+
+          log.info(
+            "[getClasstable][getEhall] "
+            "New week: ${e.newAffectedWeeks}, "
+            "day: ${e.newWeek}, "
+            "startToStop: ${e.newClassRange}, "
+            "timeArrangementIndex: $timeArrangementIndex.",
+          );
+
+          bool flag = false;
+          ClassChange? toRemove;
+          log.info("[getClasstable][getEhall] cache length = ${cache.length}");
+          for (var f in cache) {
+            //log.info("[getClasstable][getFromWeb]"
+            //    "${f.className} ${f.classCode} ${f.originalClassRange} ${f.originalAffectedWeeksList} ${f.originalWeek}");
+            //log.info("[getClasstable][getFromWeb]"
+            //    "${e.className} ${e.classCode} ${e.newClassRange} ${e.newAffectedWeeksList} ${e.newWeek}");
+            //log.info("[getClasstable][getFromWeb]"
+            //    "${f.className == e.className} ${f.classCode == e.classCode} ${listEquals(f.originalClassRange, e.newClassRange)} ${listEquals(f.originalAffectedWeeksList, e.newAffectedWeeksList)} ${f.originalWeek == e.newWeek}");
+            if (f.className == e.className &&
+                f.classCode == e.classCode &&
+                listEquals(f.originalClassRange, e.newClassRange) &&
+                listEquals(
+                    f.originalAffectedWeeksList, e.newAffectedWeeksList) &&
+                f.originalWeek == e.newWeek &&
+                f.originalTeacherData == e.newTeacherData) {
+              flag = true;
+              toRemove = f;
+              break;
+            }
+          }
+
+          if (flag) {
+            cache.remove(toRemove);
+            log.info(
+              "[getClasstable][getEhall] "
+              "Cannot be added",
+            );
+            continue;
+          }
+
+          log.info(
+            "[getClasstable][getEhall] "
+            "Can be added",
+          );
+
+          /// Add classes.
+          preliminaryData.timeArrangement.add(
+            TimeArrangement(
+              source: Source.school,
+              index: timeArrangementIndex,
+              weekList: e.newAffectedWeeks!,
+              day: e.newWeek!,
+              start: e.newClassRange[0],
+              stop: e.newClassRange[1],
+              classroom: e.newClassroom ?? e.originalClassroom,
+              teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
+            ),
+          );
+        } else {
+          log.info(
+            "[getClasstable][getEhall] "
+            "Class stop.",
+          );
+
+          for (int indexOriginalTimeArrangement
+              in indexOriginalTimeArrangementList) {
+            log.info(
+              "[getClasstable][getEhall] "
+              "Original weeklist "
+              "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList} "
+              "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
+            );
+            for (int i in e.originalAffectedWeeksList) {
+              log.info(
+                "[getClasstable][getEhall] "
+                "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
+              );
+              if (preliminaryData
+                  .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
+                preliminaryData.timeArrangement[indexOriginalTimeArrangement]
+                    .weekList[i] = false;
+              }
+            }
+            log.info(
+              "[getClasstable][getEhall] "
+              "New weeklist "
+              "${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList}.",
+            );
+          }
         }
+        toBeRemovedIndex.add(toDeal.indexOf(e));
       }
+      toDeal = [
+        for (var i = 0; i < toDeal.length; ++i)
+          if (!toBeRemovedIndex.contains(i)) toDeal[i]
+      ];
+      log.info(
+        "[getClasstable][getEhall] "
+        "After this turn, ${toDeal.length} left, removed $toBeRemovedIndex.",
+      );
     }
 
     return preliminaryData;
