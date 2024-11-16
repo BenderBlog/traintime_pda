@@ -1,8 +1,10 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
@@ -35,21 +37,55 @@ class ElectricityCard extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context) => SimpleDialog(
-              title: const Text("水电信息"),
+              title: Text(FlutterI18n.translate(
+                context,
+                "homepage.electricity_card.title",
+              )),
               children: [
                 Obx(
-                  () => Text(
-                    "是否为缓存：${isCache}\n"
-                    "上次更新时间：${electricityInfo.value.fetchDay}\n"
-                    "电费帐号：${PaymentSession.electricityAccount()}\n"
-                    "电量信息：${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? "度电" : ""}\n"
-                    "欠费信息：${electricityInfo.value.owe}\n"
-                    "长按可以重新加载，有欠费一般代表水费",
+                  () => Text.rich(
+                    TextSpan(children: [
+                      if (isCache.value)
+                        TextSpan(
+                          text: FlutterI18n.translate(
+                            context,
+                            "homepage.electricity_card.cache_notice",
+                            translationParams: {
+                              "date": Jiffy.parseFromDateTime(
+                                electricityInfo.value.fetchDay,
+                              ).format(
+                                pattern: "yyyy-MM-dd HH:mm:ss",
+                              ),
+                            },
+                          ),
+                        ),
+                      TextSpan(
+                        text: FlutterI18n.translate(
+                          context,
+                          "homepage.electricity_card.dialog_content",
+                          translationParams: {
+                            "account":
+                                PaymentSession.electricityAccount().toString(),
+                            "electricityInfo": "${FlutterI18n.translate(
+                              context,
+                              electricityInfo.value.remain,
+                            )}${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
+                            "owe": FlutterI18n.translate(
+                              context,
+                              electricityInfo.value.owe,
+                            ),
+                          },
+                        ),
+                      ),
+                    ]),
                   ),
                 ).paddingSymmetric(horizontal: 24),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("确定"),
+                  child: Text(FlutterI18n.translate(
+                    context,
+                    "confirm",
+                  )),
                 ).paddingSymmetric(horizontal: 24),
               ],
             ),
@@ -66,31 +102,33 @@ class ElectricityCard extends StatelessWidget {
         () => MainPageCard(
           isLoad: isLoad.value,
           icon: MingCuteIcons.mgc_flash_line,
-          text: "电量信息",
-          infoText: RichText(
-            text: TextSpan(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 20,
-              ),
-              children: electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
-                  ? [
-                      const TextSpan(text: "目前电量 "),
-                      TextSpan(
-                          text: double.parse(
-                        electricityInfo.value.remain,
-                      ).truncate().toString()),
-                      const TextSpan(text: " 度"),
-                    ]
-                  : [
-                      TextSpan(
-                        text: electricityInfo.value.remain,
-                      ),
-                    ],
+          text: FlutterI18n.translate(
+            context,
+            "homepage.electricity_card.title",
+          ),
+          infoText: Text(
+            electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
+                ? FlutterI18n.translate(
+                    context,
+                    "homepage.electricity_card.current_electricity",
+                    translationParams: {
+                      "amount": electricityInfo.value.remain,
+                    },
+                  )
+                : FlutterI18n.translate(
+                    context,
+                    electricityInfo.value.remain,
+                  ),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 20,
             ),
           ),
           bottomText: Text(
-            electricityInfo.value.owe,
+            FlutterI18n.translate(
+              context,
+              electricityInfo.value.owe,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),

@@ -259,14 +259,14 @@ homepage:
         fetching_infoText: "正在加载"
         no_arrangement_infoText: "暂无日程"
     electricity_card:
-        title: "电量信息"
-        current_electricity: "目前电量 "
-        kwh: " 度"
-        dialog_title: "水电信息"
-        dialog_content: "电费帐号：{account}
-            电量信息：{value} {electricityInfo}
-            欠费信息：{owe_value}
-            长按可以重新加载，有欠费一般代表水费"
+        title: "水电信息"
+        current_electricity: "目前电量 {amount} 度"
+        cache_notice: "当前加载为缓存，获取于 {date}\n"
+        dialog_content: |
+            电费帐号：{account}
+            电量信息：{electricityInfo}
+            欠费信息：{owe}
+            长按可以重新加载，有欠费一般代表水费
     library_card:
         title: "图书借阅"
         current_borrow: "目前借书 "

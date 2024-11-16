@@ -237,12 +237,20 @@ homepage:
     fetching_infoText: 正在載入
     no_arrangement_infoText: 暫無日程
   electricity_card:
-    title: 電量資訊
-    current_electricity: '目前電量 '
-    kwh: ' 度'
-    dialog_title: 水電資訊
-    dialog_content: 電費帳號：{account} 電量資訊：{value} {electricityInfo} 欠費資訊：{owe_value}
+    title: 水電資訊
+    current_electricity: 目前電量 {amount} 度
+    cache_notice: '當前載入為快取，獲取於 {date}
+
+      '
+    dialog_content: '電費帳號：{account}
+
+      電量資訊：{electricityInfo}
+
+      欠費資訊：{owe}
+
       長按可以重新載入，有欠費一般代表水費
+
+      '
   library_card:
     title: 圖書借閱
     current_borrow: '目前借書 '
