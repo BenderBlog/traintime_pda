@@ -153,10 +153,7 @@ class ClassTableWidgetState with ChangeNotifier {
   /// Get class detail by prividing index of timearrangement
   ClassDetail getClassDetail(int index) =>
       (isPartner ? partnerClass! : classTableController.classTableData)
-          .getClassDetail(
-        (isPartner ? partnerClass! : classTableController.classTableData)
-            .timeArrangement[index],
-      );
+          .getClassDetail(timeArrangement[index]);
 
   /// Bridge function to add/del/edit user defined class
   /// Only main classtable support it!
@@ -256,18 +253,21 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Generate icalendar file string.
   String get iCalenderStr {
-    String toReturn = "BEGIN:VCALENDAR\n";
+    String toReturn = "BEGIN:VCALENDAR\nTZID:Asia/Shanghai\n";
     for (var i in timeArrangement) {
       String summary =
-          "SUMMARY:${classDetail[i.index].name}@${i.classroom ?? "待定"}\n";
+          "SUMMARY:${getClassDetail(timeArrangement.indexOf(i))}@${i.classroom ?? "待定"}\n";
       String description =
-          "DESCRIPTION:课程名称：${classDetail[i.index].name}; 上课地点：${i.classroom ?? "待定"}\n";
+          "DESCRIPTION:课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; "
+          "上课地点：${i.classroom ?? "待定"}\n";
       for (int j = 0; j < i.weekList.length; ++j) {
         if (!i.weekList[j]) {
           continue;
         }
-        Jiffy day =
-            Jiffy.parseFromDateTime(startDay).add(weeks: j, days: i.day - 1);
+        Jiffy day = Jiffy.parseFromDateTime(startDay).add(
+          weeks: j,
+          days: i.day - 1,
+        );
         String vevent = "BEGIN:VEVENT\n$summary";
         List<String> startTime = time[(i.start - 1) * 2].split(":");
         List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
