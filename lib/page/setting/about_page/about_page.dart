@@ -296,8 +296,8 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Let It Roll Edition"
-                      : "May You Never Edition",
+                      ? "Within the Autumn of Conscious - PDA One Year Anniversary Edition"
+                      : "Across the Universe - PDA One Year Anniversary Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
               ],

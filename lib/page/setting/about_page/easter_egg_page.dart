@@ -4,179 +4,11 @@
 // Python script by arttnba3
 
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:pinyin/pinyin.dart';
-
-Map<String, int> tableChangeAlphabet = {
-  "l": 1,
-  "o": 0,
-  "a": 4,
-  "e": 3,
-  "t": 7,
-  "i": 1,
-  "g": 9,
-  "q": 9,
-  "s": 5,
-};
-
-Map<String, List<String>> abstractTable = {
-  'fei': ['💴'],
-  'da': ['🐘'],
-  'kai': ['🔓'],
-  'hui': ['🩶'],
-  'yi': ['①', 'Ⅰ', '🥻', '➖'],
-  'er': ['②', 'Ⅱ', '👂🏻'],
-  'san': ['③', 'Ⅲ', '🌂', '🥪', '☘', '📐'],
-  'si': ['④', 'Ⅳ', '似', '☠️'],
-  'wu': ['⑤', 'Ⅴ', '🕺🏻', '🈚️'],
-  'liu': ['⑥', 'Ⅵ'],
-  'qi': ['⑦', 'Ⅶ', '🚴🏿'],
-  'ba': ['⑧', 'Ⅷ', '👨🏻'],
-  'jiu': ['⑨', 'Ⅸ', '🍷'],
-  'shi': ['⑩', 'Ⅹ', '🪨', '💩'],
-  'zhi': ['🈯', '☞', '🧻', '📃'],
-  'chou': ['🚬'],
-  'xiang': ['🐘'],
-  'biao': ['⌚'],
-  'de': ['🉐'],
-  'niu': ['🐂'],
-  'hu': ['🐅'],
-  'ma': ['🐎', '🤱🏻'],
-  'yang': ['🐏', '☀'],
-  'hou': ['🐒'],
-  'mo': ['👺'],
-  'ji': ['🐔', '✈️'],
-  'gou': ['🐕', '🐶'],
-  'suan': ['🍋'],
-  'ku': ['🆒', '😭', '🥲'],
-  'le': ['🤣'],
-  'she': ['🐍'],
-  'zhu': ['🐖', '㊗️'],
-  'long': ['🐉', '🐲'],
-  'zhong': ['🀄️'],
-  'hua': ['🌸'],
-  'fa:': ['🇫🇷'],
-  'fang': ['◻️'],
-  'ran': ['🔥'],
-  'shu': ['📕', '🐀', '📖', '🌲'],
-  'ru': ['🧴'],
-  'ben': ['📕', '📖'],
-  'jiao': ['🦵', '🔈', '🎺', '🗣🗣🗣'],
-  'chong': ['🏄‍'],
-  'bi': ['🖊'],
-  'gao': ['⛏'],
-  'suo': ['🔒'],
-  'jian': ['➖'],
-  'jing': ['🚨', '🐋', '🐳'],
-  'cuo': ['×'],
-  'dao': ['🔪'],
-  'guai': ['🧞'],
-  'shuo': ['🗣'],
-  'deng': ['🟰', '🛋️'],
-  'chu': ['÷', '➗️'],
-  'cheng': ['×', '❌', '✖'],
-  'jia': ['＋', '➕', '⛽', '🏠'],
-  'you': ['👉', '🈶'],
-  'ce': ['🚻'],
-  'cao': ['🌿'],
-  'lang': ['🌊', '🐺'],
-  'tu': ['🐇'],
-  'cai': ['👎', '🥬'],
-  'men': ['🚪'],
-  'ju': ['🍊'],
-  'nao': ['🧠'],
-  'bu': ['⛔', '🚫', '🖐🏻'],
-  'guo': ['🍎'],
-  'he': ['⚛️'],
-  'sheng': ['🔊'],
-  'xian': ['🧵'],
-  'mu': ['🤱🏻'],
-  'shou': ['🖐🏻', '📻'],
-  'zai': ['♻️'],
-  'shang': ['👆'],
-  'xia': ['👇'],
-  'zuo': ['👈'],
-  'xiao': ['🏫'],
-  'hei': ['👨🏿'],
-  'kong': ['🈳'],
-  'guan': ['📴', '🧪'],
-  'qing': ['🌤'],
-  'dong': ['🕳'],
-  'yao': ['💊'],
-  'kan': ['👀'],
-  'qian': ['💴'],
-  'dai': ['🛍️'],
-  'lou': ['🏢'],
-  'zao': ['🛀'],
-  'mao': ['🐱'],
-  'ye': ['👴'],
-  'ban': ['©️'],
-  'neng': ['🉑'],
-  'ke': ['🉑'],
-  'hao': ['👌'],
-  'ken': ['🥺'],
-  'ding': ['📌'],
-  'bie': ['⑧'],
-  'ni': ['🫵'],
-  'ri': ['☀', '🌞'],
-  'lei': ['💦'],
-  'han': ['💦'],
-  'shui': ['💦'],
-  'xin': ['♥'],
-  'yan': ['👀', '🧂'],
-  'yin': ['🔈'],
-  'dui': ['√'],
-  'liang': ['②'],
-  'ren': ['🧑'],
-  'dan': ['🥚'],
-  'lu': ['🦌'],
-  'dian': ['⚡'],
-  'zhuan': ['🧱'],
-  'bing': ['🧊'],
-  'gui': ['👻', '🐢'],
-  'xiong': ['🐻'],
-  'kun': ['😪'],
-  'tang': ['🍬'],
-  'yue': ['🈷️', '🌙'],
-  'jin': ['🈲'],
-  'ge': ['🈹'],
-  'shao': ['🥄'],
-  'gua': ['🍉'],
-  'zha': ['💥'],
-  'wa': ['🐸'],
-  'tian': ['👅'],
-  'leng': ['🥶'],
-};
-
-Map<String, String> abstractTableMulti = {
-  '0xcafebabe': '☕👶🏻',
-  '咖啡': '☕',
-  '宝贝': '👶',
-  'cafebabe': '☕👶🏻',
-  '我': '👴',
-  '信号': '📶',
-  '电脑': '💻',
-  '可可': '🍫',
-  '企鹅': '🐧',
-  '厕所': '🚻',
-  'wc': '🚾',
-  '?': '❓',
-  '？': '❓',
-  '豆腐': '🧈',
-  '网安大楼': '🌃',
-  '小丑': '🤡',
-  '击剑': '🤺',
-  'sos': '🆘',
-  'atm': '🏧',
-  'rx': '↱χ',
-  'RX': '↱χ',
-  'Rx': '↱χ',
-};
 
 class EasterEggPage extends StatefulWidget {
   const EasterEggPage({super.key});
@@ -186,76 +18,19 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
+  final String urlApple = "https://www.bilibili.com/video/BV1as411f7ks/";
 
-  final String urlApple = "https://www.bilibili.com/video/BV1wN4y1L7Ut";
+  final String urlOthers = "https://www.bilibili.com/video/BV13T41177zn/";
 
-  final String urlOthers = "https://www.bilibili.com/video/BV1HN411Y7Ct?p=7";
+  String eastereggProduct = '''
+Easter egg page under constrction...
 
-  TextEditingController inputController = TextEditingController(
-    text: Platform.isIOS
-        ? '''
-[Verse 1]
-Let it roll across the floor
-Through the hall and out the door
-To the fountain of perpetual mirth
-Let it roll for all it's worth
+"Within the Autumn of Conscious" -> 不思議なお祓い棒, Gensokyo Band, Double Dealing Character, 2013
+"Across the Universe" -> Across the Universe, The Beatles, Let It Be, 1970
 
-我们穿过大堂而去
-穿过大厅，出门而去
-向着永远充满欢乐的源头前进
-为了欢乐，我们一起前进
+Book of PDA
 
-[Verse 2]
-Find me where ye echo lays
-Lose ye bodies in the maze
-See the Lord and all the mouths he feeds
-Let it roll among the weeds
-
-在回声中找到我
-你在迷宫中迷失
-看到上天和芸芸众生
-我们穿过草丛而去
-
-[Chorus]
-Let it roll
-
-我们继续前进吧
-
-(Sir Frankie Crisp
-Oh, Sir Frankie Crisp
-Oh, Sir Frankie Crisp
-Oh, Sir Frankie Crisp)
-
-[Verse 3]
-Let it roll down through the caves
-Ye long walks of Coole and Shades
-Through ye woode, here may ye rest awhile
-Handkerchiefs to match your tie
-
-我们继续穿过洞穴
-从阴凉中走过
-在树丛下，他休息了一下
-拿出手帕擦擦汗
-
-[Chorus]
-Let it roll...
-
-我们继续前进吧
-
-[Verse 4]
-Fools illusions everywhere
-Joan and Molly sweeps the stairs
-Eyes are shining full of inner light
-Let it roll into the night
-
-街上都是麻木的人
-小明和小红在擦楼梯
-在夜晚他们的眼睛很明亮
-我们在这夜晚中前进吧
-
-Ballad of Sir Frankie Crisp (Let It Roll)
-by George Harrison
-from All Things Must Pass, 1970
+==== Main Charater ====
 
 Once upon a time, there's a 'Hard Lovin' Man called Ray, whose understand the power of the Railgun called 'Flight of the Rat. 
 
@@ -268,85 +43,36 @@ The rat is clever, actually she is a angel named Elliot. We don't know why her s
 She knows he is the 'Child of the Time. They may argue, may laugh. In my opinion, she lighten Ray's seemly colorless life.
 
 Don't know how time flies, she made he faster in running, attacking. With the power of the 'Rat gun', he become the threating 'Speed King.
-'''
-        : '''
-And may you never lay your head down
-Without a hand to hold
-May you never make your bed out in the cold
 
-请你不要在无人支持时低下头颅
-愿你不要孤身一人
+==== Another Main Charater ====
 
-You’re just like a great strong brother of mine
-You know that I love you true
-And you never talk dirty behind my back
-And I know that there’s those that do
+Another time, in the midland of Orestreich, a lonely bard named Reggirt, found a Knight (Contributer To Be Decided) shooting at the Sun.
 
-你就像我坚强的哥哥
-我真的爱你
-有人在背后说我的坏话
-而你从不
+"Just another 'Firefall, it soon become mime.", the Knight said.
 
-Oh please won’t you, please won’t you
-Bear it in mind
-Love is a lesson to learn in our time
-Now please won’t you, please won’t you
-Bear it in mind for me
+"What's your purpose, sir? You may get your head kicked by a 'Mule", Reggrit asked.
 
-请你不要忘记
-爱是你我生命中的必修课
-请你不要 请你不要 请你不要忘记
-请你牢记在心
+Knight smiled, "It's not the Sun, 'no no no, it's the 'Demon's Eye. The source of mystery, of pain, of all struggle..."
 
-John Martyn, covered by Eric Clapton
-from Slowhand, 1977
+"Wait! It's the source of all living thing, we're all hers 'Daughter..."
 
-Translated by Ray (Elliot Edition)
+"... and that's our parents, 'Fools!" Knight signed, "What a complex feeling, 'No one came to realize this felling like me..."
 
-Once upon a time, there's a 'Hard Lovin' Man called Ray, whose understand the power of the Railgun called 'Flight of the Rat. 
+==== The Evil ====
 
-Once after a battle with a 'Bloodsucker, he was tired as a high school student. He discovered a Purple Rat in the Square Forest.
+So the time files, the world became colorless, the 'Night Prowler born from the shadow of the sun.
 
-Unknown her name, "She like a sweet potato, like my Rat gun. Just call her Sweet Purple Potato Ball, idk...", he thought. And he brought her to his home(maybe?)
+With the uncertain of the humanity and the grease of the relationship, it became more powerful. 
 
-The rat is clever, actually she is a angel named Elliot. We don't know why her soul inside a rat. Forgive me, I am drunked.
+Soon, it took away the joy, trust, and all stuff we could remains years of years. He named himself Bender, who realized his goal is to bent everything entertains us.
 
-She knows he is the 'Child of the Time. They may argue, may laugh. In my opinion, she lighten Ray's seemly colorless life.
+Night Prowler itself evolued into a sliver chrome machinery, with laser eyes which absorb the happiness and sweetie from air and earth.
 
-Don't know how time flies, she made he faster in running, attacking. With the power of the 'Rat gun', he become the threating 'Speed King.
-''',
-  );
+Itself found that a band, 'Sgt. Pepper Lonely Hearted Band, is the source of the bright things of the world.
 
-  TextEditingController resultController = TextEditingController();
+He deside to let them 'bite his shiny metal ass, and seal them with 'The Devil's Triangle...
 
-  void onSubmitted() {
-    String value = inputController.text;
-    for (var i in abstractTableMulti.entries) {
-      value = value.replaceAll(i.key, i.value);
-    }
-
-    List<String> toReturn = value.split('');
-    for (int i = 0; i < toReturn.length; ++i) {
-      String pinyin = PinyinHelper.getPinyinE(toReturn[i]);
-      if (abstractTable.containsKey(pinyin)) {
-        toReturn[i] = abstractTable[pinyin]
-                ?[Random().nextInt(abstractTable[pinyin]?.length ?? 0 - 1)] ??
-            toReturn[i];
-      }
-      bool change1 = Random().nextBool();
-      bool change2 = Random().nextBool();
-      if (toReturn[i].toLowerCase() == 'o' && change1 && change2) {
-        toReturn[i] = '⭕️';
-      }
-      if (change1 &&
-          tableChangeAlphabet.containsKey(toReturn[i].toLowerCase())) {
-        toReturn[i] =
-            tableChangeAlphabet[toReturn[i].toLowerCase()]?.toString() ??
-                toReturn[i];
-      }
-    }
-    resultController.text = toReturn.join();
-  }
+''';
 
   @override
   Widget build(BuildContext context) {
@@ -360,77 +86,32 @@ Don't know how time flies, she made he faster in running, attacking. With the po
         ),
       ),
       body: [
-        const SizedBox(height: 16.0),
-        TextFormField(
-          maxLines: null,
-          minLines: 1,
-          controller: inputController,
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-          ),
-        )
-            .padding(horizontal: 12)
-            .decorated(
-              border: Border.all(
-                width: 2,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-            )
-            .expanded(),
-        const SizedBox(height: 8),
         [
-          TextButton(
-            onPressed: onSubmitted,
-            child: Text(FlutterI18n.translate(
-              context,
-              "setting.easter_egg_page.encrypt",
-            )),
-          ),
-          TextButton(
+          IconButton.filled(
             onPressed: () => launchUrl(
               Uri.parse(
                 Platform.isIOS || Platform.isMacOS ? urlApple : urlOthers,
               ),
               mode: LaunchMode.externalApplication,
             ),
-            child: Text(FlutterI18n.translate(
-              context,
-              "setting.easter_egg_page.listen",
-            )),
+            icon: const Icon(Icons.headphones),
           ),
-          TextButton(
+          IconButton.filledTonal(
             onPressed: () => launchUrl(
               Uri.parse(
                 Platform.isIOS || Platform.isMacOS ? urlOthers : urlApple,
               ),
               mode: LaunchMode.externalApplication,
             ),
-            child: const Text("听另一首歌"),
+            icon: const Icon(Icons.headphones),
           ),
-        ].toRow(mainAxisAlignment: MainAxisAlignment.center),
-        const SizedBox(height: 8),
-        TextField(
-          controller: resultController,
-          readOnly: true,
-          maxLines: null,
-          minLines: 1,
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-          ),
-        )
-            .padding(horizontal: 12)
-            .decorated(
-              border: Border.all(
-                width: 2,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-            )
-            .expanded(),
-        const SizedBox(height: 16.0),
+        ]
+            .toRow(mainAxisAlignment: MainAxisAlignment.center)
+            .padding(bottom: 16.0),
+        Text(eastereggProduct),
       ]
           .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
+          .scrollable()
           .center()
           .padding(horizontal: 16)
           .safeArea(),

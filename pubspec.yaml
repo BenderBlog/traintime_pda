@@ -59,7 +59,6 @@ dependencies:
   timelines: ^0.1.0
   based_split_view: ^1.2.0
   disclosure: ^2.2.0
-  pinyin: ^3.3.0
   content_resolver: ^0.3.1
   # Homepage Widget
   home_widget: ^0.6.0
