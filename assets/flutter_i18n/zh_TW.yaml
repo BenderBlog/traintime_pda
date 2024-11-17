@@ -397,8 +397,15 @@ score:
 setting:
   about: 關於
   about_this_program: 關於本程式
-  version: 版本號：{version_code}
+  version: 版本號：{version}
   user_info: 使用者資訊
+  check_update: 檢查軟體更新
+  latest_version: '最新版本: {latest}'
+  waiting: 等待獲取
+  fetching_update: 正在獲取更新資訊
+  current_stable: 目前您正在執行最新版
+  current_testing: 目前您正在執行測試版
+  fetch_failed: 獲取更新資訊失敗
   ui_setting: 介面設定
   brightness_setting: 設定深淺色
   simplify_timeline: 簡化日程時間軸
@@ -408,6 +415,7 @@ setting:
   experiment_password_setting: 物理實驗系統密碼設定
   electricity_password_setting: 電費帳號密碼設定
   electricity_password_description: 非 123456 請設定
+  electricity_account_setting: 電費賬號設定
   classtable_setting: 課表相關設定
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面
@@ -416,20 +424,19 @@ setting:
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏
   clear_user_class: 清除所有使用者新增課程
-  clear_user_class_dialog:
-    title: 確認對話方塊
-    content: 是否要清除所有使用者新增課程？這個功能對從學校獲取的日程沒有影響。
-    clear: 已經清除完畢
+  clear_user_class_title: 確認對話方塊
+  clear_user_class_content: 是否要清除所有使用者新增課程？這個功能對從學校獲取的日程沒有影響。
+  clear_user_class_clear: 已經清除完畢
   class_refresh: 強制重新整理課表
-  class_refresh_dialog:
-    title: 確認對話方塊
-    content: 是否要強制重新整理課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
+  class_refresh_title: 確認對話方塊
+  class_refresh_content: 是否要強制重新整理課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
   class_swift: 課程偏移設定
   class_swift_description: '正數錯後開學日期 負數提前開學日期
 
-    目前為 {swift}'
+    目前為 {swift}
+
+    '
   core_setting: 快取登入設定
-  check_catcher: 測試錯誤攔截器
   check_logger: 檢視網路攔截器和日誌
   clear_and_restart: 清除快取後重啟
   clear_and_restart_dialog:
@@ -454,15 +461,24 @@ setting:
     title: 課程偏移設定
     input_hint: 請在此輸入數字
   change_electricity_title: 修改電費帳號密碼
+  change_electricity_account:
+    title: 修改電費帳號密碼
+    input_hint: 請在此輸入賬號
   change_experiment_title: 修改物理實驗賬號密碼
   change_sport_title: 修改體育系統賬號密碼
   change_password_dialog:
     input_hint: 請在此輸入密碼
     blank_input: 輸入空白!
-  easter_egg_page:
-    title: 你找到了彩蛋
-    encrypt: 加密上面的文字
-    listen: 聽歌時間
+  update_dialog:
+    new_version: 新版本釋出
+    not_now: 暫不更新
+    app_store: App Store 更新
+    download_apk: 下載安裝包
+    github_release: 去 Git Release
+    new_content: '版本號 {code} 新增內容：
+
+      '
+  easter_egg_page: 你找到了彩蛋
   about_page:
     benderblog: 主要開發者，iOS 小部件編寫和拼接
     bellssgit: 支援：最佳&最久故障反饋者

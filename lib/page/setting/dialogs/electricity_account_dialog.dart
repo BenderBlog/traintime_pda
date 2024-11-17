@@ -4,6 +4,7 @@
 // Electricity account dialog.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -22,24 +23,36 @@ class ElectricityAccountDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('修改电费账户密码'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "setting.change_electricity_account.title",
+      )),
       content: TextField(
         autofocus: true,
         controller: _controller,
-        decoration: const InputDecoration(
-          hintText: "请在此输入账号",
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          hintText: FlutterI18n.translate(
+            context,
+            "setting.change_electricity_account.input_hint",
+          ),
+          border: const OutlineInputBorder(),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('取消'),
+          child: Text(FlutterI18n.translate(
+            context,
+            "cancel",
+          )),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: const Text('提交'),
+          child: Text(FlutterI18n.translate(
+            context,
+            "confirm",
+          )),
           onPressed: () async {
             if (_controller.text.isNotEmpty) {
               preference.setString(

@@ -81,7 +81,7 @@ He deside to let them 'bite his shiny metal ass, and seal them with 'The Devil's
         title: Text(
           FlutterI18n.translate(
             context,
-            "setting.easter_egg_page.title",
+            "setting.easter_egg_page",
           ),
         ),
       ),

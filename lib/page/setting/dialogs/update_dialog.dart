@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/message/message.dart';
 
@@ -16,32 +17,53 @@ class UpdateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String text = "版本号 ${updateMessage.code} 新增内容：\n";
+    String text = FlutterI18n.translate(
+      context,
+      "setting.update_dialog.new_content",
+      translationParams: {
+        "code": updateMessage.code,
+      },
+    );
     for (int i = 0; i < updateMessage.update.length; ++i) {
       text += "${i + 1}.${updateMessage.update[i]}\n";
     }
     return AlertDialog(
-      title: const Text("新版本发布"),
+      title: Text(FlutterI18n.translate(
+        context,
+        "setting.update_dialog.new_version",
+      )),
       content: Text(text),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text("暂不更新"),
+          child: Text(FlutterI18n.translate(
+            context,
+            "setting.update_dialog.not_now",
+          )),
         ),
         if (Platform.isIOS)
           TextButton(
             onPressed: () => launchUrlString(updateMessage.ioslink),
-            child: const Text("App Store 更新"),
+            child: Text(FlutterI18n.translate(
+              context,
+              "setting.update_dialog.app_store",
+            )),
           )
         else if (Platform.isAndroid)
           TextButton(
             onPressed: () => launchUrlString(updateMessage.fdroid),
-            child: const Text("下载安装包"),
+            child: Text(FlutterI18n.translate(
+              context,
+              "setting.update_dialog.download_apk",
+            )),
           )
         else
           TextButton(
             onPressed: () => launchUrlString(updateMessage.github),
-            child: const Text("去 Git Release"),
+            child: Text(FlutterI18n.translate(
+              context,
+              "setting.update_dialog.github_release",
+            )),
           )
       ],
     );

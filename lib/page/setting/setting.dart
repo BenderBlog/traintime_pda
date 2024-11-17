@@ -118,27 +118,59 @@ class _SettingWindowState extends State<SettingWindow> {
           // 功能1
           const SizedBox(height: 20),
           ReXCard(
-              title: _buildListSubtitle('关于'),
+              title: _buildListSubtitle(FlutterI18n.translate(
+                context,
+                "setting.about",
+              )),
               remaining: const [],
               bottomRow: Column(children: [
                 ListTile(
-                  title: const Text("关于本程序"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.about_this_program",
+                  )),
                   subtitle: Text(
-                      '版本号：${preference.packageInfo.version}+${preference.packageInfo.buildNumber}'),
+                    FlutterI18n.translate(
+                      context,
+                      "setting.version",
+                      translationParams: {
+                        "version": "${preference.packageInfo.version}+"
+                            "${preference.packageInfo.buildNumber}"
+                      },
+                    ),
+                  ),
                   onTap: () => context.pushReplacement(const AboutPage()),
                   trailing: const Icon(Icons.navigate_next),
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text("检查软件更新"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.check_update",
+                  )),
                   subtitle: Obx(
                     () => Text(
-                      '最新版本: ${updateMessage.value?.code ?? "等待获取"}',
+                      FlutterI18n.translate(
+                        context,
+                        "setting.latest_version",
+                        translationParams: {
+                          "latest": updateMessage.value?.code ??
+                              FlutterI18n.translate(
+                                context,
+                                "setting.waiting",
+                              ),
+                        },
+                      ),
                     ),
                   ),
                   onTap: () {
                     ProgressDialog pd = ProgressDialog(context: context);
-                    pd.show(msg: '正在获取更新信息');
+                    pd.show(
+                      msg: FlutterI18n.translate(
+                        context,
+                        "setting.fetching_update",
+                      ),
+                    );
                     checkUpdate().then((value) async {
                       pd.close();
                       if (context.mounted) {
@@ -154,7 +186,12 @@ class _SettingWindowState extends State<SettingWindow> {
                         } else {
                           showToast(
                             context: context,
-                            msg: value == null ? "目前您在运行测试版" : "目前您运行的是最新稳定版",
+                            msg: FlutterI18n.translate(
+                              context,
+                              value == null
+                                  ? "setting.current_stable"
+                                  : "setting.current_testing",
+                            ),
                           );
                         }
                       }
@@ -163,7 +200,10 @@ class _SettingWindowState extends State<SettingWindow> {
                       if (context.mounted) {
                         showToast(
                           context: context,
-                          msg: "获取更新信息失败",
+                          msg: FlutterI18n.translate(
+                            context,
+                            "setting.fetch_failed",
+                          ),
                         );
                       }
                     });
@@ -174,27 +214,38 @@ class _SettingWindowState extends State<SettingWindow> {
           ReXCard(
               title: _buildListSubtitle(FlutterI18n.translate(
                 context,
-                "setting.account_setting",
+                "setting.ui_setting",
               )),
               remaining: const [],
               bottomRow: Column(children: [
                 ListTile(
-                    title: const Text('设置深浅色'),
+                    title: Text(FlutterI18n.translate(
+                      context,
+                      "setting.brightness_setting",
+                    )),
                     subtitle: Text(demoBlueModeName[
                         preference.getInt(preference.Preference.brightness)]),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
-                          context: context,
-                          builder: (context) => const ChangeBrightnessDialog());
+                        context: context,
+                        builder: (context) => const ChangeBrightnessDialog(),
+                      );
                     }),
                 const Divider(),
                 ListTile(
-                  title: const Text("简化日程时间轴"),
-                  subtitle: const Text("没有日程时 减少空间占用"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.simplify_timeline",
+                  )),
+                  subtitle: Text(FlutterI18n.translate(
+                    context,
+                    "setting.simplify_timeline_description",
+                  )),
                   trailing: Switch(
-                    value: preference
-                        .getBool(preference.Preference.simplifiedClassTimeline),
+                    value: preference.getBool(
+                      preference.Preference.simplifiedClassTimeline,
+                    ),
                     onChanged: (bool value) {
                       setState(() {
                         preference
@@ -212,7 +263,10 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
               ])),
           ReXCard(
-            title: _buildListSubtitle('账号设置'),
+            title: _buildListSubtitle(FlutterI18n.translate(
+              context,
+              "setting.account_setting",
+            )),
             remaining: const [],
             bottomRow: Column(
               children: [
@@ -249,11 +303,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ListTile(
                       title: Text(FlutterI18n.translate(
                         context,
-                        "setting.electricity_password_setting",
-                      )),
-                      subtitle: Text(FlutterI18n.translate(
-                        context,
-                        "setting.electricity_password_description",
+                        "setting.electricity_account_setting",
                       )),
                       trailing: const Icon(Icons.navigate_next),
                       onTap: () {
@@ -266,8 +316,14 @@ class _SettingWindowState extends State<SettingWindow> {
                 ],
                 const Divider(),
                 ListTile(
-                    title: const Text('电费帐号密码设置'),
-                    subtitle: const Text('非 123456 请设置'),
+                    title: Text(FlutterI18n.translate(
+                      context,
+                      "setting.electricity_password_setting",
+                    )),
+                    subtitle: Text(FlutterI18n.translate(
+                      context,
+                      "setting.electricity_password_description",
+                    )),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
@@ -280,23 +336,37 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle('课表相关设置'),
+            title: _buildListSubtitle(FlutterI18n.translate(
+              context,
+              "setting.classtable_setting",
+            )),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: const Text("开启课表背景图"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.background",
+                  )),
                   trailing: Switch(
                     value: preference.getBool(preference.Preference.decorated),
                     onChanged: (bool value) {
                       if (value == true &&
                           !preference
                               .getBool(preference.Preference.decoration)) {
-                        showToast(context: context, msg: '你先选个图片罢，就在下面');
+                        showToast(
+                          context: context,
+                          msg: FlutterI18n.translate(
+                            context,
+                            "setting.no_background",
+                          ),
+                        );
                       } else {
                         setState(() {
                           preference.setBool(
-                              preference.Preference.decorated, value);
+                            preference.Preference.decorated,
+                            value,
+                          );
                         });
                       }
                     },
@@ -304,7 +374,10 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text('课表背景图选择'),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.choose_background",
+                  )),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () async {
                     FilePickerResult? result;
@@ -312,7 +385,13 @@ class _SettingWindowState extends State<SettingWindow> {
                       result = await pickFile(type: FileType.image);
                     } on MissingStoragePermissionException {
                       if (context.mounted) {
-                        showToast(context: context, msg: "未获取存储权限，无法读取文件");
+                        showToast(
+                          context: context,
+                          msg: FlutterI18n.translate(
+                            context,
+                            "setting.no_permission",
+                          ),
+                        );
                       }
                     }
                     if (mounted) {
@@ -322,11 +401,23 @@ class _SettingWindowState extends State<SettingWindow> {
                         preference.setBool(
                             preference.Preference.decoration, true);
                         if (context.mounted) {
-                          showToast(context: context, msg: '设定成功');
+                          showToast(
+                            context: context,
+                            msg: FlutterI18n.translate(
+                              context,
+                              "setting.successful_setting",
+                            ),
+                          );
                         }
                       } else {
                         if (context.mounted) {
-                          showToast(context: context, msg: '你没有选图片捏');
+                          showToast(
+                            context: context,
+                            msg: FlutterI18n.translate(
+                              context,
+                              "setting.failure_setting",
+                            ),
+                          );
                         }
                       }
                     }
@@ -334,16 +425,22 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text("清除所有用户添加课程"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.clear_user_class",
+                  )),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: const Text("确认对话框"),
-                      content: const Text(
-                        "是否要清除所有用户添加课程？"
-                        "这个功能对从学校获取的日程没有影响。",
-                      ),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.clear_user_class_title",
+                      )),
+                      content: Text(FlutterI18n.translate(
+                        context,
+                        "setting.clear_user_class_content",
+                      )),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
@@ -353,7 +450,12 @@ class _SettingWindowState extends State<SettingWindow> {
                                 Theme.of(context).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('取消'),
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "cancel",
+                            ),
+                          ),
                         ),
                         TextButton(
                           onPressed: () {
@@ -365,10 +467,19 @@ class _SettingWindowState extends State<SettingWindow> {
                               file.deleteSync();
                             }
                             Get.find<ClassTableController>().updateClassTable();
-                            showToast(context: context, msg: "已经清除完毕");
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                "setting.clear_user_class_clear",
+                              ),
+                            );
                             Navigator.pop(context);
                           },
-                          child: const Text('确定'),
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "confirm",
+                          )),
                         ),
                       ],
                     ),
@@ -376,16 +487,22 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text("强制刷新课表"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.class_refresh",
+                  )),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: const Text("确认对话框"),
-                      content: const Text(
-                        "是否要强制刷新课表？同意后，"
-                        "将会从学校一站式后端重新获取课表，耗时会比较久。",
-                      ),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.class_refresh_title",
+                      )),
+                      content: Text(FlutterI18n.translate(
+                        context,
+                        "setting.class_refresh_content",
+                      )),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
@@ -395,15 +512,22 @@ class _SettingWindowState extends State<SettingWindow> {
                                 Theme.of(context).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('取消'),
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "cancel",
+                          )),
                         ),
                         TextButton(
                           onPressed: () {
-                            Get.put(ClassTableController())
-                                .updateClassTable(isForce: true);
+                            Get.put(ClassTableController()).updateClassTable(
+                              isForce: true,
+                            );
                             Navigator.pop(context);
                           },
-                          child: const Text('确定'),
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "confirm",
+                          )),
                         ),
                       ],
                     ),
@@ -411,10 +535,20 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text('课程偏移设置'),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.class_swift",
+                  )),
                   subtitle: Text(
-                    '正数错后开学日期 负数提前开学日期\n'
-                    '目前为 ${preference.getInt(preference.Preference.swift)}',
+                    FlutterI18n.translate(
+                      context,
+                      "setting.class_swift_description",
+                      translationParams: {
+                        "swift": preference
+                            .getInt(preference.Preference.swift)
+                            .toString(),
+                      },
+                    ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () {
@@ -433,26 +567,39 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle('缓存登录设置'),
+            title: _buildListSubtitle(FlutterI18n.translate(
+              context,
+              "setting.core_setting",
+            )),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: const Text('查看网络拦截器和日志'),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.check_logger",
+                  )),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => context.push(TalkerScreen(talker: log)),
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text('清除缓存后重启'),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.clear_and_restart",
+                  )),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: const Text("确认对话框"),
-                      content: const Text(
-                        "确定清除缓存后重启程序？",
-                      ),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.clear_and_restart_dialog.title",
+                      )),
+                      content: Text(FlutterI18n.translate(
+                        context,
+                        "setting.clear_and_restart_dialog.content",
+                      )),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
@@ -462,13 +609,21 @@ class _SettingWindowState extends State<SettingWindow> {
                                 Theme.of(context).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('取消'),
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "cancel",
+                          )),
                         ),
                         TextButton(
                           onPressed: () async {
                             ProgressDialog pd =
                                 ProgressDialog(context: context);
-                            pd.show(msg: "正在清理缓存");
+                            pd.show(
+                              msg: FlutterI18n.translate(
+                                context,
+                                "setting.clear_and_restart_dialog.cleaning",
+                              ),
+                            );
                             try {
                               await NetworkSession().clearCookieJar();
                             } on PathNotFoundException {
@@ -481,11 +636,20 @@ class _SettingWindowState extends State<SettingWindow> {
                             /// Clean cache.
                             _removeCache();
                             if (context.mounted) {
-                              showToast(context: context, msg: '缓存已被清除');
+                              showToast(
+                                context: context,
+                                msg: FlutterI18n.translate(
+                                  context,
+                                  "setting.clear_and_restart_dialog.clear",
+                                ),
+                              );
                               Restart.restartApp();
                             }
                           },
-                          child: const Text('确定'),
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "confirm",
+                          )),
                         ),
                       ],
                     ),
@@ -493,15 +657,22 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text('退出登录并重启应用'),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "setting.logout",
+                  )),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: const Text("确认对话框"),
-                      content: const Text(
-                        "确定退出登录？你的所有数据将会被彻底删除！",
-                      ),
+                      title: Text(FlutterI18n.translate(
+                        context,
+                        "setting.logout_dialog.title",
+                      )),
+                      content: Text(FlutterI18n.translate(
+                        context,
+                        "setting.logout_dialog.content",
+                      )),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
@@ -511,13 +682,22 @@ class _SettingWindowState extends State<SettingWindow> {
                                 Theme.of(context).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('取消'),
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "cancel",
+                          )),
                         ),
                         TextButton(
                           onPressed: () async {
-                            ProgressDialog pd =
-                                ProgressDialog(context: context);
-                            pd.show(msg: '正在退出登录');
+                            ProgressDialog pd = ProgressDialog(
+                              context: context,
+                            );
+                            pd.show(
+                              msg: FlutterI18n.translate(
+                                context,
+                                "setting.logout_dialog.logging_out",
+                              ),
+                            );
 
                             /// Clean Cookie
                             try {

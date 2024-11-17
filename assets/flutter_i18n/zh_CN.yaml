@@ -416,8 +416,16 @@ setting:
     # 最顶部
     about: "关于"
     about_this_program: "关于本程序"
-    version: "版本号：{version_code}"
+    version: "版本号：{version}"
     user_info: "用户信息"
+    # 软件更新
+    check_update: "检查软件更新"
+    latest_version: "最新版本: {latest}"
+    waiting: "等待获取"
+    fetching_update: "正在获取更新信息"
+    current_stable: "目前您正在运行最新版"
+    current_testing: "目前您正在运行测试版"
+    fetch_failed: "获取更新信息失败"
     # 界面设置
     ui_setting: "界面设置"
     brightness_setting: "设置深浅色"
@@ -429,6 +437,7 @@ setting:
     experiment_password_setting: "物理实验系统密码设置"
     electricity_password_setting: "电费帐号密码设置"
     electricity_password_description: "非 123456 请设置"
+    electricity_account_setting: "电费账号设置"
     # 课表相关设置
     classtable_setting: "课表相关设置"
     background: "开启课表背景图"
@@ -438,19 +447,18 @@ setting:
     successful_setting: "设定成功"
     failure_setting: "你没有选图片捏"
     clear_user_class: "清除所有用户添加课程"
-    clear_user_class_dialog:
-        title: "确认对话框"
-        content: "是否要清除所有用户添加课程？这个功能对从学校获取的日程没有影响。"
-        clear: "已经清除完毕"
+    clear_user_class_title: "确认对话框"
+    clear_user_class_content: "是否要清除所有用户添加课程？这个功能对从学校获取的日程没有影响。"
+    clear_user_class_clear: "已经清除完毕"
     class_refresh: "强制刷新课表"
-    class_refresh_dialog:
-        title: "确认对话框"
-        content: "是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。"
+    class_refresh_title: "确认对话框"
+    class_refresh_content: "是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。"
     class_swift: "课程偏移设置"
-    class_swift_description: "正数错后开学日期 负数提前开学日期\n目前为 {swift}"
+    class_swift_description: |
+        正数错后开学日期 负数提前开学日期
+        目前为 {swift}
     # 缓存登录设置
     core_setting: "缓存登录设置"
-    check_catcher: "测试错误拦截器"
     check_logger: "查看网络拦截器和日志"
     clear_and_restart: "清除缓存后重启"
     clear_and_restart_dialog:
@@ -476,15 +484,23 @@ setting:
         title: "课程偏移设置"
         input_hint: "请在此输入数字"
     change_electricity_title: "修改电费帐号密码"
+    change_electricity_account:
+        title: "修改电费帐号密码"
+        input_hint: "请在此输入账号"
     change_experiment_title: "修改物理实验账号密码"
     change_sport_title: "修改体育系统账号密码"
     change_password_dialog:
         input_hint: "请在此输入密码"
         blank_input: "输入空白!"
-    easter_egg_page:
-        title: "你找到了彩蛋"
-        encrypt: "加密上面的文本"
-        listen: "听歌时间"
+    update_dialog:
+        new_version: "新版本发布"
+        not_now: "暂不更新"
+        app_store: "App Store 更新"
+        download_apk: "下载安装包"
+        github_release: "去 Git Release"
+        new_content: "版本号 {code} 新增内容：\n"
+    # 关于页面
+    easter_egg_page: "你找到了彩蛋"
     about_page:
         benderblog: "主要开发者，iOS 小部件编写和拼接"
         bellssgit: "支持：最佳&最久故障反馈者"
