@@ -3,9 +3,11 @@
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
@@ -65,21 +67,37 @@ class _SportClassWindowState extends State<SportClassWindow>
           refreshOnStart: true,
           child: Obx(
             () {
-              if (sportClass.value.situation == null &&
-                  sportClass.value.items.isNotEmpty) {
-                return DataList<Widget>(
-                  list: sportClass.value.items
-                      .map(
-                        (element) => SportClassCard(data: element),
+              if (sportClass.value.situation == null) {
+                return sportClass.value.items.isNotEmpty
+                    ? DataList<Widget>(
+                        list: sportClass.value.items
+                            .map((element) => SportClassCard(data: element))
+                            .toList(),
+                        initFormula: (toUse) => toUse,
                       )
-                      .toList(),
-                  initFormula: (toUse) => toUse,
-                );
-              } else if (sportClass.value.situation == "正在获取") {
+                    : EmptyListView(
+                        text: FlutterI18n.translate(
+                        context,
+                        "sport.empty_class_info",
+                      ));
+              } else if (sportClass.value.situation ==
+                  "sport.situation_fetching") {
                 return const CircularProgressIndicator().center();
               } else {
-                return Center(
-                  child: Text("坏事: ${sportClass.value.situation}"),
+                return ReloadWidget(
+                  function: () => _controller.callRefresh(),
+                  errorStatus: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "sport.situation_error",
+                      translationParams: {
+                        "situation": FlutterI18n.translate(
+                          context,
+                          sportClass.value.situation ?? "",
+                        )
+                      },
+                    ),
+                  ).center(),
                 );
               }
             },
@@ -99,32 +117,29 @@ class SportClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String time = "星期";
-    switch (data.week) {
-      case 1:
-        time += "一";
-        break;
-      case 2:
-        time += "二";
-        break;
-      case 3:
-        time += "三";
-        break;
-      case 4:
-        time += "四";
-        break;
-      case 5:
-        time += "五";
-        break;
-      case 6:
-        time += "六";
-        break;
-      case 7:
-        time += "日";
-        break;
-    }
+    List<String> weekList = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
 
-    time += "第${data.start}节到第${data.stop}节";
+    String timeWeek = FlutterI18n.translate(
+      context,
+      "weekday.${weekList[data.week - 1]}",
+    );
+
+    String timePlace = FlutterI18n.translate(
+      context,
+      "sport.from_to",
+      translationParams: {
+        "start": data.start.toString(),
+        "stop": data.stop.toString(),
+      },
+    );
 
     return ReXCard(
       title: Text(data.termToShow),
@@ -134,7 +149,7 @@ class SportClassCard extends StatelessWidget {
       bottomRow: [
         InformationWithIcon(
           icon: Icons.access_time_filled_outlined,
-          text: time,
+          text: "$timeWeek $timePlace",
         ),
         [
           InformationWithIcon(

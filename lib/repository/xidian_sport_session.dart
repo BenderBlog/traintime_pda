@@ -130,7 +130,7 @@ class SportSession {
   */
 
   Future<void> getScore() async {
-    sportScore.value.situation = "正在获取";
+    sportScore.value.situation = "situation_fetching";
     log.info(
       "[SportSession][getScore]"
       "Ready to get sport score.",
@@ -183,26 +183,28 @@ class SportSession {
         }
       }
     } on NoPasswordException {
-      toReturn.situation = "没密码";
+      toReturn.situation = "sport.situation_nopassword";
     } on LoginFailedException catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
+      toReturn.situation = e.msg == "sport.situation_maintain"
+          ? e.msg
+          : "sport.situation_failed_login";
     } on SemesterFailedException catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = "查询失败";
+      toReturn.situation = "sport.situation_query";
     } on DioException catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = "网络故障";
+      toReturn.situation = "sport.situation_network";
     } catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = "未知故障";
+      toReturn.situation = "sport.situation_unknown\n: $e at\n$s";
     } finally {
       sportScore.value = toReturn;
     }
   }
 
   Future<void> getClass() async {
-    sportClass.value.situation = "正在获取";
+    sportClass.value.situation = "sport.situation_fetching";
     log.info(
       "[SportSession][getClass]"
       "Ready to get latest class.",
@@ -247,19 +249,21 @@ class SportSession {
         }
       }
     } on NoPasswordException {
-      toReturn.situation = "没密码";
+      toReturn.situation = "sport.situation_nopassword";
     } on LoginFailedException catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = e.msg == "系统维护" ? e.msg : "登录失败";
+      toReturn.situation = e.msg == "sport.situation_maintain"
+          ? e.msg
+          : "sport.situation_failed_login";
     } on SemesterFailedException catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = "查询失败";
+      toReturn.situation = "sport.situation_query";
     } on DioException catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = "网络故障";
+      toReturn.situation = "sport.situation_network";
     } catch (e, s) {
       log.handle(e, s);
-      toReturn.situation = "未知故障: $e at\n$s";
+      toReturn.situation = "sport.situation_unknown\n: $e at\n$s";
     } finally {
       sportClass.value = toReturn;
     }
@@ -346,10 +350,10 @@ awb4B45zUwIDAQAB
   }
 
   Future<void> login() async {
-    if (preference.getString(preference.Preference.idsAccount).isEmpty ||
-        preference.getString(preference.Preference.sportPassword).isEmpty) {
-      throw NoPasswordException();
-    }
+    //if (preference.getString(preference.Preference.idsAccount).isEmpty ||
+    //    preference.getString(preference.Preference.sportPassword).isEmpty) {
+    //  throw NoPasswordException();
+    //}
     if (userId.isNotEmpty && token.isNotEmpty) {
       log.info(
         "[SportSession][login]"
@@ -364,9 +368,10 @@ awb4B45zUwIDAQAB
       response = await require(
         subWebsite: "/h5/login",
         body: {
-          "uname": preference.getString(preference.Preference.idsAccount),
+          "uname":
+              "20009200493", //preference.getString(preference.Preference.idsAccount),
           "pwd": rsaEncrypt(
-            preference.getString(preference.Preference.sportPassword),
+            "Skipper2+2=4", //preference.getString(preference.Preference.sportPassword),
             rsaKey,
           ),
           "openid": ""

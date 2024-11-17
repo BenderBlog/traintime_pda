@@ -4,6 +4,7 @@
 // Interface of the sport score window of the sport data.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -71,7 +72,10 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                 sportScore.value.detail.isNotEmpty) {
               List<Widget> things = [
                 ReXCard(
-                  title: const Text("四年总分"),
+                  title: Text(FlutterI18n.translate(
+                    context,
+                    "sport.total_score",
+                  )),
                   remaining: [
                     ReXCardRemaining(
                       sportScore.value.total,
@@ -105,12 +109,26 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                 list: things,
                 initFormula: (toUse) => toUse,
               );
-            } else if (sportScore.value.situation == "正在获取") {
+            } else if (sportScore.value.situation ==
+                "sport.situation_fetching") {
               return const Center(child: CircularProgressIndicator());
             } else {
-              return ReloadWidget(
-                function: () => _controller.callRefresh(),
-                errorStatus: sportScore.value.situation,
+              return Center(
+                child: ReloadWidget(
+                  function: () => _controller.callRefresh(),
+                  errorStatus: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "sport.situation_error",
+                      translationParams: {
+                        "situation": FlutterI18n.translate(
+                          context,
+                          sportClass.value.situation ?? "",
+                        )
+                      },
+                    ),
+                  ),
+                ),
               );
             }
           }),
@@ -131,7 +149,14 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReXCard(
-      title: Text("${toUse.year} 第${toUse.gradeType}"),
+      title: Text(FlutterI18n.translate(
+        context,
+        "sport.semester",
+        translationParams: {
+          "year": toUse.year,
+          "gradeType": toUse.gradeType,
+        },
+      )),
       remaining: [
         ReXCardRemaining(
           toUse.totalScore,
@@ -153,29 +178,41 @@ class ScoreCard extends StatelessWidget {
                 3: FlexColumnWidth(0.4),
               },
               children: [
-                const TableRow(
+                TableRow(
                   children: [
                     Text(
-                      "项目",
+                      FlutterI18n.translate(
+                        context,
+                        "sport.subject",
+                      ),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      "数据",
-                      style: TextStyle(fontFeatures: [
+                      FlutterI18n.translate(
+                        context,
+                        "sport.data",
+                      ),
+                      style: const TextStyle(fontFeatures: [
                         FontFeature.tabularFigures(),
                       ]),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      "分数",
-                      style: TextStyle(fontFeatures: [
+                      FlutterI18n.translate(
+                        context,
+                        "sport.score",
+                      ),
+                      style: const TextStyle(fontFeatures: [
                         FontFeature.tabularFigures(),
                       ]),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      "及格",
-                      style: TextStyle(fontFeatures: [
+                      FlutterI18n.translate(
+                        context,
+                        "sport.passed",
+                      ),
+                      style: const TextStyle(fontFeatures: [
                         FontFeature.tabularFigures(),
                       ]),
                       textAlign: TextAlign.end,
@@ -205,7 +242,10 @@ class ScoreCard extends StatelessWidget {
                         textAlign: TextAlign.start,
                       ),
                       Text(
-                        "${i.score}分",
+                        FlutterI18n.translate(context, "sport.score_string",
+                            translationParams: {
+                              "score": i.score.toString(),
+                            }),
                         style: const TextStyle(fontFeatures: [
                           FontFeature.tabularFigures(),
                         ]),

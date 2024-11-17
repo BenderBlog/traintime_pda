@@ -49,16 +49,18 @@ no_info: "没有信息"
 catcher_detected: "发生错误"
 catcher_description: "详情如下"
 
+# 星期
+weekday:
+    monday: "周一"
+    tuesday: "周二"
+    wednesday: "周三"
+    thursday: "周四"
+    friday: "周五"
+    saturday: "周六"
+    sunday: "周日"
+
 # 日程表/课程表
 classtable:
-    weekday:
-        monday: "周一"
-        tuesday: "周二"
-        wednesday: "周三"
-        thursday: "周四"
-        friday: "周五"
-        saturday: "周六"
-        sunday: "周日"
     partner_classtable:
         override_dialog: "目前有搭子课表数据，是否要覆盖？"
         no_file: "未发现导入文件"
@@ -545,10 +547,9 @@ setting:
 
 # 体育查询
 sport:
-    fetching: "正在获取"
-    error: "坏事: {situation}"
     title: "体育查询"
     class_info: "课程信息"
+    empty_class_info: "未查询到课程信息"
     test_score: "体测成绩"
     # TODO: change sport score to support i18n
     total_score: "四年总分"
@@ -557,7 +558,16 @@ sport:
     data: "数据"
     score: "分数"
     passed: "及格"
+    from_to: "第{start}节到第{stop}节"
     score_string: "{score}分"
+    situation_nopassword: "没密码"
+    situation_maintain: "系统维护"
+    situation_failed_login: "登录失败"
+    situation_query: "查询失败"
+    situation_network: "网络故障"
+    situation_unknown: "未知故障{situation}"
+    situation_fetching: "正在获取"
+    situation_error: "坏事: {situation}"
 
 # 其他功能
 toolbox:

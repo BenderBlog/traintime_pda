@@ -34,15 +34,15 @@ login_process:
 no_info: 沒有資訊
 catcher_detected: 發生錯誤
 catcher_description: 詳情如下
+weekday:
+  monday: 週一
+  tuesday: 週二
+  wednesday: 週三
+  thursday: 週四
+  friday: 週五
+  saturday: 週六
+  sunday: 週日
 classtable:
-  weekday:
-    monday: 週一
-    tuesday: 週二
-    wednesday: 週三
-    thursday: 週四
-    friday: 週五
-    saturday: 週六
-    sunday: 週日
   partner_classtable:
     override_dialog: 目前有搭子課表資料，是否要覆蓋？
     no_file: 未發現匯入檔案
@@ -518,10 +518,9 @@ setting:
     sign_android: 安卓簽名
     title: 關於本軟體
 sport:
-  fetching: 正在獲取
-  error: '壞事: {situation}'
   title: 體育查詢
   class_info: 課程資訊
+  empty_class_info: 未查詢到課程資訊
   test_score: 體測成績
   total_score: 四年總分
   semester: '{year} 第{gradeType}'
@@ -529,7 +528,16 @@ sport:
   data: 資料
   score: 分數
   passed: 及格
+  from_to: 第{start}節到第{stop}節
   score_string: '{score}分'
+  situation_nopassword: 沒密碼
+  situation_maintain: 系統維護
+  situation_failed_login: 登入失敗
+  situation_query: 查詢失敗
+  situation_network: 網路故障
+  situation_unknown: 未知故障{situation}
+  situation_fetching: 正在獲取
+  situation_error: '壞事: {situation}'
 toolbox:
   title: 其他功能
   payment: 繳費系統

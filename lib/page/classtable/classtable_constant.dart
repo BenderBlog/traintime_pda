@@ -37,6 +37,6 @@ String getWeekString(BuildContext context, int index) {
   ];
   return FlutterI18n.translate(
     context,
-    "classtable.weekday.${weekList[index]}",
+    "weekday.${weekList[index]}",
   );
 }

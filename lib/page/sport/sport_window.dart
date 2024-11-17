@@ -4,6 +4,7 @@
 // Intro of the sport data.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/sport/sport_class_window.dart';
 import 'package:watermeter/page/sport/sport_score_window.dart';
 
@@ -16,18 +17,31 @@ class SportWindow extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("体育查询"),
-          bottom: const TabBar(
+          title: Text(FlutterI18n.translate(
+            context,
+            "sport.title",
+          )),
+          bottom: TabBar(
             tabs: [
-              Tab(text: "课程信息"),
-              Tab(text: "体测成绩"),
+              Tab(
+                text: FlutterI18n.translate(
+                  context,
+                  "sport.test_score",
+                ),
+              ),
+              Tab(
+                text: FlutterI18n.translate(
+                  context,
+                  "sport.class_info",
+                ),
+              ),
             ],
           ),
         ),
         body: const TabBarView(
           children: [
-            SportClassWindow(),
             SportScoreWindow(),
+            SportClassWindow(),
           ],
         ),
       ),
