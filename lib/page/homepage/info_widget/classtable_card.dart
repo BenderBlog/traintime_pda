@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -45,40 +46,59 @@ class _ClassTableCardItemDescriptor {
   }
 }
 
-class ClassTableCard extends StatelessWidget {
+class ClassTableCard extends StatefulWidget {
   const ClassTableCard({super.key});
 
-  static final RxBool _simplifiedMode =
+  static final RxBool simplifiedMode =
       preference.getBool(preference.Preference.simplifiedClassTimeline).obs;
 
   static void reloadSettingsFromPref() {
-    _simplifiedMode.value =
+    simplifiedMode.value =
         preference.getBool(preference.Preference.simplifiedClassTimeline);
   }
 
+  @override
+  State<ClassTableCard> createState() => _ClassTableCardState();
+}
+
+class _ClassTableCardState extends State<ClassTableCard> {
   List<_ClassTableCardItemDescriptor> _getItemDescriptors() {
     var currItem = _ClassTableCardItemDescriptor(
-        timeLabelPrefix: "当前",
+        timeLabelPrefix: FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.current",
+        ),
         icon: Icons.timelapse_outlined,
         padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0));
     currItem.addArrangementIfNotNull(current.value);
 
     var nextItem = _ClassTableCardItemDescriptor(
-        timeLabelPrefix: isTomorrow.isTrue ? "明天" : "稍后",
+        timeLabelPrefix: isTomorrow.isTrue
+            ? FlutterI18n.translate(
+                context,
+                "homepage.class_table_card.tomorrow",
+              )
+            : FlutterI18n.translate(
+                context,
+                "homepage.class_table_card.later",
+              ),
         icon: Icons.schedule_outlined,
         padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
         isTomorrow: isTomorrow.isTrue);
     nextItem.addArrangementIfNotNull(next.value);
 
     var moreItem = _ClassTableCardItemDescriptor(
-        timeLabelPrefix: "更多",
+        timeLabelPrefix: FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.more",
+        ),
         icon: Icons.more_time_outlined,
         padding: const EdgeInsets.fromLTRB(5, 1.5, 0, 10.0),
         isMultiArrangementsMode: true);
     moreItem.addAllArrangements(
         arrangement.skip(arrangement.length - remaining.value));
 
-    if (_simplifiedMode.isFalse) {
+    if (ClassTableCard.simplifiedMode.isFalse) {
       return [currItem, nextItem, moreItem];
     }
 
@@ -166,10 +186,23 @@ class ClassTableCard extends StatelessWidget {
               ),
             ));
           case ClassTableState.error:
-            showToast(context: context, msg: "遇到错误：${c.error}");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.class_table_card.error_message",
+                translationParams: {"error": c.error.toString()},
+              ),
+            );
           case ClassTableState.fetching:
           case ClassTableState.none:
-            showToast(context: context, msg: "正在获取课表");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.class_table_card.fetching_message",
+              ),
+            );
         }
       },
     );
@@ -223,11 +256,20 @@ class _ClassTableCardItem extends StatelessWidget {
     if (arr != null) {
       infoText = arr.name;
     } else if (arrangementState.value == ArrangementState.error) {
-      infoText = "遇到错误";
+      infoText = FlutterI18n.translate(
+        context,
+        "homepage.class_table_card.error_infoText",
+      );
     } else if (arrangementState.value == ArrangementState.fetching) {
-      infoText = "正在加载";
+      infoText = FlutterI18n.translate(
+        context,
+        "homepage.class_table_card.fetching_infoText",
+      );
     } else {
-      infoText = "暂无日程";
+      infoText = FlutterI18n.translate(
+        context,
+        "homepage.class_table_card.no_arrangement_infoText",
+      );
     }
 
     List<Widget> columns = [

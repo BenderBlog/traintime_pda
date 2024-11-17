@@ -138,9 +138,9 @@ class _LoginWindowState extends State<LoginWindow> {
                 borderRadius: BorderRadius.circular(roundRadius),
               ),
             ),
-            child: const Text(
-              "登录",
-              style: TextStyle(
+            child: Text(
+              FlutterI18n.translate(context, "login.login"),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
               ),
@@ -200,8 +200,10 @@ class _LoginWindowState extends State<LoginWindow> {
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, String status) =>
-            pd.update(msg: status, value: number),
+        onResponse: (int number, String status) => pd.update(
+          msg: FlutterI18n.translate(context, status),
+          value: number,
+        ),
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
         },

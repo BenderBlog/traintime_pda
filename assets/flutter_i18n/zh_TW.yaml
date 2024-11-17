@@ -11,19 +11,13 @@ confirm_title: 確認對話方塊
 cancel: 取消
 confirm: 確定
 network_error: 網路錯誤，可能是沒聯網，可能是學校伺服器出現了故障:-P
-error_detect: '遇到錯誤: {e}'
+error_detect: 遇到錯誤，請檢視日誌
 query_failed: 查詢失敗
 not_school_network: 沒有在校園網環境
 experiment_controller:
   no_password: 沒有物理實驗密碼
   login_failed: 登入失敗
 cancel_exam: 取消考試資格:P
-electricity_session:
-  fetching: 正在獲取
-  not_school_network: 非校園網
-  network_problem: 網路故障
-  query_failed: 查詢失敗
-  program_crash: 程式故障
 login_process:
   ready_page: 準備獲取登入網頁
   get_encrypt: 獲取密碼加密金鑰
@@ -143,21 +137,6 @@ classtable:
     delete: 刪除
     delete_title: 是否刪除課程資訊？
     delete_content: 所有關於這個課的資訊都會被刪除，課表上關於這門課的資訊將不復存在！
-creative_job:
-  search_hint: 搜尋需求
-  choice_type: 選擇種類
-  position_type: 職位型別
-  no_result: 沒有搜尋到結果
-  please_search: 請在上面搜尋框搜尋
-  query_for_person: '招募 {exceptNumber} 人 · '
-  end_time: 截止日期 {endTime}
-  complete_choosing: 選擇完畢
-  job_description: 工作詳情
-  browser_hint: 如果使用者感興趣，請按右上角的按鈕在瀏覽器中開啟
-  job_description_title: 崗位描述
-  reward_title: 工作回報
-  progress_title: 專案進度
-  no_description: 沒有描述
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
@@ -198,9 +177,10 @@ homepage:
     midnight: 深宵了 我在陪你
   loading: 正在載入
   load_error: 載入錯誤
-  on_holiday: 假期中
-  on_weekday: 第 ${current} 周
+  on_holiday: 當前在假期中
+  on_weekday: 當前為第 {current} 周
   loading_message: 請稍候，正在重新整理資訊
+  postgraduate_notice: 研究生功能測試中，可能不穩定！
   homepage: 主頁
   planet: 部落格星球
   setting: 設定
@@ -217,8 +197,13 @@ homepage:
   password_wrong_content: 是否重啟應用後手動登入？
   password_wrong_denial: 否，進入離線模式
   offline_mode_title: 統一認證服務離線模式開啟
-  offline_mode_content: 無法連線到統一認證服務伺服器，所有和其相關的服務暫時不可用。 成績查詢，考試資訊查詢，欠費查詢，校園卡查詢關閉。課表顯示快取資料。其他功能暫不受影響。
-    如有不便，敬請諒解。
+  offline_mode_content: '"無法連線到統一認證服務伺服器，所有和其相關的服務暫時不可用。
+
+    成績查詢，考試資訊查詢，欠費查詢，校園卡查詢關閉。課表顯示快取資料。其他功能暫不受影響。
+
+    如有不便，敬請諒解。"
+
+    '
   offline_mode: 離線模式下，一站式相關功能全部禁止使用
   notice_card:
     empty_notice: 目前沒有獲取應用公告，請重新整理
@@ -253,20 +238,18 @@ homepage:
       '
   library_card:
     title: 圖書借閱
-    current_borrow: '目前借書 '
-    unit_of_book: ' 本'
+    current_borrow: 目前借書 {count} 本
     error_occured: 獲取借書資訊發生錯誤
     fetching: 正在獲取借書資訊
     no_return: 目前沒有待歸還書籍
-    need_return: 待歸還{dued}本書籍
+    need_return: 待歸還 {dued} 本書籍
     no_info: 目前無法獲取資訊
     fetching_info: 正在查詢資訊中
   school_card_info_card:
     error_toast: 遇到錯誤，請聯絡開發者
     fetching_toast: 正在獲取資訊，請稍後再來看
     bill: 流水
-    balance: '校園卡餘額 '
-    unit: ' 元'
+    balance: 校園卡餘額 {amount} 元
     error_occured: 獲取校園卡資訊發生錯誤
     fetching: 正在獲取校園卡資訊
     bottom_text_success: 查詢一卡通流水
@@ -592,3 +575,37 @@ electricity_status:
   need_more_info: 需要在繳費平臺完善資訊
   need_account: 需要填寫電費賬號
   other_issue: 程式故障
+school_card_status:
+  failed_to_fetch: 獲取失敗
+  failed_to_query: 查詢失敗
+easter_egg: "Easter egg page under constrction...\n\n\"Within the Autumn of Conscious\"\
+  \ -> 不思議なお祓い棒, Gensokyo Band, Double Dealing Character, 2013\n\"Across the Universe\"\
+  \ -> Across the Universe, The Beatles, Let It Be, 1970\n\nBook of PDA\n\n==== Main\
+  \ Charater ====\n\nOnce upon a time, there's a 'Hard Lovin' Man called Ray, whose\
+  \ understand the power of the Railgun called 'Flight of the Rat. \n\nOnce after\
+  \ a battle with a 'Bloodsucker, he was tired as a high school student. He discovered\
+  \ a Purple Rat in the Square Forest.\n\nUnknown her name, \"She like a sweet potato,\
+  \ like my Rat gun. Just call her Sweet Purple Potato Ball, idk...\", he thought.\
+  \ And he brought her to his home(maybe?)\n\nThe rat is clever, actually she is a\
+  \ angel named Elliot. We don't know why her soul inside a rat. Forgive me, I am\
+  \ drunked.\n\nShe knows he is the 'Child of the Time. They may argue, may laugh.\
+  \ In my opinion, she lighten Ray's seemly colorless life.\n\nDon't know how time\
+  \ flies, she made he faster in running, attacking. With the power of the 'Rat gun',\
+  \ he become the threating 'Speed King.\n\n==== Another Main Charater ====\n\nAnother\
+  \ time, in the midland of Orestreich, a lonely bard named Reggirt, found a Knight\
+  \ (Contributer To Be Decided) shooting at the Sun.\n\n\"Just another 'Firefall,\
+  \ it soon become mime.\", the Knight said.\n\n\"What's your purpose, sir? You may\
+  \ get your head kicked by a 'Mule\", Reggrit asked.\n\nKnight smiled, \"It's not\
+  \ the Sun, 'no no no, it's the 'Demon's Eye. The source of mystery, of pain, of\
+  \ all struggle...\"\n\n\"Wait! It's the source of all living thing, we're all hers\
+  \ 'Daughter...\"\n\n\"... and that's our parents, 'Fools!\" Knight signed, \"What\
+  \ a complex feeling, 'No one came to realize this felling like me...\"\n\n==== The\
+  \ Evil ====\n\nSo the time files, the world became colorless, the 'Night Prowler\
+  \ born from the shadow of the sun.\n\nWith the uncertain of the humanity and the\
+  \ grease of the relationship, it became more powerful. \n\nSoon, it took away the\
+  \ joy, trust, and all stuff we could remains years of years. He named himself Bender,\
+  \ who realized his goal is to bent everything entertains us.\n\nNight Prowler itself\
+  \ evolued into a sliver chrome machinery, with laser eyes which absorb the happiness\
+  \ and sweetie from air and earth.\n\nItself found that a band, 'Sgt. Pepper Lonely\
+  \ Hearted Band, is the source of the bright things of the world.\n\nHe deside to\
+  \ let them 'bite his shiny metal ass, and seal them with 'The Devil's Triangle...\n"

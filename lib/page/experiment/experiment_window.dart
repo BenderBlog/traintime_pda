@@ -124,7 +124,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
           } else if (controller.status == ExperimentStatus.error) {
             return ReloadWidget(
               function: controller.get,
-              errorStatus: controller.error,
+              errorStatus: FlutterI18n.translate(
+                context,
+                controller.error,
+              ),
             );
           } else {
             return const Center(child: CircularProgressIndicator());

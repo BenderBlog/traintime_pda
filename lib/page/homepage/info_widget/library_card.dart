@@ -1,6 +1,7 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,13 @@ class LibraryCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (offline) {
-          showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "homepage.offline_mode",
+            ),
+          );
         } else {
           context.pushReplacement(const LibraryWindow());
         }
@@ -30,7 +37,10 @@ class LibraryCard extends StatelessWidget {
         () => MainPageCard(
           isLoad: borrow_info.state.value == SessionState.fetching,
           icon: MingCuteIcons.mgc_book_2_line,
-          text: "图书借阅",
+          text: FlutterI18n.translate(
+            context,
+            "homepage.library_card.title",
+          ),
           infoText: RichText(
             text: TextSpan(
               style: TextStyle(
@@ -39,13 +49,29 @@ class LibraryCard extends StatelessWidget {
               ),
               children: [
                 if (borrow_info.state.value == SessionState.fetched) ...[
-                  const TextSpan(text: "目前借书 "),
-                  TextSpan(text: "${borrow_info.borrowList.length}"),
-                  const TextSpan(text: " 本"),
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.current_borrow",
+                      translationParams: {
+                        "count": borrow_info.borrowList.length.toString(),
+                      },
+                    ),
+                  )
                 ] else if (borrow_info.state.value == SessionState.error)
-                  const TextSpan(text: "获取借书信息发生错误")
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.error_occured",
+                    ),
+                  )
                 else
-                  const TextSpan(text: "正在获取借书信息")
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.fetching",
+                    ),
+                  )
               ],
             ),
           ),
@@ -55,11 +81,26 @@ class LibraryCard extends StatelessWidget {
               child: Text(
                 borrow_info.state.value == SessionState.fetched
                     ? borrow_info.dued == 0
-                        ? "目前没有待归还书籍"
-                        : "待归还${borrow_info.dued}本书籍"
+                        ? FlutterI18n.translate(
+                            context,
+                            "homepage.library_card.no_return",
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            "homepage.library_card.need_return",
+                            translationParams: {
+                              "dued": borrow_info.dued.toString()
+                            },
+                          )
                     : borrow_info.state.value == SessionState.error
-                        ? "目前无法获取信息"
-                        : "正在查询信息中",
+                        ? FlutterI18n.translate(
+                            context,
+                            "homepage.library_card.no_info",
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            "homepage.library_card.fetching_info",
+                          ),
               ),
             );
           }),

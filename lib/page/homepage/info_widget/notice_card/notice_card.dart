@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/info_widget/notice_card/notice_page.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -31,7 +32,13 @@ class NoticeCard extends StatelessWidget {
               );
             }
           } else {
-            showToast(context: context, msg: "目前没有获取应用公告，请刷新");
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.notice_card.empty_notice",
+              ),
+            );
           }
         },
         child: messages.isNotEmpty
@@ -53,7 +60,10 @@ class NoticeCard extends StatelessWidget {
                 ),
               )
             : Text(
-                "没有获取应用公告",
+                FlutterI18n.translate(
+                  context,
+                  "homepage.notice_card.no_notice_avaliable",
+                ),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                 ),

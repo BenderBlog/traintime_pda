@@ -174,7 +174,7 @@ class IDSSession extends NetworkSession {
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
-      onResponse(10, "准备获取登录网页");
+      onResponse(10, "login_process.ready_page");
       log.info(
         "[IDSSession][login] "
         "Ready to get the login webpage.",
@@ -209,7 +209,7 @@ class IDSSession extends NetworkSession {
 
     /// Get AES encrypt key. There must be.
     if (onResponse != null) {
-      onResponse(30, "获取密码加密密钥");
+      onResponse(30, "login_process.get_encrypt");
     }
     String keys = form
         .firstWhere((element) => element.id == "pwdEncryptSalt")
@@ -221,7 +221,7 @@ class IDSSession extends NetworkSession {
 
     /// Prepare for login.
     if (onResponse != null) {
-      onResponse(40, "准备登录");
+      onResponse(40, "login_process.ready_login");
     }
     Map<String, dynamic> head = {
       'username': username,
@@ -241,7 +241,7 @@ class IDSSession extends NetworkSession {
     }
 
     if (onResponse != null) {
-      onResponse(45, "滑块验证");
+      onResponse(45, "login_process.slider");
     }
 
     await dioNoOfflineCheck.get(
@@ -257,7 +257,7 @@ class IDSSession extends NetworkSession {
 
     /// Post login request.
     if (onResponse != null) {
-      onResponse(50, "准备登录");
+      onResponse(50, "login_process.ready_login");
     }
     try {
       var data = await dioNoOfflineCheck.post(
@@ -271,7 +271,7 @@ class IDSSession extends NetworkSession {
       if (data.statusCode == 301 || data.statusCode == 302) {
         /// Post login progress.
         if (onResponse != null) {
-          onResponse(80, "登录后处理");
+          onResponse(80, "login_process.after_process");
         }
         return data.headers[HttpHeaders.locationHeader]![0];
       } else {
@@ -307,7 +307,7 @@ class IDSSession extends NetworkSession {
           if (data.statusCode == 301 || data.statusCode == 302) {
             /// Post login progress.
             if (onResponse != null) {
-              onResponse(80, "登录后处理");
+              onResponse(80, "login_process.after_process");
             }
             return data.headers[HttpHeaders.locationHeader]![0];
           }

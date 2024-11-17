@@ -132,11 +132,11 @@ class SchoolCardSession extends IDSSession {
           break;
         }
       }
-      if (text.isEmpty) text = "查询失败";
+      if (text.isEmpty) text = "school_card_status.failed_to_query";
       if (text.contains(RegExp(r'[0-9]'))) {
         money.value = text.substring(4);
-      } else if (text.contains("查询失败")) {
-        money.value = "查询失败";
+      } else if (text.contains("school_card_status.failed_to_query")) {
+        money.value = "school_card_status.failed_to_query";
       } else {
         /// Should not exec it.
         money.value = "0.00";
@@ -144,7 +144,7 @@ class SchoolCardSession extends IDSSession {
       isInit.value = SessionState.fetched;
     } catch (e) {
       errorSession.value = e.toString();
-      money.value = "获取失败";
+      money.value = "school_card_status.failed_to_fetch";
       isInit.value = SessionState.error;
     }
   }

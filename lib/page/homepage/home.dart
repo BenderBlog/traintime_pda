@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:content_resolver/content_resolver.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -80,29 +81,10 @@ class _HomePageMasterState extends State<HomePageMaster>
     }
   }
 
-  static final _destinations = [
-    PageInformation(
-      index: 0,
-      name: "主页",
-      icon: MingCuteIcons.mgc_home_3_line,
-      iconChoice: MingCuteIcons.mgc_home_3_fill,
-    ),
-    PageInformation(
-      index: 1,
-      name: "XDU Planet",
-      icon: MingCuteIcons.mgc_planet_line,
-      iconChoice: MingCuteIcons.mgc_planet_fill,
-    ),
-    PageInformation(
-      index: 2,
-      name: "设置",
-      icon: MingCuteIcons.mgc_user_2_line,
-      iconChoice: MingCuteIcons.mgc_user_2_fill,
-    ),
-  ];
   late StreamSubscription _intentSub;
   late PageController _controller;
   late PageView _pageView;
+
   @override
   void initState() {
     super.initState();
@@ -122,166 +104,19 @@ class _HomePageMasterState extends State<HomePageMaster>
     );
 
     WidgetsBinding.instance.addObserver(this);
-    if (Platform.isAndroid || Platform.isIOS) {
-      Future<void> onData(List<SharedMediaFile> value) async {
-        log.info("Input data: ${value.first.path}");
 
-        if (Uri.tryParse(value.first.path) == null) {
-          showToast(context: context, msg: "导入路径不存在:P");
-          ReceiveSharingIntent.instance.reset();
-          return;
-        }
-        log.info("Partner File Position: ${value.first.path}");
-
-        final c = Get.find<ClassTableController>();
-        if (c.state == ClassTableState.fetched) {
-          File file =
-              File("${supportPath.path}/${ClassTableFile.partnerClassName}");
-
-          log.info(
-            "Partner file exists: "
-            "${file.existsSync()}",
-          );
-
-          if (file.existsSync()) {
-            bool? confirm = await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("确认对话框"),
-                content: const Text("目前有搭子课表数据，是否要覆盖？"),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text("取消"),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text("确定"),
-                  )
-                ],
-              ),
-            );
-            if (context.mounted && confirm != true) {
-              return;
-            }
-          }
-          String source = "";
-          try {
-            if (Platform.isAndroid &&
-                value.first.path.startsWith("content://")) {
-              Content content =
-                  await ContentResolver.resolveContent(value.first.path);
-              source = utf8.decode(content.data.toList());
-            } else {
-              source =
-                  File.fromUri(Uri.parse(value.first.path)).readAsStringSync();
-            }
-          } catch (e) {
-            if (mounted) {
-              showToast(
-                context: context,
-                msg: '导入文件失败',
-              );
-              log.error("Import partner classtable error.", e);
-              return;
-            }
-          }
-
-          if (mounted) {
-            try {
-              final data = jsonDecode(source);
-
-              String semesterCode = Get.put(
-                ClassTableController(),
-              ).classTableData.semesterCode;
-
-              var yearNotEqual = semesterCode.substring(0, 4).compareTo(
-                      data["classtable"]["semesterCode"]
-                          .toString()
-                          .substring(0, 4)) !=
-                  0;
-              var lastNotEqual = semesterCode
-                      .substring(semesterCode.length - 1)
-                      .compareTo(data["classtable"]["semesterCode"]
-                          .toString()
-                          .substring(
-                            data["classtable"]["semesterCode"].length - 1,
-                          )) !=
-                  0;
-              if (yearNotEqual || lastNotEqual) {
-                throw NotSameSemesterException(
-                  msg: "Not the same semester. This semester: $semesterCode. "
-                      "Input source: ${data["classtable"]["semesterCode"]}."
-                      "This partner classtable is going to be deleted.",
-                );
-              }
-              File(
-                "${supportPath.path}/${ClassTableFile.partnerClassName}",
-              ).writeAsStringSync(source);
-            } catch (error, stacktrace) {
-              log.error(
-                "Error occured while importing partner class.",
-                error,
-                stacktrace,
-              );
-              showToast(
-                context: context,
-                msg: '好像导入文件有点问题:P',
-              );
-              return;
-            }
-            showToast(
-              context: context,
-              msg: '导入成功，如果打开了课表页面请重新打开',
-            );
-          }
-        } else {
-          showToast(
-            context: context,
-            msg: "还没加载课程表，等会再来吧……",
-          );
-        }
-
-        ReceiveSharingIntent.instance.reset();
-      }
-
-      // Listen to media sharing coming from outside the app while the app is in the memory.
-      _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen(onData,
-          onError: (error, stacktrace) {
-        log.error("getIntentDataStream error.", error, stacktrace);
-      });
-      // Get the media sharing coming from outside the app while the app is closed.
-      ReceiveSharingIntent.instance
-          .getInitialMedia()
-          .then(onData)
-          .catchError((err, stacktrace) {
-        log.error("getIntentDataStream error.", err, stacktrace);
-      });
-    }
-    message.checkMessage();
-    message.checkUpdate().then((value) {
-      if (value ?? false) _showUpdateNotice();
-    });
-    log.info(
-      "[home][BackgroundFetchFromHome]"
-      "Current loginstate: $loginState, if none will _loginAsync.",
-    );
-    if (loginState == IDSLoginState.none) {
-      _loginAsync();
-    } else {
-      update(
-        context: context,
-        forceRetryLogin: true,
-        sliderCaptcha: (String cookieStr) {
-          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
-        },
-      );
-    }
+    /// TODO: URGENT, rethink how to deal with the first login stuff...
   }
 
   void _loginAsync() async {
     updateCurrentData(); // load cache data
-    showToast(context: context, msg: "登录中，暂时显示缓存数据");
+    showToast(
+      context: context,
+      msg: FlutterI18n.translate(
+        context,
+        "homepage.login_message",
+      ),
+    );
 
     try {
       await update(
@@ -294,7 +129,13 @@ class _HomePageMasterState extends State<HomePageMaster>
     } finally {
       if (loginState == IDSLoginState.success) {
         if (mounted) {
-          showToast(context: context, msg: "登录成功");
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "homepage.successful_login_message",
+            ),
+          );
         }
       } else if (loginState == IDSLoginState.passwordWrong) {
         await preference.remove(preference.Preference.idsPassword);
@@ -304,22 +145,34 @@ class _HomePageMasterState extends State<HomePageMaster>
             context: context,
             barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: const Text("用户名或密码有误"),
-              content: const Text("是否重启应用后手动登录？"),
+              title: Text(FlutterI18n.translate(
+                context,
+                "homepage.password_wrong_title",
+              )),
+              content: Text(FlutterI18n.translate(
+                context,
+                "homepage.password_wrong_content",
+              )),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     Restart.restartApp();
                   },
-                  child: const Text("是"),
+                  child: Text(FlutterI18n.translate(
+                    context,
+                    "confirm",
+                  )),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     _showOfflineModeNotice();
                   },
-                  child: const Text("否，进入离线模式"),
+                  child: Text(FlutterI18n.translate(
+                    context,
+                    "homepage.password_wrong_denial",
+                  )),
                 ),
               ],
             ),
@@ -346,26 +199,216 @@ class _HomePageMasterState extends State<HomePageMaster>
     }
   }
 
+  Future<void> _onData(List<SharedMediaFile> value) async {
+    log.info("Input data: ${value.first.path}");
+
+    if (Uri.tryParse(value.first.path) == null) {
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "homepage.input_partner_data.route_not_exist",
+        ),
+      );
+      ReceiveSharingIntent.instance.reset();
+      return;
+    }
+    log.info("Partner File Position: ${value.first.path}");
+
+    final c = Get.find<ClassTableController>();
+    if (c.state == ClassTableState.fetched) {
+      File file =
+          File("${supportPath.path}/${ClassTableFile.partnerClassName}");
+
+      log.info(
+        "Partner file exists: "
+        "${file.existsSync()}",
+      );
+
+      if (file.existsSync()) {
+        bool? confirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(FlutterI18n.translate(
+              context,
+              "confirm_title",
+            )),
+            content: Text(FlutterI18n.translate(
+              context,
+              "homepage.input_partner_data.confirm_content",
+            )),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(FlutterI18n.translate(
+                  context,
+                  "cancel",
+                )),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(FlutterI18n.translate(
+                  context,
+                  "confirm",
+                )),
+              )
+            ],
+          ),
+        );
+        if (context.mounted && confirm != true) {
+          return;
+        }
+      }
+      String source = "";
+      try {
+        if (Platform.isAndroid && value.first.path.startsWith("content://")) {
+          Content content =
+              await ContentResolver.resolveContent(value.first.path);
+          source = utf8.decode(content.data.toList());
+        } else {
+          source = File.fromUri(Uri.parse(value.first.path)).readAsStringSync();
+        }
+      } catch (e) {
+        if (mounted) {
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "homepage.input_partner_data.failed_get_file",
+            ),
+          );
+          log.error("Import partner classtable error.", e);
+          return;
+        }
+      }
+
+      if (mounted) {
+        try {
+          final data = jsonDecode(source);
+
+          String semesterCode = Get.put(
+            ClassTableController(),
+          ).classTableData.semesterCode;
+
+          var yearNotEqual = semesterCode.substring(0, 4).compareTo(
+                  data["classtable"]["semesterCode"]
+                      .toString()
+                      .substring(0, 4)) !=
+              0;
+          var lastNotEqual = semesterCode
+                  .substring(semesterCode.length - 1)
+                  .compareTo(
+                      data["classtable"]["semesterCode"].toString().substring(
+                            data["classtable"]["semesterCode"].length - 1,
+                          )) !=
+              0;
+          if (yearNotEqual || lastNotEqual) {
+            throw NotSameSemesterException(
+              msg: "Not the same semester. This semester: $semesterCode. "
+                  "Input source: ${data["classtable"]["semesterCode"]}."
+                  "This partner classtable is going to be deleted.",
+            );
+          }
+          File(
+            "${supportPath.path}/${ClassTableFile.partnerClassName}",
+          ).writeAsStringSync(source);
+        } catch (error, stacktrace) {
+          log.error(
+            "Error occured while importing partner class.",
+            error,
+            stacktrace,
+          );
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "homepage.input_partner_data.failed_import",
+            ),
+          );
+          return;
+        }
+        showToast(
+          context: context,
+          msg: FlutterI18n.translate(
+            context,
+            "homepage.input_partner_data.success_message",
+          ),
+        );
+      }
+    } else {
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "homepage.input_partner_data.not_loaded",
+        ),
+      );
+    }
+
+    ReceiveSharingIntent.instance.reset();
+  }
+
   void _showOfflineModeNotice() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("统一认证服务离线模式开启"),
-          content: const Text(
-            "无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。\n"
-            "成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。\n"
-            "如有不便，敬请谅解。",
-          ),
+          title: Text(FlutterI18n.translate(
+            context,
+            "homepage.offline_mode_title",
+          )),
+          content: Text(FlutterI18n.translate(
+            context,
+            "homepage.offline_mode_content",
+          )),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("确定"),
+              child: Text(FlutterI18n.translate(context, "confirm")),
             ),
           ],
         ),
       );
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Listen to media sharing coming from outside the app while the app is in the memory.
+      _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen(
+        _onData,
+        onError: (error, stacktrace) {
+          log.error("getIntentDataStream error.", error, stacktrace);
+        },
+      );
+      // Get the media sharing coming from outside the app while the app is closed.
+      ReceiveSharingIntent.instance.getInitialMedia().then(_onData).catchError(
+        (err, stacktrace) {
+          log.error("getIntentDataStream error.", err, stacktrace);
+        },
+      );
+    }
+    message.checkMessage();
+    message.checkUpdate().then((value) {
+      if (value ?? false) _showUpdateNotice();
+    });
+    log.info(
+      "[home][BackgroundFetchFromHome]"
+      "Current loginstate: $loginState, if none will _loginAsync.",
+    );
+    if (loginState == IDSLoginState.none) {
+      _loginAsync();
+    } else {
+      update(
+        context: context,
+        forceRetryLogin: true,
+        sliderCaptcha: (String cookieStr) {
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
+        },
+      );
+    }
   }
 
   @override
@@ -377,6 +420,26 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   @override
   Widget build(BuildContext context) {
+    final destinations = [
+      PageInformation(
+        index: 0,
+        name: FlutterI18n.translate(context, "homepage.homepage"),
+        icon: MingCuteIcons.mgc_home_3_line,
+        iconChoice: MingCuteIcons.mgc_home_3_fill,
+      ),
+      PageInformation(
+        index: 1,
+        name: FlutterI18n.translate(context, "homepage.planet"),
+        icon: MingCuteIcons.mgc_planet_line,
+        iconChoice: MingCuteIcons.mgc_planet_fill,
+      ),
+      PageInformation(
+        index: 2,
+        name: FlutterI18n.translate(context, "homepage.setting"),
+        icon: MingCuteIcons.mgc_user_2_line,
+        iconChoice: MingCuteIcons.mgc_user_2_fill,
+      ),
+    ];
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: _pageView,
@@ -384,7 +447,7 @@ class _HomePageMasterState extends State<HomePageMaster>
         backgroundColor: Theme.of(context).colorScheme.surface,
         indicatorColor: Theme.of(context).colorScheme.secondary,
         height: 64,
-        destinations: _destinations
+        destinations: destinations
             .map(
               (e) => NavigationDestination(
                 icon: _selectedIndex == e.index

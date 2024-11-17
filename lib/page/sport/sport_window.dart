@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Intro of the sport data.
+// TODO: Fix reloadwidget cannot get the idea...
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';

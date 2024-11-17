@@ -135,7 +135,7 @@ class ExamController extends GetxController {
       error = "";
     } on DioException catch (e, s) {
       log.handle(e, s);
-      error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
+      error = "network_error";
     } catch (e, s) {
       log.handle(e, s);
     } finally {

@@ -33,7 +33,7 @@ class BorrowListWindow extends StatelessWidget {
           case SessionState.none:
             return ReloadWidget(
               function: borrow_info.refreshBorrowList,
-            );
+            ).center();
         }
       }
 

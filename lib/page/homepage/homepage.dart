@@ -3,6 +3,7 @@
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -62,17 +63,22 @@ class _MainPageState extends State<MainPage> {
   String get _now {
     DateTime now = DateTime.now();
 
-    if (now.hour >= 5 && now.hour < 9) return "早上好 准备出发";
-
-    if (now.hour >= 9 && now.hour < 11) return "上午好 祝万事如意";
-
-    if (now.hour >= 11 && now.hour < 14) return "中午好 一切还好吧";
-
-    if (now.hour >= 14 && now.hour < 18) return "下午好 今天如何";
-
-    if (now.hour >= 18 || now.hour == 0) return "晚上好 祝你好梦";
-
-    return "深宵了 我在陪你";
+    if (now.hour >= 5 && now.hour < 9) {
+      return "homepage.time_string.morning";
+    }
+    if (now.hour >= 9 && now.hour < 11) {
+      return "homepage.time_string.before_noon";
+    }
+    if (now.hour >= 11 && now.hour < 14) {
+      return "homepage.time_string.at_noon";
+    }
+    if (now.hour >= 14 && now.hour < 18) {
+      return "homepage.time_string.afternoon";
+    }
+    if (now.hour >= 18 || now.hour == 0) {
+      return "homepage.time_string.night";
+    }
+    return "homepage.time_string.midnight";
   }
 
   TextStyle textStyle(context) => TextStyle(
@@ -107,7 +113,7 @@ class _MainPageState extends State<MainPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _now,
+                      FlutterI18n.translate(context, _now),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -120,11 +126,27 @@ class _MainPageState extends State<MainPage> {
                           ? c.getCurrentWeek(updateTime) >= 0 &&
                                   c.getCurrentWeek(updateTime) <
                                       c.classTableData.semesterLength
-                              ? "${updateTime.month}月${updateTime.day}日 第 ${c.getCurrentWeek(updateTime) + 1} 周 "
-                              : "${updateTime.month}月${updateTime.day}日 假期中"
+                              ? FlutterI18n.translate(
+                                  context,
+                                  "homepage.on_weekday",
+                                  translationParams: {
+                                    "current":
+                                        "${c.getCurrentWeek(updateTime) + 1}"
+                                  },
+                                )
+                              : FlutterI18n.translate(
+                                  context,
+                                  "homepage.on_holiday",
+                                )
                           : c.state == ClassTableState.error
-                              ? "加载错误"
-                              : "正在加载",
+                              ? FlutterI18n.translate(
+                                  context,
+                                  "homepage.load_error",
+                                )
+                              : FlutterI18n.translate(
+                                  context,
+                                  "homepage.loading",
+                                ),
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context)
@@ -143,7 +165,10 @@ class _MainPageState extends State<MainPage> {
           onRefresh: () {
             showToast(
               context: context,
-              msg: "请稍候，正在刷新信息",
+              msg: FlutterI18n.translate(
+                context,
+                "homepage.loading_message",
+              ),
             );
             update(
                 context: context,
@@ -167,7 +192,10 @@ class _MainPageState extends State<MainPage> {
                   const NoticeCard(),
                   if (prefs.getBool(prefs.Preference.role))
                     Text(
-                      "研究生功能测试中，可能不稳定！",
+                      FlutterI18n.translate(
+                        context,
+                        "homepage.postgraduate_notice",
+                      ),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                       ),

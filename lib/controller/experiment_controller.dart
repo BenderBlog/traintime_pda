@@ -153,26 +153,26 @@ class ExperimentController extends GetxController {
         "[ExperimentController][get] "
         "Do not find experiment password",
       );
-      error = "没有物理实验密码";
+      error = "experiment_controller.no_password";
     } on NotSchoolNetworkException {
       log.warning(
         "[ExperimentController][get] "
         "Not in school exception",
       );
-      error = "非校园网，无法获取数据";
+      error = "not_school_network";
     } on LoginFailedException catch (e, s) {
       log.handle(e, s);
       if (e.msg != null && e.msg!.isNotEmpty) {
         error = e.msg!;
       } else {
-        error = "登录失败";
+        error = "experiment_controller.login_failed";
       }
     } on DioException catch (e, s) {
       log.handle(e, s);
-      error = "网络错误，可能是没联网，可能是学校服务器出现了故障:-P";
+      error = "network_error";
     } catch (e, s) {
       log.handle(e, s);
-      error = "遇到错误:$e";
+      error = "error_detect";
     } finally {
       if (status == ExperimentStatus.fetched) {
         log.info(

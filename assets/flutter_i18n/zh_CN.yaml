@@ -21,19 +21,13 @@ confirm: "确定"
 
 # controller/model 里面可能需要给用户展示的
 network_error: "网络错误，可能是没联网，可能是学校服务器出现了故障:-P"
-error_detect: "遇到错误: {e}"
+error_detect: "遇到错误，请查看日志"
 query_failed: "查询失败"
 not_school_network: "没有在校园网环境"
 experiment_controller:
     no_password: "没有物理实验密码"
     login_failed: "登录失败"
 cancel_exam: "取消考试资格:P"
-electricity_session:
-    fetching: "正在获取"
-    not_school_network: "非校园网"
-    network_problem: "网络故障"
-    query_failed: "查询失败"
-    program_crash: "程序故障"
 login_process:
     ready_page: "准备获取登录网页"
     get_encrypt: "获取密码加密密钥"
@@ -156,23 +150,6 @@ classtable:
         delete_title: "是否删除课程信息？"
         delete_content: "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！"
 
-# 双创信息
-creative_job:
-    search_hint: "搜索需求"
-    choice_type: "选择种类"
-    position_type: "职位类型"
-    no_result: "没有搜索到结果"
-    please_search: "请在上面搜索框搜索"
-    query_for_person: "招募 {exceptNumber} 人 · "
-    end_time: "截止日期 {endTime}"
-    complete_choosing: "选择完毕"
-    job_description: "工作详情"
-    browser_hint: "如果用户感兴趣，请按右上角的按钮在浏览器中打开"
-    job_description_title: "岗位描述"
-    reward_title: "工作回报"
-    progress_title: "项目进度"
-    no_description: "没有描述"
-
 # 空闲教室
 empty_classroom:
     title: "空闲教室"
@@ -218,11 +195,14 @@ homepage:
         afternoon: "下午好 今天如何"
         night: "晚上好 祝你好梦"
         midnight: "深宵了 我在陪你"
+    # homepage.dart
     loading: "正在加载"
     load_error: "加载错误"
-    on_holiday: "假期中"
-    on_weekday: "第 ${current} 周"
+    on_holiday: "当前在假期中"
+    on_weekday: "当前为第 {current} 周"
     loading_message: "请稍候，正在刷新信息"
+    postgraduate_notice: "研究生功能测试中，可能不稳定！"
+    # home.dart
     homepage: "主页"
     planet: "博客星球"
     setting: "设置"
@@ -239,11 +219,12 @@ homepage:
     password_wrong_content: "是否重启应用后手动登录？"
     password_wrong_denial: "否，进入离线模式"
     offline_mode_title: "统一认证服务离线模式开启"
-    offline_mode_content:
+    offline_mode_content: |
         "无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。
         成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。
         如有不便，敬请谅解。"
     offline_mode: "脱机模式下，一站式相关功能全部禁止使用"
+    # 以下分段者从略
     notice_card:
         empty_notice: "目前没有获取应用公告，请刷新"
         no_notice_avaliable: "没有获取应用公告"
@@ -271,20 +252,18 @@ homepage:
             长按可以重新加载，有欠费一般代表水费
     library_card:
         title: "图书借阅"
-        current_borrow: "目前借书 "
-        unit_of_book: " 本"
+        current_borrow: "目前借书 {count} 本"
         error_occured: "获取借书信息发生错误"
         fetching: "正在获取借书信息"
         no_return: "目前没有待归还书籍"
-        need_return: "待归还{dued}本书籍"
+        need_return: "待归还 {dued} 本书籍"
         no_info: "目前无法获取信息"
         fetching_info: "正在查询信息中"
     school_card_info_card:
         error_toast: "遇到错误，请联系开发者"
         fetching_toast: "正在获取信息，请稍后再来看"
         bill: "流水"
-        balance: "校园卡余额 "
-        unit: " 元"
+        balance: "校园卡余额 {amount} 元"
         error_occured: "获取校园卡信息发生错误"
         fetching: "正在获取校园卡信息"
         bottom_text_success: "查询一卡通流水"
@@ -629,3 +608,59 @@ electricity_status:
     need_more_info: "需要在缴费平台完善信息"
     need_account: "需要填写电费账号"
     other_issue: "程序故障"
+
+# 校园卡信息状态
+school_card_status:
+    failed_to_fetch: "获取失败"
+    failed_to_query: "查询失败"
+
+# 彩蛋，可以不翻译。注意，有单引号的是引用的歌曲名称，看情况吧
+easter_egg: |
+    Easter egg page under constrction...
+
+    "Within the Autumn of Conscious" -> 不思議なお祓い棒, Gensokyo Band, Double Dealing Character, 2013
+    "Across the Universe" -> Across the Universe, The Beatles, Let It Be, 1970
+
+    Book of PDA
+
+    ==== Main Charater ====
+
+    Once upon a time, there's a 'Hard Lovin' Man called Ray, whose understand the power of the Railgun called 'Flight of the Rat. 
+
+    Once after a battle with a 'Bloodsucker, he was tired as a high school student. He discovered a Purple Rat in the Square Forest.
+
+    Unknown her name, "She like a sweet potato, like my Rat gun. Just call her Sweet Purple Potato Ball, idk...", he thought. And he brought her to his home(maybe?)
+
+    The rat is clever, actually she is a angel named Elliot. We don't know why her soul inside a rat. Forgive me, I am drunked.
+
+    She knows he is the 'Child of the Time. They may argue, may laugh. In my opinion, she lighten Ray's seemly colorless life.
+
+    Don't know how time flies, she made he faster in running, attacking. With the power of the 'Rat gun', he become the threating 'Speed King.
+
+    ==== Another Main Charater ====
+
+    Another time, in the midland of Orestreich, a lonely bard named Reggirt, found a Knight (Contributer To Be Decided) shooting at the Sun.
+
+    "Just another 'Firefall, it soon become mime.", the Knight said.
+
+    "What's your purpose, sir? You may get your head kicked by a 'Mule", Reggrit asked.
+
+    Knight smiled, "It's not the Sun, 'no no no, it's the 'Demon's Eye. The source of mystery, of pain, of all struggle..."
+
+    "Wait! It's the source of all living thing, we're all hers 'Daughter..."
+
+    "... and that's our parents, 'Fools!" Knight signed, "What a complex feeling, 'No one came to realize this felling like me..."
+
+    ==== The Evil ====
+
+    So the time files, the world became colorless, the 'Night Prowler born from the shadow of the sun.
+
+    With the uncertain of the humanity and the grease of the relationship, it became more powerful. 
+
+    Soon, it took away the joy, trust, and all stuff we could remains years of years. He named himself Bender, who realized his goal is to bent everything entertains us.
+
+    Night Prowler itself evolued into a sliver chrome machinery, with laser eyes which absorb the happiness and sweetie from air and earth.
+
+    Itself found that a band, 'Sgt. Pepper Lonely Hearted Band, is the source of the bright things of the world.
+
+    He deside to let them 'bite his shiny metal ass, and seal them with 'The Devil's Triangle...

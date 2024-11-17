@@ -44,9 +44,18 @@ class ExamCard extends StatelessWidget {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(c.error.substring(
+                content: Text(FlutterI18n.translate(
+                  context,
+                  c.error.toString(),
+                ).substring(
                   0,
-                  min(c.error.length, 120),
+                  min(
+                    FlutterI18n.translate(
+                      context,
+                      c.error.toString(),
+                    ).length,
+                    120,
+                  ),
                 )),
               ),
             );

@@ -3,6 +3,7 @@
 
 import 'dart:math';
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,13 @@ class SchoolCardInfoCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (offline) {
-          showToast(context: context, msg: "脱机模式下，一站式相关功能全部禁止使用");
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "homepage.offline_mode",
+            ),
+          );
         } else {
           switch (school_card_session.isInit.value) {
             case SessionState.fetched:
@@ -43,10 +50,22 @@ class SchoolCardInfoCard extends StatelessWidget {
                 ),
               );
 
-              showToast(context: context, msg: "遇到错误，请联系开发者");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "homepage.school_card_info_card.error_toast",
+                ),
+              );
               break;
             default:
-              showToast(context: context, msg: "正在获取信息，请稍后再来看");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "homepage.school_card_info_card.fetching_toast",
+                ),
+              );
           }
         }
       },
@@ -54,7 +73,10 @@ class SchoolCardInfoCard extends StatelessWidget {
         () => MainPageCard(
           isLoad: school_card_session.isInit.value == SessionState.fetching,
           icon: MingCuteIcons.mgc_wallet_4_line,
-          text: "流水",
+          text: FlutterI18n.translate(
+            context,
+            "homepage.school_card_info_card.bill",
+          ),
           infoText: RichText(
             text: TextSpan(
               style: TextStyle(
@@ -66,35 +88,57 @@ class SchoolCardInfoCard extends StatelessWidget {
                     SessionState.fetched) ...[
                   if (school_card_session.money.value
                       .contains(RegExp(r'[0-9]')))
-                    const TextSpan(text: "校园卡余额 "),
-                  TextSpan(
-                    text: school_card_session.money.value
-                            .contains(RegExp(r'[0-9]'))
-                        ? double.parse(school_card_session.money.value) >= 10
-                            ? double.parse(school_card_session.money.value)
-                                .truncate()
-                                .toString()
-                            : school_card_session.money.value
-                        : school_card_session.money.value,
-                  ),
-                  if (school_card_session.money.value
-                      .contains(RegExp(r'[0-9]')))
-                    const TextSpan(text: " 元"),
+                    TextSpan(
+                      text: FlutterI18n.translate(
+                          context, "homepage.school_card_info_card.balance",
+                          translationParams: {
+                            "amount": double.parse(
+                                      school_card_session.money.value,
+                                    ) >=
+                                    10
+                                ? double.parse(school_card_session.money.value)
+                                    .truncate()
+                                    .toString()
+                                : school_card_session.money.value,
+                          }),
+                    )
+                  else
+                    TextSpan(
+                      text: FlutterI18n.translate(
+                        context,
+                        school_card_session.money.value,
+                      ),
+                    ),
                 ] else
                   TextSpan(
                     text: school_card_session.isInit.value == SessionState.error
-                        ? "获取校园卡信息发生错误"
-                        : "正在获取校园卡信息",
+                        ? FlutterI18n.translate(
+                            context,
+                            "homepage.school_card_info_card.error_occured",
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            "homepage.school_card_info_card.fetching",
+                          ),
                   ),
               ],
             ),
           ),
           bottomText: Text(
             school_card_session.isInit.value == SessionState.fetched
-                ? "查询一卡通流水"
+                ? FlutterI18n.translate(
+                    context,
+                    "homepage.school_card_info_card.bottom_text_success",
+                  )
                 : school_card_session.isInit.value == SessionState.error
-                    ? "目前无法获取信息"
-                    : "正在查询信息中",
+                    ? FlutterI18n.translate(
+                        context,
+                        "homepage.school_card_info_card.no_info",
+                      )
+                    : FlutterI18n.translate(
+                        context,
+                        "homepage.school_card_info_card.fetching_info",
+                      ),
             overflow: TextOverflow.ellipsis,
           ),
         ),

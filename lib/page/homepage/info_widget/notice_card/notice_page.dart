@@ -3,6 +3,7 @@
 
 import 'package:disclosure/disclosure.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -16,7 +17,14 @@ class NoticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
-        appBar: AppBar(title: const Text("通知列表")),
+        appBar: AppBar(
+          title: Text(
+            FlutterI18n.translate(
+              context,
+              "homepage.notice_card.notice_page_title",
+            ),
+          ),
+        ),
         body: DisclosureGroup(
           multiple: false,
           clearable: true,

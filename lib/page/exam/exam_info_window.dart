@@ -139,7 +139,12 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
               );
             }
           } else if (c.status == ExamStatus.error) {
-            return Center(child: Text(c.error.toString()));
+            return Center(
+              child: Text(FlutterI18n.translate(
+                context,
+                c.error.toString(),
+              )),
+            );
           } else {
             return const Center(child: CircularProgressIndicator());
           }

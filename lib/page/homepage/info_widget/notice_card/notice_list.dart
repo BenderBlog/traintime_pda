@@ -3,6 +3,7 @@
 
 import 'package:disclosure/disclosure.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -17,7 +18,10 @@ class NoticeList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => BothSideSheet(
-        title: "应用信息",
+        title: FlutterI18n.translate(
+          context,
+          "homepage.notice_card.notice_list_title",
+        ),
         child: DisclosureGroup(
           multiple: false,
           clearable: true,
@@ -58,7 +62,10 @@ class NoticeList extends StatelessWidget {
                       messages[index].message,
                       mode: LaunchMode.externalApplication,
                     ),
-                    label: const Text("访问该链接"),
+                    label: Text(FlutterI18n.translate(
+                      context,
+                      "homepage.notice_card.open_url",
+                    )),
                     icon: const Icon(Icons.ads_click),
                   ).center();
                 }

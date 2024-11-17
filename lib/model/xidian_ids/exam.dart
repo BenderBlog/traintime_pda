@@ -83,7 +83,7 @@ class Subject {
         int.parse(match.namedGroup('stopMinute')!),
       )).format(pattern: "yyyy-MM-dd HH:mm:ss");
     } else {
-      startTime = stopTime = "取消考试资格:P";
+      startTime = stopTime = "cancel_exam";
     }
 
     return Subject(
