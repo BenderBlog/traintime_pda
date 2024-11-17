@@ -5,6 +5,7 @@
 // Idea from xenode.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -23,7 +24,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
     with AutomaticKeepAliveClientMixin {
   late Future<XDUPlanetDatabase> repoList;
 
-  String selected = "全部";
+  String selected = "xdu_planet.all";
   bool isAll = false;
 
   @override
@@ -44,7 +45,9 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
         if (snapshot.connectionState == ConnectionState.done) {
           try {
             List<Article> articles = snapshot.data!.author
-                .where((e) => selected == "全部" || e.name == selected)
+                .where(
+                  (e) => selected == "xdu_planet.all" || e.name == selected,
+                )
                 .map((e) => e.article
                     .map((f) => Article(
                         title: f.title,
@@ -69,7 +72,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     setState(() => selected = e);
                   },
                   child: Text(
-                    e,
+                    FlutterI18n.translate(context, e),
                     style: TextStyle(
                       color: selected == e
                           ? Theme.of(context).colorScheme.onPrimary
@@ -84,7 +87,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
             return Scaffold(
               appBar: AppBar(
                 title: [
-                  chooseChip("全部"),
+                  chooseChip("xdu_planet.all"),
                   const VerticalDivider().padding(vertical: 8),
                   snapshot.data!.author
                       .map((e) => e.name)
@@ -113,13 +116,12 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
             );
           }
         } else {
-          return const Center(
+          return Center(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('加载中，请稍等 <(=ω=)>'),
+              const CircularProgressIndicator().padding(bottom: 16),
+              Text(FlutterI18n.translate(context, "xdu_planet.loading")),
             ],
           ));
         }
@@ -138,7 +140,12 @@ class ArticleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return [
-      TagsBoxes(text: article.author ?? "未知作者"),
+      TagsBoxes(
+          text: article.author ??
+              FlutterI18n.translate(
+                context,
+                "xdu_planet.unknown_author",
+              )),
       Text(
         article.title,
         style: Theme.of(context).textTheme.titleMedium,
@@ -149,7 +156,7 @@ class ArticleCard extends StatelessWidget {
         children: [
           InformationWithIcon(
             icon: Icons.calendar_month,
-            text: article.articleTime.format(pattern: "yyyy年MM月dd日"),
+            text: article.articleTime.format(pattern: "yyyy-MM-dd"),
           ).flexible(),
           InformationWithIcon(
             icon: Icons.access_time,

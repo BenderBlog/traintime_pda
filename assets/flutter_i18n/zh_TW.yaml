@@ -558,7 +558,8 @@ xdu_planet:
   all: 全部
   loading: 載入中，請稍等 <(=ω=)>
   unknown_author: 未知作者
-  load_failed: 文章載入失敗，如有需要可以點選右上方的按鈕在瀏覽器裡開啟。
+  load_failed_title: 載入失敗
+  load_failed_bottom: 文章載入失敗，如有需要可以點選右上方的按鈕在瀏覽器裡開啟。
   no_comment: 暫無評論
   reply_audit: '回覆評論 #{reply_to} 已被舉報或刪除'
   reply: '回覆評論 #{reply_to}：{content}'
@@ -567,6 +568,7 @@ xdu_planet:
   confirm_audit_dialog:
     title: 確認是否舉報
     content: 三思而後行，確定您想舉報嗎？舉報後該評論會有標籤，不一定會刪除。
+    cancel: 不舉報了
     ongoing: 正在舉報評論
     failed: 舉報失敗
     success: 舉報成功

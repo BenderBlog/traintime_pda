@@ -504,14 +504,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.4+1"
-  flutter_math_fork:
-    dependency: transitive
-    description:
-      name: flutter_math_fork
-      sha256: "94bee4642892a94939af0748c6a7de0ff8318feee588379dcdfea7dc5cba06c8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.2"
   flutter_native_splash:
     dependency: "direct main"
     description:
@@ -730,14 +722,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.8.0"
-  latext:
-    dependency: "direct main"
-    description:
-      name: latext
-      sha256: d341bad2af5fd71983d899ac2f28d0442b6c4b7f80ccebb5545f051c83625523
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -850,14 +834,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.6"
-  nested:
-    dependency: transitive
-    description:
-      name: nested
-      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   octo_image:
     dependency: transitive
     description:
@@ -1058,14 +1034,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
-  provider:
-    dependency: transitive
-    description:
-      name: provider
-      sha256: c8a055ee5ce3fd98d6fc872478b03823ffdb448699c6ebdbbc71d59b596fd48c
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.2"
   pub_semver:
     dependency: transitive
     description:
@@ -1431,14 +1399,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.15.0"
-  tuple:
-    dependency: transitive
-    description:
-      name: tuple
-      sha256: a97ce2013f240b2f3807bcbaf218765b6f301c3eff91092bcfa23a039e7dd151
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.2"
   typed_data:
     dependency: transitive
     description:

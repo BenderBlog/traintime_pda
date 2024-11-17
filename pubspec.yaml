@@ -60,6 +60,7 @@ dependencies:
   based_split_view: ^1.2.0
   disclosure: ^2.2.0
   content_resolver: ^0.3.1
+  permission_handler: ^11.3.1
   # Homepage Widget
   home_widget: ^0.6.0
   image: ^4.2.0
@@ -69,8 +70,6 @@ dependencies:
   flutter_widget_from_html_core: any
   fwfh_cached_network_image: ^0.14.3
   fwfh_url_launcher: ^0.9.1
-  latext: ^0.4.1
-  permission_handler: ^11.3.1
   # internationalized
   device_info_plus: ^10.1.2
   flutter_i18n: ^0.36.2

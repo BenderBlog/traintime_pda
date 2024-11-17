@@ -593,7 +593,8 @@ xdu_planet:
     all: "全部"
     loading: "加载中，请稍等 <(=ω=)>"
     unknown_author: "未知作者"
-    load_failed: "文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。"
+    load_failed_title: "加载失败"
+    load_failed_bottom: "文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。"
     no_comment: "暂无评论"
     reply_audit: "回复评论 #{reply_to} 已被举报或删除"
     reply: "回复评论 #{reply_to}：{content}"
@@ -602,6 +603,7 @@ xdu_planet:
     confirm_audit_dialog:
         title: "确认是否举报"
         content: "三思而后行，确定您想举报吗？举报后该评论会有标签，不一定会删除。"
+        cancel: "不举报了"
         ongoing: "正在举报评论"
         failed: "举报失败"
         success: "举报成功"

@@ -4,14 +4,13 @@
 // Content page of XDU Planet.
 
 import 'dart:async';
-import 'dart:math' show min;
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
-import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
-import 'package:html/parser.dart';
-import 'package:latext/latext.dart';
+import 'dart:math';
+
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -48,36 +47,6 @@ class _ContentPageState extends State<ContentPage> {
     _comments = CommentModel(id: widget.article.id);
   }
 
-  RegExp latexStuff = RegExp(r'(\$+)((?:(?!\1)[\s\S])*)\1');
-
-  /*
-  String? content(String? content) {
-    if (content == null) return null;
-    List<String> split = content.split('<hr />');
-
-    String tail = split.last.replaceAllMapped(
-      latexStuff,
-      (match) {
-        if (match.group(2) == null) return "";
-
-        String parseMiddle = match
-            .group(2)!
-            .replaceAll(RegExp(r'<br(.*)>'), "")
-            .replaceAll("&lt;", "<")
-            .replaceAll("&gt;", ">")
-            .replaceAll("&quot;", "\"")
-            .replaceAll("&#39;", "'")
-            .replaceAll("&amp;", "\\&")
-            .replaceAll("\\begin{align}", "")
-            .replaceAll("\\end{align}", "")
-            .replaceAll("\$", "\\\$");
-        print("parse: " + parseMiddle);
-        return "<pre id=\"${match.group(1)}\">$parseMiddle</pre>";
-      },
-    );
-    return tail;
-  }
-  */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,18 +70,14 @@ class _ContentPageState extends State<ContentPage> {
             if (snapshot.connectionState == ConnectionState.done) {
               try {
                 addon = HtmlWidget(
-                  snapshot.data ?? "文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。",
+                  snapshot.data ??
+                      '''
+  <h3>${FlutterI18n.translate(context, "xdu_planet.load_failed_title")}</h3>
+  <p>${FlutterI18n.translate(context, "xdu_planet.load_failed_bottom")}</p>
+''',
                   factoryBuilder: () => MyWidgetFactory(),
-                  customWidgetBuilder: (element) {
-                    if (element.innerHtml.contains(latexStuff)) {
-                      return LaTexT(
-                          laTeXCode: Text(parse(element.innerHtml).body!.text));
-                    }
-
-                    return null;
-                  },
                 );
-              } catch (e, s) {
+              } catch (e) {
                 return ReloadWidget(
                   function: () {
                     setState(() {
@@ -120,7 +85,6 @@ class _ContentPageState extends State<ContentPage> {
                           PlanetSession().content(widget.article.content);
                     });
                   },
-                  errorStatus: s,
                 );
               }
             } else {
@@ -136,7 +100,7 @@ class _ContentPageState extends State<ContentPage> {
                     ),
                     TextSpan(
                       text: "\n${widget.author} - "
-                          "${widget.article.articleTime.format(pattern: "yyyy年MM月dd日 HH:mm")}",
+                          "${Jiffy.parseFromDateTime(widget.article.time).format(pattern: "yyyy-MM-dd HH:mm")}",
                     ),
                   ]),
                 ),
@@ -157,7 +121,10 @@ class _ContentPageState extends State<ContentPage> {
               if (snapshot.connectionState == ConnectionState.done) {
                 try {
                   if (snapshot.data!.isEmpty) {
-                    list = const Text("暂无评论");
+                    list = Text(FlutterI18n.translate(
+                      context,
+                      "xdu_planet.no_comment",
+                    ));
                   } else {
                     list = List.generate(
                       snapshot.data!.length,
@@ -184,13 +151,28 @@ class _ContentPageState extends State<ContentPage> {
                                 );
                                 if (data == null) {
                                   return Text(
-                                    "回复评论 #${snapshot.data![index].reply_to} 已被举报或删除",
+                                    FlutterI18n.translate(
+                                      context,
+                                      "xdu_planet.reply_audit",
+                                      translationParams: {
+                                        "reply_to":
+                                            snapshot.data![index].reply_to
+                                      },
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   );
                                 }
                                 return Text(
-                                  "回复评论 #${snapshot.data![index].reply_to}：${data.content}",
+                                  FlutterI18n.translate(
+                                    context,
+                                    "xdu_planet.reply",
+                                    translationParams: {
+                                      "reply_to":
+                                          snapshot.data![index].reply_to,
+                                      "content": data.content,
+                                    },
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 );
@@ -218,7 +200,10 @@ class _ContentPageState extends State<ContentPage> {
                                         context.mounted) {
                                       showToast(
                                         context: context,
-                                        msg: "本评论已经被举报",
+                                        msg: FlutterI18n.translate(
+                                          context,
+                                          "xdu_planet.have_been_audit",
+                                        ),
                                       );
                                       return;
                                     }
@@ -226,19 +211,37 @@ class _ContentPageState extends State<ContentPage> {
                                             context: context,
                                             builder: (BuildContext context) =>
                                                 AlertDialog(
-                                                  title: const Text('确认是否举报'),
-                                                  content: const Text(
-                                                    '三思而后行，确定您想举报吗？举报后该评论会有标签，不一定会删除。',
+                                                  title: Text(
+                                                    FlutterI18n.translate(
+                                                      context,
+                                                      "xdu_planet.confirm_audit_dialog.title",
+                                                    ),
+                                                  ),
+                                                  content: Text(
+                                                    FlutterI18n.translate(
+                                                      context,
+                                                      "xdu_planet.confirm_audit_dialog.content",
+                                                    ),
                                                   ),
                                                   actions: <Widget>[
                                                     TextButton(
-                                                      child: const Text('不举报了'),
+                                                      child: Text(
+                                                        FlutterI18n.translate(
+                                                          context,
+                                                          "xdu_planet.confirm_audit_dialog.cancel",
+                                                        ),
+                                                      ),
                                                       onPressed: () =>
                                                           Navigator.of(context)
                                                               .pop(false),
                                                     ),
                                                     TextButton(
-                                                      child: const Text('确认'),
+                                                      child: Text(
+                                                        FlutterI18n.translate(
+                                                          context,
+                                                          "confirm",
+                                                        ),
+                                                      ),
                                                       onPressed: () =>
                                                           Navigator.of(context)
                                                               .pop(true),
@@ -248,7 +251,12 @@ class _ContentPageState extends State<ContentPage> {
                                         false;
                                     if (isConfirm && context.mounted) {
                                       var pd = ProgressDialog(context: context);
-                                      pd.show(msg: "正在举报评论");
+                                      pd.show(
+                                        msg: FlutterI18n.translate(
+                                          context,
+                                          "xdu_planet.confirm_audit_dialog.ongoing",
+                                        ),
+                                      );
                                       PlanetSession()
                                           .auditComments(
                                         id: snapshot.data![index].ID,
@@ -259,7 +267,10 @@ class _ContentPageState extends State<ContentPage> {
                                         if (context.mounted) {
                                           showToast(
                                             context: context,
-                                            msg: "举报成功",
+                                            msg: FlutterI18n.translate(
+                                              context,
+                                              "xdu_planet.confirm_audit_dialog.success",
+                                            ),
                                           );
                                         }
                                       }).onError((e, _) {
@@ -267,19 +278,25 @@ class _ContentPageState extends State<ContentPage> {
                                         if (context.mounted) {
                                           showToast(
                                             context: context,
-                                            msg: "举报失败",
+                                            msg: FlutterI18n.translate(
+                                              context,
+                                              "xdu_planet.confirm_audit_dialog.failed",
+                                            ),
                                           );
                                         }
                                       });
                                     }
                                   },
-                                  child: const Text('举报'),
+                                  child: Text(FlutterI18n.translate(
+                                    context,
+                                    "xdu_planet.audit",
+                                  )),
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    bool? result = await showDialog<bool>(
+                                    bool? result =
+                                        await showModalBottomSheet<bool>(
                                       context: context,
-                                      barrierDismissible: false,
                                       builder: (context) => CommentPopout(
                                         id: widget.article.id,
                                         replyTo: snapshot.data![index],
@@ -291,22 +308,34 @@ class _ContentPageState extends State<ContentPage> {
                                         _comments.update();
                                         showToast(
                                           context: context,
-                                          msg: "评论成功",
+                                          msg: FlutterI18n.translate(
+                                            context,
+                                            "xdu_planet.comment_success",
+                                          ),
                                         );
                                       } else if (result == false) {
                                         showToast(
                                           context: context,
-                                          msg: "评论失败，请去网络查看器和日志查看器查看报错",
+                                          msg: FlutterI18n.translate(
+                                            context,
+                                            "xdu_planet.comment_failed",
+                                          ),
                                         );
                                       } else {
                                         showToast(
                                           context: context,
-                                          msg: "没想好要说啥嘛",
+                                          msg: FlutterI18n.translate(
+                                            context,
+                                            "xdu_planet.comment_canceled",
+                                          ),
                                         );
                                       }
                                     }
                                   },
-                                  child: const Text('回复'),
+                                  child: Text(FlutterI18n.translate(
+                                    context,
+                                    "xdu_planet.comment",
+                                  )),
                                 ),
                               ],
                             ),
@@ -319,7 +348,10 @@ class _ContentPageState extends State<ContentPage> {
                   return ReloadWidget(function: _comments.update);
                 }
               } else {
-                return const Text("加载评论中……");
+                return Text(FlutterI18n.translate(
+                  context,
+                  "xdu_planet.comment_loading",
+                ));
               }
               return SelectionArea(child: list);
             },
@@ -340,9 +372,8 @@ class _ContentPageState extends State<ContentPage> {
           .safeArea(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          bool? result = await showDialog<bool>(
+          bool? result = await showModalBottomSheet<bool>(
             context: context,
-            barrierDismissible: false,
             builder: (context) => CommentPopout(id: widget.article.id),
           );
           if (context.mounted) {
@@ -351,15 +382,27 @@ class _ContentPageState extends State<ContentPage> {
               _comments.update();
               showToast(
                 context: context,
-                msg: "评论成功",
+                msg: FlutterI18n.translate(
+                  context,
+                  "xdu_planet.comment_success",
+                ),
               );
             } else if (result == false) {
               showToast(
                 context: context,
-                msg: "评论失败，请去网络查看器和日志查看器查看报错",
+                msg: FlutterI18n.translate(
+                  context,
+                  "xdu_planet.comment_failed",
+                ),
               );
             } else {
-              showToast(context: context, msg: "没想好要说啥嘛");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "xdu_planet.comment_canceled",
+                ),
+              );
             }
           }
         },
@@ -369,8 +412,7 @@ class _ContentPageState extends State<ContentPage> {
   }
 }
 
-class MyWidgetFactory extends WidgetFactory
-    with CachedNetworkImageFactory, UrlLauncherFactory {}
+class MyWidgetFactory extends WidgetFactory with UrlLauncherFactory {}
 
 class CommentModel with ChangeNotifier {
   String id;

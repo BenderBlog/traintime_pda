@@ -38,7 +38,7 @@ class CommentPopout extends StatelessWidget {
       "Amy",
       "Liz",
       "Michelle",
-      "JKTrigger",
+      "Elliot",
       "Elisabeth",
       "Isabel",
       "Chillet",

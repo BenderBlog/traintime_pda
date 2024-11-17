@@ -368,10 +368,9 @@ awb4B45zUwIDAQAB
       response = await require(
         subWebsite: "/h5/login",
         body: {
-          "uname":
-              "20009200493", //preference.getString(preference.Preference.idsAccount),
+          "uname": preference.getString(preference.Preference.idsAccount),
           "pwd": rsaEncrypt(
-            "Skipper2+2=4", //preference.getString(preference.Preference.sportPassword),
+            preference.getString(preference.Preference.sportPassword),
             rsaKey,
           ),
           "openid": ""
