@@ -463,6 +463,11 @@ setting:
     new_content: '版本號 {code} 新增內容：
 
       '
+  localization_dialog:
+    title: 修改語言
+    undefined: 追隨系統設定
+    simplifiedChinese: 簡體中文
+    traditionalChinese: 繁體中文
   easter_egg_page: 你找到了彩蛋
   about_page:
     benderblog: 主要開發者，iOS 小部件編寫和拼接

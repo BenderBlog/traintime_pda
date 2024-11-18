@@ -481,6 +481,11 @@ setting:
         download_apk: "下载安装包"
         github_release: "去 Git Release"
         new_content: "版本号 {code} 新增内容：\n"
+    localization_dialog:
+        title: "修改语言"
+        undefined: "追随系统设置"
+        simplifiedChinese: "简体中文"
+        traditionalChinese: "繁体中文"
     # 关于页面
     easter_egg_page: "你找到了彩蛋"
     about_page:

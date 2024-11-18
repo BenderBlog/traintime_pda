@@ -15,6 +15,7 @@ import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -261,6 +262,19 @@ class _SettingWindowState extends State<SettingWindow> {
                     },
                   ),
                 ),
+                const Divider(),
+                ListTile(
+                    title: Text(FlutterI18n.translate(
+                      context,
+                      "setting.localization_dialog.title",
+                    )),
+                    onTap: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => const ChangeLanguageDialog(),
+                      );
+                    }),
               ])),
           ReXCard(
             title: _buildListSubtitle(FlutterI18n.translate(

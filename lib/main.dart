@@ -107,9 +107,9 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: [
           FlutterI18nDelegate(
             translationLoader: FileTranslationLoader(
-              fallbackFile: "zh_TW",
+              fallbackFile: "zh_CN",
               useCountryCode: true,
-              forcedLocale: const Locale('zh_TW'),
+              forcedLocale: c.locale,
             ),
             missingTranslationHandler: (key, locale) {
               log.info(
@@ -123,9 +123,8 @@ class _MyAppState extends State<MyApp> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [
-          Locale('zh', 'TW'),
           Locale('zh', 'CN'),
-          //Locale('zh', 'SG'), // CFBB Lang Alternative
+          Locale('zh', 'TW'),
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
@@ -140,10 +139,11 @@ class _MyAppState extends State<MyApp> {
         ),
         builder: (context, widget) {
           Catcher2.addDefaultErrorWidget(
-              showStacktrace: true,
-              title: "未预期情况发生！",
-              description: "An unexpected behaviour occured!",
-              maxWidthForSmallMode: 150);
+            showStacktrace: true,
+            title: "未预期情况发生！",
+            description: "An unexpected behaviour occured!",
+            maxWidthForSmallMode: 150,
+          );
           if (widget != null) return widget;
           throw StateError('widget is null');
         },

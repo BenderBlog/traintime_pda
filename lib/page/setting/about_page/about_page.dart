@@ -314,11 +314,10 @@ class _AboutPageState extends State<AboutPage> {
           );
 
   Widget get _developerList => ReXCard(
-        title: Text("Made with love from ${getDevelopers().length} people")
-            .padding(
-              bottom: 8,
-            )
-            .center(),
+        title: Text(
+          "${getDevelopers().length} people involved in the "
+          "'little boy girl making process'",
+        ).padding(bottom: 8).center(),
         remaining: const [],
         bottomRow: getDevelopers()
             .map((e) => DeveloperWidget(developer: e))

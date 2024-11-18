@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+<dict>
+	<key>AppGroupId</key>
+	<string>$(CUSTOM_GROUP_ID)</string>
+	<key>NSExtension</key>
 	<dict>
-		<key>AppGroupId</key>
-		<string>$(CUSTOM_GROUP_ID)</string>
-		<key>CFBundleVersion</key>
-		<string>$(FLUTTER_BUILD_NUMBER)</string>
-		<key>NSExtension</key>
+		<key>NSExtensionAttributes</key>
 		<dict>
-			<key>NSExtensionAttributes</key>
+			<key>NSExtensionActivationRule</key>
 			<dict>
-				<key>NSExtensionActivationRule</key>
-				<dict>
-					<!--TODO: Add this flag, if you want to support sharing other files into your app-->
-					<!--Change the integer to however many files you want to be able to share at a time-->
-					<key>NSExtensionActivationSupportsFileWithMaxCount</key>
-					<integer>1</integer>
-				</dict>
+				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
+				<integer>1</integer>
 			</dict>
-			<key>NSExtensionMainStoryboard</key>
-			<string>MainInterface</string>
-			<key>NSExtensionPointIdentifier</key>
-			<string>com.apple.share-services</string>
 		</dict>
+		<key>NSExtensionMainStoryboard</key>
+		<string>MainInterface</string>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.share-services</string>
 	</dict>
+</dict>
 </plist>

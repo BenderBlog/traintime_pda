@@ -9,7 +9,7 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>zh_CN</string>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>XDYou</string>
 	<key>CFBundleExecutable</key>
@@ -18,6 +18,11 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>zh_CN</string>
+		<string>zh_TW</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>xdyou</string>
 	<key>CFBundlePackageType</key>
