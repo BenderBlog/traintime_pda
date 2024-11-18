@@ -331,7 +331,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                           10,
                           (index) => WheelChooseOptions(
                             data: index + 1,
-                            hint: "第 ${index + 1} 节",
+                            hint: FlutterI18n.translate(
+                              context,
+                              "classtable.class_add.wheel_choose_hint",
+                              translationParams: {
+                                "index": (index + 1).toString(),
+                              },
+                            ),
                           ),
                         ),
                       ).flexible(),

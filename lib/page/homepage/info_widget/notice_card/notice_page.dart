@@ -65,7 +65,10 @@ class NoticePage extends StatelessWidget {
                       messages[index].message,
                       mode: LaunchMode.externalApplication,
                     ),
-                    label: const Text("访问该链接"),
+                    label: Text(FlutterI18n.translate(
+                      context,
+                      "homepage.notice_card.open_url",
+                    )),
                     icon: const Icon(Icons.ads_click),
                   ).center();
                 }

@@ -132,7 +132,7 @@ class _ContentPageState extends State<ContentPage> {
                         title: Text(
                           "#${snapshot.data![index].ID} "
                           "${snapshot.data![index].user_id} "
-                          "${snapshot.data![index].statusStr}",
+                          "${FlutterI18n.translate(context, snapshot.data![index].statusStr)}",
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

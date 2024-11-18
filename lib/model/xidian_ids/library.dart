@@ -81,7 +81,7 @@ class BookInfo {
   final String? publisherHouse;
   final String? groupCode;
   final List<String>? callNos;
-  final List<String>? barCodes;
+  final List<String?>? barCodes;
   final List<String>? searchCode;
   final List<BookLocation>? items;
 
@@ -132,7 +132,7 @@ class BookInfo {
     if (barCodes == null || barCodes!.isEmpty) {
       return "未提供";
     }
-    return barCodes!.first;
+    return barCodes!.first ?? "未提供";
   }
 }
 

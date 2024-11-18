@@ -5,6 +5,7 @@
 
 //import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -62,33 +63,63 @@ class CommentPopout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('评论该篇文章'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "xdu_planet.comment_title",
+      )),
       content: TextField(
         controller: _controller,
         maxLines: 5,
         decoration: InputDecoration(
           hintText: replyTo == null
-              ? '发表您的高见:)'
-              : "回复评论 #${replyTo!.ID}：${replyTo!.content}",
+              ? FlutterI18n.translate(
+                  context,
+                  "xdu_planet.hint_send_comment",
+                )
+              : FlutterI18n.translate(
+                  context,
+                  "xdu_planet.reply",
+                  translationParams: {
+                    "reply_to": replyTo!.ID.toString(),
+                    "content": replyTo!.content,
+                  },
+                ),
           border: const OutlineInputBorder(),
         ),
       ),
       actions: [
         TextButton(
-          child: const Text('取消'),
+          child: Text(FlutterI18n.translate(
+            context,
+            "cancel",
+          )),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: const Text('发送'),
+          child: Text(FlutterI18n.translate(
+            context,
+            "xdu_planet.sent",
+          )),
           onPressed: () async {
             if (_controller.text.isEmpty) {
-              showToast(context: context, msg: "发送信息空白");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "xdu_planet.empty_send",
+                ),
+              );
               return;
             }
             var pd = ProgressDialog(context: context);
-            pd.show(msg: "正在发送评论");
+            pd.show(
+              msg: FlutterI18n.translate(
+                context,
+                "xdu_planet.sending",
+              ),
+            );
             //var hashedUid = md5.convert(utf8.encode(
             //    "${pref.getString(pref.Preference.idsAccount)}#${pref.getString(pref.Preference.name)}"));
             await PlanetSession()

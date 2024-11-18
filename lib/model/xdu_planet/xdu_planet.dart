@@ -99,15 +99,7 @@ class XDUPlanetComment {
 
   // 可选值为ok、block、delete、audit，分别表示已通过、已屏蔽、已删除、待审核
   String get statusStr {
-    switch (status) {
-      case "block":
-        return "被屏蔽";
-      case "delete":
-        return "被删除";
-      case "audit":
-        return "被举报待审核";
-      default:
-        return "";
-    }
+    if (status.isNotEmpty) return "xdu_planet.$status";
+    return "";
   }
 }

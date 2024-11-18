@@ -1,3 +1,4 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777
 drag_text: 上拉請求更多
 ready_text: 正在載入......
 processing_text: 正在載入......
@@ -447,6 +448,7 @@ setting:
   change_electricity_account:
     title: 修改電費帳號密碼
     input_hint: 請在此輸入賬號
+    blank_input: 輸入空白!
   change_experiment_title: 修改物理實驗賬號密碼
   change_sport_title: 修改體育系統賬號密碼
   change_password_dialog:
@@ -556,10 +558,18 @@ xdu_planet:
     failed: 舉報失敗
     success: 舉報成功
   comment: 回覆
+  send: 傳送
+  sending: 正在傳送評論
+  empty_send: 傳送資訊空白
+  hint_send_comment: 發表您的高見:)
+  comment_title: 評論該篇文章
   comment_success: 評論成功
   comment_failed: 評論失敗，請去網路檢視器和日誌檢視器檢視報錯
   comment_canceled: 沒想好要說啥嘛
   comment_loading: 載入評論中……
+  block: 被遮蔽
+  delete: 被刪除
+  audio: 被刪除
 electricity_status:
   pending: 等待獲取
   remain_fetching: 正在獲取

@@ -16,7 +16,10 @@ class ColumnChooseDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      title: const Text('选择学期'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "choose_semester",
+      )),
       children: List.generate(
         chooseList.length,
         (index) => SimpleDialogOption(

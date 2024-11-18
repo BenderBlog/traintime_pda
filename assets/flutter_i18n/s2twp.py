@@ -46,6 +46,7 @@ OrderedDumper.add_representer(OrderedDict, dict_representer)
 
 # 将转换后的内容写入新的 YAML 文件，并保持顺序
 with open('zh_TW.yaml', 'w', encoding='utf-8') as file:
+    file.write("# Translated using OpenCC s2twp Dictionary, script by Hancl777\n")
     yaml.dump(converted_content, file, Dumper=OrderedDumper, allow_unicode=True)
 
 print("YAML 文件中的中文已经转换并保持了顺序！")

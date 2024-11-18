@@ -141,8 +141,8 @@ class _MyAppState extends State<MyApp> {
         builder: (context, widget) {
           Catcher2.addDefaultErrorWidget(
               showStacktrace: true,
-              title: "发生错误",
-              description: "详情如下",
+              title: "未预期情况发生！",
+              description: "An unexpected behaviour occured!",
               maxWidthForSmallMode: 150);
           if (widget != null) return widget;
           throw StateError('widget is null');

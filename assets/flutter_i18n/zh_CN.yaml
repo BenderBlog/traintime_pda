@@ -468,6 +468,7 @@ setting:
     change_electricity_account:
         title: "修改电费帐号密码"
         input_hint: "请在此输入账号"
+        blank_input: "输入空白!"
     change_experiment_title: "修改物理实验账号密码"
     change_sport_title: "修改体育系统账号密码"
     change_password_dialog:
@@ -587,10 +588,18 @@ xdu_planet:
         failed: "举报失败"
         success: "举报成功"
     comment: "回复"
+    send: "发送"
+    sending: "正在发送评论"
+    empty_send: "发送信息空白"
+    hint_send_comment: "发表您的高见:)"
+    comment_title: "评论该篇文章"
     comment_success: "评论成功"
     comment_failed: "评论失败，请去网络查看器和日志查看器查看报错"
     comment_canceled: "没想好要说啥嘛"
     comment_loading: "加载评论中……"
+    block: "被屏蔽"
+    delete: "被删除"
+    audio: "被删除"
 
 # 电费状态
 electricity_status:
@@ -614,7 +623,7 @@ school_card_status:
     failed_to_fetch: "获取失败"
     failed_to_query: "查询失败"
 
-# 彩蛋，可以不翻译。注意，有单引号的是引用的歌曲名称，看情况吧
+# 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg: |
     Easter egg page under constrction...
 

@@ -59,7 +59,7 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
           ?.map((e) => e as String)
           .toList(),
       barCodes: (json['barCodes'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => e as String?)
           .toList(),
       items: (json['items'] as List<dynamic>?)
           ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))

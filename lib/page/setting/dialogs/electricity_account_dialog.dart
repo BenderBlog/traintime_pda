@@ -61,7 +61,13 @@ class ElectricityAccountDialog extends StatelessWidget {
               );
               Navigator.of(context).pop();
             } else {
-              showToast(context: context, msg: "输入空白!");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "setting.change_electricity_account.blank_input",
+                ),
+              );
             }
           },
         ),
