@@ -18,6 +18,7 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
+import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -116,7 +117,6 @@ class _SettingWindowState extends State<SettingWindow> {
               ],
             ),
           ).padding(horizontal: 8.0),
-          // 功能1
           const SizedBox(height: 20),
           ReXCard(
               title: _buildListSubtitle(FlutterI18n.translate(
@@ -268,6 +268,19 @@ class _SettingWindowState extends State<SettingWindow> {
                       context,
                       "setting.localization_dialog.title",
                     )),
+                    subtitle: Text(FlutterI18n.translate(
+                      context,
+                      FlutterI18n.translate(
+                        context,
+                        Localization.values
+                            .firstWhere((value) =>
+                                value.string ==
+                                preference.getString(
+                                    preference.Preference.localization))
+                            .toShow,
+                      ),
+                    )),
+                    trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
                         barrierDismissible: false,
