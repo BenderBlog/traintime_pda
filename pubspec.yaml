@@ -30,6 +30,7 @@ dependencies:
   sn_progress_dialog: ^1.1.3
   fluttertoast: ^8.2.2
   extended_nested_scroll_view: ^6.1.2
+  flex_color_scheme: ^8.0.1
   # Others
   url_launcher: ^6.1.6
   jiffy: ^6.1.0

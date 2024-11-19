@@ -8,6 +8,9 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:catcher_2/catcher_2.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -23,7 +26,7 @@ import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/themes/demo_blue.dart';
+import 'package:watermeter/themes/color_seed.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {
@@ -130,8 +133,39 @@ class _MyAppState extends State<MyApp> {
         scrollBehavior: MyCustomScrollBehavior(),
         navigatorKey: preference.debuggerKey,
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
-        theme: demoBlue,
-        darkTheme: demoBlueDark,
+        theme: FlexThemeData.light(
+          scheme: ColorSeed.deepPurple.color,
+          subThemesData: const FlexSubThemesData(
+            interactionEffects: true,
+            tintedDisabledControls: true,
+            useM2StyleDividerInM3: true,
+            inputDecoratorIsFilled: true,
+            inputDecoratorBorderType: FlexInputBorderType.outline,
+            alignedDropdown: true,
+            navigationRailUseIndicator: true,
+            navigationRailLabelType: NavigationRailLabelType.all,
+          ),
+          visualDensity: FlexColorScheme.comfortablePlatformDensity,
+          cupertinoOverrideTheme:
+              const CupertinoThemeData(applyThemeToAll: true),
+        ).useSystemChineseFont(Brightness.light),
+        darkTheme: FlexThemeData.dark(
+          scheme: ColorSeed.deepPurple.color,
+          subThemesData: const FlexSubThemesData(
+            interactionEffects: true,
+            tintedDisabledControls: true,
+            blendOnColors: true,
+            useM2StyleDividerInM3: true,
+            inputDecoratorIsFilled: true,
+            inputDecoratorBorderType: FlexInputBorderType.outline,
+            alignedDropdown: true,
+            navigationRailUseIndicator: true,
+            navigationRailLabelType: NavigationRailLabelType.all,
+          ),
+          visualDensity: FlexColorScheme.comfortablePlatformDensity,
+          cupertinoOverrideTheme:
+              const CupertinoThemeData(applyThemeToAll: true),
+        ).useSystemChineseFont(Brightness.dark),
         themeMode: c.colorState,
         home: DefaultTextStyle.merge(
           style: const TextStyle(textBaseline: TextBaseline.ideographic),

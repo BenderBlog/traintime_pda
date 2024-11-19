@@ -5,7 +5,6 @@
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 
 import 'package:watermeter/repository/localization.dart';

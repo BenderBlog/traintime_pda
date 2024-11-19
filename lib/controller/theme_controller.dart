@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/themes/demo_blue.dart';
+import 'package:watermeter/themes/color_seed.dart';
 //import 'package:watermeter/themes/color_seed.dart';
 //import 'package:watermeter/themes/demo_blue.dart';
 

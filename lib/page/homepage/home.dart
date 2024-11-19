@@ -120,8 +120,6 @@ class _HomePageMasterState extends State<HomePageMaster>
         },
       );
     }
-
-    /// TODO: URGENT, rethink how to deal with the first login stuff...
   }
 
   void _loginAsync() async {
