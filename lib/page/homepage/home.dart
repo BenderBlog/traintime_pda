@@ -71,6 +71,7 @@ class HomePageMaster extends StatefulWidget {
 class _HomePageMasterState extends State<HomePageMaster>
     with WidgetsBindingObserver {
   int _selectedIndex = 0;
+  static bool refreshAtStart = false;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -104,6 +105,21 @@ class _HomePageMasterState extends State<HomePageMaster>
     );
 
     WidgetsBinding.instance.addObserver(this);
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Listen to media sharing coming from outside the app while the app is in the memory.
+      _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen(
+        _onData,
+        onError: (error, stacktrace) {
+          log.error("getIntentDataStream error.", error, stacktrace);
+        },
+      );
+      // Get the media sharing coming from outside the app while the app is closed.
+      ReceiveSharingIntent.instance.getInitialMedia().then(_onData).catchError(
+        (err, stacktrace) {
+          log.error("getIntentDataStream error.", err, stacktrace);
+        },
+      );
+    }
 
     /// TODO: URGENT, rethink how to deal with the first login stuff...
   }
@@ -375,39 +391,28 @@ class _HomePageMasterState extends State<HomePageMaster>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (Platform.isAndroid || Platform.isIOS) {
-      // Listen to media sharing coming from outside the app while the app is in the memory.
-      _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen(
-        _onData,
-        onError: (error, stacktrace) {
-          log.error("getIntentDataStream error.", error, stacktrace);
-        },
+    if (!refreshAtStart) {
+      message.checkMessage();
+      message.checkUpdate().then((value) {
+        if (value ?? false) _showUpdateNotice();
+      });
+      log.info(
+        "[home][BackgroundFetchFromHome]"
+        "Current loginstate: $loginState, if none will _loginAsync.",
       );
-      // Get the media sharing coming from outside the app while the app is closed.
-      ReceiveSharingIntent.instance.getInitialMedia().then(_onData).catchError(
-        (err, stacktrace) {
-          log.error("getIntentDataStream error.", err, stacktrace);
-        },
-      );
-    }
-    message.checkMessage();
-    message.checkUpdate().then((value) {
-      if (value ?? false) _showUpdateNotice();
-    });
-    log.info(
-      "[home][BackgroundFetchFromHome]"
-      "Current loginstate: $loginState, if none will _loginAsync.",
-    );
-    if (loginState == IDSLoginState.none) {
-      _loginAsync();
-    } else {
-      update(
-        context: context,
-        forceRetryLogin: true,
-        sliderCaptcha: (String cookieStr) {
-          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
-        },
-      );
+      if (loginState == IDSLoginState.none) {
+        _loginAsync();
+      } else {
+        update(
+          context: context,
+          forceRetryLogin: true,
+          sliderCaptcha: (String cookieStr) {
+            return SliderCaptchaClientProvider(cookie: cookieStr)
+                .solve(context);
+          },
+        );
+      }
+      refreshAtStart = true;
     }
   }
 
