@@ -151,10 +151,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
                   child: InkWell(
                     /// The following themes are the same as the Material 3 Card Radius.
                     borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-                    splashColor:
-                        Theme.of(context).primaryColor.withOpacity(0.1),
-                    highlightColor:
-                        Theme.of(context).primaryColor.withOpacity(0.3),
                     onTap: () {
                       if (isTopRowLocked == false) {
                         classTableState.chosenWeek = index;

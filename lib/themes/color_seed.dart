@@ -34,12 +34,12 @@ const demoBlueModeMap = {
 /// App Color patten.
 /// Copied from https://github.com/flutter/samples/blob/main/material_3_demo/lib/constants.dart
 enum ColorSeed {
-  indigo('默认颜色', FlexScheme.indigo),
-  blue('天空蓝', FlexScheme.blue),
-  deepPurple('基佬紫', FlexScheme.deepPurple),
-  green('早苗绿', FlexScheme.green),
-  //orange('果粒橙', FlexScheme.orange),
-  pink('少女粉', FlexScheme.pinkM3);
+  indigo('default', FlexScheme.indigo),
+  blue('blue', FlexScheme.blue),
+  deepPurple('deepPurple', FlexScheme.deepPurple),
+  green('green', FlexScheme.green),
+  orange('orange', FlexScheme.orangeM3),
+  pink('pink', FlexScheme.sakura);
 
   const ColorSeed(this.label, this.color);
   final String label;

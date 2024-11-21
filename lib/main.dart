@@ -134,7 +134,7 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: preference.debuggerKey,
         title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
         theme: FlexThemeData.light(
-          scheme: ColorSeed.deepPurple.color,
+          scheme: c.color,
           subThemesData: const FlexSubThemesData(
             interactionEffects: true,
             tintedDisabledControls: true,
@@ -150,7 +150,7 @@ class _MyAppState extends State<MyApp> {
               const CupertinoThemeData(applyThemeToAll: true),
         ).useSystemChineseFont(Brightness.light),
         darkTheme: FlexThemeData.dark(
-          scheme: ColorSeed.deepPurple.color,
+          scheme: c.color,
           subThemesData: const FlexSubThemesData(
             interactionEffects: true,
             tintedDisabledControls: true,

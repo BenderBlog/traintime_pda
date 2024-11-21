@@ -392,6 +392,7 @@ setting:
   fetch_failed: 獲取更新資訊失敗
   ui_setting: 介面設定
   brightness_setting: 設定深淺色
+  color_setting: 顏色設定
   simplify_timeline: 簡化日程時間軸
   simplify_timeline_description: 沒有日程時 減少空間佔用
   account_setting: 賬號設定
@@ -436,8 +437,16 @@ setting:
   need_close_dialog:
     title: 請關閉應用
     content: 因為技術限制，使用者需要自行關閉視窗，然後重新開啟應用。
-  change_brightness_dialog:
+  change_color_dialog:
     title: 顏色設定
+    default: 預設顏色
+    blue: 天空藍
+    deepPurple: 基佬紫
+    green: 早苗綠
+    orange: 果粒橙
+    pink: 少女粉
+  change_brightness_dialog:
+    title: 亮度設定
     follow_setting: 跟隨系統
     day_mode: 白天模式
     night_mode: 黑夜模式

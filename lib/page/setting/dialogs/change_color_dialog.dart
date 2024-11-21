@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Change app color pattern.
-// Omit from release temporarity.
-/*
+
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -21,7 +21,10 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('颜色设置'),
+      title: Text(FlutterI18n.translate(
+        context,
+        "setting.change_color_dialog.title",
+      )),
       titleTextStyle: const TextStyle(
         fontSize: 20,
         color: Colors.black,
@@ -34,7 +37,10 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
               RadioListTile<int>(
                 title: Row(
                   children: [
-                    Text(ColorSeed.values[i].label),
+                    Text(FlutterI18n.translate(
+                      context,
+                      "setting.change_color_dialog.${ColorSeed.values[i].label}",
+                    )),
                     const SizedBox(
                       width: 10,
                     ),
@@ -43,7 +49,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: ColorSeed.values[i].color,
+                          color: ColorSeed.values[i].color.data.light.primary,
                         ),
                       ),
                     ),
@@ -65,7 +71,10 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('改完了'),
+          child: Text(FlutterI18n.translate(
+            context,
+            "confirm",
+          )),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -75,4 +84,3 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
     );
   }
 }
-*/

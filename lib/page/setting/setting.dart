@@ -15,6 +15,7 @@ import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -39,6 +40,7 @@ import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -219,6 +221,21 @@ class _SettingWindowState extends State<SettingWindow> {
               )),
               remaining: const [],
               bottomRow: Column(children: [
+                ListTile(
+                    title: Text(FlutterI18n.translate(
+                      context,
+                      "setting.color_setting",
+                    )),
+                    subtitle: Text(FlutterI18n.translate(context,
+                        "setting.change_color_dialog.${ColorSeed.values[preference.getInt(preference.Preference.color)].label}")),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const ChangeColorDialog(),
+                      );
+                    }),
+                const Divider(),
                 ListTile(
                     title: Text(FlutterI18n.translate(
                       context,

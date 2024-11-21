@@ -410,6 +410,7 @@ setting:
     # 界面设置
     ui_setting: "界面设置"
     brightness_setting: "设置深浅色"
+    color_setting: "颜色设置"
     simplify_timeline: "简化日程时间轴"
     simplify_timeline_description: "没有日程时 减少空间占用"
     # 账号设置
@@ -456,8 +457,16 @@ setting:
         title: "请关闭应用"
         content: "因为技术限制，用户需要自行关闭窗口，然后重新打开应用。"
     # 剩下乱七八糟的窗口
-    change_brightness_dialog:
+    change_color_dialog:
         title: "颜色设置"
+        default: "默认颜色"
+        blue: "天空蓝"
+        deepPurple: "基佬紫"
+        green: "早苗绿"
+        orange: "果粒橙"
+        pink: "少女粉"
+    change_brightness_dialog:
+        title: "亮度设置"
         follow_setting: "跟随系统"
         day_mode: "白天模式"
         night_mode: "黑夜模式"

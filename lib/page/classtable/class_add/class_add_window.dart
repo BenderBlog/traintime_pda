@@ -328,7 +328,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                         },
                         defaultPage: start - 1,
                         options: List.generate(
-                          10,
+                          11,
                           (index) => WheelChooseOptions(
                             data: index + 1,
                             hint: FlutterI18n.translate(
@@ -349,7 +349,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                         },
                         defaultPage: stop - 1,
                         options: List.generate(
-                          10,
+                          11,
                           (index) => WheelChooseOptions(
                             data: index + 1,
                             hint: FlutterI18n.translate(
