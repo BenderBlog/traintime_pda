@@ -98,7 +98,6 @@ class _MainPageState extends State<MainPage> {
         headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
           SliverAppBar(
             centerTitle: false,
-            backgroundColor: Theme.of(context).colorScheme.surface,
             expandedHeight: 160,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -117,7 +116,9 @@ class _MainPageState extends State<MainPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? null
+                            : Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     Text(
@@ -149,10 +150,9 @@ class _MainPageState extends State<MainPage> {
                                 ),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.6),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? null
+                            : Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ],
@@ -196,9 +196,6 @@ class _MainPageState extends State<MainPage> {
                         context,
                         "homepage.postgraduate_notice",
                       ),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
                     )
                         .center()
                         .constrained(height: 30)
@@ -206,9 +203,7 @@ class _MainPageState extends State<MainPage> {
                           horizontal: 16,
                           vertical: 14,
                         )
-                        .withHomeCardStyle(
-                          Theme.of(context).colorScheme.secondary,
-                        ),
+                        .withHomeCardStyle(context),
                   const ClassTableCard(),
                   ...children,
                   GridView.extent(

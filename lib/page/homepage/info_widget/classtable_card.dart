@@ -132,7 +132,9 @@ class _ClassTableCardState extends State<ClassTableCard> {
               position: 0,
               child: Icon(
                 itemDesc[index].icon,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).iconTheme.color
+                    : Theme.of(context).colorScheme.primary,
               ),
             ),
             startConnectorBuilder: (context, index) {
@@ -142,13 +144,17 @@ class _ClassTableCardState extends State<ClassTableCard> {
               // Use dashedLine between today and tomorrow
               if (itemDesc[index].isTomorrow) {
                 return Connector.dashedLine(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).iconTheme.color
+                      : Theme.of(context).colorScheme.primary,
                   gap: 4,
                   thickness: 3,
                 );
               }
               return Connector.solidLine(
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).iconTheme.color
+                    : Theme.of(context).colorScheme.primary,
                 thickness: 3,
               );
             },
@@ -163,7 +169,9 @@ class _ClassTableCardState extends State<ClassTableCard> {
                 );
               }
               return Connector.solidLine(
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).iconTheme.color
+                    : Theme.of(context).colorScheme.primary,
                 thickness: 3,
               );
             },
@@ -172,7 +180,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
       },
     )
         .paddingDirectional(horizontal: 20, vertical: 14)
-        .withHomeCardStyle(Theme.of(context).colorScheme.secondary)
+        .withHomeCardStyle(context)
         .gestures(
       onTap: () {
         final c = Get.find<ClassTableController>();
@@ -219,13 +227,12 @@ class _ClassTableCardItem extends StatelessWidget {
     List<Widget> columns = [
       Text(
         getTimeText(),
-        style: TextStyle(
+        style: const TextStyle(
           height: 1.1,
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.primary,
         ),
-      ).padding(top: 5).alignment(Alignment.bottomLeft)
+      ).padding(top: 5).alignment(Alignment.centerLeft)
     ];
 
     if (descriptor.isMultiArrangementsMode) {
@@ -275,11 +282,10 @@ class _ClassTableCardItem extends StatelessWidget {
     List<Widget> columns = [
       Text(
         infoText,
-        style: TextStyle(
+        style: const TextStyle(
           height: 1.1,
           fontSize: 20,
           fontWeight: FontWeight.normal,
-          color: Theme.of(context).colorScheme.primary,
         ),
       ).alignment(Alignment.centerLeft).expanded()
     ];
@@ -295,20 +301,18 @@ class _ClassTableCardItem extends StatelessWidget {
     return descriptor.displayArrangements.map((arr) => [
           Text(
             Jiffy.parseFromDateTime(arr.startTime).format(pattern: "HH:mm"),
-            style: TextStyle(
+            style: const TextStyle(
               height: 1.2,
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
             ),
           ).alignment(Alignment.topLeft),
           Text(
             arr.name,
-            style: TextStyle(
+            style: const TextStyle(
               height: 1.1,
               fontSize: 16,
               fontWeight: FontWeight.normal,
-              color: Theme.of(context).colorScheme.primary,
             ),
           ).alignment(Alignment.topLeft).expanded(),
         ].toRow(
@@ -333,36 +337,48 @@ class _ClassTableCardArrangementDetail extends StatelessWidget {
     List<Widget> items = [];
 
     if (displayArrangement.place != null) {
-      items.add(createIconText(context, Icons.room, displayArrangement.place!));
+      items.add(createIconText(
+        context,
+        Icons.room,
+        displayArrangement.place!,
+      ));
     }
 
     if (displayArrangement.seat != null) {
       items.add(createIconText(
-          context, Icons.chair, displayArrangement.seat!.toString()));
+        context,
+        Icons.chair,
+        displayArrangement.seat!.toString(),
+      ));
     }
 
     if (displayArrangement.teacher != null) {
-      items.add(
-          createIconText(context, Icons.person, displayArrangement.teacher!));
+      items.add(createIconText(
+        context,
+        Icons.person,
+        displayArrangement.teacher!,
+      ));
     }
 
     return items.toRow(separator: const SizedBox(width: 6));
   }
 
   static Widget createIconText(
-      BuildContext context, IconData icon, String text) {
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
     return [
       Icon(
         icon,
-        color: Theme.of(context).colorScheme.primary,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : Theme.of(context).colorScheme.primary,
         size: 18,
       ),
       Text(
         text,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.primary,
-          fontSize: 14,
-        ),
+        style: const TextStyle(fontSize: 14),
       )
     ].toRow(separator: const SizedBox(width: 2));
   }

@@ -2,10 +2,21 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:styled_widget/styled_widget.dart';
 
 extension HomeCardPadding on Widget {
-  Widget withHomeCardStyle(Color color) {
-    return backgroundColor(color).clipRRect(all: 12).padding(all: 4);
+  Widget withHomeCardStyle(BuildContext context) {
+    return Card(
+      //elevation: 0,
+      shadowColor: Colors.transparent,
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+      child: DefaultTextStyle(
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? null
+              : Theme.of(context).colorScheme.primary,
+        ),
+        child: this,
+      ),
+    );
   }
 }

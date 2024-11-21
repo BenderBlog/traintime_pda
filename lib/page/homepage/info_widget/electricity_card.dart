@@ -119,10 +119,7 @@ class ElectricityCard extends StatelessWidget {
                     context,
                     electricityInfo.value.remain,
                   ),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 20,
-            ),
+            style: const TextStyle(fontSize: 20),
           ),
           bottomText: Text(
             FlutterI18n.translate(

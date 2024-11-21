@@ -26,7 +26,9 @@ class SmallFunctionCard extends StatelessWidget {
       Icon(
         icon,
         size: 32,
-        color: Theme.of(context).colorScheme.onSecondaryContainer,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : Theme.of(context).colorScheme.primary,
       ),
       const SizedBox(height: 4),
       Text(
@@ -36,7 +38,9 @@ class SmallFunctionCard extends StatelessWidget {
         ),
         style: TextStyle(
           fontSize: 14,
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? null
+              : Theme.of(context).colorScheme.primary,
         ),
       ),
     ]
@@ -46,9 +50,7 @@ class SmallFunctionCard extends StatelessWidget {
         .alignment(
           Alignment.center,
         )
-        .withHomeCardStyle(
-          Theme.of(context).colorScheme.secondary,
-        )
+        .withHomeCardStyle(context)
         .gestures(
           onTap: onTap,
           onLongPress: onLongPress,

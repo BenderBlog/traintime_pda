@@ -52,9 +52,6 @@ class NoticeCard extends StatelessWidget {
                       messages[index].title,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
                     ).expanded(),
                   ],
                 ),
@@ -74,9 +71,7 @@ class NoticeCard extends StatelessWidget {
             horizontal: 16,
             vertical: 14,
           )
-          .withHomeCardStyle(
-            Theme.of(context).colorScheme.secondary,
-          ),
+          .withHomeCardStyle(context),
     );
   }
 }

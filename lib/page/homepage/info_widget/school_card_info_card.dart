@@ -77,12 +77,9 @@ class SchoolCardInfoCard extends StatelessWidget {
             context,
             "homepage.school_card_info_card.bill",
           ),
-          infoText: RichText(
-            text: TextSpan(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 20,
-              ),
+          infoText: Text.rich(
+            TextSpan(
+              style: const TextStyle(fontSize: 20),
               children: [
                 if (school_card_session.isInit.value ==
                     SessionState.fetched) ...[

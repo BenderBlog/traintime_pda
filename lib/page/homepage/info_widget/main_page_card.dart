@@ -25,34 +25,22 @@ class MainPageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorPrimary = isBold == true
-        ? Theme.of(context).colorScheme.primaryContainer
-        : Theme.of(context).colorScheme.secondaryContainer;
-
-    final colorOnPrimary = isBold == true
-        ? Theme.of(context).colorScheme.onPrimaryContainer
-        : Theme.of(context).colorScheme.onSecondaryContainer;
-
-    final colorLineProgressBG = isBold == true
-        ? Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context)
-                .colorScheme
-                .surface
-                .withOpacity(0.9) // 深色模式进度条特判
-            : Theme.of(context).colorScheme.surface.withOpacity(0.1)
-        : Theme.of(context).colorScheme.primary.withOpacity(0.1);
-
-    final colorLineProgress = isBold == true
-        ? Theme.of(context).colorScheme.onPrimaryContainer
-        : Theme.of(context).colorScheme.onSecondaryContainer;
-
     return ListTile(
       leading: Icon(
         icon,
         size: 32,
-        color: colorOnPrimary,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : Theme.of(context).colorScheme.primary,
       ),
-      title: infoText,
+      title: DefaultTextStyle.merge(
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? null
+              : Theme.of(context).colorScheme.primary,
+        ),
+        child: infoText,
+      ),
       subtitle: Builder(
         builder: (context) {
           if (isLoad ||
@@ -61,16 +49,15 @@ class MainPageCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: isLoad ? null : progress,
-                backgroundColor: colorLineProgressBG,
-                color: colorLineProgress,
                 minHeight: 4,
               ),
             );
           } else {
             return DefaultTextStyle.merge(
               style: TextStyle(
-                fontSize: 12,
-                color: colorOnPrimary,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? null
+                    : Theme.of(context).colorScheme.primary,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -85,6 +72,6 @@ class MainPageCard extends StatelessWidget {
           }
         },
       ),
-    ).withHomeCardStyle(colorPrimary);
+    ).withHomeCardStyle(context);
   }
 }

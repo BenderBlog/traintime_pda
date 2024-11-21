@@ -41,12 +41,9 @@ class LibraryCard extends StatelessWidget {
             context,
             "homepage.library_card.title",
           ),
-          infoText: RichText(
-            text: TextSpan(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 20,
-              ),
+          infoText: Text.rich(
+            TextSpan(
+              style: const TextStyle(fontSize: 20),
               children: [
                 if (borrow_info.state.value == SessionState.fetched) ...[
                   TextSpan(

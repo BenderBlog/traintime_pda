@@ -448,7 +448,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       body: _pageView,
       bottomNavigationBar: NavigationBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        indicatorColor: Theme.of(context).colorScheme.secondary,
+        indicatorColor: Theme.of(context).colorScheme.primaryContainer,
         height: 64,
         destinations: destinations
             .map(
