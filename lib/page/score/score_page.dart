@@ -96,12 +96,8 @@ class _ScorePageState extends State<ScorePage> {
                   ),
                 ),
                 onSubmitted: (String text) => c.search = text,
-              ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.secondaryContainer,
-                ),
+              ).padding(bottom: 8),
+              FilledButton(
                 onPressed: () async {
                   await showDialog<int>(
                     context: context,
@@ -126,11 +122,7 @@ class _ScorePageState extends State<ScorePage> {
                           : c.controllers.chosenSemester,
                     })),
               ).padding(right: 8),
-              TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.secondaryContainer,
-                ),
+              FilledButton(
                 onPressed: () async {
                   await showDialog<int>(
                     context: context,

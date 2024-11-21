@@ -97,7 +97,7 @@ class InformationWithIcon extends StatelessWidget {
         Icon(
           icon,
           size: 18,
-          color: Theme.of(context).colorScheme.tertiary,
+          color: Theme.of(context).colorScheme.primary,
         ),
         const SizedBox(width: 4),
         Expanded(

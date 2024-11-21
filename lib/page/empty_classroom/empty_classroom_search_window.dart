@@ -88,8 +88,8 @@ class _EmptyClassroomSearchWindowState
         height: 20,
         decoration: BoxDecoration(
           color: isUsed
-              ? Colors.transparent
-              : Theme.of(context).colorScheme.primary,
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
         child: index != null
@@ -98,8 +98,8 @@ class _EmptyClassroomSearchWindowState
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: isUsed
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onPrimary,
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.primary,
                 ),
               ).center()
             : null,
@@ -165,10 +165,7 @@ class _EmptyClassroomSearchWindowState
           ).padding(bottom: 8),
           [
             [
-              TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: colorScheme.secondaryContainer,
-                ),
+              FilledButton(
                 onPressed: () async {
                   await showCalendarDatePicker2Dialog(
                     context: context,
@@ -197,10 +194,7 @@ class _EmptyClassroomSearchWindowState
                   },
                 )),
               ).padding(right: 8),
-              TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: colorScheme.secondaryContainer,
-                ),
+              FilledButton(
                 onPressed: () {
                   setState(() {
                     text.clear();

@@ -65,7 +65,10 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                   style: TextButton.styleFrom(
                     backgroundColor: selected == e
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.secondaryContainer,
+                        : Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.1),
                   ),
                   //selected: selected == e,
                   onPressed: () {
@@ -76,7 +79,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                     style: TextStyle(
                       color: selected == e
                           ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context).colorScheme.onSecondaryContainer,
+                          : Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ).padding(
@@ -174,7 +177,7 @@ class ArticleCard extends StatelessWidget {
         )
         .card(
           elevation: 0,
-          color: Theme.of(context).colorScheme.secondaryContainer,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         )
         .gestures(
       onTap: () {

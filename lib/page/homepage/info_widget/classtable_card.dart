@@ -163,7 +163,9 @@ class _ClassTableCardState extends State<ClassTableCard> {
               if (index + 1 < itemDesc.length &&
                   itemDesc[index + 1].isTomorrow) {
                 return Connector.dashedLine(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).iconTheme.color
+                      : Theme.of(context).colorScheme.primary,
                   gap: 4,
                   thickness: 3,
                 );

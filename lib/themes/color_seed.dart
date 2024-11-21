@@ -37,9 +37,9 @@ enum ColorSeed {
   indigo('默认颜色', FlexScheme.indigo),
   blue('天空蓝', FlexScheme.blue),
   deepPurple('基佬紫', FlexScheme.deepPurple),
-  green('早苗绿', FlexScheme.green);
+  green('早苗绿', FlexScheme.green),
   //orange('果粒橙', FlexScheme.orange),
-  //pink('少女粉', FlexScheme.pink);
+  pink('少女粉', FlexScheme.pinkM3);
 
   const ColorSeed(this.label, this.color);
   final String label;

@@ -296,7 +296,7 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Within the Autumn of Conscious - PDA One Year Anniversary Edition"
+                      ? "Stormbringer - PDA One Year Anniversary Edition"
                       : "Across the Universe - PDA One Year Anniversary Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
@@ -316,7 +316,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget get _developerList => ReXCard(
         title: Text(
           "${getDevelopers().length} people involved in the "
-          "'little boy girl making process'",
+          "'famboy making process'",
         ).padding(bottom: 8).center(),
         remaining: const [],
         bottomRow: getDevelopers()
