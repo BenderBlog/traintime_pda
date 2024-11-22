@@ -25,10 +25,6 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
         context,
         "setting.change_color_dialog.title",
       )),
-      titleTextStyle: const TextStyle(
-        fontSize: 20,
-        color: Colors.black,
-      ),
       content: SingleChildScrollView(
         child: Column(
           children: [

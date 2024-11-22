@@ -317,6 +317,11 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
   Future<(String, String)> loginPayment({
     required Future<String> Function(List<int>) captchaFunction,
   }) async {
+    /// If no account
+    if (preference.getString(preference.Preference.dorm).isEmpty) {
+      throw NoAccountInfoException();
+    }
+
     /// Get electricity password
     String password = preference.getString(
       preference.Preference.electricityPassword,

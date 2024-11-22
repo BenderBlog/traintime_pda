@@ -11,6 +11,7 @@ class MainPageCard extends StatelessWidget {
   final double? progress;
   final Widget infoText;
   final Widget bottomText;
+  final Widget? rightButton;
   final bool? isBold;
   const MainPageCard({
     super.key,
@@ -19,6 +20,7 @@ class MainPageCard extends StatelessWidget {
     required this.infoText,
     required this.bottomText,
     required this.isLoad,
+    this.rightButton,
     this.progress,
     this.isBold,
   });
@@ -72,6 +74,7 @@ class MainPageCard extends StatelessWidget {
           }
         },
       ),
+      trailing: rightButton,
     ).withHomeCardStyle(context);
   }
 }

@@ -3,19 +3,15 @@
 
 // Refresh formula for homepage.
 
-import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
-import 'package:watermeter/repository/xidian_ids/payment_session.dart'
-    as electricity;
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
@@ -98,6 +94,8 @@ Future<void> update({
         final c = Get.put(ExperimentController());
         await c.get();
       }),
+      Future(() => borrow_info.LibrarySession().getBorrowList()),
+      Future(() => school_card_session.SchoolCardSession().initSession()),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(
         "[homepage Update]"
@@ -106,13 +104,6 @@ Future<void> update({
       );
       updateCurrentData();
     }),
-    electricity.update(
-        captchaFunction: (image) => showDialog<String>(
-              context: context,
-              builder: (context) => CaptchaInputDialog(image: image),
-            ).then((value) => value ?? "")),
-    borrow_info.LibrarySession().getBorrowList(),
-    school_card_session.SchoolCardSession().initSession(),
   ]);
 }
 

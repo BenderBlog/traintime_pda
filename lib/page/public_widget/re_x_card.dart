@@ -75,7 +75,10 @@ class ReXCard extends StatelessWidget {
               bottom: 0.5 * _rem,
             )
             .backgroundColor(
-              Theme.of(context).colorScheme.primary.withOpacity(opacity),
+              (Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.primary)
+                  .withOpacity(opacity),
             ),
         DefaultTextStyle.merge(
           style: TextStyle(

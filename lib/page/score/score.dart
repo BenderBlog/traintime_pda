@@ -85,7 +85,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
             title: Text(
               FlutterI18n.translate(
                 context,
-                "score.title",
+                "score.score_page.title",
               ),
             ),
           ),

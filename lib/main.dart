@@ -26,7 +26,6 @@ import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/themes/color_seed.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {

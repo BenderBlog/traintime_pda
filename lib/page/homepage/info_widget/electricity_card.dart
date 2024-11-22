@@ -92,12 +92,6 @@ class ElectricityCard extends StatelessWidget {
           );
         }
       },
-      onLongPress: () => update(
-        captchaFunction: (image) => showDialog<String>(
-          context: context,
-          builder: (context) => CaptchaInputDialog(image: image),
-        ).then((value) => value ?? ""),
-      ),
       child: Obx(
         () => MainPageCard(
           isLoad: isLoad.value,
@@ -127,6 +121,27 @@ class ElectricityCard extends StatelessWidget {
               electricityInfo.value.owe,
             ),
             overflow: TextOverflow.ellipsis,
+          ),
+          rightButton: IconButton.outlined(
+            onPressed: () => update(
+              captchaFunction: (image) => showDialog<String>(
+                context: context,
+                builder: (context) => CaptchaInputDialog(image: image),
+              ).then((value) => value ?? ""),
+            ),
+            style: IconButton.styleFrom(
+              side: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            icon: Icon(
+              Icons.refresh_rounded,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? null
+                  : Theme.of(context).colorScheme.primary,
+            ),
           ),
         ),
       ),
