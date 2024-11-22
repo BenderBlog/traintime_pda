@@ -100,7 +100,7 @@ class CommentPopout extends StatelessWidget {
         TextButton(
           child: Text(FlutterI18n.translate(
             context,
-            "xdu_planet.sent",
+            "xdu_planet.send",
           )),
           onPressed: () async {
             if (_controller.text.isEmpty) {

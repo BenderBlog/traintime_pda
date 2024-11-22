@@ -372,7 +372,7 @@ class _ContentPageState extends State<ContentPage> {
           .safeArea(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          bool? result = await showModalBottomSheet<bool>(
+          bool? result = await showDialog<bool>(
             context: context,
             builder: (context) => CommentPopout(id: widget.article.id),
           );

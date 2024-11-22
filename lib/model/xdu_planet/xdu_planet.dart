@@ -99,7 +99,7 @@ class XDUPlanetComment {
 
   // 可选值为ok、block、delete、audit，分别表示已通过、已屏蔽、已删除、待审核
   String get statusStr {
-    if (status.isNotEmpty) return "xdu_planet.$status";
+    if (status.isNotEmpty && status != "ok") return "xdu_planet.$status";
     return "";
   }
 }
