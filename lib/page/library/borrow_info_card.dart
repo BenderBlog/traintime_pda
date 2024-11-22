@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/page/public_widget/filled_card_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -55,7 +56,7 @@ class BorrowInfoCard extends StatelessWidget {
       const VerticalDivider(),
       [
         Text(
-          '${toUse.title}\n',
+          toUse.title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.start,
@@ -64,6 +65,7 @@ class BorrowInfoCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
+        const SizedBox(height: 12),
         [
           Text.rich(TextSpan(children: [
             TextSpan(children: [
@@ -225,17 +227,10 @@ class BorrowInfoCard extends StatelessWidget {
         }),
       ]
           .toColumn(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.stretch,
           )
           .expanded()
-    ]
-        .toRow()
-        .padding(all: 12)
-        .backgroundColor(
-          Theme.of(context).colorScheme.secondaryContainer,
-        )
-        .clipRRect(all: 16)
-        .padding(all: 4);
+    ].toRow().padding(all: 12).withFilledCardStyle(context);
   }
 }

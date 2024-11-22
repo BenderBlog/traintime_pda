@@ -56,15 +56,10 @@ class NoticeCard extends StatelessWidget {
                   ],
                 ),
               )
-            : Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.notice_card.no_notice_avaliable",
-                ),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ).center(),
+            : Text(FlutterI18n.translate(
+                context,
+                "homepage.notice_card.no_notice_avaliable",
+              )).center(),
       )
           .constrained(height: 30)
           .paddingDirectional(

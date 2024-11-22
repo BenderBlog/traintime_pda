@@ -315,8 +315,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget get _developerList => ReXCard(
         title: Text(
-          "${getDevelopers().length} people involved in the "
-          "'famboy making process'",
+          "${getDevelopers().length} people did not checkin the class",
         ).padding(bottom: 8).center(),
         remaining: const [],
         bottomRow: getDevelopers()

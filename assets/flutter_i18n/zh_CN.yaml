@@ -219,10 +219,10 @@ homepage:
     password_wrong_content: "是否重启应用后手动登录？"
     password_wrong_denial: "否，进入离线模式"
     offline_mode_title: "统一认证服务离线模式开启"
-    offline_mode_content: |
-        "无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。
+    offline_mode_content: |-
+        无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。
         成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。
-        如有不便，敬请谅解。"
+        如有不便，敬请谅解。
     offline_mode: "脱机模式下，一站式相关功能全部禁止使用"
     # 以下分段者从略
     notice_card:
@@ -245,7 +245,7 @@ homepage:
         title: "水电信息"
         current_electricity: "目前电量 {amount} 度"
         cache_notice: "当前加载为缓存，获取于 {date}\n"
-        dialog_content: |
+        dialog_content: |-
             电费帐号：{account}
             电量信息：{electricityInfo}
             欠费信息：{owe}
@@ -347,7 +347,7 @@ school_card_window:
 # 成绩
 score:
     cache_message: "已显示缓存成绩信息"
-    summary: |
+    summary: |-
         目前选中科目 {chosen}  总计学分 {credit}
         均分 {avg} GPA {gpa}
     all_passed: "所有科目均已通过"
@@ -361,7 +361,7 @@ score:
         search_hint: "搜索成绩记录"
         empty_list: "没有选择该学期的课程计入均分计算"
         sum_dialog_title: "小总结"
-        sum_dialog_content: |
+        sum_dialog_content: |-
             所有科目的GPA：{gpa_all}
             所有科目的均分：{avg_all}
             所有科目的学分：{credit_all}
@@ -436,7 +436,7 @@ setting:
     class_refresh_title: "确认对话框"
     class_refresh_content: "是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。"
     class_swift: "课程偏移设置"
-    class_swift_description: |
+    class_swift_description: |-
         正数错后开学日期 负数提前开学日期
         目前为 {swift}
     # 缓存登录设置
@@ -527,7 +527,7 @@ setting:
         homepage: "主页"
         code: "开源代码"
         know_more: "知道更多"
-        copyright_notice:
+        copyright_notice: |-
             本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
             代码按照 Mozilla Public License, v. 2.0 授权。
             本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
@@ -638,7 +638,7 @@ school_card_status:
     failed_to_query: "查询失败"
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
-easter_egg: |
+easter_egg: |-
     "Stormbringer" -> Deep Purple, Stormbringer, 1974
 
     她突然爆发，迅雷烈风，

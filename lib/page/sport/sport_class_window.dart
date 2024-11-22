@@ -86,19 +86,19 @@ class _SportClassWindowState extends State<SportClassWindow>
               } else {
                 return ReloadWidget(
                   function: () => _controller.callRefresh(),
-                  errorStatus: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "sport.situation_error",
-                      translationParams: {
-                        "situation": FlutterI18n.translate(
+                  errorStatus: sportClass.value.situation != null
+                      ? FlutterI18n.translate(
                           context,
-                          sportClass.value.situation ?? "",
+                          "sport.situation_error",
+                          translationParams: {
+                            "situation": FlutterI18n.translate(
+                              context,
+                              sportClass.value.situation ?? "",
+                            )
+                          },
                         )
-                      },
-                    ),
-                  ).center(),
-                );
+                      : null,
+                ).center();
               }
             },
           ),

@@ -15,7 +15,7 @@ extension HomeCardPadding on Widget {
         style: TextStyle(
           color: Theme.of(context).brightness == Brightness.dark
               ? null
-              : Theme.of(context).colorScheme.primary,
+              : Theme.of(context).colorScheme.onPrimaryFixedVariant,
         ),
         child: this,
       ),

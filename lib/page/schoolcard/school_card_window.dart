@@ -75,11 +75,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
         ),
         body: Column(
           children: [
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor:
-                    Theme.of(context).colorScheme.secondaryContainer,
-              ),
+            FilledButton(
               child: Text(FlutterI18n.translate(
                   context, "school_card_window.select_range",
                   translationParams: {
@@ -117,7 +113,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                   if (snapshot.hasError) {
                     return ReloadWidget(
                       function: () => refreshPaidStatus(),
-                    );
+                    ).center();
                   } else if (snapshot.data!.isEmpty) {
                     return EmptyListView(
                       text: FlutterI18n.translate(

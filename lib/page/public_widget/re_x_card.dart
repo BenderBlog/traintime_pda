@@ -36,9 +36,7 @@ class ReXCard extends StatelessWidget {
               DefaultTextStyle.merge(
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withOpacity(0.8)
-                      : Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 child: title,
               ).flexible(),
@@ -75,16 +73,10 @@ class ReXCard extends StatelessWidget {
               bottom: 0.5 * _rem,
             )
             .backgroundColor(
-              (Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Theme.of(context).colorScheme.primary)
-                  .withOpacity(opacity),
+              Theme.of(context).colorScheme.primary.withOpacity(opacity),
             ),
         DefaultTextStyle.merge(
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSecondaryContainer,
-            fontSize: 0.875 * _rem,
-          ),
+          style: const TextStyle(fontSize: 0.875 * _rem),
           child: bottomRow,
         ).padding(
           horizontal: _rem,

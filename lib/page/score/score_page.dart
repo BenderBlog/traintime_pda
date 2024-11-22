@@ -7,10 +7,9 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
-import 'package:watermeter/page/score/score_choice_page.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
 import 'package:watermeter/repository/preference.dart';
@@ -25,6 +24,39 @@ class ScorePage extends StatefulWidget {
 class _ScorePageState extends State<ScorePage> {
   late ScoreState c;
   late TextEditingController text;
+
+  Future<void> scoreInfoDialog(BuildContext context) => context.pushDialog(
+        AlertDialog(
+          title: Text(FlutterI18n.translate(
+            context,
+            "score.score_choice.sum_dialog_title",
+          )),
+          content: Text(
+            FlutterI18n.translate(
+              context,
+              "score.score_choice.sum_dialog_content",
+              translationParams: {
+                "gpa_all": c.evalAvg(true, isGPA: true).toStringAsFixed(3),
+                "avg_all": c.evalAvg(true).toStringAsFixed(2),
+                "credit_all": c.evalCredit(true).toStringAsFixed(2),
+                "unpassed": c.unPassed.isEmpty
+                    ? FlutterI18n.translate(context, "score.all_passed")
+                    : c.unPassed,
+                "not_core_credit": c.notCoreClass.toString(),
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(FlutterI18n.translate(
+                context,
+                "confirm",
+              )),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
 
   @override
   void didChangeDependencies() {
@@ -82,14 +114,15 @@ class _ScorePageState extends State<ScorePage> {
                   fillColor: Colors.grey.withOpacity(0.2),
                   filled: true,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
+                    horizontal: 24,
                     vertical: 10,
                   ),
+                  prefixIcon: const Icon(Icons.search),
                   hintText: FlutterI18n.translate(
                     context,
                     "score.score_page.search_hint",
                   ),
-                  hintStyle: const TextStyle(fontSize: 14),
+                  hintStyle: Theme.of(context).textTheme.labelLarge,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
                     borderSide: BorderSide.none,
@@ -232,6 +265,7 @@ class _ScorePageState extends State<ScorePage> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(c.bottomInfo(context)),
                   FloatingActionButton(
@@ -239,14 +273,8 @@ class _ScorePageState extends State<ScorePage> {
                     highlightElevation: 0.0,
                     focusElevation: 0.0,
                     disabledElevation: 0.0,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        createRoute(const ScoreChoicePage()),
-                      );
-                    },
-                    child: const Icon(
-                      Icons.panorama_fisheye,
-                    ),
+                    onPressed: () => scoreInfoDialog(context),
+                    child: const Icon(Icons.panorama_fisheye),
                   ),
                 ],
               ),

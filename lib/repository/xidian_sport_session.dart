@@ -350,10 +350,10 @@ awb4B45zUwIDAQAB
   }
 
   Future<void> login() async {
-    //if (preference.getString(preference.Preference.idsAccount).isEmpty ||
-    //    preference.getString(preference.Preference.sportPassword).isEmpty) {
-    //  throw NoPasswordException();
-    //}
+    if (preference.getString(preference.Preference.idsAccount).isEmpty ||
+        preference.getString(preference.Preference.sportPassword).isEmpty) {
+      throw NoPasswordException();
+    }
     if (userId.isNotEmpty && token.isNotEmpty) {
       log.info(
         "[SportSession][login]"

@@ -198,13 +198,11 @@ homepage:
   password_wrong_content: 是否重啟應用後手動登入？
   password_wrong_denial: 否，進入離線模式
   offline_mode_title: 統一認證服務離線模式開啟
-  offline_mode_content: '"無法連線到統一認證服務伺服器，所有和其相關的服務暫時不可用。
+  offline_mode_content: '無法連線到統一認證服務伺服器，所有和其相關的服務暫時不可用。
 
     成績查詢，考試資訊查詢，欠費查詢，校園卡查詢關閉。課表顯示快取資料。其他功能暫不受影響。
 
-    如有不便，敬請諒解。"
-
-    '
+    如有不便，敬請諒解。'
   offline_mode: 離線模式下，一站式相關功能全部禁止使用
   notice_card:
     empty_notice: 目前沒有獲取應用公告，請重新整理
@@ -234,9 +232,7 @@ homepage:
 
       欠費資訊：{owe}
 
-      長按可以重新載入，有欠費一般代表水費
-
-      '
+      長按可以重新載入，有欠費一般代表水費'
   library_card:
     title: 圖書借閱
     current_borrow: 目前借書 {count} 本
@@ -330,9 +326,7 @@ score:
   cache_message: 已顯示快取成績資訊
   summary: '目前選中科目 {chosen}  總計學分 {credit}
 
-    均分 {avg} GPA {gpa}
-
-    '
+    均分 {avg} GPA {gpa}'
   all_passed: 所有科目均已透過
   all_semester: 所有學期
   chosen_semester: 學期 {chosen}
@@ -353,9 +347,7 @@ score:
 
       公共選修課已經修得學分：{not_core_credit}
 
-      本程式提供的資料僅供參考，開發者對其準確性不負責
-
-      '
+      本程式提供的資料僅供參考，開發者對其準確性不負責'
   score_compose_card:
     no_detail: 未提供詳情資訊
     fetching: 正在獲取
@@ -418,9 +410,7 @@ setting:
   class_swift: 課程偏移設定
   class_swift_description: '正數錯後開學日期 負數提前開學日期
 
-    目前為 {swift}
-
-    '
+    目前為 {swift}'
   core_setting: 快取登入設定
   check_logger: 檢視網路攔截器和日誌
   clear_and_restart: 清除快取後重啟
@@ -508,11 +498,20 @@ setting:
     homepage: 主頁
     code: 開原始碼
     know_more: 知道更多
-    copyright_notice: 本軟體複製基於 traintime_pda 程式碼（或稱 watermeter 程式碼）編譯， 程式碼按照 Mozilla
-      Public License, v. 2.0 授權。 本程式和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。 Copyright 2023-Present
-      BenderBlog Rodriguez and contributors. The Source Code Form is subject to the
-      terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
-      with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+    copyright_notice: '本軟體複製基於 traintime_pda 程式碼（或稱 watermeter 程式碼）編譯，
+
+      程式碼按照 Mozilla Public License, v. 2.0 授權。
+
+      本程式和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
+
+      Copyright 2023-Present BenderBlog Rodriguez and contributors.
+
+      The Source Code Form is subject to the terms of the Mozilla Public License,
+      v. 2.0.
+
+      If a copy of the MPL was not distributed with this file,
+
+      You can obtain one at https://mozilla.org/MPL/2.0/.'
     beian: 備案號
     sign_android: 安卓簽名
     title: 關於本軟體
@@ -633,4 +632,4 @@ easter_egg: "\"Stormbringer\" -> Deep Purple, Stormbringer, 1974\n\n她突然爆
   \ absorb the happiness and sweetie from air and earth.\n\nItself found that a band,\
   \ 'Sgt. Pepper Lonely Hearted Band, is the source of the bright things of the world.\n\
   \nHe deside to let them 'bite his shiny metal ass, and seal them with 'The Devil's\
-  \ Triangle...\n"
+  \ Triangle..."

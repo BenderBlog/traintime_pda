@@ -121,20 +121,20 @@ class _ClassTableCardState extends State<ClassTableCard> {
         return FixedTimeline.tileBuilder(
           theme: TimelineThemeData(
             nodePosition: 0,
+            color: Theme.of(context).colorScheme.primary,
           ),
           builder: TimelineTileBuilder(
             itemCount: itemDesc.length,
             contentsAlign: ContentsAlign.basic,
             contentsBuilder: (context, index) => Padding(
-                padding: itemDesc[index].padding,
-                child: _ClassTableCardItem(itemDesc[index])),
+              padding: itemDesc[index].padding,
+              child: _ClassTableCardItem(itemDesc[index]),
+            ),
             indicatorBuilder: (context, index) => Indicator.widget(
               position: 0,
               child: Icon(
                 itemDesc[index].icon,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).iconTheme.color
-                    : Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             startConnectorBuilder: (context, index) {
@@ -144,17 +144,11 @@ class _ClassTableCardState extends State<ClassTableCard> {
               // Use dashedLine between today and tomorrow
               if (itemDesc[index].isTomorrow) {
                 return Connector.dashedLine(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).iconTheme.color
-                      : Theme.of(context).colorScheme.primary,
                   gap: 4,
                   thickness: 3,
                 );
               }
               return Connector.solidLine(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).iconTheme.color
-                    : Theme.of(context).colorScheme.primary,
                 thickness: 3,
               );
             },
@@ -163,17 +157,11 @@ class _ClassTableCardState extends State<ClassTableCard> {
               if (index + 1 < itemDesc.length &&
                   itemDesc[index + 1].isTomorrow) {
                 return Connector.dashedLine(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).iconTheme.color
-                      : Theme.of(context).colorScheme.primary,
                   gap: 4,
                   thickness: 3,
                 );
               }
               return Connector.solidLine(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).iconTheme.color
-                    : Theme.of(context).colorScheme.primary,
                 thickness: 3,
               );
             },
@@ -230,11 +218,10 @@ class _ClassTableCardItem extends StatelessWidget {
       Text(
         getTimeText(),
         style: const TextStyle(
-          height: 1.1,
           fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
-      ).padding(top: 5).alignment(Alignment.centerLeft)
+      ).alignment(Alignment.centerLeft)
     ];
 
     if (descriptor.isMultiArrangementsMode) {
@@ -365,7 +352,7 @@ class _ClassTableCardArrangementDetail extends StatelessWidget {
     return items.toRow(separator: const SizedBox(width: 6));
   }
 
-  static Widget createIconText(
+  Widget createIconText(
     BuildContext context,
     IconData icon,
     String text,
@@ -375,7 +362,7 @@ class _ClassTableCardArrangementDetail extends StatelessWidget {
         icon,
         color: Theme.of(context).brightness == Brightness.dark
             ? null
-            : Theme.of(context).colorScheme.primary,
+            : Theme.of(context).colorScheme.onPrimaryFixedVariant,
         size: 18,
       ),
       Text(
