@@ -36,13 +36,27 @@ class DeveloperWidget extends StatelessWidget {
       child: ListTile(
         minLeadingWidth: 0,
         contentPadding: EdgeInsets.zero,
-        leading: CachedNetworkImage(
-          fit: BoxFit.fitHeight,
-          imageUrl: developer.imageUrl,
-        ).clipOval().constrained(
-              width: 48,
-              height: 48,
-            ),
+        leading: Stack(
+          alignment: AlignmentDirectional.topEnd,
+          children: [
+            CachedNetworkImage(
+              fit: BoxFit.fitHeight,
+              imageUrl: developer.imageUrl,
+            ).clipOval().constrained(
+                  width: 48,
+                  height: 48,
+                ),
+            const Icon(
+              Icons.priority_high_rounded,
+              color: Colors.white,
+              size: 12,
+            )
+                .center()
+                .backgroundColor(Colors.red)
+                .clipOval()
+                .constrained(width: 16, height: 16)
+          ],
+        ),
         title: Text(developer.name),
         subtitle: Text(developer.description),
       ),
