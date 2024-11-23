@@ -12,6 +12,7 @@ dependencies:
   encrypt: ^5.0.1
   talker_flutter: ^4.4.1
   talker_dio_logger: ^4.4.1
+  tflite_flutter: ^0.11.0
   synchronized: ^3.1.0+1
   # Stroage Cache
   shared_preferences: ^2.0.15
@@ -111,5 +112,6 @@ flutter:
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/Classtable-Empty.png
+    - assets/captcha-solver.tflite
 #    - assets/flutter_i18n/zh_SG.json
 
