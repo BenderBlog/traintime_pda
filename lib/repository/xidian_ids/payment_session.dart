@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -352,68 +353,80 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
 
     await dio.get(nextStop[0]!.replaceAll('"', ""));
 
-    // New stuff, captcha code...
-    var picture = await dio
-        .get(
-          "https://payment.xidian.edu.cn/NetWorkUI/authImage",
-          options: Options(responseType: ResponseType.bytes),
-        )
-        .then((data) => data.data);
-    String checkCode = await captchaFunction(picture);
+    String lastErrorMessage = "";
+    for (int retry = 5; retry > 0; retry--) {
+      // New stuff, captcha code...
+      var picture = await dio
+          .get(
+            "https://payment.xidian.edu.cn/NetWorkUI/authImage",
+            options: Options(responseType: ResponseType.bytes),
+          )
+          .then((data) => data.data);
 
-    log.info("[PaymentSession][getOwe] checkcode is $checkCode");
+      String checkCode = retry == 1
+          ? await captchaFunction(picture) // The last try
+          : await DigitCaptchaClientProvider.infer(picture);
 
-    var value = await dio.post(
-      "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
-      data: {
-        "p_Userid": rsaEncrypt(electricityAccount()),
-        "p_Password": rsaEncrypt(password),
-        "checkCode": rsaEncrypt(checkCode),
-        "factorycode": factorycode,
-      },
-    );
-    if ((value.statusCode ?? 0) >= 300 && (value.statusCode ?? 0) < 400) {
-      log.info(
-        "[PaymentSession][getOwe] "
-        "Newbee detected.",
+      log.info("[PaymentSession][getOwe] checkcode is $checkCode");
+
+      var value = await dio.post(
+        "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
+        data: {
+          "p_Userid": rsaEncrypt(electricityAccount()),
+          "p_Password": rsaEncrypt(password),
+          "checkCode": rsaEncrypt(checkCode),
+          "factorycode": factorycode,
+        },
       );
-      bool isPostGraduate =
-          await PersonalInfoSession().checkWhetherPostgraduate();
 
-      await dio.post(value.headers["location"]![0]).then((value) async {
-        await dio.post(
-          "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
-          data: {
-            "tel": isPostGraduate
-                ? await PersonalInfoSession()
-                    .getInformationFromYjspt(onlyPhone: true)
-                : await PersonalInfoSession()
-                    .getInformationEhall(onlyPhone: true),
-            "email": "${preference.getString(preference.Preference.idsAccount)}"
-                "@stu.mail.xidian.edu.cn",
-          },
-          options: Options(contentType: Headers.jsonContentType),
+      if ((value.statusCode ?? 0) >= 300 && (value.statusCode ?? 0) < 400) {
+        log.info(
+          "[PaymentSession][getOwe] "
+          "Newbee detected.",
         );
-      }).then((value) async {
-        value = await dio.post(
-          "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
-          data: {
-            "p_Userid": electricityAccount(),
-            "p_Password": password,
-            "factorycode": factorycode,
-          },
-        );
-      });
+        bool isPostGraduate =
+            await PersonalInfoSession().checkWhetherPostgraduate();
+
+        await dio.post(value.headers["location"]![0]).then((value) async {
+          await dio.post(
+            "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
+            data: {
+              "tel": isPostGraduate
+                  ? await PersonalInfoSession()
+                      .getInformationFromYjspt(onlyPhone: true)
+                  : await PersonalInfoSession()
+                      .getInformationEhall(onlyPhone: true),
+              "email":
+                  "${preference.getString(preference.Preference.idsAccount)}"
+                      "@stu.mail.xidian.edu.cn",
+            },
+            options: Options(contentType: Headers.jsonContentType),
+          );
+        }).then((value) async {
+          value = await dio.post(
+            "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
+            data: {
+              "p_Userid": electricityAccount(),
+              "p_Password": password,
+              "factorycode": factorycode,
+            },
+          );
+        });
+      }
+
+      var decodeData = jsonDecode(value.data);
+      if (decodeData["returncode"] == "ERROR") {
+        lastErrorMessage = decodeData["returnmsg"];
+        continue;
+      }
+
+      return (
+        decodeData["roomList"][0].toString().split('@')[0],
+        decodeData["liveid"].toString(),
+      );
     }
 
-    var decodeData = jsonDecode(value.data);
-    if (decodeData["returncode"] == "ERROR") {
-      throw NotInitalizedException(decodeData["returnmsg"]);
-    }
-    return (
-      decodeData["roomList"][0].toString().split('@')[0],
-      decodeData["liveid"].toString(),
-    );
+    throw NotInitalizedException(lastErrorMessage);
   }
 
   Future<void> getElectricity((String, String) fetched) => dio.post(
