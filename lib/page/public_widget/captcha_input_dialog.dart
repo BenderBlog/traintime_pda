@@ -15,6 +15,8 @@ class DigitCaptchaClientProvider {
   static const String _interpreterAssetName = 'assets/captcha-solver.tflite';
 
   static Future<String> infer(List<int> imageData) async {
+    // Ref: https://github.com/stalomeow/captcha-solver
+
     img.Image image = img.decodeImage(Uint8List.fromList(imageData))!;
     image = img.grayscale(image);
     image = image.convert(
