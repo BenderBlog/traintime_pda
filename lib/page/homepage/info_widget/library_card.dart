@@ -10,7 +10,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
-import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:watermeter/page/homepage/info_widget/main_page_card.dart';
+import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;

@@ -8,14 +8,11 @@ extension HomeCardPadding on Widget {
     return Card(
       //elevation: 0,
       shadowColor: Colors.transparent,
-      color: Theme.of(context).colorScheme.primary.withOpacity(
-            Theme.of(context).brightness == Brightness.dark ? 0.15 : 0.075,
-          ),
       child: DefaultTextStyle(
         style: TextStyle(
           color: Theme.of(context).brightness == Brightness.dark
               ? null
-              : Theme.of(context).colorScheme.onPrimaryFixedVariant,
+              : Theme.of(context).colorScheme.primary,
         ),
         child: this,
       ),

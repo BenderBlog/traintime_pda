@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
+import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/toolbox/toolbox_page.dart';
 

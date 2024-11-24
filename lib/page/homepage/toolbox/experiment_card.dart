@@ -9,7 +9,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/experiment/experiment_window.dart';
-import 'package:watermeter/page/homepage/toolbox/small_function_card.dart';
+import 'package:watermeter/page/homepage/small_function_card.dart';
 
 class ExperimentCard extends StatelessWidget {
   const ExperimentCard({super.key});

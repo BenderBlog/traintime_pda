@@ -37,7 +37,7 @@ class MainPageCard extends StatelessWidget {
         style: TextStyle(
           color: Theme.of(context).brightness == Brightness.dark
               ? null
-              : Theme.of(context).colorScheme.onPrimaryFixedVariant,
+              : Theme.of(context).colorScheme.primary,
         ),
         child: infoText,
       ),
@@ -57,7 +57,7 @@ class MainPageCard extends StatelessWidget {
               style: TextStyle(
                 color: Theme.of(context).brightness == Brightness.dark
                     ? null
-                    : Theme.of(context).colorScheme.onPrimaryFixedVariant,
+                    : Theme.of(context).colorScheme.primary,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
