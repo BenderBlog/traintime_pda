@@ -89,15 +89,15 @@ class _BothSideSheetState extends State<BothSideSheet> {
               }
             });
           },
-          child: Container(
+          child: SizedBox(
             height: 30,
             width: double.infinity,
-            color: Theme.of(context).colorScheme.surface,
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [
                 Container(
                   width: double.infinity,
+                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
                 ),
                 Container(
                   width: 32,
@@ -114,10 +114,9 @@ class _BothSideSheetState extends State<BothSideSheet> {
             ),
           ),
         )
-      : Container(
+      : SizedBox(
           height: kToolbarHeight,
           width: double.infinity,
-          color: Theme.of(context).colorScheme.surface,
           child: Row(
             children: [
               IconButton(
@@ -144,7 +143,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
             ? heightForVertical
             : double.infinity,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: radius(context),
         ),
         child: Padding(

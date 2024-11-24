@@ -30,28 +30,13 @@ class SmallFunctionCard extends StatelessWidget {
       ),
       const SizedBox(height: 4),
       Text(
-        FlutterI18n.translate(
-          context,
-          nameKey,
-        ),
-        style: TextStyle(
-          fontSize: 14,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? null
-              : Theme.of(context).colorScheme.primary,
-        ),
+        FlutterI18n.translate(context, nameKey),
+        style: const TextStyle(fontSize: 14),
       ),
     ]
-        .toColumn(
-          mainAxisAlignment: MainAxisAlignment.center,
-        )
-        .alignment(
-          Alignment.center,
-        )
+        .toColumn(mainAxisAlignment: MainAxisAlignment.center)
+        .alignment(Alignment.center)
         .withHomeCardStyle(context)
-        .gestures(
-          onTap: onTap,
-          onLongPress: onLongPress,
-        );
+        .gestures(onTap: onTap);
   }
 }

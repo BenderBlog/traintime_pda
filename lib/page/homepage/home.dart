@@ -447,20 +447,14 @@ class _HomePageMasterState extends State<HomePageMaster>
       extendBodyBehindAppBar: true,
       body: _pageView,
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        indicatorColor: Theme.of(context).colorScheme.primary.withOpacity(
-              Theme.of(context).brightness == Brightness.dark ? 1.0 : 0.5,
-            ),
         height: 64,
         destinations: destinations
-            .map(
-              (e) => NavigationDestination(
-                icon: _selectedIndex == e.index
-                    ? Icon(e.iconChoice)
-                    : Icon(e.icon),
-                label: e.name,
-              ),
-            )
+            .map((e) => NavigationDestination(
+                  icon: _selectedIndex == e.index
+                      ? Icon(e.iconChoice)
+                      : Icon(e.icon),
+                  label: e.name,
+                ))
             .toList(),
         selectedIndex: _selectedIndex,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,

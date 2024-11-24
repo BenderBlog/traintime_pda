@@ -36,58 +36,58 @@ class ElectricityCard extends StatelessWidget {
         } else {
           showDialog(
             context: context,
-            builder: (context) => SimpleDialog(
+            builder: (context) => AlertDialog(
               title: Text(FlutterI18n.translate(
                 context,
                 "homepage.electricity_card.title",
               )),
-              children: [
-                Obx(
-                  () => Text.rich(
-                    TextSpan(children: [
-                      if (isCache.value &&
-                          !electricityInfo.value.fetchDay.isToday)
-                        TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "homepage.electricity_card.cache_notice",
-                            translationParams: {
-                              "date": Jiffy.parseFromDateTime(
-                                electricityInfo.value.fetchDay,
-                              ).format(
-                                pattern: "yyyy-MM-dd HH:mm:ss",
-                              ),
-                            },
-                          ),
-                        ),
+              content: Obx(
+                () => Text.rich(
+                  TextSpan(children: [
+                    if (isCache.value &&
+                        !electricityInfo.value.fetchDay.isToday)
                       TextSpan(
                         text: FlutterI18n.translate(
                           context,
-                          "homepage.electricity_card.dialog_content",
+                          "homepage.electricity_card.cache_notice",
                           translationParams: {
-                            "account":
-                                PaymentSession.electricityAccount().toString(),
-                            "electricityInfo": "${FlutterI18n.translate(
-                              context,
-                              electricityInfo.value.remain,
-                            )}${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
-                            "owe": FlutterI18n.translate(
-                              context,
-                              electricityInfo.value.owe,
+                            "date": Jiffy.parseFromDateTime(
+                              electricityInfo.value.fetchDay,
+                            ).format(
+                              pattern: "yyyy-MM-dd HH:mm:ss",
                             ),
                           },
                         ),
                       ),
-                    ]),
-                  ),
-                ).paddingSymmetric(horizontal: 24),
+                    TextSpan(
+                      text: FlutterI18n.translate(
+                        context,
+                        "homepage.electricity_card.dialog_content",
+                        translationParams: {
+                          "account":
+                              PaymentSession.electricityAccount().toString(),
+                          "electricityInfo": "${FlutterI18n.translate(
+                            context,
+                            electricityInfo.value.remain,
+                          )}${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
+                          "owe": FlutterI18n.translate(
+                            context,
+                            electricityInfo.value.owe,
+                          ),
+                        },
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+              actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(FlutterI18n.translate(
                     context,
                     "confirm",
                   )),
-                ).paddingSymmetric(horizontal: 24),
+                ),
               ],
             ),
           );
@@ -133,10 +133,10 @@ class ElectricityCard extends StatelessWidget {
                     "date": Jiffy.parseFromDateTime(
                       electricityInfo.value.fetchDay,
                     ).format(
-                      pattern: "yyyy-MM-dd HH:mm:ss",
+                      pattern: "yyyy-MM-dd HH:mm",
                     ),
                   },
-                ));
+                ).replaceAll("\n", ""));
               }
 
               if (electricityInfo.value.owe.contains(RegExp(r'[0-9]'))) {

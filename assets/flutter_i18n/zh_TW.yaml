@@ -223,7 +223,7 @@ homepage:
   electricity_card:
     title: 水電資訊
     current_electricity: 餘額 {amount} 度
-    cache_notice: '當前載入為快取，獲取於 {date}
+    cache_notice: '快取獲取於 {date}
 
       '
     dialog_content: '電費帳號：{account}
@@ -498,20 +498,8 @@ setting:
     homepage: 主頁
     code: 開原始碼
     know_more: 知道更多
-    copyright_notice: '本軟體複製基於 traintime_pda 程式碼（或稱 watermeter 程式碼）編譯，
-
-      程式碼按照 Mozilla Public License, v. 2.0 授權。
-
-      本程式和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
-
-      Copyright 2023 BenderBlog Rodriguez and contributors.
-
-      The Source Code Form is subject to the terms of the Mozilla Public License,
-      v. 2.0.
-
-      If a copy of the MPL was not distributed with this file,
-
-      You can obtain one at https://mozilla.org/MPL/2.0/.'
+    copyright_notice: 本軟體複製基於 traintime_pda 程式碼（或稱 watermeter 程式碼）編譯，程式碼按照 Mozilla
+      Public License, v. 2.0 授權。本程式和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
     beian: 備案號
     sign_android: 安卓簽名
     title: 關於本軟體

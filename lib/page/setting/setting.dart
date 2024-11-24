@@ -29,7 +29,6 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
-import 'package:watermeter/page/setting/dialogs/change_brightness_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/message_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
@@ -243,13 +242,30 @@ class _SettingWindowState extends State<SettingWindow> {
                     )),
                     subtitle: Text(demoBlueModeName[
                         preference.getInt(preference.Preference.brightness)]),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => const ChangeBrightnessDialog(),
-                      );
-                    }),
+                    trailing: ToggleButtons(
+                      isSelected: List<bool>.generate(
+                        3,
+                        (index) =>
+                            index ==
+                            preference.getInt(preference.Preference.brightness),
+                      ),
+                      onPressed: (int value) {
+                        setState(() {
+                          preference
+                              .setInt(preference.Preference.brightness, value)
+                              .then((value) {
+                            ThemeController toChange =
+                                Get.put(ThemeController());
+                            toChange.onUpdate();
+                          });
+                        });
+                      },
+                      children: const [
+                        Icon(Icons.phone_android_rounded),
+                        Icon(Icons.light_mode_rounded),
+                        Icon(Icons.dark_mode_rounded),
+                      ],
+                    )),
                 const Divider(),
                 ListTile(
                   title: Text(FlutterI18n.translate(

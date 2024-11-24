@@ -33,14 +33,10 @@ class MainPageCard extends StatelessWidget {
         size: 32,
         color: Theme.of(context).colorScheme.primary,
       ),
-      title: DefaultTextStyle.merge(
-        style: TextStyle(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? null
-              : Theme.of(context).colorScheme.primary,
-        ),
-        child: infoText,
-      ),
+      textColor: Theme.of(context).brightness == Brightness.dark
+          ? Theme.of(context).colorScheme.onSurface
+          : Theme.of(context).colorScheme.onSurfaceVariant,
+      title: infoText,
       subtitle: Builder(
         builder: (context) {
           if (isLoad ||
@@ -53,22 +49,7 @@ class MainPageCard extends StatelessWidget {
               ),
             );
           } else {
-            return DefaultTextStyle.merge(
-              style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? null
-                    : Theme.of(context).colorScheme.primary,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(child: bottomText),
-                  if (!isLoad &&
-                      (progress != null && progress! >= 0 && progress! <= 1))
-                    Text("${(progress! * 100).toInt()}%"),
-                ],
-              ),
-            );
+            return bottomText;
           }
         },
       ),

@@ -315,13 +315,17 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget get _developerList => ReXCard(
         title: Text(
-          "${getDevelopers().length} people did not checkin the class",
+          "${getDevelopers().length} people with a suspicious check-in status",
         ).padding(bottom: 8).center(),
         remaining: const [],
-        bottomRow: getDevelopers()
-            .map((e) => DeveloperWidget(developer: e))
-            .toList()
-            .toColumn(),
+        bottomRow: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 12.0,
+          runSpacing: 12.0,
+          children: getDevelopers()
+              .map((e) => DeveloperWidget(developer: e))
+              .toList(),
+        ).center(),
       );
 
   Widget _moreList(context) => ReXCard(
@@ -354,9 +358,10 @@ class _AboutPageState extends State<AboutPage> {
                   : "Traintime PDA",
               applicationVersion: "v${preference.packageInfo.version}+"
                   "${preference.packageInfo.buildNumber}",
+              applicationIcon: const AppIconWidget().padding(vertical: 16),
               applicationLegalese: FlutterI18n.translate(
                 context,
-                "setting.setting.about_page.copyright_notice",
+                "setting.about_page.copyright_notice",
               ),
             ),
           ),
@@ -389,12 +394,10 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.about_page.title",
-            ),
-          ),
+          title: Text(FlutterI18n.translate(
+            context,
+            "setting.about_page.title",
+          )),
         ),
         body: Builder(builder: (context) {
           if (MediaQuery.sizeOf(context).width > 600 &&
@@ -403,15 +406,13 @@ class _AboutPageState extends State<AboutPage> {
                   1) {
             return [
               [
-                const Spacer(),
                 _title(context),
-                const Spacer(),
-                _moreList(context),
               ]
-                  .toColumn(mainAxisAlignment: MainAxisAlignment.end)
+                  .toColumn(mainAxisAlignment: MainAxisAlignment.center)
                   .flexible(flex: 1),
               [
                 _developerList,
+                _moreList(context),
               ].toColumn().scrollable().flexible(flex: 1),
             ]
                 .toRow(

@@ -244,7 +244,7 @@ homepage:
     electricity_card:
         title: "水电信息"
         current_electricity: "余额 {amount} 度"
-        cache_notice: "当前加载为缓存，获取于 {date}\n"
+        cache_notice: "缓存获取于 {date}\n"
         dialog_content: |-
             电费帐号：{account}
             电量信息：{electricityInfo}
@@ -527,14 +527,7 @@ setting:
         homepage: "主页"
         code: "开源代码"
         know_more: "知道更多"
-        copyright_notice: |-
-            本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
-            代码按照 Mozilla Public License, v. 2.0 授权。
-            本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
-            Copyright 2023 BenderBlog Rodriguez and contributors.
-            The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-            If a copy of the MPL was not distributed with this file,
-            You can obtain one at https://mozilla.org/MPL/2.0/.
+        copyright_notice: 本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，代码按照 Mozilla Public License, v. 2.0 授权。本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
         beian: "备案号"
         sign_android: "安卓签名"
         title: "关于本软件"

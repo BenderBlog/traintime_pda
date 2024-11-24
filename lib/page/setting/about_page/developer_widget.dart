@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 
 class Developer {
   final String name;
@@ -29,36 +30,42 @@ class DeveloperWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => launchUrl(
-        Uri.parse(developer.url),
-        mode: LaunchMode.externalApplication,
-      ),
-      child: ListTile(
-        minLeadingWidth: 0,
-        contentPadding: EdgeInsets.zero,
-        leading: Stack(
-          alignment: AlignmentDirectional.topEnd,
-          children: [
-            CachedNetworkImage(
-              fit: BoxFit.fitHeight,
-              imageUrl: developer.imageUrl,
-            ).clipOval().constrained(
-                  width: 48,
-                  height: 48,
-                ),
-            const Icon(
-              Icons.priority_high_rounded,
-              color: Colors.white,
-              size: 12,
-            )
-                .center()
-                .backgroundColor(Colors.red)
-                .clipOval()
-                .constrained(width: 16, height: 16)
-          ],
-        ),
+      onTap: () => context.pushDialog(AlertDialog(
         title: Text(developer.name),
-        subtitle: Text(developer.description),
+        content: Text(developer.description.splitMapJoin(
+          " / ",
+          onMatch: (p0) => "\n",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => launchUrl(
+              Uri.parse(developer.url),
+              mode: LaunchMode.externalApplication,
+            ),
+            child: const Text("More about this guy"),
+          )
+        ],
+      )),
+      child: Stack(
+        alignment: AlignmentDirectional.topEnd,
+        children: [
+          CachedNetworkImage(
+            fit: BoxFit.fitHeight,
+            imageUrl: developer.imageUrl,
+          ).clipOval().constrained(
+                width: 48,
+                height: 48,
+              ),
+          const Icon(
+            Icons.priority_high_rounded,
+            color: Colors.white,
+            size: 12,
+          )
+              .center()
+              .backgroundColor(Colors.red)
+              .clipOval()
+              .constrained(width: 16, height: 16),
+        ],
       ),
     );
   }
