@@ -171,11 +171,9 @@ class _EmptyClassroomSearchWindowState
                     context: context,
                     config: CalendarDatePicker2WithActionButtonsConfig(
                       calendarType: CalendarDatePicker2Type.single,
-                      selectedDayHighlightColor: colorScheme.primary,
                     ),
                     dialogSize: const Size(325, 400),
                     value: [time],
-                    borderRadius: BorderRadius.circular(14),
                   ).then((value) {
                     if (value?.length == 1 && value?[0] != null) {
                       setState(() {

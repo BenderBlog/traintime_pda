@@ -13,7 +13,7 @@ import 'package:watermeter/themes/color_seed.dart';
 class ThemeController extends GetxController {
   late ThemeMode colorState;
   late Locale locale;
-  late FlexScheme color;
+  late List<FlexSchemeColor> color;
 
   @override
   void onInit() {
@@ -23,8 +23,8 @@ class ThemeController extends GetxController {
 
   void onUpdate() {
     log.info("[ThemeController] Changing color...");
-    color =
-        ColorSeed.values[preference.getInt(preference.Preference.color)].color;
+    int index = preference.getInt(preference.Preference.color);
+    color = pdaColorScheme.sublist(index * 2, index * 2 + 1);
 
     log.info("[ThemeController] Changing brightness...");
     colorState =

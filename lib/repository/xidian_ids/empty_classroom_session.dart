@@ -12,13 +12,33 @@ class EmptyClassroomSession extends EhallSession {
   String target =
       "https://ehall.xidian.edu.cn/jwapp/sys/kxjas/*default/index.do";
 
-  /// jxldm => 教学楼代码
   Map<String, String> buildingSetting(String jxldm) => {
         "name": "JXLDM",
         "caption": "教学楼代码",
         "builder": "equal",
         "linkOpt": "AND",
         "value": jxldm,
+      };
+
+  Map<String, String> semesterSetting(String xnxqdm) => {
+        "name": "XNXQDM",
+        "value": xnxqdm,
+        "linkOpt": "AND",
+        "builder": "equal",
+      };
+
+  Map<String, dynamic> weekCountSetting(weekCount) => {
+        "name": "ZC",
+        "value": weekCount,
+        "linkOpt": "AND",
+        "builder": "equal",
+      };
+
+  Map<String, dynamic> weekDaySetting(weekDay) => {
+        "name": "ZC",
+        "value": weekDay,
+        "linkOpt": "AND",
+        "builder": "equal",
       };
 
   List<Map<String, String>> classroomSetting(String mcOrdm) => [
@@ -53,22 +73,6 @@ class EmptyClassroomSession extends EhallSession {
     return toReturn;
   }
 
-  /*
-  Future<Map<String, String>> getType() async {
-    Map<String, String> toReturn = {};
-    var data = await dio.post(
-      "$baseUrl/ggzdpx.do",
-      data: {"dicCode": '9955766', "order": '+DM'},
-    ).then(
-      (value) => value.data["datas"]["ggzdpx"]["rows"],
-    );
-    for (var i in data) {
-      toReturn[i["DM"]] = i["MC"];
-    }
-    return toReturn;
-  }
-  */
-
   /// The function of search the buildings inside buildingCode.
   /// params:
   ///   [buildingCode]: the code defined in [getBuildingList].
@@ -81,26 +85,29 @@ class EmptyClassroomSession extends EhallSession {
     required String semesterRange,
     required String semesterPart,
   }) async {
-    String dateData = await dio.post(
+    (dynamic, dynamic) dateData = await dio.post(
       "$baseUrl/rqzhzcjc.do",
       data: {
         "RQ": date,
         "XN": semesterRange,
         "XQ": semesterPart,
       },
-    ).then(
-      (value) => value.data["datas"]["rqzhzcjc"]["ZC"].toString(),
-    );
+    ).then((value) => (
+          value.data["datas"]["rqzhzcjc"]["ZC"],
+          value.data["datas"]["rqzhzcjc"]["XQJ"],
+        ));
 
     List<EmptyClassroomData> toReturn = [];
 
     await dio.post("$baseUrl/cxjsqk.do", data: {
       "XNXQDM": "$semesterRange-$semesterPart",
-      "ZC": dateData,
-      "XQ": semesterPart,
+      "ZC": dateData.$1,
+      "XQ": dateData.$2,
       "querySetting": jsonEncode([
         buildingSetting(buildingCode),
-        //if (searchParameter.isNotEmpty) classroomSetting(searchParameter),
+        semesterSetting("$semesterRange-$semesterPart"),
+        weekCountSetting(dateData.$1),
+        weekDaySetting(dateData.$2),
       ]),
       '*order': "+LC,+JASMC",
       'pageSize': 999,

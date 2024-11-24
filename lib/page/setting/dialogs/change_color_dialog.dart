@@ -45,7 +45,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: ColorSeed.values[i].color.data.light.primary,
+                          color: pdaColorScheme[i * 2].primary,
                         ),
                       ),
                     ),
