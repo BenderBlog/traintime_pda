@@ -28,7 +28,6 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
       content: SingleChildScrollView(
         child: Column(
           children: [
-            const Divider(),
             for (int i = 0; i < ColorSeed.values.length; ++i)
               RadioListTile<int>(
                 title: Row(
@@ -61,7 +60,6 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                   });
                 },
               ),
-            const Divider(),
           ],
         ),
       ),

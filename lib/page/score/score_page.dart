@@ -110,22 +110,10 @@ class _ScorePageState extends State<ScorePage> {
                 controller: text,
                 autofocus: false,
                 decoration: InputDecoration(
-                  isDense: true,
-                  fillColor: Colors.grey.withOpacity(0.2),
-                  filled: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 10,
-                  ),
                   prefixIcon: const Icon(Icons.search),
                   hintText: FlutterI18n.translate(
                     context,
                     "score.score_page.search_hint",
-                  ),
-                  hintStyle: Theme.of(context).textTheme.labelLarge,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                    borderSide: BorderSide.none,
                   ),
                 ),
                 onSubmitted: (String text) => c.search = text,
@@ -219,48 +207,30 @@ class _ScorePageState extends State<ScorePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                    ),
+                  FilledButton(
                     onPressed: () => c.setScoreChoiceState(ChoiceState.all),
-                    child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "score.score_page.select_all",
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                    child: Text(FlutterI18n.translate(
+                      context,
+                      "score.score_page.select_all",
+                    )),
                   ),
                   const SizedBox(width: 12),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                    ),
+                  FilledButton(
                     onPressed: () => c.setScoreChoiceState(ChoiceState.none),
-                    child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "score.score_page.select_nothing",
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                    child: Text(FlutterI18n.translate(
+                      context,
+                      "score.score_page.select_nothing",
+                    )),
                   ),
                   const SizedBox(width: 12),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                    ),
+                  FilledButton(
                     onPressed: () =>
                         c.setScoreChoiceState(ChoiceState.original),
-                    child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "score.score_page.reset_select",
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  )
+                    child: Text(FlutterI18n.translate(
+                      context,
+                      "score.score_page.reset_select",
+                    )),
+                  ),
                 ],
               ),
               Row(

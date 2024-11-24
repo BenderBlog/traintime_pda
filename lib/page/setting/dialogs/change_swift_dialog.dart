@@ -45,7 +45,6 @@ class ChangeSwiftDialog extends StatelessWidget {
             context,
             "setting.change_swift_dialog.input_hint",
           ),
-          border: const OutlineInputBorder(),
         ),
       ),
       actions: <Widget>[

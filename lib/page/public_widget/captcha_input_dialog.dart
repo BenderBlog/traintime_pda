@@ -94,13 +94,6 @@ class CaptchaInputDialog extends StatelessWidget {
                 context,
                 "login.captcha_window.hint",
               ),
-              fillColor: Colors.grey.withOpacity(0.4),
-              filled: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
-                borderSide: BorderSide.none,
-              ),
             ),
           ),
         ],

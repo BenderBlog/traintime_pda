@@ -194,6 +194,6 @@ class BookInfoCard extends StatelessWidget {
           .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
           .center()
           .expanded()
-    ].toRow().padding(all: 12).card();
+    ].toRow().padding(all: 12).card(elevation: 0);
   }
 }

@@ -84,7 +84,6 @@ class CommentPopout extends StatelessWidget {
                     "content": replyTo!.content,
                   },
                 ),
-          border: const OutlineInputBorder(),
         ),
       ),
       actions: [

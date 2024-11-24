@@ -35,7 +35,6 @@ class ElectricityAccountDialog extends StatelessWidget {
             context,
             "setting.change_electricity_account.input_hint",
           ),
-          border: const OutlineInputBorder(),
         ),
       ),
       actions: <Widget>[

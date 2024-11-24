@@ -150,7 +150,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                             child: Text(
                               FlutterI18n.translate(
                                 context,
-                                "school_card_window.balance",
+                                "school_card_window.time_with_sum",
                                 translationParams: {
                                   "sum": moneySunUp(snapshot.data!)
                                 },

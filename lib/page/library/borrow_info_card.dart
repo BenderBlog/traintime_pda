@@ -220,6 +220,6 @@ class BorrowInfoCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
           )
           .expanded()
-    ].toRow().padding(horizontal: 12, vertical: 4).card();
+    ].toRow().padding(horizontal: 12, vertical: 4).card(elevation: 0);
   }
 }

@@ -30,41 +30,41 @@ class ReXCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
             fontSize: 0.875 * _rem,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              DefaultTextStyle.merge(
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-                child: title,
-              ).flexible(),
-              if (remaining.isNotEmpty)
-                Row(
-                  children: [
-                    Text(
-                      remaining.first.text,
-                      style: TextStyle(
-                        color: remaining.first.color,
-                        fontWeight:
-                            remaining.first.isBold ? FontWeight.w700 : null,
-                      ),
-                    ),
-                    for (int i = 1; i < remaining.length; ++i) ...[
-                      const VerticalDivider(width: 8),
+          child: DefaultTextStyle.merge(
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                title.flexible(),
+                if (remaining.isNotEmpty)
+                  Row(
+                    children: [
                       Text(
-                        remaining[i].text,
+                        remaining.first.text,
                         style: TextStyle(
-                          color: remaining[i].color,
+                          color: remaining.first.color,
                           fontWeight:
-                              remaining[i].isBold ? FontWeight.w700 : null,
+                              remaining.first.isBold ? FontWeight.w700 : null,
                         ),
                       ),
-                    ]
-                  ],
-                ),
-            ],
+                      for (int i = 1; i < remaining.length; ++i) ...[
+                        const VerticalDivider(width: 8),
+                        Text(
+                          remaining[i].text,
+                          style: TextStyle(
+                            color: remaining[i].color,
+                            fontWeight:
+                                remaining[i].isBold ? FontWeight.w700 : null,
+                          ),
+                        ),
+                      ]
+                    ],
+                  ),
+              ],
+            ),
           ),
         )
             .padding(
@@ -84,14 +84,7 @@ class ReXCard extends StatelessWidget {
           bottom: _rem,
         ),
       ],
-    )
-        .backgroundColor(
-          Theme.of(context).colorScheme.primary.withOpacity(
-                Theme.of(context).brightness == Brightness.dark ? 0.15 : 0.075,
-              ),
-        )
-        .clipRRect(all: _rem)
-        .padding(all: 0.5 * _rem);
+    ).card(elevation: 0);
   }
 }
 

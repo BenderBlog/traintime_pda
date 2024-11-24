@@ -47,7 +47,6 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
             context,
             "setting.change_password_dialog.input_hint",
           ),
-          border: const OutlineInputBorder(),
           suffixIcon: IconButton(
             icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
             onPressed: () => setState(() => _couldView = !_couldView),

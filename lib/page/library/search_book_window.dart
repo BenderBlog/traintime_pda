@@ -82,18 +82,11 @@ class _SearchBookWindowState extends State<SearchBookWindow>
           child: TextFormField(
             controller: text,
             decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.transparent,
               hintText: FlutterI18n.translate(
                 context,
                 "library.search_here",
               ),
-              isDense: false,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
               prefixIcon: const Icon(Icons.search),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
             ),
             onChanged: (String text) => search.value = text,
             onFieldSubmitted: (value) => setState(() {

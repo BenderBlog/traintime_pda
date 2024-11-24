@@ -39,10 +39,6 @@ class _ChangeBrightnessDialogState extends State<ChangeBrightnessDialog> {
         context,
         "setting.change_brightness_dialog.title",
       )),
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
       content: SingleChildScrollView(
         child: Column(
           children: List<Widget>.generate(
@@ -76,7 +72,6 @@ class _ChangeBrightnessDialogState extends State<ChangeBrightnessDialog> {
           },
         ),
       ],
-      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
     );
   }
 }

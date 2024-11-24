@@ -177,7 +177,6 @@ class ArticleCard extends StatelessWidget {
         )
         .card(
           elevation: 0,
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         )
         .gestures(
       onTap: () {
