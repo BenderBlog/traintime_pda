@@ -7,7 +7,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/page/public_widget/filled_card_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -64,7 +63,7 @@ class BorrowInfoCard extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
-        ),
+        ).padding(top: 10),
         const SizedBox(height: 12),
         [
           Text.rich(TextSpan(children: [
@@ -174,49 +173,39 @@ class BorrowInfoCard extends StatelessWidget {
                 color: Colors.blueGrey,
               ),
             ),
-          ]));
-          final button = Text(
-            isOverdue
-                ? FlutterI18n.translate(
-                    context,
-                    "library.cannot_be_renewable",
-                  )
-                : FlutterI18n.translate(
-                    context,
-                    "library.can_be_renewable",
-                  ),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          )
-              .padding(horizontal: 12, vertical: 8)
-              .backgroundColor(isOverdue
-                  ? Colors.grey
-                  : Theme.of(context).colorScheme.primary)
-              .clipRRect(all: 12)
-              .gestures(
-            onTap: () {
-              if (!isOverdue) {
-                ProgressDialog pd = ProgressDialog(context: context);
-                pd.show(
-                  msg: FlutterI18n.translate(
-                    context,
-                    "library.renewing",
-                  ),
-                );
-                LibrarySession().renew(toUse.loanId).then((value) {
-                  if (context.mounted) {
-                    pd.close();
-                    showToast(
-                      context: context,
-                      msg: value,
-                    );
-                  }
-                });
-              }
-            },
-          );
+          ])).padding(bottom: 10);
+          final button = TextButton(
+              onPressed: () {
+                if (!isOverdue) {
+                  ProgressDialog pd = ProgressDialog(context: context);
+                  pd.show(
+                    msg: FlutterI18n.translate(
+                      context,
+                      "library.renewing",
+                    ),
+                  );
+                  LibrarySession().renew(toUse.loanId).then((value) {
+                    if (context.mounted) {
+                      pd.close();
+                      showToast(
+                        context: context,
+                        msg: value,
+                      );
+                    }
+                  });
+                }
+              },
+              child: Text(
+                isOverdue
+                    ? FlutterI18n.translate(
+                        context,
+                        "library.cannot_be_renewable",
+                      )
+                    : FlutterI18n.translate(
+                        context,
+                        "library.can_be_renewable",
+                      ),
+              ));
           return [
             text,
             button,
@@ -231,6 +220,6 @@ class BorrowInfoCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
           )
           .expanded()
-    ].toRow().padding(all: 12).withFilledCardStyle(context);
+    ].toRow().padding(horizontal: 12, vertical: 4).card();
   }
 }
