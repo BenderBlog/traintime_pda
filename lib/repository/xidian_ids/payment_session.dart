@@ -29,7 +29,8 @@ extension IsToday on DateTime {
 }
 
 Future<void> update({
-  required Future<String> Function(List<int>) captchaFunction,
+  bool force = false,
+  Future<String> Function(List<int>)? captchaFunction,
 }) async {
   isLoad.value = true;
   isCache.value = false;
@@ -50,7 +51,7 @@ Future<void> update({
     }
   }
 
-  if (canUseCache && cache.fetchDay.isToday) {
+  if (!force && canUseCache && cache.fetchDay.isToday) {
     electricityInfo.value = cache;
     isCache.value = true;
     isLoad.value = false;
@@ -119,10 +120,13 @@ Future<void> update({
         electricityInfo.value.remain = e.msg;
       } else if (NoAccountInfoException().toString().contains(e.toString())) {
         electricityInfo.value.remain = "electricity_status.need_account";
+      } else if (CaptchaFailedException().toString().contains(e.toString())) {
+        electricityInfo.value.remain = "electricity_status.captcha_failed";
       } else {
         electricityInfo.value.remain = "electricity_status.other_issue";
       }
-      if (electricityInfo.value.owe == "electricity_status.owe_fetching") {
+      if (electricityInfo.value.owe == "electricity_status.owe_fetching" ||
+          electricityInfo.value.owe == "electricity_status.pending") {
         electricityInfo.value.owe = "electricity_status.owe_issue_unable";
       }
     },
@@ -316,12 +320,14 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
 
   /// Password, addressid, liveid
   Future<(String, String)> loginPayment({
-    required Future<String> Function(List<int>) captchaFunction,
+    required Future<String> Function(List<int>)? captchaFunction,
   }) async {
     /// If no account
     if (preference.getString(preference.Preference.dorm).isEmpty) {
       throw NoAccountInfoException();
     }
+
+    electricityInfo.value.remain = "electricity_status.remain_fetching";
 
     /// Get electricity password
     String password = preference.getString(
@@ -364,7 +370,9 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           .then((data) => data.data);
 
       String checkCode = retry == 1
-          ? await captchaFunction(picture) // The last try
+          ? captchaFunction != null
+              ? await captchaFunction(picture)
+              : throw CaptchaFailedException() // The last try
           : await DigitCaptchaClientProvider.infer(picture);
 
       log.info("[PaymentSession][getOwe] checkcode is $checkCode");
@@ -461,8 +469,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
             decodeData["returnmsg"] == "电费厂家返回xml消息体异常") {
           electricityInfo.value.owe = "electricity_status.owe_no_need";
         } else if (double.parse(decodeData["dueTotal"]) > 0.0) {
-          electricityInfo.value.owe =
-              "electricity_status.owe_need_pay ${decodeData["dueTotal"]}";
+          electricityInfo.value.owe = decodeData["dueTotal"].toString();
         } else {
           electricityInfo.value.owe = "electricity_status.owe_issue_unable";
         }
@@ -479,3 +486,5 @@ class NotInitalizedException implements Exception {
 }
 
 class NoAccountInfoException implements Exception {}
+
+class CaptchaFailedException implements Exception {}

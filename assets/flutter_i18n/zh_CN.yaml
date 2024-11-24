@@ -243,7 +243,7 @@ homepage:
         no_arrangement_infoText: "暂无日程"
     electricity_card:
         title: "水电信息"
-        current_electricity: "目前电量 {amount} 度"
+        current_electricity: "余额 {amount} 度"
         cache_notice: "当前加载为缓存，获取于 {date}\n"
         dialog_content: |-
             电费帐号：{account}
@@ -507,8 +507,8 @@ setting:
         dimole: "开发支持：辅助修复滑块问题"
         elitewars: "设计：体育成绩页面"
         elliot: "国际化(Pending)：软件英语翻译 / 开发指导：情侣课表功能开发指导"
-        godhu777777: "国际化(Pending)：繁体中文转换代码和彩蛋代码"
-        hancl777: "国际化(Pending)：繁体中文转换代码"
+        godhu777777: "国际化：繁体中文转换代码和彩蛋代码"
+        hancl777: "国际化：繁体中文转换代码"
         hhzm: "开发：电费查询账号计算"
         lhx-666-cool: "支持：Windows 和 Linux 构建脚本"
         lichtyy: "设计(Pending)：空白页面贴图"
@@ -531,7 +531,7 @@ setting:
             本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
             代码按照 Mozilla Public License, v. 2.0 授权。
             本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
-            Copyright 2023-Present BenderBlog Rodriguez and contributors.
+            Copyright 2023 BenderBlog Rodriguez and contributors.
             The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
             If a copy of the MPL was not distributed with this file,
             You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -630,6 +630,7 @@ electricity_status:
     owe_issue_unable: "目前欠款无法查询"
     need_more_info: "需要在缴费平台完善信息"
     need_account: "需要填写电费账号"
+    captcha_failed: "验证码识别失败"
     other_issue: "程序故障"
 
 # 校园卡信息状态

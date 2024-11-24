@@ -31,9 +31,7 @@ class MainPageCard extends StatelessWidget {
       leading: Icon(
         icon,
         size: 32,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? null
-            : Theme.of(context).colorScheme.primary,
+        color: Theme.of(context).colorScheme.primary,
       ),
       title: DefaultTextStyle.merge(
         style: TextStyle(

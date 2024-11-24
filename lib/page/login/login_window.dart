@@ -63,6 +63,7 @@ class _LoginWindowState extends State<LoginWindow> {
         ),
         hintText: hintText,
         suffixIcon: suffixIcon,
+        fillColor: _inputFieldBackgroundColor,
       );
 
   /// Can I see the password?

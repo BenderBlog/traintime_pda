@@ -45,7 +45,8 @@ class ElectricityCard extends StatelessWidget {
                 Obx(
                   () => Text.rich(
                     TextSpan(children: [
-                      if (isCache.value)
+                      if (isCache.value &&
+                          !electricityInfo.value.fetchDay.isToday)
                         TextSpan(
                           text: FlutterI18n.translate(
                             context,
@@ -92,58 +93,70 @@ class ElectricityCard extends StatelessWidget {
           );
         }
       },
+      onLongPress: () => update(
+        force: true,
+        captchaFunction: (image) => showDialog<String>(
+          context: context,
+          builder: (context) => CaptchaInputDialog(image: image),
+        ).then((value) => value ?? ""),
+      ),
       child: Obx(
         () => MainPageCard(
-          isLoad: isLoad.value,
-          icon: MingCuteIcons.mgc_flash_line,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.electricity_card.title",
-          ),
-          infoText: Text(
-            electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
-                ? FlutterI18n.translate(
-                    context,
-                    "homepage.electricity_card.current_electricity",
-                    translationParams: {
-                      "amount": electricityInfo.value.remain,
-                    },
-                  )
-                : FlutterI18n.translate(
-                    context,
-                    electricityInfo.value.remain,
-                  ),
-            style: const TextStyle(fontSize: 20),
-          ),
-          bottomText: Text(
-            FlutterI18n.translate(
+            isLoad: isLoad.value,
+            icon: MingCuteIcons.mgc_flash_line,
+            text: FlutterI18n.translate(
               context,
-              electricityInfo.value.owe,
+              "homepage.electricity_card.title",
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          rightButton: IconButton.outlined(
-            onPressed: () => update(
-              captchaFunction: (image) => showDialog<String>(
-                context: context,
-                builder: (context) => CaptchaInputDialog(image: image),
-              ).then((value) => value ?? ""),
+            infoText: Text(
+              electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
+                  ? FlutterI18n.translate(
+                      context,
+                      "homepage.electricity_card.current_electricity",
+                      translationParams: {
+                        "amount": electricityInfo.value.remain,
+                      },
+                    )
+                  : FlutterI18n.translate(
+                      context,
+                      electricityInfo.value.remain,
+                    ),
+              style: const TextStyle(fontSize: 20),
             ),
-            style: IconButton.styleFrom(
-              side: BorderSide(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            icon: Icon(
-              Icons.refresh_rounded,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? null
-                  : Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
+            bottomText: Builder(builder: (context) {
+              /// I believe it is not from tomorrow, like Bender lol
+              if (!electricityInfo.value.fetchDay.isToday) {
+                return Text(FlutterI18n.translate(
+                  context,
+                  "homepage.electricity_card.cache_notice",
+                  translationParams: {
+                    "date": Jiffy.parseFromDateTime(
+                      electricityInfo.value.fetchDay,
+                    ).format(
+                      pattern: "yyyy-MM-dd HH:mm:ss",
+                    ),
+                  },
+                ));
+              }
+
+              if (electricityInfo.value.owe.contains(RegExp(r'[0-9]'))) {
+                return Text(
+                  FlutterI18n.translate(
+                    context,
+                    "electricity_status.owe_need_pay",
+                    translationParams: {"due": electricityInfo.value.owe},
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                );
+              }
+              return Text(
+                FlutterI18n.translate(
+                  context,
+                  electricityInfo.value.owe,
+                ),
+                overflow: TextOverflow.ellipsis,
+              );
+            })),
       ),
     );
   }

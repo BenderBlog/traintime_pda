@@ -222,7 +222,7 @@ homepage:
     no_arrangement_infoText: 暫無日程
   electricity_card:
     title: 水電資訊
-    current_electricity: 目前電量 {amount} 度
+    current_electricity: 餘額 {amount} 度
     cache_notice: '當前載入為快取，獲取於 {date}
 
       '
@@ -478,8 +478,8 @@ setting:
     dimole: 開發支援：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
     elliot: 國際化(Pending)：軟體英語翻譯 / 開發指導：情侶課表功能開發指導
-    godhu777777: 國際化(Pending)：繁體中文轉換程式碼和彩蛋程式碼
-    hancl777: 國際化(Pending)：繁體中文轉換程式碼
+    godhu777777: 國際化：繁體中文轉換程式碼和彩蛋程式碼
+    hancl777: 國際化：繁體中文轉換程式碼
     hhzm: 開發：電費查詢賬號計算
     lhx-666-cool: 支援：Windows 和 Linux 構建指令碼
     lichtyy: 設計(Pending)：空白頁面貼圖
@@ -490,7 +490,7 @@ setting:
     rrrilac: 開發支援：電費查詢
     ray: 設計：開屏畫面 / 支援：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導
     shadowyingyi: 支援：兩次鴿子公眾號宣傳
-    stalomeow: 設計：首頁時間軸 / 開發：非同步登入 & 验证码預測
+    stalomeow: 設計：首頁時間軸 / 開發：非同步登入 & 驗證碼預測
     xeonds: 設計：設定頁面 / 開發：XDU Planet
     xiue233: 開發：Android 小部件和拼接
     wirsbf: 開發：修復調課未按預期進行
@@ -504,7 +504,7 @@ setting:
 
       本程式和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
 
-      Copyright 2023-Present BenderBlog Rodriguez and contributors.
+      Copyright 2023 BenderBlog Rodriguez and contributors.
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
       v. 2.0.
@@ -597,6 +597,7 @@ electricity_status:
   owe_issue_unable: 目前欠款無法查詢
   need_more_info: 需要在繳費平臺完善資訊
   need_account: 需要填寫電費賬號
+  captcha_failed: 驗證碼識別失敗
   other_issue: 程式故障
 school_card_status:
   failed_to_fetch: 獲取失敗

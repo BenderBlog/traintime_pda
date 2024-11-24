@@ -15,6 +15,8 @@ import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
+import 'package:watermeter/repository/xidian_ids/payment_session.dart'
+    as electricity;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 DateTime updateTime = DateTime.now();
@@ -96,6 +98,7 @@ Future<void> update({
       }),
       Future(() => borrow_info.LibrarySession().getBorrowList()),
       Future(() => school_card_session.SchoolCardSession().initSession()),
+      Future(() => electricity.update())
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(
         "[homepage Update]"
