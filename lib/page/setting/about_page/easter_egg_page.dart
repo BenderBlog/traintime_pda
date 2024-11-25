@@ -44,6 +44,7 @@ class _EasterEggPageState extends State<EasterEggPage> {
             ),
             icon: const Icon(Icons.headphones),
           ),
+          const SizedBox(width: 48),
           IconButton.filledTonal(
             onPressed: () => launchUrl(
               Uri.parse(
@@ -53,9 +54,7 @@ class _EasterEggPageState extends State<EasterEggPage> {
             ),
             icon: const Icon(Icons.headphones),
           ),
-        ]
-            .toRow(mainAxisAlignment: MainAxisAlignment.center)
-            .padding(bottom: 16.0),
+        ].toRow(mainAxisAlignment: MainAxisAlignment.center).padding(all: 16.0),
         Text(FlutterI18n.translate(context, "easter_egg")),
       ]
           .toColumn(crossAxisAlignment: CrossAxisAlignment.center)

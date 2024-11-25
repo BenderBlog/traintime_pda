@@ -120,7 +120,11 @@ classtable:
     noon_break: "午休"
     supper_break: "晚休"
     month: "{month}\n月"
-    no_class: "本周暂无安排\nConcept by LichtYy"
+    no_class: |-
+        本周暂无安排，请照顾好自己
+        LichtYy was reviewing for exam
+        He saw the tourist guide in the English paper
+        He confused.
     class_card:
         title: "日程信息"
         unknown_classroom: "未知教室"
@@ -460,11 +464,11 @@ setting:
     change_color_dialog:
         title: "颜色设置"
         default: "默认颜色"
-        blue: "天空蓝"
+        blue: "聪明蓝"
         deepPurple: "基佬紫"
-        green: "早苗绿"
-        orange: "果粒橙"
-        pink: "少女粉"
+        green: "春风绿"
+        orange: "明日香橙"
+        pink: "樱花粉"
     change_brightness_dialog:
         title: "亮度设置"
         follow_setting: "跟随系统"
@@ -511,7 +515,7 @@ setting:
         hancl777: "国际化：繁体中文转换代码"
         hhzm: "开发：电费查询账号计算"
         lhx-666-cool: "支持：Windows 和 Linux 构建脚本"
-        lichtyy: "设计(Pending)：空白页面贴图"
+        lichtyy: "设计：配色，空白页面贴图"
         lsy223622: "设计：iOS 和 Android 图标 / 支持：冠名 XDYou"
         nancunchild: "开发：图书馆搜索功能"
         pairman: "开发：成绩缓存功能和优化滑块算法"
@@ -523,7 +527,7 @@ setting:
         xeonds: "设计：设置页面 / 开发：XDU Planet"
         xiue233: "开发：Android 小部件和拼接"
         wirsbf: "开发：修复调课未按预期进行"
-        zcwzy: "开发：修复丁香电费 / 开发支持：研究生版本开发 / 设计(Pending)：空白页面贴图"
+        zcwzy: "开发：修复丁香电费 / 开发支持：研究生版本开发 / 设计：空白页面贴图"
         homepage: "主页"
         code: "开源代码"
         know_more: "知道更多"

@@ -12,6 +12,7 @@ import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 /// THe classtable view, the way the the classtable sheet rendered.
 class ClassTableView extends StatefulWidget {
@@ -73,17 +74,23 @@ class _ClassTableViewState extends State<ClassTableView> {
         }
       }
 
-      if (thisRow.isEmpty) {
+      if (thisRow.isEmpty &&
+          !preference.getBool(preference.Preference.decorated)) {
         thisRow.add(Center(
           child: Column(
             children: [
               SizedBox(height: blockheight(8)),
-              Image.asset("assets/Classtable-Empty.png"),
+              Image.asset(
+                "assets/Classtable-Empty.png",
+                scale: 2,
+              ),
               const SizedBox(height: 20),
-              Text(FlutterI18n.translate(context, "classtable.no_class")),
+              ...FlutterI18n.translate(context, "classtable.no_class")
+                  .split("\n")
+                  .map((e) => Text(e)),
             ],
           ),
-        ));
+        ).padding(left: leftRow));
       }
 
       return thisRow;

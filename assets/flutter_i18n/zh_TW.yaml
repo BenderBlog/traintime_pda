@@ -107,9 +107,13 @@ classtable:
   month: '{month}
 
     月'
-  no_class: '本週暫無安排
+  no_class: '本週暫無安排，請照顧好自己
 
-    Concept by LichtYy'
+    LichtYy was reviewing for exam
+
+    He saw the tourist guide in the English paper
+
+    He confused.'
   class_card:
     title: 日程資訊
     unknown_classroom: 未知教室
@@ -430,11 +434,11 @@ setting:
   change_color_dialog:
     title: 顏色設定
     default: 預設顏色
-    blue: 天空藍
+    blue: 聰明藍
     deepPurple: 基佬紫
-    green: 早苗綠
-    orange: 果粒橙
-    pink: 少女粉
+    green: 春風綠
+    orange: 明日香橙
+    pink: 櫻花粉
   change_brightness_dialog:
     title: 亮度設定
     follow_setting: 跟隨系統
@@ -482,7 +486,7 @@ setting:
     hancl777: 國際化：繁體中文轉換程式碼
     hhzm: 開發：電費查詢賬號計算
     lhx-666-cool: 支援：Windows 和 Linux 構建指令碼
-    lichtyy: 設計(Pending)：空白頁面貼圖
+    lichtyy: 設計：配色，空白頁面貼圖
     lsy223622: 設計：iOS 和 Android 圖示 / 支援：冠名 XDYou
     nancunchild: 開發：圖書館搜尋功能
     pairman: 開發：成績快取功能和最佳化滑塊演算法
@@ -494,7 +498,7 @@ setting:
     xeonds: 設計：設定頁面 / 開發：XDU Planet
     xiue233: 開發：Android 小部件和拼接
     wirsbf: 開發：修復調課未按預期進行
-    zcwzy: 開發：修復丁香電費 / 開發支援：研究生版本開發 / 設計(Pending)：空白頁面貼圖
+    zcwzy: 開發：修復丁香電費 / 開發支援：研究生版本開發 / 設計：空白頁面貼圖
     homepage: 主頁
     code: 開原始碼
     know_more: 知道更多

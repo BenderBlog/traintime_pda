@@ -3,7 +3,10 @@
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/themes/default_color.dart';
+import 'package:watermeter/themes/default.dart';
+import 'package:watermeter/themes/green.dart';
+import 'package:watermeter/themes/orange.dart';
+import 'package:watermeter/themes/pink.dart';
 
 /// Colors for the class information card.
 const colorList = [
@@ -39,12 +42,12 @@ List<FlexSchemeColor> pdaColorScheme = [
   FlexScheme.blue.colors(Brightness.dark),
   FlexScheme.deepPurple.colors(Brightness.light),
   FlexScheme.deepPurple.colors(Brightness.dark),
-  FlexScheme.green.colors(Brightness.light),
-  FlexScheme.green.colors(Brightness.dark),
-  FlexScheme.orangeM3.colors(Brightness.light),
-  FlexScheme.orangeM3.colors(Brightness.dark),
-  FlexScheme.sakura.colors(Brightness.light),
-  FlexScheme.sakura.colors(Brightness.dark),
+  GreenColor.light,
+  GreenColor.dark,
+  OrangeColor.light,
+  OrangeColor.dark,
+  PinkColor.light,
+  PinkColor.dark,
 ];
 
 enum ColorSeed {

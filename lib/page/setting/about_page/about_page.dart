@@ -424,10 +424,11 @@ class _AboutPageState extends State<AboutPage> {
           } else {
             return [_title(context), _developerList, _moreList(context)]
                 .toColumn(mainAxisAlignment: MainAxisAlignment.center)
+                .padding(horizontal: 16)
                 .scrollable()
                 .constrained(maxWidth: 600)
                 .center();
           }
-        }));
+        }).safeArea());
   }
 }
