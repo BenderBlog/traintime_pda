@@ -1,0 +1,5 @@
+1. 繁体中文翻译 @BenderBlog 
+包括转换脚本 @GodHu777777 @Hancl777
+2. 加速电费查询 @stalomeow
+3. 更改颜色 @BenderBlog @LichtYy
+4. 一些涉及课表加载的小修复 @wirsbf

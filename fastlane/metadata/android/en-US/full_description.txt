@@ -1,4 +1,4 @@
-"Traintime PDA" is an open-source personal data assistant for XDU undergraduates.
+"Traintime PDA" is an open-source personal data assistant for XDU students.
 
 The XDYou app in the Apple App Store have the same codebase as this.
 
@@ -13,7 +13,6 @@ The XDYou app in the Apple App Store have the same codebase as this.
  - Empty classroom check. (Not avaliable for postgraduates)
  - Physics experiment schedule check and output to iCalendar.
  - Other tools such as call for repairing, school email, etc.
- - Shuangchuang (Innovation and Entrepreneurship) project query.
  - XDU Planet: Look around the blogs of your schoolmates.
  - Physics experiment check.
  - Homepage widget.

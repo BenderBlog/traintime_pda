@@ -1,0 +1,5 @@
+1. Traditional Chinese support @BenderBlog 
+Translation script @GodHu777777 @Hancl777
+2. Speed up electricity query @stalomeow
+3. Color changing @BenderBlog @LichtYy
+4. Fix related to classtable @wirsbf
