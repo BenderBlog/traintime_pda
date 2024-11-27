@@ -8,16 +8,19 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
+import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -37,6 +40,7 @@ import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/schoolnet_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
@@ -392,6 +396,17 @@ class _SettingWindowState extends State<SettingWindow> {
                         builder: (context) => const ElectricityPasswordDialog(),
                       );
                     }),
+                const Divider(),
+                ListTile(
+                    title: const Text('校园网查询帐号密码设置'),
+                    subtitle: const Text('不设置查看不了网费'),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const SchoolNetPasswordDialog(),
+                      );
+                    }),
               ],
             ),
           ),
@@ -634,6 +649,41 @@ class _SettingWindowState extends State<SettingWindow> {
             remaining: const [],
             bottomRow: Column(
               children: [
+                ListTile(
+                    title: const Text("测试网络信息获取"),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () async {
+                      if (preference
+                          .getString(
+                            preference.Preference.schoolNetQueryPassword,
+                          )
+                          .isEmpty) {
+                        await showDialog(
+                          context: context,
+                          builder: (context) => const SchoolNetPasswordDialog(),
+                        );
+                      }
+                      await SchoolnetSession()
+                          .getNetworkUsage(
+                              captchaFunction: (memoryImage) =>
+                                  showDialog<String>(
+                                    context: context,
+                                    builder: (context) =>
+                                        CaptchaInputDialog(image: memoryImage),
+                                  ).then((value) => value ?? ""))
+                          .then((value) => Fluttertoast.showToast(
+                              msg: "此月已使用流量 ${value.used} , "
+                                  "剩余 ${value.rest} , 充值剩余 ${value.charged}"))
+                          .onError<EmptyPasswordException>((e, __) =>
+                              Fluttertoast.showToast(msg: "您忘记输入账号密码了"))
+                          //.onError<NoCaptchaException>((e, __) =>
+                          //    Fluttertoast.showToast(msg: "您没有填写验证码"))
+                          .onError<NotInitalizedException>((e, __) =>
+                              Fluttertoast.showToast(msg: "获取失败：${e.msg}"))
+                          .onError((e, __) => Fluttertoast.showToast(
+                              msg: "其他错误：${e.toString()}"));
+                    }),
+                const Divider(),
                 ListTile(
                   title: Text(FlutterI18n.translate(
                     context,

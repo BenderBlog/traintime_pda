@@ -59,7 +59,8 @@ enum Preference {
     key: "simplifiedClassTimeline",
     type: "bool",
   ), // 简化日程时间轴
-  localization(key: "localization", type: "String"); // 语言设置
+  localization(key: "localization", type: "String"), // 语言设置
+  schoolNetQueryPassword(key: "schoolNetQueryPassword", type: "String");
 
   const Preference({required this.key, this.type = "String"});
 
