@@ -269,10 +269,10 @@ class ClassChange {
   }
 
   String? get originalTeacher =>
-      originalTeacherData?.replaceAll(RegExp(r'(/|[0-9])'), '');
+      originalTeacherData?.replaceAll(RegExp(r'(/|[0-9a-zA-z])'), '');
 
   String? get newTeacher =>
-      newTeacherData?.replaceAll(RegExp(r'(/|[0-9])'), '');
+      newTeacherData?.replaceAll(RegExp(r'(/|[0-9a-zA-z])'), '');
 
   String? get originalNewTeacher => newTeacherData;
 
