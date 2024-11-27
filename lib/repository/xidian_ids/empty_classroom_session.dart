@@ -116,8 +116,10 @@ class EmptyClassroomSession extends EhallSession {
       for (var i in value.data["datas"]["cxjsqk"]["rows"]) {
         toReturn.add(
           EmptyClassroomData(
-            name:
-                i["JASMC"].toString().replaceAll('(', "\n").replaceAll(')', ""),
+            name: i["JASMC"]
+                .toString()
+                .replaceAll(RegExp(r'[(（]'), "\n")
+                .replaceAll(RegExp(r'[)）]'), ""),
             isUsed: List.generate(
               10,
               (index) => i["JC${index + 1}"].toString().contains("1_"),

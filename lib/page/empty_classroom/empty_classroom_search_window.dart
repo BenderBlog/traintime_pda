@@ -84,8 +84,8 @@ class _EmptyClassroomSearchWindowState
   }
 
   Widget getIcon(bool isUsed, {int? index}) => Container(
-        width: 20,
-        height: 20,
+        width: 18,
+        height: 18,
         decoration: BoxDecoration(
           color: isUsed
               ? Theme.of(context).colorScheme.primary
@@ -97,6 +97,7 @@ class _EmptyClassroomSearchWindowState
                 index.toString(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 12,
                   color: isUsed
                       ? Theme.of(context).colorScheme.onPrimary
                       : Theme.of(context).colorScheme.primary,
@@ -255,15 +256,15 @@ class _EmptyClassroomSearchWindowState
               ),
               DataColumn2(
                 label: const Text('1-4').center(),
-                size: ColumnSize.M,
+                fixedWidth: 100,
               ),
               DataColumn2(
                 label: const Text('5-8').center(),
-                size: ColumnSize.M,
+                fixedWidth: 100,
               ),
               DataColumn2(
                 label: const Text('9-10').center(),
-                size: ColumnSize.S,
+                fixedWidth: 50,
               ),
             ],
             rows: List<DataRow>.generate(
@@ -274,6 +275,7 @@ class _EmptyClassroomSearchWindowState
                     data[index].name,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ).center()),
                   DataCell(Wrap(
                     alignment: WrapAlignment.center,
