@@ -39,7 +39,7 @@ class Score {
   });
 
   bool? get isPassed {
-    if (isPassedStr == null) return null;
+    if (isPassedStr == null || isPassedStr == "null") return null;
     return isPassedStr == "1";
   }
 
