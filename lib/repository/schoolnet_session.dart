@@ -97,21 +97,36 @@ class SchoolnetSession extends NetworkSession {
     if (csrf.isEmpty || key.isEmpty) throw NotInitalizedException;
 
     String lastErrorMessage = "";
-    for (int retry = 5; retry > 0; retry--) {
+    for (int retry = 10; retry > 0; retry--) {
+      // Refresh captcha
+      await _dio
+          .get('https://zfw.xidian.edu.cn/site/captcha', queryParameters: {
+        'refresh': 1,
+        '_': DateTime.now().millisecondsSinceEpoch,
+      });
       // Get verifycode
-      String imgPath = parse(page.data.toString())
-              .getElementById("loginform-verifycode-image")
-              ?.attributes["src"] ??
-          "";
       var picture = await _dio
-          .get(imgPath, options: Options(responseType: ResponseType.bytes))
+          .get(
+            "https://zfw.xidian.edu.cn/site/captcha",
+            options: Options(responseType: ResponseType.bytes),
+          )
           .then((data) => data.data);
 
-      String verifycode = retry == 1
+      String? verifycode = retry == 1
           ? captchaFunction != null
               ? await captchaFunction(picture)
               : throw CaptchaFailedException() // The last try
-          : await DigitCaptchaClientProvider.infer(picture);
+          : await DigitCaptchaClientProvider.infer(
+              DigitCaptchaType.zfw, picture);
+
+      if (verifycode == null) {
+        log.info(
+            '[SchoolnetSession] Captcha is impossible to be inferred.');
+        retry++; // Do not count this try
+        continue;
+      }
+
+      log.info("[SchoolnetSession] verifycode is $verifycode");
 
       // Encrypt the password
       var rsaKey = RSAKeyParser().parse(key);
@@ -140,9 +155,16 @@ class SchoolnetSession extends NetworkSession {
       if (!jsonDecode(page.data)["success"]) {
         lastErrorMessage = jsonDecode(page.data)["message"] ?? "未知错误";
         log.info(
-          "[SchoolNetSession] Attempt ${5 - retry} "
+          "[SchoolNetSession] Attempt ${11 - retry} "
           "failed: $lastErrorMessage",
         );
+
+        // No need to retry if the error is about username or password
+        if (lastErrorMessage.contains("用户名") ||
+            lastErrorMessage.contains("密码")) {
+          break;
+        }
+
         continue;
       }
       // Login post
