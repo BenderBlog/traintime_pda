@@ -673,7 +673,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                   ).then((value) => value ?? ""))
                           .then((value) => Fluttertoast.showToast(
                               msg: "此月已使用流量 ${value.used} , "
-                                  "剩余 ${value.rest} , 充值剩余 ${value.charged}"))
+                                  "剩余 ${value.rest} , 结账日期 ${value.charged}"))
                           .onError<EmptyPasswordException>((e, __) =>
                               Fluttertoast.showToast(msg: "您忘记输入账号密码了"))
                           //.onError<NoCaptchaException>((e, __) =>

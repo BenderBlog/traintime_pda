@@ -38,13 +38,15 @@ class SchoolnetSession extends NetworkSession {
     String charged = "";
     parse(page).getElementsByTagName("tr").forEach((value) {
       var tdList = value.getElementsByTagName("td");
-      if (tdList.length == 4) {
+      if (tdList.length == 7) {
+        print(tdList);
         // TODO: Bug detect here...
         String usedT = tdList[2].innerHtml;
         if (usedT.isNotEmpty) {
           ipList.add((tdList[0].innerHtml, tdList[1].innerHtml, usedT));
         }
-      } else if (tdList.length == 6) {
+      } else if (tdList.length == 4) {
+        print(tdList);
         used = tdList[1].innerHtml;
         rest = tdList[2].innerHtml;
         charged = tdList[3].innerHtml;
@@ -120,8 +122,7 @@ class SchoolnetSession extends NetworkSession {
               DigitCaptchaType.zfw, picture);
 
       if (verifycode == null) {
-        log.info(
-            '[SchoolnetSession] Captcha is impossible to be inferred.');
+        log.info('[SchoolnetSession] Captcha is impossible to be inferred.');
         retry++; // Do not count this try
         continue;
       }
