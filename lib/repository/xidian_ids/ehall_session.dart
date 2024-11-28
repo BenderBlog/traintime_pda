@@ -33,7 +33,7 @@ class EhallSession extends IDSSession {
 
   Future<bool> isLoggedIn() async {
     var response = await dioEhall.get(
-      "https://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json",
+      "https://ehall.xidian.edu.cn/jsonp/getAppUsageMonitor.json?type=uv",
     );
     log.info(
       "[ehall_session][isLoggedIn] "
