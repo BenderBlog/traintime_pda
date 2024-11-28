@@ -112,6 +112,7 @@ flutter:
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/Classtable-Empty.png
-    - assets/captcha-solver.tflite
+    - assets/captcha-solver-payment.tflite
+    - assets/captcha-solver-zfw.tflite
 #    - assets/flutter_i18n/zh_SG.json
 

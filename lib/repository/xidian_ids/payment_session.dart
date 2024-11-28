@@ -369,11 +369,19 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           )
           .then((data) => data.data);
 
-      String checkCode = retry == 1
+      String? checkCode = retry == 1
           ? captchaFunction != null
               ? await captchaFunction(picture)
               : throw CaptchaFailedException() // The last try
-          : await DigitCaptchaClientProvider.infer(picture);
+          : await DigitCaptchaClientProvider.infer(
+              DigitCaptchaType.payment, picture);
+
+      if (checkCode == null) {
+        log.info(
+            '[PaymentSession][getOwe] Captcha is impossible to be inferred.');
+        retry++; // Do not count this try
+        continue;
+      }
 
       log.info("[PaymentSession][getOwe] checkcode is $checkCode");
 
