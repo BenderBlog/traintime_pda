@@ -76,10 +76,11 @@ class _SportClassWindowState extends State<SportClassWindow>
                         initFormula: (toUse) => toUse,
                       )
                     : EmptyListView(
+                        type: Type.defaultimg,
                         text: FlutterI18n.translate(
-                        context,
-                        "sport.empty_class_info",
-                      ));
+                          context,
+                          "sport.empty_class_info",
+                        ));
               } else if (sportClass.value.situation ==
                   "sport.situation_fetching") {
                 return const CircularProgressIndicator().center();

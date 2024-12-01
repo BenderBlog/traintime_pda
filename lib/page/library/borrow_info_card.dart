@@ -27,13 +27,13 @@ class BorrowInfoCard extends StatelessWidget {
       CachedNetworkImage(
         imageUrl: LibrarySession.bookCover(toUse.isbn),
         placeholder: (context, url) => Image.asset(
-          "assets/Empty-Cover.jpg",
+          "assets/art/pda_empty_cover.jpg",
           width: 176 * 0.5,
           height: 250 * 0.5,
           fit: BoxFit.fitHeight,
         ),
         errorWidget: (context, url, error) => Image.asset(
-          "assets/Empty-Cover.jpg",
+          "assets/art/pda_empty_cover.jpg",
           width: 176 * 0.5,
           height: 250 * 0.5,
           fit: BoxFit.fitHeight,

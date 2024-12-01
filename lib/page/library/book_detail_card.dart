@@ -36,13 +36,13 @@ class _BookDetailCardState extends State<BookDetailCard> {
             CachedNetworkImage(
               imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
               placeholder: (context, url) => Image.asset(
-                "assets/Empty-Cover.jpg",
+                "assets/art/pda_empty_cover.jpg",
                 width: 120,
                 height: 150,
                 fit: BoxFit.fill,
               ),
               errorWidget: (context, url, error) => Image.asset(
-                "assets/Empty-Cover.jpg",
+                "assets/art/pda_empty_cover.jpg",
                 width: 120,
                 height: 150,
                 fit: BoxFit.fill,

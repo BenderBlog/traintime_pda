@@ -74,6 +74,7 @@ class BorrowListDetail extends StatelessWidget {
           );
         } else {
           return EmptyListView(
+            type: Type.reading,
             text: FlutterI18n.translate(
               context,
               "library.empty_borrow_list",

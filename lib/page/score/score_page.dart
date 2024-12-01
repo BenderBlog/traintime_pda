@@ -187,6 +187,7 @@ class _ScorePageState extends State<ScorePage> {
               );
             } else {
               return EmptyListView(
+                type: Type.defaultimg,
                 text: FlutterI18n.translate(
                   context,
                   "score.score_page.no_record",

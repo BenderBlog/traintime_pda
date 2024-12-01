@@ -25,13 +25,13 @@ class BookInfoCard extends StatelessWidget {
       CachedNetworkImage(
         imageUrl: LibrarySession.bookCover(toUse.isbn ?? ""),
         placeholder: (context, url) => Image.asset(
-          "assets/Empty-Cover.jpg",
+          "assets/art/pda_empty_cover.jpg",
           width: 176 * 0.6,
           height: 250 * 0.6,
           fit: BoxFit.fill,
         ),
         errorWidget: (context, url, error) => Image.asset(
-          "assets/Empty-Cover.jpg",
+          "assets/art/pda_empty_cover.jpg",
           width: 176 * 0.6,
           height: 250 * 0.6,
           fit: BoxFit.fill,

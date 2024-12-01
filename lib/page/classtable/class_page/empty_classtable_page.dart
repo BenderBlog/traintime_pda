@@ -10,6 +10,7 @@ class EmptyClasstablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => EmptyListView(
+        type: Type.writing,
         text: FlutterI18n.translate(
           context,
           "classtable.empty_class_message",

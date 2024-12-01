@@ -3,12 +3,32 @@
 
 import 'package:flutter/material.dart';
 
+enum Type {
+  reading,
+  writing,
+  defaultimg,
+}
+
 class EmptyListView extends StatelessWidget {
   final String text;
-  const EmptyListView({
+  final String assets;
+
+  static String _getAssets(Type type) {
+    switch (type) {
+      case Type.reading:
+        return "assets/art/pda_girl_reading.png";
+      case Type.writing:
+        return "assets/art/pda_girl_writing.png";
+      default:
+        return "assets/art/pda_girl_default.png";
+    }
+  }
+
+  EmptyListView({
     super.key,
     required this.text,
-  });
+    required Type type,
+  }) : assets = _getAssets(type);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +36,7 @@ class EmptyListView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Image.asset(
-          "assets/Empty-Cover.jpg",
+          assets,
           scale: 1.5,
         ),
         const Divider(color: Colors.transparent),

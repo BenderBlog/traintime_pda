@@ -39,22 +39,16 @@ class SchoolnetSession extends NetworkSession {
     parse(page).getElementsByTagName("tr").forEach((value) {
       var tdList = value.getElementsByTagName("td");
       if (tdList.length == 7) {
-        print(tdList);
-        // TODO: Bug detect here...
         String usedT = tdList[2].innerHtml;
         if (usedT.isNotEmpty) {
-          ipList.add((tdList[0].innerHtml, tdList[1].innerHtml, usedT));
+          ipList.add((tdList[1].innerHtml, tdList[3].innerHtml, usedT));
         }
       } else if (tdList.length == 4) {
-        print(tdList);
         used = tdList[1].innerHtml;
         rest = tdList[2].innerHtml;
         charged = tdList[3].innerHtml;
       }
     });
-    //for (var ip_info in ipList) {
-    //  print(ip_info);
-    //}
     return NetworkUsage(
       ipList: ipList,
       used: used,

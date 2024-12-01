@@ -166,6 +166,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
               return const Center(child: CircularProgressIndicator());
             } else if (search.value.isNotEmpty) {
               return EmptyListView(
+                type: Type.reading,
                 text: FlutterI18n.translate(
                   context,
                   "library.no_result",

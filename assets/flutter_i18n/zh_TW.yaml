@@ -263,6 +263,7 @@ homepage:
     experiment: 物理實驗
     score: 成績查詢
     sport: 體育資訊
+    schoolnet: 網路查詢
     toolbox: 其他功能
     score_cannot_reach: 離線狀態且無快取成績資料，無法訪問
     exam_fetching: 請稍候，正在獲取考試資訊
@@ -317,6 +318,23 @@ login:
     hint: 輸入驗證碼
     message_on_empty: 請輸入驗證碼
   slider_title: 伺服器認證服務
+school_net:
+  dialog_title: 校園網使用詳情
+  basic_message: '此月已使用流量 {used} ,剩餘 {rest} , 結賬日期 {charged}
+
+    詳細資訊如下
+
+    '
+  detail_message: 'IP 地址：{ip}
+
+    上線時間：{time}
+
+    已經使用流量：{amount}
+
+    '
+  empty_password: 您忘記輸入賬號密碼了
+  error_fetch: 獲取失敗：{msg}
+  error_other: 其他錯誤：{msg}
 school_card_window:
   title: 校園卡流水資訊
   income: 支出 {income}
@@ -397,6 +415,8 @@ setting:
   electricity_password_setting: 電費帳號密碼設定
   electricity_password_description: 非 123456 請設定
   electricity_account_setting: 電費賬號設定
+  schoolnet_password_setting: 校園網帳號密碼設定
+  schoolnet_password_description: 不設定檢視不了網費
   classtable_setting: 課表相關設定
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面
@@ -457,6 +477,7 @@ setting:
   change_password_dialog:
     input_hint: 請在此輸入密碼
     blank_input: 輸入空白!
+  change_schoolnet_password_title: 修改校園網查詢帳號密碼
   update_dialog:
     new_version: 新版本釋出
     not_now: 暫不更新

@@ -10,6 +10,7 @@ dependencies:
   dio: ^5.0.0
   crypto: ^3.0.2
   encrypt: ^5.0.1
+  pointycastle: ^3.9.1
   talker_flutter: ^4.4.1
   talker_dio_logger: ^4.4.1
   tflite_flutter: ^0.11.0
@@ -104,14 +105,17 @@ flutter_native_splash:
 flutter:
   uses-material-design: true
   assets:
-    - assets/Icon-App-iTunes.png
-    - assets/Empty-Cover.jpg
     - assets/icon.png
-    - assets/CP1919.svg.vec
     - assets/Icon-App-iTunes-Background.png
+    - assets/Icon-App-iTunes.png
+    - assets/art/pda_empty_cover.jpg
+    - assets/art/pda_classtable_empty.png
+    - assets/art/pda_girl_reading.png
+    - assets/art/pda_girl_writing.png
+    - assets/art/pda_girl_default.png
+    - assets/art/CP1919.svg.vec
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
-    - assets/Classtable-Empty.png
     - assets/captcha-solver-payment.tflite
     - assets/captcha-solver-zfw.tflite
 #    - assets/flutter_i18n/zh_SG.json

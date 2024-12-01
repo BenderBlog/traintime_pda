@@ -25,6 +25,7 @@ class NoArrangedInfo extends StatelessWidget {
       body: Builder(builder: (context) {
         if (list.isEmpty) {
           return EmptyListView(
+            type: Type.writing,
             text: FlutterI18n.translate(
               context,
               "exam.no_arrangement.all_arranged",

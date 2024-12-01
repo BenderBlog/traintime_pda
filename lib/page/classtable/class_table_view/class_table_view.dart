@@ -81,7 +81,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             children: [
               SizedBox(height: blockheight(8)),
               Image.asset(
-                "assets/Classtable-Empty.png",
+                "assets/art/pda_classtable_empty.png",
                 scale: 2,
               ),
               const SizedBox(height: 20),

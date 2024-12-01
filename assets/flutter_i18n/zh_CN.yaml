@@ -280,6 +280,7 @@ homepage:
         experiment: "物理实验"
         score: "成绩查询"
         sport: "体育信息"
+        schoolnet: "网络查询"
         toolbox: "其他功能"
         score_cannot_reach: "脱机状态且无缓存成绩数据，无法访问"
         exam_fetching: "请稍候，正在获取考试信息"
@@ -336,6 +337,19 @@ login:
         hint: "输入验证码"
         message_on_empty: "请输入验证码"
     slider_title: "服务器认证服务"
+
+# 校园网信息
+school_net:
+    dialog_title: "校园网使用详情"
+    basic_message: "此月已使用流量 {used} ,剩余 {rest} , 结账日期 {charged}\n详细信息如下\n"
+    detail_message: |
+        IP 地址：{ip}
+        上线时间：{time}
+        已经使用流量：{amount}
+
+    empty_password: "您忘记输入账号密码了"
+    error_fetch: "获取失败：{msg}"
+    error_other: "其他错误：{msg}"
 
 # 校园卡流水
 school_card_window:
@@ -424,6 +438,8 @@ setting:
     electricity_password_setting: "电费帐号密码设置"
     electricity_password_description: "非 123456 请设置"
     electricity_account_setting: "电费账号设置"
+    schoolnet_password_setting: "校园网帐号密码设置"
+    schoolnet_password_description: "不设置查看不了网费"
     # 课表相关设置
     classtable_setting: "课表相关设置"
     background: "开启课表背景图"
@@ -487,6 +503,7 @@ setting:
     change_password_dialog:
         input_hint: "请在此输入密码"
         blank_input: "输入空白!"
+    change_schoolnet_password_title: "修改校园网查询帐号密码"
     update_dialog:
         new_version: "新版本发布"
         not_now: "暂不更新"
