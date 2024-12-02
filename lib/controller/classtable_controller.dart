@@ -207,10 +207,8 @@ class ClassTableController extends GetxController {
   }
 
   /// The start day of the semester.
-  DateTime get startDay {
-    return DateTime.parse(classTableData.termStartDay).add(
-        Duration(days: 7 * preference.getInt(preference.Preference.swift)));
-  }
+  DateTime get startDay => DateTime.parse(classTableData.termStartDay)
+      .add(Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
   Future<void> updateClassTable({
     bool isForce = false,

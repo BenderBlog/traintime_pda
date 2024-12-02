@@ -88,7 +88,7 @@ class DigitCaptchaClientProvider {
       }
 
       // Align with the size of payment captcha
-      img.Image result = new img.Image(
+      img.Image result = img.Image(
           width: 200, height: 80, format: img.Format.float32, numChannels: 1);
       for (int x = 0; x < result.width; x++) {
         for (int y = 0; y < result.height; y++) {

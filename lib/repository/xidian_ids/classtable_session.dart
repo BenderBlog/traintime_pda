@@ -115,6 +115,7 @@ class ClassTableFile extends EhallSession {
     int weekDay = now.weekday - 1;
     String termStartDay = Jiffy.parseFromDateTime(now)
         .add(weeks: 1 - int.parse(currentWeek), days: -weekDay)
+        .startOf(Unit.day)
         .format(pattern: "yyyy-MM-dd HH:mm:ss");
 
     if (preference.getString(preference.Preference.currentStartDay) !=
