@@ -360,19 +360,29 @@ class _ClassTablePageState extends State<ClassTablePage> {
                     final box = context.findRenderObject() as RenderBox?;
                     switch (action) {
                       case 'A':
+                        var notArranged = ClassTableState.of(context)!
+                            .controllers
+                            .notArranged;
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (BuildContext context) {
-                              return const NotArrangedClassList();
+                              return NotArrangedClassList(
+                                notArranged: notArranged,
+                              );
                             },
                           ),
                         );
                         break;
                       case 'B':
+                        var classChange = ClassTableState.of(context)!
+                            .controllers
+                            .classChange;
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (BuildContext context) {
-                              return const ClassChangeList();
+                              return ClassChangeList(
+                                classChanges: classChange,
+                              );
                             },
                           ),
                         );

@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 
 /// A new page to show the class without time arrangement.
 
 class NotArrangedClassList extends StatelessWidget {
-  const NotArrangedClassList({super.key});
+  final List<NotArrangementClassDetail> notArranged;
+  const NotArrangedClassList({
+    super.key,
+    required this.notArranged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final List<NotArrangementClassDetail> notArranged =
-        ClassTableState.of(context)!.controllers.notArranged;
-
     return Scaffold(
         appBar: AppBar(
           title: Text(FlutterI18n.translate(
