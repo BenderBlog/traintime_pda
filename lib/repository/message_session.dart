@@ -53,28 +53,30 @@ Future<void> checkMessage() => messageLock.synchronized(() async {
       // Add cache.
     });
 
-Future<bool?> checkUpdate() =>
-    updateLock.synchronized(() => dio.get("$url/version.json").then((data) {
-          updateMessage.value = UpdateMessage.fromJson(data.data);
-          List<int> versionCode = updateMessage.value!.code
-              .split('.')
-              .map((value) => int.parse(value))
-              .toList();
-          List<int> localCode = pref.packageInfo.version
-              .split('.')
-              .map((value) => int.parse(value))
-              .toList();
-          bool? isNewAvaliable = false;
-          for (int i = 0;
-              i < math.min(versionCode.length, localCode.length);
-              i++) {
-            if (versionCode[i] > localCode[i]) {
-              isNewAvaliable = true;
-              break;
-            } else if (versionCode[i] < localCode[i]) {
-              isNewAvaliable = null;
-              break;
-            }
+Future<bool?> checkUpdate() => updateLock.synchronized<bool?>(() async {
+      updateMessage.value = null;
+      return dio.get("$url/version.json").then((data) {
+        updateMessage.value = UpdateMessage.fromJson(data.data);
+        List<int> versionCode = updateMessage.value!.code
+            .split('.')
+            .map((value) => int.parse(value))
+            .toList();
+        List<int> localCode = pref.packageInfo.version
+            .split('.')
+            .map((value) => int.parse(value))
+            .toList();
+        bool? isNewAvaliable = false;
+        for (int i = 0;
+            i < math.min(versionCode.length, localCode.length);
+            i++) {
+          if (versionCode[i] > localCode[i]) {
+            isNewAvaliable = true;
+            break;
+          } else if (versionCode[i] < localCode[i]) {
+            isNewAvaliable = null;
+            break;
           }
-          return isNewAvaliable;
-        }));
+        }
+        return isNewAvaliable;
+      });
+    });

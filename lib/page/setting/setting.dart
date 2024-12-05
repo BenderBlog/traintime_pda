@@ -167,15 +167,14 @@ class _SettingWindowState extends State<SettingWindow> {
                     ),
                   ),
                   onTap: () {
-                    ProgressDialog pd = ProgressDialog(context: context);
-                    pd.show(
+                    showToast(
+                      context: context,
                       msg: FlutterI18n.translate(
                         context,
                         "setting.fetching_update",
                       ),
                     );
                     checkUpdate().then((value) async {
-                      pd.close();
                       if (context.mounted) {
                         if ((value ?? false) && updateMessage.value != null) {
                           await showDialog(
@@ -199,7 +198,6 @@ class _SettingWindowState extends State<SettingWindow> {
                         }
                       }
                     }, onError: (e, s) {
-                      pd.close();
                       if (context.mounted) {
                         showToast(
                           context: context,
