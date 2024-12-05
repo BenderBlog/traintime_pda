@@ -8,18 +8,21 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/wheel_choser.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
 
 class ClassAddWindow extends StatefulWidget {
   final (ClassDetail, TimeArrangement)? toChange;
-  const ClassAddWindow({super.key, this.toChange});
+  final int semesterLength;
+  const ClassAddWindow({
+    super.key,
+    this.toChange,
+    required this.semesterLength,
+  });
 
   @override
   State<ClassAddWindow> createState() => _ClassAddWindowState();
 }
 
 class _ClassAddWindowState extends State<ClassAddWindow> {
-  late final ClassTableWidgetState controller;
   late List<bool> chosenWeek;
   late TextEditingController classNameController;
   late TextEditingController teacherNameController;
@@ -37,13 +40,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    controller = ClassTableState.of(context)!.controllers;
+    //controller = ClassTableState.of(context)!.controllers;
     if (widget.toChange == null) {
       classNameController = TextEditingController();
       teacherNameController = TextEditingController();
       classRoomController = TextEditingController();
       chosenWeek = List<bool>.generate(
-        controller.semesterLength,
+        widget.semesterLength,
         (index) => false,
       );
       week = 1;
@@ -123,48 +126,42 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ),
                 );
               } else if (widget.toChange == null) {
-                await controller
-                    .addUserDefinedClass(
-                        ClassDetail(name: classNameController.text),
-                        TimeArrangement(
-                          source: Source.user,
-                          index: -1,
-                          teacher: teacherNameController.text.isNotEmpty
-                              ? teacherNameController.text
-                              : null,
-                          classroom: classRoomController.text.isNotEmpty
-                              ? classRoomController.text
-                              : null,
-                          weekList: chosenWeek,
-                          day: week,
-                          start: start,
-                          stop: stop,
-                        ))
-                    .then((value) {
-                  if (context.mounted) Navigator.of(context).pop();
-                });
+                Navigator.of(context).pop((
+                  ClassDetail(name: classNameController.text),
+                  TimeArrangement(
+                    source: Source.user,
+                    index: -1,
+                    teacher: teacherNameController.text.isNotEmpty
+                        ? teacherNameController.text
+                        : null,
+                    classroom: classRoomController.text.isNotEmpty
+                        ? classRoomController.text
+                        : null,
+                    weekList: chosenWeek,
+                    day: week,
+                    start: start,
+                    stop: stop,
+                  )
+                ));
               } else {
-                await controller
-                    .editUserDefinedClass(
-                        widget.toChange!.$2,
-                        ClassDetail(name: classNameController.text),
-                        TimeArrangement(
-                          source: Source.user,
-                          index: widget.toChange!.$2.index,
-                          teacher: teacherNameController.text.isNotEmpty
-                              ? teacherNameController.text
-                              : null,
-                          classroom: classRoomController.text.isNotEmpty
-                              ? classRoomController.text
-                              : null,
-                          weekList: chosenWeek,
-                          day: week,
-                          start: start,
-                          stop: stop,
-                        ))
-                    .then((value) {
-                  if (context.mounted) Navigator.of(context).pop();
-                });
+                Navigator.of(context).pop((
+                  widget.toChange!.$2,
+                  ClassDetail(name: classNameController.text),
+                  TimeArrangement(
+                    source: Source.user,
+                    index: widget.toChange!.$2.index,
+                    teacher: teacherNameController.text.isNotEmpty
+                        ? teacherNameController.text
+                        : null,
+                    classroom: classRoomController.text.isNotEmpty
+                        ? classRoomController.text
+                        : null,
+                    weekList: chosenWeek,
+                    day: week,
+                    start: start,
+                    stop: stop,
+                  )
+                ));
               }
             },
             child: Text(FlutterI18n.translate(
@@ -257,7 +254,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 crossAxisSpacing: 4,
                 maxCrossAxisExtent: 30,
                 children: List.generate(
-                  controller.semesterLength,
+                  widget.semesterLength,
                   (index) => weekDoc(index: index),
                 ),
               ),

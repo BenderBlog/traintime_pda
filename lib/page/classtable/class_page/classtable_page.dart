@@ -8,6 +8,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
@@ -388,13 +389,28 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         );
                         break;
                       case 'C':
-                        Navigator.of(context).push(
+                        int semesterLength = ClassTableState.of(context)!
+                            .controllers
+                            .semesterLength;
+                        (ClassDetail, TimeArrangement)? data =
+                            await Navigator.of(context)
+                                .push<(ClassDetail, TimeArrangement)>(
                           MaterialPageRoute(
                             builder: (BuildContext context) {
-                              return const ClassAddWindow();
+                              return ClassAddWindow(
+                                semesterLength: semesterLength,
+                              );
                             },
                           ),
                         );
+                        if (context.mounted && data != null) {
+                          await ClassTableState.of(context)!
+                              .controllers
+                              .addUserDefinedClass(
+                                data.$1,
+                                data.$2,
+                              );
+                        }
                         break;
                       case 'D':
                       case 'E':

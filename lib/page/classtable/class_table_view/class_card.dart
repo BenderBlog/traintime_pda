@@ -4,8 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -52,9 +54,13 @@ class ClassCard extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       overlayColor: Colors.transparent,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      var controller = ClassTableState.of(context)!.controllers;
+
                       /// The way to show the class info of the period.
-                      BothSideSheet.show(
+                      /// The last one indicate whether to delete this stuff.
+                      (ClassDetail, TimeArrangement, bool)? toUse =
+                          await BothSideSheet.show(
                         title: FlutterI18n.translate(
                           context,
                           "classtable.class_card.title",
@@ -78,6 +84,31 @@ class ClassCard extends StatelessWidget {
                         ),
                         context: context,
                       );
+                      print(toUse);
+                      if (context.mounted && toUse != null) {
+                        if (toUse.$3) {
+                          await ClassTableState.of(context)!
+                              .controllers
+                              .deleteUserDefinedClass(toUse.$2);
+                        } else {
+                          await Navigator.of(context)
+                              .push(
+                                MaterialPageRoute(
+                                  builder: (context) => ClassAddWindow(
+                                    toChange: (toUse.$1, toUse.$2),
+                                    semesterLength: controller.semesterLength,
+                                  ),
+                                ),
+                              )
+                              .then(
+                                (value) => controller.editUserDefinedClass(
+                                  value.$1,
+                                  value.$2,
+                                  value.$3,
+                                ),
+                              );
+                        }
+                      }
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

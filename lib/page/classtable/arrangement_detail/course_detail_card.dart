@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// A dialog/card shows the class detail / time arrangement.
 class ClassDetailCard extends StatelessWidget {
@@ -151,14 +149,11 @@ class ClassDetailCard extends StatelessWidget {
                   children: [
                     TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ClassAddWindow(
-                                toChange: (classDetail, timeArrangement),
-                              ),
-                            ),
-                          );
+                          Navigator.of(context).pop((
+                            classDetail,
+                            timeArrangement,
+                            false,
+                          ));
                         },
                         child: Text(
                           FlutterI18n.translate(
@@ -208,12 +203,11 @@ class ClassDetailCard extends StatelessWidget {
                             ),
                           );
                           if (context.mounted && isContinue == true) {
-                            await ClassTableState.of(context)!
-                                .controllers
-                                .deleteUserDefinedClass(timeArrangement)
-                                .then((value) {
-                              if (context.mounted) Navigator.pop(context);
-                            });
+                            Navigator.of(context).pop((
+                              classDetail,
+                              timeArrangement,
+                              true,
+                            ));
                           }
                         },
                         child: Text(
