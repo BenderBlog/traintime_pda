@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 enum Type {
   reading,
-  writing,
   defaultimg,
 }
 
@@ -17,8 +16,6 @@ class EmptyListView extends StatelessWidget {
     switch (type) {
       case Type.reading:
         return "assets/art/pda_girl_reading.png";
-      case Type.writing:
-        return "assets/art/pda_girl_writing.png";
       default:
         return "assets/art/pda_girl_default.png";
     }

@@ -95,13 +95,13 @@ class _AboutPageState extends State<AboutPage> {
           "https://space.bilibili.com/49892391/",
         ),
         Developer(
-          "Elliot",
+          "Elliot（西电紫鼠球）",
           "https://img.moegirl.org.cn/common/thumb/6/64/Hirasawa_yui_1.jpg/800px-Hirasawa_yui_1.jpg",
           FlutterI18n.translate(
             context,
             "setting.about_page.elliot",
           ),
-          "https://www.bilibili.com/bangumi/play/ss1172/",
+          "https://mp.weixin.qq.com/s/_egmj3rjwOTAB-KHzKsYGw",
         ),
         Developer(
           "GodHu777777",
@@ -248,6 +248,15 @@ class _AboutPageState extends State<AboutPage> {
           "https://xiue233.github.io/",
         ),
         Developer(
+          "xizi",
+          "https://static.wikia.nocookie.net/chiikawa/images/c/c3/Hachi_main.png/revision/latest?cb=20231016011752&path-prefix=zh",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.xizi",
+          ),
+          "https://www.bilibili.com/video/BV1Rg4y1x7su/",
+        ),
+        Developer(
           "wirsbf",
           "https://avatars.githubusercontent.com/u/144008530",
           FlutterI18n.translate(
@@ -324,7 +333,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget get _developerList => ReXCard(
         title: Text(
-          "${getDevelopers().length} people with a suspicious check-in status",
+          "Made with love from ${getDevelopers().length} people",
         ).padding(bottom: 8).center(),
         remaining: const [],
         bottomRow: Wrap(

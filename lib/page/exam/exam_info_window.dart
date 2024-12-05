@@ -132,7 +132,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
               ).safeArea();
             } else {
               return EmptyListView(
-                type: Type.writing,
+                type: Type.reading,
                 text: FlutterI18n.translate(
                   context,
                   "exam.no_exam_arrangement",

@@ -28,7 +28,7 @@ class NotArrangedClassList extends StatelessWidget {
         body: Builder(builder: (context) {
           if (notArranged.isEmpty) {
             return EmptyListView(
-              type: Type.writing,
+              type: Type.reading,
               text: FlutterI18n.translate(
                 context,
                 "classtable.not_arranged_page.empty_message",

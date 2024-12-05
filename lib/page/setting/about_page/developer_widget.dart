@@ -46,27 +46,13 @@ class DeveloperWidget extends StatelessWidget {
           )
         ],
       )),
-      child: Stack(
-        alignment: AlignmentDirectional.topEnd,
-        children: [
-          CachedNetworkImage(
-            fit: BoxFit.fitHeight,
-            imageUrl: developer.imageUrl,
-          ).clipOval().constrained(
-                width: 48,
-                height: 48,
-              ),
-          const Icon(
-            Icons.priority_high_rounded,
-            color: Colors.white,
-            size: 12,
-          )
-              .center()
-              .backgroundColor(Colors.red)
-              .clipOval()
-              .constrained(width: 16, height: 16),
-        ],
-      ),
+      child: CachedNetworkImage(
+        fit: BoxFit.fitHeight,
+        imageUrl: developer.imageUrl,
+      ).clipOval().constrained(
+            width: 48,
+            height: 48,
+          ),
     );
   }
 }

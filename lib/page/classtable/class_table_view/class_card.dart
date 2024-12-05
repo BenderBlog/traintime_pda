@@ -84,7 +84,6 @@ class ClassCard extends StatelessWidget {
                         ),
                         context: context,
                       );
-                      print(toUse);
                       if (context.mounted && toUse != null) {
                         if (toUse.$3) {
                           await ClassTableState.of(context)!

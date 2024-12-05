@@ -39,31 +39,15 @@ class _LoginWindowState extends State<LoginWindow> {
   final double roundRadius = 36;
 
   /// Variables of the input textfield
-  final Color _inputFieldBackgroundColor =
-      const Color.fromRGBO(250, 250, 250, 1);
-  final Color _inputFieldColor = const Color.fromRGBO(35, 62, 99, 0.35);
-  final double _inputFieldIconSize = 28;
-  final double _inputFieldFontSize = 20;
   InputDecoration _inputDecoration({
     required IconData iconData,
     required String hintText,
     Widget? suffixIcon,
   }) =>
       InputDecoration(
-        border: InputBorder.none,
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        prefixIcon: Icon(
-          iconData,
-          size: _inputFieldIconSize,
-          color: _inputFieldColor,
-        ),
-        hintStyle: TextStyle(
-          fontSize: _inputFieldFontSize,
-          color: _inputFieldColor,
-        ),
+        prefixIcon: Icon(iconData),
         hintText: hintText,
         suffixIcon: suffixIcon,
-        fillColor: _inputFieldBackgroundColor,
       );
 
   /// Can I see the password?
@@ -78,37 +62,17 @@ class _LoginWindowState extends State<LoginWindow> {
               iconData: MingCuteIcons.mgc_user_3_fill,
               hintText: FlutterI18n.translate(context, "login.identity_number"),
             ),
-            style: TextStyle(
-              fontSize: _inputFieldFontSize,
-              color: _inputFieldColor,
-            ),
-          ).center().padding(horizontal: 12).decorated(
-            color: _inputFieldBackgroundColor,
-            borderRadius: BorderRadius.circular(roundRadius),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(19),
-                offset: const Offset(0, 2),
-                blurRadius: 1,
-              ),
-            ],
-          ).height(64),
+          ).center(),
           const SizedBox(height: 16.0),
           TextField(
             controller: _idsPasswordController,
             obscureText: _couldNotView,
-            style: TextStyle(
-              fontSize: _inputFieldFontSize,
-              color: _inputFieldColor,
-            ),
             decoration: _inputDecoration(
               iconData: MingCuteIcons.mgc_safe_lock_fill,
               hintText: FlutterI18n.translate(context, "login.password"),
               suffixIcon: IconButton(
                 icon: Icon(
                   _couldNotView ? Icons.visibility : Icons.visibility_off,
-                  size: _inputFieldIconSize,
-                  color: _inputFieldColor,
                 ),
                 onPressed: () {
                   setState(() {
@@ -117,27 +81,12 @@ class _LoginWindowState extends State<LoginWindow> {
                 },
               ),
             ),
-          ).center().padding(horizontal: 12).decorated(
-            color: _inputFieldBackgroundColor,
-            borderRadius: BorderRadius.circular(roundRadius),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(19),
-                offset: const Offset(0, 2),
-                blurRadius: 1,
-              ),
-            ],
-          ).height(64),
+          ).center(),
           SizedBox(height: width / height > 1.0 ? 16.0 : 64.0),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              padding: const EdgeInsets.all(12.0),
               minimumSize: const Size(double.infinity, 56),
               maximumSize: const Size(double.infinity, 64),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(roundRadius),
-              ),
             ),
             child: Text(
               FlutterI18n.translate(context, "login.login"),
