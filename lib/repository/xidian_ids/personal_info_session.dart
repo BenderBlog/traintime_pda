@@ -71,15 +71,15 @@ class PersonalInfoSession extends EhallSession {
     if (onlyPhone == false) {
       preference.setString(
         preference.Preference.execution,
-        detailed["performance"][0]["CONTENT"][4]["CAPTION"],
+        "", //detailed["performance"][0]["CONTENT"][4]["CAPTION"],
       );
       preference.setString(
         preference.Preference.institutes,
-        detailed["performance"][0]["CONTENT"][2]["CAPTION"],
+        "", //detailed["performance"][0]["CONTENT"][2]["CAPTION"],
       );
       preference.setString(
         preference.Preference.subject,
-        detailed["performance"][0]["CONTENT"][3]["CAPTION"],
+        "", //detailed["performance"][0]["CONTENT"][3]["CAPTION"],
       );
       preference.setString(
         preference.Preference.dorm,
