@@ -23,7 +23,7 @@ class SplitPagePlaceholder extends StatelessWidget {
           ).constrained(maxWidth: 300);
         } else {
           return SvgPicture(
-            const AssetBytesLoader("assets/CP1919.svg.vec"),
+            const AssetBytesLoader("assets/art/CP1919.svg.vec"),
             colorFilter: ColorFilter.mode(
               Theme.of(context).colorScheme.primary,
               BlendMode.srcIn,
