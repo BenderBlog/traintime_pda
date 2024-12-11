@@ -320,9 +320,11 @@ login:
   slider_title: 伺服器認證服務
 school_net:
   dialog_title: 校園網使用詳情
+  fetching: 正在獲取校園網資訊
   basic_message: '此月已使用流量 {used} ,剩餘 {rest} , 結賬日期 {charged}
 
-    詳細資訊如下
+
+    當前線上裝置如下：
 
     '
   detail_message: 'IP 地址：{ip}

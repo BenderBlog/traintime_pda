@@ -341,7 +341,8 @@ login:
 # 校园网信息
 school_net:
     dialog_title: "校园网使用详情"
-    basic_message: "此月已使用流量 {used} ,剩余 {rest} , 结账日期 {charged}\n详细信息如下\n"
+    fetching: "正在获取校园网信息"
+    basic_message: "此月已使用流量 {used} ,剩余 {rest} , 结账日期 {charged}\n\n当前在线设备如下：\n"
     detail_message: |
         IP 地址：{ip}
         上线时间：{time}
