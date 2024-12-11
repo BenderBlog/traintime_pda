@@ -106,7 +106,7 @@ class _EmptyClassroomSearchWindowState
             ? Text(
                 index.toString(),
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   fontSize: 12,
                   color: isUsed
                       ? Theme.of(context).colorScheme.onPrimary
@@ -116,7 +116,7 @@ class _EmptyClassroomSearchWindowState
             : null,
       ).decorated(
         border: Border.all(
-          width: 2,
+          width: 1,
           color: Theme.of(context).colorScheme.primary,
         ),
         borderRadius: BorderRadius.circular(6),

@@ -191,8 +191,8 @@ class _SettingWindowState extends State<SettingWindow> {
                             msg: FlutterI18n.translate(
                               context,
                               value == null
-                                  ? "setting.current_stable"
-                                  : "setting.current_testing",
+                                  ? "setting.current_testing"
+                                  : "setting.current_stable",
                             ),
                           );
                         }
