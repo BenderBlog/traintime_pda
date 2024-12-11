@@ -77,18 +77,16 @@ class SchoolnetCard extends StatelessWidget {
               ),
             );
           }
-        }).onError<EmptyPasswordException>((e, __) {
+        }).onError((e, __) {
           if (context.mounted) {
-            Fluttertoast.showToast(
-              msg: FlutterI18n.translate(
-                context,
-                "school_net.empty_password",
-              ),
-            );
-          }
-        }).onError<NotInitalizedException>(
-          (e, __) {
-            if (context.mounted) {
+            if (e.toString() == "EmptyPasswordException") {
+              Fluttertoast.showToast(
+                msg: FlutterI18n.translate(
+                  context,
+                  "school_net.empty_password",
+                ),
+              );
+            } else if (e is NotInitalizedException) {
               Fluttertoast.showToast(
                 msg: FlutterI18n.translate(
                   context,
@@ -98,19 +96,17 @@ class SchoolnetCard extends StatelessWidget {
                   },
                 ),
               );
+            } else {
+              Fluttertoast.showToast(
+                msg: FlutterI18n.translate(
+                  context,
+                  "school_net.error_other",
+                  translationParams: {
+                    "msg": e.toString(),
+                  },
+                ),
+              );
             }
-          },
-        ).onError((e, __) {
-          if (context.mounted) {
-            Fluttertoast.showToast(
-              msg: FlutterI18n.translate(
-                context,
-                "school_net.error_other",
-                translationParams: {
-                  "msg": e.toString(),
-                },
-              ),
-            );
           }
         });
       },
