@@ -71,7 +71,17 @@ class _EmptyClassroomSearchWindowState
 
   @override
   void initState() {
-    chosen = widget.places.first;
+    String lastchosenClassroom = preference.getString(
+      preference.Preference.emptyClassroomLastChoice,
+    );
+    EmptyClassroomPlace? toGet;
+    if (lastchosenClassroom.isNotEmpty) {
+      for (var i in widget.places) {
+        if (i.code == lastchosenClassroom) toGet = i;
+      }
+    }
+    toGet ??= widget.places.first;
+    chosen = toGet;
     time = DateTime.now();
     updateData();
     super.initState();
@@ -128,6 +138,10 @@ class _EmptyClassroomSearchWindowState
                       if (value != null) {
                         setState(() {
                           chosen = value;
+                          preference.setString(
+                            preference.Preference.emptyClassroomLastChoice,
+                            chosen.code,
+                          );
                           updateData();
                         });
                       }
@@ -252,7 +266,7 @@ class _EmptyClassroomSearchWindowState
                   context,
                   "empty_classroom.classroom",
                 )).center(),
-                size: ColumnSize.S,
+                fixedWidth: 100,
               ),
               DataColumn2(
                 label: const Text('1-4').center(),
