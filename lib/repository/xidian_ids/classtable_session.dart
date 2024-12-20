@@ -586,6 +586,7 @@ class ClassTableFile extends EhallSession {
                 listEquals(
                     f.originalAffectedWeeksList, e.newAffectedWeeksList) &&
                 f.originalWeek == e.newWeek &&
+                f.originalClassroom == e.newClassroom &&
                 f.originalTeacherData == e.newTeacherData) {
               flag = true;
               toRemove = f;
