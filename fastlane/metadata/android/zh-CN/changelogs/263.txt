@@ -1,0 +1,4 @@
+1. 校园网查询 @BenderBlog @stalomeow
+2. 修复某些状态下无法登录
+3. 修复课程表和调课信息处理方面的很多错误
+4. 更换插图，保证可爱以及开源 @BenderBlog @LichtYy @ZCWzy

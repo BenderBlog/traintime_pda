@@ -1,0 +1,4 @@
+1. Schoolnet query dialog @BenderBlog @stalomeow
+2. Fix: Unable to login in some cases.
+3. Fix: Lots of stuff in classtable and class change.
+4. Change assets with more cute and foss stuff @BenderBlog @LichtYy @ZCWzy
