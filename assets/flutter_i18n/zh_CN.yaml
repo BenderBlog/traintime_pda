@@ -102,15 +102,13 @@ classtable:
         "7": "日"
         change_class_message: 调课信息，从第{originalAffectedWeeks}周
             星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
-            调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的
-            {newClassRangeStart}-{newClassRangeStop}节，{newClassroom}教室上课
+            调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，{newClassroom}教室上课
         patch_class_message: 补课信息，第{newAffectedWeeksListStr}周
             星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，
             {newClassroom}补课
         stop_class_message: 停课信息，第{originalAffectedWeeks}周
-            星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
-            {originalClassroom}停课
-        class_info: "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}\n{teacherChange}"
+            星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节停课
+        class_info: "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}{teacherChange}"
     not_arranged_page:
         title: "没有时间安排的科目"
         empty_message: "目前全部课程均有时间安排"

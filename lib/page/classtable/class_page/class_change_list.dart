@@ -104,7 +104,9 @@ class ClassChangeList extends StatelessWidget {
                         "newClassRangeStart":
                             toShow.newClassRange[0].toString(),
                         "newClassRangeStop": toShow.newClassRange[1].toString(),
-                        "newClassroom": toShow.newClassroom.toString(),
+                        "newClassroom":
+                            (toShow.newClassroom ?? toShow.originalClassroom)
+                                .toString(),
                       });
                   break;
                 case ChangeType.patch:
@@ -141,10 +143,10 @@ class ClassChangeList extends StatelessWidget {
                       translationParams: {
                         "classCode": classChanges[index].classCode,
                         "classNumber": classChanges[index].classNumber,
-                        "classChange": classChange,
+                        "classChange": classChange.replaceAll(" ", ''),
                         "teacherChange":
                             classChanges[index].type == ChangeType.change
-                                ? teacherChange
+                                ? "\n$teacherChange"
                                 : "",
                       }),
                 ),

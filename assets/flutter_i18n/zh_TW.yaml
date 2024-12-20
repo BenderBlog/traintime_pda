@@ -84,16 +84,13 @@ classtable:
     '6': 六
     '7': 日
     change_class_message: 調課資訊，從第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
-      調整為第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的 {newClassRangeStart}-{newClassRangeStop}節，{newClassroom}教室上課
+      調整為第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，{newClassroom}教室上課
     patch_class_message: 補課資訊，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，
       {newClassroom}補課
-    stop_class_message: 停課資訊，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
-      {originalClassroom}停課
+    stop_class_message: 停課資訊，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課
     class_info: '編號: {classCode} | {classNumber} 班
 
-      安排變更：{classChange}
-
-      {teacherChange}'
+      安排變更：{classChange}{teacherChange}'
   not_arranged_page:
     title: 沒有時間安排的科目
     empty_message: 目前全部課程均有時間安排
