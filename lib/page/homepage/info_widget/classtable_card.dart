@@ -10,7 +10,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:timelines/timelines.dart';
+import 'package:timelines_plus/timelines_plus.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';

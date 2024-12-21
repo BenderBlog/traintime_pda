@@ -59,7 +59,7 @@ dependencies:
   file_picker: ^8.0.3
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.1
-  timelines: ^0.1.0
+  timelines_plus: ^1.0.4
   based_split_view: ^1.2.0
   disclosure: ^2.2.0
   content_resolver: ^0.3.1
