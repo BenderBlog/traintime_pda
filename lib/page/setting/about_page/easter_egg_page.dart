@@ -18,9 +18,9 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  final String urlApple = "https://www.bilibili.com/video/BV1wA411Y7AM/";
+  final String urlApple = "https://www.bilibili.com/video/BV1Ab411T7TB/?p=2";
 
-  final String urlOthers = "https://www.bilibili.com/video/BV13T41177zn/";
+  final String urlOthers = "https://www.bilibili.com/video/BV1Cs411272t/";
 
   @override
   Widget build(BuildContext context) {
