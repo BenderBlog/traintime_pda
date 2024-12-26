@@ -16,15 +16,19 @@ class Subject {
   String place;
   String? seat;
 
-  static RegExp timeRegExp = RegExp(
+  static RegExp timeRegExpUnderGraduate = RegExp(
     r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})',
+  );
+  static RegExp timeRegExpPostGraduate = RegExp(
+    r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (.{3})\((?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})\)',
   );
 
   @override
   String toString() => "$subject $typeStr $type $time $place $seat\n";
 
   Jiffy? get startTime {
-    RegExpMatch? match = timeRegExp.firstMatch(time);
+    RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
+        timeRegExpPostGraduate.firstMatch(time);
     if (match == null) return null;
 
     return Jiffy.parseFromDateTime(DateTime(
@@ -37,7 +41,8 @@ class Subject {
   }
 
   Jiffy? get stopTime {
-    RegExpMatch? match = timeRegExp.firstMatch(time);
+    RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
+        timeRegExpPostGraduate.firstMatch(time);
     if (match == null) return null;
 
     return Jiffy.parseFromDateTime(DateTime(
@@ -64,7 +69,8 @@ class Subject {
     required String place,
     String? seat,
   }) {
-    RegExpMatch? match = timeRegExp.firstMatch(time);
+    RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
+        timeRegExpPostGraduate.firstMatch(time);
     late String startTime, stopTime;
     if (match != null) {
       startTime = Jiffy.parseFromDateTime(DateTime(

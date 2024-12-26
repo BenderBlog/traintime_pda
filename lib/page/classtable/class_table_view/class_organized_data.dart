@@ -161,6 +161,12 @@ class ClassOrgainzedData {
         }
       }
 
+      if (timeInMin >
+          int.parse(_timeInBlock.last.split(":")[0]) * 60 +
+              int.parse(_timeInBlock.last.split(":")[1])) {
+        return 61;
+      }
+
       throw OutOfIndexException();
     }
 
