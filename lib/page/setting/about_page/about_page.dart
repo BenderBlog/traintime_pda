@@ -314,8 +314,8 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Holidays In The Sun - PDA One Year Anniversary, Second Edition"
-                      : "Revolution - PDA One Year Anniversary, Second Edition",
+                      ? "Learning to Live and Sleep Edition"
+                      : "Learning How to Love You Edition",
                   style: const TextStyle(fontSize: 16),
                 ),
               ],

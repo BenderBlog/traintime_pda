@@ -46,15 +46,6 @@ class _ScorePageState extends State<ScorePage> {
               },
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(FlutterI18n.translate(
-                context,
-                "confirm",
-              )),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
         ),
       );
 

@@ -172,7 +172,7 @@ SPEC CHECKSUMS:
   file_picker: 09aa5ec1ab24135ccd7a1621c46c84134bfd6655
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
-  flutter_native_splash: e8a1e01082d97a8099d973f919f57904c925008a
+  flutter_native_splash: f71420956eb811e6d310720fee915f1d42852e7a
   fluttertoast: e9a18c7be5413da53898f660530c56f35edfba9c
   home_widget: 0434835a4c9a75704264feff6be17ea40e0f0d57
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
