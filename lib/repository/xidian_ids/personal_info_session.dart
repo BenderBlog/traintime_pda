@@ -4,7 +4,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -89,22 +88,38 @@ class PersonalInfoSession extends EhallSession {
         "[ehall_session][getInformation] "
         "Get the day the semester begin.",
       );
-      DateTime now = DateTime.now();
-      var currentWeek = await dio.post(
-        'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-        data: {'day': Jiffy.parseFromDateTime(now).format(pattern: "yyyyMMdd")},
-      ).then((value) => value.data);
-      currentWeek = RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])![0]!;
+
       log.info(
-        "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
+        "[ehall_session][getInformation] "
+        "Get the semester information.",
       );
-      int weekDay = now.weekday - 1;
-      String termStartDay = Jiffy.parseFromDateTime(now)
-          .add(weeks: 1 - int.parse(currentWeek), days: -weekDay)
-          .format(pattern: "yyyy-MM-dd");
+      String get = await useApp("4770397878132218");
+      await dioEhall.post(get);
+      String semesterCode = await dioEhall
+          .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
+          )
+          .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
+
+      log.info(
+        "[ehall_session][getInformation] "
+        "Get the day the semester begin.",
+      );
+      String termStartDay = await dioEhall.post(
+        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+        data: {
+          'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
+          'XQ': semesterCode.split('-')[2]
+        },
+      ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
       preference.setString(
         preference.Preference.currentStartDay,
         termStartDay,
+      );
+      List<String> semester = semesterCode.split("-");
+      preference.setString(
+        preference.Preference.currentSemester,
+        semester.first + semester.last,
       );
     }
 

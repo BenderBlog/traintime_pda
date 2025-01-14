@@ -665,7 +665,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
         appBar: AppBar(
           title: Text(FlutterI18n.translate(
             context,
-            "classtable.partner_classtable.page_title",
+            "classtable.page_title",
           )),
           leading: IconButton(
             icon: Icon(

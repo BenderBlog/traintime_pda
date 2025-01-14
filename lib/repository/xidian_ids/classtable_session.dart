@@ -108,7 +108,15 @@ class ClassTableFile extends EhallSession {
       'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
       data: {'day': Jiffy.parseFromDateTime(now).format(pattern: "yyyyMMdd")},
     ).then((value) => value.data);
-    currentWeek = RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])![0]!;
+    if (!currentWeek.toString().contains("xnxq")) {
+      return ClassTableData(
+        semesterCode: semesterCode,
+        termStartDay: "2025-01-01",
+      );
+    }
+    currentWeek =
+        RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])?[0] ?? "null";
+
     log.info(
       "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
     );
