@@ -66,7 +66,7 @@ class _ScoreWindowState extends State<ScoreWindow> {
                 ),
               );
             }
-            return ScoreState.init(
+            body = ScoreState.init(
               scoreTable: snapshot.data!,
               context: context,
               child: _getNavigator(
@@ -88,6 +88,16 @@ class _ScoreWindowState extends State<ScoreWindow> {
                 "score.score_page.title",
               ),
             ),
+            actions: [
+              if (snapshot.connectionState == ConnectionState.done &&
+                  !snapshot.hasError)
+                IconButton(
+                  icon: const Icon(Icons.replay_outlined),
+                  onPressed: () => setState(() {
+                    scoreList = scoreSession.getScore(force: true);
+                  }),
+                ),
+            ],
           ),
           body: body,
         );

@@ -6,14 +6,12 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
-import 'package:watermeter/repository/preference.dart' as pref;
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -27,38 +25,32 @@ class _ScorePageState extends State<ScorePage> {
   late TextEditingController text;
 
   Widget scoreInfoDialog(BuildContext context) => FloatingActionButton(
-        onPressed: () => (pref.getBool(pref.Preference.role))
-            ? launchUrlString(
-                "https://yjspt.xidian.edu.cn/gsapp/sys/frReport2/show.do"
-                "?__cumulatepagenumber__=false&ZCDM=CJGL_XSCJD_DCCJDPDF&"
-                "reportlet=CJGL_YJSCJD_XDU.cpt&"
-                "xh=${pref.getString(pref.Preference.idsAccount)}",
-              )
-            : context.pushDialog(
-                AlertDialog(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "score.score_choice.sum_dialog_title",
-                  )),
-                  content: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "score.score_choice.sum_dialog_content",
-                      translationParams: {
-                        "gpa_all":
-                            c.evalAvg(true, isGPA: true).toStringAsFixed(3),
-                        "avg_all": c.evalAvg(true).toStringAsFixed(2),
-                        "credit_all": c.evalCredit(true).toStringAsFixed(2),
-                        "unpassed": c.unPassed.isEmpty
-                            ? FlutterI18n.translate(context, "score.all_passed")
-                            : c.unPassed,
-                        "not_core_credit": c.notCoreClass.toString(),
-                      },
-                    ),
-                  ),
-                ),
-              ),
-        child: const Icon(Icons.panorama_fisheye),
+        child: const Icon(Icons.calculate),
+        onPressed: () => c.setScoreChoiceMod(),
+      );
+
+  void pushSumDialog(BuildContext context) => context.pushDialog(
+        AlertDialog(
+          title: Text(FlutterI18n.translate(
+            context,
+            "score.score_choice.sum_dialog_title",
+          )),
+          content: Text(
+            FlutterI18n.translate(
+              context,
+              "score.score_choice.sum_dialog_content",
+              translationParams: {
+                "gpa_all": c.evalAvg(true, isGPA: true).toStringAsFixed(3),
+                "avg_all": c.evalAvg(true).toStringAsFixed(2),
+                "credit_all": c.evalCredit(true).toStringAsFixed(2),
+                "unpassed": c.unPassed.isEmpty
+                    ? FlutterI18n.translate(context, "score.all_passed")
+                    : c.unPassed,
+                "not_core_credit": c.notCoreClass.toString(),
+              },
+            ),
+          ),
+        ),
       );
 
   @override
@@ -87,6 +79,7 @@ class _ScorePageState extends State<ScorePage> {
     );
 
     return Scaffold(
+      /*
       appBar: AppBar(
         leading: BackButton(
           onPressed: Navigator.of(c.context).pop,
@@ -96,13 +89,14 @@ class _ScorePageState extends State<ScorePage> {
           "score.score_page.title",
         )),
         actions: [
-          if (!pref.getBool(pref.Preference.role))
-            IconButton(
-              icon: const Icon(Icons.calculate),
-              onPressed: () => c.setScoreChoiceMod(),
-            ),
+          //if (!pref.getBool(pref.Preference.role))
+          IconButton(
+            icon: const Icon(Icons.calculate),
+            onPressed: () => c.setScoreChoiceMod(),
+          ),
         ],
       ),
+      */
       body: Column(
         children: [
           Wrap(
@@ -200,7 +194,9 @@ class _ScorePageState extends State<ScorePage> {
           }).safeArea().expanded(),
         ],
       ),
-      floatingActionButton: scoreInfoDialog(context),
+      floatingActionButton:
+          //pref.getBool(pref.Preference.role) ? null :
+          scoreInfoDialog(context),
       bottomNavigationBar: Visibility(
         visible: c.controllers.isSelectMod,
         child: BottomAppBar(
@@ -244,6 +240,11 @@ class _ScorePageState extends State<ScorePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(c.bottomInfo(context)),
+                  TextButton.icon(
+                    onPressed: () => pushSumDialog(context),
+                    icon: const Icon(Icons.info),
+                    label: const Text("小总结"),
+                  )
                 ],
               ),
             ],
