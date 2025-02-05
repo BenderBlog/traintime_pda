@@ -314,7 +314,7 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
-                      ? "Learning to Live and Sleep Edition"
+                      ? "Start Me Up Edition"
                       : "Learning How to Love You Edition",
                   style: const TextStyle(fontSize: 16),
                 ),

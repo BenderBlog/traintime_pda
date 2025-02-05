@@ -18,7 +18,7 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  final String urlApple = "https://www.bilibili.com/video/BV1ZH4y177U3/";
+  final String urlApple = "https://www.bilibili.com/video/BV1Fu411D7Lk/";
 
   final String urlOthers =
       "https://music.163.com/outchain/player?type=2&id=22569925&auto=1";

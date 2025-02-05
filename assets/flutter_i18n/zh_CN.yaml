@@ -353,8 +353,8 @@ school_net:
 # 校园卡流水
 school_card_window:
     title: "校园卡流水信息"
-    income: "支出 {income}"
-    expense: "收入 {expense}"
+    income: "收入 {income}"
+    expense: "支出 {expense}"
     select_range: "选择日期：从 {startDay} 到 {endDay}"
     store_name: "商户名称"
     balance: "金额"

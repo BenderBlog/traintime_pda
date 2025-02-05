@@ -34,14 +34,14 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
     if (sumUp.isLowerThan(0)) {
       return FlutterI18n.translate(
         context,
-        "school_card_window.income",
-        translationParams: {"income": (sumUp * -1).toStringAsFixed(2)},
+        "school_card_window.expense",
+        translationParams: {"expense": (sumUp * -1).toStringAsFixed(2)},
       );
     } else {
       return FlutterI18n.translate(
         context,
-        "school_card_window.expense",
-        translationParams: {"expense": sumUp.toStringAsFixed(2)},
+        "school_card_window.income",
+        translationParams: {"income": sumUp.toStringAsFixed(2)},
       );
     }
   }
