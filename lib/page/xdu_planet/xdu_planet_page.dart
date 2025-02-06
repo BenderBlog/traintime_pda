@@ -68,7 +68,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                         : Theme.of(context)
                             .colorScheme
                             .primary
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                   ),
                   //selected: selected == e,
                   onPressed: () {

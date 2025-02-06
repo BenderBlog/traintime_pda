@@ -159,7 +159,9 @@ class ClassTableController extends GetxController {
     TimeArrangement timeArrangement,
   ) async {
     if (originalTimeArrangement.source != Source.user ||
-        originalTimeArrangement.index != timeArrangement.index) return;
+        originalTimeArrangement.index != timeArrangement.index) {
+      return;
+    }
     int timeArrangementIndex =
         userDefinedClassData.timeArrangement.indexOf(originalTimeArrangement);
     userDefinedClassData.timeArrangement[timeArrangementIndex].weekList =

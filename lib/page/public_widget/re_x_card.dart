@@ -73,7 +73,7 @@ class ReXCard extends StatelessWidget {
               bottom: 0.5 * _rem,
             )
             .backgroundColor(
-              Theme.of(context).colorScheme.primary.withOpacity(opacity),
+              Theme.of(context).colorScheme.primary.withValues(alpha: opacity),
             ),
         DefaultTextStyle.merge(
           style: const TextStyle(fontSize: 0.875 * _rem),

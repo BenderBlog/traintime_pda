@@ -84,7 +84,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         .textColor(color)
         .center()
         .decorated(
-          color: chosenWeek[index] ? color.withOpacity(0.2) : null,
+          color: chosenWeek[index] ? color.withValues(alpha: 0.2) : null,
           borderRadius: const BorderRadius.all(Radius.circular(100.0)),
         )
         .clipOval()
@@ -228,7 +228,10 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   vertical: 6,
                 ),
                 elevation: 0,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
               ),
           Column(
             children: [
@@ -264,7 +267,10 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   vertical: 6,
                 ),
                 elevation: 0,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
               ),
           Column(
             children: [
@@ -369,7 +375,10 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   vertical: 6,
                 ),
                 elevation: 0,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
               ),
         ],
       ),

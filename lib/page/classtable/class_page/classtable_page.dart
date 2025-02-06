@@ -145,8 +145,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
               child: SizedBox(
                 width: weekButtonWidth,
                 child: Card(
-                  color: Theme.of(context).highlightColor.withOpacity(
-                        classTableState.chosenWeek == index ? 0.3 : 0.0,
+                  color: Theme.of(context).highlightColor.withValues(
+                        alpha: classTableState.chosenWeek == index ? 0.3 : 0.0,
                       ),
                   elevation: 0.0,
                   child: InkWell(

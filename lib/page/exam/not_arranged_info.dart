@@ -40,7 +40,7 @@ class NoArrangedInfo extends StatelessWidget {
               vertical: 6,
             ),
             elevation: 0,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             child: ListTile(
               title: Text(
                 toUse.subject,

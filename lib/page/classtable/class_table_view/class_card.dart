@@ -40,7 +40,7 @@ class ClassCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Container(
           // Border
-          color: color.shade300.withOpacity(0.8),
+          color: color.shade300.withValues(alpha: 0.8),
           padding: const EdgeInsets.all(2),
           child: Stack(
             children: [
@@ -48,7 +48,7 @@ class ClassCard extends StatelessWidget {
                 // Inner
                 borderRadius: BorderRadius.circular(6),
                 child: Container(
-                  color: color.shade100.withOpacity(0.7),
+                  color: color.shade100.withValues(alpha: 0.7),
                   child: TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
