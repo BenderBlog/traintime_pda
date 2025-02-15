@@ -45,6 +45,8 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    namespace = "io.github.benderblog.traintime_pda"
+
     defaultConfig {
         applicationId "io.github.benderblog.traintime_pda"
         // You can update the following values to match your application needs.
@@ -87,6 +89,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21"
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Ref. https://github.com/tensorflow/flutter-tflite/issues/278
+    implementation "org.tensorflow:tensorflow-lite-gpu-api:+"
 }
 
 ext.abiCodes = ["x86_64": 1, "armeabi-v7a": 2, "arm64-v8a": 3]
