@@ -11,6 +11,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 import 'package:watermeter/page/library/borrow_info_card.dart';
@@ -83,18 +84,23 @@ class BorrowListDetail extends StatelessWidget {
         }
       }),
       bottomNavigationBar: BottomAppBar(
-        height: 40,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            I18nText(
-              "library.borrow_list_info",
-              translationParams: {
-                "borrow": borrow_info.borrowList.length.toString(),
-                "dued": borrow_info.dued.toString(),
-              },
-            ),
-          ],
+        height:
+            prefs.getString(Preference.localization.key) == "en_US" ? 80 : 50,
+        child: I18nText(
+          "library.borrow_list_info",
+          translationParams: {
+            "borrow": borrow_info.borrowList.length.toString(),
+            "dued": borrow_info.dued.toString(),
+          },
+          child: Text(
+            "",
+            maxLines: prefs.getString(
+                      Preference.localization.key,
+                    ) ==
+                    "en_US"
+                ? 2
+                : 1,
+          ),
         ),
       ),
     );

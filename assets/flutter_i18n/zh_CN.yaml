@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # EasyRefresh 下拉插件的玩意
-drag_text: "上拉请求更多"
+drag_text: "上拉获取更多数据"
 ready_text: "正在加载......"
-processing_text: "正在加载......"
+processing_text: "正在处理......"
 processed_text: "请求成功"
-no_more_text: "数据没有更多"
-failed_text: "数据获取失败更多"
+no_more_text: "没有更多数据"
+failed_text: "数据获取失败"
 
 # 公共组件
 choose_semester: "选择学期"
@@ -15,7 +15,7 @@ error_detected: "Ouch! 发生错误啦"
 click_to_refresh: "点我刷新"
 
 # 取消和确定
-confirm_title: "确认对话框"
+confirm_title: "确认？"
 cancel: "取消"
 confirm: "确定"
 
@@ -139,8 +139,8 @@ classtable:
         input_week_hint: "选择上课周次"
         input_time_hint: "选择上课时间"
         input_time_weekday_hint: "上课周次"
-        input_start_time_hint: "上课时间段"
-        input_end_time_hint: "下课时间段"
+        input_start_time_hint: "上课时间"
+        input_end_time_hint: "下课时间"
         wheel_choose_hint: "第 {index} 节"
     course_detail_card:
         class_number_string: "{number} 班"
@@ -353,8 +353,8 @@ school_net:
 # 校园卡流水
 school_card_window:
     title: "校园卡流水信息"
-    income: "收入 {income}"
-    expense: "支出 {expense}"
+    income: "支出 {income}"
+    expense: "收入 {expense}"
     select_range: "选择日期：从 {startDay} 到 {endDay}"
     store_name: "商户名称"
     balance: "金额"
@@ -405,6 +405,7 @@ score:
         select_all: "全选"
         select_nothing: "全不选"
         reset_select: "重置选择"
+        summary: "总结"
         # 也许没用
         CET-4: "国家英语四级"
         CET-6: "国家英语六级"
@@ -515,6 +516,7 @@ setting:
         undefined: "追随系统设置"
         simplifiedChinese: "简体中文"
         traditionalChinese: "繁体中文"
+        english: "英语"
     # 关于页面
     easter_egg_page: "你找到了彩蛋"
     about_page:
@@ -655,13 +657,9 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg: |-
-    "Holiday in the Sun" -> Sex Pistols, 1977
+    "Learning How to Love You" -> George Harrison, 1976
 
-    又是一个廉价的黄金周旅行灾难！
-
-    "Revolution" -> John Lennon, The Beatles, 1970
-
-    想要毁坏旧势力？别把我忘了！
+    "Start Me Up" -> Rolling Stones, 1981
 
     Book of PDA under constrction...
 

@@ -1,0 +1,722 @@
+# Copyright 2024 BenderBlog Rodriguez and contributors.
+# SPDX-License-Identifier: MPL-2.0
+
+# 初步翻译：Elliot
+# 初步校对：Benderblog
+# 第二次校对：Ray
+
+# EasyRefresh 下拉插件的玩意
+drag_text: "Pull to request more"
+ready_text: "Loading..."
+processing_text: "Processing..."
+processed_text: "Successfully requested"
+no_more_text: "No more data"
+failed_text: "Failed to load data"
+
+# 公共组件
+choose_semester: "Choose Semester"
+error_detected: "Ouch! An error has occurred!"
+click_to_refresh: "Click to refresh"
+
+# 取消和确定
+confirm_title: "Confirm？(ゝ∀･)"
+cancel: "Cancel"
+confirm: "Okay"
+
+# controller/model 里面可能需要给用户展示的
+network_error: "Network error, maybe you are not connected to the Internet, or the school server is down :P"
+error_detect: "An error has occurred,"
+query_failed: "Query failed"
+not_school_network: "Not on the Campus Network"
+experiment_controller:
+   no_password: "Experiment password is not set"
+   login_failed: "Login failed"
+cancel_exam: "Disqualified to exam :P"
+login_process:
+   ready_page: "Prepare to obtain login environment"
+   get_encrypt: "Obtain password encryption key"
+   ready_login: "Prepare to login"
+   slider: "Solving slider captcha"
+   after_process: "Post-login processing"
+   failed: "Login failed, response status code: {statusCode}"
+# TODO: ehall_exam_session data
+
+no_info: "No information"
+
+# main.dart 里面 Catcher 插件字符串
+catcher_detected: "An error have occurred"
+catcher_description: "Details are shown as follows"
+
+# 星期
+weekday:
+   monday: "Monday"
+   tuesday: "Tuesday"
+   wednesday: "Wednesday"
+   thursday: "Thursday"
+   friday: "Friday"
+   saturday: "Saturday"
+   sunday: "Sunday"
+
+# 日程表/课程表
+classtable:
+   partner_classtable:
+      override_dialog: "Currently there is a partner classtable data, do you want to overwrite?"
+      no_file: "Import file not found"
+      no_permission: "Storage permission denied , cannot read file"
+      problem: "Maybe there is a problem with the import file :P"
+      success: "Successfully imported"
+      share_dialog:
+         title: "Caution ( ´•̥̥̥ω•̥̥̥` )"
+         content: "The exported file may include your personal information, please DO NOT share casually"
+      save_dialog:
+         title: "Save calendar file to..."
+         success_message: "Should be saved"
+         failure_message: "Can not create the file, save fails."
+      delete_dialog:
+         title: "(｡í _ ì｡)For real?"
+         message: "Are you sure to delete the partner classtable?"
+         success_message: "Done"
+      name_dialog:
+         title: "Input the name of the partner classtable to be shown on your partner's screen"
+         hint: "Input here, otherwise it will be shown as 'Sweetie'"
+         cancel: "There's nobody other than my sweetie"
+         accept: "Submit"
+         blank_input: "Input is blank!"
+   page_title: "My Schedule"
+   partner_page_title: "{partner_name}'s Schedule"
+   popup_menu:
+      not_arranged: "View unarranged class information"
+      class_changed: "View class schedule changes"
+      add_class: "Add class information"
+      generate_ical: "Generate calendar file"
+      generate_partner_file: "Generate partner classtable file"
+      import_partner_file: "Import partner classtable file"
+      delete_partner_file: "Delete partner classtable file"
+   class_change_page:
+      title: "Class Adjustment"
+      empty_message: "Currently there's no class schedule changes"
+      teacher_change: "Teacher has been changed from {previous_teacher} to {new_teacher}"
+      no_teacher_change: "Teacher kept unchanged"
+      "1": "One"
+      "2": "Two"
+      "3": "Three"
+      "4": "Four"
+      "5": "Five"
+      "6": "Six"
+      "7": "Seven"
+      # TODO: Need English specific code at the native platform
+      change_class_message:
+         This is a course adjustment info，Originally scheduled on period {originalClassRangeStart}
+         to period {originalClassRangeEnd} at the {weekChar_originalWeek}th day of the {originalAffectedWeeks}th week(s),
+         now it is at the {newClassroom} classroom, arranged at the period {newClassRangeStart} to period {newClassRangeStop}
+         at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
+      patch_class_message:
+         This is a course reschedule info，The course have been rescheduled at the {newClassroom}, on the period
+         {newClassRangeStart} to period {newClassRangeStop} at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
+      stop_class_message:
+         This is a course suspension info. The class will be suspended at the period {originalClassRangeStart} to
+         period {originalClassRangeEnd} at the {weekChar_originalWeek} day of the {originalAffectedWeeks} week(s).
+      class_info: "Code: {classCode} | Class {classNumber}\nSchedule change: {classChange}\n{teacherChange}"
+   not_arranged_page:
+      title: "Classes without schedule"
+      empty_message: "All courses have been scheduled"
+      content: "Code {classCode} | Class {classNumber}\nTeacher: {teacher}"
+   empty_class_message: "Semester {semester_code} has no class arranged"
+   week_title: "Week {week}"
+   noon_break: "Noon"
+   supper_break: "Supper"
+   month: "{month}\nMonth"
+   no_class: |-
+      No schedule arranged in this week, please take care of yourself and be well
+      LichtYy was reviewing for exam
+      He saw the tourist guide in the English paper
+      He confused.
+   class_card:
+      title: "Schedule Information"
+      unknown_classroom: "Unknown classroom"
+      remains_hint: "There is/are {remain_count} schedule(s) remaining"
+   class_add:
+      add_class_title: "Add class info"
+      change_class_title: "Modify class info"
+      class_name_empty_message: "Class name cannot be empty"
+      wrong_time_message: "Incorrect time input"
+      save_button: "Save"
+      input_classname_hint: "Class name (required)"
+      input_teacher_hint: "Teacher's name (optional)"
+      input_classroom_hint: "Classroom location (optional)"
+      input_week_hint: "Select class weeks"
+      input_time_hint: "Select class time"
+      input_time_weekday_hint: "Class days"
+      input_start_time_hint: "Time to start"
+      input_end_time_hint: "Time to end"
+      wheel_choose_hint: "Period {index}"
+   course_detail_card:
+      class_number_string: "Class {number}"
+      unknown_teacher: "Unknown teacher"
+      unknown_place: "Unknown classroom"
+      class_period: "period {start} to {stop}"
+      edit: "Edit"
+      delete: "Delete"
+      delete_title: "Are you sure to delete this class information?"
+      delete_content: "Everything will be excuted."
+
+# 空闲教室
+empty_classroom:
+   title: "Empty Classrooms"
+   date: "Date {date}"
+   building: "Building {building}"
+   search_hint: "Classroom name or code"
+   classroom: "Classroom"
+   empty: "Available"
+   occupied: "Occupied"
+
+# 考试信息
+exam:
+   title: "Exam Schedule"
+   cache_hint: "Displaying cached exam schedule info"
+   not_finished: "Still there are some bad guys here."
+   all_finished: "Say goodbye to all the exams."
+   unable_to_exam: "Unable to exam"
+   finished: "All exams "
+   none_finished: "No exams have been completed"
+   no_exam_arrangement: "No exam has been arranged currently"
+   no_arrangement:
+      title: "Not arranged exams"
+      all_arranged: "Exams have been scheduled for all subjects"
+      subtitle: "Code: {id}"
+
+# 物理实验
+experiment:
+   title: "Physics Experiment"
+   ongoing: "Ongoing experiment"
+   not_finished: "Experiments to be done"
+   all_finished: "All experiments have been completed"
+   finished: "Completed experiments"
+   score_sum: "Total score: {sum}"
+   none_finished: "None of the experiments have been completed"
+   not_provided: "Not provided"
+
+# 主页
+homepage:
+   time_string:
+      morning: "Good morning, fueled to go!"
+      before_noon: "Good morning, wish sunrise lies on you"
+      at_noon: "Good noon, everything's fine?"
+      afternoon: "Good afternoon, are you OK?"
+      night: "Good evening, and sweet dreams"
+      midnight: "It's late at night, I'm here with you."
+   # homepage.dart
+   loading: "Loading"
+   load_error: "Something wrong"
+   on_holiday: "Currently on holiday"
+   on_weekday: "Currently week {current}"
+   loading_message: "Please wait, refreshing information"
+   postgraduate_notice: "Postgraduate features are under testing, it's unstable!"
+   # home.dart
+   homepage: "Homepage"
+   planet: "Blog Planet"
+   setting: "Settings"
+   input_partner_data:
+      route_not_exist: "Import path does not exist:P"
+      failed_get_file: "Failed to import file"
+      failed_import: "Maybe there is a problem with the import file:P"
+      success_message: "Import successful, if the class schedule page is open, please reopen it"
+      not_loaded: "Class schedule has not been loaded yet, please try again later..."
+      confirm_content: "There is currently partner class schedule data, do you want to overwrite?"
+   login_message: "Logging in, currently displaying cached data"
+   successful_login_message: "Login successful"
+   password_wrong_title: "Wrong username or password"
+   password_wrong_content: "Restart the app and log in manually?"
+   password_wrong_denial: "No, enter offline mode"
+   offline_mode_title: "Uniform Authentication Service offline mode activated"
+   offline_mode_content: |
+      "Unable to connect to the Unified Authentication Service server, all related services are temporarily unavailable.
+      Score inquiry, exam information inquiry, overdue fee inquiry, campus card inquiry are closed. The schedule displays cached data. Other functions are temporarily not affected.
+      We apologize for any inconvenience caused."
+   offline_mode: "In offline mode, all one-stop related functions are disabled"
+   # 以下分段者从略
+   notice_card:
+      empty_notice: "No application announcements retrieved, please refresh"
+      no_notice_avaliable: "Failed to fetch the application announcements"
+      notice_list_title: "Notifications"
+      open_url: "Open link"
+      notice_page_title: "Notification List"
+   class_table_card:
+      current: "Current"
+      tomorrow: "Tomorrow"
+      later: "Later"
+      more: "More"
+      error_message: "An error occurred: {error}"
+      fetching_message: "Fetching class schedule"
+      error_infoText: "An error occurred"
+      fetching_infoText: "Loading"
+      no_arrangement_infoText: "No schedule at the moment"
+   electricity_card:
+      title: "Electricity and Water Information"
+      current_electricity: "{amount} kWh remains"
+      cache_notice: "Currently loading cache, retrieved on {date}\n"
+      dialog_content: |
+         Electricity account：{account}
+         Electricity information：{electricityInfo}
+         Arrears：{owe}
+         Long press to reload, arrears generally indicate water fees
+   library_card:
+      title: "Library Info"
+      current_borrow: "Borrowing {count} book(s)"
+      error_occured: "Error occurred while retrieving borrowing information"
+      fetching: "Fetching borrowing information"
+      no_return: "Currently there's no book to be returned"
+      need_return: "Need to return {dued} books"
+      no_info: "Cannot retrieve information at the moment"
+      fetching_info: "Fetching information..."
+   school_card_info_card:
+      error_toast: "An error occurred, please contact the developer"
+      fetching_toast: "Fetching information, please check later"
+      bill: "Bill"
+      balance: "Card balance {amount} RMB"
+      error_occured: "Error occurred while retrieving campus card information"
+      fetching: "Fetching campus card information"
+      bottom_text_success: "Query campus card bill"
+      no_info: "Cannot retrieve information currently"
+      fetching_info: "Fetching information..."
+   toolbox:
+      creative: "Innovation and Entrepreneurship Competition"
+      empty_classroom: "Empty Classrooms"
+      exam: "Exam Schedule"
+      experiment: "Physics Experiment"
+      score: "Score Query"
+      sport: "Sports Information"
+      schoolnet: "Schoolnet Usage"
+      toolbox: "Other Functions"
+      score_cannot_reach: "Offline mode with no cached score data, unable to access"
+      exam_fetching: "Fetching exam information, please wait"
+      exam_error: "An error occurred, please contact the developer"
+
+# 图书馆
+library:
+   title: "Library Information"
+   borrow_state_title: "Borrowing Status"
+   search_book_title: "Search Books"
+   not_provided: "No information provided"
+   author: "Author "
+   publish_house: "Publisher "
+   call_number: "Call Number "
+   publish_date: "Publication Date"
+   isbn: "ISBN"
+   arrangement_code: "Arrangement Code "
+   avaliable_borrow: "Available to borrow"
+   storage: "Storage"
+   on_shelve: "On shelf"
+   book_code: "Book code: {barCode}"
+   due_date: " Due date"
+   borrow_str: " Borrow"
+   after_due_date: " day(s) overdue"
+   before_due_date: " day(s) left"
+   can_be_renewable: "Renewable"
+   cannot_be_renewable: "Not renewable"
+   renewing: "Renewing"
+   empty_borrow_list: "No borrowed books found"
+   borrow_list_info: "Borrowing {borrow} book(s), among which {dued} book(s) have expired"
+   search_book_window:
+   search_here: "Search here"
+   book_detail: "Book details"
+   no_result: "No result"
+   please_search: "Please search above"
+
+# 登录界面
+login:
+   identity_number: "Student ID"
+   password: "IDS Login password"
+   login: "Login"
+   incorrect_password_pattern: "Username or password does not meet requirements, student ID must be 11 digits and password cannot be empty"
+   on_login_progress: "Logging in..."
+   complete_login: "Login successful"
+   failed_login_cannot_connect_to_server: "Cannot connect to server"
+   failed_login_with_code: "Request failed, response status code: {code}"
+   failed_login_with_message: "Request failed, error message: {message}"
+   failed_login_other: "Unknown error, please contact the developer"
+   clear_cache: "Clear cache"
+   complete_clear_cache: "Cache cleared successfully"
+   see_inspector: "View network interaction"
+   captcha_window:
+      title: "Please enter captcha"
+      hint: "Input captcha"
+      message_on_empty: "Please enter captcha"
+   slider_title: "Server authentication service"
+
+# 校园网信息
+school_net:
+   dialog_title: "Schoolnet Usage Query"
+   fetching: "Fetching schoolnet usage data"
+   basic_message: "In this month, you have used {used} cellular data, with {rest} remains, billing date {charged}\n\nCurrently online devices：\n"
+   detail_message: |
+      IP andress：{ip}
+      online time：{time}
+      cellular data used：{amount}
+
+   empty_password: "You may forgot to enter the schoolnet password"
+   error_fetch: "Failed to fetch：{msg}"
+   error_other: "Other error：{msg}"
+
+# 校园卡流水
+school_card_window:
+   title: "Campus Card Transaction History"
+   income: "Income ￥{income}"
+   expense: "Expense ￥{expense}"
+   select_range: "Select date: from {startDay} to {endDay}"
+   store_name: "Expense place"
+   balance: "Amount"
+   time_with_sum: "Time ({sum})"
+   no_record: "No records found, please try again with different dates"
+
+# 成绩
+score:
+   cache_message: "Cached score information is displayed"
+   summary: |-
+      Selected subjects {chosen}  Total credits {credit}
+      Average {avg} GPA {gpa}
+   all_passed: "All subjects have passed"
+   # TODO：string in eval detected
+   all_semester: "All semesters"
+   chosen_semester: "{chosen}"
+   all_type: "All types"
+   chosen_type: "{type}"
+   score_choice:
+      title: "Transcript"
+      search_hint: "Search for score records"
+      empty_list: "No courses from this semester is selected to be calculated"
+      sum_dialog_title: "Summary"
+      sum_dialog_content: |-
+         Overall GPA of all subjects：{gpa_all}
+         Overall average：{avg_all}
+         Total credits：{credit_all}
+         Unpassed subjects：{unpassed}
+         Public elective credits already obtained：{not_core_credit}
+         The data provided by this program is for reference only, and the developer is not responsible for its accuracy
+   score_compose_card:
+      no_detail: "No detailed information provided"
+      fetching: "Fetching..."
+      credit: "Credits"
+      gpa: "GPA"
+      score: "Score"
+   score_info_card:
+      title: "Score Details"
+      original_course: "Initial course"
+      failed: "[Failed]"
+      credit: "Credits {credit}"
+      gpa: "GPA {gpa}"
+      score: "Score {score}"
+   score_page:
+      title: "Score Query"
+      search_hint: "Search for score records"
+      no_record: "No relevant information found"
+      select_all: "Select all"
+      select_nothing: "Clear"
+      reset_select: "Reset"
+      summary: "Summary"
+      # 也许没用
+      CET-4: "College English Test Band 4"
+      CET-6: "College English Test Band 6"
+
+# 设置
+setting:
+   # 最顶部
+   about: "About"
+   about_this_program: "About this program"
+   version: "Version：{version}"
+   user_info: "User information"
+   # 软件更新
+   check_update: "Check for software updates"
+   latest_version: "Latest version: {latest}"
+   waiting: "Waiting to obtain"
+   fetching_update: "Fetching update information"
+   current_stable: "You are running the latest version"
+   current_testing: "You are running the testing version"
+   fetch_failed: "Failed to fetch update information"
+   # 界面设置
+   ui_setting: "UI Settings"
+   brightness_setting: "Set light/dark mode"
+   color_setting: "Color setting"
+   simplify_timeline: "Simplify schedule timeline"
+   simplify_timeline_description: "Reduce space occupation while no schedule"
+   # 账号设置
+   account_setting: "Account Settings"
+   sport_password_setting: "Sports system password setting"
+   experiment_password_setting: "Experiment system password setting"
+   electricity_password_setting: "Electricity account password setting"
+   electricity_password_description: "Please set if not 123456"
+   electricity_account_setting: "Electricity account setting"
+   schoolnet_password_setting: "Schoolnet password setting"
+   schoolnet_password_description: "If you don't setting it, you cannot query it."
+   # 课表相关设置
+   classtable_setting: "Class schedule related settings"
+   background: "Enable class schedule background image"
+   no_background: "You need to select an image first, it's at below"
+   choose_background: "Choose class schedule background image"
+   no_permission: "No storage permission obtained, cannot read files"
+   successful_setting: "Successfully set"
+   failure_setting: "You did not select an image"
+   clear_user_class: "Clear all user-added courses"
+   clear_user_class_title: "Confirmation dialog"
+   clear_user_class_content: "Do you want to clear all user-added courses? This function does not affect the schedule obtained from the school."
+   clear_user_class_clear: "Already cleared"
+   class_refresh: "Force refresh class schedule"
+   class_refresh_title: "Confirmation dialog"
+   class_refresh_content: "Do you want to force refreshing the class schedule? If you agree, we will fetch the schedule from the school, which may takes a long time."
+   class_swift: "Class schedule offset setting"
+   class_swift_description: |
+      Positive number delays the start date, negative number advances the start date
+      Currently {swift}
+   # 缓存登录设置
+   core_setting: "Cached login settings"
+   check_logger: "View network interceptor and logs"
+   clear_and_restart: "Clear cache and restart"
+   clear_and_restart_dialog:
+      title: "Confirmation dialog"
+      content: "Are you sure to clear cache and restart the program?"
+      cleaning: "Clearing cache..."
+      clear: "Cache has been cleared"
+   logout: "Log out and restart the app"
+   logout_dialog:
+      title: "Confirmation dialog"
+      content: "Are you want to log out? All your data will be completely deleted!"
+      logging_out: "Logging out..."
+   need_close_dialog:
+      title: "Please close the app"
+      content: "Due to technical limitations, you need to close the window manually and then reopen the app."
+   # 剩下乱七八糟的窗口
+   change_color_dialog:
+      title: "Color setting"
+      default: "Default"
+      blue: "Sky Blue"
+      deepPurple: "Deep Purple"
+      green: "Spring Green"
+      orange: "Asuka Orange"
+      pink: "Sakura Pink"
+   change_brightness_dialog:
+      title: "Brightness settings"
+      follow_setting: "Follow system"
+      day_mode: "Day mode"
+      night_mode: "Night mode"
+   change_swift_dialog:
+      title: "Class schedule offset setting"
+      input_hint: "Please input number here"
+   change_electricity_title: "Modify electricity account password"
+   change_electricity_account:
+      title: "Modify electricity account password"
+      input_hint: "Please input account here"
+      blank_input: "Blank input!"
+   change_experiment_title: "Modify physics experiment account password"
+   change_sport_title: "Modify sports system account password"
+   change_password_dialog:
+      input_hint: "Please input password here"
+      blank_input: "Blank input!"
+   change_schoolnet_password_title: "Modify the schoolnet query password"
+   update_dialog:
+      new_version: "New version available"
+      not_now: "Not now"
+      app_store: "Update from App Store"
+      download_apk: "Download APK"
+      github_release: "Go to Git Release"
+      new_content: "New features from version {code}:\n"
+   localization_dialog:
+      title: "Change the language"
+      undefined: "Follow system setting"
+      simplifiedChinese: "Simplified Chinese"
+      traditionalChinese: "Traditional Chinese"
+      english: "English"
+   # 关于页面
+   easter_egg_page: "You found an Easter egg"
+   about_page:
+      benderblog: "Main developer, iOS widget"
+      bellssgit: "Support: best and longest feedback source"
+      brackrat: "Design: homepage, login page, color scheme, iOS widgets, etc."
+      breezeline: "Support: valueless and meaningless product manager (from his own description)"
+      cafebabe: "Support: provide Easter egg code"
+      chitao1234: "Development: fix slider misalignment issue"
+      dimole: "Development support: assist in fixing slider issue"
+      elitewars: "Design: sports score page"
+      elliot: "Internationalization: English translation / Development guidance: on partner classtable development"
+      godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code"
+      hancl777: "Internationalization: Traditional Chinese conversion code"
+      hawa130: "Design: Class info card"
+      hhzm: "Development: electricity fee inquiry account calculation"
+      lhx-666-cool: "Support: Windows and Linux build scripts"
+      lichtyy: "Design: color pattern and blank page picture"
+      lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
+      nancunchild: "Development: library search function"
+      pairman: "Development: score cache and optimize slider algorithm"
+      reverierxu: "Design: REX card for information display / Development support: on postgraduate class schedule"
+      rrrilac: "Development support: electricity query"
+      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development"
+      shadowyingyi: "Support: two times of pigeon house official account publicity" # keep this line
+      stalomeow: "Design: homepage timeline / Development: asynchronous login and captcha predict"
+      xeonds: "Design: settings page / Development: XDU Planet"
+      xiue233: "Development: Android applet"
+      xizi: "Development support: on postgraduate version"
+      wirsbf: "Development: fix course adjustment did not proceed as expected"
+      zcwzy: "Development: fix Dingxiang apartment electricity fee / development support: on postgraduate version / design: blank page picture"
+      # TODO: PDA Girl inspriation
+      homepage: "Homepage"
+      code: "Open Source Code"
+      know_more: "Learn more"
+      copyright_notice: |
+         本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
+         代码按照 Mozilla Public License, v. 2.0 授权。
+         本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
+         Copyright 2023-Present BenderBlog Rodriguez and contributors.
+         The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+         If a copy of the MPL was not distributed with this file,
+         You can obtain one at https://mozilla.org/MPL/2.0/.
+      beian: "ICP record number"
+      sign_android: "Android signature"
+      title: "About this software"
+
+# 体育查询
+sport:
+   title: "Sport Query"
+   class_info: "Class information"
+   empty_class_info: "No class information found"
+   test_score: "Sport test score"
+   # TODO: change sport score to support i18n
+   total_score: "Four-year total score"
+   semester: "Semester {year} {gradeType}"
+   subject: "Subject"
+   data: "Data"
+   score: "Score"
+   passed: "Passed"
+   from_to: "Period {start} to {stop}"
+   score_string: "{score} points"
+   situation_nopassword: "No password"
+   situation_maintain: "System maintenance"
+   situation_failed_login: "Login failed"
+   situation_query: "Query failed"
+   situation_network: "Network malfunction"
+   situation_unknown: "Unknown malfunction {situation}"
+   situation_fetching: "Fetching..."
+   situation_error: "Bad thing: {situation}"
+
+# 其他功能
+toolbox:
+   title: "Other Functions"
+   payment: "Payment System"
+   payment_description: "Times to pay the electricity fee"
+   repair: "Repair report"
+   repair_description: "Don't let the water leak from the top"
+   reserve: "Space Reservation"
+   reserve_description: "Find a place to gathering"
+   mobile: "Mobile Portal"
+   mobile_description: "Specific for leaving"
+   network: "Network Query"
+   network_description: "Hope never charges (NO!)"
+   physics: "Physics Calculation"
+   physics_description: "Hope the operation goes smoothly"
+   discover: "Ruisi Navigation"
+   discover_description: "Lots other functions"
+
+# XDU Planet
+xdu_planet:
+   # TODO：string in eval detected
+   all: "All"
+   loading: "Loading, please wait <(=ω=)>"
+   unknown_author: "Unknown author"
+   load_failed_title: "Failed to load"
+   load_failed_bottom: "Failed to load the article, you can click the button on the top right of the screen to open it in the browser."
+   no_comment: "No comments yet"
+   reply_audit: "Reply comment #{reply_to} has been reported or deleted"
+   reply: "Reply to #{reply_to}: {content}"
+   have_been_audit: "This comment has been reported"
+   audit: "Report"
+   confirm_audit_dialog:
+      title: "Confirm reporting"
+      content: "Think twice. Reporting will tag the comment, but it may not be deleted."
+      cancel: "Forget it"
+      ongoing: "Reporting..."
+      failed: "Failed to report"
+      success: "Successfully reporting"
+   comment: "Reply"
+   send: "Send"
+   sending: "Sending comment"
+   empty_send: "Blank message sent"
+   hint_send_comment: "Express yourself!"
+   comment_title: "Comment on this article"
+   comment_success: "Successfully commenting"
+   comment_failed: "Comment failed, please check the log"
+   comment_canceled: "Nothing to say?"
+   comment_loading: "Loading comments..."
+   block: "Blocked"
+   delete: "Deleted"
+   audio: "Deleted"
+
+# 电费状态
+electricity_status:
+   pending: "Pending"
+   remain_fetching: "Fetching..."
+   remain_network_issue: "Network malfunction"
+   remain_not_found: "Query failed"
+   remain_other_issue: "Query malfunction"
+   owe_fetching: "Obtaining arrearage"
+   owe_issue: "Network malfunction of overdue information"
+   owe_not_found: "Cannot query arrearage"
+   owe_no_need: "No need to pay arrearage"
+   owe_need_pay: "Need to pay arrearage {due} yuan"
+   owe_issue_unable: "Cannot query arrearage"
+   need_more_info: "Need to improve information on the payment platform"
+   need_account: "Need to input electricity account"
+   captcha_failed: "Failed to check captcha"
+   other_issue: "Program malfunction"
+
+# 校园卡信息状态
+school_card_status:
+   failed_to_fetch: "Failed fetching"
+   failed_to_query: "Failed querying"
+
+# 彩蛋，翻译者可自行发挥，扯啥都行
+easter_egg: |-
+   "Learning How to Love You" -> George Harrison, 1976
+
+   "Start Me Up" -> Rolling Stones, 1981
+
+   Book of PDA under constrction...
+
+   ==== Main Charater ====
+
+   Once upon a time, there's a 'Hard Lovin' Man called Ray, whose understand the power of the Railgun called 'Flight of the Rat. 
+
+   Once after a battle with a 'Bloodsucker, he was tired as a high school student. He discovered a Purple Rat in the Square Forest.
+
+   Unknown her name, "She like a sweet potato, like my Rat gun. Just call her Sweet Purple Potato Ball, idk...", he thought. And he brought her to his home(maybe?)
+
+   The rat is clever, actually she is a angel named Elliot. We don't know why her soul inside a rat. Forgive me, I am drunked.
+
+   She knows he is the 'Child of the Time. They may argue, may laugh. In my opinion, she lighten Ray's seemly colorless life.
+
+   Don't know how time flies, she made he faster in running, attacking. With the power of the 'Rat gun', he become the threating 'Speed King.
+
+   ==== Another Main Charater ====
+
+   Another time, in the midland of Orestreich, a lonely bard named Reggirt, found a Knight (Contributer To Be Decided) shooting at the Sun.
+
+   "Just another 'Firefall, it soon become mime.", the Knight said.
+
+   "What's your purpose, sir? You may get your head kicked by a 'Mule", Reggrit asked.
+
+   Knight smiled, "It's not the Sun, 'no no no, it's the 'Demon's Eye. The source of mystery, of pain, of all struggle..."
+
+   "Wait! It's the source of all living thing, we're all hers 'Daughter..."
+
+   "... and that's our parents, 'Fools!" Knight signed, "What a complex feeling, 'No one came to realize this felling like me..."
+
+   ==== The Evil ====
+
+   So the time files, the world became colorless, the 'Night Prowler born from the shadow of the sun.
+
+   With the uncertain of the humanity and the grease of the relationship, it became more powerful. 
+
+   Soon, it took away the joy, trust, and all stuff we could remains years of years. He named himself Bender, who realized his goal is to bent everything entertains us.
+
+   Night Prowler itself evolued into a sliver chrome machinery, with laser eyes which absorb the happiness and sweetie from air and earth.
+
+   Itself found that a band, 'Sgt. Pepper Lonely Hearted Band, is the source of the bright things of the world.
+
+   He deside to let them 'bite his shiny metal ass, and seal them with 'The Devil's Triangle...

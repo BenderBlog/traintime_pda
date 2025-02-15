@@ -79,24 +79,6 @@ class _ScorePageState extends State<ScorePage> {
     );
 
     return Scaffold(
-      /*
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: Navigator.of(c.context).pop,
-        ),
-        title: Text(FlutterI18n.translate(
-          context,
-          "score.score_page.title",
-        )),
-        actions: [
-          //if (!pref.getBool(pref.Preference.role))
-          IconButton(
-            icon: const Icon(Icons.calculate),
-            onPressed: () => c.setScoreChoiceMod(),
-          ),
-        ],
-      ),
-      */
       body: Column(
         children: [
           Wrap(
@@ -194,9 +176,7 @@ class _ScorePageState extends State<ScorePage> {
           }).safeArea().expanded(),
         ],
       ),
-      floatingActionButton:
-          //pref.getBool(pref.Preference.role) ? null :
-          scoreInfoDialog(context),
+      floatingActionButton: scoreInfoDialog(context),
       bottomNavigationBar: Visibility(
         visible: c.controllers.isSelectMod,
         child: BottomAppBar(
@@ -240,10 +220,9 @@ class _ScorePageState extends State<ScorePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(c.bottomInfo(context)),
-                  TextButton.icon(
+                  IconButton(
                     onPressed: () => pushSumDialog(context),
                     icon: const Icon(Icons.info),
-                    label: const Text("小总结"),
                   )
                 ],
               ),

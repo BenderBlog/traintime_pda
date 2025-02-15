@@ -32,6 +32,7 @@ class SmallFunctionCard extends StatelessWidget {
       Text(
         FlutterI18n.translate(context, nameKey),
         style: const TextStyle(fontSize: 14),
+        textAlign: TextAlign.center,
       ),
     ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)

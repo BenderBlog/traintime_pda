@@ -115,7 +115,7 @@ class _MyAppState extends State<MyApp> {
             ),
             missingTranslationHandler: (key, locale) {
               log.info(
-                "--- Missing Key: $key, "
+                "[Locale] Missing Key: $key, "
                 "languageCode: ${locale?.languageCode ?? "unknown"}",
               );
             },
@@ -127,6 +127,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('zh', 'CN'),
           Locale('zh', 'TW'),
+          Locale('en', 'US')
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),

@@ -110,6 +110,9 @@
 		26B4A9C82B4C05D0003F5F24 /* ClasstableWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClasstableWidgetExtension.entitlements; sourceTree = "<group>"; };
 		26CC2A462B526A0C007E67CB /* ClasstableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClasstableModel.swift; sourceTree = "<group>"; };
 		26CC2A482B541A9A007E67CB /* EventItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventItem.swift; sourceTree = "<group>"; };
+		26D4C13B2D6075DB008FEE1D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		26D4C13C2D6075DB008FEE1D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		26D4C13D2D6075DC008FEE1D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		26D534592CA2F49E004BC175 /* PartnerShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PartnerShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		26D534692CA2F4A4004BC175 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26D5346A2CA2F4A4004BC175 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -417,6 +420,7 @@
 				Base,
 				"zh-Hans",
 				"zh-Hant",
+				en,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -672,6 +676,7 @@
 				26D5346A2CA2F4A4004BC175 /* Base */,
 				26312D112CEB2A5100EFEB73 /* zh-Hans */,
 				26312D142CEB2A6100EFEB73 /* zh-Hant */,
+				26D4C13D2D6075DC008FEE1D /* en */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -682,6 +687,7 @@
 				97C146FB1CF9000F007C117D /* Base */,
 				26312D102CEB2A5100EFEB73 /* zh-Hans */,
 				26312D132CEB2A6000EFEB73 /* zh-Hant */,
+				26D4C13C2D6075DB008FEE1D /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -692,6 +698,7 @@
 				97C147001CF9000F007C117D /* Base */,
 				26312D0F2CEB2A5100EFEB73 /* zh-Hans */,
 				26312D122CEB2A6000EFEB73 /* zh-Hant */,
+				26D4C13B2D6075DB008FEE1D /* en */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
