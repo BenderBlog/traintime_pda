@@ -98,7 +98,11 @@ class _MyAppState extends State<MyApp> {
 
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
-      IDSSession().dio.get("https://www.xidian.edu.cn");
+      try {
+        IDSSession().dio.get("https://www.xidian.edu.cn");
+        // Should the permission request be sent on iOS
+        // ignore: empty_catches
+      } catch (e) {}
     }
   }
 

@@ -5,7 +5,6 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
@@ -149,19 +148,18 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                   ),
                 ),
               );
-              return LayoutBuilder(
-                builder: (context, constraints) => AlignedGridView.count(
-                  shrinkWrap: true,
+              return LayoutBuilder(builder: (context, constraints) {
+                return ListView.builder(
                   itemCount: bookList.length,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 6 +
+                        (constraints.maxWidth > 496
+                            ? ((constraints.maxWidth - 496) / 2 - 2)
+                            : 0),
                   ),
-                  crossAxisCount: constraints.maxWidth ~/ 360,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
                   itemBuilder: (context, index) => bookList[index],
-                ),
-              ).safeArea();
+                );
+              });
             } else if (isSearching.value) {
               return const Center(child: CircularProgressIndicator());
             } else if (search.value.isNotEmpty) {
