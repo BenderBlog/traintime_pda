@@ -108,7 +108,11 @@ class EhallSession extends IDSSession {
         "[ehall_session][useApp] "
         "Transfer address: ${value.headers['location']![0]}.",
       );
-      return value.headers['location']![0];
+
+      return value.headers['location']![0].replaceAll(
+        RegExp(r';jsessionid=(.*)\?'),
+        "?",
+      );
     });
   }
 }

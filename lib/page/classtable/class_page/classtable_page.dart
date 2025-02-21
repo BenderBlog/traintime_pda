@@ -457,8 +457,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                             content: TextField(
                                               autofocus: true,
                                               controller: controller,
-                                              keyboardType:
-                                                  TextInputType.number,
                                               maxLines: 1,
                                               decoration: InputDecoration(
                                                 hintText: FlutterI18n.translate(

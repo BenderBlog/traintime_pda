@@ -65,8 +65,12 @@ class ExamSession extends EhallSession {
   }
 
   Future<ExamData> getExamEhall() async {
-    var firstPost = await useApp("4768687067472349");
-    await dioEhall.get(firstPost);
+    String? location = await useApp("4768687067472349");
+    while (location != null) {
+      var response = await dio.get(location);
+      log.info("[ExamFile][getExamEhall] Received location: $location.");
+      location = response.headers[HttpHeaders.locationHeader]?[0];
+    }
 
     String semester = pref.getString(pref.Preference.currentSemester);
 
