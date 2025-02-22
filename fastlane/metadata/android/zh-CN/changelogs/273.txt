@@ -1,0 +1,3 @@
+1. 若干错误修复 @BenderBlog
+2. 英语翻译支持 @Elliot
+3. 研究生预科生测试支持 @BenderBlog
