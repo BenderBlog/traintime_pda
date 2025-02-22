@@ -42,6 +42,7 @@ jobs:
       - name: Build APK
         run: |
           sed -i -e "2a\add_link_options(\"LINKER:--build-id=none\")" ~/.pub-cache/hosted/pub.dev/content_resolver-0.3.2/android/CMakeLists.txt
+          sed -i -e "s/target_compile_options(dbufhelper PRIVATE -DBUILD_FOR_ANDROID)/target_compile_options(dbufhelper PRIVATE -DBUILD_FOR_ANDROID -ffile-prefix-map)/g" ~/.pub-cache/hosted/pub.dev/content_resolver-0.3.2/android/CMakeLists.txt
           .flutter/bin/flutter build apk --split-per-abi
           .flutter/bin/flutter build appbundle
 
