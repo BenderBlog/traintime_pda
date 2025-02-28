@@ -253,63 +253,95 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Generate icalendar file string.
   String get iCalenderStr {
-    String toReturn = "BEGIN:VCALENDAR\nTZID:Asia/Shanghai\n";
+    String toReturn = "BEGIN:VCALENDAR\n";
 
     // @hgh: i here means each single course assignment
     for (var i in timeArrangement) {
-      String summary =
-          "SUMMARY:${getClassDetail(timeArrangement.indexOf(i))}@${i.classroom ?? "待定"}\n";
-      String description =
-          "DESCRIPTION:课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; "
+      // @hgh: j here means each week for a single course assignment
+      // @hgh: find the first week that has class
+      int j = i.weekList.indexWhere((element) => element);
+
+      // @benderblog: basically not happens, but if not arranged, just skip it.
+      if (j == -1) continue;
+
+      String summary = "SUMMARY:"
+          "${getClassDetail(timeArrangement.indexOf(i))}"
+          "@${i.classroom ?? "待定"}\n";
+      String description = "DESCRIPTION:"
+          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; "
           "上课地点：${i.classroom ?? "待定"}\n";
 
-      // @: j here means each week for a single course assignment
-      int j = 0;
-      // @: find the first week that has class
-      for(j = 0; !i.weekList[j]; ++j);
-
-      // @: initialize the first day(or, first recurrence) of the class
-      Jiffy day = Jiffy.parseFromDateTime(startDay).add(
+      // @hgh: initialize the first day(or, first recurrence) of the class
+      Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
         weeks: j,
         days: i.day - 1,
       );
       String vevent = "BEGIN:VEVENT\n$summary";
       List<String> startTime = time[(i.start - 1) * 2].split(":");
-      List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");        
-      vevent +=
-        "DTSTART:${day.add(hours: int.parse(startTime[0]), minutes: int.parse(startTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
-      vevent +=
-        "DTEND:${day.add(hours: int.parse(stopTime[0]), minutes: int.parse(stopTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
-      
+      List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
+      vevent += "DTSTART;TZID:Asia/Shanghai:"
+          "${firstDay.add(
+                hours: int.parse(startTime[0]),
+                minutes: int.parse(startTime[1]),
+              ).format(
+                pattern: 'yyyyMMddTHHmmss',
+              )}\n";
+      vevent += "DTSTART;TZID:Asia/Shanghai:"
+          "${firstDay.add(
+                hours: int.parse(stopTime[0]),
+                minutes: int.parse(stopTime[1]),
+              ).format(
+                pattern: 'yyyyMMddTHHmmss',
+              )}\n";
+
       for (int j = 0; j < i.weekList.length; ++j) {
-        // @: if the next week doesn't have class, then end the current recurrence
+        // @hgh: if the next week doesn't have class, then end the current recurrence
         if (j != i.weekList.length - 1 && !i.weekList[j + 1]) {
-            vevent += "RRULE:FREQ=WEEKLY;UNTIL=${day.add(weeks: j).set(hour:23, minute:59, second:59).format(pattern: 'yyyyMMddTHHmmss')}\n";
-            toReturn += "$vevent${description}END:VEVENT\n";// one recurrence over equals to one VEVENT over
+          vevent += "RRULE:FREQ=WEEKLY;"
+              "UNTIL=${firstDay.add(
+                    weeks: j,
+                    days: 1,
+                  ).format(
+                    pattern: 'yyyyMMddTHHmmss',
+                  )}"
+              "\n";
+          toReturn += "$vevent$description"
+              "END:VEVENT\n"; // one recurrence over equals to one VEVENT over
 
-            /*
-            *  upper: end the current recurrence
-            *
-            *  lower: start a new recurrence
-            */
-            
-            // @: find the next week that has class
-            j++;
-            while(j < i.weekList.length && !i.weekList[j]) ++j;
-            // @: if the next week is the last week, then end the current recurrence
-            if(j == i.weekList.length) break;
+          // upper: end the current recurrence
+          // lower: start a new recurrence
 
-            // reset the vevent
-            Jiffy day = Jiffy.parseFromDateTime(startDay).add(
-              weeks: j,
-              days: i.day - 1,
-            );
-            vevent = "BEGIN:VEVENT\n$summary";   
-            vevent +=
-              "DTSTART:${day.add(weeks: j, hours: int.parse(startTime[0]), minutes: int.parse(startTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
-            vevent +=
-              "DTEND:${day.add(weeks: j, hours: int.parse(stopTime[0]), minutes: int.parse(stopTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";            
-        } 
+          // @hgh: find the next week that has class
+          j++;
+          while (j < i.weekList.length && !i.weekList[j]) {
+            ++j;
+          }
+          // @hgh: if the next week is the last week, then end the current recurrence
+          if (j == i.weekList.length) break;
+
+          // reset the vevent
+          Jiffy day = Jiffy.parseFromDateTime(startDay).add(
+            weeks: j,
+            days: i.day - 1,
+          );
+          vevent = "BEGIN:VEVENT\n" "$summary";
+          vevent += "DTSTART;TZID:Asia/Shanghai:"
+              "${day.add(
+                    weeks: j,
+                    hours: int.parse(startTime[0]),
+                    minutes: int.parse(startTime[1]),
+                  ).format(
+                    pattern: 'yyyyMMddTHHmmss',
+                  )}\n";
+          vevent += "DTEND;TZID:Asia/Shanghai:"
+              "${day.add(
+                    weeks: j,
+                    hours: int.parse(stopTime[0]),
+                    minutes: int.parse(stopTime[1]),
+                  ).format(
+                    pattern: 'yyyyMMddTHHmmss',
+                  )}\n";
+        }
       }
     }
     return "${toReturn}END:VCALENDAR";
