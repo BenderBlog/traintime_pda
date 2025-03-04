@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.4.3+27
+version: 1.4.5+28
 
 environment:
   sdk: ">=3.0.0"
@@ -64,6 +64,8 @@ dependencies:
   disclosure: ^2.2.0
   content_resolver: ^0.3.1
   permission_handler: ^11.3.1
+  # Output to system calendar
+  device_calendar: ^4.3.3
   # Homepage Widget
   home_widget: ^0.6.0
   image: ^4.2.0

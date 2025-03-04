@@ -335,6 +335,13 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         )),
                       ),
                       PopupMenuItem<String>(
+                        value: 'H',
+                        child: Text(FlutterI18n.translate(
+                          context, "Output to sys.",
+                          //"classtable.popup_menu.delete_partner_file",
+                        )),
+                      ),
+                      PopupMenuItem<String>(
                         value: 'E',
                         child: Text(FlutterI18n.translate(
                           context,
@@ -636,6 +643,17 @@ class _ClassTablePageState extends State<ClassTablePage> {
                             ),
                           );
                         }
+                      case 'H':
+                        await classTableState.outputToCalendar().then((data) {
+                          if (context.mounted) {
+                            showToast(
+                              context: context,
+                              msg: data
+                                  ? "Successfully output to calendar"
+                                  : "Failed to output class to calendar.",
+                            );
+                          }
+                        });
                     }
                   },
                 ),
