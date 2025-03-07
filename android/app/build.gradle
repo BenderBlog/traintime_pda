@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 34
+    compileSdk = 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -44,6 +44,8 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
+    namespace = "io.github.benderblog.traintime_pda"
 
     defaultConfig {
         applicationId "io.github.benderblog.traintime_pda"
@@ -87,6 +89,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21"
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Ref. https://github.com/tensorflow/flutter-tflite/issues/278
+    implementation "org.tensorflow:tensorflow-lite-gpu-api:+"
 }
 
 ext.abiCodes = ["x86_64": 1, "armeabi-v7a": 2, "arm64-v8a": 3]

@@ -13,6 +13,10 @@ enum Localization {
   traditionalChinese(
     toShow: "setting.localization_dialog.traditionalChinese",
     string: "zh_TW",
+  ),
+  english(
+    toShow: "setting.localization_dialog.english",
+    string: "en_US",
   );
   // english under construction.
 

@@ -107,7 +107,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurfaceVariant
-                        .withOpacity(0.4),
+                        .withValues(alpha: 0.4),
                   ),
                 )
               ],

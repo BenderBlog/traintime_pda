@@ -312,11 +312,9 @@ class _AboutPageState extends State<AboutPage> {
                 TextSpan(
                   text: " v${preference.packageInfo.version}\n",
                 ),
-                TextSpan(
-                  text: Platform.isIOS || Platform.isMacOS
-                      ? "Holidays In The Sun - PDA One Year Anniversary, Second Edition"
-                      : "Revolution - PDA One Year Anniversary, Second Edition",
-                  style: const TextStyle(fontSize: 16),
+                const TextSpan(
+                  text: "PDA Girl Edition",
+                  style: TextStyle(fontSize: 16),
                 ),
               ],
             ),

@@ -12,7 +12,6 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
-import 'package:watermeter/repository/preference.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -25,7 +24,12 @@ class _ScorePageState extends State<ScorePage> {
   late ScoreState c;
   late TextEditingController text;
 
-  Future<void> scoreInfoDialog(BuildContext context) => context.pushDialog(
+  Widget scoreInfoDialog(BuildContext context) => FloatingActionButton(
+        child: const Icon(Icons.calculate),
+        onPressed: () => c.setScoreChoiceMod(),
+      );
+
+  void pushSumDialog(BuildContext context) => context.pushDialog(
         AlertDialog(
           title: Text(FlutterI18n.translate(
             context,
@@ -46,15 +50,6 @@ class _ScorePageState extends State<ScorePage> {
               },
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(FlutterI18n.translate(
-                context,
-                "confirm",
-              )),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
         ),
       );
 
@@ -84,22 +79,6 @@ class _ScorePageState extends State<ScorePage> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: Navigator.of(c.context).pop,
-        ),
-        title: Text(FlutterI18n.translate(
-          context,
-          "score.score_page.title",
-        )),
-        actions: [
-          if (!getBool(Preference.role))
-            IconButton(
-              icon: const Icon(Icons.calculate),
-              onPressed: () => c.setScoreChoiceMod(),
-            ),
-        ],
-      ),
       body: Column(
         children: [
           Wrap(
@@ -197,6 +176,7 @@ class _ScorePageState extends State<ScorePage> {
           }).safeArea().expanded(),
         ],
       ),
+      floatingActionButton: scoreInfoDialog(context),
       bottomNavigationBar: Visibility(
         visible: c.controllers.isSelectMod,
         child: BottomAppBar(
@@ -234,19 +214,16 @@ class _ScorePageState extends State<ScorePage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(c.bottomInfo(context)),
-                  FloatingActionButton(
-                    elevation: 0.0,
-                    highlightElevation: 0.0,
-                    focusElevation: 0.0,
-                    disabledElevation: 0.0,
-                    onPressed: () => scoreInfoDialog(context),
-                    child: const Icon(Icons.panorama_fisheye),
-                  ),
+                  IconButton(
+                    onPressed: () => pushSumDialog(context),
+                    icon: const Icon(Icons.info),
+                  )
                 ],
               ),
             ],

@@ -11,6 +11,12 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 
+enum ExperimentFetchStatus {
+  notSchoolNetwork,
+  noPassword,
+  success,
+}
+
 class ExperimentSession extends NetworkSession {
   @override
   Dio get dio => Dio()
@@ -130,15 +136,15 @@ class ExperimentSession extends NetworkSession {
     throw NotFoundTeacherException;
   }
 
-  Future<List<ExperimentData>> getData() async {
+  Future<(ExperimentFetchStatus, List<ExperimentData>)> getData() async {
     if (await NetworkSession.isInSchool() == false) {
-      throw NotSchoolNetworkException;
+      return (ExperimentFetchStatus.notSchoolNetwork, <ExperimentData>[]);
     }
 
     if (preference
         .getString(preference.Preference.experimentPassword)
         .isEmpty) {
-      throw NoExperimentPasswordException;
+      return (ExperimentFetchStatus.noPassword, <ExperimentData>[]);
     }
 
     log.debug(
@@ -257,7 +263,7 @@ class ExperimentSession extends NetworkSession {
         ),
       );
     }
-    return toReturn;
+    return (ExperimentFetchStatus.success, toReturn);
   }
 }
 

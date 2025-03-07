@@ -4,7 +4,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -89,22 +88,32 @@ class PersonalInfoSession extends EhallSession {
         "[ehall_session][getInformation] "
         "Get the day the semester begin.",
       );
-      DateTime now = DateTime.now();
-      var currentWeek = await dio.post(
-        'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-        data: {'day': Jiffy.parseFromDateTime(now).format(pattern: "yyyyMMdd")},
-      ).then((value) => value.data);
-      currentWeek = RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])![0]!;
+
       log.info(
-        "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
+        "[ehall_session][getInformation] "
+        "Get the semester information.",
       );
-      int weekDay = now.weekday - 1;
-      String termStartDay = Jiffy.parseFromDateTime(now)
-          .add(weeks: 1 - int.parse(currentWeek), days: -weekDay)
-          .format(pattern: "yyyy-MM-dd");
+      String? location = await checkAndLogin(
+        target: "https://yjspt.xidian.edu.cn/gsapp/"
+            "sys/wdkbapp/*default/index.do#/xskcb",
+        sliderCaptcha: (String cookieStr) =>
+            SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+      );
+
+      while (location != null) {
+        var response = await dio.get(location);
+        log.info("[getClasstable][getYjspt] Received location: $location.");
+        location = response.headers[HttpHeaders.locationHeader]?[0];
+      }
+
+      var semesterCode = await dio
+          .post(
+            "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/kfdxnxqcx.do",
+          )
+          .then((value) => value.data["datas"]["kfdxnxqcx"]["rows"][0]["WID"]);
       preference.setString(
-        preference.Preference.currentStartDay,
-        termStartDay,
+        preference.Preference.currentSemester,
+        semesterCode,
       );
     }
 
@@ -222,22 +231,6 @@ class PersonalInfoSession extends EhallSession {
       preference.setString(
         preference.Preference.currentSemester,
         semesterCode,
-      );
-
-      log.info(
-        "[ehall_session][getInformation] "
-        "Get the day the semester begin.",
-      );
-      String termStartDay = await dioEhall.post(
-        'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-        data: {
-          'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
-          'XQ': semesterCode.split('-')[2]
-        },
-      ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-      preference.setString(
-        preference.Preference.currentStartDay,
-        termStartDay,
       );
     }
 

@@ -22,7 +22,7 @@ class ClassTableDateRow extends StatelessWidget {
       /// day shows.
       height: midRowHeight,
       padding: const EdgeInsets.symmetric(vertical: 5),
-      color: Colors.grey.shade200.withOpacity(0.75),
+      color: Colors.grey.shade200.withValues(alpha: 0.75),
       child: Row(children: [
         Text(
           FlutterI18n.translate(

@@ -145,8 +145,8 @@ class _ClassTablePageState extends State<ClassTablePage> {
               child: SizedBox(
                 width: weekButtonWidth,
                 child: Card(
-                  color: Theme.of(context).highlightColor.withOpacity(
-                        classTableState.chosenWeek == index ? 0.3 : 0.0,
+                  color: Theme.of(context).highlightColor.withValues(
+                        alpha: classTableState.chosenWeek == index ? 0.3 : 0.0,
                       ),
                   elevation: 0.0,
                   child: InkWell(
@@ -335,6 +335,13 @@ class _ClassTablePageState extends State<ClassTablePage> {
                         )),
                       ),
                       PopupMenuItem<String>(
+                        value: 'H',
+                        child: Text(FlutterI18n.translate(
+                          context, "Output to sys.",
+                          //"classtable.popup_menu.delete_partner_file",
+                        )),
+                      ),
+                      PopupMenuItem<String>(
                         value: 'E',
                         child: Text(FlutterI18n.translate(
                           context,
@@ -457,8 +464,6 @@ class _ClassTablePageState extends State<ClassTablePage> {
                                             content: TextField(
                                               autofocus: true,
                                               controller: controller,
-                                              keyboardType:
-                                                  TextInputType.number,
                                               maxLines: 1,
                                               decoration: InputDecoration(
                                                 hintText: FlutterI18n.translate(
@@ -638,6 +643,17 @@ class _ClassTablePageState extends State<ClassTablePage> {
                             ),
                           );
                         }
+                      case 'H':
+                        await classTableState.outputToCalendar().then((data) {
+                          if (context.mounted) {
+                            showToast(
+                              context: context,
+                              msg: data
+                                  ? "Successfully output to calendar"
+                                  : "Failed to output class to calendar.",
+                            );
+                          }
+                        });
                     }
                   },
                 ),
@@ -665,7 +681,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
         appBar: AppBar(
           title: Text(FlutterI18n.translate(
             context,
-            "classtable.partner_classtable.page_title",
+            "classtable.page_title",
           )),
           leading: IconButton(
             icon: Icon(

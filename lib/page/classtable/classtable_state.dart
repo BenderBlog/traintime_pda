@@ -5,9 +5,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
@@ -253,32 +255,258 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Generate icalendar file string.
   String get iCalenderStr {
-    String toReturn = "BEGIN:VCALENDAR\nTZID:Asia/Shanghai\n";
+    String toReturn = "BEGIN:VCALENDAR\n";
+
+    // @hgh: i here means each single course assignment
     for (var i in timeArrangement) {
-      String summary =
-          "SUMMARY:${getClassDetail(timeArrangement.indexOf(i))}@${i.classroom ?? "待定"}\n";
-      String description =
-          "DESCRIPTION:课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; "
+      // @hgh: j here means each week for a single course assignment
+      // @hgh: find the first week that has class
+      int j = i.weekList.indexWhere((element) => element);
+
+      // @benderblog: basically not happens, but if not arranged, just skip it.
+      if (j == -1) continue;
+
+      String summary = "SUMMARY:"
+          "${getClassDetail(timeArrangement.indexOf(i)).name}"
+          "@${i.classroom ?? "待定"}\n";
+      String description = "DESCRIPTION:"
+          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; "
           "上课地点：${i.classroom ?? "待定"}\n";
+
+      // @hgh: initialize the first day(or, first recurrence) of the class
+      Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
+        weeks: j,
+        days: i.day - 1,
+      );
+      String vevent = "BEGIN:VEVENT\n$summary";
+      List<String> startTime = time[(i.start - 1) * 2].split(":");
+      List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
+      vevent += "DTSTART;TZID:Asia/Shanghai:"
+          "${firstDay.add(
+                hours: int.parse(startTime[0]),
+                minutes: int.parse(startTime[1]),
+              ).format(
+                pattern: 'yyyyMMddTHHmmss',
+              )}\n";
+      vevent += "DTEND;TZID:Asia/Shanghai:"
+          "${firstDay.add(
+                hours: int.parse(stopTime[0]),
+                minutes: int.parse(stopTime[1]),
+              ).format(
+                pattern: 'yyyyMMddTHHmmss',
+              )}\n";
+
       for (int j = 0; j < i.weekList.length; ++j) {
-        if (!i.weekList[j]) {
-          continue;
+        // @hgh: if the next week doesn't have class, then end the current recurrence
+        if (j != i.weekList.length - 1 && !i.weekList[j + 1]) {
+          vevent += "RRULE:FREQ=WEEKLY;"
+              "UNTIL=${firstDay.add(
+                    weeks: j,
+                    days: 1,
+                  ).format(
+                    pattern: 'yyyyMMddTHHmmss',
+                  )}"
+              "\n";
+          toReturn += "$vevent$description"
+              "END:VEVENT\n"; // one recurrence over equals to one VEVENT over
+
+          // upper: end the current recurrence
+          // lower: start a new recurrence
+
+          // @hgh: find the next week that has class
+          j++;
+          while (j < i.weekList.length && !i.weekList[j]) {
+            ++j;
+          }
+          // @hgh: if the next week is the last week, then end the current recurrence
+          if (j == i.weekList.length) break;
+
+          // reset the vevent
+          Jiffy day = Jiffy.parseFromDateTime(startDay).add(
+            weeks: j,
+            days: i.day - 1,
+          );
+          vevent = "BEGIN:VEVENT\n" "$summary";
+          vevent += "DTSTART;TZID:Asia/Shanghai:"
+              "${day.add(
+                    weeks: j,
+                    hours: int.parse(startTime[0]),
+                    minutes: int.parse(startTime[1]),
+                  ).format(
+                    pattern: 'yyyyMMddTHHmmss',
+                  )}\n";
+          vevent += "DTEND;TZID:Asia/Shanghai:"
+              "${day.add(
+                    weeks: j,
+                    hours: int.parse(stopTime[0]),
+                    minutes: int.parse(stopTime[1]),
+                  ).format(
+                    pattern: 'yyyyMMddTHHmmss',
+                  )}\n";
         }
-        Jiffy day = Jiffy.parseFromDateTime(startDay).add(
-          weeks: j,
-          days: i.day - 1,
-        );
-        String vevent = "BEGIN:VEVENT\n$summary";
-        List<String> startTime = time[(i.start - 1) * 2].split(":");
-        List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
-        vevent +=
-            "DTSTART:${day.add(hours: int.parse(startTime[0]), minutes: int.parse(startTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
-        vevent +=
-            "DTEND:${day.add(hours: int.parse(stopTime[0]), minutes: int.parse(stopTime[1])).format(pattern: 'yyyyMMddTHHmmss')}\n";
-        toReturn += "$vevent${description}END:VEVENT\n";
       }
     }
     return "${toReturn}END:VCALENDAR";
+  }
+
+  /// Output to System Calendar
+  Future<bool> outputToCalendar() async {
+    // Fetch calendar permission
+    final DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
+    Result<bool> hasPermitted = await deviceCalendarPlugin.hasPermissions();
+    if (hasPermitted.data != true) {
+      hasPermitted = await deviceCalendarPlugin.requestPermissions();
+      if (hasPermitted.data != true) {
+        log.info(
+          "[Classtable][outputToCalendar] "
+          "Gain permission failed: "
+          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
+        );
+        return false;
+      }
+    }
+
+    // Generate a new calendar
+    (bool, String) calendarIdData = await DeviceCalendarPlugin()
+        .createCalendar(
+      "PDA Class Arrangement $semesterCode "
+      "created at ${Jiffy.now().millisecond}",
+    )
+        .then((data) {
+      if (!data.isSuccess) {
+        log.info(
+          "[Classtable][outputToCalendar] "
+          "Generate new calendar failed: "
+          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
+        );
+        return (false, "");
+      } else {
+        return (true, data.data!);
+      }
+    });
+
+    if (!calendarIdData.$1) {
+      return false;
+    }
+    String calendarId = calendarIdData.$2;
+
+    // UTC+8 timezone defination, hard-coded since our school is in here...
+    Location currentLocation = getLocation("Asia/Shanghai");
+
+    // @hgh: i here means each single course assignment
+    for (var i in timeArrangement) {
+      // @hgh: j here means each week for a single course assignment
+      // @hgh: find the first week that has class
+      int j = i.weekList.indexWhere((element) => element);
+
+      // @benderblog: basically not happens, but if not arranged, just skip it.
+      if (j == -1) continue;
+
+      String title = "${getClassDetail(timeArrangement.indexOf(i)).name}"
+          "@${i.classroom ?? "待定"}";
+      String description =
+          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; \n"
+          "老师：${i.teacher ?? "未知"}"
+          "上课地点：${i.classroom ?? "待定"}";
+
+      // @hgh: initialize the first day(or, first recurrence) of the class
+      Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
+        weeks: j,
+        days: i.day - 1,
+      );
+      List<String> startTime = time[(i.start - 1) * 2].split(":");
+      List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
+      Jiffy startTimeToUse = firstDay.add(
+        hours: int.parse(startTime[0]),
+        minutes: int.parse(startTime[1]),
+      );
+      Jiffy stopTimeToUse = firstDay.add(
+        hours: int.parse(stopTime[0]),
+        minutes: int.parse(stopTime[1]),
+      );
+
+      DayOfWeek getDayOfWeek(int day) {
+        switch (day) {
+          case 1:
+            return DayOfWeek.Monday;
+          case 2:
+            return DayOfWeek.Tuesday;
+          case 3:
+            return DayOfWeek.Wednesday;
+          case 4:
+            return DayOfWeek.Thursday;
+          case 5:
+            return DayOfWeek.Friday;
+          case 6:
+            return DayOfWeek.Saturday;
+          case 7:
+            return DayOfWeek.Sunday;
+          default:
+            return DayOfWeek.Sunday;
+        }
+      }
+
+      for (int j = 0; j < i.weekList.length; ++j) {
+        // @hgh: if the next week doesn't have class, then end the current recurrence
+        if (j != i.weekList.length - 1 && !i.weekList[j + 1]) {
+          RecurrenceRule rrule = RecurrenceRule(
+            RecurrenceFrequency.Weekly,
+            daysOfWeek: [getDayOfWeek(i.day)],
+            endDate: firstDay.add(weeks: j, days: 1).dateTime,
+          );
+          Result<String>? addEventResult =
+              await deviceCalendarPlugin.createOrUpdateEvent(Event(
+            calendarId,
+            title: title,
+            description: description,
+            recurrenceRule: rrule,
+            start: TZDateTime.from(
+              startTimeToUse.dateTime,
+              currentLocation,
+            ),
+            end: TZDateTime.from(
+              stopTimeToUse.dateTime,
+              currentLocation,
+            ),
+          ));
+          // If got error, return with false.
+          if (addEventResult == null ||
+              addEventResult.data == null ||
+              addEventResult.data!.isEmpty) {
+            log.info(
+              "[Classtable][outputToCalendar] "
+              "Add failed: "
+              "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
+            );
+            return false;
+          }
+
+          // upper: end the current recurrence
+          // lower: start a new recurrence
+
+          // @hgh: find the next week that has class
+          j++;
+          while (j < i.weekList.length && !i.weekList[j]) {
+            ++j;
+          }
+          // @hgh: if the next week is the last week, then end the current recurrence
+          if (j == i.weekList.length) break;
+
+          // reset the vevent
+          startTimeToUse = firstDay.add(
+            weeks: j,
+            hours: int.parse(startTime[0]),
+            minutes: int.parse(startTime[1]),
+          );
+          stopTimeToUse = firstDay.add(
+            weeks: j,
+            hours: int.parse(stopTime[0]),
+            minutes: int.parse(stopTime[1]),
+          );
+        }
+      }
+    }
+    return true;
   }
 
   /// Generate shared class data.

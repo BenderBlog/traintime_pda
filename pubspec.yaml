@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.4.2+26
+version: 1.4.5+28
 
 environment:
   sdk: ">=3.0.0"
@@ -64,11 +64,17 @@ dependencies:
   disclosure: ^2.2.0
   content_resolver: ^0.3.1
   permission_handler: ^11.3.1
+  # Output to system calendar
+  device_calendar: ^4.3.3
   # Homepage Widget
   home_widget: ^0.6.0
   image: ^4.2.0
   catcher_2: ^2.0.0
-  receive_sharing_intent: ^1.8.1
+  #receive_sharing_intent: ^1.8.1
+  receive_sharing_intent:
+    git:
+      url: https://github.com/KasemJaffer/receive_sharing_intent
+      ref: 2cea396843cd3ab1b5ec4334be4233864637874e
   # XDU Planet
   flutter_widget_from_html_core: any
   fwfh_cached_network_image: ^0.14.3
@@ -116,5 +122,6 @@ flutter:
     - assets/art/CP1919.svg.vec
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
+    - assets/flutter_i18n/en_US.yaml
     - assets/captcha-solver-payment.tflite
     - assets/captcha-solver-zfw.tflite

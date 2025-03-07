@@ -133,7 +133,7 @@ class ExperimentController extends GetxController {
   @override
   void onReady() async {
     super.onReady();
-    get().then((value) => update());
+    get();
   }
 
   Future<void> get() async {
@@ -145,21 +145,25 @@ class ExperimentController extends GetxController {
       "Fetching data from Internet.",
     );
     try {
-      data = await ExperimentSession().getData();
-      status = ExperimentStatus.fetched;
-      error = "";
-    } on NoExperimentPasswordException {
-      log.warning(
-        "[ExperimentController][get] "
-        "Do not find experiment password",
-      );
-      error = "experiment_controller.no_password";
-    } on NotSchoolNetworkException {
-      log.warning(
-        "[ExperimentController][get] "
-        "Not in school exception",
-      );
-      error = "not_school_network";
+      (ExperimentFetchStatus, List<ExperimentData>) returnedData =
+          await ExperimentSession().getData();
+      if (returnedData.$1 == ExperimentFetchStatus.notSchoolNetwork) {
+        log.warning(
+          "[ExperimentController][get] "
+          "Not in school exception",
+        );
+        error = "not_school_network";
+      } else if (returnedData.$1 == ExperimentFetchStatus.noPassword) {
+        log.warning(
+          "[ExperimentController][get] "
+          "Do not find experiment password",
+        );
+        error = "experiment_controller.no_password";
+      } else {
+        data = returnedData.$2;
+        status = ExperimentStatus.fetched;
+        error = "";
+      }
     } on LoginFailedException catch (e, s) {
       log.handle(e, s);
       if (e.msg != null && e.msg!.isNotEmpty) {

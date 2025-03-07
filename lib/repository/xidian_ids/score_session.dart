@@ -238,7 +238,7 @@ class ScoreSession extends EhallSession {
     return toReturn;
   }
 
-  Future<List<Score>> getScore() async {
+  Future<List<Score>> getScore({bool force = false}) async {
     List<Score> toReturn = [];
     List<Score> cache = [];
 
@@ -247,10 +247,9 @@ class ScoreSession extends EhallSession {
       "[ScoreSession][getScore] "
       "Path at ${supportPath.path}/$scoreListCacheName.",
     );
-    if (file.existsSync()) {
+    if (file.existsSync() && !force) {
       final timeDiff =
           DateTime.now().difference(file.lastModifiedSync()).inMinutes;
-
       log.info(
         "[ScoreSession][getScore] "
         "Cache file found.",
@@ -289,6 +288,7 @@ class ScoreSession extends EhallSession {
         "[ScoreSession][getScore] "
         "Cached the score data.",
       );
+      isScoreListCacheUsed = false;
       return toReturn;
     } catch (e) {
       if (cache.isNotEmpty) {

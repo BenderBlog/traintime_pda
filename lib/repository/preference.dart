@@ -53,7 +53,7 @@ enum Preference {
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
-  currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
+  //currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
   role(key: "role", type: "bool"), // 是否为研究生
   simplifiedClassTimeline(
     key: "simplifiedClassTimeline",

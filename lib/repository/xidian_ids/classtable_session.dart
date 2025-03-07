@@ -108,7 +108,15 @@ class ClassTableFile extends EhallSession {
       'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
       data: {'day': Jiffy.parseFromDateTime(now).format(pattern: "yyyyMMdd")},
     ).then((value) => value.data);
-    currentWeek = RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])![0]!;
+    if (!currentWeek.toString().contains("xnxq")) {
+      return ClassTableData(
+        semesterCode: semesterCode,
+        termStartDay: "2025-01-01",
+      );
+    }
+    currentWeek =
+        RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])?[0] ?? "null";
+
     log.info(
       "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
     );
@@ -118,11 +126,11 @@ class ClassTableFile extends EhallSession {
         .startOf(Unit.day)
         .format(pattern: "yyyy-MM-dd HH:mm:ss");
 
-    if (preference.getString(preference.Preference.currentStartDay) !=
-        termStartDay) {
+    if (preference.getString(preference.Preference.currentSemester) !=
+        semesterCode) {
       preference.setString(
-        preference.Preference.currentStartDay,
-        termStartDay,
+        preference.Preference.currentSemester,
+        semesterCode,
       );
 
       /// New semenster, user defined class is useless.
@@ -293,6 +301,10 @@ class ClassTableFile extends EhallSession {
         preference.Preference.currentSemester,
         semesterCode,
       );
+
+      /// New semenster, user defined class is useless.
+      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
 
     log.info(
@@ -306,17 +318,6 @@ class ClassTableFile extends EhallSession {
         'XQ': semesterCode.split('-')[2]
       },
     ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
-    if (preference.getString(preference.Preference.currentStartDay) !=
-        termStartDay) {
-      preference.setString(
-        preference.Preference.currentStartDay,
-        termStartDay,
-      );
-
-      /// New semenster, user defined class is useless.
-      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      if (userClassFile.existsSync()) userClassFile.deleteSync();
-    }
     log.info(
       "[getClasstable][getEhall] "
       "Will get $semesterCode which start at $termStartDay.",

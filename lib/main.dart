@@ -98,7 +98,11 @@ class _MyAppState extends State<MyApp> {
 
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
-      IDSSession().dio.get("https://www.xidian.edu.cn");
+      try {
+        IDSSession().dio.get("https://www.xidian.edu.cn");
+        // Should the permission request be sent on iOS
+        // ignore: empty_catches
+      } catch (e) {}
     }
   }
 
@@ -115,7 +119,7 @@ class _MyAppState extends State<MyApp> {
             ),
             missingTranslationHandler: (key, locale) {
               log.info(
-                "--- Missing Key: $key, "
+                "[Locale] Missing Key: $key, "
                 "languageCode: ${locale?.languageCode ?? "unknown"}",
               );
             },
@@ -127,6 +131,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('zh', 'CN'),
           Locale('zh', 'TW'),
+          Locale('en', 'US')
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),

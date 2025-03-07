@@ -43,7 +43,7 @@ class ClassDetailCard extends StatelessWidget {
             style: TextStyle(
               color: isOccupied
                   ? infoColor.shade900
-                  : infoColor.shade400.withOpacity(0.8),
+                  : infoColor.shade400.withValues(alpha: 0.8),
             ),
           ),
         ),

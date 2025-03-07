@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # EasyRefresh 下拉插件的玩意
-drag_text: "上拉请求更多"
+drag_text: "上拉获取更多数据"
 ready_text: "正在加载......"
-processing_text: "正在加载......"
+processing_text: "正在处理......"
 processed_text: "请求成功"
-no_more_text: "数据没有更多"
-failed_text: "数据获取失败更多"
+no_more_text: "没有更多数据"
+failed_text: "数据获取失败"
 
 # 公共组件
 choose_semester: "选择学期"
@@ -15,7 +15,7 @@ error_detected: "Ouch! 发生错误啦"
 click_to_refresh: "点我刷新"
 
 # 取消和确定
-confirm_title: "确认对话框"
+confirm_title: "确认？"
 cancel: "取消"
 confirm: "确定"
 
@@ -139,8 +139,8 @@ classtable:
         input_week_hint: "选择上课周次"
         input_time_hint: "选择上课时间"
         input_time_weekday_hint: "上课周次"
-        input_start_time_hint: "上课时间段"
-        input_end_time_hint: "下课时间段"
+        input_start_time_hint: "上课时间"
+        input_end_time_hint: "下课时间"
         wheel_choose_hint: "第 {index} 节"
     course_detail_card:
         class_number_string: "{number} 班"
@@ -405,6 +405,7 @@ score:
         select_all: "全选"
         select_nothing: "全不选"
         reset_select: "重置选择"
+        summary: "总结"
         # 也许没用
         CET-4: "国家英语四级"
         CET-6: "国家英语六级"
@@ -515,6 +516,7 @@ setting:
         undefined: "追随系统设置"
         simplifiedChinese: "简体中文"
         traditionalChinese: "繁体中文"
+        english: "英语"
     # 关于页面
     easter_egg_page: "你找到了彩蛋"
     about_page:
@@ -655,54 +657,23 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg: |-
-    "Holiday in the Sun" -> Sex Pistols, 1977
+    (本歌曲请搭配 PDA 娘)
 
-    又是一个廉价的黄金周旅行灾难！
+    天空在哭泣
+    看着眼泪落在街头
 
-    "Revolution" -> John Lennon, The Beatles, 1970
+    我望向窗外
+    雨倾盆而下
 
-    想要毁坏旧势力？别把我忘了！
+    她将我落在那个早晨
+    我不知为何
+    每次想到的时候
+    我都垂头哭泣
 
-    Book of PDA under constrction...
+    天放晴了
+    尽管我的心中还在大雨
+    阳光和煦
+    我爱她
+    我不想分离
 
-    ==== Main Charater ====
-
-    Once upon a time, there's a 'Hard Lovin' Man called Ray, whose understand the power of the Railgun called 'Flight of the Rat. 
-
-    Once after a battle with a 'Bloodsucker, he was tired as a high school student. He discovered a Purple Rat in the Square Forest.
-
-    Unknown her name, "She like a sweet potato, like my Rat gun. Just call her Sweet Purple Potato Ball, idk...", he thought. And he brought her to his home(maybe?)
-
-    The rat is clever, actually she is a angel named Elliot. We don't know why her soul inside a rat. Forgive me, I am drunked.
-
-    She knows he is the 'Child of the Time. They may argue, may laugh. In my opinion, she lighten Ray's seemly colorless life.
-
-    Don't know how time flies, she made he faster in running, attacking. With the power of the 'Rat gun', he become the threating 'Speed King.
-
-    ==== Another Main Charater ====
-
-    Another time, in the midland of Orestreich, a lonely bard named Reggirt, found a Knight (Contributer To Be Decided) shooting at the Sun.
-
-    "Just another 'Firefall, it soon become mime.", the Knight said.
-
-    "What's your purpose, sir? You may get your head kicked by a 'Mule", Reggrit asked.
-
-    Knight smiled, "It's not the Sun, 'no no no, it's the 'Demon's Eye. The source of mystery, of pain, of all struggle..."
-
-    "Wait! It's the source of all living thing, we're all hers 'Daughter..."
-
-    "... and that's our parents, 'Fools!" Knight signed, "What a complex feeling, 'No one came to realize this felling like me..."
-
-    ==== The Evil ====
-
-    So the time files, the world became colorless, the 'Night Prowler born from the shadow of the sun.
-
-    With the uncertain of the humanity and the grease of the relationship, it became more powerful. 
-
-    Soon, it took away the joy, trust, and all stuff we could remains years of years. He named himself Bender, who realized his goal is to bent everything entertains us.
-
-    Night Prowler itself evolued into a sliver chrome machinery, with laser eyes which absorb the happiness and sweetie from air and earth.
-
-    Itself found that a band, 'Sgt. Pepper Lonely Hearted Band, is the source of the bright things of the world.
-
-    He deside to let them 'bite his shiny metal ass, and seal them with 'The Devil's Triangle...
+    Translate by Ray (Laid at Rat's Inside Edition)

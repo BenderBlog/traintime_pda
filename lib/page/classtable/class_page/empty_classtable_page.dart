@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
+import 'package:watermeter/repository/preference.dart';
 
 class EmptyClasstablePage extends StatelessWidget {
   const EmptyClasstablePage({super.key});
@@ -11,9 +12,9 @@ class EmptyClasstablePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => EmptyListView(
         type: Type.reading,
-        text: FlutterI18n.translate(
-          context,
-          "classtable.empty_class_message",
-        ),
+        text: FlutterI18n.translate(context, "classtable.empty_class_message",
+            translationParams: {
+              "semester_code": getString(Preference.currentSemester)
+            }),
       );
 }

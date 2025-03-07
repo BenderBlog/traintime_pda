@@ -203,7 +203,7 @@ class _ClassTableViewState extends State<ClassTableView> {
       [
         classSubRow(false)
             .toColumn()
-            .decorated(color: Colors.grey.shade200.withOpacity(0.75))
+            .decorated(color: Colors.grey.shade200.withValues(alpha: 0.75))
             .constrained(width: leftRow)
             .positioned(left: 0),
         ...classSubRow(true),
