@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
@@ -19,6 +20,8 @@ enum SessionState {
   error,
   none,
 }
+
+Rx<SessionState> isInit = SessionState.none.obs;
 
 class NetworkSession {
   //@protected
@@ -57,6 +60,51 @@ class NetworkSession {
         .then((value) => isInSchool = true)
         .onError((error, stackTrace) => isInSchool = false);
     return isInSchool;
+  }
+
+  NetworkSession() {
+    if (isInit.value == SessionState.none) {
+      initSession();
+    }
+  }
+
+  Future<void> initSession() async {
+    log.info(
+      "[NetworkSession][initSession] "
+      "Current State: ${isInit.value}",
+    );
+    if (isInit.value == SessionState.fetching) {
+      return;
+    }
+    try {
+      isInit.value = SessionState.fetching;
+      log.info(
+        "[NetworkSession][initSession] "
+        "Fetching...",
+      );
+      var response = await dio.get(
+        "http://linux.xidian.edu.cn",
+      );
+      if (response.statusCode == 200) {
+        isInit.value = SessionState.fetched;
+        log.info(
+          "[NetworkSession][initSession] "
+          "Fetched",
+        );
+      } else {
+        isInit.value = SessionState.error;
+        log.error(
+          "[NetworkSession][initSession] "
+          "Error",
+        );
+      }
+    } catch (e) {
+      isInit.value = SessionState.error;
+      log.error(
+        "[NetworkSession][initSession] "
+        "Error: $e",
+      );
+    }
   }
 }
 
