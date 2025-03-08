@@ -124,6 +124,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const CircularProgressIndicator(),
+
               const SizedBox(height: 16),
               Text(FlutterI18n.translate(context, "xdu_planet.loading")),
             ],
