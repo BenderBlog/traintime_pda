@@ -5,8 +5,7 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
-import 'package:watermeter/page/homepage/info_widget/network_card.dart';
-import 'package:watermeter/page/homepage/toolbox/schoolnet_card.dart';
+import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -49,14 +48,13 @@ class _MainPageState extends State<MainPage> {
     ElectricityCard(),
     LibraryCard(),
     SchoolCardInfoCard(),
-    NetworkCard(),
+    SchoolnetCard(),
   ];
 
   final List<Widget> smallFunction = [
     const ScoreCard(),
     const ExamCard(),
     const EmptyClassroomCard(),
-    // const SchoolnetCard(),
     if (prefs.getBool(prefs.Preference.role) == false) ...[
       const ExperimentCard(),
       const SportCard(),

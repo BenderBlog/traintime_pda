@@ -295,39 +295,47 @@ class _AboutPageState extends State<AboutPage> {
         ),
       ];
 
-  Widget _title(context) => [
-        const AppIconWidget(),
-        const Divider(color: Colors.transparent),
-        DefaultTextStyle.merge(
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 22),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: Platform.isIOS || Platform.isMacOS
-                      ? "XDYou"
-                      : "Traintime PDA",
-                ),
-                TextSpan(
-                  text: " v${preference.packageInfo.version}\n",
-                ),
-                const TextSpan(
-                  text: "PDA Girl Edition",
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
+  Widget _title(context) {
+    String langtag =
+        FlutterI18n.currentLocale(context)?.toLanguageTag() ?? "und";
+    return [
+      const AppIconWidget(),
+      const Divider(color: Colors.transparent),
+      DefaultTextStyle.merge(
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 22),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: Platform.isIOS || Platform.isMacOS
+                    ? "XDYou"
+                    : "Traintime PDA",
+              ),
+              TextSpan(
+                text: " v${preference.packageInfo.version}\n",
+              ),
+              TextSpan(
+                text: langtag.contains("en")
+                    ? "Take it to the Limit Edition"
+                    : langtag.contains("TW")
+                        ? "Gimme Shelter Edition"
+                        : "The Sky is Crying Edition",
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
           ),
         ),
-      ]
-          .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
-          .padding(all: 32)
-          .gestures(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const EasterEggPage()),
-            ),
-          );
+      ),
+    ]
+        .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
+        .padding(all: 32)
+        .gestures(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const EasterEggPage()),
+          ),
+        );
+  }
 
   Widget get _developerList => ReXCard(
         title: Text(
