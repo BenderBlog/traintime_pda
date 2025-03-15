@@ -8,18 +8,15 @@ class NetworkUsage {
   final String rest;
   final String charged;
 
-  /// Provide by xenode, "blackbox"...
-  final NetworkInfo networkInfo;
-
   const NetworkUsage({
     required this.ipList,
     required this.used,
     required this.rest,
     required this.charged,
-    required this.networkInfo,
   });
 }
 
+/// Provide by xenode, "blackbox"...
 class NetworkInfo {
   late int serverFlag;
   late int addTime;

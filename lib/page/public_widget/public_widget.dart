@@ -154,9 +154,11 @@ class ReloadWidget extends StatelessWidget {
   final void Function() function;
   // Stands for Exception...
   final Object? errorStatus;
+  final String? buttonName;
   const ReloadWidget({
     super.key,
     required this.function,
+    this.buttonName,
     this.errorStatus,
   });
 
@@ -171,10 +173,11 @@ class ReloadWidget extends StatelessWidget {
       ),
       FilledButton(
         onPressed: function,
-        child: Text(FlutterI18n.translate(
-          context,
-          "click_to_refresh",
-        )),
+        child: Text(buttonName ??
+            FlutterI18n.translate(
+              context,
+              "click_to_refresh",
+            )),
       ),
     ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)

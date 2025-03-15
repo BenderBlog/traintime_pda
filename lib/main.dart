@@ -290,7 +290,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, widget) {
           Catcher2.addDefaultErrorWidget(
             showStacktrace: true,
-            title: "未预期情况发生！",
+            title: "Unexpected problem:P",
             description: "An unexpected behaviour occured!",
             maxWidthForSmallMode: 150,
           );

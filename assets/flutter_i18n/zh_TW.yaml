@@ -268,6 +268,12 @@ homepage:
     score_cannot_reach: 離線狀態且無快取成績資料，無法訪問
     exam_fetching: 請稍候，正在獲取考試資訊
     exam_error: 遇到錯誤，請聯絡開發者
+  school_net:
+    title: 校園網餘量
+    no_password: 無校園網密碼，點選設定
+    failed: 獲取校園網流量資訊失敗
+    fetching: 正在獲取校園網流量資訊
+    remaining: 當前餘量 {remaining}
 library:
   title: 圖書館資訊
   borrow_state_title: 借書狀態
@@ -319,24 +325,45 @@ login:
     message_on_empty: 請輸入驗證碼
   slider_title: 伺服器認證服務
 school_net:
-  dialog_title: 校園網使用詳情
+  title: 校園網使用詳情
+  ids_account_net:
+    title: 當前使用者
+    notice: "這是登入到 PDA 賬戶的校園網資訊
+
+      注意: 流量計費採用GB單位（1000進位制）"
+    overview: 賬戶概覽
+    account: 賬號
+    used: 已使用流量
+    remain: 餘額
+    current_online: 線上裝置（{length}臺）
+    no_device_online: 當前沒有線上裝置
+  current_login_net:
+    title: 正在使用
+    notice: "這是您正在使用中校園網的資訊，可能和您登入 PDA 的資訊不一致
+
+      注意: 流量計費採用GB單位（1000進位制）"
+    overview: 賬戶概覽
+    account: 賬號
+    plan_type: 套餐型別
+    remain: 餘額
+    usage_situation: 流量使用情況
+    used_percent: 已使用 {percent}%
+    used: 已使用流量
+    remain_count: 剩餘流量
+    total: 總流量
+    non_schoolnet: 非校園網
+  device_list:
+    ip: 線上裝置IP
+    time: 上線時間
+    remain: 流量用量
   fetching: 正在獲取校園網資訊
-  basic_message: "此月已使用流量 {used} ,剩餘 {rest} , 結賬日期 {charged}
-
-
-    當前線上裝置如下：
-
-    "
-  detail_message: "IP 地址：{ip}
-
-    上線時間：{time}
-
-    已經使用流量：{amount}
-
-    "
   empty_password: 您忘記輸入賬號密碼了
-  error_fetch: 獲取失敗：{msg}
+  not_initalized: 疑似查詢後端尚未開放查詢
+  captcha_failed: 驗證碼識別失敗
+  wrong_password: 密碼錯誤
+  error_fetch: 獲取失敗
   error_other: 其他錯誤：{msg}
+  refresh: 刷新
 school_card_window:
   title: 校園卡流水資訊
   income: 支出 {income}
@@ -392,6 +419,7 @@ score:
     select_all: 全選
     select_nothing: 全不選
     reset_select: 重置選擇
+    summary: 總結
     CET-4: 國家英語四級
     CET-6: 國家英語六級
 setting:

@@ -291,7 +291,12 @@ homepage:
       score_cannot_reach: "Offline mode with no cached score data, unable to access"
       exam_fetching: "Fetching exam information, please wait"
       exam_error: "An error occurred, please contact the developer"
-
+   school_net:
+      title: "School Net Usage"
+      no_password: "The query password is not set, click to set up"
+      failed: "Failed to get the school net usage info"
+      fetching: "Fetching the school net usage info"
+      remaining: "Remaining {remaining}"
 # 图书馆
 library:
    title: "Library Information"
@@ -346,17 +351,48 @@ login:
 
 # 校园网信息
 school_net:
-   dialog_title: "Schoolnet Usage Query"
-   fetching: "Fetching schoolnet usage data"
-   basic_message: "In this month, you have used {used} cellular data, with {rest} remains, billing date {charged}\n\nCurrently online devices：\n"
-   detail_message: |
-      IP andress：{ip}
-      online time：{time}
-      cellular data used：{amount}
+   title: "School Net Usage Query"
+   ids_account_net:
+      title: "Current user"
+      notice: "This is the current PDA user's information.
 
+         Notice that network traffic is charged in GB (1GB=1000MB)."
+      overview: "Overview of the account"
+      account: "Account"
+      used: "Data usage"
+      remain: "Balance"
+      current_online: "Online devices (currently {length})"
+      no_device_online: "No device is online at the moment"
+   current_login_net:
+      title: "Current using"
+      notice: "This is the information of the current using account.
+
+         It may be different from the current user's, and DON'T BE EVIL!
+
+         Notice that network traffic is charged in GB (1GB=1000MB)."
+      overview: "Overview of the account"
+      account: "Account"
+      plan_type: "Type of the plan"
+      remain: "Balance"
+      usage_situation: "Traffic usage info"
+      used_percent: "Used {percent}%"
+      used: "Data usage"
+      remain_count: "Data remaining"
+      total: "Total data"
+      non_schoolnet: "Not in school net environment"
+   device_list:
+      ip: "Device IP"
+      time: "Online time"
+      remain: "Traffic used"
+
+   fetching: "Fetching schoolnet usage data"
    empty_password: "You may forgot to enter the schoolnet password"
+   not_initalized: "It seems the backend is not open for query:P"
+   captcha_failed: "Failed to idenify captcha"
+   wrong_password: "Wrong schoolnet password"
    error_fetch: "Failed to fetch：{msg}"
    error_other: "Other error：{msg}"
+   refresh: "Refresh"
 
 # 校园卡流水
 school_card_window:

@@ -2,13 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/page/networkcard/network_card_window.dart';
+import 'package:watermeter/page/schoolnet/network_card_window.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -22,28 +20,7 @@ class SchoolnetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        if (preference
-            .getString(preference.Preference.schoolNetQueryPassword)
-            .isEmpty) {
-          await showDialog(
-            context: context,
-            builder: (context) => const SchoolNetPasswordDialog(),
-          ).then((value) {
-            if (preference
-                .getString(preference.Preference.schoolNetQueryPassword)
-                .isNotEmpty) {
-              update(
-                captchaFunction: (image) => showDialog<String>(
-                  context: context,
-                  builder: (context) => CaptchaInputDialog(image: image),
-                ).then((value) => value ?? ""),
-              );
-            }
-          });
-        }
-        if (context.mounted) {
-          context.pushReplacement(const NetworkCardWindow());
-        }
+        context.pushReplacement(const NetworkCardWindow());
       },
       child: Obx(
         () => MainPageCard(

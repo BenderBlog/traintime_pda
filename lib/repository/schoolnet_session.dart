@@ -18,6 +18,19 @@ Rxn<NetworkUsage?> networkInfo = Rxn();
 Rx<SessionState> schoolNetStatus = SessionState.none.obs;
 var isError = "".obs;
 
+// NetworkInfo is not controlled by schoolNetStatus, do remember
+enum CurrentUserNetInfoState {
+  fetching,
+  fetched,
+  notSchool,
+  error,
+  none,
+}
+
+Rxn<NetworkInfo?> currentUserNetInfo = Rxn();
+Rx<CurrentUserNetInfoState> currentUserNetInfoStatus =
+    CurrentUserNetInfoState.none.obs;
+
 Future<void> update({
   Future<String> Function(List<int>)? captchaFunction,
 }) async {
@@ -31,6 +44,38 @@ class SchoolnetSession extends NetworkSession {
     ..options.headers = {"Host": "zfw.xidian.edu.cn"}
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = true;
+
+  static Future<void> getCurrentUserLogin() async {
+    final dio = Dio();
+    currentUserNetInfoStatus.value = CurrentUserNetInfoState.fetching;
+    if (await NetworkSession.isInSchool() == false) {
+      currentUserNetInfoStatus.value = CurrentUserNetInfoState.notSchool;
+      return;
+    }
+    try {
+      final networkInfoResponse = await dio
+          .get(
+            'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
+            queryParameters: {
+              'callback': 'jsonp',
+              '_': DateTime.now().millisecondsSinceEpoch.toString(),
+            },
+            options: Options(
+              responseType: ResponseType.plain,
+            ),
+          )
+          .then((value) => value.data);
+      final jsonString = networkInfoResponse.substring(
+        6,
+        networkInfoResponse.length - 1,
+      );
+      currentUserNetInfo.value = NetworkInfo.fromJson(jsonDecode(jsonString));
+      currentUserNetInfoStatus.value = CurrentUserNetInfoState.fetched;
+      return;
+    } catch (e) {
+      currentUserNetInfoStatus.value = CurrentUserNetInfoState.error;
+    }
+  }
 
   String _getPostStringBody(Map<String, dynamic> toPost) {
     String toPostStr = "";
@@ -48,18 +93,6 @@ class SchoolnetSession extends NetworkSession {
     // Return data
     try {
       final page = await _dio.get("/home").then((page) => page.data);
-      final networkInfoResponse = await dio
-          .get(
-            'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
-            queryParameters: {
-              'callback': 'jsonp',
-              '_': DateTime.now().millisecondsSinceEpoch.toString(),
-            },
-            options: Options(
-              responseType: ResponseType.plain,
-            ),
-          )
-          .then((value) => value.data);
 
       List<(String, String, String)> ipList = [];
       String used = "";
@@ -78,17 +111,11 @@ class SchoolnetSession extends NetworkSession {
           charged = tdList[3].innerHtml;
         }
       });
-
-      final jsonString = networkInfoResponse.substring(
-        6,
-        networkInfoResponse.length - 1,
-      );
       networkInfo.value = NetworkUsage(
         ipList: ipList,
         used: used,
         rest: rest,
         charged: charged,
-        networkInfo: NetworkInfo.fromJson(jsonDecode(jsonString)),
       );
       isError.value = "";
       schoolNetStatus.value = SessionState.fetched;
