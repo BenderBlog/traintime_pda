@@ -122,6 +122,7 @@ class ExamController extends GetxController {
 
   Future<void> get() async {
     ExamStatus previous = status;
+    update();
     log.info(
       "[ExamController][get] "
       "Fetching data from Internet.",

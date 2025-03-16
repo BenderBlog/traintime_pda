@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
@@ -48,16 +49,28 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
             "exam.title",
           )),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.more_time),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => NoArrangedInfo(
-                    list: c.data.toBeArranged,
+            if (!offline &&
+                (c.status == ExamStatus.cache ||
+                    c.status == ExamStatus.fetched))
+              IconButton(
+                icon: const Icon(Icons.update),
+                onPressed: () => c.get().then((value) {
+                  c.update();
+                  updateCurrentData();
+                }),
+              ),
+            if ((c.status == ExamStatus.cache ||
+                c.status == ExamStatus.fetched))
+              IconButton(
+                icon: const Icon(Icons.more_time),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NoArrangedInfo(
+                      list: c.data.toBeArranged,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
         body: Builder(builder: (context) {
