@@ -88,6 +88,8 @@ classtable:
         generate_partner_file: "生成共享课表文件"
         import_partner_file: "导入共享课表文件"
         delete_partner_file: "删除共享课表文件"
+        output_to_system: "导出到系统日历"
+        refresh_classtable: "刷新日程表"
     class_change_page:
         title: "课程调整"
         empty_message: "目前没有调课信息"
@@ -151,6 +153,12 @@ classtable:
         delete: "删除"
         delete_title: "是否删除课程信息？"
         delete_content: "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！"
+    output_to_system:
+        success: "成功导出到系统日历"
+        failure: "导出到系统日历过程中发生了问题:P"
+    refresh_classtable:
+        ready: "准备刷新日程信息"
+        success: "成功刷新日程信息"
 
 # 空闲教室
 empty_classroom:

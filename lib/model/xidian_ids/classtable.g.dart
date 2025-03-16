@@ -50,26 +50,17 @@ TimeArrangement _$TimeArrangementFromJson(Map<String, dynamic> json) =>
       stop: (json['stop'] as num).toInt(),
     );
 
-Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) {
-  final val = <String, dynamic>{
-    'index': instance.index,
-    'week_list': instance.weekList,
-    'teacher': instance.teacher,
-    'day': instance.day,
-    'start': instance.start,
-    'stop': instance.stop,
-    'source': _$SourceEnumMap[instance.source]!,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('classroom', instance.classroom);
-  return val;
-}
+Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) =>
+    <String, dynamic>{
+      'index': instance.index,
+      'week_list': instance.weekList,
+      'teacher': instance.teacher,
+      'day': instance.day,
+      'start': instance.start,
+      'stop': instance.stop,
+      'source': _$SourceEnumMap[instance.source]!,
+      if (instance.classroom case final value?) 'classroom': value,
+    };
 
 const _$SourceEnumMap = {
   Source.empty: 'empty',

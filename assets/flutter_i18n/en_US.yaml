@@ -92,6 +92,8 @@ classtable:
       generate_partner_file: "Generate partner classtable file"
       import_partner_file: "Import partner classtable file"
       delete_partner_file: "Delete partner classtable file"
+      output_to_system: "Output schedule to system calendar"
+      refresh_classtable: "Refresh schedule"
    class_change_page:
       title: "Class Adjustment"
       empty_message: "Currently there's no class schedule changes"
@@ -159,6 +161,12 @@ classtable:
       delete: "Delete"
       delete_title: "Are you sure to delete this class information?"
       delete_content: "Everything will be excuted."
+   output_to_system:
+      success: Successfully output to the system calendar.
+      failure: Problem occurred while outputing to the system calendar.
+   refresh_classtable:
+      ready: Ready to refresh the schedule
+      success: Successfully refresh the schedule
 
 # 空闲教室
 empty_classroom:

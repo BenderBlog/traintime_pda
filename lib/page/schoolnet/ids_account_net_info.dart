@@ -95,7 +95,7 @@ class IdsAccountNetInfo extends StatelessWidget {
                           child: Text(
                             FlutterI18n.translate(
                               context,
-                              "school_net.current_login_net.no_device_online",
+                              "school_net.ids_account_net.no_device_online",
                             ),
                             style: const TextStyle(
                               color: Colors.grey,

@@ -337,8 +337,15 @@ class _ClassTablePageState extends State<ClassTablePage> {
                       PopupMenuItem<String>(
                         value: 'H',
                         child: Text(FlutterI18n.translate(
-                          context, "Output to sys.",
-                          //"classtable.popup_menu.delete_partner_file",
+                          context,
+                          "classtable.popup_menu.output_to_system",
+                        )),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'I',
+                        child: Text(FlutterI18n.translate(
+                          context,
+                          "classtable.popup_menu.refresh_classtable",
                         )),
                       ),
                       PopupMenuItem<String>(
@@ -648,12 +655,70 @@ class _ClassTablePageState extends State<ClassTablePage> {
                           if (context.mounted) {
                             showToast(
                               context: context,
-                              msg: data
-                                  ? "Successfully output to calendar"
-                                  : "Failed to output class to calendar.",
+                              msg: FlutterI18n.translate(
+                                context,
+                                data
+                                    ? "classtable.output_to_system.success"
+                                    : "classtable.output_to_system.failure",
+                              ),
                             );
                           }
                         });
+                      case 'I':
+                        bool isAccepted = await showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: Text(FlutterI18n.translate(
+                                  context,
+                                  "setting.class_refresh_title",
+                                )),
+                                content: Text(FlutterI18n.translate(
+                                  context,
+                                  "setting.class_refresh_content",
+                                )),
+                                actions: [
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      foregroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: Text(FlutterI18n.translate(
+                                      context,
+                                      "cancel",
+                                    )),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    child: Text(FlutterI18n.translate(
+                                      context,
+                                      "confirm",
+                                    )),
+                                  ),
+                                ],
+                              ),
+                            ) ??
+                            false;
+                        if (context.mounted && isAccepted) {
+                          await classTableState
+                              .updateClasstable(context)
+                              .then((data) {
+                            if (context.mounted) {
+                              showToast(
+                                context: context,
+                                msg: FlutterI18n.translate(
+                                  context,
+                                  "classtable.refresh_classtable.success",
+                                ),
+                              );
+                            }
+                          });
+                        }
                     }
                   },
                 ),
@@ -693,7 +758,38 @@ class _ClassTablePageState extends State<ClassTablePage> {
                 Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
           ),
         ),
-        body: const EmptyClasstablePage(),
+        body: [
+          const EmptyClasstablePage(),
+          TextButton.icon(
+            onPressed: () async {
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "classtable.refresh_classtable.ready",
+                ),
+              );
+              await classTableState.updateClasstable(context).then((data) {
+                if (context.mounted) {
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "classtable.refresh_classtable.success",
+                    ),
+                  );
+                }
+              });
+            },
+            icon: const Icon(Icons.update),
+            label: Text(
+              FlutterI18n.translate(
+                context,
+                "classtable.popup_menu.refresh_classtable",
+              ),
+            ),
+          )
+        ].toColumn(),
       );
     }
   }

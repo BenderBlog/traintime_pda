@@ -17,11 +17,13 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/page/homepage/refresh.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
 class ClassTableState extends InheritedWidget {
@@ -517,6 +519,16 @@ class ClassTableWidgetState with ChangeNotifier {
         "exam": examController.data.subject,
         "experiment": experimentController.data,
       });
+
+  /// Update classtable infos
+  Future<void> updateClasstable(BuildContext context) async {
+    await update(
+      context: context,
+      sliderCaptcha: (String cookieStr) {
+        return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
+      },
+    );
+  }
 
   ClassTableWidgetState({
     required this.currentWeek,

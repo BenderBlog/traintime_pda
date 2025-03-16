@@ -71,6 +71,8 @@ classtable:
     generate_partner_file: 生成共享課表檔案
     import_partner_file: 匯入共享課表檔案
     delete_partner_file: 刪除共享課表檔案
+    output_to_system: 匯出到系統日曆
+    refresh_classtable: 重新获取日程表
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課資訊
@@ -141,6 +143,12 @@ classtable:
     delete: 刪除
     delete_title: 是否刪除課程資訊？
     delete_content: 所有關於這個課的資訊都會被刪除，課表上關於這門課的資訊將不復存在！
+  output_to_system:
+    success: 成功匯出到系統日曆
+    failure: 匯出到系統日曆過程中發生了問題:P
+  refresh_classtable:
+    ready: 準備重新整理日程資訊
+    success: 成功重新整理日程資訊
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
@@ -649,8 +657,7 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg: |-
-  (本歌曲請搭配 PDA 娘)
+easter_egg: (本歌曲請搭配 PDA 娘)
 
   外面雷聲大作
   爲啥非得是今天
