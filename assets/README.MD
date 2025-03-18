@@ -20,3 +20,4 @@
  - Icon-App-iTunes-Background：lsy223622，XDYou 图标，仅 iOS 版本使用。版权所有，作者保留一切权利
  - Icon-App-iTunes：lsy223622，XDYou 图标，仅 iOS 版本使用。版权所有，作者保留一切权利
  - icon.png：Benderblog / lsy223622，Traintime PDA 图标
+ - guide：西电信息技术中心

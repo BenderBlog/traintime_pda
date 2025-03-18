@@ -1,0 +1,538 @@
+<!doctype html>
+<html>
+
+<body>
+    <h1 id='网络服务使用说明'>网络服务使用说明</h1>
+    <p><strong>致繁體中文用戶：抱歉，因開發資源和時間不夠，本文檔僅提供簡體中文版本。</strong></p>
+    <p><strong>For English Users: Sorry, due to lack of resource and time, only Simplify Chinese Edition of the document
+            is avaliable.</strong></p>
+    <p>Original file provided through <a href='https://github.com/Mrzcyserver'>Brill</a> by <a
+            href='https://linux.xidian.edu.cn/git/XDUNA'>XDUNA</a> and <a
+            href='https://xxzx.xidian.edu.cn/index.htm'>XDU Information and Technology Center</a>.</p>
+    <p><strong>本文档非官方文档！</strong>如有不妥或冲突处，请咨询信息处或网管会。本文档“按原样提供”，不提供任何保证和担保！</p>
+    <p>Edited by BenderBlog Rodriguez, 2025-03-17</p>
+    <p>Original file last edit: 2024-09-07</p>
+    <h2 id='常见问题及解决方案'>常见问题及解决方案</h2>
+    <h3 id='1-西电南校区都有哪些网络覆盖'>1. 西电南校区都有哪些网络覆盖?</h3>
+    <p>移动、联通 、电信三大运营商的移动通信网络，教育网 CERNET</p>
+    <p><strong>更新</strong> 2025-03-17：目前默认校园网限速政策如下</p>
+    <figure class='table-figure'>
+        <table>
+            <thead>
+                <tr>
+                    <th style='text-align:center;'>使用者类别</th>
+                    <th style='text-align:center;'>免费额度</th>
+                    <th style='text-align:center;'>带宽</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style='text-align:center;'>在校学生</td>
+                    <td style='text-align:center;'>20G/月</td>
+                    <td style='text-align:center;'>100M</td>
+                </tr>
+                <tr>
+                    <td style='text-align:center;'>在职职工</td>
+                    <td style='text-align:center;'>40G/月</td>
+                    <td style='text-align:center;'>100M</td>
+                </tr>
+                <tr>
+                    <td style='text-align:center;'>离退休职工</td>
+                    <td style='text-align:center;'>10G/月</td>
+                    <td style='text-align:center;'>100M</td>
+                </tr>
+            </tbody>
+        </table>
+    </figure>
+    <p>相关问题：</p>
+    <p>Q：默认校园网超额了咋办？</p>
+    <p>A：超额后仍可免费正常访问教学科研服务资源，其他资源进行限速管理。目前计划限速资源范围为主流视频网页、直播网站、游戏资源，后续可动态调整。</p>
+    <p>Q：免费额度能否结转？</p>
+    <p>A：不能。因业务计费规则，学生及职工每月免费的校园网使用额度，仅在当月生效，不可跨月使用；当月未使用的额度无法结转。</p>
+    <p>Q：请问有无无限量校园网服务？</p>
+    <p>A：虑到校园网部分用户仍有较大其他的需求，学校现已引入联通与电信两家运营商为教工和学生用户提供非免费或其他上网服务，用户可自由选择。详情请咨询相关运营商。</p>
+    <p>Q：必须办理学校规定的手机SIM卡吗?</p>
+    <p>A：学校从来没有规定必须办理某种手机卡，或者使用某种套餐，请大家谨防受骗！</p>
+    <h3 id='2-如何使用校园网'>2. 如何使用校园网?</h3>
+    <p>每一位同学默认都开启了校园网服务，账号为“学号”，初始密码为身份证后六位。</p>
+    <p>宿舍中已经为大家加装了无线网络ap盒， 仅供提高网络速度和使用体验，不可连接网线。</p>
+    <p><strong>注意：以下描述大多数内容仅涉及默认校园网账户，如果您购买了运营商服务，请看本文档第四章：运营商账号使用说明</strong></p>
+    <ol start=''>
+        <li>
+            <p>WIFI 使用方式</p>
+            <p>在全校范围内，使用 WLAN 连接名称为<code>stu-xdwlan</code>/<code>stu-wlan</code>/<code>xd-wlan</code>（前者优先）
+                的热点，根据提示，帐号为学号，默认密码为身份证后六位即可使用 ，密码修改过的，使用修改后的密码登录。</p>
+            <p>若连接 Wi-Fi 后没有提示需要登录，则可以手动在浏览器打开 <a href='https://10.255.44.33' target='_blank'
+                    class='url'>https://10.255.44.33</a> 或 <a href='https://w.xidian.edu.cn' target='_blank'
+                    class='url'>https://w.xidian.edu.cn</a> 进行登录。</p>
+            <p>注意，部分用户无法网址登录的，可以尝试在保持 stu-xdwlan 连接下进入学在西电app，在弹窗中登录。</p>
+            <p>新设备 (手机/电脑) 在首次登录校园网时，可能出现“网络延迟，需要刷新页面后重新登录”，请参考文档第16条开启无感知认证。</p>
+            <p>使用本方式进行认证的时候，用户不能使用代理软件或浏览器开启代理功能，并且DNS必须是自动获取学校DNS，不能手动配置。</p>
+            <p><img src="asset:assets/guide/img/071.jpg" referrerpolicy="no-referrer" alt="电脑端登录界面"></p>
+            <p><img src="asset:assets/guide/img/070.png" referrerpolicy="no-referrer" alt="手机端登录界面"></p>
+        </li>
+
+    </ol>
+    <ol start='2'>
+        <li>
+            <p>拨号使用方式</p>
+            <p>在全校范围内，使用网线插入端口连接电脑 (例如宿舍桌下的端口)，可以新建 PPPoE 宽带链接。路由器可以将一人的校园网分享给<strong>多个设备</strong>使用。</p>
+            <p><strong>更新</strong> 2025-03-17：下表为拨号使用的账号说明</p>
+            <figure class='table-figure'>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style='text-align:center;'>运营商</th>
+                            <th style='text-align:center;'>账号</th>
+                            <th style='text-align:center;'>举例说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style='text-align:center;'>默认校园网</td>
+                            <td style='text-align:center;'>您的学号</td>
+                            <td style='text-align:center;'>2000111111</td>
+                        </tr>
+                        <tr>
+                            <td style='text-align:center;'>移动账号</td>
+                            <td style='text-align:center;'>暂无（截止2025年3月17日）</td>
+                            <td style='text-align:center;'>暂无</td>
+                        </tr>
+                        <tr>
+                            <td style='text-align:center;'>联通账号</td>
+                            <td style='text-align:center;'>您的学号@lt</td>
+                            <td style='text-align:center;'>2000111111@lt</td>
+                        </tr>
+                        <tr>
+                            <td style='text-align:center;'>电信账号</td>
+                            <td style='text-align:center;'>您的学号@dx</td>
+                            <td style='text-align:center;'>2000111111@dx</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </figure>
+            <p><strong>Windows 11 用户 ：</strong></p>
+            <p>点击中央主页面菜单按钮进入设置菜单</p>
+            <p><img src="asset:assets/guide/img/015.png" referrerpolicy="no-referrer"></p>
+            <p>打开网络和 internet，点击拨号</p>
+            <p><img src="asset:assets/guide/img/016.png" referrerpolicy="no-referrer"></p>
+            <p>选择第一个，点击下一步</p>
+            <p><img src="asset:assets/guide/img/066.png" referrerpolicy="no-referrer"></p>
+            <p>选择第一项</p>
+            <p><img src="asset:assets/guide/img/067.png" referrerpolicy="no-referrer"></p>
+            <p>输入用户名和密码，点击连接即可。</p>
+            <p><img src="asset:assets/guide/img/068.png" referrerpolicy="no-referrer"></p>
+            <p><strong>macOS 用户：</strong></p>
+            <p>Macbook 新款机型都不再支持水晶头直接连接，如果要使用网线，则必须搭配 RJ-45 转 USB-C 转换器（网线转 USB 转换器）。</p>
+            <p><img src="asset:assets/guide/img/010.png" referrerpolicy="no-referrer"></p>
+            <p>打开系统偏好设置，打开网络设置</p>
+            <p><img src="asset:assets/guide/img/011.png" referrerpolicy="no-referrer"></p>
+            <p>正常情况下，应该能够看到转换器设备的名称，例如在图上，转换器显示为USB10/ 100 LAN，然后点击右下 角的加号，准备在下一步新建连接；</p>
+            <p><img src="asset:assets/guide/img/012.png" referrerpolicy="no-referrer"></p>
+            <p>接口选择 PPPoE ，以太网选择上一步显示的转换器名称，服务名称可以任意填写，例如：XidianLAN；</p>
+            <p><img src="asset:assets/guide/img/013.png" referrerpolicy="no-referrer"></p>
+            <p>点击刚刚新建好的连接(例如刚才新建的 XidianLAN)，然后在账号栏输入账号，在密码栏输入密码，PPPoE 服务名称保留空白，不要填写 。确认无误后点击连接，当有提示是否使用更改时，点是(或确认) 。
+            </p>
+        </li>
+        <li>
+            <p>MAC认证上网</p>
+            <p>MAC认证是校园网无线的一种认证方式，该方式可让您无需在登录过的终端上重新走一遍流程了。当终端设备第一次使用校园网无线认证成功上网后，系统会绑定你当前登录终端的MAC地址，当此终端再次登录校园无线时，不会在弹出potal页面，连上WIFI后会通过MAC地址登录绑定账号，直接上网。
+            </p>
+            <p>每个校园网账号可以绑定6个MAC终端（MAC地址绑定不仅记录无线终端MAC还会记录有线认证终端MAC），当记录满之后，再次登新的终端时，会随机替换已绑定MAC中的一个，用户可以通过校园网自服务平台查看、增加或解绑MAC地址，也可关闭MAC认证功能，如下图。
+            </p>
+            <p>关于MAC认证上网和其他事宜，请参考第十三章：开启/关闭无感认证。</p>
+            <p><img src="asset:assets/guide/img/072.png" referrerpolicy="no-referrer"></p>
+        </li>
+
+    </ol>
+    <h3 id='3-如何查询校园网剩余流量'>3. 如何查询校园网剩余流量?</h3>
+    <p>（如果您不方便用 Traintime PDA / XDYou 查询的话）使用浏览器打开 <a href='https://zfw.xidian.edu.cn/' target='_blank'
+            class='url'>https://zfw.xidian.edu.cn/</a>，使用账号和密码登录，可以看到剩余流量信息。</p>
+    <p><img src="asset:assets/guide/img/017.png" referrerpolicy="no-referrer"></p>
+    <h3 id='4更新-2025-03-17运营商账号使用说明'>4.<strong>更新</strong> 2025-03-17：运营商账号使用说明</h3>
+    <ol start=''>
+        <li>
+            <p>订购产品</p>
+            <p>运营商认证上网账号密码与校园网相同，如需订购运营商产品，需要到学校运营商处订购运营商产品，详情请咨询运营商。</p>
+        </li>
+        <li>
+            <p>产品使用</p>
+            <p>订购产品后需要登录校园网自服务平台，打开左侧菜单栏，点击“产品-产品使用优先级”，将要使用的产品拖拽到最上面即可生效，具体页面如下图：</p>
+            <p><img src="asset:assets/guide/img/073.png" referrerpolicy="no-referrer"></p>
+            <p>所有账号默认产品是校园网，如果要使用校园网把校园网拖拽到最上面，如果要使用运营商产品，把运营商产品拖拽到最上面即可。</p>
+            <p><strong>注：选择使用运营商产品的用户，不管是无线还是有线认证，校园网产品要放在自服务“产品使用优先级”最下面，否则即使选择的是运营商产品，实际使用的却是校园网。</strong></p>
+            <p>MAC 认证用户须知：MAC认证只要在自服务上将要使用的产品拖拽到最上面，校园网产品在最下面即可。</p>
+        </li>
+
+    </ol>
+    <h3 id='5-如何下载学校提供的正版软件'>5. 如何下载学校提供的正版软件? </h3>
+    <p>使用浏览器打开正版软件平台 <a href='http://gsoft.xidian.edu.cn' target='_blank' class='url'>http://gsoft.xidian.edu.cn</a>
+        根据提示操作。目前学校提供的正版化软件包括但不限于：</p>
+    <ul>
+        <li>Office 系列：办公软件</li>
+        <li>Windows 系列：操作系统</li>
+        <li>MATLAB：数值分析仿真软件</li>
+        <li>Visio：矢量图绘制</li>
+        <li>福昕PDF编辑器</li>
+        <li>MathType：数学公式编辑软件</li>
+        <li>等等……</li>
+
+    </ul>
+    <p>详细使用场景请查看网页信息，或涉及下载激活客户端或输入密钥。</p>
+    <p>注意： 需要在校内操作， 或在校外连接西电 VPN 操作 (见 12 条) 。</p>
+    <h3 id='6-如何注册使用-matlab'>6. 如何注册使用 MATLAB?</h3>
+    <p>要使用由Mathworks公司授权西安电子科技大学使用的教育版MATLAB软件，请先使用西电edu邮箱注册Mathworks账户。西电edu邮箱请参考文档第七章：如何使用西电学生邮箱？</p>
+    <p>使用浏览器打开 <a href='https://ww2.mathworks.cn/mwaccount/register' target='_blank'
+            class='url'>https://ww2.mathworks.cn/mwaccount/register</a></p>
+    <p><img src="asset:assets/guide/img/021.png" referrerpolicy="no-referrer"></p>
+    <p>在电子邮件地址栏内填写带有xidian.edu.cn 的邮箱，随后点击创建按钮；</p>
+    <p>浏览器打开 <a href='http://mail.stu.xidian.edu.cn' target='_blank'
+            class='url'>http://mail.stu.xidian.edu.cn</a>，找到Mathworks 发送的验证邮件，点击邮件内的链接完成注册 。</p>
+    <p>接下来下载安装并激活 MATLAB：</p>
+    <p>方法一：浏览器打开 <a href='https://gsoft.xidian.edu.cn/soft?categoryid=9' target='_blank'
+            class='url'>https://gsoft.xidian.edu.cn/soft?categoryid=9</a>，选择版本后根据提示选择 Windows、 macOS 或 Linux 版本并下载；</p>
+    <p>方法二：登录 MATLAB官网 <a href='https://ww2.mathworks.cn/login' target='_blank'
+            class='url'>https://ww2.mathworks.cn/login</a>，在授权许可列表中，点击下载按钮：</p>
+    <p><img src="asset:assets/guide/img/022.png" referrerpolicy="no-referrer"></p>
+    <p>根据提示选择 MATLAB 版本、操作系统版本，下载完成后运行安装程序，并选择“使用 MathWorks 账户登录”，点击下一步：</p>
+    <p><img src="asset:assets/guide/img/023.png" referrerpolicy="no-referrer"></p>
+    <p>随后阅读 MATLAB使用条款，如果同意，则选择“是”，并点击下一步。在下一页填写账户并登录：</p>
+    <p><img src="asset:assets/guide/img/024.png" referrerpolicy="no-referrer"></p>
+    <p>登录成功后，在产品列表选择需要安装的 MATLAB 产品。</p>
+    <p>MATLAB许可证应该每年均会更新一次，如出现许可证过期提示请联系信息处。</p>
+    <h3 id='7-如何使用西电学生邮箱'>7. 如何使用西电学生邮箱?</h3>
+    <p>每位同学入学时候都已经注册了邮箱账号，请打开学生邮箱网站(<a href='http://mail.stu.xidian.edu.cn' target='_blank'
+            class='url'>http://mail.stu.xidian.edu.cn</a>)进行登录。邮箱账号为学号，密码为“身份证后六位”+“abc”；</p>
+    <p><img src="asset:assets/guide/img/026.png" referrerpolicy="no-referrer"></p>
+    <blockquote>
+        <p>对于很久之前入学的老同志，这里介绍曾经西电学生邮箱使用统一的命名规范：姓名首字母+姓全拼(+下划线+序号) @stu.xidian.edu.cn，例如，姓名李白，则邮箱地址为 <a
+                href='mailto:bli@stu.xidian.edu.cn' target='_blank' class='url'>bli@stu.xidian.edu.cn</a>，如<a
+                href='mailto:bli@stu.xidian.edu.cn' target='_blank' class='url'>bli@stu.xidian.edu.cn</a>已经被 4
+            人使用，则重新修改为 bli_<a href='mailto:5@stu.xidian.edu.cn' target='_blank' class='url'>5@stu.xidian.edu.cn</a></p>
+    </blockquote>
+    <p>如果注册过程中出现任何问题，本人无法解决的，请在工作日上班时间携带本人证件，到图书馆A区一站式服务大厅22号工位现场办理解决 ；</p>
+    <h3 id='8-信息网络技术中心的办公室地址在哪里'>8. 信息网络技术中心的办公室地址在哪里?</h3>
+    <p><strong>学生与教职工用户办理个人业务：</strong></p>
+    <p>南校区：图书馆A区一站式服务大厅 22 号窗口</p>
+    <p>电话：029-81892115，029-81891357 </p>
+    <p>北校区：教辅楼一层东侧</p>
+    <p>电话：029-88201252，029-88204626 </p>
+    <p><strong>统一身份认证账号相关业务：</strong></p>
+    <p>电话：029-88201650</p>
+    <p><strong>组织或其他大型业务：</strong></p>
+    <p>北校区：逸夫图书馆11楼</p>
+    <p>电话：029-88201710</p>
+    <h3 id='9-一卡通如何缴费充值'>9. 一卡通如何缴费充值?</h3>
+    <ol start=''>
+        <li>在食堂、宿舍楼、一站式服务大厅等找到圈存机，绑定学校配备的交通银行卡，在圈存机上，使用银行转账为一卡通充值；</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/028.png" referrerpolicy="no-referrer"></p>
+    <ol start='2'>
+        <li>使用支付宝，搜索校园生活，点击一卡通，选择学校：西安电子科技大学(不是西安电子科技大学长安学院)，使用学号按照提示充值；</li>
+        <li>使用翼支付，搜索“校园卡”，输入城市：西安，学校：西安电子科技大学，输入学号与姓名，根据提示进行充值</li>
+
+    </ol>
+    <h3 id='10-如何在食堂使用移动支付'>10. 如何在食堂使用移动支付?</h3>
+    <ol start=''>
+        <li>
+            <p>使用支付宝或微信：首先打开西电官网(<a href='http://www.xidian.edu.cn' target='_blank'
+                    class='url'>www.xidian.edu.cn</a>)主页，在页面最下方，找到支付宝虚拟卡、微信虚拟卡二维码，点击后按照提示进行操作；</p>
+        </li>
+        <li>
+            <p>使用银联云闪付APP：之前从未使用过云闪付的，请首先注册云闪付账号，完成绑卡、身份认证等操作之后，在享优惠→更多→生活精选→校园服务，完成西安电子科技大学认证；</p>
+            <p><img src="asset:assets/guide/img/029.png" referrerpolicy="no-referrer"><img
+                    src="asset:assets/guide/img/030.png" referrerpolicy="no-referrer"><img
+                    src="asset:assets/guide/img/031.png" referrerpolicy="no-referrer"></p>
+        </li>
+
+    </ol>
+    <p>使用手机支付时，请打开二维码，对准食堂窗口刷卡机的扫描区域进行付款。</p>
+    <h3 id='11-什么是统一身份认证'>11. 什么是统一身份认证?</h3>
+    <p><img src="asset:assets/guide/img/032.png" referrerpolicy="no-referrer"></p>
+    <p>统一身份认证是每位同学、 教职工在西电的电子ID，与QQ号码能登陆腾讯的各种业务类似，使用校内各种网上业务，都需要使用统一身份认证来确认您的身份。选课、上网、查成绩、办业务都需要使用统一身份认证登陆。</p>
+    <p>统一身份认证相关问题咨询电话： 029-88201650。</p>
+    <h3 id='12-如何使用西电-vpn'>12. 如何使用西电 VPN</h3>
+    <p>当暂时无法访问校内网络却希望访问校内资源时，例如图书馆、 OA 办公平台等，可以使用西电VPN远程连接。以下教程介绍了 Windows 使用西电 VPN 的方法，Linux、Android、iOS、MacOS
+        等其他操作系统与之类似，请参考操作。</p>
+    <p>浏览器打开 <a href='https://vpn.xidian.edu.cn/' target='_blank'
+            class='url'>https://vpn.xidian.edu.cn/</a>，首先点击“下载客户端”，下载安装 EasyConnect 软件，安装完成后，打开软件进行操作：</p>
+    <p>在软件的连接地址一栏内填写：vpn.xidian.edu.cn ， 点击下一步按钮：</p>
+    <p><img src="asset:assets/guide/img/034.png" referrerpolicy="no-referrer"></p>
+    <p>随后填写在账号一栏填写学号，在密码一栏填写统一身份认证密码：</p>
+    <p><img src="asset:assets/guide/img/035.png" referrerpolicy="no-referrer"></p>
+    <p>点击登录， 等待连接成功即可使用。</p>
+    <p><img src="asset:assets/guide/img/037.png" referrerpolicy="no-referrer"></p>
+    <p>注意：出于安全考虑，减轻流量压力，西电 VPN 仅开放了如上图所示资源与部分公共资源的访问权限。</p>
+    <p>部分未开放服务、普通学生与教职工电脑分配到的 IP 地址、由信息网络技术中心运营的部分虚拟机的直接 IP 地址等受到学校防火墙保护，并不在 VPN 可访问范围内。详情请咨询有关人员。</p>
+    <h3 id='13-开启关闭无感认证'>13. 开启/关闭无感认证</h3>
+    <p>常用于切换账号不成功等情况。</p>
+    <ol start=''>
+        <li>浏览器访问 zfw.xidian.edu.cn，输入网络账号和密码进行登录</li>
+        <li>网页左侧菜单点击用户， 再点击无感知认证，如最左面“MAC认证”所示。</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/072.png" referrerpolicy="no-referrer"></p>
+    <ol start='3'>
+        <li>开启/关闭无感知认证，如上图左上角所示。</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/042.png" referrerpolicy="no-referrer"></p>
+    <p>(台式电脑需要连接无线网卡后才可连接 stu-wlan)</p>
+    <ol start='4'>
+        <li>电脑连接显示”网络有延迟，请刷新页面后重新登录“时，请使用：win+r打开运行窗口</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/043.png" referrerpolicy="no-referrer"></p>
+    <p>在运行窗口中输入cmd，出现命令窗口</p>
+    <p>在 命令窗口中输入 <code>ipconfig /all</code> 的指令，按下回车</p>
+    <p><img src="asset:assets/guide/img/044.jpeg" referrerpolicy="no-referrer"></p>
+    <p>即可在物理地址中查看到系统网卡的mac地址。</p>
+    <p><img src="asset:assets/guide/img/045.png" referrerpolicy="no-referrer"></p>
+    <p>在学校自服务网站中填写本机mac地址。<strong>手动添加时需要注意，字母全部为小写，分隔符为“：”</strong> 手动/自动添加后，需要成功登陆一次才能生效</p>
+    <p><img src="asset:assets/guide/img/046.png" referrerpolicy="no-referrer"></p>
+    <p>打开“网络和Internet设置”，”wlan“，关闭”使用随机硬件地址“，即可正常登录使用校园网。</p>
+    <p><img src="asset:assets/guide/img/047.png" referrerpolicy="no-referrer"></p>
+    <h3 id='14-修改-dns'>14. 修改 DNS</h3>
+    <p>部分同学设置了 DNS，虽然学校的 DNS 服务质量并不高，但是某些校内网站（如无线认证页面）必须使用学校提供的 DNS ，因此可以通过将 DNS 设置为自动，以使用学校分配的 DNS</p>
+    <p>如果后续遇到部分页面加载慢等问题，也可以使用第三方 DNS，如：</p>
+    <ul>
+        <li>119.29.29.29</li>
+        <li>223.6.6.6</li>
+
+    </ul>
+    <p>我们<strong>不建议</strong>使用以下 DNS：</p>
+    <ul>
+        <li>223.5.5.5 （校园网无法访问）</li>
+        <li>114.114.114.114 （存在较为严重的 DNS 劫持现象）</li>
+
+    </ul>
+    <p><strong>1. MacOS (Sonoma 14.6.1)</strong></p>
+    <ol start=''>
+        <li>
+            <p>找到系统设置</p>
+            <p><img src="asset:assets/guide/img/052.png" referrerpolicy="no-referrer"></p>
+        </li>
+        <li>
+            <p>如果使用 Wi-Fi / 无线连接，点详细信息后</p>
+            <p><img src="asset:assets/guide/img/054.png" referrerpolicy="no-referrer"></p>
+            <p>如果使用LAN / 有线连接，在网络选项卡中，点击你的网卡设备（图中为AX88179A）</p>
+        </li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/055.png" referrerpolicy="no-referrer"></p>
+    <p><img src="asset:assets/guide/img/056.png" referrerpolicy="no-referrer"></p>
+    <ol start='3'>
+        <li>点击 DNS</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/057.png" referrerpolicy="no-referrer"></p>
+    <p>&nbsp;</p>
+    <ol start='4'>
+        <li>
+            <p>(Wi-Fi) 点 “+” 添加 DNS</p>
+            <p><img src="asset:assets/guide/img/058.png" referrerpolicy="no-referrer"></p>
+        </li>
+
+    </ol>
+    <p>这里如果是灰色字体 xxx.xxx.xxx.xxx 则为默认自动获取 DNS</p>
+    <p><strong>2. Windows (10与11同理) (Wi-Fi与LAN的修改方法一致)</strong></p>
+    <ol start=''>
+        <li>右键网络图标，点击打 开“网络和Internet设置”</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/059.jpeg" referrerpolicy="no-referrer"></p>
+    <p><img src="asset:assets/guide/img/060.jpeg" referrerpolicy="no-referrer"></p>
+    <ol start='2'>
+        <li>点击“更改适配器”选项，找到你现在正在使用的网络适配器，本机使用的是直接DHCP所以我的适配器 如图所示，右键它。</li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/061.png" referrerpolicy="no-referrer"></p>
+    <ol start='3'>
+        <li>点击“属性”，在打开的选项卡中找到如图所示的选项 并点击“属性”。在这里我们就可以配置DNS设置了。 </li>
+
+    </ol>
+    <p><img src="asset:assets/guide/img/062.jpeg" referrerpolicy="no-referrer"></p>
+    <p><img src="asset:assets/guide/img/064.png" referrerpolicy="no-referrer"></p>
+    <p><img src="asset:assets/guide/img/063.jpeg" referrerpolicy="no-referrer"></p>
+    <p><strong>3. Linux</strong></p>
+    <p>由于Linux系统情况过于多样，用户可移步西电开源社区QQ群咨询： 851993750</p>
+    <h2 id='附录'>附录</h2>
+    <h3 id='pppoe-拨号错误代码速查表'>PPPoE 拨号错误代码速查表</h3>
+    <p>该表可辅助您快速排查错误信息，并有助于相关人员定位您的问题。</p>
+    <p>常见编号：</p>
+    <ul>
+        <li>651：调制解调器报告错误。这通常是物理层的损坏，比如网线断了，没插好，网卡烧了，网卡接触不良，机房交换机出问题等。</li>
+        <li>691：因为用户名和/或密码在此域上无效，所以访问被拒绝。可能账号密码输错了，或者拨号太频繁了。</li>
+
+    </ul>
+    <p>其他编号：</p>
+    <ul>
+        <li>600：某操作处于挂起状态。</li>
+        <li>601：检测到一个无效端口句柄。</li>
+        <li>602：指定的端口已经打开。</li>
+        <li>603：呼叫方缓冲区太小。</li>
+        <li>604：指定了错误的信息。</li>
+        <li>605：无法设置端口信息。</li>
+        <li>606：指定的端口未连接。</li>
+        <li>607：检测到无效事件。</li>
+        <li>608：指定了一个不存在的设备。</li>
+        <li>609：指定了一个不存在的设备类型。</li>
+        <li>610：指定了一个无效的缓冲区。</li>
+        <li>611：指定了一个无法使用的路由。</li>
+        <li>612：指定了一个没有分配的路由。</li>
+        <li>613：指定了一种无效的压缩。</li>
+        <li>614：可用缓冲区不足。</li>
+        <li>615：找不到指定的端口。</li>
+        <li>616：某异步请求处于挂起状态。</li>
+        <li>617：调制解调器已经在断开连接。</li>
+        <li>618：指定的端口没有打开。</li>
+        <li>619：指定的端口没有连接。</li>
+        <li>620：无法确定端点。</li>
+        <li>621：系统无法打开电话簿。</li>
+        <li>622：系统无法加载电话簿。</li>
+        <li>623：系统无法找到此连接的电话簿项。</li>
+        <li>624：系统无法更新电话簿文件。</li>
+        <li>625：系统在电话簿中找到无效信息。</li>
+        <li>626：无法加载字符串。</li>
+        <li>627：无法找到关键字。</li>
+        <li>628：连接被关闭。</li>
+        <li>629：连接被远程计算机关闭。一般是用户名或者密码错误。</li>
+        <li>630：由于硬件故障，调制解调器断开连接。</li>
+        <li>631：用户断开了调制解调器连接。</li>
+        <li>632：检测到不正确的结构大小。</li>
+        <li>633：调制解调器正在使用中或没有进行拨出配置。</li>
+        <li>634：您的计算机无法在远程网络上注册。</li>
+        <li>635：出现未知错误。</li>
+        <li>636：连接到端口的设备不是所期望的设备。</li>
+        <li>637：检测到不能转换的字符串。</li>
+        <li>638：请求超时。</li>
+        <li>639：异步网络不可用。</li>
+        <li>640：发生与NetBIOS有关的错误。</li>
+        <li>641：服务器不能分配支持客户端时所需的NetBIOS资源。</li>
+        <li>642：计算机的某个NetBIOS名已经在远程网络上注册。</li>
+        <li>643：服务器端的网络适配器出现故障。</li>
+        <li>644：您将无法接收网络弹出式消息。</li>
+        <li>645：发生内部身份验证错误。</li>
+        <li>646：此时不允许该帐户登录。</li>
+        <li>647：此帐户被禁用。</li>
+        <li>648：该帐户的密码已过期。</li>
+        <li>649：帐户没有拨入的权限。</li>
+        <li>650：远程访问服务器没有响应。</li>
+        <li>652：有一个来自调制解调器的无法识别的响应。</li>
+        <li>653：在设备.INF文件部分中未找到调制解调器所需的宏。</li>
+        <li>654：设备.INF文件部分中的命令或响应引用了未定义的宏。</li>
+        <li>655：在设备.INF文件部分中未找到宏。</li>
+        <li>656：设备.INF文件部分中的宏包含未定义的宏。</li>
+        <li>657：无法打开设备.INF文件。</li>
+        <li>658：设备.INF或媒体.INI文件中的设备名太长。</li>
+        <li>659：媒体.INI文件引用了未知的设备名。</li>
+        <li>660：设备.INF文件不包含对命令的响应。</li>
+        <li>661：设备.INF文件缺少命令。</li>
+        <li>662：试图设置设备.INF文件部分中没有列出的宏。</li>
+        <li>663：媒体.INI文件引用了未知的设备类型。</li>
+        <li>664：系统内存不足。</li>
+        <li>665：未正确配置调制解调器。</li>
+        <li>666：调制解调器未正常工作。</li>
+        <li>667：系统不能读取媒体.INI文件。</li>
+        <li>668：连接被终止。</li>
+        <li>669：媒体.INI文件中的用法参数无效。</li>
+        <li>670：系统不能从媒体.INI文件中读取部分名称。</li>
+        <li>671：系统不能从媒体.INI文件中读取设备类型。</li>
+        <li>672：系统不能从媒体.INI文件中读取设备名称。</li>
+        <li>673：系统不能从媒体.INI文件中读取用法。</li>
+        <li>674：系统不能从媒体.INI文件中读取最大的连接速率(bps)。</li>
+        <li>675：系统不能从媒体.INI文件中读取最大的载波连接速度。</li>
+        <li>676：电话线忙。</li>
+        <li>677：某人而不是调制解调器作出了应答。</li>
+        <li>678：没有应答。</li>
+        <li>679：系统无法检测到载波。</li>
+        <li>680：没有拨号音。</li>
+        <li>681：调制解调器报告常规错误。</li>
+        <li>692：调制解调器出现硬件故障。</li>
+        <li>695：未启动状态机。</li>
+        <li>696：已启动状态机。</li>
+        <li>697：响应循环未完成。</li>
+        <li>699：调制解调器的响应导致缓冲区溢出。</li>
+        <li>700：设备.INF文件中的扩展命令太长。</li>
+        <li>701：调制解调器使用了COM驱动程序不支持的连接速度。</li>
+        <li>703：连接需要您提供信息，但应用程序不允许用户交互。</li>
+        <li>704：回拨号码无效。</li>
+        <li>705：授权状态无效。</li>
+        <li>707：出现与X.25协议有关的错误。</li>
+        <li>708：帐户过期。</li>
+        <li>709：更改域上的密码时发生错误。密码可能太短或者可能与以前使用的密码匹配。</li>
+        <li>710：当与调制解调器通讯时检测到序列溢出错误。</li>
+        <li>711：无法启动“远程访问服务管理器”。事件日志中提供了其他信息。</li>
+        <li>712：双路端口正在初始化。等几秒钟再重拨。</li>
+        <li>713：没有活动的ISDN线路可用。</li>
+        <li>714：没有ISDN信道可用于拨号。</li>
+        <li>715：由于电话线质量差，所以发生过多错误。</li>
+        <li>716：远程访问服务IP配置不可用。</li>
+        <li>717：在远程访问服务IP地址的静态池中没有可用的IP地址。</li>
+        <li>718：等待远程计算机作出有效响应时连接超时。</li>
+        <li>719：连接被远程计算机终止。</li>
+        <li>721：远程计算机没有响应。</li>
+        <li>722：从远程计算机接收到无效的数据。该数据被忽略。</li>
+        <li>723：电话号码（包含前缀和后缀）太长。</li>
+        <li>726：IPX协议不能用于在多个调制解调器上同时向外拨号。</li>
+        <li>728：系统找不到IP适配器。</li>
+        <li>729：除非安装IP协议，否则不能使用SLIP。</li>
+        <li>731：未配置协议。</li>
+        <li>732：您的计算机和远程计算机的PPP控制协议无法一致。</li>
+        <li>733：您的计算机和远程计算机的PPP控制协议无法一致。</li>
+        <li>734：PPP链接控制协议被终止。</li>
+        <li>735：请求的地址被服务器拒绝。</li>
+        <li>736：远程计算机终止了控制协议。</li>
+        <li>737：检测到环回。</li>
+        <li>738：服务器没有指派地址。</li>
+        <li>739：远程服务器所需的身份验证协议不能使用存储的密码。请重拨，并显式输入密码。</li>
+        <li>740：检测到无效拨号规则。</li>
+        <li>741：本地计算机不支持所需的数据加密类型。</li>
+        <li>742：远程计算机不支持所需的数据加密类型。</li>
+        <li>743：远程服务器要求数据加密。</li>
+        <li>751：回拨号码包含无效的字符。只允许有下列字符：0到9、T、P、W、(,)、-、@和空格。</li>
+        <li>752：当处理脚本时遇到语法错误。</li>
+        <li>753：由于连接是由多协议路由器创建的，所以该连接无法断开。</li>
+        <li>754：系统无法找到多路链接束。</li>
+        <li>755：由于该项已经指定自定义的拨号程序，所以系统不能执行自动拨号。</li>
+        <li>756：已经拨打该连接。</li>
+        <li>757：远程访问服务不能自动启动。事件日志中提供了其他信息。</li>
+        <li>758：该连接上已经启用Internet连接共享。</li>
+        <li>760：启用路由功能时发生错误。</li>
+        <li>761：启用连接的Internet连接共享时发生错误。</li>
+        <li>763：不能启用Internet连接共享。除了要共享的连接之外，还有两个或多个局域网连接。</li>
+        <li>764：未安装智能卡阅读器。</li>
+        <li>765：不能启用Internet连接共享。LAN连接已经配置了自动IP定址所需的IP地址。</li>
+        <li>767：不能启用Internet连接共享。专用网络上选定的LAN连接配置了多个IP地址。在启用Internet连接共享之前，请使用单个IP地址重新配置LAN连接。</li>
+        <li>768：由于数据加密失败，导致连接尝试失败。</li>
+        <li>769：指定的目的地是不可访问的。</li>
+        <li>770：远程机器拒绝连接尝试。</li>
+        <li>771：由于网络忙，导致连接尝试失败。</li>
+        <li>772：远程计算机的网络硬件与请求的呼叫类型不兼容。</li>
+        <li>773：由于目标号码已更改，导致连接尝试失败。</li>
+        <li>774：临时故障导致连接尝试失败。请再次尝试连接。</li>
+        <li>775：呼叫被远程计算机阻塞。</li>
+        <li>776：由于目标已经调用“请勿打扰”功能，所以该呼叫无法连接。</li>
+        <li>777：远程计算机上的调制解调器出现故障，导致连接尝试失败。</li>
+        <li>778：不能验证服务器的身份。</li>
+        <li>780：所尝试使用的功能对此连接无效。</li>
+        <li>783：不能启用Internet连接共享。被选为专用网络的LAN连接不存在，或者已与网络断开连接。启用Internet连接共享前，请确保已连接LAN适配器。</li>
+        <li>784：登录时无法使用该连接进行拨号，因为它配置使用的用户名和智能卡上的不一样。如果要在登录时使用它，必须对它进行配置以使用智能卡上的用户名。</li>
+        <li>785：登录时无法使用该连接进行拨号，因为没有将其配置成使用智能卡。如果要在登录时使用它，必须编辑该连接的属性以便使用智能卡。</li>
+        <li>788：L2TP连接尝试失败，因为安全层无法与远程计算机协商兼容参数。</li>
+        <li>789：L2TP连接尝试失败，因为安全层在与远程计算机进行初始协商时遇到处理错误。</li>
+        <li>791：L2TP连接尝试失败，因为没有找到该连接的安全策略。</li>
+        <li>792：L2TP连接尝试失败，因为安全协商超时。</li>
+        <li>793：L2TP连接尝试失败，因为协商安全时发生错误。</li>
+        <li>794：该用户的帧协议RADIUS属性不是PPP。</li>
+        <li>795：该用户的隧道类型RADIUS属性不正确。</li>
+        <li>796：该用户的服务类型RADIUS属性既不是成帧也不是回拨成帧。</li>
+        <li>797：无法建立到远程计算机的连接，因为找不到调制解调器或者调制解调器忙。</li>
+        <li>799：由于网络上存在IP地址冲突，所以无法启用Internet连接共享(ICS)。ICS要求将主机配置成使用192.168.0.1。请确保网络上没有其他客户端被配置成使用192.168.0.1。</li>
+        <li>800：无法建立VPN连接。可能无法连接VPN服务器，或者该连接的安全参数配置不正确。</li>
+
+    </ul>
+</body>
+
+</html>

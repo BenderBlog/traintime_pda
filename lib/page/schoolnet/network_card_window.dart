@@ -3,7 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/schoolnet/current_login_user_net_info.dart';
+import 'package:watermeter/page/schoolnet/help_guide.dart';
 import 'package:watermeter/page/schoolnet/ids_account_net_info.dart';
 
 class NetworkCardWindow extends StatefulWidget {
@@ -25,6 +27,12 @@ class _NetworkCardWindowState extends State<NetworkCardWindow> {
             context,
             "school_net.title",
           )),
+          actions: [
+            IconButton(
+              onPressed: () => context.push(const HelpGuide()),
+              icon: const Icon(Icons.help),
+            ),
+          ],
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
