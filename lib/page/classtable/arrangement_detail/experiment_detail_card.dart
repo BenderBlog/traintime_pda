@@ -56,6 +56,11 @@ class ExperimentDetailCard extends StatelessWidget {
                 ).flexible(),
               ].toRow(),
               CustomListTile(
+                icon: Icons.book,
+                str: experiment.reference,
+                infoColor: infoColor,
+              ),
+              CustomListTile(
                 icon: Icons.access_time_filled_outlined,
                 str: experiment.timeStr,
                 infoColor: infoColor,
