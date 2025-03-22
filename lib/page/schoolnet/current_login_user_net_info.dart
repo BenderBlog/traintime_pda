@@ -99,7 +99,7 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
                 LinearProgressIndicator(
-                  value: usedPercentage.clamp(0.0, 1.0) as double,
+                  value: usedPercentage.clamp(0.0, 1.0).toDouble(),
                 ),
                 const SizedBox(height: 4),
                 Text(

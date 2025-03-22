@@ -147,6 +147,7 @@ class LibrarySession extends IDSSession {
     }
   }
 
+  @override
   Future<void> initSession() async {
     log.info(
       "[LibrarySession][initSession] "

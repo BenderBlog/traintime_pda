@@ -78,6 +78,7 @@ class SchoolCardSession extends IDSSession {
     return toReturn;
   }
 
+  @override
   Future<void> initSession() async {
     log.info(
       "[SchoolCardSession][initSession] "
