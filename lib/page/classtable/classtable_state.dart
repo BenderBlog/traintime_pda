@@ -348,6 +348,38 @@ class ClassTableWidgetState with ChangeNotifier {
         }
       }
     }
+
+    // Add exam data and experiment data here.
+    for (var i in subjects) {
+      String summary = "SUMMARY:"
+          "${i.subject} ${i.typeStr}"
+          "@${i.place} ${i.seat != null ? "-${i.seat}" : ""}\n";
+      String description = "DESCRIPTION:"
+          "考试信息：${i.subject}\n"
+          "类型：${i.typeStr}\n"
+          "地点：${i.place} ${i.seat != null ? "-${i.seat}" : ""}\n";
+      String vevent = "BEGIN:VEVENT\n$summary";
+      vevent +=
+          "DTSTART;TZID:Asia/Shanghai:${i.startTime!.format(pattern: 'yyyyMMddTHHmmss')}\n";
+      vevent +=
+          "DTEND;TZID:Asia/Shanghai:${i.stopTime!.format(pattern: 'yyyyMMddTHHmmss')}\n";
+      toReturn += "$vevent${description}END:VEVENT\n";
+    }
+
+    for (var i in experiments) {
+      String summary = "SUMMARY:"
+          "${i.name}@${i.classroom}}\n";
+      String description = "DESCRIPTION:"
+          "物理实验：${i.name}\n"
+          "地点：${i.classroom}\n";
+      String vevent = "BEGIN:VEVENT\n$summary";
+      vevent +=
+          "DTSTART;TZID:Asia/Shanghai:${Jiffy.parseFromDateTime(i.time.first).format(pattern: 'yyyyMMddTHHmmss')}\n";
+      vevent +=
+          "DTEND;TZID:Asia/Shanghai:${Jiffy.parseFromDateTime(i.time.last).format(pattern: 'yyyyMMddTHHmmss')}\n";
+      toReturn += "$vevent${description}END:VEVENT\n";
+    }
+
     return "${toReturn}END:VCALENDAR";
   }
 
@@ -508,6 +540,73 @@ class ClassTableWidgetState with ChangeNotifier {
         }
       }
     }
+
+    // Add exam data and experiment data here.
+    for (var i in subjects) {
+      String title = "${i.subject} ${i.typeStr}"
+          "@${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
+      String description = "考试信息：${i.subject}\n"
+          "类型：${i.typeStr}\n"
+          "地点：${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
+
+      Result<String>? addEventResult =
+          await deviceCalendarPlugin.createOrUpdateEvent(Event(
+        calendarId,
+        title: title,
+        description: description,
+        start: TZDateTime.from(
+          i.startTime!.dateTime,
+          currentLocation,
+        ),
+        end: TZDateTime.from(
+          i.stopTime!.dateTime,
+          currentLocation,
+        ),
+      ));
+      // If got error, return with false.
+      if (addEventResult == null ||
+          addEventResult.data == null ||
+          addEventResult.data!.isEmpty) {
+        log.info(
+          "[Classtable][outputToCalendar] "
+          "Add failed: "
+          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
+        );
+        return false;
+      }
+    }
+
+    for (var i in experiments) {
+      String title = "${i.name}@${i.classroom}}";
+      String description = "物理实验：${i.name}\n"
+          "地点：${i.classroom}";
+      Result<String>? addEventResult =
+          await deviceCalendarPlugin.createOrUpdateEvent(Event(
+        calendarId,
+        title: title,
+        description: description,
+        start: TZDateTime.from(
+          i.time.first,
+          currentLocation,
+        ),
+        end: TZDateTime.from(
+          i.time.last,
+          currentLocation,
+        ),
+      ));
+      // If got error, return with false.
+      if (addEventResult == null ||
+          addEventResult.data == null ||
+          addEventResult.data!.isEmpty) {
+        log.info(
+          "[Classtable][outputToCalendar] "
+          "Add failed: "
+          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
+        );
+        return false;
+      }
+    }
+
     return true;
   }
 
