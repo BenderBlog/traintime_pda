@@ -1,0 +1,4 @@
+1. 优化 iCal 文件输出 @GodHu777777
+2. 输出日程安排到日历 @BenderBlog
+3. 校园网余量查询页面 @xeonds @BenderBlog
+4. 网络服务使用说明 西电网络管理协会经由 @MrBrilliant2046 提供
