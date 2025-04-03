@@ -1,4 +1,4 @@
-name: Release for Linux
+name: Release for Appimage
 
 on:
   workflow_dispatch:
@@ -40,10 +40,12 @@ jobs:
           fastforge package --platform=linux --targets=appimage
 
       - name: Find Executable
-        run: export dir=$(find ./ -name watermeter-*)
-
+        run: |
+          export dir=$(find ./ -name watermeter-*)
+          cp $dir ./watermeter.Appimage
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Watermeter_Appimage
-          path: $dir
+          path: watermeter.Appimage
