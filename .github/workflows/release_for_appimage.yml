@@ -1,4 +1,4 @@
-name: Release for Linux
+name: Release for Appimage
 
 on:
   workflow_dispatch:
@@ -19,9 +19,12 @@ jobs:
           sudo apt install build-essential
           sudo apt install ninja-build
           sudo apt install -y libgtk-3-dev libfuse2
-	  wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-	  chmod +x appimagetool
-	  mv appimagetool /usr/local/bin/
+   
+      - name: Install Appimage tool
+        run: |
+	  wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool
+          mv appimagetool /usr/local/bin/
 
       - name: Install Flutter
         run: |
