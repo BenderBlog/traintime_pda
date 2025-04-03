@@ -73,7 +73,10 @@ class ScoreState extends InheritedWidget {
       );
     }
     whatever.removeWhere(
-      (element) => !element.name.contains(controllers.search),
+      (element) =>
+          !element.name.toLowerCase().contains(
+            controllers.search.toLowerCase(),
+          ),
     );
     return whatever;
   }
