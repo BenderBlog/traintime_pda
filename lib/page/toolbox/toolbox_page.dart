@@ -95,7 +95,7 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
           ),
           WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.discover"),
-            url: "https://nav.xdruisi.com/",
+            url: "https://nav.xdruisi.cn/",
             description: FlutterI18n.translate(
               context,
               "toolbox.discover_description",
