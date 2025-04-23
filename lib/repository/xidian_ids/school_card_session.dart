@@ -126,21 +126,30 @@ class SchoolCardSession extends IDSSession {
 
       /// Post formula: fetch money.
       String text = "";
-      var getSpans = page.getElementsByTagName("span");
-      for (var i in getSpans) {
+      for (var i in page.getElementsByTagName("span")) {
         if (i.attributes["name"] == "showbalanceid") {
           text = i.innerHtml;
           break;
         }
       }
-      if (text.isEmpty) text = "school_card_status.failed_to_query";
-      if (text.contains(RegExp(r'[0-9]'))) {
-        money.value = text.substring(4);
+      log.info("[SchoolCardSession] remains on the surface: $text");
+
+      if (text.contains("余额未结转")) {
+        var element = page.getElementById("hidebalanceid");
+        if (element != null) {
+          text = element.innerHtml;
+        }
+      } else if (text.contains(RegExp(r'[0-9]'))) {
+        text = text.substring(4);
+      }
+      log.info("[SchoolCardSession] remains: $text");
+
+      if (text.isEmpty) {
+        text = "school_card_status.failed_to_query";
       } else if (text.contains("school_card_status.failed_to_query")) {
         money.value = "school_card_status.failed_to_query";
       } else {
-        /// Should not exec it.
-        money.value = "0.00";
+        money.value = text;
       }
       isInit.value = SessionState.fetched;
     } catch (e) {

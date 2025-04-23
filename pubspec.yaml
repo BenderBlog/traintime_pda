@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.4.5+28
+version: 1.4.6+29
 
 environment:
   sdk: ">=3.0.0"
@@ -37,7 +37,6 @@ dependencies:
   url_launcher: ^6.1.6
   jiffy: ^6.1.0
   auto_size_text: ^3.0.0
-  async: ^2.10.0 # For AsyncMemoizer
   graphic: ^2.2.0
   restart_app: ^1.2.1
   calendar_date_picker2: ^1.0.6

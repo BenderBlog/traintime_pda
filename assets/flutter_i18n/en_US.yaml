@@ -601,6 +601,7 @@ setting:
       xizi: "Development support: on postgraduate version"
       wirsbf: "Development: fix course adjustment did not proceed as expected"
       zcwzy: "Development: fix Dingxiang apartment electricity fee / development support: on postgraduate version / design: blank page picture"
+      zyar-er: "Development support: fix shortcut url"
       # TODO: PDA Girl inspriation
       homepage: "Homepage"
       code: "Open Source Code"
@@ -717,15 +718,47 @@ school_card_status:
    failed_to_query: "Failed querying"
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
-easter_egg: |-
-   (This is a song related to the PDA girl)
+easter_egg_apple: |-
+   Welcome to our sanguinary sect of worship
+   Feel at home in our black conventicle
+   As we anathematise all those who oppose us
 
-   All alone at the end of the evening
-   And the bright lights have faded to blue
-   I was thinking 'bout a woman who might loved me
-   And I never knew
+   Don't summon the devil, don't call the priests
+   If you need the strength, the conjuring
+   Obey!
 
-   So put me on a highway
-   And show me a sign
-   And take it to the limit
-   One more time
+   Behold, the flames rise from the compass' cardinal points
+   Burn the sacred oil, and with the ashes you'll anoint
+   Arrange the symbols of the wizard and magician
+   Light the candles, place the parchment paper in position
+   Between its leaves place the lash from a black cat's eye
+   A straw of a broom, fold, and burn, and centralize
+
+   Don't summon the devil, don't call the priests
+   If you need the strength, then conjure me
+
+   I am the devil's advocate, salesman if you will
+   You know my name, you know my name
+   I met your father years ago, I gave him what he'd please
+   He called my name, and you'll do the same
+   I'm claiming what is mine by right, it's time to close the deal
+   You're bought and sold, bought and sold
+   Come join me in my infernal depths, Mephisto's hall of fame
+   I've got your soul, I've got your soul
+
+easter_egg_others: |-
+   Man, what are you thinking of?
+   Man, what do you need?
+   Man, nobody tell you what to do.
+   Man, you need somebody to hurt?
+
+   In a rainy night, can you hear me?
+   In a rainy night, can you help me?
+
+   Man, you feel so lonely.
+   Man, can't you hear the message come from the sky?
+   Man, you are driving into the rain.
+   Man, you know it's time to find the faith?
+
+   In a rainy night, can you hear me?
+   In a rainy night, can you help me?

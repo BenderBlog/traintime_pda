@@ -3,6 +3,8 @@
 
 // Python script by arttnba3
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -16,19 +18,14 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  // Gimme Shelter - Rolling Stongs - Let it bleed...
-  final String urlTC = "https://www.bilibili.com/video/BV1mt411p7bZ/";
+  // Dead Romance - Beyond - 再见理想
+  final String urlOthers = "https://www.bilibili.com/video/BV1cT41187Nk/";
 
-  // The Sky is Crying - Elmore James arr. Eric Clapton - There's one in every crowd
-  final String urlSC = "https://www.bilibili.com/video/BV1S841187nW?t=952.7";
-
-  // Take it to the Limit - Eagles - One of these nights.
-  final String urlEnglish = "https://www.bilibili.com/video/BV1yd4y1v7Xg";
+  // The Conjuring - Megadeth - Peace Sells But Who's Buying
+  final String urlApple = "https://www.bilibili.com/video/BV1Kx4y127zY/";
 
   @override
   Widget build(BuildContext context) {
-    String langtag =
-        FlutterI18n.currentLocale(context)?.toLanguageTag() ?? "und";
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -40,14 +37,10 @@ class _EasterEggPageState extends State<EasterEggPage> {
       ),
       body: [
         [
-          IconButton.filled(
+          IconButton.filledTonal(
             onPressed: () => launchUrl(
               Uri.parse(
-                langtag.contains("en")
-                    ? urlEnglish
-                    : langtag.contains("tw")
-                        ? urlTC
-                        : urlSC,
+                Platform.isIOS || Platform.isMacOS ? urlApple : urlOthers,
               ),
               mode: LaunchMode.externalApplication,
             ),
@@ -57,25 +50,7 @@ class _EasterEggPageState extends State<EasterEggPage> {
           IconButton.filledTonal(
             onPressed: () => launchUrl(
               Uri.parse(
-                langtag.contains("en")
-                    ? urlSC
-                    : langtag.contains("tw")
-                        ? urlSC
-                        : urlTC,
-              ),
-              mode: LaunchMode.externalApplication,
-            ),
-            icon: const Icon(Icons.headphones),
-          ),
-          const SizedBox(width: 24),
-          IconButton.filledTonal(
-            onPressed: () => launchUrl(
-              Uri.parse(
-                langtag.contains("en")
-                    ? urlTC
-                    : langtag.contains("tw")
-                        ? urlEnglish
-                        : urlEnglish,
+                Platform.isIOS || Platform.isMacOS ? urlOthers : urlApple,
               ),
               mode: LaunchMode.externalApplication,
             ),
@@ -83,11 +58,14 @@ class _EasterEggPageState extends State<EasterEggPage> {
           ),
         ].toRow(mainAxisAlignment: MainAxisAlignment.center).padding(all: 24.0),
         Text(
-          FlutterI18n.translate(context, "easter_egg"),
+          FlutterI18n.translate(
+            context,
+            Platform.isIOS || Platform.isMacOS
+                ? "easter_egg_apple"
+                : "easter_egg_others",
+          ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
-        Image.asset("assets/art/pda_girl_default.png"),
       ]
           .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
           .scrollable()

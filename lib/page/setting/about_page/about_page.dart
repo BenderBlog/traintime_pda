@@ -282,6 +282,14 @@ class _AboutPageState extends State<AboutPage> {
           ),
           "https://github.com/ZCWzy",
         ),
+        Developer(
+            "ZYar-er",
+            "https://avatars.githubusercontent.com/u/95170599?v=4",
+            FlutterI18n.translate(
+              context,
+              "setting.about_page.zyar-er",
+            ),
+            "https://github.com/ZYar-er")
       ];
 
   List<Link> linkData() => [
@@ -304,8 +312,6 @@ class _AboutPageState extends State<AboutPage> {
       ];
 
   Widget _title(context) {
-    String langtag =
-        FlutterI18n.currentLocale(context)?.toLanguageTag() ?? "und";
     return [
       const AppIconWidget(),
       const Divider(color: Colors.transparent),
@@ -324,11 +330,8 @@ class _AboutPageState extends State<AboutPage> {
                 text: " v${preference.packageInfo.version}\n",
               ),
               TextSpan(
-                text: langtag.contains("en")
-                    ? "Take it to the Limit Edition"
-                    : langtag.contains("TW")
-                        ? "Gimme Shelter Edition"
-                        : "The Sky is Crying Edition",
+                text:
+                    "${Platform.isIOS || Platform.isMacOS ? "The Conjuring" : "Dead Romance"} - Neuromancy Edition",
                 style: const TextStyle(fontSize: 16),
               ),
             ],
