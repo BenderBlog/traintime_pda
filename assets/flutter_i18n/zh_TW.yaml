@@ -371,11 +371,11 @@ school_net:
   wrong_password: 密碼錯誤
   error_fetch: 獲取失敗
   error_other: 其他錯誤：{msg}
-  refresh: 刷新
+  refresh: 重新整理
 school_card_window:
   title: 校園卡流水資訊
-  income: 支出 {income}
-  expense: 收入 {expense}
+  income: 收入 {income}
+  expense: 支出 {expense}
   select_range: 選擇日期：從 {startDay} 到 {endDay}
   store_name: 商戶名稱
   balance: 金額
