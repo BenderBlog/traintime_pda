@@ -39,7 +39,7 @@ dependencies:
   auto_size_text: ^3.0.0
   graphic: ^2.2.0
   restart_app: ^1.2.1
-  calendar_date_picker2: ^1.0.6
+  calendar_date_picker2: ^2.0.0
   cached_network_image: ^3.2.3
   qr_flutter: ^4.1.0
   data_table_2: ^2.5.1
@@ -54,18 +54,18 @@ dependencies:
   vector_graphics: ^1.1.11+1
   vector_graphics_compiler: ^1.1.11+1
   styled_widget: ^0.4.1
-  file_picker: ^8.0.3
+  file_picker: ^10.1.2
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.1
   timelines_plus: ^1.0.4
   based_split_view: ^1.2.0
   disclosure: ^2.2.0
-  content_resolver: ^0.3.1
-  permission_handler: ^11.3.1
+  content_resolver: ^0.3.3
+  permission_handler: ^12.0.0+1
   # Output to system calendar
   device_calendar: ^4.3.3
   # Homepage Widget
-  home_widget: ^0.6.0
+  home_widget: ^0.7.0+1
   image: ^4.2.0
   catcher_2: ^2.0.0
   #receive_sharing_intent: ^1.8.1
@@ -75,10 +75,10 @@ dependencies:
       ref: 2cea396843cd3ab1b5ec4334be4233864637874e
   # XDU Planet
   flutter_widget_from_html_core: any
-  fwfh_cached_network_image: ^0.14.3
-  fwfh_url_launcher: ^0.9.1
+  fwfh_cached_network_image: ^0.16.0
+  fwfh_url_launcher: ^0.16.0
   # internationalized
-  device_info_plus: ^10.1.2
+  device_info_plus: ^11.4.0
   flutter_i18n: ^0.36.2
   flutter_localizations:
     sdk: flutter
@@ -87,12 +87,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.3
   build_runner: ^2.4.8
   json_serializable: ^6.7.1
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   change_app_package_name: ^1.1.0
-  pigeon: ^20.0.1
+  pigeon: ^25.3.1
 
 flutter_launcher_icons:
   android: true

@@ -19,8 +19,6 @@ RxString errorSession = "".obs;
 
 class SchoolCardSession extends IDSSession {
   static String openid = "";
-  static String virtualCardUrl = "";
-  static String personalCenter = "";
 
   /*
   Future<Uint8List> getQRCode() async {
@@ -115,44 +113,27 @@ class SchoolCardSession extends IDSSession {
         }
       }
 
-      page.getElementsByTagName('a').forEach((element) {
-        if (element.attributes["href"]?.contains("openVirtualcard") ?? false) {
-          virtualCardUrl += element.attributes["href"]!;
-        }
-        if (element.attributes["href"]?.contains("openMyAccount") ?? false) {
-          personalCenter += element.attributes["href"]!;
-        }
-      });
-
       /// Post formula: fetch money.
-      String text = "";
-      for (var i in page.getElementsByTagName("span")) {
-        if (i.attributes["name"] == "showbalanceid") {
-          text = i.innerHtml;
-          break;
-        }
-      }
-      log.info("[SchoolCardSession] remains on the surface: $text");
+      response = await dio.get(
+        "https://v8scan.xidian.edu.cn/myaccount/openMyAccount?openid=$openid",
+      );
+      page = parse(response.data);
 
-      if (text.contains("余额未结转")) {
-        var element = page.getElementById("hidebalanceid");
-        if (element != null) {
-          text = element.innerHtml;
-        }
-      } else if (text.contains(RegExp(r'[0-9]'))) {
-        text = text.substring(4);
-      }
-      log.info("[SchoolCardSession] remains: $text");
+      money.value = page
+              .getElementsByTagName("li")
+              .firstOrNull
+              ?.children
+              .elementAtOrNull(1)
+              ?.children
+              .elementAtOrNull(1)
+              ?.innerHtml ??
+          "school_card_status.failed_to_query";
+      log.info("[SchoolCardSession][initSession] Money $money");
 
-      if (text.isEmpty) {
-        text = "school_card_status.failed_to_query";
-      } else if (text.contains("school_card_status.failed_to_query")) {
-        money.value = "school_card_status.failed_to_query";
-      } else {
-        money.value = text;
-      }
       isInit.value = SessionState.fetched;
-    } catch (e) {
+    } catch (e, s) {
+      log.error(
+          "[SchoolCardSession][initSession] Money failed to fetch.", e, s);
       errorSession.value = e.toString();
       money.value = "school_card_status.failed_to_fetch";
       isInit.value = SessionState.error;
