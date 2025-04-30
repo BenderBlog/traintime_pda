@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -57,9 +58,26 @@ void main() async {
     ]);
   }
 
-  // Loading cookiejar.
+  // Load cookiejar and other stuff
   repo_general.supportPath = await getApplicationSupportDirectory();
-  preference.prefs = await SharedPreferences.getInstance();
+
+  // Load shared preference. Per the migration guide
+  // https://pub.dev/packages/shared_preferences#migrating-from-sharedpreferences-to-sharedpreferencesasyncwithcache
+  const SharedPreferencesOptions sharedPreferencesOptions =
+      SharedPreferencesOptions();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.getKeys().isNotEmpty) {
+    await migrateLegacySharedPreferencesToSharedPreferencesAsyncIfNecessary(
+      legacySharedPreferencesInstance: prefs,
+      sharedPreferencesAsyncOptions: sharedPreferencesOptions,
+      migrationCompletedKey: 'pdaMigrationCompleted',
+    );
+  }
+  preference.prefs = await SharedPreferencesWithCache.create(
+    cacheOptions: const SharedPreferencesWithCacheOptions(),
+  );
+
+  // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
 
   // Have user registered?

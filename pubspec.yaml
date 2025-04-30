@@ -16,12 +16,12 @@ dependencies:
   tflite_flutter: ^0.11.0
   synchronized: ^3.1.0+1
   # Stroage Cache
-  shared_preferences: ^2.0.15
+  shared_preferences: ^2.5.3
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.3
   path_provider: ^2.0.11
   json_annotation: ^4.8.0
-  share_plus: ^10.0.1
+  share_plus: ^10.1.4
   # Deal with html
   html: ^0.15.4
   charset_converter: ^2.2.1
@@ -35,7 +35,7 @@ dependencies:
   flex_color_scheme: ^8.0.1
   # Others
   url_launcher: ^6.1.6
-  jiffy: ^6.1.0
+  jiffy: ^6.3.2
   auto_size_text: ^3.0.0
   graphic: ^2.2.0
   restart_app: ^1.2.1

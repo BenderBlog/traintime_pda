@@ -9,7 +9,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/repository/logger.dart';
 
-late SharedPreferences prefs;
+late SharedPreferencesWithCache prefs;
 late PackageInfo packageInfo;
 
 final GlobalKey<NavigatorState> debuggerKey =
@@ -102,7 +102,7 @@ Future<void> setString(Preference key, String value) async {
     throw WrongTypeException;
   }
   await prefs.setString(key.key, value);
-  await prefs.reload();
+  await prefs.reloadCache();
 }
 
 Future<void> setBool(Preference key, bool value) async {
@@ -110,7 +110,7 @@ Future<void> setBool(Preference key, bool value) async {
     throw WrongTypeException;
   }
   await prefs.setBool(key.key, value);
-  await prefs.reload();
+  await prefs.reloadCache();
 }
 
 Future<void> setInt(Preference key, int value) async {
@@ -118,17 +118,17 @@ Future<void> setInt(Preference key, int value) async {
     throw WrongTypeException;
   }
   await prefs.setInt(key.key, value);
-  await prefs.reload();
+  await prefs.reloadCache();
 }
 
 Future<void> remove(Preference key) async {
   await prefs.remove(key.key);
-  await prefs.reload();
+  await prefs.reloadCache();
 }
 
 Future<void> prefrenceClear() async {
   await prefs.clear();
-  await prefs.reload();
+  await prefs.reloadCache();
 }
 
 class NotRegisteredException implements Exception {}
