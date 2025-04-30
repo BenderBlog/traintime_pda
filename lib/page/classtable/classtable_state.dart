@@ -9,6 +9,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -255,9 +256,12 @@ class ClassTableWidgetState with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Generate icalendar file string.
-  String get iCalenderStr {
-    String toReturn = "BEGIN:VCALENDAR\n";
+  List<Event> get events {
+    List<Event> events = [];
+
+    // UTC+8 timezone defination, hard-coded since our school is in here...
+    tz.initializeTimeZones();
+    Location currentLocation = getLocation("Asia/Shanghai");
 
     // @hgh: i here means each single course assignment
     for (var i in timeArrangement) {
@@ -268,116 +272,194 @@ class ClassTableWidgetState with ChangeNotifier {
       // @benderblog: basically not happens, but if not arranged, just skip it.
       if (j == -1) continue;
 
-      String summary = "SUMMARY:"
-          "${getClassDetail(timeArrangement.indexOf(i)).name}"
-          "@${i.classroom ?? "待定"}\n";
-      String description = "DESCRIPTION:"
-          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; "
-          "上课地点：${i.classroom ?? "待定"}\n";
+      // @benderblog: rewrite, using ai generated algorithm to get the ranges of "true".
+      List<(int, int)> ranges = [];
+      int start = -1;
 
-      // @hgh: initialize the first day(or, first recurrence) of the class
-      Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
-        weeks: j,
-        days: i.day - 1,
-      );
-      String vevent = "BEGIN:VEVENT\n$summary";
+      for (j; j < i.weekList.length; j++) {
+        if (i.weekList[j] && start == -1) {
+          start = j;
+        } else if (!i.weekList[j] && start != -1) {
+          ranges.add((start, j - 1));
+          start = -1;
+        }
+      }
+
+      // @ai: Handle the case where the array ends with a sequence of true values.
+      if (start != -1) {
+        ranges.add((start, j - 1));
+      }
+
+      String title =
+          "${getClassDetail(timeArrangement.indexOf(i)).name}@${i.classroom ?? "待定"}";
+      String description =
+          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name} - 老师：${i.teacher ?? "未知"}";
+      String? location = i.classroom ?? "待定";
+
       List<String> startTime = time[(i.start - 1) * 2].split(":");
       List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
-      vevent += "DTSTART;TZID:Asia/Shanghai:"
-          "${firstDay.add(
-                hours: int.parse(startTime[0]),
-                minutes: int.parse(startTime[1]),
-              ).format(
-                pattern: 'yyyyMMddTHHmmss',
-              )}\n";
-      vevent += "DTEND;TZID:Asia/Shanghai:"
-          "${firstDay.add(
-                hours: int.parse(stopTime[0]),
-                minutes: int.parse(stopTime[1]),
-              ).format(
-                pattern: 'yyyyMMddTHHmmss',
-              )}\n";
 
-      for (int j = 0; j < i.weekList.length; ++j) {
-        // @hgh: if the next week doesn't have class, then end the current recurrence
-        if (j != i.weekList.length - 1 && !i.weekList[j + 1]) {
-          vevent += "RRULE:FREQ=WEEKLY;"
-              "UNTIL=${firstDay.add(
-                    weeks: j,
-                    days: 1,
-                  ).format(
-                    pattern: 'yyyyMMddTHHmmss',
-                  )}"
-              "\n";
-          toReturn += "$vevent$description"
-              "END:VEVENT\n"; // one recurrence over equals to one VEVENT over
-
-          // upper: end the current recurrence
-          // lower: start a new recurrence
-
-          // @hgh: find the next week that has class
-          j++;
-          while (j < i.weekList.length && !i.weekList[j]) {
-            ++j;
-          }
-          // @hgh: if the next week is the last week, then end the current recurrence
-          if (j == i.weekList.length) break;
-
-          // reset the vevent
-          Jiffy day = Jiffy.parseFromDateTime(startDay).add(
-            weeks: j,
-            days: i.day - 1,
-          );
-          vevent = "BEGIN:VEVENT\n" "$summary";
-          vevent += "DTSTART;TZID:Asia/Shanghai:"
-              "${day.add(
-                    weeks: j,
-                    hours: int.parse(startTime[0]),
-                    minutes: int.parse(startTime[1]),
-                  ).format(
-                    pattern: 'yyyyMMddTHHmmss',
-                  )}\n";
-          vevent += "DTEND;TZID:Asia/Shanghai:"
-              "${day.add(
-                    weeks: j,
-                    hours: int.parse(stopTime[0]),
-                    minutes: int.parse(stopTime[1]),
-                  ).format(
-                    pattern: 'yyyyMMddTHHmmss',
-                  )}\n";
+      DayOfWeek getDayOfWeek(int day) {
+        switch (day) {
+          case 1:
+            return DayOfWeek.Monday;
+          case 2:
+            return DayOfWeek.Tuesday;
+          case 3:
+            return DayOfWeek.Wednesday;
+          case 4:
+            return DayOfWeek.Thursday;
+          case 5:
+            return DayOfWeek.Friday;
+          case 6:
+            return DayOfWeek.Saturday;
+          case 7:
+            return DayOfWeek.Sunday;
+          default:
+            return DayOfWeek.Sunday;
         }
+      }
+
+      // @benderblog: start dealing with
+      for (var range in ranges) {
+        // @hgh: initialize the first day(or, first recurrence) of the class
+        Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
+          weeks: range.$1,
+          days: i.day - 1,
+        );
+
+        Jiffy startTimeToUse = firstDay.add(
+          hours: int.parse(startTime[0]),
+          minutes: int.parse(startTime[1]),
+        );
+        Jiffy stopTimeToUse = firstDay.add(
+          hours: int.parse(stopTime[0]),
+          minutes: int.parse(stopTime[1]),
+        );
+
+        RecurrenceRule rrule = RecurrenceRule(
+          RecurrenceFrequency.Weekly,
+          daysOfWeek: [getDayOfWeek(i.day)],
+          endDate: firstDay.add(weeks: range.$2 - range.$1, days: 1).dateTime,
+        );
+
+        events.add(Event(
+          null,
+          title: title,
+          description: description,
+          recurrenceRule: rrule,
+          start: TZDateTime.from(
+            startTimeToUse.dateTime,
+            currentLocation,
+          ),
+          end: TZDateTime.from(
+            stopTimeToUse.dateTime,
+            currentLocation,
+          ),
+          location: location,
+        ));
       }
     }
 
     // Add exam data and experiment data here.
     for (var i in subjects) {
-      String summary = "SUMMARY:"
-          "${i.subject} ${i.typeStr}"
-          "@${i.place} ${i.seat != null ? "-${i.seat}" : ""}\n";
-      String description = "DESCRIPTION:"
-          "考试信息：${i.subject}\n"
-          "类型：${i.typeStr}\n"
-          "地点：${i.place} ${i.seat != null ? "-${i.seat}" : ""}\n";
-      String vevent = "BEGIN:VEVENT\n$summary";
-      vevent +=
-          "DTSTART;TZID:Asia/Shanghai:${i.startTime!.format(pattern: 'yyyyMMddTHHmmss')}\n";
-      vevent +=
-          "DTEND;TZID:Asia/Shanghai:${i.stopTime!.format(pattern: 'yyyyMMddTHHmmss')}\n";
-      toReturn += "$vevent${description}END:VEVENT\n";
+      String title =
+          "${i.subject} ${i.typeStr}@${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
+      String description = "考试信息：${i.subject} - ${i.typeStr}";
+      String location = "${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
+
+      events.add(Event(
+        null,
+        title: title,
+        description: description,
+        start: TZDateTime.from(
+          i.startTime!.dateTime,
+          currentLocation,
+        ),
+        end: TZDateTime.from(
+          i.stopTime!.dateTime,
+          currentLocation,
+        ),
+        location: location,
+      ));
     }
 
     for (var i in experiments) {
-      String summary = "SUMMARY:"
-          "${i.name}@${i.classroom}}\n";
-      String description = "DESCRIPTION:"
-          "物理实验：${i.name}\n"
-          "地点：${i.classroom}\n";
-      String vevent = "BEGIN:VEVENT\n$summary";
-      vevent +=
-          "DTSTART;TZID:Asia/Shanghai:${Jiffy.parseFromDateTime(i.time.first).format(pattern: 'yyyyMMddTHHmmss')}\n";
-      vevent +=
-          "DTEND;TZID:Asia/Shanghai:${Jiffy.parseFromDateTime(i.time.last).format(pattern: 'yyyyMMddTHHmmss')}\n";
-      toReturn += "$vevent${description}END:VEVENT\n";
+      events.add(Event(
+        null,
+        title: "${i.name}@${i.classroom}}",
+        start: TZDateTime.from(
+          i.time.first,
+          currentLocation,
+        ),
+        end: TZDateTime.from(
+          i.time.last,
+          currentLocation,
+        ),
+        location: i.classroom,
+      ));
+    }
+    return events;
+  }
+
+  /// Generate icalendar file string.
+  String get iCalenderStr {
+    String toReturn = '''BEGIN:VCALENDAR
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:Asia/Shanghai
+X-LIC-LOCATION:Asia/Shanghai
+BEGIN:STANDARD
+TZOFFSETFROM:+0800
+TZOFFSETTO:+0800
+TZNAME:CST
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+''';
+
+    for (var i in events) {
+      String vevent = "BEGIN:VEVENT\n";
+
+      vevent += "DTSTAMP:"
+          "${Jiffy.now().format(pattern: 'yyyyMMddTHHmmssZ')}\n";
+      vevent += "SUMMARY:${i.title ?? "待定"}\n";
+      vevent += "DESCRIPTION:${i.description ?? "待定"}\n";
+
+      /// Minus 8 hours to match the "UTC time"
+      vevent += "DTSTART;TZID=Asia/Shanghai:"
+          "${Jiffy.parseFromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch).format(pattern: 'yyyyMMddTHHmmss')}\n";
+      vevent += "DTEND;TZID=Asia/Shanghai:"
+          "${Jiffy.parseFromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch).format(pattern: 'yyyyMMddTHHmmss')}\n";
+      if (i.location != null) {
+        vevent += "LOCATION:${i.location}\n";
+      }
+
+      if (i.recurrenceRule != null) {
+        String getWeekStr(DayOfWeek day) {
+          switch (day) {
+            case DayOfWeek.Monday:
+              return "MO";
+            case DayOfWeek.Tuesday:
+              return "TU";
+            case DayOfWeek.Wednesday:
+              return "WE";
+            case DayOfWeek.Thursday:
+              return "TH";
+            case DayOfWeek.Friday:
+              return "FR";
+            case DayOfWeek.Saturday:
+              return "SA";
+            case DayOfWeek.Sunday:
+              return "SU";
+          }
+        }
+
+        vevent +=
+            "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=${getWeekStr(i.recurrenceRule!.daysOfWeek!.first)};"
+            "UNTIL=${Jiffy.parseFromDateTime(i.recurrenceRule!.endDate!).format(pattern: 'yyyyMMdd')}\n";
+      }
+      toReturn += "${vevent}END:VEVENT\n";
     }
 
     return "${toReturn}END:VCALENDAR";
@@ -424,176 +506,10 @@ class ClassTableWidgetState with ChangeNotifier {
     }
     String calendarId = calendarIdData.$2;
 
-    // UTC+8 timezone defination, hard-coded since our school is in here...
-    Location currentLocation = getLocation("Asia/Shanghai");
-
-    // @hgh: i here means each single course assignment
-    for (var i in timeArrangement) {
-      // @hgh: j here means each week for a single course assignment
-      // @hgh: find the first week that has class
-      int j = i.weekList.indexWhere((element) => element);
-
-      // @benderblog: basically not happens, but if not arranged, just skip it.
-      if (j == -1) continue;
-
-      String title = "${getClassDetail(timeArrangement.indexOf(i)).name}"
-          "@${i.classroom ?? "待定"}";
-      String description =
-          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name}; \n"
-          "老师：${i.teacher ?? "未知"}"
-          "上课地点：${i.classroom ?? "待定"}";
-
-      // @hgh: initialize the first day(or, first recurrence) of the class
-      Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
-        weeks: j,
-        days: i.day - 1,
-      );
-      List<String> startTime = time[(i.start - 1) * 2].split(":");
-      List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
-      Jiffy startTimeToUse = firstDay.add(
-        hours: int.parse(startTime[0]),
-        minutes: int.parse(startTime[1]),
-      );
-      Jiffy stopTimeToUse = firstDay.add(
-        hours: int.parse(stopTime[0]),
-        minutes: int.parse(stopTime[1]),
-      );
-
-      DayOfWeek getDayOfWeek(int day) {
-        switch (day) {
-          case 1:
-            return DayOfWeek.Monday;
-          case 2:
-            return DayOfWeek.Tuesday;
-          case 3:
-            return DayOfWeek.Wednesday;
-          case 4:
-            return DayOfWeek.Thursday;
-          case 5:
-            return DayOfWeek.Friday;
-          case 6:
-            return DayOfWeek.Saturday;
-          case 7:
-            return DayOfWeek.Sunday;
-          default:
-            return DayOfWeek.Sunday;
-        }
-      }
-
-      for (int j = 0; j < i.weekList.length; ++j) {
-        // @hgh: if the next week doesn't have class, then end the current recurrence
-        if (j != i.weekList.length - 1 && !i.weekList[j + 1]) {
-          RecurrenceRule rrule = RecurrenceRule(
-            RecurrenceFrequency.Weekly,
-            daysOfWeek: [getDayOfWeek(i.day)],
-            endDate: firstDay.add(weeks: j, days: 1).dateTime,
-          );
-          Result<String>? addEventResult =
-              await deviceCalendarPlugin.createOrUpdateEvent(Event(
-            calendarId,
-            title: title,
-            description: description,
-            recurrenceRule: rrule,
-            start: TZDateTime.from(
-              startTimeToUse.dateTime,
-              currentLocation,
-            ),
-            end: TZDateTime.from(
-              stopTimeToUse.dateTime,
-              currentLocation,
-            ),
-          ));
-          // If got error, return with false.
-          if (addEventResult == null ||
-              addEventResult.data == null ||
-              addEventResult.data!.isEmpty) {
-            log.info(
-              "[Classtable][outputToCalendar] "
-              "Add failed: "
-              "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
-            );
-            return false;
-          }
-
-          // upper: end the current recurrence
-          // lower: start a new recurrence
-
-          // @hgh: find the next week that has class
-          j++;
-          while (j < i.weekList.length && !i.weekList[j]) {
-            ++j;
-          }
-          // @hgh: if the next week is the last week, then end the current recurrence
-          if (j == i.weekList.length) break;
-
-          // reset the vevent
-          startTimeToUse = firstDay.add(
-            weeks: j,
-            hours: int.parse(startTime[0]),
-            minutes: int.parse(startTime[1]),
-          );
-          stopTimeToUse = firstDay.add(
-            weeks: j,
-            hours: int.parse(stopTime[0]),
-            minutes: int.parse(stopTime[1]),
-          );
-        }
-      }
-    }
-
-    // Add exam data and experiment data here.
-    for (var i in subjects) {
-      String title = "${i.subject} ${i.typeStr}"
-          "@${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
-      String description = "考试信息：${i.subject}\n"
-          "类型：${i.typeStr}\n"
-          "地点：${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
-
+    for (var i in events) {
+      var toPush = i..calendarId = calendarId;
       Result<String>? addEventResult =
-          await deviceCalendarPlugin.createOrUpdateEvent(Event(
-        calendarId,
-        title: title,
-        description: description,
-        start: TZDateTime.from(
-          i.startTime!.dateTime,
-          currentLocation,
-        ),
-        end: TZDateTime.from(
-          i.stopTime!.dateTime,
-          currentLocation,
-        ),
-      ));
-      // If got error, return with false.
-      if (addEventResult == null ||
-          addEventResult.data == null ||
-          addEventResult.data!.isEmpty) {
-        log.info(
-          "[Classtable][outputToCalendar] "
-          "Add failed: "
-          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
-        );
-        return false;
-      }
-    }
-
-    for (var i in experiments) {
-      String title = "${i.name}@${i.classroom}}";
-      String description = "物理实验：${i.name}\n"
-          "地点：${i.classroom}";
-      Result<String>? addEventResult =
-          await deviceCalendarPlugin.createOrUpdateEvent(Event(
-        calendarId,
-        title: title,
-        description: description,
-        start: TZDateTime.from(
-          i.time.first,
-          currentLocation,
-        ),
-        end: TZDateTime.from(
-          i.time.last,
-          currentLocation,
-        ),
-      ));
+          await deviceCalendarPlugin.createOrUpdateEvent(toPush);
       // If got error, return with false.
       if (addEventResult == null ||
           addEventResult.data == null ||
