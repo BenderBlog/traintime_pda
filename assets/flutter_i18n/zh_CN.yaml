@@ -156,6 +156,8 @@ classtable:
     output_to_system:
         success: "成功导出到系统日历"
         failure: "导出到系统日历过程中发生了问题:P"
+        request_all_title: "权限需求说明"
+        request_all: "因导出插件限制，用户必须同时授予本软件读取日历和写入日历权限，才能正常导出日程。不过，本软件不会读取日历。"
     refresh_classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"

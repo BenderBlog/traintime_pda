@@ -164,6 +164,8 @@ classtable:
    output_to_system:
       success: Successfully output to the system calendar.
       failure: Problem occurred while outputing to the system calendar.
+      request_all_title: Information on requesting permission
+      request_all: Due to technical difficulties, users must grant both read calendar and write calendar permissions to this software in order to export schedules properly. However, this software will not read the calendar.
    refresh_classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule

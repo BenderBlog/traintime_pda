@@ -466,12 +466,15 @@ END:VTIMEZONE
   }
 
   /// Output to System Calendar
-  Future<bool> outputToCalendar() async {
+  Future<bool> outputToCalendar(Future<void> Function() showDialog) async {
     // Fetch calendar permission
     final DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
     Result<bool> hasPermitted = await deviceCalendarPlugin.hasPermissions();
     if (hasPermitted.data != true) {
+      await showDialog();
+      print("result haspermitted eval?");
       hasPermitted = await deviceCalendarPlugin.requestPermissions();
+      print("result ${hasPermitted.data}");
       if (hasPermitted.data != true) {
         log.info(
           "[Classtable][outputToCalendar] "

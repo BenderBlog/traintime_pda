@@ -651,7 +651,32 @@ class _ClassTablePageState extends State<ClassTablePage> {
                           );
                         }
                       case 'H':
-                        await classTableState.outputToCalendar().then((data) {
+                        await classTableState.outputToCalendar(() async {
+                          await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Text(FlutterI18n.translate(
+                                      context,
+                                      "classtable.output_to_system.request_all_title",
+                                    )),
+                                    content: Text(FlutterI18n.translate(
+                                      context,
+                                      "classtable.output_to_system.request_all",
+                                    )),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: Text(
+                                          FlutterI18n.translate(
+                                            context,
+                                            "confirm",
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ));
+                        }).then((data) {
                           if (context.mounted) {
                             showToast(
                               context: context,

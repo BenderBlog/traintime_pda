@@ -2,7 +2,7 @@ import opencc
 import yaml
 from collections import OrderedDict
 
-converter = opencc.OpenCC('s2twp.json')
+converter = opencc.OpenCC('s2tw.json')
 
 # 自定义 Loader，使用 OrderedDict 读取 YAML 文件
 class OrderedLoader(yaml.SafeLoader):
