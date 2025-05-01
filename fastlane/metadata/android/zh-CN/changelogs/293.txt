@@ -3,3 +3,4 @@
 3. 修改成绩搜索逻辑，现在大小写不敏感 @Pairman
 4. 修改部分快捷方式 @ZYar-er
 5. (非移动端) Linux AppImage 编译初步支持 @lhx-666-cool
+6. 导出课程表到系统日历有错误 @BenderBlog

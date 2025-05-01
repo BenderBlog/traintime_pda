@@ -3,3 +3,4 @@
 3. Change login in search score, now case insensitive. @Pairman
 4. Some url in toolbox chagned. @ZYar-er
 5. (Non-mobile platform) Linux AppImage support. @lhx-666-cool
+6. Fix error on outputing schedule to system calendar. @BenderBlog

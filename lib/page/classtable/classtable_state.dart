@@ -472,9 +472,7 @@ END:VTIMEZONE
     Result<bool> hasPermitted = await deviceCalendarPlugin.hasPermissions();
     if (hasPermitted.data != true) {
       await showDialog();
-      print("result haspermitted eval?");
       hasPermitted = await deviceCalendarPlugin.requestPermissions();
-      print("result ${hasPermitted.data}");
       if (hasPermitted.data != true) {
         log.info(
           "[Classtable][outputToCalendar] "

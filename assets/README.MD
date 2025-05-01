@@ -5,7 +5,8 @@
     - CP1919.svg.vec：基于 CP1919.svg 制作，公有领域
     - pda_classtable_empty.png：LichtYy
     - pda_empty_cover: ZCWzy
-    - pda_girl_default: Benderblog，PDA 娘
+    - pda_girl_default_ver1: Benderblog，PDA 娘（初始版本）
+    - pda_girl_default: Benderblog，PDA 娘（目前版本，配合开发代号）
     - pda_girl_reading: Benderblog，PDA 娘在阅读
  - flutter_i18n：全部的翻译文件和转换脚本
  - random

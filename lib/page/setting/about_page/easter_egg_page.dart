@@ -66,6 +66,9 @@ class _EasterEggPageState extends State<EasterEggPage> {
           ),
           textAlign: TextAlign.center,
         ),
+        SizedBox(height: 20),
+        Image.asset("assets/art/pda_girl_default.png"),
+        Text("Demon calling you...")
       ]
           .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
           .scrollable()
