@@ -37,7 +37,7 @@
             android:layout_centerVertical="true"
             android:background="?android:selectableItemBackgroundBorderless"
             android:contentDescription="@string/classtable_day_switcher_decription"
-            android:src="@drawable/icon_next" />
+            android:src="@drawable/ic_next_day" />
 
     </RelativeLayout>
 

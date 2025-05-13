@@ -1,11 +1,13 @@
+// Copyright 2025 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
+
+// Original author: Xiue233
+
 package io.github.benderblog.traintime_pda.model
 
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.time.LocalDateTime
 
 object ClassTableConstants {
     const val CLASS_FILE_NAME = "ClassTable.json"
@@ -48,31 +50,29 @@ object ClassTableConstants {
 }
 
 object ClassTableWidgetKeys {
-    const val PACKAGE_NAME = "package_name"
     const val SHOW_TODAY = "show_today"
     const val SP_FILE_NAME = "class_table_widget"
 }
 
 data class TimeLineItem(
+    val type: Source = Source.SCHOOL,
     val name: String,
     val teacher: String,
     val place: String,
-    val startTime: Date,
-    val endTime: Date,
-    val start: Int,
-    val end: Int,
-    val type: Source = Source.SCHOOL
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
+    val colorIndex: Int,
 ) {
     val startTimeStr: String = when (type) {
         Source.EXAM -> "考"
         Source.EXPERIMENT -> "实"
-        else -> start.toString()
+        else -> "课"
     }
 
     val endTimeStr: String = when (type) {
         Source.EXAM -> "试"
         Source.EXPERIMENT -> "验"
-        else -> end.toString()
+        else -> "程"
     }
 }
 
@@ -119,7 +119,6 @@ data class ClassTableData(
             Source.EXAM -> "Unknown Exam"
             Source.EXPERIMENT -> "Unknown Experiment"
             Source.EMPTY -> "Unknown Empty"
-            else -> "Unknown None"
         }
 }
 
@@ -197,33 +196,18 @@ data class Subject(
     val seat: String,
 )
 
-val Subject.startTime: Date?
+val Subject.startTime: LocalDateTime?
     get() = try {
-        SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
-            .parse(startTimeStr)
+        LocalDateTime.parse(startTimeStr)
     } catch (e: Exception) {
         null
     }
 
-val Subject.endTime: Date?
+val Subject.endTime: LocalDateTime?
     get() = try {
-        SimpleDateFormat(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
-            .parse(endTimeStr)
+        LocalDateTime.parse(endTimeStr)
     } catch (e: Exception) {
         null
-    }
-
-val Subject.type: String
-    get() = typeStr.run {
-        if (contains("期末考试")) {
-            "期末考试"
-        } else if (contains("期中考试")) {
-            "期中考试"
-        } else if (contains("结课考试")) {
-            "结课考试"
-        } else {
-            typeStr
-        }
     }
 
 data class ExperimentData(
@@ -241,32 +225,43 @@ data class ExperimentData(
 
 class ExperimentDataListToken : TypeToken<List<ExperimentData>>()
 
-val ExperimentData.timeRange: Pair<Date, Date>
+val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
     get() {
         /// Return is month/day/year , hope not change...
         val dateNums: List<Int> = date.split('/').map { it ->
             it.toInt()
         }
+
         /// And the time arrangement too.
-        val cal = Calendar.getInstance()
-        cal.set(dateNums[2], dateNums[0] - 1, dateNums[1])
-        lateinit var startTime: Date
-        lateinit var stopTime: Date
+        lateinit var startTime: LocalDateTime
+        lateinit var stopTime: LocalDateTime
 
         if (timeStr.contains("15")) {
-            cal.set(3, 15)
-            cal.set(4, 55)
-            startTime = cal.time
-            cal.set(3, 18)
-            cal.set(4, 10)
-            stopTime = cal.time
+            startTime = LocalDateTime.of(
+                dateNums[2],
+                dateNums[0],
+                dateNums[1],
+                15,55,0,
+            )
+            stopTime = LocalDateTime.of(
+                dateNums[2],
+                dateNums[0],
+                dateNums[1],
+                18,10,0,
+            )
         } else {
-            cal.set(3, 18)
-            cal.set(4, 30)
-            startTime = cal.time
-            cal.set(3, 20)
-            cal.set(4, 45)
-            stopTime = cal.time
+            startTime = LocalDateTime.of(
+                dateNums[2],
+                dateNums[0],
+                dateNums[1],
+                18,30,0,
+            )
+            stopTime = LocalDateTime.of(
+                dateNums[2],
+                dateNums[0],
+                dateNums[1],
+                20,45,0,
+            )
         }
 
         return Pair(startTime, stopTime)

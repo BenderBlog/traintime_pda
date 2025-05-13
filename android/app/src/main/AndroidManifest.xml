@@ -31,7 +31,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="*/*"
+                <data
+                    android:host="TODO"
+                    android:mimeType="*/*"
                     android:scheme="content"
                     android:pathPattern=".*\\.erc" />
                 <data android:mimeType="*/*"
@@ -52,12 +54,11 @@
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver android:name=".widget.classtable.ClassTableWidgetProvider"
+        <receiver android:name=".widget.classtable.ClassTableWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="io.github.benderblog.traintime_pda.widget.classtable.CLICK_NEXT_DAY" />
-                <action android:name="io.github.benderblog.traintime_pda.widget.classtable.CLICK_PREVIOUS_DAY"/>
+                <action android:name="io.github.benderblog.traintime_pda.widget.classtable.CLICK" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/classtable_widget_config" />
