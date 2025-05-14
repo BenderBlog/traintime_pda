@@ -125,7 +125,7 @@ class ClassTableWidget : GlanceAppWidget() {
 
         // 组件状态
         var currentWeekIndex by remember { mutableIntStateOf(-1) }
-        var tomorrowWeekIndex by remember { mutableStateOf(-1)}
+        var tomorrowWeekIndex by remember { mutableIntStateOf(-1)}
         var schedulesToday by remember { mutableStateOf<List<TimeLineItem>>(emptyList()) }
         var schedulesTomorrow by remember { mutableStateOf<List<TimeLineItem>>(emptyList()) }
         var isShowingToday by remember { mutableStateOf(false) }
