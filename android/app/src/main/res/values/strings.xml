@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_classtable_description">课程表</string>
-    <string name="widget_electricity_description">电费详情</string>
-    <string name="widget_classtable_date_tip_loading">Loading...</string>
-    <string name="widget_classtable_titile">课程表</string>
-    <string name="widget_classtable_item_tip">暂无课程信息</string>
-    <string name="widget_classtable_no_course_tip">好像没课啦？</string>
+    <string name="widget_classtable_description">Time Arrangement Widget</string>
+    <string name="widget_classtable_date_loading">Loading…</string>
+    <string name="widget_classtable_title">PDA Arrangements</string>
+    <string name="widget_classtable_no_arrangement">No arrangement</string>
     <string name="classtable_day_switcher_decription">ClassTable Day Switcher</string>
+    <string name="widget_classtable_on_holiday">On Holiday</string>
+    <string name="widget_classtable_week_identifier">Week %1$d</string>
+    <string name="widget_classtable_on_error">Error occurred: %1$s</string>
+    <string name="widget_classtable_unknown_error">Unknown error</string>
+    <string name="widget_classtable_load_data_error">Failed to load data. %1$s</string>
+    <string name="widget_classtable_calculate_index_error">Problem on calculating index. %1$s</string>
+    <string name="widget_classtable_parse_term_start_time_error">Failed to parse the term start day</string>
 </resources>

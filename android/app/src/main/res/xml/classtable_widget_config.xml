@@ -5,7 +5,7 @@
     android:targetCellWidth="2"
     android:targetCellHeight="2"
     android:minHeight="102dp"
-    android:updatePeriodMillis="10800000"
+    android:updatePeriodMillis="2700000"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">

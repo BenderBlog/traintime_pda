@@ -1,6 +1,11 @@
+// Copyright 2025 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
+
 package io.github.benderblog.traintime_pda.widget.classtable
 
+import android.content.Context
 import android.util.Log
+import io.github.benderblog.traintime_pda.R
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ExamData
@@ -33,7 +38,7 @@ class ClassTableWidgetDataProvider {
 
     private val tag = "[PDA ClassTableWidget][ClassTableWidgetDataProvider]"
 
-    fun reloadData(currentTime: LocalDateTime) {
+    fun reloadData(currentTime: LocalDateTime, context: Context) {
         Log.d(tag, "reloadData() called.")
         todayArrangements.clear()
         tomorrowArrangements.clear()
@@ -42,7 +47,7 @@ class ClassTableWidgetDataProvider {
         curWeekIndex = -1
 
         try {
-            loadBasicConfig(currentTime)
+            loadBasicConfig(currentTime, context)
 
             if (curWeekIndex >= 0 && todayIndex >= 0) {
                 Log.d(tag, "Loading data for today (Week: $curWeekIndex, Day: $todayIndex)")
@@ -63,15 +68,12 @@ class ClassTableWidgetDataProvider {
                 loadOneDayExperiment(LocalDateTime.now().plusDays(1), tomorrowArrangements)
 
                 sortArrangements()
-            } else {
-                Log.w(tag, "Week index or day index is invalid. Skipping data loading.")
-                if (errorMessage == null) {
-                    errorMessage = "无法计算当前周/天，请检查学期配置。"
-                }
             }
         } catch (e: Exception) {
             Log.e("ClassDataProvider", "Error during reloadData", e)
-            errorMessage = "加载数据时出错: ${e.message ?: "未知错误"}"
+            errorMessage = e.localizedMessage ?: context.getString(
+                R.string.widget_classtable_unknown_error
+            )
             todayArrangements.clear()
             tomorrowArrangements.clear()
         }
@@ -84,7 +86,7 @@ class ClassTableWidgetDataProvider {
     fun getCurrentWeekIndex(): Int = curWeekIndex
     fun getErrorMessage(): String? = errorMessage
 
-    private fun loadBasicConfig(currentTime: LocalDateTime) {
+    private fun loadBasicConfig(currentTime: LocalDateTime, context: Context) {
         try {
             Log.d(tag, "loadBasicConfig() triggered")
             // initialize data
@@ -94,7 +96,7 @@ class ClassTableWidgetDataProvider {
                 try {
                     ClassTableDataHolder.gson.fromJson(it, ClassTableData::class.java)
                 } catch (e: Exception) {
-                    Log.e(tag, "Failed to parse schoolClassJsonData", e);
+                    Log.e(tag, "Failed to parse schoolClassJsonData", e)
                     null
                 }
             } ?: ClassTableData.EMPTY
@@ -106,7 +108,7 @@ class ClassTableWidgetDataProvider {
                 try {
                     ClassTableDataHolder.gson.fromJson(it, UserDefinedClassData::class.java)
                 } catch (e: Exception) {
-                    Log.e(tag, "Failed to parse userDefinedClassJsonData", e);
+                    Log.e(tag, "Failed to parse userDefinedClassJsonData", e)
                     null
                 }
             } ?: UserDefinedClassData.EMPTY
@@ -118,7 +120,7 @@ class ClassTableWidgetDataProvider {
                 try {
                     ClassTableDataHolder.gson.fromJson(it, ExamData::class.java)
                 } catch (e: Exception) {
-                    Log.e(tag, "Failed to parse examJsonData", e);
+                    Log.e(tag, "Failed to parse examJsonData", e)
                     null
                 }
             } ?: ExamData.EMPTY
@@ -133,7 +135,7 @@ class ClassTableWidgetDataProvider {
                         ExperimentDataListToken().type
                     )
                 } catch (e: Exception) {
-                    Log.e(tag, "Failed to parse experimentJsonData", e);
+                    Log.e(tag, "Failed to parse experimentJsonData", e)
                     null
                 }
             } ?: emptyList()
@@ -181,7 +183,10 @@ class ClassTableWidgetDataProvider {
                 Log.d(tag, "Calculation finished. curWeekIndex: $curWeekIndex, todayIndex: $todayIndex")
             } catch (e: Exception) {
                 Log.e(tag, "Error calculating date indices", e)
-                errorMessage = "计算周/日索引时出错: ${e.message}"
+                errorMessage = context.getString(
+                    R.string.widget_classtable_calculate_index_error,
+                    e.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+                )
                 curWeekIndex = -1
                 todayIndex = -1
             }
@@ -192,10 +197,15 @@ class ClassTableWidgetDataProvider {
                 "with format '${ClassTableConstants.DATE_FORMAT_STR}'",
                 e
             )
-            errorMessage = "无法解析学期开始日期格式"
+            errorMessage = context.getString(
+                R.string.widget_classtable_parse_term_start_time_error,
+            )
         } catch (e: Exception) {
-            Log.e(tag, "Error calculating date indices using java.time", e)
-            errorMessage = "计算周/日索引时出错: ${e.message}"
+            Log.e(tag, "Error calculating date indices", e)
+            errorMessage = context.getString(
+                R.string.widget_classtable_calculate_index_error,
+                e.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+            )
         }
     }
 

@@ -15,8 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
@@ -34,6 +36,7 @@ import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
@@ -70,7 +73,6 @@ class ClassTableWidget : GlanceAppWidget() {
 
     // Glance related code
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-
         provideContent {
             Content(currentState())
         }
@@ -94,8 +96,23 @@ class ClassTableWidget : GlanceAppWidget() {
             "#9CCC65",
             "#66BB6A",
         ).map { it.toColorInt() }
+    }
 
-        val weekTextArray = arrayOf("星期一","星期二","星期三","星期四","星期五","星期六","星期日")
+    override suspend fun onDelete(context: Context, glanceId: GlanceId) {
+        Log.d(tag, "onDelete() triggered on $glanceId.")
+        super.onDelete(context, glanceId)
+        try {
+            updateAppWidgetState(context, HomeWidgetGlanceStateDefinition(), glanceId) { prefs ->
+                prefs.preferences.edit {
+                    remove(ClassTableWidgetKeys.SHOW_TODAY)
+                }
+                Log.d(tag, "Key ${ClassTableWidgetKeys.SHOW_TODAY} terminated.")
+                prefs
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Error updating state in onDelete for $glanceId: ${e.message}", e)
+        }
+        Log.d(tag, "Goodbye widget $glanceId.")
     }
 
     @Composable
@@ -120,7 +137,7 @@ class ClassTableWidget : GlanceAppWidget() {
 
         // 加载显示今天还是明天
         val prefs = currentState.preferences
-        isShowingToday = !prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
+        isShowingToday = prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
         if (!isShowingToday) {
             day = day.plusDays(1)
         }
@@ -139,10 +156,13 @@ class ClassTableWidget : GlanceAppWidget() {
             withContext(Dispatchers.IO) {
                 try {
                     ClassTableDataHolder.loadData(context)
-                    dataProvider.reloadData(day)
+                    dataProvider.reloadData(day, context)
                 } catch (e: Exception) {
                     Log.e(tag, "Error during data loading prep: ${e.message}", e)
-                    errorMessage = "Failed to load the data: ${e.localizedMessage}"
+                    errorMessage = context.getString(
+                        R.string.widget_classtable_load_data_error,
+                        e.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+                    )
                 }
             }
 
@@ -189,6 +209,23 @@ class ClassTableWidget : GlanceAppWidget() {
         schedulesToday: List<TimeLineItem>,
         schedulesTomorrow: List<TimeLineItem>
     ) {
+        val context = LocalContext.current
+
+        // 根据本地化生成日期格式化器
+        val locale = Locale.current
+
+        val formatter = if (locale.language == "zh") {
+            DateTimeFormatter.ofPattern(
+                "M月d日 E", locale.platformLocale
+            )
+        } else {
+            DateTimeFormatter.ofPattern(
+                "MMMM d E", locale.platformLocale
+            )
+        }
+
+
+
         GlanceTheme {
             Scaffold (
                 backgroundColor = GlanceTheme.colors.widgetBackground,
@@ -201,17 +238,23 @@ class ClassTableWidget : GlanceAppWidget() {
                     ){
                         Column(modifier = GlanceModifier.defaultWeight().padding(vertical = 4.dp)) {
                             Text(
-                                "PDA 日程信息",
+                                context.getString(R.string.widget_classtable_title),
                                 style = TextStyle(
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 14.sp,
                                     color = GlanceTheme.colors.primary
                                 )
                             )
+
                             Text(
-                                "${day.monthValue}月${day.dayOfMonth}日 " +
-                                        "${weekTextArray[day.dayOfWeek.value - 1]} " +
-                                        if (currentWeekIndex < 0) "假期中" else " 第 ${ currentWeekIndex + 1 } 周 ",
+                                "${day.format(formatter)} " +
+                                        if (currentWeekIndex < 0)
+                                            context.getString(R.string.widget_classtable_on_holiday)
+                                        else
+                                            context.getString(
+                                                R.string.widget_classtable_week_identifier,
+                                                currentWeekIndex + 1
+                                            ),
                                 style = TextStyle(
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 10.sp,
@@ -262,9 +305,17 @@ class ClassTableWidget : GlanceAppWidget() {
                         }
 
                         val textDefault = when (status) {
-                            ClassTableWidgetLoadState.LOADING -> "正在加载信息"
-                            ClassTableWidgetLoadState.ERROR -> "遇到错误：${errorMessage ?: "未知错误"}"
-                            ClassTableWidgetLoadState.FINISHED -> "今日没有安排"
+                            ClassTableWidgetLoadState.LOADING ->
+                                context.getString(R.string.widget_classtable_date_loading)
+                            ClassTableWidgetLoadState.FINISHED ->
+                                context.getString(R.string.widget_classtable_no_arrangement)
+                            ClassTableWidgetLoadState.ERROR ->
+                                context.getString(
+                                    R.string.widget_classtable_on_error,
+                                    errorMessage ?: context.getString(
+                                        R.string.widget_classtable_unknown_error
+                                    )
+                                )
                         }
 
                         Column(

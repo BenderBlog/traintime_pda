@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_classtable_description">日程小组件</string>
+    <string name="widget_classtable_date_loading">加载中……</string>
+    <string name="widget_classtable_title">PDA 日程信息</string>
+    <string name="widget_classtable_no_arrangement">目前没有安排</string>
+    <string name="classtable_day_switcher_decription">切换显示日期</string>
+    <string name="widget_classtable_on_holiday">假期中</string>
+    <string name="widget_classtable_week_identifier">第 %1$d 周</string>
+    <string name="widget_classtable_on_error">遇到错误：%1$s</string>
+    <string name="widget_classtable_unknown_error">未知错误</string>
+    <string name="widget_classtable_load_data_error">数据加载故障。%1$s</string>
+    <string name="widget_classtable_calculate_index_error">计算时间索引时出错。%1$s</string>
+    <string name="widget_classtable_parse_term_start_time_error">无法解析学期开始日期格式</string>
+</resources>

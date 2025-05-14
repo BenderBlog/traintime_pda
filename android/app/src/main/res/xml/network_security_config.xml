@@ -2,6 +2,5 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">xidian.edu.cn</domain>
-        <domain includeSubdomains="true">10.168.55.50:8088</domain>
     </domain-config>
 </network-security-config>
