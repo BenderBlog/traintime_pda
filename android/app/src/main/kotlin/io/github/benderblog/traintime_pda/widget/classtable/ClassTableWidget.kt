@@ -133,14 +133,11 @@ class ClassTableWidget : GlanceAppWidget() {
         Log.d(tag, "Content state initialized.")
 
         // 获取当前日期
-        var day = LocalDateTime.now()
+        val day = LocalDateTime.now()
 
         // 加载显示今天还是明天
         val prefs = currentState.preferences
         isShowingToday = prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
-        if (!isShowingToday) {
-            day = day.plusDays(1)
-        }
         Log.d(tag,
             "Will load day: "+
                     "${day.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}, " +
