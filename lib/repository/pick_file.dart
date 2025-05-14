@@ -28,7 +28,6 @@ Future<FilePickerResult?> pickFile({
   return await FilePicker.platform.pickFiles(
     type: type,
     compressionQuality: 0,
-    allowCompression: false,
     allowMultiple: false,
   );
 }
