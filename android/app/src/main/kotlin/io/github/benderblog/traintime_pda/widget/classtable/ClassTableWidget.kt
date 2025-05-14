@@ -38,6 +38,7 @@ import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -350,6 +351,7 @@ class ClassTableWidget : GlanceAppWidget() {
     @Composable
     private fun ScheduleRow(item: TimeLineItem) {
         val color = Color(indicatorColorList[item.colorIndex % indicatorColorList.size])
+        val colorProvider = ColorProvider(color,color)
 
         Row(
             modifier = GlanceModifier
@@ -361,25 +363,42 @@ class ClassTableWidget : GlanceAppWidget() {
         ) {
             Text(
                 "${item.startTimeStr}\n${item.endTimeStr}",
-                style = TextStyle(fontSize = 12.sp),
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = colorProvider,
+                ),
                 modifier = GlanceModifier.padding(end = 6.dp)
             )
             Spacer(modifier =
                 GlanceModifier.width(6.dp)
                     .cornerRadius(4.dp)
-                    .background(color)
+                    .background(color.copy(alpha = 0.6f))
             )
             Column(
                 modifier = GlanceModifier.defaultWeight().padding(start = 6.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
-                Text(item.name, style = TextStyle(fontSize = 14.sp), maxLines = 1)
-                Text("${item.place} ${item.teacher}", style = TextStyle(fontSize = 10.sp), maxLines = 1)
+                Text(
+                    item.name,
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = colorProvider
+                    ),
+                    maxLines = 1
+                )
+                Text(
+                    "${item.place} ${item.teacher}",
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        color = colorProvider
+                    ),
+                    maxLines = 1
+                )
             }
 
             Text(
                 "${item.startTime.format(timeFormatter)}\n${item.endTime.format(timeFormatter)}",
-                style = TextStyle(fontSize = 12.sp)
+                style = TextStyle(fontSize = 12.sp, color = colorProvider)
             )
         }
     }
