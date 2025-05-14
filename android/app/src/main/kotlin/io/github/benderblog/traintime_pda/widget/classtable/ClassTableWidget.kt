@@ -125,6 +125,7 @@ class ClassTableWidget : GlanceAppWidget() {
 
         // 组件状态
         var currentWeekIndex by remember { mutableIntStateOf(-1) }
+        var tomorrowWeekIndex by remember { mutableStateOf(-1)}
         var schedulesToday by remember { mutableStateOf<List<TimeLineItem>>(emptyList()) }
         var schedulesTomorrow by remember { mutableStateOf<List<TimeLineItem>>(emptyList()) }
         var isShowingToday by remember { mutableStateOf(false) }
@@ -180,6 +181,7 @@ class ClassTableWidget : GlanceAppWidget() {
 
             // 加载当前周次
             currentWeekIndex = dataProvider.getCurrentWeekIndex()
+            tomorrowWeekIndex = dataProvider.getTomorrowWeekIndex()
 
             widgetState = ClassTableWidgetLoadState.FINISHED
             Log.d(tag, "LaunchedEffect finished.")
@@ -189,6 +191,7 @@ class ClassTableWidget : GlanceAppWidget() {
             widgetState,
             errorMessage,
             currentWeekIndex,
+            tomorrowWeekIndex,
             day,
             isShowingToday,
             schedulesToday,
@@ -201,6 +204,7 @@ class ClassTableWidget : GlanceAppWidget() {
         status: ClassTableWidgetLoadState,
         errorMessage: String?,
         currentWeekIndex: Int,
+        tomorrowWeekIndex: Int,
         day: LocalDateTime,
         isShowingToday: Boolean,
         schedulesToday: List<TimeLineItem>,
@@ -220,8 +224,6 @@ class ClassTableWidget : GlanceAppWidget() {
                 "MMMM d E", locale.platformLocale
             )
         }
-
-
 
         GlanceTheme {
             Scaffold (
@@ -244,13 +246,17 @@ class ClassTableWidget : GlanceAppWidget() {
                             )
 
                             Text(
-                                "${day.format(formatter)} " +
+                                "${day.plusDays(if (!isShowingToday) 1 else 0).format(formatter)} " +
                                         if (currentWeekIndex < 0)
                                             context.getString(R.string.widget_classtable_on_holiday)
                                         else
                                             context.getString(
                                                 R.string.widget_classtable_week_identifier,
-                                                currentWeekIndex + 1
+                                                if (isShowingToday) {
+                                                    currentWeekIndex + 1
+                                                } else {
+                                                    tomorrowWeekIndex + 1
+                                                }
                                             ),
                                 style = TextStyle(
                                     fontWeight = FontWeight.Medium,
@@ -388,6 +394,7 @@ class ClassTableWidget : GlanceAppWidget() {
             ClassTableWidgetLoadState.FINISHED,
             "测试错误信号发出",
             -1,
+            -1,
             LocalDateTime.now(),
             true,
             emptyList(),
@@ -405,6 +412,7 @@ class ClassTableWidget : GlanceAppWidget() {
         ClassTableWidgetGlanceView(
             ClassTableWidgetLoadState.FINISHED,
             "测试错误信号发出",
+            -1,
             -1,
             LocalDateTime.now(),
             true,

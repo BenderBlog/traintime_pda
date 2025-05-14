@@ -29,6 +29,7 @@ class ClassTableWidgetDataProvider {
 
     private var todayIndex: Int = 0
     private var curWeekIndex: Int = 0
+    private var tomorrowWeekIndex: Int = 0
 
     private lateinit var classTableData: ClassTableData
     private lateinit var examData: ExamData
@@ -45,6 +46,7 @@ class ClassTableWidgetDataProvider {
         errorMessage = null
         todayIndex = -1
         curWeekIndex = -1
+        tomorrowWeekIndex = -1
 
         try {
             loadBasicConfig(currentTime, context)
@@ -56,14 +58,14 @@ class ClassTableWidgetDataProvider {
                 loadOneDayExperiment(LocalDateTime.now(), todayArrangements)
 
                 var tomorrowDayIndex = todayIndex + 1
-                var weekForTomorrowIndex = curWeekIndex
+                tomorrowWeekIndex = curWeekIndex
                 if (tomorrowDayIndex > 7) {
                     tomorrowDayIndex = 1
-                    weekForTomorrowIndex += 1
+                    tomorrowWeekIndex += 1
                 }
-                Log.d(tag, "Loading data for tomorrow (Week: $weekForTomorrowIndex, Day: $tomorrowDayIndex)")
+                Log.d(tag, "Loading data for tomorrow (Week: $tomorrowWeekIndex, Day: $tomorrowDayIndex)")
 
-                loadOneDayClass(weekForTomorrowIndex, tomorrowDayIndex, tomorrowArrangements)
+                loadOneDayClass(tomorrowWeekIndex, tomorrowDayIndex, tomorrowArrangements)
                 loadOneDayExam(LocalDateTime.now().plusDays(1), tomorrowArrangements)
                 loadOneDayExperiment(LocalDateTime.now().plusDays(1), tomorrowArrangements)
 
@@ -84,6 +86,7 @@ class ClassTableWidgetDataProvider {
     fun getTomorrowItems(): List<TimeLineItem> = tomorrowArrangements
     fun getTodayItems(): List<TimeLineItem> = todayArrangements
     fun getCurrentWeekIndex(): Int = curWeekIndex
+    fun getTomorrowWeekIndex(): Int = tomorrowWeekIndex
     fun getErrorMessage(): String? = errorMessage
 
     private fun loadBasicConfig(currentTime: LocalDateTime, context: Context) {
@@ -155,7 +158,7 @@ class ClassTableWidgetDataProvider {
                     Log.w(tag, "Term start day is blank and no class data loaded.")
                 } else {
                     Log.e(tag, "Term start day is blank, cannot calculate week/day index!")
-                    errorMessage = "未设置学期开始日期"
+                    errorMessage = context.getString(R.string.widget_classtable_parse_term_start_time_error)
                 }
                 return
             }
