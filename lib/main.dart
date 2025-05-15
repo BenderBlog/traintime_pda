@@ -4,7 +4,6 @@
 // Intro of the watermeter program.
 
 import 'dart:io';
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:catcher_2/catcher_2.dart';
@@ -36,27 +35,6 @@ void main() async {
   log.info(
     "Traintime PDA Codebase is written by BenderBlog Rodriguez and contributors",
   );
-
-  // Init the homepage widget data.
-  // Register to receive BackgroundFetch events after app is terminated.
-  // Requires {stopOnTerminate: false, enableHeadless: true}
-  // Disable horizontal screen in phone.
-  // See https://stackoverflow.com/questions/57755174/getting-screen-size-in-a-class-without-buildcontext-in-flutter
-  final data = WidgetsBinding.instance.platformDispatcher.views.first;
-
-  log.info(
-    "Shortest size: ${data.physicalSize.width} ${data.physicalSize.height} "
-    "${min(data.physicalSize.width, data.physicalSize.height) / data.devicePixelRatio}",
-  );
-
-  if (min(data.physicalSize.width, data.physicalSize.height) /
-          data.devicePixelRatio <
-      480) {
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-  }
 
   // Load cookiejar and other stuff
   repo_general.supportPath = await getApplicationSupportDirectory();
@@ -122,6 +100,18 @@ class _MyAppState extends State<MyApp> {
         // ignore: empty_catches
       } catch (e) {}
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      double screenWidth = MediaQuery.of(context).size.width;
+      log.info("Screen width: $screenWidth.");
+      if (screenWidth < 480) {
+        log.info("Vertical vision mode disabled!");
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+    });
   }
 
   @override
