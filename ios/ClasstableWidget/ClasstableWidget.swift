@@ -282,17 +282,26 @@ struct ClasstableWidgetEntryView : View {
     var body: some View {
         var day = Date()
         let calendar = Calendar.current
-        let array = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
+        //let array = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
         if #available(iOS 17.0, macOS 13.0, tvOS 17.0, watchOS 10.0, *), IsTomorrowManager.value {
             print("isTomorrow")
             day = calendar.date(byAdding: .day, value: 1, to: day)!
         }
-        var comps : DateComponents = DateComponents()
-        comps = calendar.dateComponents([.year,.month,.day,.weekday,], from: day)
-        var title = "日程信息"
+        var title = NSLocalizedString("title", comment: "Title of the widget")
         if (widgetFamily != .systemSmall) {
             title = "XDYou ".appending(title)
         }
+        
+        // Date formatter
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = NSLocalizedString("date_formatter", comment: "Date format pattern")
+        
+        // Week of the semester
+        let weekOfSemester = String(
+            format:NSLocalizedString("week_of_semester", comment: "Show week of the semester"),
+            entry.currentWeek + 1,
+        )
+        
         return VStack(alignment: .leading) {
             HStack {
                 VStack(alignment: .leading) {
@@ -304,8 +313,8 @@ struct ClasstableWidgetEntryView : View {
                             Color(hexString: "#314e7a")
                         )
                     Text(
-                        "\(comps.month!)月\(comps.day!)日 \(array[comps.weekday! - 1])" +
-                        " \(entry.currentWeek >= 0 ? "第\(entry.currentWeek + 1)周" : "")"
+                        "\(dateFormatter.string(from: day))" +
+                        " \(entry.currentWeek >= 0 ? "\(weekOfSemester)" : "")"
                     ).font(.system(size: 10))
                      .foregroundStyle(Color(hexString: "#abbed1"))
                 }
@@ -334,7 +343,7 @@ struct ClasstableWidgetEntryView : View {
 
                 Spacer()
             } else {
-                let text = Text("目前没有安排了").foregroundStyle(Color(hexString: "#abbed1"))
+                let text = Text(NSLocalizedString("no_arrangement", comment: "No arrangment")).foregroundStyle(Color(hexString: "#abbed1"))
                 let icon = Image(systemName: "tray").foregroundStyle(Color(hexString: "#abbed1"))
                 if (widgetFamily == .systemSmall) {
                     text.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -369,15 +378,15 @@ struct ClasstableWidget: Widget {
                     .background(Color("WidgetBackground"))
             }
         }
-        .configurationDisplayName("课程表组件")
-        .description("展示今日课程信息")
+        .configurationDisplayName(NSLocalizedString("widget_title", comment: "Widget Title"))
+        .description(NSLocalizedString("widget_description", comment: "Widget Description"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
 
 
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
-#Preview(as: .systemSmall) {
+#Preview(as: .systemLarge) {
     ClasstableWidget()
 } timeline: {
     SimpleEntry(
@@ -422,5 +431,4 @@ struct ClasstableWidget: Widget {
             )
         ]
     )
-
 }
