@@ -1,6 +1,8 @@
 // Copyright 2023 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,8 +35,30 @@ class ThemeController extends GetxController {
     String localization = preference.getString(
       preference.Preference.localization,
     );
+    if (localization.isEmpty) {
+      String systemLocale = Platform.localeName;
+      log.info("[ThemeController] System lang $systemLocale");
+      if (systemLocale.contains("zh")) {
+        if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
+          if (systemLocale.contains("Hans")) {
+            localization = "zh_CN";
+          } else {
+            localization = "zh_TW";
+          }
+        } else {
+          if (systemLocale.contains("CN") || systemLocale.contains("SG")) {
+            localization = "zh_CN";
+          } else {
+            localization = "zh_TW";
+          }
+        }
+      } else {
+        localization = "en_US";
+      }
+    }
+    log.info("[ThemeController] Locale to set $localization");
     locale = Locale.fromSubtags(
-      languageCode: localization.isNotEmpty ? localization : "und",
+      languageCode: localization,
     );
 
     update();
