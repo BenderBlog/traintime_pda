@@ -10,7 +10,7 @@ import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
-import 'package:watermeter/repository/xidian_ids/payment_session.dart';
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 
 class ElectricityCard extends StatelessWidget {
   const ElectricityCard({super.key});
@@ -64,8 +64,8 @@ class ElectricityCard extends StatelessWidget {
                         context,
                         "homepage.electricity_card.dialog_content",
                         translationParams: {
-                          "account":
-                              PaymentSession.electricityAccount().toString(),
+                          "account": ElectricitySession.electricityAccount()
+                              .toString(),
                           "electricityInfo": "${FlutterI18n.translate(
                             context,
                             electricityInfo.value.remain,
@@ -76,6 +76,15 @@ class ElectricityCard extends StatelessWidget {
                           ),
                         },
                       ),
+                    ),
+                    TextSpan(
+                      text: historyElectricityInfo
+                          .map(
+                            (e) =>
+                                "${Jiffy.parseFromDateTime(e.fetchDay).format(pattern: "yyyy-MM-dd")} "
+                                "${e.remain}",
+                          )
+                          .toString(),
                     ),
                   ]),
                 ),

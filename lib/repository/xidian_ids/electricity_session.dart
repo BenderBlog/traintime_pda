@@ -17,6 +17,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
+var historyElectricityInfo = RxList<ElectricityInfo>();
 var electricityInfo = ElectricityInfo.empty(DateTime.now()).obs;
 var isCache = false.obs;
 var isLoad = false.obs;
@@ -39,11 +40,12 @@ Future<void> update({
   late ElectricityInfo cache;
   bool canUseCache = false;
 
-  if (PaymentSession.isCacheExist) {
+  if (ElectricitySession.isCacheExist) {
     try {
       cache = ElectricityInfo.fromJson(
-        jsonDecode(PaymentSession.file.readAsStringSync()),
+        jsonDecode(ElectricitySession.fileCache.readAsStringSync()),
       );
+      ElectricitySession.refreshElectricityHistory(electricityInfo.value);
       canUseCache = true;
     } catch (e, s) {
       log.handle(e, s);
@@ -58,7 +60,7 @@ Future<void> update({
     return;
   }
 
-  await PaymentSession()
+  await ElectricitySession()
       .loginPayment(captchaFunction: captchaFunction)
       .then(
         (value) => Future.wait([
@@ -66,7 +68,7 @@ Future<void> update({
             try {
               electricityInfo.value.remain =
                   "electricity_status.remain_fetching";
-              await PaymentSession().getElectricity(value);
+              await ElectricitySession().getElectricity(value);
             } on DioException catch (e, s) {
               log.handle(e, s);
               electricityInfo.value.remain =
@@ -83,7 +85,7 @@ Future<void> update({
           Future(() async {
             try {
               electricityInfo.value.owe = "electricity_status.owe_fetching";
-              await PaymentSession().getOwe(value);
+              await ElectricitySession().getOwe(value);
             } on DioException {
               log.info(
                 "[PaymentSession][update] "
@@ -96,12 +98,13 @@ Future<void> update({
             }
           })
         ]).then((value) async {
-          if (PaymentSession.isCacheExist) {
-            await PaymentSession.file.create();
+          if (ElectricitySession.isCacheExist) {
+            await ElectricitySession.fileCache.create();
           }
-          PaymentSession.file.writeAsStringSync(
+          ElectricitySession.fileCache.writeAsStringSync(
             jsonEncode(electricityInfo.value.toJson()),
           );
+          ElectricitySession.refreshElectricityHistory(electricityInfo.value);
         }),
       )
       .catchError(
@@ -134,12 +137,14 @@ Future<void> update({
   isLoad.value = false;
 }
 
-class PaymentSession extends IDSSession {
+class ElectricitySession extends IDSSession {
   static const factorycode = "E003";
   static const electricityCache = "Electricity.json";
-  static File file = File("${supportPath.path}/$electricityCache");
+  static const electricityHistory = "ElectricityHistory.json";
+  static File fileCache = File("${supportPath.path}/$electricityCache");
+  static File fileHistory = File("${supportPath.path}/$electricityHistory");
 
-  static bool get isCacheExist => file.existsSync();
+  static bool get isCacheExist => fileCache.existsSync();
 
   static const pubKey = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCa1ILSkh
@@ -151,6 +156,41 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
   RegExp getTransfer = RegExp(
     r'"http://payment.xidian.edu.cn/NetWorkUI/(.*?)"',
   );
+
+  // Read the cached list
+  // Input an electricity info will refresh the list
+  static void refreshElectricityHistory(ElectricityInfo? info) {
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      ElectricitySession.fileHistory.createSync();
+    }
+
+    var list = <ElectricityInfo>[];
+    try {
+      List proto =
+          jsonDecode(ElectricitySession.fileHistory.readAsStringSync());
+      list.clear();
+      list.addAll(List<ElectricityInfo>.generate(
+          proto.length, (data) => ElectricityInfo.fromJson(proto[data])));
+    } catch (e, s) {
+      log.handle(e, s);
+    }
+
+    if (info != null) {
+      if (list.length > 7) {
+        list.removeAt(0);
+      }
+      if (!(list.isNotEmpty &&
+          list.last.fetchDay.year == info.fetchDay.year &&
+          list.last.fetchDay.month == info.fetchDay.month &&
+          list.last.fetchDay.day == info.fetchDay.day)) {
+        list.add(info);
+        fileHistory.writeAsStringSync(jsonEncode(list));
+      }
+    }
+
+    historyElectricityInfo.clear();
+    historyElectricityInfo.addAll(list);
+  }
 
   /// The way to get the electricity number.
   /// Refrence here: https://see.xidian.edu.cn/html/news/9179.html

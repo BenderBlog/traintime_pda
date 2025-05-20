@@ -15,7 +15,7 @@ import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
 import 'package:watermeter/repository/message_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
-import 'package:watermeter/repository/xidian_ids/payment_session.dart'
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/schoolnet_session.dart' as school_net;
