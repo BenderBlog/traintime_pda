@@ -162,6 +162,19 @@ classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"
 
+electricity:
+    title: "水电信息"
+    power_title: "余额信息"
+    cache_notice: "上次获取时间"
+    account: "电费账号"
+    remain_power: "电量信息"
+    owe_info: "欠费信息"
+    history: "历史记录"
+    info: "有欠费一般代表水费"
+    date: "日期"
+    power: "该日0点电量"
+    update: "刷新信息"
+
 # 空闲教室
 empty_classroom:
     title: "空闲教室"

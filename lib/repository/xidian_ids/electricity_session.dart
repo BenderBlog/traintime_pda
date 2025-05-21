@@ -45,7 +45,6 @@ Future<void> update({
       cache = ElectricityInfo.fromJson(
         jsonDecode(ElectricitySession.fileCache.readAsStringSync()),
       );
-      ElectricitySession.refreshElectricityHistory(electricityInfo.value);
       canUseCache = true;
     } catch (e, s) {
       log.handle(e, s);
@@ -54,6 +53,7 @@ Future<void> update({
   }
 
   if (!force && canUseCache && cache.fetchDay.isToday) {
+    ElectricitySession.refreshElectricityHistory(cache);
     electricityInfo.value = cache;
     isCache.value = true;
     isLoad.value = false;
@@ -182,7 +182,8 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       if (!(list.isNotEmpty &&
           list.last.fetchDay.year == info.fetchDay.year &&
           list.last.fetchDay.month == info.fetchDay.month &&
-          list.last.fetchDay.day == info.fetchDay.day)) {
+          list.last.fetchDay.day == info.fetchDay.day &&
+          list.last.remain == info.remain)) {
         list.add(info);
         fileHistory.writeAsStringSync(jsonEncode(list));
       }

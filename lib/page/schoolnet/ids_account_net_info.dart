@@ -8,7 +8,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/schoolnet/device_list.dart';
-import 'package:watermeter/page/schoolnet/info_card.dart';
+import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/schoolnet_session.dart';

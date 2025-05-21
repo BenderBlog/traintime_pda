@@ -170,6 +170,19 @@ classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
 
+electricity:
+   title: "Power info"
+   power_title: "Remain info"
+   cache_notice: "Last fetched"
+   account: "Power account"
+   remain_power: "Remain power"
+   owe_info: "Arrears info"
+   history: "History records"
+   info: "Arrears generally indicate water fees"
+   date: "Date"
+   power: "Remain power"
+   update: "Refresh information"
+
 # 空闲教室
 empty_classroom:
    title: "Empty Classrooms"

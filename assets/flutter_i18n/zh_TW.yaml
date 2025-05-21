@@ -149,6 +149,18 @@ classtable:
   refresh_classtable:
     ready: 準備刷新日程信息
     success: 成功刷新日程信息
+electricity:
+  title: 水電信息
+  power_title: 餘額信息
+  cache_notice: 上次獲取時間
+  account: 電費賬號
+  remain_power: 電量信息
+  owe_info: 欠費信息
+  history: 歷史記錄
+  info: 有欠費一般代表水費
+  date: 日期
+  power: 該日0點電量
+  update: 刷新信息
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
