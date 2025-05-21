@@ -49,13 +49,13 @@ catcher_description: "Details are shown as follows"
 
 # 星期
 weekday:
-   monday: "Monday"
-   tuesday: "Tuesday"
-   wednesday: "Wednesday"
-   thursday: "Thursday"
-   friday: "Friday"
-   saturday: "Saturday"
-   sunday: "Sunday"
+   monday: "Mon."
+   tuesday: "Tue."
+   wednesday: "Wed."
+   thursday: "Thu."
+   friday: "Fri."
+   saturday: "Sat."
+   sunday: "Sun."
 
 # 日程表/课程表
 classtable:
@@ -87,15 +87,15 @@ classtable:
    popup_menu:
       not_arranged: "View unarranged class information"
       class_changed: "View class schedule changes"
-      add_class: "Add class information"
-      generate_ical: "Generate calendar file"
-      generate_partner_file: "Generate partner classtable file"
+      add_class: "Add class"
+      generate_ical: "Export calendar file"
+      generate_partner_file: "Export partner classtable file"
       import_partner_file: "Import partner classtable file"
       delete_partner_file: "Delete partner classtable file"
-      output_to_system: "Output schedule to system calendar"
+      output_to_system: "Export to system calendar"
       refresh_classtable: "Refresh schedule"
    class_change_page:
-      title: "Class Adjustment"
+      title: "Schedule Changes"
       empty_message: "Currently there's no class schedule changes"
       teacher_change: "Teacher has been changed from {previous_teacher} to {new_teacher}"
       no_teacher_change: "Teacher kept unchanged"
@@ -120,14 +120,14 @@ classtable:
          period {originalClassRangeEnd} at the {weekChar_originalWeek} day of the {originalAffectedWeeks} week(s).
       class_info: "Code: {classCode} | Class {classNumber}\nSchedule change: {classChange}\n{teacherChange}"
    not_arranged_page:
-      title: "Classes without schedule"
+      title: "Unscheduled Classes"
       empty_message: "All courses have been scheduled"
       content: "Code {classCode} | Class {classNumber}\nTeacher: {teacher}"
    empty_class_message: "Semester {semester_code} has no class arranged"
    week_title: "Week {week}"
    noon_break: "Noon"
    supper_break: "Supper"
-   month: "{month}\nMonth"
+   month: "{month}\nmo"
    no_class: |-
       No schedule arranged in this week, please take care of yourself and be well
       LichtYy was reviewing for exam
@@ -146,11 +146,11 @@ classtable:
       input_classname_hint: "Class name (required)"
       input_teacher_hint: "Teacher's name (optional)"
       input_classroom_hint: "Classroom location (optional)"
-      input_week_hint: "Select class weeks"
-      input_time_hint: "Select class time"
-      input_time_weekday_hint: "Class days"
-      input_start_time_hint: "Time to start"
-      input_end_time_hint: "Time to end"
+      input_week_hint: "Select weeks"
+      input_time_hint: "Select time"
+      input_time_weekday_hint: "weekday"
+      input_start_time_hint: "Start time"
+      input_end_time_hint: "End time"
       wheel_choose_hint: "Period {index}"
    course_detail_card:
       class_number_string: "Class {number}"
@@ -172,10 +172,10 @@ classtable:
 
 electricity:
    title: "Power info"
-   power_title: "Remain info"
+   power_title: "Information"
    cache_notice: "Last fetched"
    account: "Power account"
-   remain_power: "Remain power"
+   remain_power: "Remaining"
    owe_info: "Arrears info"
    history: "History records"
    info: "Arrears generally indicate water fees"
@@ -481,11 +481,11 @@ score:
 setting:
    # 最顶部
    about: "About"
-   about_this_program: "About this program"
+   about_this_program: "About this APP"
    version: "Version：{version}"
    user_info: "User information"
    # 软件更新
-   check_update: "Check for software updates"
+   check_update: "Check for updates"
    latest_version: "Latest version: {latest}"
    waiting: "Waiting to obtain"
    fetching_update: "Fetching update information"
@@ -494,15 +494,15 @@ setting:
    fetch_failed: "Failed to fetch update information"
    # 界面设置
    ui_setting: "UI Settings"
-   brightness_setting: "Set light/dark mode"
-   color_setting: "Color setting"
+   brightness_setting: "Light/Dark mode"
+   color_setting: "Color theme"
    simplify_timeline: "Simplify schedule timeline"
    simplify_timeline_description: "Reduce space occupation while no schedule"
    # 账号设置
    account_setting: "Account Settings"
-   sport_password_setting: "Sports system password setting"
-   experiment_password_setting: "Experiment system password setting"
-   electricity_password_setting: "Electricity account password setting"
+   sport_password_setting: "P.E. system password"
+   experiment_password_setting: "Physics system password"
+   electricity_password_setting: "Electricity account password"
    electricity_password_description: "Please set if not 123456"
    electricity_account_setting: "Electricity account setting"
    schoolnet_password_setting: "Schoolnet password setting"
@@ -579,7 +579,7 @@ setting:
       github_release: "Go to Git Release"
       new_content: "New features from version {code}:\n"
    localization_dialog:
-      title: "Change the language"
+      title: "Languages"
       undefined: "Follow system setting"
       simplifiedChinese: "Simplified Chinese"
       traditionalChinese: "Traditional Chinese"
@@ -619,7 +619,7 @@ setting:
       zyar-er: "Development support: fix shortcut url"
       # TODO: PDA Girl inspriation
       homepage: "Homepage"
-      code: "Open Source Code"
+      code: "Source code"
       know_more: "Learn more"
       copyright_notice: |
          本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
@@ -719,7 +719,7 @@ electricity_status:
    owe_fetching: "Obtaining arrearage"
    owe_issue: "Network malfunction of overdue information"
    owe_not_found: "Cannot query arrearage"
-   owe_no_need: "No need to pay arrearage"
+   owe_no_need: "None"
    owe_need_pay: "Need to pay arrearage {due} yuan"
    owe_issue_unable: "Cannot query arrearage"
    need_more_info: "Need to improve information on the payment platform"
