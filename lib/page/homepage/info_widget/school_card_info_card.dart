@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -68,6 +70,53 @@ class SchoolCardInfoCard extends StatelessWidget {
               );
           }
         }
+      },
+      onLongPress: () async {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) {
+            return FutureBuilder<Uint8List>(
+              future: school_card_session.SchoolCardSession().getQRCode(),
+              builder: (context, snapshot) {
+                return Dialog(
+                  backgroundColor: Colors.transparent,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        color: Colors.white.withOpacity(0.85),
+                        child: snapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? const SizedBox(
+                                width: 120,
+                                height: 120,
+                                child:
+                                    Center(child: CircularProgressIndicator()),
+                              )
+                            : snapshot.hasError
+                                ? SizedBox(
+                                    width: 200,
+                                    child: Text(
+                                      "二维码获取失败: ${snapshot.error}",
+                                      style: const TextStyle(color: Colors.red),
+                                    ),
+                                  )
+                                : Image.memory(
+                                    snapshot.data!,
+                                    width: 200,
+                                    height: 200,
+                                  ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
       },
       child: Obx(
         () => MainPageCard(
