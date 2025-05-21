@@ -5,7 +5,6 @@
 
 import 'dart:io';
 import 'dart:convert';
-// import 'dart:nativewrappers/_internal/vm/lib/developer.dart' as developer;
 import 'dart:typed_data';
 import 'package:html/parser.dart';
 import 'package:dio/dio.dart';
@@ -22,12 +21,11 @@ RxString errorSession = "".obs;
 class SchoolCardSession extends IDSSession {
   static String openid = "";
 
-  // /*
   Future<Uint8List> getQRCode() async {
-    // developer.log(
-    //   "try to get QR Code",
-    //   name: "SchoolCardSession",
-    // );
+    log.info(
+      "[SchoolCardSession][initSession] "
+      "Try to get QR Code",
+    );
     final homeUrl =
         "https://v8scan.xidian.edu.cn/home/openHomePage?openid=$openid";
     final homeResp = await dio.get(homeUrl);
@@ -45,7 +43,7 @@ class SchoolCardSession extends IDSSession {
       }
     }
     if (id == null) {
-      throw Exception("未找到校园码 id");
+      throw Exception("aTag id not found.");
     }
 
     final qrUrl =
@@ -54,19 +52,17 @@ class SchoolCardSession extends IDSSession {
     final qrDoc = parse(qrResp.data);
     final img = qrDoc.getElementById("qrcode");
     if (img == null) {
-      throw Exception("二维码图片未找到");
+      throw Exception("QR image not found.");
     }
     var src = img.attributes["src"] ?? "";
     // 提取 base64 数据
-    var base64Data = src
-        .replaceAll("data:image/png;base64,", "")
-        .replaceAll("\n", "");
+    var base64Data =
+        src.replaceAll("data:image/png;base64,", "").replaceAll("\n", "");
     if (base64Data.isEmpty) {
-      throw Exception("二维码数据为空");
+      throw Exception("QR data is empty.");
     }
     return base64Decode(base64Data);
   }
-  // */
 
   // 获取支付记录
   Future<List<PaidRecord>> getPaidStatus(String begin, String end) async {
@@ -75,18 +71,16 @@ class SchoolCardSession extends IDSSession {
       initSession();
     }
     List<PaidRecord> toReturn = [];
-    var response = await dio
-        .post(
-          "https://v8scan.xidian.edu.cn/selftrade/queryCardSelfTradeList?openid=$openid",
-          options: Options(contentType: "application/json; charset=utf-8"),
-          data: {
-            "beginDate": begin,
-            "endDate": end,
-            "tradeType": "-1",
-            "openid": openid,
-          },
-        )
-        .then((value) => jsonDecode(value.data));
+    var response = await dio.post(
+      "https://v8scan.xidian.edu.cn/selftrade/queryCardSelfTradeList?openid=$openid",
+      options: Options(contentType: "application/json; charset=utf-8"),
+      data: {
+        "beginDate": begin,
+        "endDate": end,
+        "tradeType": "-1",
+        "openid": openid,
+      },
+    ).then((value) => jsonDecode(value.data));
     for (var i in response["resultData"]) {
       toReturn.add(
         PaidRecord(place: i["mername"], date: i["txdate"], money: i["txamt"]),
@@ -138,8 +132,7 @@ class SchoolCardSession extends IDSSession {
       );
       page = parse(response.data);
 
-      money.value =
-          page
+      money.value = page
               .getElementsByTagName("li")
               .firstOrNull
               ?.children

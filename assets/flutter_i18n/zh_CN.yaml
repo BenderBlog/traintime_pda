@@ -413,6 +413,9 @@ school_card_window:
     balance: "金额"
     time_with_sum: "时间(共{sum}元)"
     no_record: "未查询到记录，请修改日期后重试"
+    qr_code: "支付码"
+    qr_code_error: "二维码获取失败：{info}"
+    reload: "重新加载"
 
 # 成绩
 score:

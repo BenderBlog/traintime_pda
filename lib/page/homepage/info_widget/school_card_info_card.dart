@@ -71,53 +71,6 @@ class SchoolCardInfoCard extends StatelessWidget {
           }
         }
       },
-      onLongPress: () async {
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (context) {
-            return FutureBuilder<Uint8List>(
-              future: school_card_session.SchoolCardSession().getQRCode(),
-              builder: (context, snapshot) {
-                return Dialog(
-                  backgroundColor: Colors.transparent,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        color: Colors.white.withOpacity(0.85),
-                        child: snapshot.connectionState ==
-                                ConnectionState.waiting
-                            ? const SizedBox(
-                                width: 120,
-                                height: 120,
-                                child:
-                                    Center(child: CircularProgressIndicator()),
-                              )
-                            : snapshot.hasError
-                                ? SizedBox(
-                                    width: 200,
-                                    child: Text(
-                                      "二维码获取失败: ${snapshot.error}",
-                                      style: const TextStyle(color: Colors.red),
-                                    ),
-                                  )
-                                : Image.memory(
-                                    snapshot.data!,
-                                    width: 200,
-                                    height: 200,
-                                  ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
       child: Obx(
         () => MainPageCard(
           isLoad: school_card_session.isInit.value == SessionState.fetching,
@@ -187,8 +140,92 @@ class SchoolCardInfoCard extends StatelessWidget {
                       ),
             overflow: TextOverflow.ellipsis,
           ),
+          rightButton: school_card_session.isInit.value == SessionState.fetched
+              ? IconButton.filledTonal(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (context) {
+                        return QRCodeView();
+                      },
+                    );
+                  },
+                  icon: Icon(Icons.qr_code_2),
+                )
+              : null,
         ),
       ),
+    );
+  }
+}
+
+class QRCodeView extends StatefulWidget {
+  const QRCodeView({super.key});
+
+  @override
+  State<QRCodeView> createState() => _QRCodeViewState();
+}
+
+class _QRCodeViewState extends State<QRCodeView> {
+  Future<Uint8List> qrCode =
+      school_card_session.SchoolCardSession().getQRCode();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(FlutterI18n.translate(
+        context,
+        "school_card_window.qr_code",
+      )),
+      content: FutureBuilder<Uint8List>(
+        future: qrCode,
+        builder: (context, snapshot) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                color: Colors.white.withValues(alpha: 0.85),
+                child: snapshot.connectionState == ConnectionState.waiting
+                    ? const SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    : snapshot.hasError
+                        ? SizedBox(
+                            width: 200,
+                            child: Text(FlutterI18n.translate(
+                              context,
+                              "school_card_window.qr_code",
+                              translationParams: {
+                                "info": snapshot.error.toString(),
+                              },
+                            )))
+                        : Image.memory(
+                            snapshot.data!,
+                            width: 200,
+                            height: 200,
+                          ),
+              ),
+            ),
+          );
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            setState(() {
+              qrCode = school_card_session.SchoolCardSession().getQRCode();
+            });
+          },
+          child: Text(
+            FlutterI18n.translate(context, "school_card_window.reload"),
+          ),
+        )
+      ],
     );
   }
 }
