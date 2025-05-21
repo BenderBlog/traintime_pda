@@ -1,4 +1,5 @@
-// Copyright 2023 BenderBlog Rodriguez and contributors.
+// Copyright 2023-2025 BenderBlog Rodriguez and contributors
+// Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MIT
 
 // https://juejin.cn/post/7284608063914622995

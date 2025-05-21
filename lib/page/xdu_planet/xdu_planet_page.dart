@@ -1,4 +1,5 @@
-// Copyright 2023 BenderBlog Rodriguez and contributors.
+// Copyright 2023-2025 BenderBlog Rodriguez and contributors
+// Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
 // Mainpage of XDU Planet.
@@ -124,7 +125,6 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const CircularProgressIndicator(),
-
               const SizedBox(height: 16),
               Text(FlutterI18n.translate(context, "xdu_planet.loading")),
             ],

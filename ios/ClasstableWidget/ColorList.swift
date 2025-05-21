@@ -1,9 +1,11 @@
+// Copyright 2023-2025 BenderBlog Rodriguez and contributors
+// Copyright 2025 Traintime PDA authors.
+// SPDX-License-Identifier: MPL-2.0
 //
 //  ColorList.swift
 //  ClasstableWidgetExtension
 //
 //  Created by BenderBlog Rodriguez on 2024/2/29.
-//  SPDX-License-Identifier: MPL-2.0
 //
 
 import Foundation

@@ -1,4 +1,5 @@
-// Copyright 2024 BenderBlog Rodriguez and contributors.
+// Copyright 2023-2025 BenderBlog Rodriguez and contributors
+// Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
 // Ref. https://github.com/acterglobal/a3/pull/2183/
