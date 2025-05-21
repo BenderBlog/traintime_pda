@@ -39,7 +39,7 @@ class ThemeController extends GetxController {
       String systemLocale = Platform.localeName;
       log.info("[ThemeController] System lang $systemLocale");
       if (systemLocale.contains("zh")) {
-        if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
+        if (Platform.isIOS || Platform.isMacOS) {
           if (systemLocale.contains("Hans")) {
             localization = "zh_CN";
           } else {

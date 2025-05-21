@@ -39,6 +39,7 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -822,7 +823,9 @@ void _removeCache() {
     ClassTableFile.schoolClassName,
     ExamController.examDataCacheName,
     ExperimentController.experimentCacheName,
-    ScoreSession.scoreListCacheName
+    ScoreSession.scoreListCacheName,
+    ElectricitySession.electricityCache,
+    ElectricitySession.electricityHistory
   ]) {
     var file = File(
       "${supportPath.path}/$value",
@@ -841,7 +844,9 @@ void _removeAll() {
     ClassTableFile.decorationName,
     ExamController.examDataCacheName,
     ExperimentController.experimentCacheName,
-    ScoreSession.scoreListCacheName
+    ScoreSession.scoreListCacheName,
+    ElectricitySession.electricityCache,
+    ElectricitySession.electricityHistory
   ]) {
     var file = File(
       "${supportPath.path}/$value",
