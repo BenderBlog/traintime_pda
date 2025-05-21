@@ -468,6 +468,8 @@ score:
 
 # 设置
 setting:
+    # 致谢板块
+    acknowledgement: "Made With Love From {developers} People"
     # 最顶部
     about: "关于"
     about_this_program: "关于本程序"

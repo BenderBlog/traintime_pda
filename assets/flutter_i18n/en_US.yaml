@@ -15,7 +15,7 @@ failed_text: "Failed to load data"
 
 # 公共组件
 choose_semester: "Choose Semester"
-error_detected: "Ouch! An error has occurred!"
+error_detected: "Ouch! An error occurred!"
 click_to_refresh: "Click to refresh"
 
 # 取消和确定
@@ -49,13 +49,13 @@ catcher_description: "Details are shown as follows"
 
 # 星期
 weekday:
-   monday: "Mon."
-   tuesday: "Tue."
-   wednesday: "Wed."
-   thursday: "Thu."
-   friday: "Fri."
-   saturday: "Sat."
-   sunday: "Sun."
+   monday: "Mon"
+   tuesday: "Tue"
+   wednesday: "Wed"
+   thursday: "Thu"
+   friday: "Fri"
+   saturday: "Sat"
+   sunday: "Sun"
 
 # 日程表/课程表
 classtable:
@@ -85,8 +85,8 @@ classtable:
    page_title: "My Schedule"
    partner_page_title: "{partner_name}'s Schedule"
    popup_menu:
-      not_arranged: "View unarranged class information"
-      class_changed: "View class schedule changes"
+      not_arranged: "View unarranged classes"
+      class_changed: "View schedule changes"
       add_class: "Add class"
       generate_ical: "Export calendar file"
       generate_partner_file: "Export partner classtable file"
@@ -138,7 +138,7 @@ classtable:
       unknown_classroom: "Unknown classroom"
       remains_hint: "There is/are {remain_count} schedule(s) remaining"
    class_add:
-      add_class_title: "Add class info"
+      add_class_title: "Add class information"
       change_class_title: "Modify class info"
       class_name_empty_message: "Class name cannot be empty"
       wrong_time_message: "Incorrect time input"
@@ -148,9 +148,9 @@ classtable:
       input_classroom_hint: "Classroom location (optional)"
       input_week_hint: "Select weeks"
       input_time_hint: "Select time"
-      input_time_weekday_hint: "weekday"
-      input_start_time_hint: "Start time"
-      input_end_time_hint: "End time"
+      input_time_weekday_hint: "Weekday"
+      input_start_time_hint: "Time start"
+      input_end_time_hint: "Time end"
       wheel_choose_hint: "Period {index}"
    course_detail_card:
       class_number_string: "Class {number}"
@@ -171,17 +171,17 @@ classtable:
       success: Successfully refresh the schedule
 
 electricity:
-   title: "Power info"
-   power_title: "Information"
+   title: "Power Info"
+   power_title: "Infomation"
    cache_notice: "Last fetched"
-   account: "Power account"
-   remain_power: "Remaining"
-   owe_info: "Arrears info"
-   history: "History records"
+   account: "Account"
+   remain_power: "Remain power"
+   owe_info: "Arrears"
+   history: "Billing History"
    info: "Arrears generally indicate water fees"
    date: "Date"
-   power: "Remain power"
-   update: "Refresh information"
+   power: "Remaining"
+   update: "Refresh"
 
 # 空闲教室
 empty_classroom:
@@ -275,7 +275,7 @@ homepage:
       fetching_infoText: "Loading"
       no_arrangement_infoText: "No schedule at the moment"
    electricity_card:
-      title: "Electricity and Water Information"
+      title: "Electricity and Hydroenergy Information"
       current_electricity: "{amount} kWh remains"
       cache_notice: "Currently loading cache, retrieved on {date}\n"
       dialog_content: |
@@ -304,13 +304,13 @@ homepage:
       fetching_info: "Fetching information..."
    toolbox:
       creative: "Innovation and Entrepreneurship Competition"
-      empty_classroom: "Empty Classrooms"
-      exam: "Exam Schedule"
-      experiment: "Physics Experiment"
-      score: "Score Query"
-      sport: "Sports Information"
+      empty_classroom: "Classrooms"
+      exam: "Exams"
+      experiment: "Physics Experiments"
+      score: "Grades"
+      sport: "PE Information"
       schoolnet: "Schoolnet Usage"
-      toolbox: "Other Functions"
+      toolbox: "Others"
       score_cannot_reach: "Offline mode with no cached score data, unable to access"
       exam_fetching: "Fetching exam information, please wait"
       exam_error: "An error occurred, please contact the developer"
@@ -479,7 +479,9 @@ score:
 
 # 设置
 setting:
-   # 最顶部
+   # 致谢板块
+   acknowledgement: "Made With Love From {developers} People"
+   # 关于
    about: "About"
    about_this_program: "About this APP"
    version: "Version：{version}"
@@ -487,7 +489,7 @@ setting:
    # 软件更新
    check_update: "Check for updates"
    latest_version: "Latest version: {latest}"
-   waiting: "Waiting to obtain"
+   waiting: "Waiting for obtain"
    fetching_update: "Fetching update information"
    current_stable: "You are running the latest version"
    current_testing: "You are running the testing version"
@@ -500,27 +502,27 @@ setting:
    simplify_timeline_description: "Reduce space occupation while no schedule"
    # 账号设置
    account_setting: "Account Settings"
-   sport_password_setting: "P.E. system password"
-   experiment_password_setting: "Physics system password"
+   sport_password_setting: "PE system password"
+   experiment_password_setting: "Physics experiment password"
    electricity_password_setting: "Electricity account password"
-   electricity_password_description: "Please set if not 123456"
+   electricity_password_description: "Please set if not default"
    electricity_account_setting: "Electricity account setting"
-   schoolnet_password_setting: "Schoolnet password setting"
-   schoolnet_password_description: "If you don't setting it, you cannot query it."
+   schoolnet_password_setting: "Campus net password"
+   schoolnet_password_description: "If you have not setted it, you cannot query it."
    # 课表相关设置
-   classtable_setting: "Class schedule related settings"
-   background: "Enable class schedule background image"
+   classtable_setting: "Class Schedule Related"
+   background: "Background image"
    no_background: "You need to select an image first, it's at below"
-   choose_background: "Choose class schedule background image"
+   choose_background: "Choose background image"
    no_permission: "No storage permission obtained, cannot read files"
    successful_setting: "Successfully set"
    failure_setting: "You did not select an image"
-   clear_user_class: "Clear all user-added courses"
-   clear_user_class_title: "Confirmation dialog"
+   clear_user_class: "Clear all customized courses"
+   clear_user_class_title: "Clear Confirmation"
    clear_user_class_content: "Do you want to clear all user-added courses? This function does not affect the schedule obtained from the school."
    clear_user_class_clear: "Already cleared"
    class_refresh: "Force refresh class schedule"
-   class_refresh_title: "Confirmation dialog"
+   class_refresh_title: "Refresh Confirmation"
    class_refresh_content: "Do you want to force refreshing the class schedule? If you agree, we will fetch the schedule from the school, which may takes a long time."
    class_swift: "Class schedule offset setting"
    class_swift_description: |
@@ -531,17 +533,17 @@ setting:
    check_logger: "View network interceptor and logs"
    clear_and_restart: "Clear cache and restart"
    clear_and_restart_dialog:
-      title: "Confirmation dialog"
+      title: "Restart confirmation"
       content: "Are you sure to clear cache and restart the program?"
       cleaning: "Clearing cache..."
       clear: "Cache has been cleared"
    logout: "Log out and restart the app"
    logout_dialog:
-      title: "Confirmation dialog"
+      title: "Logout confirmation"
       content: "Are you want to log out? All your data will be completely deleted!"
       logging_out: "Logging out..."
    need_close_dialog:
-      title: "Please close the app"
+      title: "Crashed"
       content: "Due to technical limitations, you need to close the window manually and then reopen the app."
    # 剩下乱七八糟的窗口
    change_color_dialog:
@@ -604,7 +606,7 @@ setting:
       lichtyy: "Design: color pattern and blank page picture"
       lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
       mrbrilliant2046: "Support: Provided the school net user guide"
-      nancunchild: "Development: library search function"
+      nancunchild: "Development: library search function / i18n: English correction"
       pairman: "Development: score cache and optimize slider algorithm"
       reverierxu: "Design: REX card for information display / Development support: on postgraduate class schedule"
       rrrilac: "Development support: electricity query"
@@ -622,16 +624,17 @@ setting:
       code: "Source code"
       know_more: "Learn more"
       copyright_notice: |
-         本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，
-         代码按照 Mozilla Public License, v. 2.0 授权。
-         本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
+         This APP copied from traintime_pda (or watermeter),
+         It based on Mozilla Public License, v2.0 authorication.
+         This APP has no relation to Xidian Universirt, Tishineng Service, Shuwow, Electric Meter and other services.
+         
          Copyright 2023-Present BenderBlog Rodriguez and contributors.
          The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
          If a copy of the MPL was not distributed with this file,
          You can obtain one at https://mozilla.org/MPL/2.0/.
       beian: "ICP record number"
       sign_android: "Android signature"
-      title: "About this software"
+      title: "About this APP"
 
 # 体育查询
 sport:
@@ -720,7 +723,7 @@ electricity_status:
    owe_issue: "Network malfunction of overdue information"
    owe_not_found: "Cannot query arrearage"
    owe_no_need: "None"
-   owe_need_pay: "Need to pay arrearage {due} yuan"
+   owe_need_pay: "Need to pay {due} yuan"
    owe_issue_unable: "Cannot query arrearage"
    need_more_info: "Need to improve information on the payment platform"
    need_account: "Need to input electricity account"

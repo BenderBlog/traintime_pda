@@ -351,8 +351,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget get _developerList => ReXCard(
         title: Text(
-          "Made with love from ${getDevelopers().length} people",
-        ).padding(bottom: 8).center(),
+          FlutterI18n.translate(context, "setting.acknowledgement", {"developers": getDevelopers().length})).padding(bottom: 8).center(),
         remaining: const [],
         bottomRow: Wrap(
           alignment: WrapAlignment.center,
