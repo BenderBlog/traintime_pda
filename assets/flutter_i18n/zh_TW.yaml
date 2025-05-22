@@ -441,7 +441,10 @@ score:
     summary: 總結
     CET-4: 國家英語四級
     CET-6: 國家英語六級
+
 setting:
+  # 致谢板块
+  acknowledgement: "Made With Love From {developers} People"
   about: 關於
   about_this_program: 關於本程序
   version: 版本號：{version}
