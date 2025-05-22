@@ -1,4 +1,5 @@
-# Copyright 2024 BenderBlog Rodriguez and contributors.
+# Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+# Copyright 2025 Traintime PDA authors.
 # SPDX-License-Identifier: MPL-2.0
 
 # EasyRefresh 下拉插件的玩意
@@ -162,6 +163,7 @@ classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"
 
+# 电量窗口
 electricity:
     title: "水电信息"
     power_title: "余额信息"
@@ -551,9 +553,9 @@ setting:
     change_swift_dialog:
         title: "课程偏移设置"
         input_hint: "请在此输入数字"
-    change_electricity_title: "修改电费帐号密码"
+    change_electricity_title: "修改电费帐号"
     change_electricity_account:
-        title: "修改电费帐号密码"
+        title: "修改电费帐号"
         input_hint: "请在此输入账号"
         blank_input: "输入空白!"
     change_experiment_title: "修改物理实验账号密码"
@@ -586,23 +588,23 @@ setting:
         chitao1234: "开发：修复滑块不对齐问题"
         dimole: "开发支持：辅助修复滑块问题"
         elitewars: "设计：体育成绩页面"
-        elliot: "国际化(Pending)：软件英语翻译 / 开发指导：情侣课表功能开发指导"
-        godhu777777: "国际化：繁体中文转换代码和彩蛋代码"
+        elliot: "国际化：软件英语翻译 / 开发指导：情侣课表功能开发指导"
+        godhu777777: "国际化：繁体中文转换代码和彩蛋代码 / 开发：优化导出日历文件大小"
         hancl777: "国际化：繁体中文转换代码"
         hawa130: "设计：课程详情卡片"
         hhzm: "开发：电费查询账号计算"
         lhx-666-cool: "支持：Windows 和 Linux 构建脚本"
         lichtyy: "设计：配色，空白页面贴图"
         lsy223622: "设计：iOS 和 Android 图标 / 支持：冠名 XDYou"
-        mrbrilliant2046: "支持：提供网络服务使用说明文档"
-        nancunchild: "开发：图书馆搜索功能"
-        pairman: "开发：成绩缓存功能和优化滑块算法"
+        mrbrilliant2046: "支持：提供网络服务使用说明文档 / 国际化：优化英语翻译"
+        nancunchild: "开发：图书馆搜索功能 / 国际化：优化英语翻译"
+        pairman: "开发：成绩缓存功能和优化滑块算法 / 国际化：优化英语翻译"
         reverierxu: "设计：用于信息展示的 ReX 卡片 / 开发支持：研究生课表"
         rrrilac: "开发支持：电费查询"
-        ray: "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表 / 开发指导：情侣课表功能开发指导"
+        ray: "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表 / 开发指导：情侣课表功能开发指导 / 国际化：优化英语翻译"
         shadowyingyi: "支持：两次鸽子公众号宣传"
         stalomeow: "设计：首页时间轴 / 开发：异步登录 & 验证码预测"
-        xeonds: "设计：设置页面 / 开发：XDU Planet"
+        xeonds: "设计：设置页面 / 开发：XDU Planet / 开发：校园卡付款码"
         xiue233: "开发：Android 小部件和拼接"
         xizi: "开发支持：研究生版本开发"
         wirsbf: "开发：修复调课未按预期进行"
@@ -611,7 +613,16 @@ setting:
         homepage: "主页"
         code: "开源代码"
         know_more: "知道更多"
-        copyright_notice: 本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译，代码按照 Mozilla Public License, v. 2.0 授权。本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
+        copyright_notice: |-
+            本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译或修改，代码按照 Mozilla Public License, v. 2.0 授权。
+            本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
+
+            Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+            Copyright 2025 Traintime PDA authors.
+
+            The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.
+
+            注意：XDYou 不可以随意分发！
         beian: "备案号"
         sign_android: "安卓签名"
         title: "关于本软件"
@@ -717,53 +728,10 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-    欢迎来到我们黑暗的角落
-    我们聚集在此，诅咒攻击我们的人
-
-    不要召唤恶魔，不要召唤神父
-    如您需要力量，招魂才是正道
-
-    听好了！
-
-    看那烈火，熊熊燃烧
-    涂上圣油，抹上灰烬
-    放好符号，摆好蜡烛
-    中间空位，黑眼之处
-    心中默念，仇恨之魂
-
-    首当其一，伤我心者
-    次之，嘲笑本软件者
-    后者，背后说坏话者
-
-    “我乃仆从，亦可交易”
-    “从您之命，为您服务”
-    “您父已从，您祖也来”
-    “您名既知，亦将顺从”
-    我诉我愿，达成交易
-    “既已如此，欢迎堕落”
-    “无穷深渊，黑暗圣堂”
-    我之魂魄，落入他手
-
-    Translate by BenderBlog
+    There has to be an invisible sun
+    It gives its heat to everyone
+    There has to be an invisible sun
+    That gives us hope when the whole day's done
 
 easter_egg_others: |-
-    雨夜闻否
-    雨夜相否
-
-    君有何忧
-    君有何求
-    无侪对坐
-    无侣相交
-
-    雨夜闻否
-    雨夜相否
-
-    君也寻侣
-    君也问天
-    君奔疾雨
-    君赴远道
-
-    雨夜闻否
-    雨夜相否
-
-    Translated by LichtYy
+    TO BE Determined

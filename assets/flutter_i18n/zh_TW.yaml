@@ -392,6 +392,9 @@ school_card_window:
   balance: 金額
   time_with_sum: 時間(共{sum}元)
   no_record: 未查詢到記錄，請修改日期後重試
+  qr_code: 支付碼
+  qr_code_error: 二維碼獲取失敗：{info}
+  reload: 重新加載
 score:
   cache_message: 已顯示緩存成績信息
   summary: '目前選中科目 {chosen}  總計學分 {credit}
@@ -441,10 +444,8 @@ score:
     summary: 總結
     CET-4: 國家英語四級
     CET-6: 國家英語六級
-
 setting:
-  # 致谢板块
-  acknowledgement: "Made With Love From {developers} People"
+  acknowledgement: Made With Love From {developers} People
   about: 關於
   about_this_program: 關於本程序
   version: 版本號：{version}
@@ -519,9 +520,9 @@ setting:
   change_swift_dialog:
     title: 課程偏移設置
     input_hint: 請在此輸入數字
-  change_electricity_title: 修改電費帳號密碼
+  change_electricity_title: 修改電費帳號
   change_electricity_account:
-    title: 修改電費帳號密碼
+    title: 修改電費帳號
     input_hint: 請在此輸入賬號
     blank_input: 輸入空白!
   change_experiment_title: 修改物理實驗賬號密碼
@@ -555,23 +556,23 @@ setting:
     chitao1234: 開發：修復滑塊不對齊問題
     dimole: 開發支持：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
-    elliot: 國際化(Pending)：軟件英語翻譯 / 開發指導：情侶課表功能開發指導
-    godhu777777: 國際化：繁體中文轉換代碼和彩蛋代碼
+    elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導
+    godhu777777: 國際化：繁體中文轉換代碼和彩蛋代碼 / 開發：優化導出日曆文件大小
     hancl777: 國際化：繁體中文轉換代碼
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
     lhx-666-cool: 支持：Windows 和 Linux 構建腳本
     lichtyy: 設計：配色，空白頁面貼圖
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
-    mrbrilliant2046: 支持：提供網絡服務使用說明文檔
-    nancunchild: 開發：圖書館搜索功能
-    pairman: 開發：成績緩存功能和優化滑塊算法
+    mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
+    nancunchild: 開發：圖書館搜索功能 / 國際化：優化英語翻譯
+    pairman: 開發：成績緩存功能和優化滑塊算法 / 國際化：優化英語翻譯
     reverierxu: 設計：用於信息展示的 ReX 卡片 / 開發支持：研究生課表
     rrrilac: 開發支持：電費查詢
-    ray: 設計：開屏畫面 / 支持：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導
+    ray: 設計：開屏畫面 / 支持：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導 / 國際化：優化英語翻譯
     shadowyingyi: 支持：兩次鴿子公眾號宣傳
     stalomeow: 設計：首頁時間軸 / 開發：異步登錄 & 驗證碼預測
-    xeonds: 設計：設置頁面 / 開發：XDU Planet
+    xeonds: 設計：設置頁面 / 開發：XDU Planet / 開發：校園卡付款碼
     xiue233: 開發：Android 小部件和拼接
     xizi: 開發支持：研究生版本開發
     wirsbf: 開發：修復調課未按預期進行
@@ -580,8 +581,23 @@ setting:
     homepage: 主頁
     code: 開源代碼
     know_more: 知道更多
-    copyright_notice: 本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯，代碼按照 Mozilla Public
-      License, v. 2.0 授權。本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
+    copyright_notice: '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
+      Public License, v. 2.0 授權。
+
+      本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
+
+
+      Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+
+      Copyright 2025 Traintime PDA authors.
+
+
+      The Source Code Form is subject to the terms of the Mozilla Public License,
+      v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
+      one at https://mozilla.org/MPL/2.0/.
+
+
+      注意：XDYou 不可以隨意分發！'
     beian: 備案號
     sign_android: 安卓簽名
     title: 關於本軟件
@@ -672,86 +688,11 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: '歡迎來到我們黑暗的角落
+easter_egg_apple: 'There has to be an invisible sun
 
-  我們聚集在此，詛咒攻擊我們的人
+  It gives its heat to everyone
 
+  There has to be an invisible sun
 
-  不要召喚惡魔，不要召喚神父
-
-  如您需要力量，招魂才是正道
-
-
-  聽好了！
-
-
-  看那烈火，熊熊燃燒
-
-  塗上聖油，抹上灰燼
-
-  放好符號，擺好蠟燭
-
-  中間空位，黑眼之處
-
-  心中默唸，仇恨之魂
-
-
-  首當其一，傷我心者
-
-  次之，嘲笑本軟件者
-
-  後者，背後說壞話者
-
-
-  “我乃僕從，亦可交易”
-
-  “從您之命，為您服務”
-
-  “您父已從，您祖也來”
-
-  “您名既知，亦將順從”
-
-  我訴我願，達成交易
-
-  “既已如此，歡迎墮落”
-
-  “無窮深淵，黑暗聖堂”
-
-  我之魂魄，落入他手
-
-
-  Translate by BenderBlog'
-easter_egg_others: '雨夜聞否
-
-  雨夜相否
-
-
-  君有何憂
-
-  君有何求
-
-  無儕對坐
-
-  無侶相交
-
-
-  雨夜聞否
-
-  雨夜相否
-
-
-  君也尋侶
-
-  君也問天
-
-  君奔疾雨
-
-  君赴遠道
-
-
-  雨夜聞否
-
-  雨夜相否
-
-
-  Translated by LichtYy'
+  That gives us hope when the whole day''s done'
+easter_egg_others: TO BE Determined

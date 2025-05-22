@@ -19,11 +19,11 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  // Dead Romance - Beyond - 再见理想
-  final String urlOthers = "https://www.bilibili.com/video/BV1cT41187Nk/";
+  // Ommadawn
+  final String urlOthers = "https://www.bilibili.com/video/BV1s44y1S7DW/";
 
-  // The Conjuring - Megadeth - Peace Sells But Who's Buying
-  final String urlApple = "https://www.bilibili.com/video/BV1Kx4y127zY/";
+  // The Invisible Sun - The Police - Ghosts in the Machine
+  final String urlApple = "https://www.bilibili.com/video/BV1LE411e7n1/?p=10";
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,8 @@ class _EasterEggPageState extends State<EasterEggPage> {
         ),
         SizedBox(height: 20),
         Image.asset("assets/art/pda_girl_default.png"),
-        Text("Demon calling you...")
+        Text("The sun shall rose to the destination "
+            "where all of us enjoys the happiness."),
       ]
           .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
           .scrollable()

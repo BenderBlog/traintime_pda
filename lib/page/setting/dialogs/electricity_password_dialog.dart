@@ -37,7 +37,7 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
     return AlertDialog(
       title: Text(FlutterI18n.translate(
         context,
-        "setting.change_electricity_title",
+        "setting.electricity_password_setting",
       )),
       content: TextField(
         autofocus: true,

@@ -96,8 +96,8 @@ class _AboutPageState extends State<AboutPage> {
           "https://space.bilibili.com/49892391/",
         ),
         Developer(
-          "Elliot（西电紫鼠球）",
-          "https://img.moegirl.org.cn/common/thumb/6/64/Hirasawa_yui_1.jpg/800px-Hirasawa_yui_1.jpg",
+          "Mother Elliot Flores",
+          "https://legacy.superbart.top/picture/Random/hirasawa.jpg",
           FlutterI18n.translate(
             context,
             "setting.about_page.elliot",
@@ -168,13 +168,14 @@ class _AboutPageState extends State<AboutPage> {
           "https://lsy223622.com/",
         ),
         Developer(
-            "MrBrilliant2046",
-            "https://avatars.githubusercontent.com/u/94728421?v=4",
-            FlutterI18n.translate(
-              context,
-              "setting.about_page.mrbrilliant2046",
-            ),
-            "https://github.com/MrBrilliant2046"),
+          "MrBrilliant2046",
+          "https://avatars.githubusercontent.com/u/94728421?v=4",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.mrbrilliant2046",
+          ),
+          "https://github.com/MrBrilliant2046",
+        ),
         Developer(
           "NanCunChild",
           "https://avatars.githubusercontent.com/u/85873278?v=4",
@@ -212,7 +213,7 @@ class _AboutPageState extends State<AboutPage> {
           "https://github.com/Rrrilac",
         ),
         Developer(
-          "Ray (Elliot Edition)",
+          "Ray Flores",
           "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
           FlutterI18n.translate(
             context,
@@ -284,13 +285,14 @@ class _AboutPageState extends State<AboutPage> {
           "https://github.com/ZCWzy",
         ),
         Developer(
-            "ZYar-er",
-            "https://avatars.githubusercontent.com/u/95170599?v=4",
-            FlutterI18n.translate(
-              context,
-              "setting.about_page.zyar-er",
-            ),
-            "https://github.com/ZYar-er")
+          "ZYar-er",
+          "https://avatars.githubusercontent.com/u/95170599?v=4",
+          FlutterI18n.translate(
+            context,
+            "setting.about_page.zyar-er",
+          ),
+          "https://github.com/ZYar-er",
+        )
       ];
 
   List<Link> linkData() => [
@@ -332,7 +334,7 @@ class _AboutPageState extends State<AboutPage> {
               ),
               TextSpan(
                 text:
-                    "${Platform.isIOS || Platform.isMacOS ? "The Conjuring" : "Dead Romance"} - Neuromancy Edition",
+                    "${Platform.isIOS || Platform.isMacOS ? "The Invisible Sun" : "Ommadawn"} - Second Himawari Edition",
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -351,7 +353,14 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget get _developerList => ReXCard(
         title: Text(
-          FlutterI18n.translate(context, "setting.acknowledgement", {"developers": getDevelopers().length})).padding(bottom: 8).center(),
+          FlutterI18n.translate(
+            context,
+            "setting.acknowledgement",
+            translationParams: {
+              "developers": getDevelopers().length.toString(),
+            },
+          ),
+        ).padding(bottom: 8).center(),
         remaining: const [],
         bottomRow: Wrap(
           alignment: WrapAlignment.center,

@@ -1,9 +1,11 @@
-# Copyright 2024 BenderBlog Rodriguez and contributors.
+# Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+# Copyright 2025 Traintime PDA authors.
 # SPDX-License-Identifier: MPL-2.0
 
 # 初步翻译：Elliot
 # 初步校对：Benderblog
 # 第二次校对：Ray
+# 第三次校对：Pairman
 
 # EasyRefresh 下拉插件的玩意
 drag_text: "Pull to request more"
@@ -19,7 +21,7 @@ error_detected: "Ouch! An error occurred!"
 click_to_refresh: "Click to refresh"
 
 # 取消和确定
-confirm_title: "Confirm？(ゝ∀･)"
+confirm_title: "Confirm? (ゝ∀･)"
 cancel: "Cancel"
 confirm: "Okay"
 
@@ -44,18 +46,18 @@ login_process:
 no_info: "No information"
 
 # main.dart 里面 Catcher 插件字符串
-catcher_detected: "An error have occurred"
+catcher_detected: "An error has occurred"
 catcher_description: "Details are shown as follows"
 
 # 星期
 weekday:
-   monday: "Mon"
-   tuesday: "Tue"
-   wednesday: "Wed"
-   thursday: "Thu"
-   friday: "Fri"
-   saturday: "Sat"
-   sunday: "Sun"
+   monday: "Mon."
+   tuesday: "Tue."
+   wednesday: "Wed."
+   thursday: "Thu."
+   friday: "Fri."
+   saturday: "Sat."
+   sunday: "Sun."
 
 # 日程表/课程表
 classtable:
@@ -63,10 +65,10 @@ classtable:
       override_dialog: "Currently there is a partner classtable data, do you want to overwrite?"
       no_file: "Import file not found"
       no_permission: "Storage permission denied , cannot read file"
-      problem: "Maybe there is a problem with the import file :P"
+      problem: "Maybe there's a problem with the import file :P"
       success: "Successfully imported"
       share_dialog:
-         title: "Caution ( ´•̥̥̥ω•̥̥̥` )"
+         title: "Caution!"
          content: "The exported file may include your personal information, please DO NOT share casually"
       save_dialog:
          title: "Save calendar file to..."
@@ -170,6 +172,7 @@ classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
 
+# 电量窗口
 electricity:
    title: "Power Info"
    power_title: "Infomation"
@@ -427,6 +430,9 @@ school_card_window:
    balance: "Amount"
    time_with_sum: "Time ({sum})"
    no_record: "No records found, please try again with different dates"
+   qr_code: "Payment Code"
+   qr_code_error: "Get QR Code failed: {info}"
+   reload: "Reload"
 
 # 成绩
 score:
@@ -562,9 +568,9 @@ setting:
    change_swift_dialog:
       title: "Class schedule offset setting"
       input_hint: "Please input number here"
-   change_electricity_title: "Modify electricity account password"
+   change_electricity_title: "Modify electricity account"
    change_electricity_account:
-      title: "Modify electricity account password"
+      title: "Modify electricity account"
       input_hint: "Please input account here"
       blank_input: "Blank input!"
    change_experiment_title: "Modify physics experiment account password"
@@ -598,22 +604,22 @@ setting:
       dimole: "Development support: assist in fixing slider issue"
       elitewars: "Design: sports score page"
       elliot: "Internationalization: English translation / Development guidance: on partner classtable development"
-      godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code"
+      godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar"
       hancl777: "Internationalization: Traditional Chinese conversion code"
       hawa130: "Design: Class info card"
       hhzm: "Development: electricity fee inquiry account calculation"
       lhx-666-cool: "Support: Windows and Linux build scripts"
       lichtyy: "Design: color pattern and blank page picture"
       lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
-      mrbrilliant2046: "Support: Provided the school net user guide"
-      nancunchild: "Development: library search function / i18n: English correction"
-      pairman: "Development: score cache and optimize slider algorithm"
+      mrbrilliant2046: "Support: Provided the school net user guide / Internationalization: English correction"
+      nancunchild: "Development: library search function / Internationalization: English correction"
+      pairman: "Development: score cache and optimize slider algorithm / Internationalization: English correction"
       reverierxu: "Design: REX card for information display / Development support: on postgraduate class schedule"
       rrrilac: "Development support: electricity query"
-      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development"
+      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development / Internationalization: English correction"
       shadowyingyi: "Support: two times of pigeon house official account publicity" # keep this line
       stalomeow: "Design: homepage timeline / Development: asynchronous login and captcha predict"
-      xeonds: "Design: settings page / Development: XDU Planet"
+      xeonds: "Design: settings page / Development: XDU Planet / Development: Payment Code"
       xiue233: "Development: Android applet"
       xizi: "Development support: on postgraduate version"
       wirsbf: "Development: fix course adjustment did not proceed as expected"
@@ -623,15 +629,17 @@ setting:
       homepage: "Homepage"
       code: "Source code"
       know_more: "Learn more"
-      copyright_notice: |
-         This APP copied from traintime_pda (or watermeter),
-         It based on Mozilla Public License, v2.0 authorication.
-         This APP has no relation to Xidian Universirt, Tishineng Service, Shuwow, Electric Meter and other services.
-         
-         Copyright 2023-Present BenderBlog Rodriguez and contributors.
-         The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-         If a copy of the MPL was not distributed with this file,
-         You can obtain one at https://mozilla.org/MPL/2.0/.
+      copyright_notice: |-
+         This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.
+
+         This APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.
+
+         Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+         Copyright 2025 Traintime PDA authors.
+
+         The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.
+
+         Notice: XDYou is not a freely distribute software!
       beian: "ICP record number"
       sign_android: "Android signature"
       title: "About this APP"
@@ -737,46 +745,13 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-   Welcome to our sanguinary sect of worship
-   Feel at home in our black conventicle
-   As we anathematise all those who oppose us
-
-   Don't summon the devil, don't call the priests
-   If you need the strength, the conjuring
-   Obey!
-
-   Behold, the flames rise from the compass' cardinal points
-   Burn the sacred oil, and with the ashes you'll anoint
-   Arrange the symbols of the wizard and magician
-   Light the candles, place the parchment paper in position
-   Between its leaves place the lash from a black cat's eye
-   A straw of a broom, fold, and burn, and centralize
-
-   Don't summon the devil, don't call the priests
-   If you need the strength, then conjure me
-
-   I am the devil's advocate, salesman if you will
-   You know my name, you know my name
-   I met your father years ago, I gave him what he'd please
-   He called my name, and you'll do the same
-   I'm claiming what is mine by right, it's time to close the deal
-   You're bought and sold, bought and sold
-   Come join me in my infernal depths, Mephisto's hall of fame
-   I've got your soul, I've got your soul
+   There has to be an invisible sun
+   It gives its heat to everyone
+   There has to be an invisible sun
+   That gives us hope when the whole day's done
 
 easter_egg_others: |-
-   Man, what are you thinking of?
-   Man, what do you need?
-   Man, nobody tell you what to do.
-   Man, you need somebody to hurt?
-
-   In a rainy night, can you hear me?
-   In a rainy night, can you help me?
-
-   Man, you feel so lonely.
-   Man, can't you hear the message come from the sky?
-   Man, you are driving into the rain.
-   Man, you know it's time to find the faith?
-
-   In a rainy night, can you hear me?
-   In a rainy night, can you help me?
+   Ab yul ann I dyad awt
+   En yab na log a toc na awd
+   Taw may on omma dawn egg kyowl
+   Omma dawn egg kyowl
