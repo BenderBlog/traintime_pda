@@ -45,6 +45,7 @@ dependencies:
   data_table_2: ^2.5.1
   flutter_native_splash: ^2.3.1
   get:
+  provider: ^6.1.5
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2

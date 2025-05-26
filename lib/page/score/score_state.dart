@@ -7,19 +7,98 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/score/score_statics.dart';
+import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
-class ScoreState extends InheritedWidget {
-  /// Static data.
-  final List<Score> scoreTable;
-  final Set<String> semester;
-  final Set<String> statuses;
-  final Set<String> unPassedSet;
+class ScoreState extends ChangeNotifier {
+  /// Score fetch state.
+  ScoreFetchState state = ScoreFetchState.fetching;
 
-  /// Parent's Buildcontext.
-  final BuildContext context;
+  /// Score data
+  List<Score> scoreData = [];
+  Set<String> semester = {};
+  Set<String> statuses = {};
+  Set<String> unPassedSet = {};
 
-  /// Changeable state.
-  final ScoreWidgetState controllers;
+  /// Error string
+  String? error;
+
+  /// Is score is selected to count.
+  List<bool> isSelected = [];
+
+  /// Is select mod?
+  bool _isSelectMod = false;
+
+  /// Empty means all semester.
+  String _chosenSemester = "";
+
+  /// Empty means all status.
+  String _chosenStatus = "";
+
+  /// Search parameter
+  String _search = "";
+
+  /// Init
+  ScoreState() {
+    refreshingState();
+  }
+
+  /// Refresh the score page's state.
+  Future<void> refreshingState({bool isForce = false}) async {
+    /// Set to fetching mode.
+    state = ScoreFetchState.fetching;
+    notifyListeners();
+
+    /// Reset data.
+    scoreData.clear();
+    semester.clear();
+    statuses.clear();
+    unPassedSet.clear();
+
+    /// Error status changed.
+    error = null;
+
+    /// State reset in here.
+    isSelected.clear();
+    _isSelectMod = false;
+    _chosenSemester = "";
+    _chosenStatus = "";
+    _search = "";
+    try {
+      ScoreSession session = ScoreSession();
+
+      /// Fetch the data.
+      scoreData = await session.getScore(force: isForce);
+      semester = {for (var i in scoreData) i.semesterCode};
+      statuses = {for (var i in scoreData) i.classStatus};
+      unPassedSet = {
+        for (var i in scoreData)
+          if (i.isFinish && !i.isPassed!) i.name
+      };
+
+      /// Fresh the state.
+      isSelected = List<bool>.generate(
+        scoreData.length,
+        (int index) {
+          for (var i in courseIgnore) {
+            if (scoreData[index].name.contains(i)) return false;
+          }
+          for (var i in typesIgnore) {
+            if (scoreData[index].classType.contains(i)) return false;
+          }
+          return true;
+        },
+      );
+      state = ScoreFetchState.ok;
+    } catch (e, s) {
+      log.error("[ScorePageState] Error on fetching score info.", e, s);
+      state = ScoreFetchState.error;
+      error = e.toString();
+    } finally {
+      log.info("[ScorePageState] Finish fetching. state: $state");
+      notifyListeners();
+    }
+  }
 
   /// Exclude these from counting avgs
   /// 1. CET-4 and CET-6
@@ -34,11 +113,10 @@ class ScoreState extends InheritedWidget {
 
   double evalCredit(bool isAll) {
     double totalCredit = 0.0;
-    for (var i = 0; i < controllers.isSelected.length; ++i) {
-      if (((controllers.isSelected[i] == true && isAll == false) ||
-              isAll == true) &&
-          _evalCount(scoreTable[i])) {
-        totalCredit += scoreTable[i].credit;
+    for (var i = 0; i < isSelected.length; ++i) {
+      if (((isSelected[i] == true && isAll == false) || isAll == true) &&
+          _evalCount(scoreData[i])) {
+        totalCredit += scoreData[i].credit;
       }
     }
     return totalCredit;
@@ -48,12 +126,11 @@ class ScoreState extends InheritedWidget {
   double evalAvg(bool isAll, {bool isGPA = false}) {
     double totalScore = 0.0;
     double totalCredit = evalCredit(isAll);
-    for (var i = 0; i < controllers.isSelected.length; ++i) {
-      if (((controllers.isSelected[i] == true && isAll == false) ||
-              isAll == true) &&
-          _evalCount(scoreTable[i])) {
-        totalScore += (isGPA ? scoreTable[i].gpa : scoreTable[i].score!) *
-            scoreTable[i].credit;
+    for (var i = 0; i < isSelected.length; ++i) {
+      if (((isSelected[i] == true && isAll == false) || isAll == true) &&
+          _evalCount(scoreData[i])) {
+        totalScore += (isGPA ? scoreData[i].gpa : scoreData[i].score!) *
+            scoreData[i].credit;
       }
     }
     return totalCredit != 0 ? totalScore / totalCredit : 0.0;
@@ -62,47 +139,22 @@ class ScoreState extends InheritedWidget {
   List<Score> get toShow {
     /// If I write "whatever = scores.scoreTable", every change I made to "whatever"
     /// also applies to scores.scoreTable. Since reference whatsoever.
-    List<Score> whatever = List.from(scoreTable);
-    if (controllers.chosenSemester != "") {
-      whatever.removeWhere(
-        (element) => element.semesterCode != controllers.chosenSemester,
-      );
+    List<Score> whatever = List.from(scoreData);
+    if (_chosenSemester != "") {
+      whatever
+          .removeWhere((element) => element.semesterCode != _chosenSemester);
     }
-    if (controllers.chosenStatus != "") {
-      whatever.removeWhere(
-        (element) => element.classStatus != controllers.chosenStatus,
-      );
+    if (_chosenStatus != "") {
+      whatever.removeWhere((element) => element.classStatus != _chosenStatus);
     }
     whatever.removeWhere(
-      (element) => !element.name.toLowerCase().contains(
-            controllers.search.toLowerCase(),
-          ),
+      (element) => !element.name.toLowerCase().contains(_search.toLowerCase()),
     );
     return whatever;
   }
 
-  List<Score> get getSelectedScoreList => List.from(scoreTable)
-    ..removeWhere((element) => !controllers.isSelected[element.mark]);
-
-  List<Score> get selectedScoreList {
-    List<Score> whatever = List.from(getSelectedScoreList);
-    if (controllers.chosenSemesterInScoreChoice != "") {
-      whatever.removeWhere(
-        (element) =>
-            element.semesterCode != controllers.chosenSemesterInScoreChoice,
-      );
-    }
-    if (controllers.chosenStatusInScoreChoice != "") {
-      whatever.removeWhere(
-        (element) =>
-            element.classStatus != controllers.chosenStatusInScoreChoice,
-      );
-    }
-    whatever.removeWhere(
-      (element) => !element.name.contains(controllers.searchInScoreChoice),
-    );
-    return whatever;
-  }
+  List<Score> get getSelectedScoreList =>
+      List.from(scoreData)..removeWhere((element) => !isSelected[element.mark]);
 
   String get unPassed => unPassedSet.isEmpty ? "" : unPassedSet.join(",");
 
@@ -116,7 +168,7 @@ class ScoreState extends InheritedWidget {
 
   double get notCoreClass {
     double toReturn = 0.0;
-    for (var i in scoreTable) {
+    for (var i in scoreData) {
       if (i.classStatus.contains(notCoreClassType) &&
           i.isFinish &&
           i.isPassed!) {
@@ -126,68 +178,45 @@ class ScoreState extends InheritedWidget {
     return toReturn;
   }
 
-  factory ScoreState.init({
-    required List<Score> scoreTable,
-    required Widget child,
-    required BuildContext context,
-  }) {
-    Set<String> semester = {for (var i in scoreTable) i.semesterCode};
-    Set<String> statuses = {for (var i in scoreTable) i.classStatus};
-    Set<String> unPassedSet = {
-      for (var i in scoreTable)
-        if (i.isFinish && !i.isPassed!) i.name
-    };
-    return ScoreState._(
-      scoreTable: scoreTable,
-      controllers: ScoreWidgetState(
-        isSelected: List<bool>.generate(
-          scoreTable.length,
-          (int index) {
-            for (var i in courseIgnore) {
-              if (scoreTable[index].name.contains(i)) return false;
-            }
-            for (var i in typesIgnore) {
-              if (scoreTable[index].classType.contains(i)) return false;
-            }
-            return true;
-          },
-        ),
-        chosenSemester: "",
-      ),
-      semester: semester,
-      statuses: statuses,
-      unPassedSet: unPassedSet,
-      context: context,
-      child: child,
-    );
+  set isSelectMode(bool value) {
+    _isSelectMod = value;
+    notifyListeners();
   }
 
-  const ScoreState._({
-    required super.child,
-    required this.scoreTable,
-    required this.controllers,
-    required this.semester,
-    required this.statuses,
-    required this.unPassedSet,
-    required this.context,
-  });
+  bool get isSelectMode => _isSelectMod;
 
-  void setScoreChoiceMod() {
-    controllers.isSelectMod = !controllers.isSelectMod;
-    controllers.notifyListeners();
+  set chosenSemester(String toSet) {
+    _chosenSemester = toSet;
+    notifyListeners();
   }
+
+  String get chosenSemester => _chosenSemester;
+
+  set chosenStatus(String toSet) {
+    _chosenStatus = toSet;
+    notifyListeners();
+  }
+
+  String get chosenStatus => _chosenStatus;
+
+  set search(String toSet) {
+    _search = toSet;
+    notifyListeners();
+  }
+
+  String get search => _search;
 
   void setScoreChoiceFromIndex(int index) {
-    controllers.isSelected[index] = !controllers.isSelected[index];
-    controllers.notifyListeners();
+    isSelected[index] = !isSelected[index];
+    notifyListeners();
   }
 
   void setScoreChoiceState(ChoiceState state) {
     for (var stuff in toShow) {
       if (state == ChoiceState.all) {
-        controllers.isSelected[stuff.mark] = true;
+        isSelected[stuff.mark] = true;
       } else if (state == ChoiceState.none) {
-        controllers.isSelected[stuff.mark] = false;
+        isSelected[stuff.mark] = false;
       } else {
         bool toBeGiven = true;
         for (var i in courseIgnore) {
@@ -196,93 +225,9 @@ class ScoreState extends InheritedWidget {
         for (var i in typesIgnore) {
           if (stuff.classType.contains(i)) toBeGiven = false;
         }
-        controllers.isSelected[stuff.mark] = toBeGiven;
+        isSelected[stuff.mark] = toBeGiven;
       }
     }
-    controllers.notifyListeners();
-  }
-
-  set search(String text) {
-    controllers.search = text;
-    controllers.notifyListeners();
-  }
-
-  set chosenSemester(String str) {
-    controllers.chosenSemester = str;
-    controllers.notifyListeners();
-  }
-
-  set chosenStatus(String str) {
-    controllers.chosenStatus = str;
-    controllers.notifyListeners();
-  }
-
-  set searchInScoreChoice(String text) {
-    controllers.searchInScoreChoice = text;
-    controllers.notifyListeners();
-  }
-
-  set chosenSemesterInScoreChoice(String str) {
-    controllers.chosenSemesterInScoreChoice = str;
-    controllers.notifyListeners();
-  }
-
-  set chosenStatusInScoreChoice(String str) {
-    controllers.chosenStatusInScoreChoice = str;
-    controllers.notifyListeners();
-  }
-
-  static ScoreState? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ScoreState>();
-  }
-
-  @override
-  bool updateShouldNotify(covariant ScoreState oldWidget) {
-    ScoreWidgetState newState = controllers;
-    ScoreWidgetState oldState = oldWidget.controllers;
-
-    return (!listEquals(oldState.isSelected, newState.isSelected) ||
-        oldState.chosenSemester != newState.chosenSemester ||
-        oldState.chosenStatus != newState.chosenStatus ||
-        oldState.chosenSemesterInScoreChoice !=
-            newState.chosenSemesterInScoreChoice ||
-        oldState.chosenStatusInScoreChoice !=
-            newState.chosenStatusInScoreChoice ||
-        oldState.search != newState.search ||
-        oldState.searchInScoreChoice != newState.chosenSemesterInScoreChoice);
-  }
-}
-
-class ScoreWidgetState extends ChangeNotifier {
-  /// Is score is selected to count.
-  List<bool> isSelected;
-
-  /// Is select mod?
-  bool isSelectMod = false;
-
-  /// Empty means all semester.
-  String chosenSemester = "";
-
-  /// Empty means all status.
-  String chosenStatus = "";
-
-  /// Empty means all semester, especially in score choice window.
-  String chosenSemesterInScoreChoice = "";
-
-  /// Empty means all status, especially in score choice window.
-  String chosenStatusInScoreChoice = "";
-
-  /// Search parameter
-  String search = "";
-  String searchInScoreChoice = "";
-
-  ScoreWidgetState({
-    required this.isSelected,
-    required this.chosenSemester,
-  });
-
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
+    notifyListeners();
   }
 }

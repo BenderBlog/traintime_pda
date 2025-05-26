@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:provider/provider.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -31,8 +32,8 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
   late ScoreState c;
 
   double get cardOpacity {
-    if ((c.controllers.isSelectMod || widget.isScoreChoice) &&
-        !c.controllers.isSelected[widget.mark]) {
+    if ((c.isSelectMode || widget.isScoreChoice) &&
+        !c.isSelected[widget.mark]) {
       return 0.38;
     } else {
       return 1;
@@ -41,8 +42,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
 
   @override
   void didChangeDependencies() {
-    c = ScoreState.of(context)!;
-    c.controllers.addListener(() => mounted ? setState(() {}) : null);
+    c = Provider.of<ScoreState>(context);
     super.didChangeDependencies();
   }
 
@@ -53,7 +53,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
     return GestureDetector(
       onTap: () {
         /// Score choice window
-        if (c.controllers.isSelectMod) {
+        if (c.isSelectMode) {
           if (widget.isScoreChoice) {
             setState(() => _isVisible = false);
             Future.delayed(_duration).then((value) {
@@ -71,10 +71,10 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
               "score.score_info_card.title",
             ),
             child: ScoreComposeCard(
-              score: c.scoreTable[widget.mark],
+              score: c.scoreData[widget.mark],
               detail: ScoreSession().getDetail(
-                c.scoreTable[widget.mark].classID,
-                c.scoreTable[widget.mark].semesterCode,
+                c.scoreData[widget.mark].classID,
+                c.scoreData[widget.mark].semesterCode,
               ),
             ),
           );
@@ -87,19 +87,19 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
             opacity: cardOpacity,
             title: Text.rich(TextSpan(children: [
               // TODO: Backend-return Data, unable to change at the moment...
-              if (c.scoreTable[widget.mark].scoreStatus != "初修")
-                TextSpan(text: "${c.scoreTable[widget.mark].scoreStatus} "),
-              if (c.scoreTable[widget.mark].isPassed == false)
+              if (c.scoreData[widget.mark].scoreStatus != "初修")
+                TextSpan(text: "${c.scoreData[widget.mark].scoreStatus} "),
+              if (c.scoreData[widget.mark].isPassed == false)
                 TextSpan(
                   text: FlutterI18n.translate(
                     context,
                     "score.score_info_card.failed",
                   ),
                 ),
-              TextSpan(text: c.scoreTable[widget.mark].name)
+              TextSpan(text: c.scoreData[widget.mark].name)
             ])),
             remaining: [
-              ReXCardRemaining(c.scoreTable[widget.mark].classStatus),
+              ReXCardRemaining(c.scoreData[widget.mark].classStatus),
             ],
             bottomRow: DefaultTextStyle(
               style: TextStyle(
@@ -110,19 +110,19 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                   "${FlutterI18n.translate(
                     context,
                     "score.score_compose_card.credit",
-                  )}: ${c.scoreTable[widget.mark].credit}",
+                  )}: ${c.scoreData[widget.mark].credit}",
                 ).expanded(flex: 2),
                 Text(
                   "${FlutterI18n.translate(
                     context,
                     "score.score_compose_card.gpa",
-                  )}: ${c.scoreTable[widget.mark].gpa}",
+                  )}: ${c.scoreData[widget.mark].gpa}",
                 ).expanded(flex: 3),
                 Text(
                   "${FlutterI18n.translate(
                     context,
                     "score.score_compose_card.score",
-                  )}: ${c.scoreTable[widget.mark].scoreStr}",
+                  )}: ${c.scoreData[widget.mark].scoreStr}",
                 ).expanded(flex: 3),
               ].toRow(),
             )),
