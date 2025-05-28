@@ -114,6 +114,7 @@ flutter:
     - assets/icon.png
     - assets/Icon-App-iTunes-Background.png
     - assets/Icon-App-iTunes.png
+    - assets/art/aboutRobots-icon.png
     - assets/art/pda_empty_cover.jpg
     - assets/art/pda_classtable_empty.png
     - assets/art/pda_girl_reading.png

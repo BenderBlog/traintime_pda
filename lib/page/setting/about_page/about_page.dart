@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/about_page/easter_egg_page.dart';
@@ -22,6 +23,12 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
+  // Ommadawn
+  final String urlOthers = "https://www.bilibili.com/video/BV1s44y1S7DW/";
+
+  // The Invisible Sun - The Police - Ghosts in the Machine
+  final String urlApple = "https://www.bilibili.com/video/BV1LE411e7n1/?p=10";
+
   List<Developer> getDevelopers() => [
         Developer(
           "BenderBlog Rodriguez",
@@ -434,6 +441,51 @@ class _AboutPageState extends State<AboutPage> {
         ].toList().toColumn(),
       );
 
+  Widget _versionHint(context) => ReXCard(
+        title: Text(FlutterI18n.translate(
+          context,
+          "setting.easter_egg_page",
+        )).padding(bottom: 8).center(),
+        remaining: const [],
+        bottomRow: [
+          [
+            IconButton.filledTonal(
+              onPressed: () => launchUrl(
+                Uri.parse(
+                  Platform.isIOS || Platform.isMacOS ? urlApple : urlOthers,
+                ),
+                mode: LaunchMode.externalApplication,
+              ),
+              icon: const Icon(Icons.headphones),
+            ),
+            const SizedBox(width: 24),
+            IconButton.filledTonal(
+              onPressed: () => launchUrl(
+                Uri.parse(
+                  Platform.isIOS || Platform.isMacOS ? urlOthers : urlApple,
+                ),
+                mode: LaunchMode.externalApplication,
+              ),
+              icon: const Icon(Icons.headphones),
+            ),
+          ].toRow(mainAxisAlignment: MainAxisAlignment.center),
+          Text(
+            FlutterI18n.translate(
+              context,
+              Platform.isIOS || Platform.isMacOS
+                  ? "easter_egg_apple"
+                  : "easter_egg_others",
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 20),
+          Image.asset("assets/art/pda_girl_reading.png"),
+          SizedBox(height: 20),
+          Text("The sun shall rose to the destination "
+              "where all of us enjoys the happiness."),
+        ].toColumn(),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -466,7 +518,12 @@ class _AboutPageState extends State<AboutPage> {
                 .constrained(maxWidth: 800)
                 .center();
           } else {
-            return [_title(context), _developerList, _moreList(context)]
+            return [
+              _title(context),
+              _developerList,
+              _moreList(context),
+              _versionHint(context),
+            ]
                 .toColumn(mainAxisAlignment: MainAxisAlignment.center)
                 .padding(horizontal: 16)
                 .scrollable()

@@ -141,6 +141,7 @@ class ElectricityWindow extends StatelessWidget {
               ),
             ),
           ).padding(all: 4),
+          Image.asset("assets/art/pda_girl_default.png")
         ]
             .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
             .constrained(maxWidth: 480)

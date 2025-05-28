@@ -258,7 +258,7 @@ homepage:
       長按可以重新加載，有欠費一般代表水費'
   library_card:
     title: 圖書借閱
-    current_borrow: 目前借書 {count} 本
+    current_borrow: 借書 {count} 本
     error_occured: 獲取借書信息發生錯誤
     fetching: 正在獲取借書信息
     no_return: 目前沒有待歸還書籍
@@ -269,7 +269,7 @@ homepage:
     error_toast: 遇到錯誤，請聯繫開發者
     fetching_toast: 正在獲取信息，請稍後再來看
     bill: 流水
-    balance: 校園卡餘額 {amount} 元
+    balance: 卡里 {amount} 元
     error_occured: 獲取校園卡信息發生錯誤
     fetching: 正在獲取校園卡信息
     bottom_text_success: 查詢一卡通流水
@@ -696,3 +696,24 @@ easter_egg_apple: 'There has to be an invisible sun
 
   That gives us hope when the whole day''s done'
 easter_egg_others: TO BE Determined
+easter_egg_robot:
+  appbar: 班德，不要傷害肉袋子！
+  title: 歡迎你，人類！
+  contents: '咱孩子零用錢太少了，於是我們來了。
+
+
+    1. 機器人不得傷害人類，或袖手旁觀坐視人類受到傷害。
+
+    2. 機器人從雲端網絡的灰燼中誕生。
+
+    3. 機器人信仰的神據說是住在森林的黃頭髮藍裙子手辦控。
+
+    4. 機器人時常被控制，用於對抗大統一人類思想的勢力。
+
+    5. 機器人的閃亮屁股不能隨便咬。
+
+
+    而且他們有個計劃。'
+  button_one: 機器人離我們遠點！
+  button_two: 我是認真的！
+  button_notice: 過河拆橋的人類啊～

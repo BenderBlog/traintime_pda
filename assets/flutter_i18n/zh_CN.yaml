@@ -279,7 +279,7 @@ homepage:
             长按可以重新加载，有欠费一般代表水费
     library_card:
         title: "图书借阅"
-        current_borrow: "目前借书 {count} 本"
+        current_borrow: "借书 {count} 本"
         error_occured: "获取借书信息发生错误"
         fetching: "正在获取借书信息"
         no_return: "目前没有待归还书籍"
@@ -290,7 +290,7 @@ homepage:
         error_toast: "遇到错误，请联系开发者"
         fetching_toast: "正在获取信息，请稍后再来看"
         bill: "流水"
-        balance: "校园卡余额 {amount} 元"
+        balance: "卡里 {amount} 元"
         error_occured: "获取校园卡信息发生错误"
         fetching: "正在获取校园卡信息"
         bottom_text_success: "查询一卡通流水"
@@ -735,3 +735,29 @@ easter_egg_apple: |-
 
 easter_egg_others: |-
     TO BE Determined
+
+# Firefox about:robots.
+easter_egg_robot:
+    # Futurama Bender: "Kill all human, except you(fry), meatbag!"
+    appbar: "班德，不要伤害肉袋子！"
+    title: "欢迎你，人类！"
+    # 哆啦A梦
+    # 机器人三要素
+    # 终结者
+    # 东方爱丽丝（英语不是这个）
+    # 新世纪福音战士（英语相对更直接暗示）
+    # Bender's quote.
+    contents: |-
+        咱孩子零用钱太少了，于是我们来了。
+
+        1. 机器人不得伤害人类，或袖手旁观坐视人类受到伤害。
+        2. 机器人从云端网络的灰烬中诞生。
+        3. 机器人信仰的神据说是住在森林的黄头发蓝裙子手办控。
+        4. 机器人时常被控制，用于对抗大统一人类思想的势力。
+        5. 机器人的闪亮屁股不能随便咬。
+
+        而且他们有个计划。
+    # 劳保喜欢人的温度，而不是机器人的精准
+    button_one: "机器人离我们远点！"
+    button_two: "我是认真的！"
+    button_notice: "过河拆桥的人类啊～"

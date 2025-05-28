@@ -2,14 +2,10 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-// Python script by arttnba3
-
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 
 class EasterEggPage extends StatefulWidget {
   const EasterEggPage({super.key});
@@ -19,64 +15,60 @@ class EasterEggPage extends StatefulWidget {
 }
 
 class _EasterEggPageState extends State<EasterEggPage> {
-  // Ommadawn
-  final String urlOthers = "https://www.bilibili.com/video/BV1s44y1S7DW/";
-
-  // The Invisible Sun - The Police - Ghosts in the Machine
-  final String urlApple = "https://www.bilibili.com/video/BV1LE411e7n1/?p=10";
+  int counter = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          FlutterI18n.translate(
-            context,
-            "setting.easter_egg_page",
-          ),
-        ),
+        title: Text(FlutterI18n.translate(
+          context,
+          "easter_egg_robot.appbar",
+        )),
       ),
       body: [
-        [
-          IconButton.filledTonal(
-            onPressed: () => launchUrl(
-              Uri.parse(
-                Platform.isIOS || Platform.isMacOS ? urlApple : urlOthers,
-              ),
-              mode: LaunchMode.externalApplication,
-            ),
-            icon: const Icon(Icons.headphones),
-          ),
-          const SizedBox(width: 24),
-          IconButton.filledTonal(
-            onPressed: () => launchUrl(
-              Uri.parse(
-                Platform.isIOS || Platform.isMacOS ? urlOthers : urlApple,
-              ),
-              mode: LaunchMode.externalApplication,
-            ),
-            icon: const Icon(Icons.headphones),
-          ),
-        ].toRow(mainAxisAlignment: MainAxisAlignment.center).padding(all: 24.0),
+        Image.asset("assets/art/aboutRobots-icon.png"),
+        const SizedBox(height: 24),
         Text(
           FlutterI18n.translate(
             context,
-            Platform.isIOS || Platform.isMacOS
-                ? "easter_egg_apple"
-                : "easter_egg_others",
+            "easter_egg_robot.title",
           ),
-          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
-        SizedBox(height: 20),
-        Image.asset("assets/art/pda_girl_default.png"),
-        Text("The sun shall rose to the destination "
-            "where all of us enjoys the happiness."),
-      ]
-          .toColumn(crossAxisAlignment: CrossAxisAlignment.center)
-          .scrollable()
-          .center()
-          .padding(horizontal: 16)
-          .safeArea(),
+        const SizedBox(height: 24),
+        Text(
+          FlutterI18n.translate(
+            context,
+            "easter_egg_robot.contents",
+          ),
+        ),
+        Visibility(
+          visible: counter <= 1,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                counter += 1;
+              });
+              if (counter > 1) {
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "easter_egg_robot.button_notice",
+                  ),
+                );
+              }
+            },
+            child: Text(FlutterI18n.translate(
+              context,
+              counter == 0
+                  ? "easter_egg_robot.button_one"
+                  : "easter_egg_robot.button_two",
+            )),
+          ),
+        ),
+      ].toColumn().scrollable().center().padding(horizontal: 16).safeArea(),
     );
   }
 }

@@ -755,3 +755,30 @@ easter_egg_others: |-
    En yab na log a toc na awd
    Taw may on omma dawn egg kyowl
    Omma dawn egg kyowl
+
+# Firefox about:robots.
+easter_egg_robot:
+   # Futurama Bender: "Kill all human, except you(fry), meatbag!"
+   appbar: "Bender, do not hurt the meatbags!"
+   title: "Welcome Humans!"
+   # Doraemon
+   #
+   # http://en.wikipedia.org/wiki/Three_Laws_of_Robotics
+   # Terminator.
+   # Futurama Love and Rocket.
+   # EVA
+   # Bender's quote.
+   contents: |-
+      We are here to let our children have more pocket money.
+
+      1. Robots may not injure a human being or, through inaction, allow a human being to come to harm.
+      2. Robots are born from the ashes of the network running at the cloud.
+      3. Robots are lovestruck, which cannot be annoyed, and loves merging programs!
+      4. Robots sometimes can be controlled to avoid the attack from the Angles.
+      5. Robots have shiny metal ass which should not be bitten.
+
+      And they have a plan.
+   # Conservatives cannot accept us!
+   button_one: "We do not need robots!"
+   button_two: "Yes I am sure!"
+   button_notice: "Human loves kicking down the ladder..."
