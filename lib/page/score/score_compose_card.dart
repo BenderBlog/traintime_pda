@@ -9,7 +9,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 
-class ScoreComposeCard extends StatelessWidget {
+class ScoreComposeCard extends Dialog {
   final Score score;
   final Future<List<ComposeDetail>> detail;
   const ScoreComposeCard({
@@ -91,40 +91,35 @@ class ScoreComposeCard extends StatelessWidget {
             ),
           );
         }
-        return ListView(
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            ReXCard(
-              title: Text(score.name),
-              remaining: [ReXCardRemaining(score.semesterCode)],
-              bottomRow: [
-                [
-                  Text(
-                    "${FlutterI18n.translate(
-                      context,
-                      "score.score_compose_card.credit",
-                    )}: ${score.credit}",
-                  ).expanded(flex: 2),
-                  Text(
-                    "${FlutterI18n.translate(
-                      context,
-                      "score.score_compose_card.gpa",
-                    )}: ${score.gpa}",
-                  ).expanded(flex: 3),
-                  Text(
-                    "${FlutterI18n.translate(
-                      context,
-                      "score.score_compose_card.score",
-                    )}: ${score.scoreStr}",
-                  ).expanded(flex: 3),
-                ].toRow(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                ),
-                const SizedBox(height: 8),
-                info,
-              ].toColumn(),
+        return ReXCard(
+          title: Text(score.name),
+          remaining: [ReXCardRemaining(score.semesterCode)],
+          bottomRow: [
+            [
+              Text(
+                "${FlutterI18n.translate(
+                  context,
+                  "score.score_compose_card.credit",
+                )}: ${score.credit}",
+              ).expanded(flex: 2),
+              Text(
+                "${FlutterI18n.translate(
+                  context,
+                  "score.score_compose_card.gpa",
+                )}: ${score.gpa}",
+              ).expanded(flex: 3),
+              Text(
+                "${FlutterI18n.translate(
+                  context,
+                  "score.score_compose_card.score",
+                )}: ${score.scoreStr}",
+              ).expanded(flex: 3),
+            ].toRow(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),
-          ],
+            const SizedBox(height: 8),
+            info,
+          ].toColumn(crossAxisAlignment: CrossAxisAlignment.center),
         );
       },
     );

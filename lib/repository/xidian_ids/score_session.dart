@@ -105,8 +105,8 @@ class ScoreSession extends EhallSession {
 
       return [
         ComposeDetail(
-          content: "获取详情失败",
-          ratio: "",
+          content: "",
+          ratio: "获取详情失败",
           score: "",
         )
       ];

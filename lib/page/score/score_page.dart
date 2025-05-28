@@ -32,30 +32,13 @@ class _ScorePageState extends State<ScorePage> {
         ),
       );
 
-  void pushSumDialog(BuildContext context) => context.pushDialog(
+  void pushSumDialog(BuildContext context, String text) => context.pushDialog(
         AlertDialog(
           title: Text(FlutterI18n.translate(
             context,
             "score.score_choice.sum_dialog_title",
           )),
-          content: Consumer<ScoreState>(
-            builder: (context, state, _) => Text(
-              FlutterI18n.translate(
-                context,
-                "score.score_choice.sum_dialog_content",
-                translationParams: {
-                  "gpa_all":
-                      state.evalAvg(true, isGPA: true).toStringAsFixed(3),
-                  "avg_all": state.evalAvg(true).toStringAsFixed(2),
-                  "credit_all": state.evalCredit(true).toStringAsFixed(2),
-                  "unpassed": state.unPassed.isEmpty
-                      ? FlutterI18n.translate(context, "score.all_passed")
-                      : state.unPassed,
-                  "not_core_credit": state.notCoreClass.toString(),
-                },
-              ),
-            ),
-          ),
+          content: Text(text),
         ),
       );
 
@@ -69,34 +52,28 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> scoreList = List<Widget>.generate(
-      context.read<ScoreState>().toShow.length,
-      (index) => ScoreInfoCard(
-        mark: context.read<ScoreState>().toShow[index].mark,
-      ),
-    );
-
     return Scaffold(
       body: Column(
         children: [
-          Consumer<ScoreState>(
-            builder: (context, state, _) => Wrap(
-              alignment: WrapAlignment.start,
-              children: [
-                TextField(
-                  style: const TextStyle(fontSize: 14),
-                  controller: text,
-                  autofocus: false,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: FlutterI18n.translate(
-                      context,
-                      "score.score_page.search_hint",
-                    ),
+          Wrap(
+            alignment: WrapAlignment.start,
+            children: [
+              TextField(
+                style: const TextStyle(fontSize: 14),
+                controller: text,
+                autofocus: false,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: FlutterI18n.translate(
+                    context,
+                    "score.score_page.search_hint",
                   ),
-                  onChanged: (String text) => state.search = text,
-                ).padding(bottom: 8),
-                FilledButton(
+                ),
+                onSubmitted: (String text) =>
+                    context.read<ScoreState>().search = text,
+              ).padding(bottom: 8),
+              Consumer<ScoreState>(
+                builder: (context, state, _) => FilledButton(
                   onPressed: () async {
                     await showDialog<int>(
                       context: context,
@@ -121,8 +98,10 @@ class _ScorePageState extends State<ScorePage> {
                               )
                             : state.chosenSemester,
                       })),
-                ).padding(right: 8),
-                FilledButton(
+                ),
+              ).padding(right: 8),
+              Consumer<ScoreState>(
+                builder: (context, state, _) => FilledButton(
                   onPressed: () async {
                     await showDialog<int>(
                       context: context,
@@ -148,8 +127,8 @@ class _ScorePageState extends State<ScorePage> {
                             : state.chosenStatus,
                       })),
                 ),
-              ],
-            ),
+              ),
+            ],
           )
               .padding(horizontal: 14, top: 8, bottom: 6)
               .constrained(maxWidth: 480),
@@ -160,12 +139,14 @@ class _ScorePageState extends State<ScorePage> {
                   shrinkWrap: true,
                   itemCount: state.toShow.length,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: 10,
                   ),
                   crossAxisCount: constraints.maxWidth ~/ cardWidth,
                   mainAxisSpacing: 4,
                   crossAxisSpacing: 4,
-                  itemBuilder: (context, index) => scoreList[index],
+                  itemBuilder: (context, index) => ScoreInfoCard(
+                    mark: state.toShow[index].mark,
+                  ),
                 ),
               );
             } else {
@@ -228,7 +209,26 @@ class _ScorePageState extends State<ScorePage> {
                   children: [
                     Text(state.bottomInfo(context)),
                     IconButton(
-                      onPressed: () => pushSumDialog(context),
+                      onPressed: () => pushSumDialog(
+                        context,
+                        FlutterI18n.translate(
+                          context,
+                          "score.score_choice.sum_dialog_content",
+                          translationParams: {
+                            "gpa_all": state
+                                .evalAvg(true, isGPA: true)
+                                .toStringAsFixed(3),
+                            "avg_all": state.evalAvg(true).toStringAsFixed(2),
+                            "credit_all":
+                                state.evalCredit(true).toStringAsFixed(2),
+                            "unpassed": state.unPassed.isEmpty
+                                ? FlutterI18n.translate(
+                                    context, "score.all_passed")
+                                : state.unPassed,
+                            "not_core_credit": state.notCoreClass.toString(),
+                          },
+                        ),
+                      ),
                       icon: const Icon(Icons.info),
                     )
                   ],

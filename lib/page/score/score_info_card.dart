@@ -4,7 +4,6 @@
 
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:provider/provider.dart';
-import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -64,19 +63,20 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
             c.setScoreChoiceFromIndex(widget.mark);
           }
         } else if (!getBool(Preference.role)) {
-          BothSideSheet.show(
+          showDialog(
             context: context,
-            title: FlutterI18n.translate(
-              context,
-              "score.score_info_card.title",
-            ),
-            child: ScoreComposeCard(
-              score: c.scoreData[widget.mark],
-              detail: ScoreSession().getDetail(
-                c.scoreData[widget.mark].classID,
-                c.scoreData[widget.mark].semesterCode,
-              ),
-            ),
+            builder: (context) {
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                child: ScoreComposeCard(
+                  score: c.scoreData[widget.mark],
+                  detail: ScoreSession().getDetail(
+                    c.scoreData[widget.mark].classID,
+                    c.scoreData[widget.mark].semesterCode,
+                  ),
+                ),
+              );
+            },
           );
         }
       },

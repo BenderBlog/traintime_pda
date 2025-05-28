@@ -2,10 +2,10 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/score/score_statics.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
@@ -39,12 +39,15 @@ class ScoreState extends ChangeNotifier {
   String _search = "";
 
   /// Init
-  ScoreState() {
-    refreshingState();
+  ScoreState(BuildContext context) {
+    refreshingState(context);
   }
 
   /// Refresh the score page's state.
-  Future<void> refreshingState({bool isForce = false}) async {
+  Future<void> refreshingState(
+    BuildContext context, {
+    bool isForce = false,
+  }) async {
     /// Set to fetching mode.
     state = ScoreFetchState.fetching;
     notifyListeners();
@@ -96,6 +99,17 @@ class ScoreState extends ChangeNotifier {
       error = e.toString();
     } finally {
       log.info("[ScorePageState] Finish fetching. state: $state");
+      if (context.mounted) {
+        if (ScoreSession.isScoreListCacheUsed) {
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "score.cache_message",
+            ),
+          );
+        }
+      }
       notifyListeners();
     }
   }
