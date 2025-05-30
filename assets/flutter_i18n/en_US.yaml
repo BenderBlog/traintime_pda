@@ -226,7 +226,7 @@ experiment:
 homepage:
    time_string:
       morning: "Good morning, fueled to go!"
-      before_noon: "Good morning, wish sunrise lies on you"
+      before_noon: "Good morning, may the light lies on you"
       at_noon: "Good noon, everything's fine?"
       afternoon: "Good afternoon, are you OK?"
       night: "Good evening, and sweet dreams"
@@ -236,8 +236,8 @@ homepage:
    load_error: "Something wrong"
    on_holiday: "Currently on holiday"
    on_weekday: "Currently week {current}"
-   loading_message: "Please wait, refreshing information"
-   postgraduate_notice: "Postgraduate features are under testing, it's unstable!"
+   loading_message: "Refreshing information..."
+   postgraduate_notice: "Postgraduate features activated!"
    # home.dart
    homepage: "Homepage"
    planet: "Blog Planet"

@@ -30,7 +30,7 @@ class ClassChangeList extends StatelessWidget {
       body: Builder(builder: (context) {
         if (classChanges.isEmpty) {
           return EmptyListView(
-            type: Type.reading,
+            type: EmptyListViewType.defaultimg,
             text: FlutterI18n.translate(
               context,
               "classtable.class_change_page.empty_message",

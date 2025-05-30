@@ -77,7 +77,7 @@ class _SportClassWindowState extends State<SportClassWindow>
                         initFormula: (toUse) => toUse,
                       )
                     : EmptyListView(
-                        type: Type.defaultimg,
+                        type: EmptyListViewType.singing,
                         text: FlutterI18n.translate(
                           context,
                           "sport.empty_class_info",

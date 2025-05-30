@@ -12,7 +12,7 @@ class EmptyClasstablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => EmptyListView(
-        type: Type.reading,
+        type: EmptyListViewType.defaultimg,
         text: FlutterI18n.translate(context, "classtable.empty_class_message",
             translationParams: {
               "semester_code": getString(Preference.currentSemester)

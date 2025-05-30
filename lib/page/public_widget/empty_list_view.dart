@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 
-enum Type {
+enum EmptyListViewType {
   reading,
+  singing,
   defaultimg,
 }
 
@@ -13,10 +14,12 @@ class EmptyListView extends StatelessWidget {
   final String text;
   final String assets;
 
-  static String _getAssets(Type type) {
+  static String _getAssets(EmptyListViewType type) {
     switch (type) {
-      case Type.reading:
+      case EmptyListViewType.reading:
         return "assets/art/pda_girl_reading.png";
+      case EmptyListViewType.singing:
+        return "assets/art/pda_girl_singing.png";
       default:
         return "assets/art/pda_girl_default.png";
     }
@@ -25,7 +28,7 @@ class EmptyListView extends StatelessWidget {
   EmptyListView({
     super.key,
     required this.text,
-    required Type type,
+    required EmptyListViewType type,
   }) : assets = _getAssets(type);
 
   @override

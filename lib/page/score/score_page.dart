@@ -151,7 +151,7 @@ class _ScorePageState extends State<ScorePage> {
               );
             } else {
               return EmptyListView(
-                type: Type.reading,
+                type: EmptyListViewType.reading,
                 text: FlutterI18n.translate(
                   context,
                   "score.score_page.no_record",

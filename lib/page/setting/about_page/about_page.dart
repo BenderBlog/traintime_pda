@@ -479,7 +479,9 @@ class _AboutPageState extends State<AboutPage> {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
-          Image.asset("assets/art/pda_girl_reading.png"),
+          Image.asset(Platform.isIOS || Platform.isMacOS
+              ? "assets/art/pda_girl_reading.png"
+              : "assets/art/pda_girl_singing.png"),
           SizedBox(height: 20),
           Text("The sun shall rose to the destination "
               "where all of us enjoys the happiness."),

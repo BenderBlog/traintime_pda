@@ -117,7 +117,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                     ).center();
                   } else if (snapshot.data!.isEmpty) {
                     return EmptyListView(
-                      type: Type.reading,
+                      type: EmptyListViewType.singing,
                       text: FlutterI18n.translate(
                         context,
                         "school_card_window.no_record",
