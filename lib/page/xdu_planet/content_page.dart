@@ -8,12 +8,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:intl/intl.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -101,7 +101,7 @@ class _ContentPageState extends State<ContentPage> {
                     ),
                     TextSpan(
                       text: "\n${widget.author} - "
-                          "${Jiffy.parseFromDateTime(widget.article.time).format(pattern: "yyyy-MM-dd HH:mm")}",
+                          "${DateFormat("yyyy-MM-dd HH:mm").format(widget.article.time)}",
                     ),
                   ]),
                 ),
@@ -138,9 +138,9 @@ class _ContentPageState extends State<ContentPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(Jiffy.parseFromDateTime(
-                              snapshot.data![index].CreatedAt,
-                            ).toLocal().format(pattern: 'yyyy-MM-dd HH:mm:ss')),
+                            Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(
+                              snapshot.data![index].CreatedAt.toLocal(),
+                            )),
                             if (snapshot.data![index].reply_to.isNotEmpty)
                               Builder(builder: (context) {
                                 // No need to think about orelse.

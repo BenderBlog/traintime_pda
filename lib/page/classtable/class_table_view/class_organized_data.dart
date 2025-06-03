@@ -90,8 +90,8 @@ class ClassOrgainzedData {
   ) =>
       ClassOrgainzedData._(
         data: [(subject)],
-        start: subject.startTime!.dateTime,
-        stop: subject.stopTime!.dateTime,
+        start: subject.startTime!,
+        stop: subject.stopTime!,
         color: color,
         name: "${subject.subject}${subject.type}",
         place: "${subject.place} "

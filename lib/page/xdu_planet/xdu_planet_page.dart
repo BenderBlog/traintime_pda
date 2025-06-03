@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -161,11 +162,11 @@ class ArticleCard extends StatelessWidget {
         children: [
           InformationWithIcon(
             icon: Icons.calendar_month,
-            text: article.articleTime.format(pattern: "yyyy-MM-dd"),
+            text: DateFormat("yyyy-MM-dd").format(article.articleTime),
           ).flexible(),
           InformationWithIcon(
             icon: Icons.access_time,
-            text: article.articleTime.format(pattern: "HH:mm:ss"),
+            text: DateFormat("HH:mm:ss").format(article.articleTime),
           ).flexible(),
         ],
       )

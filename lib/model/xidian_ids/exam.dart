@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'exam.g.dart';
@@ -27,32 +27,32 @@ class Subject {
   @override
   String toString() => "$subject $typeStr $type $time $place $seat\n";
 
-  Jiffy? get startTime {
+  DateTime? get startTime {
     RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
         timeRegExpPostGraduate.firstMatch(time);
     if (match == null) return null;
 
-    return Jiffy.parseFromDateTime(DateTime(
+    return DateTime(
       int.parse(match.namedGroup('year')!),
       int.parse(match.namedGroup('month')!),
       int.parse(match.namedGroup('day')!),
       int.parse(match.namedGroup('hour')!),
       int.parse(match.namedGroup('minute')!),
-    ));
+    );
   }
 
-  Jiffy? get stopTime {
+  DateTime? get stopTime {
     RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
         timeRegExpPostGraduate.firstMatch(time);
     if (match == null) return null;
 
-    return Jiffy.parseFromDateTime(DateTime(
+    return DateTime(
       int.parse(match.namedGroup('year')!),
       int.parse(match.namedGroup('month')!),
       int.parse(match.namedGroup('day')!),
       int.parse(match.namedGroup('stopHour')!),
       int.parse(match.namedGroup('stopMinute')!),
-    ));
+    );
   }
 
   String get type {
@@ -74,21 +74,23 @@ class Subject {
         timeRegExpPostGraduate.firstMatch(time);
     late String startTime, stopTime;
     if (match != null) {
-      startTime = Jiffy.parseFromDateTime(DateTime(
+      DateFormat formatter = DateFormat("yyyy-MM-dd HH:mm:ss");
+
+      startTime = formatter.format(DateTime(
         int.parse(match.namedGroup('year')!),
         int.parse(match.namedGroup('month')!),
         int.parse(match.namedGroup('day')!),
         int.parse(match.namedGroup('hour')!),
         int.parse(match.namedGroup('minute')!),
-      )).format(pattern: "yyyy-MM-dd HH:mm:ss");
+      ));
 
-      stopTime = Jiffy.parseFromDateTime(DateTime(
+      stopTime = formatter.format(DateTime(
         int.parse(match.namedGroup('year')!),
         int.parse(match.namedGroup('month')!),
         int.parse(match.namedGroup('day')!),
         int.parse(match.namedGroup('stopHour')!),
         int.parse(match.namedGroup('stopMinute')!),
-      )).format(pattern: "yyyy-MM-dd HH:mm:ss");
+      ));
     } else {
       startTime = stopTime = "cancel_exam";
     }

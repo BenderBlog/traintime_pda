@@ -4,13 +4,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:intl/intl.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
-import 'package:jiffy/jiffy.dart';
+
 import 'package:timelines_plus/timelines_plus.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -236,12 +237,11 @@ class _ClassTableCardItem extends StatelessWidget {
 
   String getTimeText() {
     String timeText = descriptor.timeLabelPrefix;
-
+    DateFormat formatter = DateFormat("HH:mm");
     if (!descriptor.isMultiArrangementsMode && descriptor.isNotEmpty) {
       HomeArrangement arr = descriptor.displayArrangements[0];
-      timeText += " "
-          "${Jiffy.parseFromDateTime(arr.startTime).format(pattern: "HH:mm")} - "
-          "${Jiffy.parseFromDateTime(arr.endTime).format(pattern: "HH:mm")}";
+      timeText +=
+          " ${formatter.format(arr.startTime)} - ${formatter.format(arr.endTime)}";
     }
     return timeText;
   }
@@ -290,7 +290,7 @@ class _ClassTableCardItem extends StatelessWidget {
   Iterable<Widget> getMultiArrangementsColumns(BuildContext context) {
     return descriptor.displayArrangements.map((arr) => [
           Text(
-            Jiffy.parseFromDateTime(arr.startTime).format(pattern: "HH:mm"),
+            DateFormat("HH:mm").format(arr.startTime),
             style: const TextStyle(
               height: 1.2,
               fontSize: 16,

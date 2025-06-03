@@ -6,13 +6,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
+import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -42,33 +43,22 @@ class ExperimentController extends GetxController {
 
   List<HomeArrangement> getExperimentOfDay(DateTime now) {
     List<ExperimentData> isFinished = List.from(data);
-
-    isFinished.removeWhere(
-      (element) => !Jiffy.parseFromDateTime(element.time.first).isSame(
-        Jiffy.parseFromDateTime(now),
-        unit: Unit.day,
-      ),
-    );
+    DateFormat formatter = DateFormat(HomeArrangement.format);
+    isFinished.removeWhere((element) => !element.time.first.isAtSameDayAs(now));
     return isFinished
         .map((e) => HomeArrangement(
               name: e.name,
               place: e.classroom,
               teacher: e.teacher,
-              startTimeStr: Jiffy.parseFromDateTime(e.time[0])
-                  .format(pattern: HomeArrangement.format),
-              endTimeStr: Jiffy.parseFromDateTime(e.time[1])
-                  .format(pattern: HomeArrangement.format),
+              startTimeStr: formatter.format(e.time[0]),
+              endTimeStr: formatter.format(e.time[1]),
             ))
         .toList();
   }
 
   List<ExperimentData> isFinished(DateTime now) {
     List<ExperimentData> isFinished = List.from(data);
-    isFinished.removeWhere(
-      (e) => Jiffy.parseFromDateTime(e.time[0]).isAfter(
-        Jiffy.parseFromDateTime(now),
-      ),
-    );
+    isFinished.removeWhere((e) => e.time[0].isAfter(now));
     return isFinished
       ..sort(
         (a, b) =>
@@ -79,9 +69,7 @@ class ExperimentController extends GetxController {
   List<ExperimentData> isNotFinished(DateTime now) {
     List<ExperimentData> isNotFinished = List.from(data);
     isNotFinished.removeWhere(
-      (e) => Jiffy.parseFromDateTime(e.time[0]).isSameOrBefore(
-        Jiffy.parseFromDateTime(now),
-      ),
+      (e) => e.time[0].isAtSameMicrosecondAs(now) || e.time[0].isBefore(now),
     );
     return isNotFinished
       ..sort(
@@ -93,10 +81,9 @@ class ExperimentController extends GetxController {
   List<ExperimentData> doing(DateTime now) {
     List<ExperimentData> isNotFinished = List.from(data);
     isNotFinished.removeWhere(
-      (element) => !Jiffy.parseFromDateTime(now).isBetween(
-        Jiffy.parseFromDateTime(element.time[0]),
-        Jiffy.parseFromDateTime(element.time[1]),
-      ),
+      (element) =>
+          now.microsecondsSinceEpoch < element.time[0].microsecondsSinceEpoch ||
+          now.microsecondsSinceEpoch > element.time[1].microsecondsSinceEpoch,
     );
     return isNotFinished
       ..sort(

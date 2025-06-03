@@ -6,11 +6,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
+import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
@@ -34,22 +35,21 @@ class ExamController extends GetxController {
 
   List<HomeArrangement> getExamOfDate(DateTime now) {
     List<Subject> isFinished = List.from(data.subject);
+    DateFormat formatter = DateFormat(HomeArrangement.format);
 
-    isFinished.removeWhere((element) => !(element.startTime?.isSame(
-          Jiffy.parseFromDateTime(now),
-          unit: Unit.day,
-        ) ??
-        false));
+    isFinished.removeWhere(
+        (element) => !(element.startTime?.isAtSameDayAs(now) ?? false));
     return isFinished
         .map((e) => HomeArrangement(
               name: "${e.subject}考试",
               place: e.place,
               seat: e.seat,
-              startTimeStr:
-                  e.startTime?.format(pattern: HomeArrangement.format) ??
-                      e.startTimeStr,
-              endTimeStr: e.stopTime?.format(pattern: HomeArrangement.format) ??
-                  e.endTimeStr,
+              startTimeStr: e.startTime != null
+                  ? formatter.format(e.startTime!)
+                  : e.startTimeStr,
+              endTimeStr: e.stopTime != null
+                  ? formatter.format(e.stopTime!)
+                  : e.endTimeStr,
             ))
         .toList();
   }
@@ -58,11 +58,7 @@ class ExamController extends GetxController {
     List<Subject> isFinished = List.from(data.subject);
     // Should remove all disqualified.
     isFinished.removeWhere(
-      (element) =>
-          element.startTime?.isAfter(
-            Jiffy.parseFromDateTime(now),
-          ) ??
-          true,
+      (element) => element.startTime?.isAfter(now) ?? true,
     );
     return isFinished;
   }
@@ -78,13 +74,13 @@ class ExamController extends GetxController {
   List<Subject> isNotFinished(DateTime now) {
     List<Subject> isNotFinished = List.from(data.subject);
     // Should remove all disqualified.
-    isNotFinished.removeWhere(
-      (element) =>
-          element.startTime?.isSameOrBefore(
-            Jiffy.parseFromDateTime(now),
-          ) ??
-          true,
-    );
+    isNotFinished.removeWhere((element) {
+      if (element.startTime == null) {
+        return true;
+      }
+      return element.startTime!.millisecondsSinceEpoch <=
+          now.millisecondsSinceEpoch;
+    });
     return isNotFinished
       ..sort(
         (a, b) =>

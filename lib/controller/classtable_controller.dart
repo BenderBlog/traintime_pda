@@ -6,10 +6,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:home_widget/home_widget.dart';
+import 'package:intl/intl.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -43,41 +43,39 @@ class ClassTableController extends GetxController {
 
   int getCurrentWeek(DateTime now) {
     // Get the current index.
-    int delta = Jiffy.parseFromDateTime(now)
-        .diff(Jiffy.parseFromDateTime(startDay), unit: Unit.day)
-        .toInt();
+    int delta = now.difference(startDay).inDays;
     if (delta < 0) delta = -7;
     return delta ~/ 7;
   }
 
-  /// Get all of [timeToQuery]'s arrangement in classtable
-  List<HomeArrangement> getArrangementOfDay(DateTime timeToQuery) {
-    Jiffy updateTime = Jiffy.parseFromDateTime(timeToQuery);
-    int currentWeek = getCurrentWeek(timeToQuery);
+  /// Get all of [updateTime]'s arrangement in classtable
+  List<HomeArrangement> getArrangementOfDay(DateTime updateTime) {
+    DateFormat formatter = DateFormat(HomeArrangement.format);
+    int currentWeek = getCurrentWeek(updateTime);
     Set<HomeArrangement> getArrangement = {};
     if (currentWeek >= 0 && currentWeek < classTableData.semesterLength) {
       for (var i in classTableData.timeArrangement) {
         if (i.weekList.length > currentWeek &&
             i.weekList[currentWeek] &&
-            i.day == updateTime.dateTime.weekday) {
+            i.day == updateTime.weekday) {
           getArrangement.add(HomeArrangement(
             name: getClassDetail(i).name,
             teacher: i.teacher,
             place: i.classroom,
-            startTimeStr: Jiffy.parseFromDateTime(DateTime(
+            startTimeStr: formatter.format(DateTime(
               updateTime.year,
               updateTime.month,
-              updateTime.date,
+              updateTime.day,
               int.parse(time[(i.start - 1) * 2].split(':')[0]),
               int.parse(time[(i.start - 1) * 2].split(':')[1]),
-            )).format(pattern: HomeArrangement.format),
-            endTimeStr: Jiffy.parseFromDateTime(DateTime(
+            )),
+            endTimeStr: formatter.format(DateTime(
               updateTime.year,
               updateTime.month,
-              updateTime.date,
+              updateTime.day,
               int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
               int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
-            )).format(pattern: HomeArrangement.format),
+            )),
           ));
         }
       }

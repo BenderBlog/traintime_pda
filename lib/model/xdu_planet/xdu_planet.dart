@@ -4,7 +4,6 @@
 
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:jiffy/jiffy.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'xdu_planet.g.dart';
@@ -31,7 +30,7 @@ class Article {
   Map<String, dynamic> toJson() => _$ArticleToJson(this);
 
   String get id => content.replaceAll("db/", "").replaceAll(".txt", "");
-  Jiffy get articleTime => Jiffy.parseFromDateTime(time).toLocal();
+  DateTime get articleTime => time.toLocal();
 }
 
 @JsonSerializable(explicitToJson: true)

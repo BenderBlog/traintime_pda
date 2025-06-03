@@ -4,7 +4,6 @@
 
 // Refresh formula for homepage.
 
-import 'package:jiffy/jiffy.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -179,9 +178,7 @@ void updateCurrentData() {
     toAdd.removeWhere((element) => !updateTime.isBefore(element.endTime));
   }
 
-  toAdd.sort((a, b) => Jiffy.parseFromDateTime(a.startTime)
-      .diff(Jiffy.parseFromDateTime(b.startTime))
-      .toInt());
+  toAdd.sort((a, b) => a.startTime.difference(b.startTime).inMicroseconds);
 
   arrangement.clear();
   arrangement.addAll(toAdd);
@@ -198,10 +195,10 @@ void updateCurrentData() {
       );
 
       /// Is current.
-      if (Jiffy.parseFromDateTime(updateTime).isBetween(
-        Jiffy.parseFromDateTime(arr.current.startTime),
-        Jiffy.parseFromDateTime(arr.current.endTime),
-      )) {
+      if (updateTime.microsecondsSinceEpoch >=
+              arr.current.startTime.microsecondsSinceEpoch &&
+          updateTime.microsecondsSinceEpoch <=
+              arr.current.endTime.microsecondsSinceEpoch) {
         break;
       }
 
@@ -215,15 +212,8 @@ void updateCurrentData() {
       }
 
       /// Will be occured next 30 minute.
-      if (List<int>.generate(
-        inAdvance,
-        (index) => index,
-      ).contains(
-        Jiffy.parseFromDateTime(arr.current.startTime).diff(
-          Jiffy.parseFromDateTime(updateTime),
-          unit: Unit.minute,
-        ),
-      )) {
+      if (List<int>.generate(inAdvance, (index) => index)
+          .contains(arr.current.startTime.difference(updateTime).inMinutes)) {
         break;
       }
     }

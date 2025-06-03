@@ -6,7 +6,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -41,6 +41,8 @@ class _EmptyClassroomSearchWindowState
   String semesterCode =
       preference.getString(preference.Preference.currentSemester);
 
+  DateFormat formatter = DateFormat("yyyy-MM-dd");
+
   List<EmptyClassroomData> get data {
     List<EmptyClassroomData> toReturn = [];
     for (var i in fetchedData) {
@@ -56,7 +58,7 @@ class _EmptyClassroomSearchWindowState
       int startYear = int.parse(semesterCode.substring(0, 4));
       fetchedData.addAll(await EmptyClassroomSession().searchData(
         buildingCode: chosen.code,
-        date: Jiffy.parseFromDateTime(time).format(pattern: "yyyy-MM-dd"),
+        date: formatter.format(time),
         semesterRange: "$startYear-${startYear + 1}",
         semesterPart: semesterCode[semesterCode.length - 1],
       ));
@@ -203,8 +205,7 @@ class _EmptyClassroomSearchWindowState
                   context,
                   "empty_classroom.date",
                   translationParams: {
-                    "date": Jiffy.parseFromDateTime(time)
-                        .format(pattern: "yyyy-MM-dd")
+                    "date": formatter.format(time),
                   },
                 )),
               ).padding(right: 8),

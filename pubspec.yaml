@@ -35,7 +35,8 @@ dependencies:
   flex_color_scheme: ^8.0.1
   # Others
   url_launcher: ^6.1.6
-  jiffy: ^6.3.2
+  #jiffy: ^6.3.2
+  time: ^2.1.5
   auto_size_text: ^3.0.0
   graphic: ^2.2.0
   restart_app: ^1.2.1

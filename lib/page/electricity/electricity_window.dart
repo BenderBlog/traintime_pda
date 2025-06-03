@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
@@ -69,10 +69,10 @@ class ElectricityWindow extends StatelessWidget {
                   context,
                   "electricity.cache_notice",
                 ),
-                value: Jiffy.parseFromDateTime(
-                  electricityInfo.value.fetchDay,
+                value: DateFormat(
+                  "yyyy-MM-dd HH:mm:ss",
                 ).format(
-                  pattern: "yyyy-MM-dd HH:mm:ss",
+                  electricityInfo.value.fetchDay,
                 ),
               ),
               InfoItem(
@@ -121,8 +121,9 @@ class ElectricityWindow extends StatelessWidget {
                 ],
                 rows: historyElectricityInfo.map((info) {
                   return DataRow(cells: [
-                    DataCell(Text(Jiffy.parseFromDateTime(info.fetchDay)
-                        .format(pattern: "yyyy-MM-dd HH:mm"))),
+                    DataCell(Text(
+                      DateFormat("yyyy-MM-dd HH:mm").format(info.fetchDay),
+                    )),
                     DataCell(Text(info.remain)),
                   ]);
                 }).toList(),

@@ -7,7 +7,8 @@
 
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
+import 'package:time/time.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -107,7 +108,7 @@ class ClassTableFile extends EhallSession {
     DateTime now = DateTime.now();
     var currentWeek = await dio.post(
       'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-      data: {'day': Jiffy.parseFromDateTime(now).format(pattern: "yyyyMMdd")},
+      data: {'day': DateFormat("yyyyMMdd").format(now)},
     ).then((value) => value.data);
     if (!currentWeek.toString().contains("xnxq")) {
       return ClassTableData(
@@ -122,10 +123,9 @@ class ClassTableFile extends EhallSession {
       "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
     );
     int weekDay = now.weekday - 1;
-    String termStartDay = Jiffy.parseFromDateTime(now)
-        .add(weeks: 1 - int.parse(currentWeek), days: -weekDay)
-        .startOf(Unit.day)
-        .format(pattern: "yyyy-MM-dd HH:mm:ss");
+    String termStartDay = DateFormat("yyyy-MM-dd HH:mm:ss").format(
+      now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
+    );
 
     if (preference.getString(preference.Preference.currentSemester) !=
         semesterCode) {

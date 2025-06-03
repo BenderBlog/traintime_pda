@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:intl/intl.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -78,7 +79,7 @@ class BorrowInfoCard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: toUse.loanDateTime.format(pattern: 'M/dd'),
+                text: DateFormat("M/dd").format(toUse.loanDateTime),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -120,7 +121,7 @@ class BorrowInfoCard extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: toUse.normReturnDateTime.format(pattern: 'M/dd'),
+              text: DateFormat("M/dd").format(toUse.normReturnDateTime),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

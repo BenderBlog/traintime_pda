@@ -5,7 +5,8 @@
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
+
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/electricity/electricity_window.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
@@ -143,10 +144,8 @@ class ElectricityCard extends StatelessWidget {
                   context,
                   "homepage.electricity_card.cache_notice",
                   translationParams: {
-                    "date": Jiffy.parseFromDateTime(
+                    "date": DateFormat("yyyy-MM-dd HH:mm").format(
                       electricityInfo.value.fetchDay,
-                    ).format(
-                      pattern: "yyyy-MM-dd HH:mm",
                     ),
                   },
                 ).replaceAll("\n", ""));

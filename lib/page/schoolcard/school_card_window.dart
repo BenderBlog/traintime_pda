@@ -7,8 +7,9 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:time/time.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -25,7 +26,8 @@ class SchoolCardWindow extends StatefulWidget {
 class _SchoolCardWindowState extends State<SchoolCardWindow> {
   List<DateTime?> timeRange = [];
   late Future<List<PaidRecord>> getPaid;
-  late Jiffy now;
+  late DateTime now;
+  DateFormat formatter = DateFormat("yyyy-MM-dd");
 
   String moneySunUp(List<PaidRecord> theRecord) {
     double sumUp = 0;
@@ -49,18 +51,18 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
 
   void refreshPaidStatus() => setState(() {
         getPaid = SchoolCardSession().getPaidStatus(
-          Jiffy.parseFromDateTime(timeRange[0]!).format(pattern: "yyyy-MM-dd"),
-          Jiffy.parseFromDateTime(timeRange[1]!).format(pattern: "yyyy-MM-dd"),
+          formatter.format(timeRange[0]!),
+          formatter.format(timeRange[1]!),
         );
       });
 
   @override
   void initState() {
     super.initState();
-    var now = Jiffy.now();
+    var now = DateTime.now();
     timeRange = [
-      now.startOf(Unit.month).dateTime,
-      now.dateTime,
+      now.firstDayOfMonth,
+      now,
     ];
     refreshPaidStatus();
   }
@@ -80,10 +82,8 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
               child: Text(FlutterI18n.translate(
                   context, "school_card_window.select_range",
                   translationParams: {
-                    "startDay": Jiffy.parseFromDateTime(timeRange[0]!)
-                        .format(pattern: "yyyy-MM-dd"),
-                    "endDay": Jiffy.parseFromDateTime(timeRange[1]!)
-                        .format(pattern: "yyyy-MM-dd"),
+                    "startDay": formatter.format(timeRange[0]!),
+                    "endDay": formatter.format(timeRange[1]!),
                   })),
               onPressed: () async {
                 await showCalendarDatePicker2Dialog(

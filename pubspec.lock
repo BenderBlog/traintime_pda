@@ -701,14 +701,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  jiffy:
-    dependency: "direct main"
-    description:
-      name: jiffy
-      sha256: "9bafbfe6d97587048bf449165e050029e716a12438f54a3d39e7e3a256decdac"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.4.3"
   js:
     dependency: transitive
     description:
@@ -1411,6 +1403,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.0"
+  time:
+    dependency: "direct main"
+    description:
+      name: time
+      sha256: "370572cf5d1e58adcb3e354c47515da3f7469dac3a95b447117e728e7be6f461"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.5"
   timelines_plus:
     dependency: "direct main"
     description:

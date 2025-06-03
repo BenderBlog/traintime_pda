@@ -6,7 +6,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -454,7 +455,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
                           );
                           if (context.mounted) {
                             String fileName = "classtable-"
-                                "${Jiffy.now().format(pattern: "yyyyMMddTHHmmss")}-"
+                                "${DateFormat("yyyyMMddTHHmmss").format(DateTime.now())}-"
                                 "${classTableState.semesterCode}";
                             String sweetheartName = "";
                             if (action == 'D') {

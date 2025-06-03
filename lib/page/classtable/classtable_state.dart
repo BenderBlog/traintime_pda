@@ -9,7 +9,7 @@ import 'dart:math' as math;
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -143,7 +143,7 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// The day the semester start, used to calculate the first day of the week.
   DateTime get startDay =>
-      Jiffy.parse(classTableController.classTableData.termStartDay).dateTime;
+      DateTime.parse(classTableController.classTableData.termStartDay);
 
   /// The currentWeek.
   final int currentWeek;
@@ -324,24 +324,23 @@ class ClassTableWidgetState with ChangeNotifier {
       // @benderblog: start dealing with
       for (var range in ranges) {
         // @hgh: initialize the first day(or, first recurrence) of the class
-        Jiffy firstDay = Jiffy.parseFromDateTime(startDay).add(
-          weeks: range.$1,
-          days: i.day - 1,
-        );
+        DateTime firstDay = startDay.add(Duration(
+          days: range.$1 * 7 + i.day - 1,
+        ));
 
-        Jiffy startTimeToUse = firstDay.add(
+        DateTime startTimeToUse = firstDay.add(Duration(
           hours: int.parse(startTime[0]),
           minutes: int.parse(startTime[1]),
-        );
-        Jiffy stopTimeToUse = firstDay.add(
+        ));
+        DateTime stopTimeToUse = firstDay.add(Duration(
           hours: int.parse(stopTime[0]),
           minutes: int.parse(stopTime[1]),
-        );
+        ));
 
         RecurrenceRule rrule = RecurrenceRule(
           RecurrenceFrequency.Weekly,
           daysOfWeek: [getDayOfWeek(i.day)],
-          endDate: firstDay.add(weeks: range.$2 - range.$1, days: 1).dateTime,
+          endDate: firstDay.add(Duration(days: (range.$2 - range.$1) * 7 + 1)),
         );
 
         events.add(Event(
@@ -350,11 +349,11 @@ class ClassTableWidgetState with ChangeNotifier {
           description: description,
           recurrenceRule: rrule,
           start: TZDateTime.from(
-            startTimeToUse.dateTime,
+            startTimeToUse,
             currentLocation,
           ),
           end: TZDateTime.from(
-            stopTimeToUse.dateTime,
+            stopTimeToUse,
             currentLocation,
           ),
           location: location,
@@ -374,11 +373,11 @@ class ClassTableWidgetState with ChangeNotifier {
         title: title,
         description: description,
         start: TZDateTime.from(
-          i.startTime!.dateTime,
+          i.startTime!,
           currentLocation,
         ),
         end: TZDateTime.from(
-          i.stopTime!.dateTime,
+          i.stopTime!,
           currentLocation,
         ),
         location: location,
@@ -423,15 +422,15 @@ END:VTIMEZONE
       String vevent = "BEGIN:VEVENT\n";
 
       vevent += "DTSTAMP:"
-          "${Jiffy.now().format(pattern: 'yyyyMMddTHHmmssZ')}\n";
+          "${DateFormat('yyyyMMddTHHmmssZ').format(DateTime.now())}\n";
       vevent += "SUMMARY:${i.title ?? "待定"}\n";
       vevent += "DESCRIPTION:${i.description ?? "待定"}\n";
 
       /// Minus 8 hours to match the "UTC time"
       vevent += "DTSTART;TZID=Asia/Shanghai:"
-          "${Jiffy.parseFromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch).format(pattern: 'yyyyMMddTHHmmss')}\n";
+          "${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch))}\n";
       vevent += "DTEND;TZID=Asia/Shanghai:"
-          "${Jiffy.parseFromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch).format(pattern: 'yyyyMMddTHHmmss')}\n";
+          "${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch))}\n";
       if (i.location != null) {
         vevent += "LOCATION:${i.location}\n";
       }
@@ -458,7 +457,7 @@ END:VTIMEZONE
 
         vevent +=
             "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=${getWeekStr(i.recurrenceRule!.daysOfWeek!.first)};"
-            "UNTIL=${Jiffy.parseFromDateTime(i.recurrenceRule!.endDate!).format(pattern: 'yyyyMMdd')}\n";
+            "UNTIL=${DateFormat('yyyyMMdd').format(i.recurrenceRule!.endDate!)}\n";
       }
       toReturn += "${vevent}END:VEVENT\n";
     }
@@ -488,7 +487,7 @@ END:VTIMEZONE
     (bool, String) calendarIdData = await DeviceCalendarPlugin()
         .createCalendar(
       "PDA Class Arrangement $semesterCode "
-      "created at ${Jiffy.now().millisecond}",
+      "created at ${DateTime.now().millisecondsSinceEpoch}",
     )
         .then((data) {
       if (!data.isSuccess) {
@@ -601,13 +600,11 @@ END:VTIMEZONE
     for (final i in subjects) {
       if (i.startTime == null ||
           i.stopTime == null ||
-          i.startTime!.isBefore(Jiffy.parseFromDateTime(startDay))) {
+          i.startTime!.isBefore(startDay)) {
         continue;
       }
 
-      int diff = i.startTime!
-          .diff(Jiffy.parseFromDateTime(startDay), unit: Unit.day)
-          .toInt();
+      int diff = i.startTime!.difference(startDay).inDays;
 
       if (diff ~/ 7 == weekIndex && diff % 7 + 1 == dayIndex) {
         events.add(ClassOrgainzedData.fromSubject(
@@ -618,9 +615,7 @@ END:VTIMEZONE
     }
 
     for (final i in experiments) {
-      int diff = Jiffy.parseFromDateTime(i.time[0])
-          .diff(Jiffy.parseFromDateTime(startDay), unit: Unit.day)
-          .toInt();
+      int diff = i.time[0].difference(startDay).inDays;
 
       if (diff ~/ 7 == weekIndex && diff % 7 + 1 == dayIndex) {
         events.add(ClassOrgainzedData.fromExperiment(
