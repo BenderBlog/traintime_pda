@@ -118,7 +118,8 @@ class IdsAccountNetInfo extends StatelessWidget {
               .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
               .constrained(maxWidth: 480)
               .padding(all: 12)
-              .scrollable();
+              .scrollable()
+              .center();
         } else if (schoolNetStatus.value == SessionState.fetching) {
           return const Center(child: CircularProgressIndicator());
         } else if (schoolNetStatus.value == SessionState.error &&

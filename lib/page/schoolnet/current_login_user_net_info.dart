@@ -152,7 +152,8 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
               .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
               .constrained(maxWidth: 480)
               .padding(all: 12)
-              .scrollable();
+              .scrollable()
+              .center();
         } else if (currentUserNetInfoStatus.value ==
             CurrentUserNetInfoState.fetching) {
           return const Center(

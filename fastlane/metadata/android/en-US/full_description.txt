@@ -1,21 +1,21 @@
-"Traintime PDA" is an open-source personal data assistant for XDU students.
+"Traintime PDA" is a Free and Open Source personal data assistant for XDU students.
 
 The XDYou app in the Apple App Store have the same codebase as this.
 
  - Both undergraduates and postgraduates are supported.
  - View classtable with exam arrangement and experiment arrangement, also set your idol as the background, or exchange the classtable with your sweetie.
  - View sport related data: sport class detail and test score. (Punch machine will be sorely missed)
- - Check your dorm's electricity balance and (maybe) pay your electricty fee. (Postgraduates shall enter the electricity account manually)
- - View your grade and easily calculate GPA and average score by choosing the subjects. (Postgraduates cannot count your GPA and average score, sry)
- - View the exam schedule by semester.
+ - Check your dorm's electricity balance, (maybe) pay your electricty fee and check your historical electricity usage. (Postgraduates shall enter the electricity account manually)
+ - View your grade, easily calculate GPA and average score by choosing the subjects.
+ - View the exam schedule.
  - View the due time of the borrowed books and query the details of the books in the library.
- - View the bill you spent in the cafeteria.
- - Empty classroom check. (Not avaliable for postgraduates)
- - Physics experiment schedule check and output to iCalendar.
+ - View the bill you spent in the cafeteria, use the payment code if your card have money.
+ - Empty classroom check.
+ - Physics experiment schedule check and output it to iCalendar.
  - Other tools such as call for repairing, school email, etc.
  - XDU Planet: Look around the blogs of your schoolmates.
- - Physics experiment check.
  - Schoolnet Query.
  - Homepage widget.
+ - i18n support with Traditional Chinese and English.
 
 If you got some idea about it, contact me freely.

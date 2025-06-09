@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -193,6 +195,20 @@ class _MainPageState extends State<MainPage> {
                 const HeaderLocator(),
                 <Widget>[
                   const NoticeCard(),
+                  if (Platform.isLinux)
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "homepage.linux_notice",
+                      ),
+                    )
+                        .center()
+                        .constrained(height: 30)
+                        .paddingDirectional(
+                          horizontal: 16,
+                          vertical: 14,
+                        )
+                        .withHomeCardStyle(context),
                   if (prefs.getBool(prefs.Preference.role))
                     Text(
                       FlutterI18n.translate(
