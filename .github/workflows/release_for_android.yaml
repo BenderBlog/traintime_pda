@@ -42,7 +42,6 @@ jobs:
       - name: Build APK
         run: |
           .flutter/bin/flutter build apk --split-per-abi
-          .flutter/bin/flutter build appbundle
 
       - name: Release
         uses: softprops/action-gh-release@v1
