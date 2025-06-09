@@ -364,13 +364,14 @@ class _ClassTablePageState extends State<ClassTablePage> {
                           "classtable.popup_menu.import_partner_file",
                         )),
                       ),
-                      PopupMenuItem<String>(
-                        value: 'G',
-                        child: Text(FlutterI18n.translate(
-                          context,
-                          "classtable.popup_menu.delete_partner_file",
-                        )),
-                      ),
+                      if (classTableState.havePartner)
+                        PopupMenuItem<String>(
+                          value: 'G',
+                          child: Text(FlutterI18n.translate(
+                            context,
+                            "classtable.popup_menu.delete_partner_file",
+                          )),
+                        ),
                     ],
                   ],
                   onSelected: (String action) async {
