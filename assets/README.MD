@@ -5,12 +5,13 @@
     - CP1919.svg.vec：基于 CP1919.svg 制作，公有领域
     - pda_classtable_empty.png：LichtYy
     - pda_empty_cover: ZCWzy
-    - pda_girl_default_ver1: Benderblog，PDA 娘（初始版本）
+    - pda_girl_<.*>_ver<.*>: Benderblog，PDA 娘（历史版本）
     - pda_girl_default: Benderblog，PDA 娘（目前版本，配合开发代号）
     - pda_girl_reading: Benderblog，PDA 娘在阅读
+    - pda_girl_singing: Benderblog, PDA 娘在唱歌
+    - Fxemoji_u1F4BE_Kazami_Yuka: https://github.com/mozilla/fxemoji 加上随便找的风见幽香 fumo
  - flutter_i18n：全部的翻译文件和转换脚本
  - random
-    - CP1919.svg：基于 PSR B1919+21 脉冲星数据生成，公有领域
     - Credit-1.jpg：早期版本感谢名单，最终产物没有使用
     - Credit-2.jpg：早期版本感谢名单，最终产物没有使用
     - Ray.jpg：贡献者 Ray（Elliot Edition）自画像，最终产物没有使用。版权所有，作者保留一切权利

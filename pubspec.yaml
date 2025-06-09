@@ -38,7 +38,6 @@ dependencies:
   #jiffy: ^6.3.2
   time: ^2.1.5
   auto_size_text: ^3.0.0
-  graphic: ^2.2.0
   restart_app: ^1.2.1
   calendar_date_picker2: ^2.0.0
   cached_network_image: ^3.2.3
@@ -51,10 +50,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   package_info_plus: ^8.0.0
-  flutter_svg: ^2.0.10+1
   flutter_staggered_grid_view: ^0.7.0
-  vector_graphics: ^1.1.11+1
-  vector_graphics_compiler: ^1.1.11+1
   styled_widget: ^0.4.1
   file_picker: ^10.1.9
   chinese_font_library: ^1.1.0
@@ -121,7 +117,7 @@ flutter:
     - assets/art/pda_girl_default.png
     - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.png
-    - assets/art/CP1919.svg.vec
+    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/flutter_i18n/en_US.yaml
