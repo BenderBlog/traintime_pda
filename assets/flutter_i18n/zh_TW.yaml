@@ -205,6 +205,7 @@ homepage:
   on_weekday: 當前為第 {current} 周
   loading_message: 請稍候，正在刷新信息
   postgraduate_notice: 研究生功能已經激活！
+  linux_notice: Linux 版本正在測試，歡迎反饋！
   homepage: 主頁
   planet: 博客星球
   setting: 設置

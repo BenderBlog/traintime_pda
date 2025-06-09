@@ -229,6 +229,7 @@ homepage:
     on_weekday: "当前为第 {current} 周"
     loading_message: "请稍候，正在刷新信息"
     postgraduate_notice: "研究生功能已经激活！"
+    linux_notice: "Linux 版本正在测试，欢迎反馈！"
     # home.dart
     homepage: "主页"
     planet: "博客星球"

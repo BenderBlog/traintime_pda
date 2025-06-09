@@ -1,0 +1,6 @@
+1. 安卓小部件重构 @BenderBlog
+2. 校园卡付款二维码 @xeondes
+3. 本地化侦测优化 @BenderBlog
+   和翻译优化 @Pairman @Nancuncloud @MrBrilliant2046
+4. 成绩页面重构 @BenderBlog
+5. 若干性能优化，SDK 更新

@@ -1,0 +1,6 @@
+1. Rewrite Android Applet with Jetpack Compose Glance @BenderBlog
+2. Payment QR Code @xeondes
+3. Language detect fix @BenderBlog
+   English translate fix @Pairman @Nancuncloud @MrBrilliant2046
+4. Reconstruct the score page @BenderBlog
+5. Serveral performance optimization and SDK upgrade

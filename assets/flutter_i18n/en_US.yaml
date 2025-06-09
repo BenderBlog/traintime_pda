@@ -238,6 +238,7 @@ homepage:
    on_weekday: "Currently week {current}"
    loading_message: "Refreshing information..."
    postgraduate_notice: "Postgraduate features activated!"
+   linux_notice: "Linux version is under testing, feel free to feedback!"
    # home.dart
    homepage: "Homepage"
    planet: "Blog Planet"
