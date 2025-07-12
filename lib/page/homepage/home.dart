@@ -99,9 +99,11 @@ class _HomePageMasterState extends State<HomePageMaster>
         SettingWindow(),
       ],
       onPageChanged: (int index) {
-        setState(() {
-          _selectedIndex = index;
-        });
+        if (_selectedIndex != index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
       },
     );
 
@@ -460,10 +462,12 @@ class _HomePageMasterState extends State<HomePageMaster>
         selectedIndex: _selectedIndex,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          _controller.jumpToPage(_selectedIndex);
+          if (_selectedIndex != index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+            _controller.jumpToPage(_selectedIndex);
+          }
         },
       ),
     );
