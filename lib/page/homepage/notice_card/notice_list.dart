@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
-import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
 class NoticeList extends StatelessWidget {

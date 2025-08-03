@@ -9,13 +9,16 @@ import 'dart:math' as math;
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/model/pda_service/club_info.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/model/message/message.dart';
+import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
 RxList<NoticeMessage> messages = <NoticeMessage>[].obs;
 Rx<UpdateMessage?> updateMessage = Rx<UpdateMessage?>(null);
+RxList<ClubInfo> clubList = <ClubInfo>[].obs;
+Rx<SessionState> clubState = SessionState.none.obs;
 
 Dio get dio => Dio()..interceptors.add(logDioAdapter);
 
@@ -23,6 +26,7 @@ const url = "https://legacy.superbart.top/traintime_pda_backend";
 
 final messageLock = Lock(reentrant: false);
 final updateLock = Lock(reentrant: false);
+final clubLock = Lock(reentrant: false);
 
 Future<void> checkMessage() => messageLock.synchronized(() async {
       var file = File("${supportPath.path}/Notice.json");
@@ -81,3 +85,23 @@ Future<bool?> checkUpdate() => updateLock.synchronized<bool?>(() async {
         return isNewAvaliable;
       });
     });
+
+Future<void> getClubList() => clubLock.synchronized(() async {
+      clubState.value = SessionState.fetching;
+      return dio.get("$url/club.json").then((data) {
+        clubList.clear();
+        try {
+          for (var i in data.data) {
+            clubList.add(ClubInfo.fromJson(i));
+          }
+          clubState.value = SessionState.fetched;
+        } catch (e, s) {
+          log.error("[getClubList] Error occured!", e, s);
+          clubState.value = SessionState.error;
+        }
+      });
+    });
+
+String getClubAvatar(String code) => "$url/poster/$code.jpg";
+
+String getClubImage(String code, int index) => "$url/poster/$code-$index.jpg";

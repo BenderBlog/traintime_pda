@@ -10,7 +10,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
-import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/page/homepage/notice_card/marquee_widget.dart';
 import 'package:watermeter/page/homepage/notice_card/notice_list.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';

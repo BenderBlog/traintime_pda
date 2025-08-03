@@ -10,6 +10,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/library_capacity_card.dart';
+import 'package:watermeter/page/homepage/toolbox/club_suggestion_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -65,6 +66,7 @@ class _MainPageState extends State<MainPage> {
       const SportCard(),
     ],
     const ToolboxCard(),
+    const ClubSuggestionCard(),
   ];
 
   String get _now {

@@ -6,7 +6,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:result_dart/result_dart.dart';
 import 'package:watermeter/model/library_capacity.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/pda_service_session.dart';
 
 Rx<Result<LibraryCapacity>> northStatus =
     LibraryCapacity(occupancy: 0, availableSeats: 0).toSuccess<Exception>().obs;

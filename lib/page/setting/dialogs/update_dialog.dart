@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:watermeter/model/message/message.dart';
+import 'package:watermeter/model/pda_service/message.dart';
 
 class UpdateDialog extends StatelessWidget {
   final UpdateMessage updateMessage;
