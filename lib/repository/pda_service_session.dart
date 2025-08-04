@@ -101,6 +101,11 @@ Future<void> getClubList() => clubLock.synchronized(() async {
         }
       });
     });
+Future<String> getClubArticle(String code) =>
+    clubLock.synchronized<String>(() => dio
+        .get("$url/club_introduction/$code/index.html")
+        .then((value) => (value.data as String).replaceAll(
+            "<img src=\"", "<img src=\"$url/club_introduction/$code/")));
 
 String getClubAvatar(String code) => "$url/poster/$code.jpg";
 

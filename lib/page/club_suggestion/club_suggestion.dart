@@ -6,6 +6,7 @@ import 'package:watermeter/model/pda_service/club_info.dart';
 import 'package:watermeter/page/club_suggestion/club_detail.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/pda_service_session.dart';
 
@@ -34,11 +35,6 @@ class ClubSuggestion extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final data = clubList[index];
                   return [
-                    const Icon(
-                      Icons.face_2,
-                      size: 48,
-                    ),
-                    /*
                     Image.network(
                       getClubAvatar(data.code),
                       errorBuilder: (
@@ -54,7 +50,7 @@ class ClubSuggestion extends StatelessWidget {
                       },
                       width: 64,
                       height: 64,
-                    ).clipOval(),*/
+                    ).clipOval(),
                     VerticalDivider(),
                     [
                       [
