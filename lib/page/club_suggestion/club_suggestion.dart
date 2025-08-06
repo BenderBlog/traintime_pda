@@ -35,8 +35,8 @@ class ClubSuggestion extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final data = clubList[index];
                   return [
-                    Image.network(
-                      getClubAvatar(data.code),
+                    Image(
+                      image: data.icon,
                       errorBuilder: (
                         BuildContext context,
                         Object e,
@@ -80,7 +80,8 @@ class ClubSuggestion extends StatelessWidget {
                               )
                                   .padding(all: 4)
                                   .backgroundColor(
-                                      Theme.of(context).colorScheme.primary)
+                                    Theme.of(context).colorScheme.primary,
+                                  )
                                   .clipRRect(all: 8)
                                   .padding(left: 4),
                             )

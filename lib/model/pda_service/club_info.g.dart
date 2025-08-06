@@ -12,8 +12,9 @@ ClubInfo _$ClubInfoFromJson(Map<String, dynamic> json) => ClubInfo(
       title: json['title'] as String,
       intro: json['intro'] as String,
       description: json['description'] as String,
-      qq: json['qq'].toString(),
+      qq: qqFromJson(json['qq']),
       pic: (json['pic'] as num).toInt(),
+      qqlink: json['qqlink'] as String,
     );
 
 Map<String, dynamic> _$ClubInfoToJson(ClubInfo instance) => <String, dynamic>{
@@ -23,5 +24,6 @@ Map<String, dynamic> _$ClubInfoToJson(ClubInfo instance) => <String, dynamic>{
       'intro': instance.intro,
       'description': instance.description,
       'qq': instance.qq,
+      'qqlink': instance.qqlink,
       'pic': instance.pic,
     };

@@ -10,6 +10,8 @@
     - pda_girl_reading: Benderblog，PDA 娘在阅读
     - pda_girl_singing: Benderblog, PDA 娘在唱歌
     - Fxemoji_u1F4BE_Kazami_Yuka: https://github.com/mozilla/fxemoji 加上随便找的风见幽香 fumo
+    - aboutRobots-icon.png：Firefox 彩蛋
+    - thinking-face.png：Google Noto Emoji 1f914，SIL Open Font License 1.1
  - flutter_i18n：全部的翻译文件和转换脚本
  - random
     - Credit-1.jpg：早期版本感谢名单，最终产物没有使用

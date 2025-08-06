@@ -1,6 +1,8 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
+import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:watermeter/repository/pda_service_session.dart';
 
 part 'club_info.g.dart';
 
@@ -14,6 +16,8 @@ enum ClubType {
   unknown, // 未知
 }
 
+String qqFromJson(data) => data.toString();
+
 @JsonSerializable(explicitToJson: true)
 class ClubInfo {
   final String code;
@@ -21,8 +25,12 @@ class ClubInfo {
   final String title;
   final String intro;
   final String description;
+  @JsonKey(name: "qq", fromJson: qqFromJson)
   final String qq;
+  final String qqlink;
   final int pic;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final ImageProvider icon;
 
   ClubInfo({
     required this.code,
@@ -32,7 +40,8 @@ class ClubInfo {
     required this.description,
     required this.qq,
     required this.pic,
-  });
+    required this.qqlink,
+  }) : icon = NetworkImage(getClubAvatar(code));
 
   List<ClubType> get typeList => type.split('|').map<ClubType>((value) {
         if (value == "tech") {
