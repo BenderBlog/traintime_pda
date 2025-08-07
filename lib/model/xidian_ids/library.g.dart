@@ -7,19 +7,19 @@ part of 'library.dart';
 // **************************************************************************
 
 BorrowData _$BorrowDataFromJson(Map<String, dynamic> json) => BorrowData(
-      title: json['title'] as String,
-      author: json['author'] as String,
-      publisher: json['publisher'] as String,
-      isbn: json['isbn'] as String,
-      recordId: (json['recordId'] as num).toInt(),
-      loanId: (json['loanId'] as num).toInt(),
-      itemId: (json['itemId'] as num).toInt(),
-      loanDate: json['loanDate'] as String,
-      renewDate: json['renewDate'] as String?,
-      normReturnDate: json['normReturnDate'] as String,
-      loanType: json['loanType'] as String,
-      barcode: json['barcode'] as String,
-    );
+  title: json['title'] as String,
+  author: json['author'] as String,
+  publisher: json['publisher'] as String,
+  isbn: json['isbn'] as String,
+  recordId: (json['recordId'] as num).toInt(),
+  loanId: (json['loanId'] as num).toInt(),
+  itemId: (json['itemId'] as num).toInt(),
+  loanDate: json['loanDate'] as String,
+  renewDate: json['renewDate'] as String?,
+  normReturnDate: json['normReturnDate'] as String,
+  loanType: json['loanType'] as String,
+  barcode: json['barcode'] as String,
+);
 
 Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
     <String, dynamic>{
@@ -38,70 +38,71 @@ Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
     };
 
 BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
-      author: json['author'] as String?,
-      subject: json['subject'] as String?,
-      isbn: json['isbn'] as String?,
-      description: json['description'] as String?,
-      bookName: json['bookName'] as String,
-      eitems: (json['eitems'] as List<dynamic>?)
-          ?.map((e) => EBookItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      barCode: json['barCode'] as String?,
-      bookLibCode: json['bookLibCode'] as String?,
-      docNumber: (json['docNumber'] as num).toInt(),
-      publishYear: json['publishYear'] as String?,
-      series: json['series'] as String?,
-      publisherHouse: json['publisherHouse'] as String?,
-      groupCode: json['groupCode'] as String?,
-      callNos:
-          (json['callNos'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      searchCode: (json['searchCode'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      barCodes: (json['barCodes'] as List<dynamic>?)
-          ?.map((e) => e as String?)
-          .toList(),
-      items: (json['items'] as List<dynamic>?)
-          ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+  author: json['author'] as String?,
+  subject: json['subject'] as String?,
+  isbn: json['isbn'] as String?,
+  description: json['description'] as String?,
+  bookName: json['bookName'] as String,
+  eitems: (json['eitems'] as List<dynamic>?)
+      ?.map((e) => EBookItem.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  barCode: json['barCode'] as String?,
+  bookLibCode: json['bookLibCode'] as String?,
+  docNumber: (json['docNumber'] as num).toInt(),
+  publishYear: json['publishYear'] as String?,
+  series: json['series'] as String?,
+  publisherHouse: json['publisherHouse'] as String?,
+  groupCode: json['groupCode'] as String?,
+  callNos: (json['callNos'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  searchCode: (json['searchCode'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  barCodes: (json['barCodes'] as List<dynamic>?)
+      ?.map((e) => e as String?)
+      .toList(),
+  items: (json['items'] as List<dynamic>?)
+      ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{
-      'author': instance.author,
-      'subject': instance.subject,
-      'isbn': instance.isbn,
-      'description': instance.description,
-      'bookName': instance.bookName,
-      'eitems': instance.eitems,
-      'barCode': instance.barCode,
-      'bookLibCode': instance.bookLibCode,
-      'docNumber': instance.docNumber,
-      'publishYear': instance.publishYear,
-      'series': instance.series,
-      'publisherHouse': instance.publisherHouse,
-      'groupCode': instance.groupCode,
-      'callNos': instance.callNos,
-      'barCodes': instance.barCodes,
-      'searchCode': instance.searchCode,
-      'items': instance.items,
-    };
+  'author': instance.author,
+  'subject': instance.subject,
+  'isbn': instance.isbn,
+  'description': instance.description,
+  'bookName': instance.bookName,
+  'eitems': instance.eitems,
+  'barCode': instance.barCode,
+  'bookLibCode': instance.bookLibCode,
+  'docNumber': instance.docNumber,
+  'publishYear': instance.publishYear,
+  'series': instance.series,
+  'publisherHouse': instance.publisherHouse,
+  'groupCode': instance.groupCode,
+  'callNos': instance.callNos,
+  'barCodes': instance.barCodes,
+  'searchCode': instance.searchCode,
+  'items': instance.items,
+};
 
 BookLocation _$BookLocationFromJson(Map<String, dynamic> json) => BookLocation(
-      yearVol: json['yearVol'] as String?,
-      locationName: json['locationName'] as String?,
-      searchCode: json['searchCode'] as String,
-      campus: json['campus'] as String?,
-      inDate: json['inDate'] as String?,
-      barCode: json['barCode'] as String?,
-      itemId: (json['itemId'] as num).toInt(),
-      circAttr: json['circAttr'] as String,
-      locationId: json['locationId'] as String?,
-      processType: json['processType'] as String,
-      curLocationId: json['curLocationId'] as String,
-      propNo: json['propNo'] as String?,
-      borrowStatus: json['borrowStatus'] as String?,
-      noBorrowMessages: json['noBorrowMessages'] as String?,
-    );
+  yearVol: json['yearVol'] as String?,
+  locationName: json['locationName'] as String?,
+  searchCode: json['searchCode'] as String,
+  campus: json['campus'] as String?,
+  inDate: json['inDate'] as String?,
+  barCode: json['barCode'] as String?,
+  itemId: (json['itemId'] as num).toInt(),
+  circAttr: json['circAttr'] as String,
+  locationId: json['locationId'] as String?,
+  processType: json['processType'] as String,
+  curLocationId: json['curLocationId'] as String,
+  propNo: json['propNo'] as String?,
+  borrowStatus: json['borrowStatus'] as String?,
+  noBorrowMessages: json['noBorrowMessages'] as String?,
+);
 
 Map<String, dynamic> _$BookLocationToJson(BookLocation instance) =>
     <String, dynamic>{
@@ -122,25 +123,25 @@ Map<String, dynamic> _$BookLocationToJson(BookLocation instance) =>
     };
 
 EBookItem _$EBookItemFromJson(Map<String, dynamic> json) => EBookItem(
-      itemId: (json['itemId'] as num).toInt(),
-      packageId: (json['packageId'] as num).toInt(),
-      elecResourceUrl: json['elecResourceUrl'] as String?,
-      packageName: json['packageName'] as String?,
-      type: (json['type'] as num).toInt(),
-      collectionId: (json['collectionId'] as num).toInt(),
-      dbVender: json['dbVender'] as String?,
-      url: json['url'] as String,
-      collectionName: json['collectionName'] as String,
-    );
+  itemId: (json['itemId'] as num).toInt(),
+  packageId: (json['packageId'] as num).toInt(),
+  elecResourceUrl: json['elecResourceUrl'] as String?,
+  packageName: json['packageName'] as String?,
+  type: (json['type'] as num).toInt(),
+  collectionId: (json['collectionId'] as num).toInt(),
+  dbVender: json['dbVender'] as String?,
+  url: json['url'] as String,
+  collectionName: json['collectionName'] as String,
+);
 
 Map<String, dynamic> _$EBookItemToJson(EBookItem instance) => <String, dynamic>{
-      'itemId': instance.itemId,
-      'packageId': instance.packageId,
-      'elecResourceUrl': instance.elecResourceUrl,
-      'packageName': instance.packageName,
-      'type': instance.type,
-      'collectionId': instance.collectionId,
-      'dbVender': instance.dbVender,
-      'url': instance.url,
-      'collectionName': instance.collectionName,
-    };
+  'itemId': instance.itemId,
+  'packageId': instance.packageId,
+  'elecResourceUrl': instance.elecResourceUrl,
+  'packageName': instance.packageName,
+  'type': instance.type,
+  'collectionId': instance.collectionId,
+  'dbVender': instance.dbVender,
+  'url': instance.url,
+  'collectionName': instance.collectionName,
+};

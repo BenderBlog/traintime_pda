@@ -7,28 +7,28 @@ part of 'classtable.dart';
 // **************************************************************************
 
 NotArrangementClassDetail _$NotArrangementClassDetailFromJson(
-        Map<String, dynamic> json) =>
-    NotArrangementClassDetail(
-      name: json['name'] as String,
-      code: json['code'] as String?,
-      number: json['number'] as String?,
-      teacher: json['teacher'] as String?,
-    );
+  Map<String, dynamic> json,
+) => NotArrangementClassDetail(
+  name: json['name'] as String,
+  code: json['code'] as String?,
+  number: json['number'] as String?,
+  teacher: json['teacher'] as String?,
+);
 
 Map<String, dynamic> _$NotArrangementClassDetailToJson(
-        NotArrangementClassDetail instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'code': instance.code,
-      'number': instance.number,
-      'teacher': instance.teacher,
-    };
+  NotArrangementClassDetail instance,
+) => <String, dynamic>{
+  'name': instance.name,
+  'code': instance.code,
+  'number': instance.number,
+  'teacher': instance.teacher,
+};
 
 ClassDetail _$ClassDetailFromJson(Map<String, dynamic> json) => ClassDetail(
-      name: json['name'] as String,
-      code: json['code'] as String?,
-      number: json['number'] as String?,
-    );
+  name: json['name'] as String,
+  code: json['code'] as String?,
+  number: json['number'] as String?,
+);
 
 Map<String, dynamic> _$ClassDetailToJson(ClassDetail instance) =>
     <String, dynamic>{
@@ -41,8 +41,9 @@ TimeArrangement _$TimeArrangementFromJson(Map<String, dynamic> json) =>
     TimeArrangement(
       source: $enumDecode(_$SourceEnumMap, json['source']),
       index: (json['index'] as num).toInt(),
-      weekList:
-          (json['week_list'] as List<dynamic>).map((e) => e as bool).toList(),
+      weekList: (json['week_list'] as List<dynamic>)
+          .map((e) => e as bool)
+          .toList(),
       classroom: json['classroom'] as String?,
       teacher: json['teacher'] as String?,
       day: (json['day'] as num).toInt(),
@@ -59,7 +60,7 @@ Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) =>
       'start': instance.start,
       'stop': instance.stop,
       'source': _$SourceEnumMap[instance.source]!,
-      if (instance.classroom case final value?) 'classroom': value,
+      'classroom': ?instance.classroom,
     };
 
 const _$SourceEnumMap = {
@@ -80,8 +81,10 @@ ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
           ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       notArranged: (json['notArranged'] as List<dynamic>?)
-          ?.map((e) =>
-              NotArrangementClassDetail.fromJson(e as Map<String, dynamic>))
+          ?.map(
+            (e) =>
+                NotArrangementClassDetail.fromJson(e as Map<String, dynamic>),
+          )
           .toList(),
       timeArrangement: (json['timeArrangement'] as List<dynamic>?)
           ?.map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
@@ -91,44 +94,45 @@ ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$ClassTableDataToJson(ClassTableData instance) =>
-    <String, dynamic>{
-      'semesterLength': instance.semesterLength,
-      'semesterCode': instance.semesterCode,
-      'termStartDay': instance.termStartDay,
-      'classDetail': instance.classDetail.map((e) => e.toJson()).toList(),
-      'userDefinedDetail':
-          instance.userDefinedDetail.map((e) => e.toJson()).toList(),
-      'notArranged': instance.notArranged.map((e) => e.toJson()).toList(),
-      'timeArrangement':
-          instance.timeArrangement.map((e) => e.toJson()).toList(),
-      'classChanges': instance.classChanges.map((e) => e.toJson()).toList(),
-    };
+Map<String, dynamic> _$ClassTableDataToJson(
+  ClassTableData instance,
+) => <String, dynamic>{
+  'semesterLength': instance.semesterLength,
+  'semesterCode': instance.semesterCode,
+  'termStartDay': instance.termStartDay,
+  'classDetail': instance.classDetail.map((e) => e.toJson()).toList(),
+  'userDefinedDetail': instance.userDefinedDetail
+      .map((e) => e.toJson())
+      .toList(),
+  'notArranged': instance.notArranged.map((e) => e.toJson()).toList(),
+  'timeArrangement': instance.timeArrangement.map((e) => e.toJson()).toList(),
+  'classChanges': instance.classChanges.map((e) => e.toJson()).toList(),
+};
 
 ClassChange _$ClassChangeFromJson(Map<String, dynamic> json) => ClassChange(
-      type: $enumDecode(_$ChangeTypeEnumMap, json['type']),
-      classCode: json['classCode'] as String,
-      classNumber: json['classNumber'] as String,
-      className: json['className'] as String,
-      originalAffectedWeeks: (json['originalAffectedWeeks'] as List<dynamic>?)
-          ?.map((e) => e as bool)
-          .toList(),
-      newAffectedWeeks: (json['newAffectedWeeks'] as List<dynamic>?)
-          ?.map((e) => e as bool)
-          .toList(),
-      originalTeacherData: json['originalTeacherData'] as String?,
-      newTeacherData: json['newTeacherData'] as String?,
-      originalClassRange: (json['originalClassRange'] as List<dynamic>)
-          .map((e) => (e as num).toInt())
-          .toList(),
-      newClassRange: (json['newClassRange'] as List<dynamic>)
-          .map((e) => (e as num).toInt())
-          .toList(),
-      originalWeek: (json['originalWeek'] as num?)?.toInt(),
-      newWeek: (json['newWeek'] as num?)?.toInt(),
-      originalClassroom: json['originalClassroom'] as String?,
-      newClassroom: json['newClassroom'] as String?,
-    );
+  type: $enumDecode(_$ChangeTypeEnumMap, json['type']),
+  classCode: json['classCode'] as String,
+  classNumber: json['classNumber'] as String,
+  className: json['className'] as String,
+  originalAffectedWeeks: (json['originalAffectedWeeks'] as List<dynamic>?)
+      ?.map((e) => e as bool)
+      .toList(),
+  newAffectedWeeks: (json['newAffectedWeeks'] as List<dynamic>?)
+      ?.map((e) => e as bool)
+      .toList(),
+  originalTeacherData: json['originalTeacherData'] as String?,
+  newTeacherData: json['newTeacherData'] as String?,
+  originalClassRange: (json['originalClassRange'] as List<dynamic>)
+      .map((e) => (e as num).toInt())
+      .toList(),
+  newClassRange: (json['newClassRange'] as List<dynamic>)
+      .map((e) => (e as num).toInt())
+      .toList(),
+  originalWeek: (json['originalWeek'] as num?)?.toInt(),
+  newWeek: (json['newWeek'] as num?)?.toInt(),
+  originalClassroom: json['originalClassroom'] as String?,
+  newClassroom: json['newClassroom'] as String?,
+);
 
 Map<String, dynamic> _$ClassChangeToJson(ClassChange instance) =>
     <String, dynamic>{
@@ -155,21 +159,21 @@ const _$ChangeTypeEnumMap = {
 };
 
 UserDefinedClassData _$UserDefinedClassDataFromJson(
-        Map<String, dynamic> json) =>
-    UserDefinedClassData(
-      userDefinedDetail: (json['userDefinedDetail'] as List<dynamic>)
-          .map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      timeArrangement: (json['timeArrangement'] as List<dynamic>)
-          .map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+  Map<String, dynamic> json,
+) => UserDefinedClassData(
+  userDefinedDetail: (json['userDefinedDetail'] as List<dynamic>)
+      .map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  timeArrangement: (json['timeArrangement'] as List<dynamic>)
+      .map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$UserDefinedClassDataToJson(
-        UserDefinedClassData instance) =>
-    <String, dynamic>{
-      'userDefinedDetail':
-          instance.userDefinedDetail.map((e) => e.toJson()).toList(),
-      'timeArrangement':
-          instance.timeArrangement.map((e) => e.toJson()).toList(),
-    };
+  UserDefinedClassData instance,
+) => <String, dynamic>{
+  'userDefinedDetail': instance.userDefinedDetail
+      .map((e) => e.toJson())
+      .toList(),
+  'timeArrangement': instance.timeArrangement.map((e) => e.toJson()).toList(),
+};
