@@ -22,19 +22,16 @@ class _ClubDetailState extends State<ClubDetail> {
   late ScrollController _scrollController;
   late Future<String> _content;
 
-  static const _expandedHeight = 300.0;
+  static const _expandedHeight = 280.0;
+  static const _maxWidth = 600.0;
 
-  bool _isShrunk = false;
+  double _opacity = 0.0;
 
   void _scrollListener() {
-    final shouldBeShrunk = _scrollController.hasClients &&
-        _scrollController.offset > (_expandedHeight - kToolbarHeight);
-
-    if (shouldBeShrunk != _isShrunk) {
-      setState(() {
-        _isShrunk = shouldBeShrunk;
-      });
-    }
+    _opacity = (_scrollController.offset / (_expandedHeight - kToolbarHeight));
+    if (_opacity < 0.0) _opacity = 0.0;
+    if (_opacity >= 1.0) _opacity = 1.0;
+    setState(() {});
   }
 
   @override
@@ -54,135 +51,164 @@ class _ClubDetailState extends State<ClubDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            expandedHeight: _expandedHeight,
-            centerTitle: false,
-            pinned: true,
-            title: Visibility(
-              visible: _isShrunk,
-              child: Text(widget.info.title),
-            ),
-            elevation: 0,
-            //leading: const BackButton(),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image(
-                    image: widget.info.icon,
-                    height: 100,
-                    width: 100,
-                  ).clipOval(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    widget.info.title,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    widget.info.intro,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    widget.info.typeList
-                        .map<String>((type) => switch (type) {
-                              ClubType.tech => "技术",
-                              ClubType.acg => "晒你系",
-                              ClubType.union => "官方",
-                              ClubType.profit => "商业",
-                              ClubType.sport => "体育",
-                              ClubType.art => "文化",
-                              ClubType.unknown => "未知",
-                            })
-                        .join("; "),
-                    //style: TextStyle(fontSize: 14),
-                  ),
-                ],
-              ).padding(top: kToolbarHeight),
-            ),
+    return Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.yellow,
+            brightness: Theme.of(context).brightness,
           ),
-          SliverToBoxAdapter(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height,
-              ),
-              child: Material(
-                elevation: 7,
-                child: [
-                  [
-                    TextButton(
-                      child: Text("QQ"),
-                      onPressed: () async {
+        ),
+        child: Scaffold(
+          body: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverAppBar(
+                expandedHeight: _expandedHeight,
+                centerTitle: false,
+                pinned: true,
+                title: Opacity(
+                  opacity: _opacity,
+                  child: Text(widget.info.title),
+                ),
+                elevation: 0,
+                //leading: const BackButton(),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image(
+                        image: widget.info.icon,
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.fill,
+                      ).clipOval(),
+                      const SizedBox(height: 16),
+                      Text(
+                        widget.info.title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(widget.info.intro),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: widget.info.typeList
+                            .map<Widget>((type) => TagsBoxes(
+                                    text: switch (type) {
+                                  ClubType.tech => "技术",
+                                  ClubType.acg => "晒你系",
+                                  ClubType.union => "官方",
+                                  ClubType.profit => "商业",
+                                  ClubType.sport => "体育",
+                                  ClubType.art => "文化",
+                                  ClubType.unknown => "未知",
+                                }))
+                            .toList(),
+                      )
+                    ],
+                  ).padding(top: kToolbarHeight, bottom: 46),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(46.0),
+                  child: [
+                    InkWell(
+                      onTap: () async {
                         await Clipboard.setData(
                             ClipboardData(text: widget.info.qq));
                         if (context.mounted) {
                           showToast(context: context, msg: "QQ 号已经复制到剪贴板");
                         }
                       },
-                    ),
-                    TextButton(
-                      child: Text("邀请链接"),
-                      onPressed: () async {
+                      child: Ink(
+                        height: 46.0,
+                        child: Text(
+                          "QQ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ).center(),
+                      ),
+                    ).expanded(),
+                    InkWell(
+                      onTap: () async {
                         if (widget.info.qqlink.isEmpty) {
                           showToast(context: context, msg: "未提供入群链接");
                         }
                         launchUrlString(widget.info.qqlink);
                       },
-                    )
-                  ].toRow(mainAxisAlignment: MainAxisAlignment.spaceAround),
-                  Divider(color: Colors.transparent),
-                  if (widget.info.pic > 0) ...[
-                    ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: widget.info.pic,
-                      itemBuilder: (context, index) => CachedNetworkImage(
-                        imageUrl: getClubImage(widget.info.code, index),
-                        height: 300,
-                      ).clipRRect(all: 12).padding(horizontal: 4),
-                    ).clipRRect(all: 12).constrained(height: 300),
-                    Divider(color: Colors.transparent),
-                  ],
-                  SelectionArea(
-                      child: FutureBuilder<String>(
-                    future: _content,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        try {
-                          return HtmlWidget(
-                            snapshot.data ?? '''<p>加载遇到问题</p>''',
-                          ).padding(horizontal: 4);
-                        } catch (e) {
-                          return ReloadWidget(
-                            function: () {
-                              setState(() {
-                                _content = getClubArticle(widget.info.code);
-                              });
-                            },
+                      child: Ink(
+                        height: 46.0,
+                        child: Text(
+                          "邀请链接",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ).center(),
+                      ),
+                    ).expanded()
+                  ]
+                      .toRow(mainAxisAlignment: MainAxisAlignment.spaceAround)
+                      .constrained(maxWidth: _maxWidth),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height,
+                  ),
+                  child: [
+                    if (widget.info.pic > 0) ...[
+                      ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: widget.info.pic,
+                        itemBuilder: (context, index) => CachedNetworkImage(
+                          imageUrl: getClubImage(widget.info.code, index),
+                          height: 300,
+                        ).clipRRect(all: 12).padding(horizontal: 4),
+                      )
+                          .clipRRect(all: 12)
+                          .constrained(height: 300, maxWidth: 600),
+                      Divider(color: Colors.transparent),
+                    ],
+                    SelectionArea(
+                        child: FutureBuilder<String>(
+                      future: _content,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          try {
+                            return HtmlWidget(
+                              snapshot.data ?? '''<p>加载遇到问题</p>''',
+                            ).padding(horizontal: 4);
+                          } catch (e) {
+                            return ReloadWidget(
+                              function: () {
+                                setState(() {
+                                  _content = getClubArticle(widget.info.code);
+                                });
+                              },
+                            );
+                          }
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
                         }
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  )),
-                ].toColumn(),
+                      },
+                    )).constrained(maxWidth: _maxWidth),
+                    Divider(color: Colors.transparent),
+                  ].toColumn().padding(horizontal: 8),
+                ),
               ),
-            ),
-          )
-        ],
-      ),
-    );
+            ],
+          ),
+        ));
   }
 }
