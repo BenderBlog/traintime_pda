@@ -15,6 +15,7 @@ enum ClubType {
   art, // 思政，美术社团
   game, // 游戏社团
   unknown, // 未知
+  all, // 所有
 }
 
 String qqFromJson(data) => data.toString();

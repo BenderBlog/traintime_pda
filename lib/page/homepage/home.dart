@@ -14,6 +14,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/page/club_suggestion/club_suggestion.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
@@ -54,9 +55,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BasedSplitView(
       navigatorKey: splitViewKey,
-      leftWidget: HomePageMaster(
-        key: leftKey,
-      ),
+      leftWidget: HomePageMaster(key: leftKey),
       rightPlaceholder: const SplitPagePlaceholder(),
     );
   }
@@ -95,6 +94,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       controller: _controller,
       children: const [
         MainPage(),
+        ClubSuggestion(),
         XDUPlanetPage(),
         SettingWindow(),
       ],
@@ -117,11 +117,12 @@ class _HomePageMasterState extends State<HomePageMaster>
         },
       );
       // Get the media sharing coming from outside the app while the app is closed.
-      ReceiveSharingIntent.instance.getInitialMedia().then(_onData).catchError(
-        (err, stacktrace) {
-          log.error("getIntentDataStream error.", err, stacktrace);
-        },
-      );
+      ReceiveSharingIntent.instance.getInitialMedia().then(_onData).catchError((
+        err,
+        stacktrace,
+      ) {
+        log.error("getIntentDataStream error.", err, stacktrace);
+      });
     }
   }
 
@@ -129,10 +130,7 @@ class _HomePageMasterState extends State<HomePageMaster>
     updateCurrentData(); // load cache data
     showToast(
       context: context,
-      msg: FlutterI18n.translate(
-        context,
-        "homepage.login_message",
-      ),
+      msg: FlutterI18n.translate(context, "homepage.login_message"),
     );
 
     try {
@@ -162,34 +160,34 @@ class _HomePageMasterState extends State<HomePageMaster>
             context: context,
             barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: Text(FlutterI18n.translate(
-                context,
-                "homepage.password_wrong_title",
-              )),
-              content: Text(FlutterI18n.translate(
-                context,
-                "homepage.password_wrong_content",
-              )),
+              title: Text(
+                FlutterI18n.translate(context, "homepage.password_wrong_title"),
+              ),
+              content: Text(
+                FlutterI18n.translate(
+                  context,
+                  "homepage.password_wrong_content",
+                ),
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     Restart.restartApp();
                   },
-                  child: Text(FlutterI18n.translate(
-                    context,
-                    "confirm",
-                  )),
+                  child: Text(FlutterI18n.translate(context, "confirm")),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     _showOfflineModeNotice();
                   },
-                  child: Text(FlutterI18n.translate(
-                    context,
-                    "homepage.password_wrong_denial",
-                  )),
+                  child: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "homepage.password_wrong_denial",
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -206,11 +204,8 @@ class _HomePageMasterState extends State<HomePageMaster>
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await showDialog(
           context: context,
-          builder: (context) => Obx(
-            () => UpdateDialog(
-              updateMessage: updateMessage.value!,
-            ),
-          ),
+          builder: (context) =>
+              Obx(() => UpdateDialog(updateMessage: updateMessage.value!)),
         );
       });
     }
@@ -234,8 +229,9 @@ class _HomePageMasterState extends State<HomePageMaster>
 
     final c = Get.find<ClassTableController>();
     if (c.state == ClassTableState.fetched) {
-      File file =
-          File("${supportPath.path}/${ClassTableFile.partnerClassName}");
+      File file = File(
+        "${supportPath.path}/${ClassTableFile.partnerClassName}",
+      );
 
       log.info(
         "Partner file exists: "
@@ -246,29 +242,22 @@ class _HomePageMasterState extends State<HomePageMaster>
         bool? confirm = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text(FlutterI18n.translate(
-              context,
-              "confirm_title",
-            )),
-            content: Text(FlutterI18n.translate(
-              context,
-              "homepage.input_partner_data.confirm_content",
-            )),
+            title: Text(FlutterI18n.translate(context, "confirm_title")),
+            content: Text(
+              FlutterI18n.translate(
+                context,
+                "homepage.input_partner_data.confirm_content",
+              ),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: Text(FlutterI18n.translate(
-                  context,
-                  "cancel",
-                )),
+                child: Text(FlutterI18n.translate(context, "cancel")),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: Text(FlutterI18n.translate(
-                  context,
-                  "confirm",
-                )),
-              )
+                child: Text(FlutterI18n.translate(context, "confirm")),
+              ),
             ],
           ),
         );
@@ -279,8 +268,9 @@ class _HomePageMasterState extends State<HomePageMaster>
       String source = "";
       try {
         if (Platform.isAndroid && value.first.path.startsWith("content://")) {
-          Content content =
-              await ContentResolver.resolveContent(value.first.path);
+          Content content = await ContentResolver.resolveContent(
+            value.first.path,
+          );
           source = utf8.decode(content.data.toList());
         } else {
           source = File.fromUri(Uri.parse(value.first.path)).readAsStringSync();
@@ -307,21 +297,29 @@ class _HomePageMasterState extends State<HomePageMaster>
             ClassTableController(),
           ).classTableData.semesterCode;
 
-          var yearNotEqual = semesterCode.substring(0, 4).compareTo(
-                  data["classtable"]["semesterCode"]
-                      .toString()
-                      .substring(0, 4)) !=
+          var yearNotEqual =
+              semesterCode
+                  .substring(0, 4)
+                  .compareTo(
+                    data["classtable"]["semesterCode"].toString().substring(
+                      0,
+                      4,
+                    ),
+                  ) !=
               0;
-          var lastNotEqual = semesterCode
+          var lastNotEqual =
+              semesterCode
                   .substring(semesterCode.length - 1)
                   .compareTo(
-                      data["classtable"]["semesterCode"].toString().substring(
-                            data["classtable"]["semesterCode"].length - 1,
-                          )) !=
+                    data["classtable"]["semesterCode"].toString().substring(
+                      data["classtable"]["semesterCode"].length - 1,
+                    ),
+                  ) !=
               0;
           if (yearNotEqual || lastNotEqual) {
             throw NotSameSemesterException(
-              msg: "Not the same semester. This semester: $semesterCode. "
+              msg:
+                  "Not the same semester. This semester: $semesterCode. "
                   "Input source: ${data["classtable"]["semesterCode"]}."
                   "This partner classtable is going to be deleted.",
             );
@@ -370,14 +368,12 @@ class _HomePageMasterState extends State<HomePageMaster>
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(FlutterI18n.translate(
-            context,
-            "homepage.offline_mode_title",
-          )),
-          content: Text(FlutterI18n.translate(
-            context,
-            "homepage.offline_mode_content",
-          )),
+          title: Text(
+            FlutterI18n.translate(context, "homepage.offline_mode_title"),
+          ),
+          content: Text(
+            FlutterI18n.translate(context, "homepage.offline_mode_content"),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -408,8 +404,9 @@ class _HomePageMasterState extends State<HomePageMaster>
           context: context,
           forceRetryLogin: true,
           sliderCaptcha: (String cookieStr) {
-            return SliderCaptchaClientProvider(cookie: cookieStr)
-                .solve(context);
+            return SliderCaptchaClientProvider(
+              cookie: cookieStr,
+            ).solve(context);
           },
         );
       }
@@ -435,12 +432,18 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 1,
+        name: "社团", //FlutterI18n.translate(context, "homepage.club"),
+        icon: Icons.star_outline,
+        iconChoice: Icons.star,
+      ),
+      PageInformation(
+        index: 2,
         name: FlutterI18n.translate(context, "homepage.planet"),
         icon: MingCuteIcons.mgc_planet_line,
         iconChoice: MingCuteIcons.mgc_planet_fill,
       ),
       PageInformation(
-        index: 2,
+        index: 3,
         name: FlutterI18n.translate(context, "homepage.setting"),
         icon: MingCuteIcons.mgc_user_2_line,
         iconChoice: MingCuteIcons.mgc_user_2_fill,
@@ -452,12 +455,14 @@ class _HomePageMasterState extends State<HomePageMaster>
       bottomNavigationBar: NavigationBar(
         height: 64,
         destinations: destinations
-            .map((e) => NavigationDestination(
-                  icon: _selectedIndex == e.index
-                      ? Icon(e.iconChoice)
-                      : Icon(e.icon),
-                  label: e.name,
-                ))
+            .map(
+              (e) => NavigationDestination(
+                icon: _selectedIndex == e.index
+                    ? Icon(e.iconChoice)
+                    : Icon(e.icon),
+                label: e.name,
+              ),
+            )
             .toList(),
         selectedIndex: _selectedIndex,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
