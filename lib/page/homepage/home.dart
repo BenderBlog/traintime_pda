@@ -393,6 +393,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       message.checkUpdate().then((value) {
         if (value ?? false) _showUpdateNotice();
       });
+      message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
         "Current loginstate: $loginState, if none will _loginAsync.",

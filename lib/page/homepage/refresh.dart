@@ -31,12 +31,7 @@ Rxn<HomeArrangement> current = Rxn<HomeArrangement>();
 RxList<HomeArrangement> arrangement = <HomeArrangement>[].obs;
 Rx<ArrangementState> arrangementState = ArrangementState.none.obs;
 
-enum ArrangementState {
-  fetching,
-  fetched,
-  error,
-  none,
-}
+enum ArrangementState { fetching, fetched, error, none }
 
 Future<void> _comboLogin({
   required Future<void> Function(String) sliderCaptcha,
@@ -49,7 +44,8 @@ Future<void> _comboLogin({
 
   try {
     await IDSSession().checkAndLogin(
-      target: "https://ehall.xidian.edu.cn/login?service="
+      target:
+          "https://ehall.xidian.edu.cn/login?service="
           "https://ehall.xidian.edu.cn/new/index.html",
       sliderCaptcha: sliderCaptcha,
     );
@@ -79,6 +75,7 @@ Future<void> update({
 }) async {
   // Update data
   message.checkMessage();
+  message.getClubList();
 
   // Retry Login
   if (forceRetryLogin || loginState == IDSLoginState.fail) {
@@ -103,7 +100,7 @@ Future<void> update({
       Future(() => school_card_session.SchoolCardSession().initSession()),
       Future(() => electricity.update()),
       Future(() => school_net.update()),
-      Future(() => library_capacity.update())
+      Future(() => library_capacity.update()),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(
         "[homepage Update]"
@@ -193,9 +190,7 @@ void updateCurrentData() {
   } else {
     Iterator<HomeArrangement> arr = arrangement.iterator;
     while (arr.moveNext()) {
-      log.info(
-        "[updateCurrentData] arr.current: ${arr.current.name}",
-      );
+      log.info("[updateCurrentData] arr.current: ${arr.current.name}");
 
       /// Is current.
       if (updateTime.microsecondsSinceEpoch >=
@@ -215,8 +210,10 @@ void updateCurrentData() {
       }
 
       /// Will be occured next 30 minute.
-      if (List<int>.generate(inAdvance, (index) => index)
-          .contains(arr.current.startTime.difference(updateTime).inMinutes)) {
+      if (List<int>.generate(
+        inAdvance,
+        (index) => index,
+      ).contains(arr.current.startTime.difference(updateTime).inMinutes)) {
         break;
       }
     }

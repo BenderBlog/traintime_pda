@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/library_capacity_card.dart';
+import 'package:watermeter/page/homepage/notice_card/club_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -190,6 +191,7 @@ class _MainPageState extends State<MainPage> {
                 const HeaderLocator(),
                 <Widget>[
                   const NoticeCard(),
+                  const ClubPromotionCard(),
                   const ClassTableCard(),
                   ...children,
                   GridView.extent(

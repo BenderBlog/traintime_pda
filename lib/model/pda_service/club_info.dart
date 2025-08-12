@@ -40,6 +40,20 @@ List<ClubType> toTypeList(type) =>
         return ClubType.unknown;
     }).toList();
 
+String getTypeName(ClubType type) {
+  return switch (type) {
+    ClubType.tech => "技术",
+    ClubType.acg => "晒你系",
+    ClubType.union => "官方",
+    ClubType.profit => "商业",
+    ClubType.sport => "体育",
+    ClubType.art => "文化",
+    ClubType.unknown => "未知",
+    ClubType.game => "游戏",
+    ClubType.all => "所有",
+  };
+}
+
 Color fromJsonToColor(color) {
   String value = color.toString();
   if (value == "red") {
