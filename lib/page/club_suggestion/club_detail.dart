@@ -143,6 +143,29 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
               centerTitle: false,
               pinned: true,
               title: Opacity(opacity: _opacity, child: Text(widget.info.title)),
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: widget.info.qq),
+                    );
+                    if (context.mounted) {
+                      showToast(context: context, msg: "QQ 号已经复制到剪贴板");
+                    }
+                  },
+                  icon: Icon(Icons.chat),
+                ),
+
+                IconButton(
+                  onPressed: () async {
+                    if (widget.info.qqlink.isEmpty) {
+                      showToast(context: context, msg: "未提供入群链接");
+                    }
+                    launchUrlString(widget.info.qqlink);
+                  },
+                  icon: Icon(Icons.link),
+                ),
+              ],
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Padding(
@@ -183,78 +206,10 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                               padding: EdgeInsetsGeometry.symmetric(
                                 horizontal: 2,
                               ),
-                              child: TagsBoxes(
-                                text: switch (type) {
-                                  ClubType.tech => "技术",
-                                  ClubType.acg => "晒你系",
-                                  ClubType.union => "官方",
-                                  ClubType.profit => "商业",
-                                  ClubType.sport => "体育",
-                                  ClubType.art => "文化",
-                                  ClubType.game => "游戏",
-                                  ClubType.unknown => "未知",
-                                  ClubType.all => "所有",
-                                },
-                              ),
+                              child: TagsBoxes(text: type.getTypeName()),
                             ),
                           ),
                         ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(46.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: _maxWidth),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            await Clipboard.setData(
-                              ClipboardData(text: widget.info.qq),
-                            );
-                            if (context.mounted) {
-                              showToast(context: context, msg: "QQ 号已经复制到剪贴板");
-                            }
-                          },
-                          child: Ink(
-                            height: 46.0,
-                            child: Center(
-                              child: Text(
-                                "QQ",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            if (widget.info.qqlink.isEmpty) {
-                              showToast(context: context, msg: "未提供入群链接");
-                            }
-                            launchUrlString(widget.info.qqlink);
-                          },
-                          child: Ink(
-                            height: 46.0,
-                            child: Center(
-                              child: Text(
-                                "邀请链接",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -264,9 +219,11 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
             SliverToBoxAdapter(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
+                  minHeight:
+                      MediaQuery.of(context).size.height - kToolbarHeight,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FutureBuilder<String>(
                       future: _content,

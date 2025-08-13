@@ -61,17 +61,7 @@ class ClubCard extends StatelessWidget {
                                       ).colorScheme.primary,
                                     ),
                                     child: Text(
-                                      switch (type) {
-                                        ClubType.tech => "技术",
-                                        ClubType.acg => "晒你系",
-                                        ClubType.union => "官方",
-                                        ClubType.profit => "商业",
-                                        ClubType.sport => "体育",
-                                        ClubType.art => "文化",
-                                        ClubType.unknown => "未知",
-                                        ClubType.game => "游戏",
-                                        ClubType.all => "所有",
-                                      },
+                                      type.getTypeName(),
                                       style: TextStyle(
                                         color: Theme.of(
                                           context,

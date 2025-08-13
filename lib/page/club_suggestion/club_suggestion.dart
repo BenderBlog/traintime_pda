@@ -35,17 +35,7 @@ class _ClubSuggestionState extends State<ClubSuggestion> {
         shownType = e;
       }),
       child: Text(
-        switch (e) {
-          ClubType.tech => "技术",
-          ClubType.acg => "晒你系",
-          ClubType.union => "官方",
-          ClubType.profit => "商业",
-          ClubType.sport => "体育",
-          ClubType.art => "文化",
-          ClubType.game => "游戏",
-          ClubType.unknown => "未知",
-          ClubType.all => "所有",
-        },
+        e.getTypeName(),
         style: TextStyle(
           color: shownType == e
               ? Theme.of(context).colorScheme.onPrimary
@@ -118,7 +108,7 @@ class _ClubSuggestionState extends State<ClubSuggestion> {
                   crossAxisSpacing: 4,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: () => context.push(
+                      onTap: () => context.pushReplacement(
                         ClubDetail(code: filteredClubList[index].code),
                       ),
                       child: ClubCard(data: filteredClubList[index]),

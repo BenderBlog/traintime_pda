@@ -25,10 +25,10 @@ class ClubPromotionCard extends StatelessWidget {
                 itemCount: clubList.length,
                 itemBuilder: (context, index) => Row(
                   children: [
-                    TagsBoxes(text: getTypeName(clubList[index].type.first)),
+                    TagsBoxes(text: clubList[index].type.first.getTypeName()),
                     const SizedBox(width: 8),
                     Text(
-                      clubList[index].title,
+                      "${clubList[index].title} - ${clubList[index].intro}",
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ).expanded(),
