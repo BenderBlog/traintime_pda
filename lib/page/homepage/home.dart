@@ -84,28 +84,11 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   late StreamSubscription _intentSub;
   late PageController _controller;
-  late PageView _pageView;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController();
-    _pageView = PageView(
-      controller: _controller,
-      children: const [
-        MainPage(),
-        ClubSuggestion(),
-        XDUPlanetPage(),
-        SettingWindow(),
-      ],
-      onPageChanged: (int index) {
-        if (_selectedIndex != index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        }
-      },
-    );
 
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid || Platform.isIOS) {
@@ -452,7 +435,29 @@ class _HomePageMasterState extends State<HomePageMaster>
     ];
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: _pageView,
+      body: PageView(
+        controller: _controller,
+        children: [
+          MainPage(
+            changePage: () {
+              setState(() {
+                _selectedIndex = 1;
+              });
+              _controller.jumpToPage(_selectedIndex);
+            },
+          ),
+          const ClubSuggestion(),
+          const XDUPlanetPage(),
+          const SettingWindow(),
+        ],
+        onPageChanged: (int index) {
+          if (_selectedIndex != index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
+        },
+      ),
       bottomNavigationBar: NavigationBar(
         height: 64,
         destinations: destinations

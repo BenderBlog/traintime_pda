@@ -31,7 +31,9 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final Function()? changePage;
+
+  const MainPage({super.key, this.changePage});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -191,7 +193,7 @@ class _MainPageState extends State<MainPage> {
                 const HeaderLocator(),
                 <Widget>[
                   const NoticeCard(),
-                  const ClubPromotionCard(),
+                  ClubPromotionCard(onTap: widget.changePage),
                   const ClassTableCard(),
                   ...children,
                   GridView.extent(
