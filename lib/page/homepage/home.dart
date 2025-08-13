@@ -416,7 +416,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 1,
-        name: "社团", //FlutterI18n.translate(context, "homepage.club"),
+        name: FlutterI18n.translate(context, "homepage.club"),
         icon: Icons.star_outline,
         iconChoice: Icons.star,
       ),

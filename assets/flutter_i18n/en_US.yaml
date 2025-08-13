@@ -172,6 +172,30 @@ classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
 
+
+# 社团介绍
+club_promotion:
+   type:
+       tech: "Tech"
+       acg: "ACG"
+       union: "Official"
+       profit: "Commercial"
+       sport: "Sport"
+       art: "Culture"
+       unknown: "Unknown"
+       game: "Game"
+       all: "All"
+   wrong_param: "Wrong Parameter"
+   no_group_info: "No Club info"
+   loading: "Loading"
+   error_outside: "Error detected at the outside"
+   error: "Error detected"
+   qq_copied: "QQ Group Number have been copied to the clipboard"
+   no_link: "No group invite link provided"
+   loading_problem: "Error on loading page"
+   picture_preview: "Picture"
+
+
 # 电量窗口
 electricity:
    title: "Power Info"
@@ -241,6 +265,7 @@ homepage:
    linux_notice: "Linux version is under testing, feel free to feedback!"
    # home.dart
    homepage: "Homepage"
+   club: "Club Recommendation"
    planet: "Blog Planet"
    setting: "Settings"
    input_partner_data:
@@ -324,6 +349,10 @@ homepage:
       failed: "Failed to get the school net usage info"
       fetching: "Fetching the school net usage info"
       remaining: "Remaining {remaining}"
+   club_promotion:
+      failed: "Failed to fetch club info"
+      fetching: "Fetching club info"
+
 # 图书馆
 library:
    title: "Library Information"
@@ -354,6 +383,15 @@ library:
    book_detail: "Book details"
    no_result: "No result"
    please_search: "Please search above"
+
+# 图书馆入馆状态信息卡
+library_card:
+    title: "Library status"
+    fetching: "Fetching"
+    northern_library: "Northern Library"
+    southern_library: "Southern Library"
+    people: "People: {people}"
+    seat: "Seats: {seat}"
 
 # 登录界面
 login:
@@ -746,17 +784,11 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-   There has to be an invisible sun
-   It gives its heat to everyone
-   There has to be an invisible sun
-   That gives us hope when the whole day's done
+   Enjoy your life, dude!
 
 easter_egg_others: |-
-   Ab yul ann I dyad awt
-   En yab na log a toc na awd
-   Taw may on omma dawn egg kyowl
-   Omma dawn egg kyowl
-
+   Enjoy your life, dude!
+   
 # Firefox about:robots.
 easter_egg_robot:
    # Futurama Bender: "Kill all human, except you(fry), meatbag!"

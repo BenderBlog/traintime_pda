@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -37,22 +38,39 @@ class _ClubDetailState extends State<ClubDetail> {
   Widget build(BuildContext context) {
     return widget.code.isEmpty
         ? Scaffold(
-            appBar: AppBar(title: Text("错误参数")),
-            body: Text("未传入社团信息"),
+            appBar: AppBar(
+              title: Text(
+                FlutterI18n.translate(context, "club_promotion.wrong_param"),
+              ),
+            ),
+            body: Text(
+              FlutterI18n.translate(context, "club_promotion.no_group_info"),
+            ).center(),
           )
         : FutureBuilder<ResultDart<ClubInfo, Exception>>(
             future: _future,
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return Scaffold(
-                  appBar: AppBar(title: Text("正在加载")),
+                  appBar: AppBar(
+                    title: Text(
+                      FlutterI18n.translate(context, "club_promotion.loading"),
+                    ),
+                  ),
                   body: CircularProgressIndicator().center(),
                 );
               }
 
               if (snapshot.hasError) {
                 return Scaffold(
-                  appBar: AppBar(title: Text("在外围遇到错误")),
+                  appBar: AppBar(
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "club_promotion.error_outside",
+                      ),
+                    ),
+                  ),
                   body: ReloadWidget(
                     function: () => setState(() {
                       _future = getClubInfo(widget.code);
@@ -65,7 +83,11 @@ class _ClubDetailState extends State<ClubDetail> {
               return snapshot.data!.fold(
                 (success) => ClubDetailPage(info: success),
                 (failure) => Scaffold(
-                  appBar: AppBar(title: Text("遇到错误")),
+                  appBar: AppBar(
+                    title: Text(
+                      FlutterI18n.translate(context, "club_promotion.error"),
+                    ),
+                  ),
                   body: ReloadWidget(
                     function: () => setState(() {
                       _future = getClubInfo(widget.code);
@@ -150,7 +172,13 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                       ClipboardData(text: widget.info.qq),
                     );
                     if (context.mounted) {
-                      showToast(context: context, msg: "QQ 号已经复制到剪贴板");
+                      showToast(
+                        context: context,
+                        msg: FlutterI18n.translate(
+                          context,
+                          "club_promotion.qq_copied",
+                        ),
+                      );
                     }
                   },
                   icon: Icon(Icons.chat),
@@ -159,7 +187,13 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                 IconButton(
                   onPressed: () async {
                     if (widget.info.qqlink.isEmpty) {
-                      showToast(context: context, msg: "未提供入群链接");
+                      showToast(
+                        context: context,
+                        msg: FlutterI18n.translate(
+                          context,
+                          "club_promotion.no_link",
+                        ),
+                      );
                     }
                     launchUrlString(widget.info.qqlink);
                   },
@@ -206,7 +240,12 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                               padding: EdgeInsetsGeometry.symmetric(
                                 horizontal: 2,
                               ),
-                              child: TagsBoxes(text: type.getTypeName()),
+                              child: TagsBoxes(
+                                text: FlutterI18n.translate(
+                                  context,
+                                  type.getTypeName(),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -223,7 +262,7 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                       MediaQuery.of(context).size.height - kToolbarHeight,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     FutureBuilder<String>(
                       future: _content,
@@ -298,7 +337,8 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                                   right: 8,
                                 ),
                                 child: HtmlWidget(
-                                  snapshot.data ?? '''<p>加载遇到问题</p>''',
+                                  snapshot.data ??
+                                      '''<p>${FlutterI18n.translate(context, "club_promotion.loading_problem")}</p>''',
                                 ),
                               ),
                             );

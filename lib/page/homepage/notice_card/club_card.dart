@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/pda_service/club_info.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -25,7 +26,12 @@ class ClubPromotionCard extends StatelessWidget {
                 itemCount: clubList.length,
                 itemBuilder: (context, index) => Row(
                   children: [
-                    TagsBoxes(text: clubList[index].type.first.getTypeName()),
+                    TagsBoxes(
+                      text: FlutterI18n.translate(
+                        context,
+                        clubList[index].type.first.getTypeName(),
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       "${clubList[index].title} - ${clubList[index].intro}",
@@ -37,9 +43,19 @@ class ClubPromotionCard extends StatelessWidget {
               );
 
             case SessionState.error:
-              return Text("社团信息获取失败").center();
+              return Text(
+                FlutterI18n.translate(
+                  context,
+                  "homepage.club_promotion.failed",
+                ),
+              ).center();
             default:
-              return Text("社团信息清单正在加载").center();
+              return Text(
+                FlutterI18n.translate(
+                  context,
+                  "homepage.club_promotion.fetching",
+                ),
+              ).center();
           }
         })
         .constrained(height: 30)

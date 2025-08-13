@@ -43,15 +43,15 @@ List<ClubType> toTypeList(type) =>
 extension Name on ClubType {
   String getTypeName() {
     return switch (this) {
-      ClubType.tech => "技术",
-      ClubType.acg => "晒你系",
-      ClubType.union => "官方",
-      ClubType.profit => "商业",
-      ClubType.sport => "体育",
-      ClubType.art => "文化",
-      ClubType.unknown => "未知",
-      ClubType.game => "游戏",
-      ClubType.all => "所有",
+      ClubType.tech => "club_promotion.type.tech",
+      ClubType.acg => "club_promotion.type.acg",
+      ClubType.union => "club_promotion.type.union",
+      ClubType.profit => "club_promotion.type.profit",
+      ClubType.sport => "club_promotion.type.sport",
+      ClubType.art => "club_promotion.type.art",
+      ClubType.unknown => "club_promotion.type.unknown",
+      ClubType.game => "club_promotion.type.game",
+      ClubType.all => "club_promotion.type.all",
     };
   }
 }
