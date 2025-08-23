@@ -352,7 +352,7 @@ library:
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取
-  nothern_library: 北校區狀況
+  northern_library: 北校區狀況
   southern_library: 南校區狀況
   people: 在館 {people} 人
   seat: 空位 {seat} 個
@@ -593,8 +593,10 @@ setting:
     hancl777: 國際化：繁體中文轉換代碼
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
+    ka-mate-ka-ora: 國際化：軟件英語翻譯優化
     lhx-666-cool: 支持：Windows 和 Linux 構建腳本
     lichtyy: 設計：配色，空白頁面貼圖
+    lqsy-y: 支持：推文宣傳圖片製作
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
     nancunchild: 開發：圖書館搜索功能 / 國際化：優化英語翻譯

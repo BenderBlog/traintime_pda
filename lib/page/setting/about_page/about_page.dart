@@ -110,6 +110,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://hhzm.win/",
     ),
     Developer(
+      "Ka-mate-ka-ora",
+      "https://avatars.githubusercontent.com/u/187651078",
+      FlutterI18n.translate(context, "setting.about_page.ka-mate-ka-ora"),
+      "https://github.com/Ka-mate-ka-ora/",
+    ),
+    Developer(
       "lhx-666-cool",
       "https://avatars.githubusercontent.com/u/63273792",
       FlutterI18n.translate(context, "setting.about_page.lhx-666-cool"),
@@ -120,6 +126,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://avatars.githubusercontent.com/u/105974550",
       FlutterI18n.translate(context, "setting.about_page.lichtyy"),
       "https://github.com/lichtYy",
+    ),
+    Developer(
+      "LQSY-H",
+      "https://avatars.githubusercontent.com/u/142521812",
+      FlutterI18n.translate(context, "setting.about_page.lqsy-h"),
+      "https://github.com/LQSY-H",
     ),
     Developer(
       "lsy223622 (木生睡不着)",
