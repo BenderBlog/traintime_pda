@@ -58,9 +58,7 @@ class ThemeController extends GetxController {
       }
     }
     log.info("[ThemeController] Locale to set $localization");
-    locale = Locale.fromSubtags(
-      languageCode: localization,
-    );
+    locale = Locale.fromSubtags(languageCode: localization);
 
     update();
   }

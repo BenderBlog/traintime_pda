@@ -95,7 +95,8 @@ class PersonalInfoSession extends EhallSession {
         "Get the semester information.",
       );
       String? location = await checkAndLogin(
-        target: "https://yjspt.xidian.edu.cn/gsapp/"
+        target:
+            "https://yjspt.xidian.edu.cn/gsapp/"
             "sys/wdkbapp/*default/index.do#/xskcb",
         sliderCaptcha: (String cookieStr) =>
             SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
@@ -112,10 +113,7 @@ class PersonalInfoSession extends EhallSession {
             "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/kfdxnxqcx.do",
           )
           .then((value) => value.data["datas"]["kfdxnxqcx"]["rows"][0]["WID"]);
-      preference.setString(
-        preference.Preference.currentSemester,
-        semesterCode,
-      );
+      preference.setString(preference.Preference.currentSemester, semesterCode);
     }
 
     return "02981891206";
@@ -136,15 +134,19 @@ class PersonalInfoSession extends EhallSession {
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
     );
-    log.info("[ehall_session][useApp] "
-        "Location is $location");
+    log.info(
+      "[ehall_session][useApp] "
+      "Location is $location",
+    );
     var response = await dio.get(
       location,
-      options: Options(headers: {
-        HttpHeaders.refererHeader:
-            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-        HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-      }),
+      options: Options(
+        headers: {
+          HttpHeaders.refererHeader:
+              "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+          HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+        },
+      ),
     );
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
@@ -154,20 +156,24 @@ class PersonalInfoSession extends EhallSession {
       );
       response = await dioEhall.get(
         location,
-        options: Options(headers: {
-          HttpHeaders.refererHeader:
-              "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-          HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-        }),
+        options: Options(
+          headers: {
+            HttpHeaders.refererHeader:
+                "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+            HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+          },
+        ),
       );
     }
     await dioEhall.post(
       "https://xgxt.xidian.edu.cn/xsfw/sys/swpubapp/indexmenu/getAppConfig.do?appId=4585275700341858&appName=jbxxapp",
-      options: Options(headers: {
-        HttpHeaders.refererHeader:
-            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
-        HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-      }),
+      options: Options(
+        headers: {
+          HttpHeaders.refererHeader:
+              "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
+          HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
+        },
+      ),
     );
 
     /// Get information here. resultCode==00000 is successful.
@@ -177,17 +183,19 @@ class PersonalInfoSession extends EhallSession {
     );
     var detailed = await dioEhall
         .post(
-            "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBaseInfo.do",
-            data: "requestParamStr="
-                "{\"XSBH\":\"${preference.getString(preference.Preference.idsAccount)}\"}",
-            options: Options(headers: {
+          "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/modules/infoStudent/getStuBaseInfo.do",
+          data:
+              "requestParamStr="
+              "{\"XSBH\":\"${preference.getString(preference.Preference.idsAccount)}\"}",
+          options: Options(
+            headers: {
               HttpHeaders.refererHeader:
                   "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do",
               HttpHeaders.hostHeader: "xgxt.xidian.edu.cn",
-            }))
-        .then(
-          (value) => value.data,
-        );
+            },
+          ),
+        )
+        .then((value) => value.data);
     log.info(
       "[ehall_session][getInformation] "
       "Storing the user information.",
@@ -229,10 +237,7 @@ class PersonalInfoSession extends EhallSession {
             "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
           )
           .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-      preference.setString(
-        preference.Preference.currentSemester,
-        semesterCode,
-      );
+      preference.setString(preference.Preference.currentSemester, semesterCode);
     }
 
     return detailed["data"]["SJH"] ?? "02981891206";

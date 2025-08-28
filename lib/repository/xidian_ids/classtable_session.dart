@@ -65,12 +65,14 @@ class ClassTableFile extends EhallSession {
 
     // Deal with the not arranged data.
     for (var i in qResult["notArranged"]) {
-      toReturn.notArranged.add(NotArrangementClassDetail(
-        name: i["KCM"],
-        code: i["KCH"],
-        number: i["KXH"],
-        teacher: i["SKJS"],
-      ));
+      toReturn.notArranged.add(
+        NotArrangementClassDetail(
+          name: i["KCM"],
+          code: i["KCH"],
+          number: i["KXH"],
+          teacher: i["SKJS"],
+        ),
+      );
     }
 
     return toReturn;
@@ -88,7 +90,8 @@ class ClassTableFile extends EhallSession {
 
     log.info("[getClasstable][getYjspt] Login the system.");
     String? location = await checkAndLogin(
-      target: "https://yjspt.xidian.edu.cn/gsapp/"
+      target:
+          "https://yjspt.xidian.edu.cn/gsapp/"
           "sys/wdkbapp/*default/index.do#/xskcb",
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
@@ -106,10 +109,12 @@ class ClassTableFile extends EhallSession {
         .then((value) => value.data["datas"]["kfdxnxqcx"]["rows"][0]["WID"]);
 
     DateTime now = DateTime.now();
-    var currentWeek = await dio.post(
-      'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-      data: {'day': DateFormat("yyyyMMdd").format(now)},
-    ).then((value) => value.data);
+    var currentWeek = await dio
+        .post(
+          'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
+          data: {'day': DateFormat("yyyyMMdd").format(now)},
+        )
+        .then((value) => value.data);
     if (!currentWeek.toString().contains("xnxq")) {
       return ClassTableData(
         semesterCode: semesterCode,
@@ -129,19 +134,16 @@ class ClassTableFile extends EhallSession {
 
     if (preference.getString(preference.Preference.currentSemester) !=
         semesterCode) {
-      preference.setString(
-        preference.Preference.currentSemester,
-        semesterCode,
-      );
+      preference.setString(preference.Preference.currentSemester, semesterCode);
 
       /// New semenster, user defined class is useless.
       var userClassFile = File("${supportPath.path}/$userDefinedClassName");
       if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
 
-    Map<String, dynamic> data = await dio.post(classInfoURL, data: {
-      "XNXQDM": semesterCode,
-    }).then((response) => response.data);
+    Map<String, dynamic> data = await dio
+        .post(classInfoURL, data: {"XNXQDM": semesterCode})
+        .then((response) => response.data);
 
     if (data['code'] != "0") {
       log.warning(
@@ -166,13 +168,15 @@ class ClassTableFile extends EhallSession {
 
     qResult["rows"] = data["datas"]["xspkjgcx"]["rows"];
 
-    var notOnTable = await dio.post(
-      notArrangedInfoURL,
-      data: {
-        'XNXQDM': semesterCode,
-        'XH': preference.getString(preference.Preference.idsAccount),
-      },
-    ).then((value) => value.data['datas']['xswsckbkc']);
+    var notOnTable = await dio
+        .post(
+          notArrangedInfoURL,
+          data: {
+            'XNXQDM': semesterCode,
+            'XH': preference.getString(preference.Preference.idsAccount),
+          },
+        )
+        .then((value) => value.data['datas']['xswsckbkc']);
     qResult["notArranged"] = notOnTable["rows"];
 
     ClassTableData toReturn = ClassTableData();
@@ -185,10 +189,7 @@ class ClassTableFile extends EhallSession {
     );
 
     for (var i in qResult["rows"]) {
-      var toDeal = ClassDetail(
-        name: i["KCMC"],
-        code: i["KCDM"],
-      );
+      var toDeal = ClassDetail(name: i["KCMC"], code: i["KCDM"]);
       if (!toReturn.classDetail.contains(toDeal)) {
         toReturn.classDetail.add(toDeal);
       }
@@ -220,9 +221,9 @@ class ClassTableFile extends EhallSession {
         "${i.weekList}-${i.day}-${i.classroom}".hashCode;
 
     for (var i = 0; i < toReturn.classDetail.length; ++i) {
-      List<TimeArrangement> data =
-          List<TimeArrangement>.from(toReturn.timeArrangement)
-            ..removeWhere((item) => item.index != i);
+      List<TimeArrangement> data = List<TimeArrangement>.from(
+        toReturn.timeArrangement,
+      )..removeWhere((item) => item.index != i);
       List<int> entries = [];
       //Map<int, List<TimeArrangement>> toAdd = {};
 
@@ -236,9 +237,8 @@ class ClassTableFile extends EhallSession {
           ..sort((a, b) => a.start - b.start);
 
         List<int> arrangementsProto = {
-          for (var i in result) ...[i.start, i.stop]
-        }.toList()
-          ..sort();
+          for (var i in result) ...[i.start, i.stop],
+        }.toList()..sort();
 
         log.info(arrangementsProto);
 
@@ -254,16 +254,18 @@ class ClassTableFile extends EhallSession {
         log.info(arrangements);
 
         for (var j in arrangements) {
-          newStuff.add(TimeArrangement(
-            source: Source.school,
-            index: i,
-            classroom: result.first.classroom,
-            teacher: result.first.teacher,
-            weekList: result.first.weekList,
-            day: result.first.day,
-            start: j.first,
-            stop: j.last,
-          ));
+          newStuff.add(
+            TimeArrangement(
+              source: Source.school,
+              index: i,
+              classroom: result.first.classroom,
+              teacher: result.first.teacher,
+              weekList: result.first.weekList,
+              day: result.first.day,
+              start: j.first,
+              stop: j.last,
+            ),
+          );
         }
       }
     }
@@ -271,10 +273,9 @@ class ClassTableFile extends EhallSession {
     toReturn.timeArrangement = newStuff;
 
     for (var i in qResult["notArranged"]) {
-      toReturn.notArranged.add(NotArrangementClassDetail(
-        name: i["KCMC"],
-        code: i["KCDM"],
-      ));
+      toReturn.notArranged.add(
+        NotArrangementClassDetail(name: i["KCMC"], code: i["KCDM"]),
+      );
     }
 
     return toReturn;
@@ -298,10 +299,7 @@ class ClassTableFile extends EhallSession {
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
     if (preference.getString(preference.Preference.currentSemester) !=
         semesterCode) {
-      preference.setString(
-        preference.Preference.currentSemester,
-        semesterCode,
-      );
+      preference.setString(preference.Preference.currentSemester, semesterCode);
 
       /// New semenster, user defined class is useless.
       var userClassFile = File("${supportPath.path}/$userDefinedClassName");
@@ -312,25 +310,29 @@ class ClassTableFile extends EhallSession {
       "[getClasstable][getEhall] "
       "Fetch the day the semester begin.",
     );
-    String termStartDay = await dioEhall.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
-      data: {
-        'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
-        'XQ': semesterCode.split('-')[2]
-      },
-    ).then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
+    String termStartDay = await dioEhall
+        .post(
+          'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
+          data: {
+            'XN': '${semesterCode.split('-')[0]}-${semesterCode.split('-')[1]}',
+            'XQ': semesterCode.split('-')[2],
+          },
+        )
+        .then((value) => value.data['datas']['cxjcs']['rows'][0]["XQKSRQ"]);
     log.info(
       "[getClasstable][getEhall] "
       "Will get $semesterCode which start at $termStartDay.",
     );
 
-    qResult = await dioEhall.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
-      data: {
-        'XNXQDM': semesterCode,
-        'XH': preference.getString(preference.Preference.idsAccount),
-      },
-    ).then((value) => value.data['datas']['xskcb']);
+    qResult = await dioEhall
+        .post(
+          'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
+          data: {
+            'XNXQDM': semesterCode,
+            'XH': preference.getString(preference.Preference.idsAccount),
+          },
+        )
+        .then((value) => value.data['datas']['xskcb']);
     if (qResult['extParams']['code'] != 1) {
       log.warning(
         "[getClasstable][getEhall] "
@@ -359,17 +361,17 @@ class ClassTableFile extends EhallSession {
     qResult["semesterCode"] = semesterCode;
     qResult["termStartDay"] = termStartDay;
 
-    var notOnTable = await dioEhall.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
-      data: {
-        'XNXQDM': semesterCode,
-        'XH': preference.getString(preference.Preference.idsAccount),
-      },
-    ).then((value) => value.data['datas']['cxxsllsywpk']);
+    var notOnTable = await dioEhall
+        .post(
+          "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
+          data: {
+            'XNXQDM': semesterCode,
+            'XH': preference.getString(preference.Preference.idsAccount),
+          },
+        )
+        .then((value) => value.data['datas']['cxxsllsywpk']);
 
-    log.info(
-      "[getClasstable][getEhall] $notOnTable",
-    );
+    log.info("[getClasstable][getEhall] $notOnTable");
     qResult["notArranged"] = notOnTable["rows"];
 
     ClassTableData preliminaryData = simplifyData(qResult);
@@ -380,18 +382,18 @@ class ClassTableFile extends EhallSession {
       "Deal with the class change...",
     );
 
-    qResult = await dioEhall.post(
-      'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xsdkkc.do',
-      data: {
-        'XNXQDM': semesterCode,
-        //'SKZC': "6",
-        '*order': "-SQSJ",
-      },
-    ).then((value) => value.data['datas']['xsdkkc']);
+    qResult = await dioEhall
+        .post(
+          'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xsdkkc.do',
+          data: {
+            'XNXQDM': semesterCode,
+            //'SKZC': "6",
+            '*order': "-SQSJ",
+          },
+        )
+        .then((value) => value.data['datas']['xsdkkc']);
     if (qResult['extParams']['code'] != 1) {
-      log.warning(
-        "[getClasstable][getEhall] ${qResult['extParams']['msg']}",
-      );
+      log.warning("[getClasstable][getEhall] ${qResult['extParams']['msg']}");
     }
 
     // ignore: non_constant_identifier_names
@@ -451,8 +453,9 @@ class ClassTableFile extends EhallSession {
     );
 
     List<ClassChange> cache = [];
-    List<ClassChange> toDeal =
-        List<ClassChange>.from(preliminaryData.classChanges);
+    List<ClassChange> toDeal = List<ClassChange>.from(
+      preliminaryData.classChanges,
+    );
 
     while (toDeal.isNotEmpty) {
       List<int> toBeRemovedIndex = [];
@@ -544,11 +547,15 @@ class ClassTableFile extends EhallSession {
                 "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
               );
               if (preliminaryData
-                  .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
-                preliminaryData.timeArrangement[indexOriginalTimeArrangement]
-                    .weekList[i] = false;
+                  .timeArrangement[indexOriginalTimeArrangement]
+                  .weekList[i]) {
+                preliminaryData
+                        .timeArrangement[indexOriginalTimeArrangement]
+                        .weekList[i] =
+                    false;
                 timeArrangementIndex = preliminaryData
-                    .timeArrangement[indexOriginalTimeArrangement].index;
+                    .timeArrangement[indexOriginalTimeArrangement]
+                    .index;
               }
             }
 
@@ -561,7 +568,8 @@ class ClassTableFile extends EhallSession {
           if (timeArrangementIndex == indexOriginalTimeArrangementList.first) {
             cache.add(e);
             timeArrangementIndex = preliminaryData
-                .timeArrangement[indexOriginalTimeArrangementList.first].index;
+                .timeArrangement[indexOriginalTimeArrangementList.first]
+                .index;
           }
 
           log.info(
@@ -586,7 +594,9 @@ class ClassTableFile extends EhallSession {
                 f.classCode == e.classCode &&
                 listEquals(f.originalClassRange, e.newClassRange) &&
                 listEquals(
-                    f.originalAffectedWeeksList, e.newAffectedWeeksList) &&
+                  f.originalAffectedWeeksList,
+                  e.newAffectedWeeksList,
+                ) &&
                 f.originalWeek == e.newWeek &&
                 f.originalClassroom == e.newClassroom &&
                 f.originalTeacherData == e.newTeacherData) {
@@ -643,9 +653,12 @@ class ClassTableFile extends EhallSession {
                 "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
               );
               if (preliminaryData
-                  .timeArrangement[indexOriginalTimeArrangement].weekList[i]) {
-                preliminaryData.timeArrangement[indexOriginalTimeArrangement]
-                    .weekList[i] = false;
+                  .timeArrangement[indexOriginalTimeArrangement]
+                  .weekList[i]) {
+                preliminaryData
+                        .timeArrangement[indexOriginalTimeArrangement]
+                        .weekList[i] =
+                    false;
               }
             }
             log.info(
@@ -659,7 +672,7 @@ class ClassTableFile extends EhallSession {
       }
       toDeal = [
         for (var i = 0; i < toDeal.length; ++i)
-          if (!toBeRemovedIndex.contains(i)) toDeal[i]
+          if (!toBeRemovedIndex.contains(i)) toDeal[i],
       ];
       log.info(
         "[getClasstable][getEhall] "

@@ -16,12 +16,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
-enum ClassTableState {
-  fetching,
-  fetched,
-  error,
-  none,
-}
+enum ClassTableState { fetching, fetched, error, none }
 
 class ClassTableController extends GetxController {
   // Classtable state
@@ -58,25 +53,31 @@ class ClassTableController extends GetxController {
         if (i.weekList.length > currentWeek &&
             i.weekList[currentWeek] &&
             i.day == updateTime.weekday) {
-          getArrangement.add(HomeArrangement(
-            name: getClassDetail(i).name,
-            teacher: i.teacher,
-            place: i.classroom,
-            startTimeStr: formatter.format(DateTime(
-              updateTime.year,
-              updateTime.month,
-              updateTime.day,
-              int.parse(time[(i.start - 1) * 2].split(':')[0]),
-              int.parse(time[(i.start - 1) * 2].split(':')[1]),
-            )),
-            endTimeStr: formatter.format(DateTime(
-              updateTime.year,
-              updateTime.month,
-              updateTime.day,
-              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
-              int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
-            )),
-          ));
+          getArrangement.add(
+            HomeArrangement(
+              name: getClassDetail(i).name,
+              teacher: i.teacher,
+              place: i.classroom,
+              startTimeStr: formatter.format(
+                DateTime(
+                  updateTime.year,
+                  updateTime.month,
+                  updateTime.day,
+                  int.parse(time[(i.start - 1) * 2].split(':')[0]),
+                  int.parse(time[(i.start - 1) * 2].split(':')[1]),
+                ),
+              ),
+              endTimeStr: formatter.format(
+                DateTime(
+                  updateTime.year,
+                  updateTime.month,
+                  updateTime.day,
+                  int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
+                  int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
+                ),
+              ),
+            ),
+          );
         }
       }
     }
@@ -100,9 +101,9 @@ class ClassTableController extends GetxController {
         "[ClassTableController][onInit] "
         "Init from cache.",
       );
-      classTableData = ClassTableData.fromJson(jsonDecode(
-        classTableFile.readAsStringSync(),
-      ));
+      classTableData = ClassTableData.fromJson(
+        jsonDecode(classTableFile.readAsStringSync()),
+      );
       state = ClassTableState.fetched;
     } else {
       log.info(
@@ -146,9 +147,9 @@ class ClassTableController extends GetxController {
     userDefinedClassData.userDefinedDetail.add(classDetail);
     timeArrangement.index = userDefinedClassData.userDefinedDetail.length - 1;
     userDefinedClassData.timeArrangement.add(timeArrangement);
-    userDefinedFile.writeAsStringSync(jsonEncode(
-      userDefinedClassData.toJson(),
-    ));
+    userDefinedFile.writeAsStringSync(
+      jsonEncode(userDefinedClassData.toJson()),
+    );
     await updateClassTable(isUserDefinedChanged: true);
   }
 
@@ -161,8 +162,9 @@ class ClassTableController extends GetxController {
         originalTimeArrangement.index != timeArrangement.index) {
       return;
     }
-    int timeArrangementIndex =
-        userDefinedClassData.timeArrangement.indexOf(originalTimeArrangement);
+    int timeArrangementIndex = userDefinedClassData.timeArrangement.indexOf(
+      originalTimeArrangement,
+    );
     userDefinedClassData.timeArrangement[timeArrangementIndex].weekList =
         timeArrangement.weekList;
     userDefinedClassData.timeArrangement[timeArrangementIndex].teacher =
@@ -185,15 +187,13 @@ class ClassTableController extends GetxController {
     userDefinedClassData.userDefinedDetail[classDetailIndex].number =
         classDetail.number;
 
-    userDefinedFile.writeAsStringSync(jsonEncode(
-      userDefinedClassData.toJson(),
-    ));
+    userDefinedFile.writeAsStringSync(
+      jsonEncode(userDefinedClassData.toJson()),
+    );
     await updateClassTable(isUserDefinedChanged: true);
   }
 
-  Future<void> deleteUserDefinedClass(
-    TimeArrangement timeArrangement,
-  ) async {
+  Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) async {
     if (timeArrangement.source != Source.user) return;
     int tempIndex = timeArrangement.index;
     userDefinedClassData.timeArrangement.remove(timeArrangement);
@@ -201,15 +201,16 @@ class ClassTableController extends GetxController {
     for (var i in userDefinedClassData.timeArrangement) {
       if (i.index >= tempIndex) i.index -= 1;
     }
-    userDefinedFile.writeAsStringSync(jsonEncode(
-      userDefinedClassData.toJson(),
-    ));
+    userDefinedFile.writeAsStringSync(
+      jsonEncode(userDefinedClassData.toJson()),
+    );
     await updateClassTable(isUserDefinedChanged: true);
   }
 
   /// The start day of the semester.
-  DateTime get startDay => DateTime.parse(classTableData.termStartDay)
-      .add(Duration(days: 7 * preference.getInt(preference.Preference.swift)));
+  DateTime get startDay => DateTime.parse(
+    classTableData.termStartDay,
+  ).add(Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
   Future<void> updateClassTable({
     bool isForce = false,
@@ -225,27 +226,35 @@ class ClassTableController extends GetxController {
 
       refreshUserDefinedClass();
       bool classTableFileIsExist = classTableFile.existsSync();
-      bool isNotNeedRefreshCache = classTableFileIsExist &&
+      bool isNotNeedRefreshCache =
+          classTableFileIsExist &&
           !isForce &&
           DateTime.now().difference(classTableFile.lastModifiedSync()).inDays <=
               2;
+      bool isEmptyCache = false;
+      if (classTableFileIsExist) {
+        classTableData = ClassTableData.fromJson(
+          jsonDecode(classTableFile.readAsStringSync()),
+        );
+        classTableData.userDefinedDetail =
+            userDefinedClassData.userDefinedDetail;
+        classTableData.timeArrangement.addAll(
+          userDefinedClassData.timeArrangement,
+        );
+        isEmptyCache =
+            classTableData.classDetail.isEmpty ||
+            classTableData.timeArrangement.isEmpty;
+      }
 
       log.info(
         "[ClassTableController][updateClassTable]"
         "Cache file exist: $classTableFileIsExist.\n"
         "Is not need refresh cache: $isNotNeedRefreshCache\n"
-        "Is user class changed: $isUserDefinedChanged",
+        "Is user class changed: $isUserDefinedChanged\n"
+        "Is cache empty: $isEmptyCache",
       );
 
-      if (isNotNeedRefreshCache || isUserDefinedChanged) {
-        classTableData = ClassTableData.fromJson(jsonDecode(
-          classTableFile.readAsStringSync(),
-        ));
-        classTableData.userDefinedDetail =
-            userDefinedClassData.userDefinedDetail;
-        classTableData.timeArrangement
-            .addAll(userDefinedClassData.timeArrangement);
-      } else {
+      if (isEmptyCache || (!isNotNeedRefreshCache && !isUserDefinedChanged)) {
         try {
           bool isPostGraduate = preference.getBool(preference.Preference.role);
           var toUse = isPostGraduate
@@ -258,13 +267,14 @@ class ClassTableController extends GetxController {
         } catch (e, s) {
           log.handle(e, s);
           if (classTableFileIsExist) {
-            classTableData = ClassTableData.fromJson(jsonDecode(
-              classTableFile.readAsStringSync(),
-            ));
+            classTableData = ClassTableData.fromJson(
+              jsonDecode(classTableFile.readAsStringSync()),
+            );
             classTableData.userDefinedDetail =
                 userDefinedClassData.userDefinedDetail;
-            classTableData.timeArrangement
-                .addAll(userDefinedClassData.timeArrangement);
+            classTableData.timeArrangement.addAll(
+              userDefinedClassData.timeArrangement,
+            );
           } else {
             rethrow;
           }
@@ -276,11 +286,13 @@ class ClassTableController extends GetxController {
       if (Platform.isIOS) {
         final api = SaveToGroupIdSwiftApi();
         try {
-          bool data = await api.saveToGroupId(FileToGroupID(
-            appid: preference.appId,
-            fileName: "ClassTable.json",
-            data: jsonEncode(classTableData.toJson()),
-          ));
+          bool data = await api.saveToGroupId(
+            FileToGroupID(
+              appid: preference.appId,
+              fileName: "ClassTable.json",
+              data: jsonEncode(classTableData.toJson()),
+            ),
+          );
           log.info(
             "[ClassTableController][updateClassTable] "
             "ios ClassTable.json save to public place status: $data.",
@@ -289,11 +301,13 @@ class ClassTableController extends GetxController {
           log.handle(e, s);
         }
         try {
-          bool data = await api.saveToGroupId(FileToGroupID(
-            appid: preference.appId,
-            fileName: "WeekSwift.txt",
-            data: preference.getInt(preference.Preference.swift).toString(),
-          ));
+          bool data = await api.saveToGroupId(
+            FileToGroupID(
+              appid: preference.appId,
+              fileName: "WeekSwift.txt",
+              data: preference.getInt(preference.Preference.swift).toString(),
+            ),
+          );
           log.info(
             "[ClassTableController][updateClassTable] "
             "ios WeekSwift.txt save to public place status: $data.",
@@ -303,7 +317,8 @@ class ClassTableController extends GetxController {
         }
         HomeWidget.updateWidget(
           iOSName: "ClasstableWidget",
-          qualifiedAndroidName: "io.github.benderblog.traintime_pda."
+          qualifiedAndroidName:
+              "io.github.benderblog.traintime_pda."
               "widget.classtable.ClassTableWidgetProvider",
         );
       }

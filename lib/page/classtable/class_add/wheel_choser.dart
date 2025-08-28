@@ -9,10 +9,7 @@ class WheelChooseOptions<T> {
   T data;
   String hint;
 
-  WheelChooseOptions({
-    required this.data,
-    required this.hint,
-  });
+  WheelChooseOptions({required this.data, required this.hint});
 }
 
 class WheelChoose<T> extends StatelessWidget {
@@ -51,9 +48,9 @@ class WheelChoose<T> extends StatelessWidget {
           pageSnapping: true,
           physics: const AlwaysScrollableScrollPhysics(),
           itemBuilder: (ctx, index) {
-            return Text(options[index].hint)
-                .textColor(Theme.of(context).colorScheme.primary)
-                .center();
+            return Text(
+              options[index].hint,
+            ).textColor(Theme.of(context).colorScheme.primary).center();
           },
           onPageChanged: (int index) {
             changeBookIdCallBack(options[index].data);

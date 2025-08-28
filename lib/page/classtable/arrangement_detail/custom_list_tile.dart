@@ -19,25 +19,17 @@ class CustomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: infoColor.shade900,
-          ),
+          Icon(icon, color: infoColor.shade900),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               str,
-              style: TextStyle(
-                color: infoColor.shade900,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: infoColor.shade900, fontSize: 16),
             ),
-          )
+          ),
         ],
       ),
     );

@@ -52,15 +52,9 @@ class SettingWindow extends StatefulWidget {
 
 class _SettingWindowState extends State<SettingWindow> {
   Widget _buildListSubtitle(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      )
-          .padding(
-            bottom: 8,
-          )
-          .center();
+    text,
+    style: const TextStyle(fontWeight: FontWeight.bold),
+  ).padding(bottom: 8).center();
 
   void restart() {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -70,14 +64,12 @@ class _SettingWindowState extends State<SettingWindow> {
         barrierDismissible: false,
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(FlutterI18n.translate(
-            context,
-            "setting.need_close_dialog.title",
-          )),
-          content: Text(FlutterI18n.translate(
-            context,
-            "setting.need_close_dialog.content",
-          )),
+          title: Text(
+            FlutterI18n.translate(context, "setting.need_close_dialog.title"),
+          ),
+          content: Text(
+            FlutterI18n.translate(context, "setting.need_close_dialog.content"),
+          ),
         ),
       );
     }
@@ -123,24 +115,27 @@ class _SettingWindowState extends State<SettingWindow> {
           ).padding(horizontal: 8.0),
           const SizedBox(height: 20),
           ReXCard(
-              title: _buildListSubtitle(FlutterI18n.translate(
-                context,
-                "setting.about",
-              )),
-              remaining: const [],
-              bottomRow: Column(children: [
+            title: _buildListSubtitle(
+              FlutterI18n.translate(context, "setting.about"),
+            ),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.about_this_program",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.about_this_program",
+                    ),
+                  ),
                   subtitle: Text(
                     FlutterI18n.translate(
                       context,
                       "setting.version",
                       translationParams: {
-                        "version": "${preference.packageInfo.version}+"
-                            "${preference.packageInfo.buildNumber}"
+                        "version":
+                            "${preference.packageInfo.version}+"
+                            "${preference.packageInfo.buildNumber}",
                       },
                     ),
                   ),
@@ -149,21 +144,18 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.check_update",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.check_update"),
+                  ),
                   subtitle: Obx(
                     () => Text(
                       FlutterI18n.translate(
                         context,
                         "setting.latest_version",
                         translationParams: {
-                          "latest": updateMessage.value?.code ??
-                              FlutterI18n.translate(
-                                context,
-                                "setting.waiting",
-                              ),
+                          "latest":
+                              updateMessage.value?.code ??
+                              FlutterI18n.translate(context, "setting.waiting"),
                         },
                       ),
                     ),
@@ -176,107 +168,124 @@ class _SettingWindowState extends State<SettingWindow> {
                         "setting.fetching_update",
                       ),
                     );
-                    checkUpdate().then((value) async {
-                      if (context.mounted) {
-                        if ((value ?? false) && updateMessage.value != null) {
-                          await showDialog(
-                            context: context,
-                            builder: (context) => Obx(
-                              () => UpdateDialog(
-                                updateMessage: updateMessage.value!,
+                    checkUpdate().then(
+                      (value) async {
+                        if (context.mounted) {
+                          if ((value ?? false) && updateMessage.value != null) {
+                            await showDialog(
+                              context: context,
+                              builder: (context) => Obx(
+                                () => UpdateDialog(
+                                  updateMessage: updateMessage.value!,
+                                ),
                               ),
-                            ),
-                          );
-                        } else {
+                            );
+                          } else {
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                value == null
+                                    ? "setting.current_testing"
+                                    : "setting.current_stable",
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      onError: (e, s) {
+                        if (context.mounted) {
                           showToast(
                             context: context,
                             msg: FlutterI18n.translate(
                               context,
-                              value == null
-                                  ? "setting.current_testing"
-                                  : "setting.current_stable",
+                              "setting.fetch_failed",
                             ),
                           );
                         }
-                      }
-                    }, onError: (e, s) {
-                      if (context.mounted) {
-                        showToast(
-                          context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "setting.fetch_failed",
-                          ),
-                        );
-                      }
-                    });
+                      },
+                    );
                   },
                   trailing: const Icon(Icons.navigate_next),
                 ),
-              ])),
+              ],
+            ),
+          ),
           ReXCard(
-              title: _buildListSubtitle(FlutterI18n.translate(
-                context,
-                "setting.ui_setting",
-              )),
-              remaining: const [],
-              bottomRow: Column(children: [
+            title: _buildListSubtitle(
+              FlutterI18n.translate(context, "setting.ui_setting"),
+            ),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
                 ListTile(
-                    title: Text(FlutterI18n.translate(
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.color_setting"),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
                       context,
-                      "setting.color_setting",
-                    )),
-                    subtitle: Text(FlutterI18n.translate(context,
-                        "setting.change_color_dialog.${ColorSeed.values[preference.getInt(preference.Preference.color)].label}")),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => const ChangeColorDialog(),
-                      );
-                    }),
+                      "setting.change_color_dialog.${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const ChangeColorDialog(),
+                    );
+                  },
+                ),
                 const Divider(),
                 ListTile(
-                    title: Text(FlutterI18n.translate(
+                  title: Text(
+                    FlutterI18n.translate(
                       context,
                       "setting.brightness_setting",
-                    )),
-                    subtitle: Text(demoBlueModeName[
-                        preference.getInt(preference.Preference.brightness)]),
-                    trailing: ToggleButtons(
-                      isSelected: List<bool>.generate(
-                        3,
-                        (index) =>
-                            index ==
-                            preference.getInt(preference.Preference.brightness),
-                      ),
-                      onPressed: (int value) {
-                        setState(() {
-                          preference
-                              .setInt(preference.Preference.brightness, value)
-                              .then((value) {
-                            ThemeController toChange =
-                                Get.put(ThemeController());
-                            toChange.onUpdate();
-                          });
-                        });
-                      },
-                      children: const [
-                        Icon(Icons.phone_android_rounded),
-                        Icon(Icons.light_mode_rounded),
-                        Icon(Icons.dark_mode_rounded),
-                      ],
-                    )),
+                    ),
+                  ),
+                  subtitle: Text(
+                    demoBlueModeName[preference.getInt(
+                      preference.Preference.brightness,
+                    )],
+                  ),
+                  trailing: ToggleButtons(
+                    isSelected: List<bool>.generate(
+                      3,
+                      (index) =>
+                          index ==
+                          preference.getInt(preference.Preference.brightness),
+                    ),
+                    onPressed: (int value) {
+                      setState(() {
+                        preference
+                            .setInt(preference.Preference.brightness, value)
+                            .then((value) {
+                              ThemeController toChange = Get.put(
+                                ThemeController(),
+                              );
+                              toChange.onUpdate();
+                            });
+                      });
+                    },
+                    children: const [
+                      Icon(Icons.phone_android_rounded),
+                      Icon(Icons.light_mode_rounded),
+                      Icon(Icons.dark_mode_rounded),
+                    ],
+                  ),
+                ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.simplify_timeline",
-                  )),
-                  subtitle: Text(FlutterI18n.translate(
-                    context,
-                    "setting.simplify_timeline_description",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.simplify_timeline"),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.simplify_timeline_description",
+                    ),
+                  ),
                   trailing: Switch(
                     value: preference.getBool(
                       preference.Preference.simplifiedClassTimeline,
@@ -298,140 +307,166 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                    title: Text(FlutterI18n.translate(
+                  title: Text(
+                    FlutterI18n.translate(
                       context,
                       "setting.localization_dialog.title",
-                    )),
-                    subtitle: Text(FlutterI18n.translate(
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
                       context,
                       FlutterI18n.translate(
                         context,
                         Localization.values
-                            .firstWhere((value) =>
-                                value.string ==
-                                preference.getString(
-                                    preference.Preference.localization))
+                            .firstWhere(
+                              (value) =>
+                                  value.string ==
+                                  preference.getString(
+                                    preference.Preference.localization,
+                                  ),
+                            )
                             .toShow,
                       ),
-                    )),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => const ChangeLanguageDialog(),
-                      );
-                    }),
-              ])),
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => const ChangeLanguageDialog(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
           ReXCard(
-            title: _buildListSubtitle(FlutterI18n.translate(
-              context,
-              "setting.account_setting",
-            )),
+            title: _buildListSubtitle(
+              FlutterI18n.translate(context, "setting.account_setting"),
+            ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 if (!preference.getBool(preference.Preference.role)) ...[
                   ListTile(
-                      title: Text(FlutterI18n.translate(
+                    title: Text(
+                      FlutterI18n.translate(
                         context,
                         "setting.sport_password_setting",
-                      )),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => const SportPasswordDialog(),
-                        );
-                      }),
+                      ),
+                    ),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => const SportPasswordDialog(),
+                      );
+                    },
+                  ),
                   const Divider(),
                   ListTile(
-                      title: Text(FlutterI18n.translate(
+                    title: Text(
+                      FlutterI18n.translate(
                         context,
                         "setting.experiment_password_setting",
-                      )),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) =>
-                              const ExperimentPasswordDialog(),
-                        );
-                      }),
+                      ),
+                    ),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => const ExperimentPasswordDialog(),
+                      );
+                    },
+                  ),
                 ] else ...[
                   ListTile(
-                      title: Text(FlutterI18n.translate(
+                    title: Text(
+                      FlutterI18n.translate(
                         context,
                         "setting.electricity_account_setting",
-                      )),
-                      trailing: const Icon(Icons.navigate_next),
-                      onTap: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => ElectricityAccountDialog(),
-                        );
-                      }),
+                      ),
+                    ),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => ElectricityAccountDialog(),
+                      );
+                    },
+                  ),
                 ],
                 const Divider(),
                 ListTile(
-                    title: Text(FlutterI18n.translate(
+                  title: Text(
+                    FlutterI18n.translate(
                       context,
                       "setting.electricity_password_setting",
-                    )),
-                    subtitle: Text(FlutterI18n.translate(
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
                       context,
                       "setting.electricity_password_description",
-                    )),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) => const ElectricityPasswordDialog(),
-                      );
-                    }),
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const ElectricityPasswordDialog(),
+                    );
+                  },
+                ),
                 const Divider(),
                 ListTile(
-                    title: Text(FlutterI18n.translate(
+                  title: Text(
+                    FlutterI18n.translate(
                       context,
                       "setting.schoolnet_password_setting",
-                    )),
-                    subtitle: Text(FlutterI18n.translate(
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
                       context,
                       "setting.schoolnet_password_description",
-                    )),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => const SchoolNetPasswordDialog(),
-                      );
-                    }),
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const SchoolNetPasswordDialog(),
+                    );
+                  },
+                ),
               ],
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle(FlutterI18n.translate(
-              context,
-              "setting.classtable_setting",
-            )),
+            title: _buildListSubtitle(
+              FlutterI18n.translate(context, "setting.classtable_setting"),
+            ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.background",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.background"),
+                  ),
                   trailing: Switch(
                     value: preference.getBool(preference.Preference.decorated),
                     onChanged: (bool value) {
                       if (value == true &&
-                          !preference
-                              .getBool(preference.Preference.decoration)) {
+                          !preference.getBool(
+                            preference.Preference.decoration,
+                          )) {
                         showToast(
                           context: context,
                           msg: FlutterI18n.translate(
@@ -452,10 +487,9 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.choose_background",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.choose_background"),
+                  ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () async {
                     FilePickerResult? result;
@@ -475,9 +509,12 @@ class _SettingWindowState extends State<SettingWindow> {
                     if (mounted) {
                       if (result != null) {
                         File(result.files.single.path!).copySync(
-                            "${supportPath.path}/${ClassTableFile.decorationName}");
+                          "${supportPath.path}/${ClassTableFile.decorationName}",
+                        );
                         preference.setBool(
-                            preference.Preference.decoration, true);
+                          preference.Preference.decoration,
+                          true,
+                        );
                         if (context.mounted) {
                           showToast(
                             context: context,
@@ -503,37 +540,37 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.clear_user_class",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.clear_user_class"),
+                  ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(FlutterI18n.translate(
-                        context,
-                        "setting.clear_user_class_title",
-                      )),
-                      content: Text(FlutterI18n.translate(
-                        context,
-                        "setting.clear_user_class_content",
-                      )),
+                      title: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.clear_user_class_title",
+                        ),
+                      ),
+                      content: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.clear_user_class_content",
+                        ),
+                      ),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "cancel",
-                            ),
-                          ),
+                          child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
                           onPressed: () {
@@ -554,10 +591,9 @@ class _SettingWindowState extends State<SettingWindow> {
                             );
                             Navigator.pop(context);
                           },
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "confirm",
-                          )),
+                          child: Text(
+                            FlutterI18n.translate(context, "confirm"),
+                          ),
                         ),
                       ],
                     ),
@@ -565,47 +601,52 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.class_refresh",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.class_refresh"),
+                  ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(FlutterI18n.translate(
-                        context,
-                        "setting.class_refresh_title",
-                      )),
-                      content: Text(FlutterI18n.translate(
-                        context,
-                        "setting.class_refresh_content",
-                      )),
+                      title: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.class_refresh_title",
+                        ),
+                      ),
+                      content: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.class_refresh_content",
+                        ),
+                      ),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "cancel",
-                          )),
+                          child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
                           onPressed: () {
-                            Get.put(ClassTableController()).updateClassTable(
-                              isForce: true,
-                            );
+                            Future.wait([
+                              Get.put(
+                                ClassTableController(),
+                              ).updateClassTable(isForce: true),
+                              Get.put(ExamController()).get(),
+                              Get.put(ExperimentController()).get(),
+                            ]).then((value) => value.first);
                             Navigator.pop(context);
                           },
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "confirm",
-                          )),
+                          child: Text(
+                            FlutterI18n.translate(context, "confirm"),
+                          ),
                         ),
                       ],
                     ),
@@ -613,10 +654,9 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.class_swift",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.class_swift"),
+                  ),
                   subtitle: Text(
                     FlutterI18n.translate(
                       context,
@@ -645,57 +685,58 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle(FlutterI18n.translate(
-              context,
-              "setting.core_setting",
-            )),
+            title: _buildListSubtitle(
+              FlutterI18n.translate(context, "setting.core_setting"),
+            ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.check_logger",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.check_logger"),
+                  ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => context.push(TalkerScreen(talker: log)),
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.clear_and_restart",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.clear_and_restart"),
+                  ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(FlutterI18n.translate(
-                        context,
-                        "setting.clear_and_restart_dialog.title",
-                      )),
-                      content: Text(FlutterI18n.translate(
-                        context,
-                        "setting.clear_and_restart_dialog.content",
-                      )),
+                      title: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.clear_and_restart_dialog.title",
+                        ),
+                      ),
+                      content: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.clear_and_restart_dialog.content",
+                        ),
+                      ),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "cancel",
-                          )),
+                          child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
                           onPressed: () async {
-                            ProgressDialog pd =
-                                ProgressDialog(context: context);
+                            ProgressDialog pd = ProgressDialog(
+                              context: context,
+                            );
                             pd.show(
                               msg: FlutterI18n.translate(
                                 context,
@@ -724,10 +765,9 @@ class _SettingWindowState extends State<SettingWindow> {
                               Restart.restartApp();
                             }
                           },
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "confirm",
-                          )),
+                          child: Text(
+                            FlutterI18n.translate(context, "confirm"),
+                          ),
                         ),
                       ],
                     ),
@@ -735,35 +775,35 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "setting.logout",
-                  )),
+                  title: Text(FlutterI18n.translate(context, "setting.logout")),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(FlutterI18n.translate(
-                        context,
-                        "setting.logout_dialog.title",
-                      )),
-                      content: Text(FlutterI18n.translate(
-                        context,
-                        "setting.logout_dialog.content",
-                      )),
+                      title: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.logout_dialog.title",
+                        ),
+                      ),
+                      content: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.logout_dialog.content",
+                        ),
+                      ),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "cancel",
-                          )),
+                          child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -791,8 +831,9 @@ class _SettingWindowState extends State<SettingWindow> {
                             await preference.prefrenceClear();
 
                             /// Theme back to default
-                            ThemeController toChange =
-                                Get.put(ThemeController());
+                            ThemeController toChange = Get.put(
+                              ThemeController(),
+                            );
                             toChange.onUpdate();
 
                             /// Restart app
@@ -801,10 +842,9 @@ class _SettingWindowState extends State<SettingWindow> {
                               Restart.restartApp();
                             }
                           },
-                          child: Text(FlutterI18n.translate(
-                            context,
-                            "confirm",
-                          )),
+                          child: Text(
+                            FlutterI18n.translate(context, "confirm"),
+                          ),
                         ),
                       ],
                     ),
@@ -826,11 +866,9 @@ void _removeCache() {
     ExperimentController.experimentCacheName,
     ScoreSession.scoreListCacheName,
     ElectricitySession.electricityCache,
-    ElectricitySession.electricityHistory
+    ElectricitySession.electricityHistory,
   ]) {
-    var file = File(
-      "${supportPath.path}/$value",
-    );
+    var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {
       file.deleteSync();
     }
@@ -847,11 +885,9 @@ void _removeAll() {
     ExperimentController.experimentCacheName,
     ScoreSession.scoreListCacheName,
     ElectricitySession.electricityCache,
-    ElectricitySession.electricityHistory
+    ElectricitySession.electricityHistory,
   ]) {
-    var file = File(
-      "${supportPath.path}/$value",
-    );
+    var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {
       file.deleteSync();
     }

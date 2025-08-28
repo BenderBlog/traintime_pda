@@ -4,11 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-enum EmptyListViewType {
-  reading,
-  singing,
-  defaultimg,
-}
+enum EmptyListViewType { reading, singing, defaultimg }
 
 class EmptyListView extends StatelessWidget {
   final String text;
@@ -36,10 +32,7 @@ class EmptyListView extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset(
-          assets,
-          scale: 1.5,
-        ),
+        Image.asset(assets, scale: 1.5),
         const Divider(color: Colors.transparent),
         Text(text),
       ],

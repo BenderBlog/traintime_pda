@@ -8,25 +8,21 @@ class InfoCard extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const InfoCard({
-    super.key,
-    required this.title,
-    required this.children,
-  });
+  const InfoCard({super.key, required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
     return [
-      Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).primaryColor,
             ),
-      ),
-      const SizedBox(height: 8),
-      ...children,
-    ]
+          ),
+          const SizedBox(height: 8),
+          ...children,
+        ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
         .padding(all: 16)
         .card(elevation: 0);
@@ -56,10 +52,7 @@ class InfoItem extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             "$label：",
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
           ),
           const SizedBox(width: 4),
           Text(

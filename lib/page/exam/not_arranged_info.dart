@@ -17,50 +17,48 @@ class NoArrangedInfo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlutterI18n.translate(
-            context,
-            "exam.no_arrangement.title",
-          ),
+          FlutterI18n.translate(context, "exam.no_arrangement.title"),
         ),
       ),
-      body: Builder(builder: (context) {
-        if (list.isEmpty) {
-          return EmptyListView(
-            type: EmptyListViewType.defaultimg,
-            text: FlutterI18n.translate(
-              context,
-              "exam.no_arrangement.all_arranged",
+      body: Builder(
+        builder: (context) {
+          if (list.isEmpty) {
+            return EmptyListView(
+              type: EmptyListViewType.defaultimg,
+              text: FlutterI18n.translate(
+                context,
+                "exam.no_arrangement.all_arranged",
+              ),
+            );
+          }
+          return DataList<ToBeArranged>(
+            list: list,
+            initFormula: (toUse) => Card(
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              elevation: 0,
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
+              child: ListTile(
+                title: Text(
+                  toUse.subject,
+                  textScaler: const TextScaler.linear(1.1),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                subtitle: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "exam.no_arrangement.subtitle",
+                    translationParams: {"id": toUse.id},
+                  ),
+                ),
+              ),
             ),
           );
-        }
-        return DataList<ToBeArranged>(
-          list: list,
-          initFormula: (toUse) => Card(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 6,
-            ),
-            elevation: 0,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            child: ListTile(
-              title: Text(
-                toUse.subject,
-                textScaler: const TextScaler.linear(1.1),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              subtitle: Text(
-                FlutterI18n.translate(
-                  context,
-                  "exam.no_arrangement.subtitle",
-                  translationParams: {"id": toUse.id},
-                ),
-              ),
-            ),
-          ),
-        );
-      }),
+        },
+      ),
     );
   }
 }

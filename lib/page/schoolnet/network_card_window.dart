@@ -24,10 +24,7 @@ class _NetworkCardWindowState extends State<NetworkCardWindow> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(
-            context,
-            "school_net.title",
-          )),
+          title: Text(FlutterI18n.translate(context, "school_net.title")),
           actions: [
             IconButton(
               onPressed: () => context.push(const HelpGuide()),
@@ -52,10 +49,7 @@ class _NetworkCardWindowState extends State<NetworkCardWindow> {
           ),
         ),
         body: const TabBarView(
-          children: <Widget>[
-            IdsAccountNetInfo(),
-            CurrentLoginUserNetInfo(),
-          ],
+          children: <Widget>[IdsAccountNetInfo(), CurrentLoginUserNetInfo()],
         ),
       ),
     );

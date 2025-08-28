@@ -73,10 +73,9 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                 sportScore.value.detail.isNotEmpty) {
               List<Widget> things = [
                 ReXCard(
-                  title: Text(FlutterI18n.translate(
-                    context,
-                    "sport.total_score",
-                  )),
+                  title: Text(
+                    FlutterI18n.translate(context, "sport.total_score"),
+                  ),
                   remaining: [
                     ReXCardRemaining(
                       sportScore.value.total,
@@ -91,7 +90,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                           ? Colors.red
                           : null,
                       isBold: sportScore.value.rank.contains("不"),
-                    )
+                    ),
                   ],
                   bottomRow: Text(
                     sportScore.value.detail.substring(
@@ -101,10 +100,12 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                   ),
                 ),
               ];
-              things.addAll(List<Widget>.generate(
-                sportScore.value.list.length,
-                (index) => ScoreCard(toUse: sportScore.value.list[index]),
-              ).reversed);
+              things.addAll(
+                List<Widget>.generate(
+                  sportScore.value.list.length,
+                  (index) => ScoreCard(toUse: sportScore.value.list[index]),
+                ).reversed,
+              );
               return DataList<Widget>(
                 physics: physics,
                 list: things,
@@ -125,7 +126,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                             "situation": FlutterI18n.translate(
                               context,
                               sportClass.value.situation ?? "",
-                            )
+                            ),
                           },
                         )
                       : null,
@@ -150,14 +151,13 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReXCard(
-      title: Text(FlutterI18n.translate(
-        context,
-        "sport.semester",
-        translationParams: {
-          "year": toUse.year,
-          "gradeType": toUse.gradeType,
-        },
-      )),
+      title: Text(
+        FlutterI18n.translate(
+          context,
+          "sport.semester",
+          translationParams: {"year": toUse.year, "gradeType": toUse.gradeType},
+        ),
+      ),
       remaining: [
         ReXCardRemaining(
           toUse.totalScore,
@@ -168,7 +168,7 @@ class ScoreCard extends StatelessWidget {
           toUse.rank,
           color: toUse.rank.contains("不") ? Colors.red : null,
           isBold: toUse.rank.contains("不"),
-        )
+        ),
       ],
       bottomRow: toUse.details.isNotEmpty
           ? Table(
@@ -182,40 +182,28 @@ class ScoreCard extends StatelessWidget {
                 TableRow(
                   children: [
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "sport.subject",
+                      FlutterI18n.translate(context, "sport.subject"),
+                      textAlign: TextAlign.start,
+                    ),
+                    Text(
+                      FlutterI18n.translate(context, "sport.data"),
+                      style: const TextStyle(
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "sport.data",
+                      FlutterI18n.translate(context, "sport.score"),
+                      style: const TextStyle(
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
-                      style: const TextStyle(fontFeatures: [
-                        FontFeature.tabularFigures(),
-                      ]),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "sport.score",
+                      FlutterI18n.translate(context, "sport.passed"),
+                      style: const TextStyle(
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
-                      style: const TextStyle(fontFeatures: [
-                        FontFeature.tabularFigures(),
-                      ]),
-                      textAlign: TextAlign.start,
-                    ),
-                    Text(
-                      FlutterI18n.translate(
-                        context,
-                        "sport.passed",
-                      ),
-                      style: const TextStyle(fontFeatures: [
-                        FontFeature.tabularFigures(),
-                      ]),
                       textAlign: TextAlign.end,
                     ),
                   ],
@@ -229,27 +217,25 @@ class ScoreCard extends StatelessWidget {
                 for (var i in toUse.details)
                   TableRow(
                     children: [
-                      Text(
-                        i.examName,
-                        textAlign: TextAlign.start,
-                      ),
+                      Text(i.examName, textAlign: TextAlign.start),
                       Text(
                         i.actualScore.contains('/')
                             ? "${i.actualScore.split('/')[0]}cm/${i.actualScore.split('/')[1]}kg"
                             : "${i.actualScore}${unitToShow(i.examunit)}",
-                        style: const TextStyle(fontFeatures: [
-                          FontFeature.tabularFigures(),
-                        ]),
+                        style: const TextStyle(
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
                         textAlign: TextAlign.start,
                       ),
                       Text(
-                        FlutterI18n.translate(context, "sport.score_string",
-                            translationParams: {
-                              "score": i.score.toString(),
-                            }),
-                        style: const TextStyle(fontFeatures: [
-                          FontFeature.tabularFigures(),
-                        ]),
+                        FlutterI18n.translate(
+                          context,
+                          "sport.score_string",
+                          translationParams: {"score": i.score.toString()},
+                        ),
+                        style: const TextStyle(
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
                         textAlign: TextAlign.start,
                       ),
                       Icon(

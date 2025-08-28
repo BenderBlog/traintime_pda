@@ -12,21 +12,18 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 
 class NotArrangedClassList extends StatelessWidget {
   final List<NotArrangementClassDetail> notArranged;
-  const NotArrangedClassList({
-    super.key,
-    required this.notArranged,
-  });
+  const NotArrangedClassList({super.key, required this.notArranged});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(FlutterI18n.translate(
-            context,
-            "classtable.not_arranged_page.title",
-          )),
+      appBar: AppBar(
+        title: Text(
+          FlutterI18n.translate(context, "classtable.not_arranged_page.title"),
         ),
-        body: Builder(builder: (context) {
+      ),
+      body: Builder(
+        builder: (context) {
           if (notArranged.isEmpty) {
             return EmptyListView(
               type: EmptyListViewType.defaultimg,
@@ -47,16 +44,16 @@ class NotArrangedClassList extends StatelessWidget {
                   translationParams: {
                     "classCode": notArranged[index].code ?? "",
                     "classNumber": notArranged[index].number ?? "",
-                    "teacher": notArranged[index].teacher ??
-                        FlutterI18n.translate(
-                          context,
-                          "no_info",
-                        ),
+                    "teacher":
+                        notArranged[index].teacher ??
+                        FlutterI18n.translate(context, "no_info"),
                   },
                 ),
               ),
             ),
           ).constrained(maxWidth: 600);
-        }).center());
+        },
+      ).center(),
+    );
   }
 }

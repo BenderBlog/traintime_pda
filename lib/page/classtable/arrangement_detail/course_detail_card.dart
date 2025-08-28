@@ -55,14 +55,9 @@ class ClassDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        maxWidth: 360.0,
-      ),
+      constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 4,
-          vertical: 4,
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         elevation: 0,
         color: infoColor.shade100,
         child: Container(
@@ -77,13 +72,7 @@ class ClassDetailCard extends StatelessWidget {
             children: [
               Text(
                 "${classDetail.name}"
-                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${FlutterI18n.translate(
-                    context,
-                    "classtable.course_detail_card.class_number_string",
-                    translationParams: {
-                      "number": classDetail.number.toString(),
-                    },
-                  )}" : ""}",
+                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${FlutterI18n.translate(context, "classtable.course_detail_card.class_number_string", translationParams: {"number": classDetail.number.toString()})}" : ""}",
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -96,7 +85,8 @@ class ClassDetailCard extends StatelessWidget {
                   Flexible(
                     child: CustomListTile(
                       icon: Icons.person,
-                      str: timeArrangement.teacher ??
+                      str:
+                          timeArrangement.teacher ??
                           FlutterI18n.translate(
                             context,
                             "classtable.course_detail_card.unknown_teacher",
@@ -107,7 +97,8 @@ class ClassDetailCard extends StatelessWidget {
                   Flexible(
                     child: CustomListTile(
                       icon: Icons.room,
-                      str: timeArrangement.classroom ??
+                      str:
+                          timeArrangement.classroom ??
                           FlutterI18n.translate(
                             context,
                             "classtable.course_detail_card.unknown_place",
@@ -119,11 +110,9 @@ class ClassDetailCard extends StatelessWidget {
               ),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
-                str: "${getWeekString(context, timeArrangement.day - 1)}"
-                    "${FlutterI18n.translate(context, "classtable.course_detail_card.class_period", translationParams: {
-                      "start": timeArrangement.start.toString(),
-                      "stop": timeArrangement.stop.toString(),
-                    })} "
+                str:
+                    "${getWeekString(context, timeArrangement.day - 1)}"
+                    "${FlutterI18n.translate(context, "classtable.course_detail_card.class_period", translationParams: {"start": timeArrangement.start.toString(), "stop": timeArrangement.stop.toString()})} "
                     "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
                 infoColor: infoColor,
               ),
@@ -149,79 +138,76 @@ class ClassDetailCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop((
-                            classDetail,
-                            timeArrangement,
-                            false,
-                          ));
-                        },
-                        child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "classtable.course_detail_card.edit",
-                          ),
-                          style: TextStyle(
-                            color: infoColor.shade900,
-                          ),
-                        )),
+                      onPressed: () {
+                        Navigator.of(
+                          context,
+                        ).pop((classDetail, timeArrangement, false));
+                      },
+                      child: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.course_detail_card.edit",
+                        ),
+                        style: TextStyle(color: infoColor.shade900),
+                      ),
+                    ),
                     TextButton(
-                        onPressed: () async {
-                          bool? isContinue = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(FlutterI18n.translate(
+                      onPressed: () async {
+                        bool? isContinue = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(
+                              FlutterI18n.translate(
                                 context,
                                 "classtable.course_detail_card.delete_title",
-                              )),
-                              content: Text(FlutterI18n.translate(
+                              ),
+                            ),
+                            content: Text(
+                              FlutterI18n.translate(
                                 context,
                                 "classtable.course_detail_card.delete_content",
-                              )),
-                              actions: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: Text(FlutterI18n.translate(
-                                    context,
-                                    "cancel",
-                                  )),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: Text(FlutterI18n.translate(
-                                    context,
-                                    "confirm",
-                                  )),
-                                ),
-                              ],
+                              ),
                             ),
-                          );
-                          if (context.mounted && isContinue == true) {
-                            Navigator.of(context).pop((
-                              classDetail,
-                              timeArrangement,
-                              true,
-                            ));
-                          }
-                        },
-                        child: Text(
-                          FlutterI18n.translate(
+                            actions: [
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                ),
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text(
+                                  FlutterI18n.translate(context, "cancel"),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text(
+                                  FlutterI18n.translate(context, "confirm"),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (context.mounted && isContinue == true) {
+                          Navigator.of(
                             context,
-                            "classtable.course_detail_card.delete",
-                          ),
-                          style: TextStyle(
-                            color: infoColor.shade900,
-                          ),
-                        ))
+                          ).pop((classDetail, timeArrangement, true));
+                        }
+                      },
+                      child: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.course_detail_card.delete",
+                        ),
+                        style: TextStyle(color: infoColor.shade900),
+                      ),
+                    ),
                   ],
-                )
+                ),
             ],
           ),
         ),
@@ -246,20 +232,14 @@ class CustomListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: infoColor.shade900,
-        ),
+        Icon(icon, color: infoColor.shade900),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             str,
-            style: TextStyle(
-              color: infoColor.shade900,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: infoColor.shade900, fontSize: 16),
           ),
-        )
+        ),
       ],
     ).padding(vertical: 4);
   }

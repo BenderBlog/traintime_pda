@@ -33,11 +33,7 @@ class FileToGroupID {
   String data;
 
   Object encode() {
-    return <Object?>[
-      appid,
-      fileName,
-      data,
-    ];
+    return <Object?>[appid, fileName, data];
   }
 
   static FileToGroupID decode(Object result) {
@@ -78,7 +74,7 @@ class SaveToGroupIdSwiftApi {
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
   SaveToGroupIdSwiftApi({BinaryMessenger? binaryMessenger})
-      : __pigeon_binaryMessenger = binaryMessenger;
+    : __pigeon_binaryMessenger = binaryMessenger;
   final BinaryMessenger? __pigeon_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec =
@@ -89,10 +85,10 @@ class SaveToGroupIdSwiftApi {
         'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.getHostLanguage';
     final BasicMessageChannel<Object?> __pigeon_channel =
         BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
+          __pigeon_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: __pigeon_binaryMessenger,
+        );
     final List<Object?>? __pigeon_replyList =
         await __pigeon_channel.send(null) as List<Object?>?;
     if (__pigeon_replyList == null) {
@@ -118,10 +114,10 @@ class SaveToGroupIdSwiftApi {
         'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.saveToGroupId';
     final BasicMessageChannel<Object?> __pigeon_channel =
         BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
+          __pigeon_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: __pigeon_binaryMessenger,
+        );
     final List<Object?>? __pigeon_replyList =
         await __pigeon_channel.send(<Object?>[data]) as List<Object?>?;
     if (__pigeon_replyList == null) {

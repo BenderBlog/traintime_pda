@@ -24,10 +24,7 @@ class ScoreWindow extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "score.score_page.title",
-                ),
+                FlutterI18n.translate(context, "score.score_page.title"),
               ),
               actions: [
                 if (state.state == ScoreFetchState.ok)
@@ -38,19 +35,21 @@ class ScoreWindow extends StatelessWidget {
                   ),
               ],
             ),
-            body: Builder(builder: (context) {
-              switch (state.state) {
-                case ScoreFetchState.ok:
-                  return const ScorePage();
-                case ScoreFetchState.error:
-                  return ReloadWidget(
-                    errorStatus: state.error,
-                    function: () => state.refreshingState(context),
-                  );
-                case ScoreFetchState.fetching:
-                  return const Center(child: CircularProgressIndicator());
-              }
-            }),
+            body: Builder(
+              builder: (context) {
+                switch (state.state) {
+                  case ScoreFetchState.ok:
+                    return const ScorePage();
+                  case ScoreFetchState.error:
+                    return ReloadWidget(
+                      errorStatus: state.error,
+                      function: () => state.refreshingState(context),
+                    );
+                  case ScoreFetchState.fetching:
+                    return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
           );
         },
       ),

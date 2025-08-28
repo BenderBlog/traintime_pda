@@ -22,7 +22,8 @@ class SportCard extends StatelessWidget {
       onTap: () async {
         bool isGood = true;
         if (preference.getString(preference.Preference.sportPassword).isEmpty) {
-          isGood = await showDialog<bool>(
+          isGood =
+              await showDialog<bool>(
                 context: context,
                 builder: (context) => const SportPasswordDialog(),
               ) ??

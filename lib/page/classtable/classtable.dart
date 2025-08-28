@@ -23,9 +23,7 @@ class ClassTableWindow extends StatelessWidget {
     return ClassTableState(
       parentContext: parentContext,
       constraints: constraints,
-      controllers: ClassTableWidgetState(
-        currentWeek: currentWeek,
-      ),
+      controllers: ClassTableWidgetState(currentWeek: currentWeek),
       child: const ClassTablePage(),
     );
   }

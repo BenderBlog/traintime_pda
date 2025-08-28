@@ -10,24 +10,29 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ElectricityAccountDialog extends StatelessWidget {
-  final TextEditingController _controller =
-      TextEditingController.fromValue(TextEditingValue(
-    text: preference.getString(preference.Preference.dorm),
-    selection: TextSelection.fromPosition(TextPosition(
-      affinity: TextAffinity.downstream,
-      offset: preference.getString(preference.Preference.dorm).length,
-    )),
-  ));
+  final TextEditingController _controller = TextEditingController.fromValue(
+    TextEditingValue(
+      text: preference.getString(preference.Preference.dorm),
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          affinity: TextAffinity.downstream,
+          offset: preference.getString(preference.Preference.dorm).length,
+        ),
+      ),
+    ),
+  );
 
   ElectricityAccountDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "setting.change_electricity_account.title",
-      )),
+      title: Text(
+        FlutterI18n.translate(
+          context,
+          "setting.change_electricity_account.title",
+        ),
+      ),
       content: TextField(
         autofocus: true,
         controller: _controller,
@@ -40,19 +45,13 @@ class ElectricityAccountDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "cancel",
-          )),
+          child: Text(FlutterI18n.translate(context, "cancel")),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "confirm",
-          )),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
             if (_controller.text.isNotEmpty) {
               preference.setString(

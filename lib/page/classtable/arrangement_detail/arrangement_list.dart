@@ -18,8 +18,9 @@ class ArrangementList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ArrangementDetailState classDetailState =
-        ArrangementDetailState.of(context)!;
+    ArrangementDetailState classDetailState = ArrangementDetailState.of(
+      context,
+    )!;
     return ListView(
       shrinkWrap: true,
       children: List.generate(classDetailState.information.length, (i) {
@@ -27,8 +28,9 @@ class ArrangementList extends StatelessWidget {
           return ClassDetailCard(
             classDetail: classDetailState.information[i].$1,
             timeArrangement: classDetailState.information[i].$2,
-            infoColor: colorList[
-                classDetailState.information[i].$2.index % colorList.length],
+            infoColor:
+                colorList[classDetailState.information[i].$2.index %
+                    colorList.length],
             currentWeek: classDetailState.currentWeek,
           );
         } else if (classDetailState.information[i] is Subject) {

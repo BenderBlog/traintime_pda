@@ -16,10 +16,7 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart';
 class BookDetailCard extends StatefulWidget {
   final BookInfo toUse;
 
-  const BookDetailCard({
-    super.key,
-    required this.toUse,
-  });
+  const BookDetailCard({super.key, required this.toUse});
 
   @override
   State<BookDetailCard> createState() => _BookDetailCardState();
@@ -35,31 +32,31 @@ class _BookDetailCardState extends State<BookDetailCard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             CachedNetworkImage(
-              imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
-              placeholder: (context, url) => Image.asset(
-                "assets/art/pda_empty_cover.jpg",
-                width: 120,
-                height: 150,
-                fit: BoxFit.fill,
-              ),
-              errorWidget: (context, url, error) => Image.asset(
-                "assets/art/pda_empty_cover.jpg",
-                width: 120,
-                height: 150,
-                fit: BoxFit.fill,
-              ),
-              width: 120,
-              height: 150,
-              fit: BoxFit.fitHeight,
-              alignment: Alignment.center,
-              errorListener: (e) {
-                if (e is DioException) {
-                  log.info('Error with Internet error...');
-                } else {
-                  log.info('Image Exception is: ${e.runtimeType}');
-                }
-              },
-            )
+                  imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
+                  placeholder: (context, url) => Image.asset(
+                    "assets/art/pda_empty_cover.jpg",
+                    width: 120,
+                    height: 150,
+                    fit: BoxFit.fill,
+                  ),
+                  errorWidget: (context, url, error) => Image.asset(
+                    "assets/art/pda_empty_cover.jpg",
+                    width: 120,
+                    height: 150,
+                    fit: BoxFit.fill,
+                  ),
+                  width: 120,
+                  height: 150,
+                  fit: BoxFit.fitHeight,
+                  alignment: Alignment.center,
+                  errorListener: (e) {
+                    if (e is DioException) {
+                      log.info('Error with Internet error...');
+                    } else {
+                      log.info('Image Exception is: ${e.runtimeType}');
+                    }
+                  },
+                )
                 //.clipRect(clipper: BookImageClipper())
                 .clipRRect(all: 14)
                 .padding(all: 2)
@@ -69,155 +66,178 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 )
                 .padding(right: 12),
             [
-              Text(
-                widget.toUse.bookName,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "library.author",
-                    ),
+                  Text(
+                    widget.toUse.bookName,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.start,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFBFBFBF),
                     ),
                   ),
-                  TextSpan(
-                    text: widget.toUse.author ??
-                        FlutterI18n.translate(
-                          context,
-                          "library.not_provided",
+                  const SizedBox(height: 8),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: FlutterI18n.translate(
+                            context,
+                            "library.author",
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFBFBFBF),
+                          ),
                         ),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                        TextSpan(
+                          text:
+                              widget.toUse.author ??
+                              FlutterI18n.translate(
+                                context,
+                                "library.not_provided",
+                              ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ]),
-              ),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "library.publish_house",
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: FlutterI18n.translate(
+                            context,
+                            "library.publish_house",
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFBFBFBF),
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              widget.toUse.publisherHouse ??
+                              FlutterI18n.translate(
+                                context,
+                                "library.not_provided",
+                              ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFBFBFBF),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: FlutterI18n.translate(
+                            context,
+                            "library.call_number",
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFBFBFBF),
+                          ),
+                        ),
+                        TextSpan(
+                          text: widget.toUse.searchCodeStr,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                TextSpan(
-                  text: widget.toUse.publisherHouse ??
-                      FlutterI18n.translate(
-                        context,
-                        "library.not_provided",
-                      ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: FlutterI18n.translate(
+                            context,
+                            "library.publish_date",
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFBFBFBF),
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              widget.toUse.publishYear ??
+                              FlutterI18n.translate(
+                                context,
+                                "library.not_provided",
+                              ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ])),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "library.call_number",
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: FlutterI18n.translate(context, "library.isbn"),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFBFBFBF),
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              widget.toUse.isbn ??
+                              FlutterI18n.translate(
+                                context,
+                                "library.not_provided",
+                              ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFBFBFBF),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: FlutterI18n.translate(
+                            context,
+                            "library.arrangement_code",
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFBFBFBF),
+                          ),
+                        ),
+                        TextSpan(
+                          text: widget.toUse.barCodesStr,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                TextSpan(
-                  text: widget.toUse.searchCodeStr,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ])),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "library.publish_date",
-                  ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFBFBFBF),
-                  ),
-                ),
-                TextSpan(
-                  text: widget.toUse.publishYear ??
-                      FlutterI18n.translate(
-                        context,
-                        "library.not_provided",
-                      ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ])),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "library.isbn",
-                  ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFBFBFBF),
-                  ),
-                ),
-                TextSpan(
-                  text: widget.toUse.isbn ??
-                      FlutterI18n.translate(
-                        context,
-                        "library.not_provided",
-                      ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ])),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "library.arrangement_code",
-                  ),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFBFBFBF),
-                  ),
-                ),
-                TextSpan(
-                  text: widget.toUse.barCodesStr,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ])),
-            ]
+                ]
                 .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
                 .flexible(),
           ],
@@ -230,17 +250,13 @@ class _BookDetailCardState extends State<BookDetailCard> {
               if (widget.toUse.items != null)
                 ...List.generate(
                   widget.toUse.items!.length,
-                  (index) => BookPlaceCard(
-                    toUse: widget.toUse.items![index],
-                  ),
+                  (index) => BookPlaceCard(toUse: widget.toUse.items![index]),
                 ),
               if (widget.toUse.eitems != null)
                 ...List.generate(
                   widget.toUse.eitems!.length,
-                  (index) => EBookPlaceCard(
-                    toUse: widget.toUse.eitems![index],
-                  ),
-                )
+                  (index) => EBookPlaceCard(toUse: widget.toUse.eitems![index]),
+                ),
             ],
           ),
         ),

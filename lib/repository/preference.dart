@@ -13,10 +13,12 @@ import 'package:watermeter/repository/logger.dart';
 late SharedPreferencesWithCache prefs;
 late PackageInfo packageInfo;
 
-final GlobalKey<NavigatorState> debuggerKey =
-    GlobalKey<NavigatorState>(debugLabel: "PDADebuggerKey");
-final GlobalKey<NavigatorState> splitViewKey =
-    GlobalKey<NavigatorState>(debugLabel: "PDASplitKey");
+final GlobalKey<NavigatorState> debuggerKey = GlobalKey<NavigatorState>(
+  debugLabel: "PDADebuggerKey",
+);
+final GlobalKey<NavigatorState> splitViewKey = GlobalKey<NavigatorState>(
+  debugLabel: "PDASplitKey",
+);
 final GlobalKey leftKey = GlobalKey();
 const String appId = "group.xyz.superbart.xdyou";
 
@@ -30,9 +32,7 @@ Catcher2Options catcherOptions = Catcher2Options(
     ),
     ConsoleHandler(),
   ],
-  localizationOptions: [
-    LocalizationOptions.buildDefaultChineseOptions(),
-  ],
+  localizationOptions: [LocalizationOptions.buildDefaultChineseOptions()],
   logger: PDACatcher2Logger(),
 );
 

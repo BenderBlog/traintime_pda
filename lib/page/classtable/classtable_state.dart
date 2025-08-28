@@ -19,13 +19,11 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
 class ClassTableState extends InheritedWidget {
@@ -166,52 +164,47 @@ class ClassTableWidgetState with ChangeNotifier {
   Future<void> addUserDefinedClass(
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
-  ) =>
-      classTableController
-          .addUserDefinedClass(
-            classDetail,
-            timeArrangement,
-          )
-          .then((value) => notifyListeners());
+  ) => classTableController
+      .addUserDefinedClass(classDetail, timeArrangement)
+      .then((value) => notifyListeners());
 
   Future<void> editUserDefinedClass(
     TimeArrangement oldTimeArrangment,
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
-  ) =>
-      classTableController
-          .editUserDefinedClass(
-            oldTimeArrangment,
-            classDetail,
-            timeArrangement,
-          )
-          .then((value) => notifyListeners());
+  ) => classTableController
+      .editUserDefinedClass(oldTimeArrangment, classDetail, timeArrangement)
+      .then((value) => notifyListeners());
 
-  Future<void> deleteUserDefinedClass(
-    TimeArrangement timeArrangement,
-  ) =>
+  Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) =>
       classTableController
           .deleteUserDefinedClass(timeArrangement)
           .then((value) => notifyListeners());
 
   /// Decode Partner String info
   (String, ClassTableData, List<Subject>, List<ExperimentData>, bool)
-      decodePartnerClass(
-    String source,
-  ) {
+  decodePartnerClass(String source) {
     final data = jsonDecode(source);
-    var yearNotEqual = semesterCode.substring(0, 4).compareTo(
-            data["classtable"]["semesterCode"].toString().substring(0, 4)) !=
+    var yearNotEqual =
+        semesterCode
+            .substring(0, 4)
+            .compareTo(
+              data["classtable"]["semesterCode"].toString().substring(0, 4),
+            ) !=
         0;
-    var lastNotEqual = semesterCode
+    var lastNotEqual =
+        semesterCode
             .substring(semesterCode.length - 1)
-            .compareTo(data["classtable"]["semesterCode"].toString().substring(
-                  data["classtable"]["semesterCode"].length - 1,
-                )) !=
+            .compareTo(
+              data["classtable"]["semesterCode"].toString().substring(
+                data["classtable"]["semesterCode"].length - 1,
+              ),
+            ) !=
         0;
     if (yearNotEqual || lastNotEqual) {
       throw NotSameSemesterException(
-        msg: "Not the same semester. This semester: $semesterCode. "
+        msg:
+            "Not the same semester. This semester: $semesterCode. "
             "Input source: ${data["classtable"]["semesterCode"]}."
             "This partner classtable is going to be deleted.",
       );
@@ -324,18 +317,22 @@ class ClassTableWidgetState with ChangeNotifier {
       // @benderblog: start dealing with
       for (var range in ranges) {
         // @hgh: initialize the first day(or, first recurrence) of the class
-        DateTime firstDay = startDay.add(Duration(
-          days: range.$1 * 7 + i.day - 1,
-        ));
+        DateTime firstDay = startDay.add(
+          Duration(days: range.$1 * 7 + i.day - 1),
+        );
 
-        DateTime startTimeToUse = firstDay.add(Duration(
-          hours: int.parse(startTime[0]),
-          minutes: int.parse(startTime[1]),
-        ));
-        DateTime stopTimeToUse = firstDay.add(Duration(
-          hours: int.parse(stopTime[0]),
-          minutes: int.parse(stopTime[1]),
-        ));
+        DateTime startTimeToUse = firstDay.add(
+          Duration(
+            hours: int.parse(startTime[0]),
+            minutes: int.parse(startTime[1]),
+          ),
+        );
+        DateTime stopTimeToUse = firstDay.add(
+          Duration(
+            hours: int.parse(stopTime[0]),
+            minutes: int.parse(stopTime[1]),
+          ),
+        );
 
         RecurrenceRule rrule = RecurrenceRule(
           RecurrenceFrequency.Weekly,
@@ -343,21 +340,17 @@ class ClassTableWidgetState with ChangeNotifier {
           endDate: firstDay.add(Duration(days: (range.$2 - range.$1) * 7 + 1)),
         );
 
-        events.add(Event(
-          null,
-          title: title,
-          description: description,
-          recurrenceRule: rrule,
-          start: TZDateTime.from(
-            startTimeToUse,
-            currentLocation,
+        events.add(
+          Event(
+            null,
+            title: title,
+            description: description,
+            recurrenceRule: rrule,
+            start: TZDateTime.from(startTimeToUse, currentLocation),
+            end: TZDateTime.from(stopTimeToUse, currentLocation),
+            location: location,
           ),
-          end: TZDateTime.from(
-            stopTimeToUse,
-            currentLocation,
-          ),
-          location: location,
-        ));
+        );
       }
     }
 
@@ -368,36 +361,28 @@ class ClassTableWidgetState with ChangeNotifier {
       String description = "考试信息：${i.subject} - ${i.typeStr}";
       String location = "${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
 
-      events.add(Event(
-        null,
-        title: title,
-        description: description,
-        start: TZDateTime.from(
-          i.startTime!,
-          currentLocation,
+      events.add(
+        Event(
+          null,
+          title: title,
+          description: description,
+          start: TZDateTime.from(i.startTime!, currentLocation),
+          end: TZDateTime.from(i.stopTime!, currentLocation),
+          location: location,
         ),
-        end: TZDateTime.from(
-          i.stopTime!,
-          currentLocation,
-        ),
-        location: location,
-      ));
+      );
     }
 
     for (var i in experiments) {
-      events.add(Event(
-        null,
-        title: "${i.name}@${i.classroom}}",
-        start: TZDateTime.from(
-          i.time.first,
-          currentLocation,
+      events.add(
+        Event(
+          null,
+          title: "${i.name}@${i.classroom}}",
+          start: TZDateTime.from(i.time.first, currentLocation),
+          end: TZDateTime.from(i.time.last, currentLocation),
+          location: i.classroom,
         ),
-        end: TZDateTime.from(
-          i.time.last,
-          currentLocation,
-        ),
-        location: i.classroom,
-      ));
+      );
     }
     return events;
   }
@@ -421,15 +406,18 @@ END:VTIMEZONE
     for (var i in events) {
       String vevent = "BEGIN:VEVENT\n";
 
-      vevent += "DTSTAMP:"
+      vevent +=
+          "DTSTAMP:"
           "${DateFormat('yyyyMMddTHHmmssZ').format(DateTime.now())}\n";
       vevent += "SUMMARY:${i.title ?? "待定"}\n";
       vevent += "DESCRIPTION:${i.description ?? "待定"}\n";
 
       /// Minus 8 hours to match the "UTC time"
-      vevent += "DTSTART;TZID=Asia/Shanghai:"
+      vevent +=
+          "DTSTART;TZID=Asia/Shanghai:"
           "${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch))}\n";
-      vevent += "DTEND;TZID=Asia/Shanghai:"
+      vevent +=
+          "DTEND;TZID=Asia/Shanghai:"
           "${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch))}\n";
       if (i.location != null) {
         vevent += "LOCATION:${i.location}\n";
@@ -486,21 +474,21 @@ END:VTIMEZONE
     // Generate a new calendar
     (bool, String) calendarIdData = await DeviceCalendarPlugin()
         .createCalendar(
-      "PDA Class Arrangement $semesterCode "
-      "created at ${DateTime.now().millisecondsSinceEpoch}",
-    )
+          "PDA Class Arrangement $semesterCode "
+          "created at ${DateTime.now().millisecondsSinceEpoch}",
+        )
         .then((data) {
-      if (!data.isSuccess) {
-        log.info(
-          "[Classtable][outputToCalendar] "
-          "Generate new calendar failed: "
-          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
-        );
-        return (false, "");
-      } else {
-        return (true, data.data!);
-      }
-    });
+          if (!data.isSuccess) {
+            log.info(
+              "[Classtable][outputToCalendar] "
+              "Generate new calendar failed: "
+              "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
+            );
+            return (false, "");
+          } else {
+            return (true, data.data!);
+          }
+        });
 
     if (!calendarIdData.$1) {
       return false;
@@ -509,8 +497,8 @@ END:VTIMEZONE
 
     for (var i in events) {
       var toPush = i..calendarId = calendarId;
-      Result<String>? addEventResult =
-          await deviceCalendarPlugin.createOrUpdateEvent(toPush);
+      Result<String>? addEventResult = await deviceCalendarPlugin
+          .createOrUpdateEvent(toPush);
       // If got error, return with false.
       if (addEventResult == null ||
           addEventResult.data == null ||
@@ -530,26 +518,23 @@ END:VTIMEZONE
   /// Generate shared class data.
   /// Elliot Ray Classtable (Format)
   String ercStr(String name) => jsonEncode({
-        "name": name,
-        "classtable": classTableController.classTableData,
-        "exam": examController.data.subject,
-        "experiment": experimentController.data,
-      });
+    "name": name,
+    "classtable": classTableController.classTableData,
+    "exam": examController.data.subject,
+    "experiment": experimentController.data,
+  });
 
   /// Update classtable infos
   Future<void> updateClasstable(BuildContext context) async {
-    await update(
-      context: context,
-      sliderCaptcha: (String cookieStr) {
-        return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
-      },
-    );
+    log.info("Updating time arrangement data...");
+    return await Future.wait([
+      classTableController.updateClassTable(isForce: true),
+      examController.get(),
+      experimentController.get(),
+    ]).then((value) => value.first);
   }
 
-  ClassTableWidgetState({
-    required this.currentWeek,
-    this.partnerClass,
-  }) {
+  ClassTableWidgetState({required this.currentWeek, this.partnerClass}) {
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {
@@ -589,11 +574,13 @@ END:VTIMEZONE
       if (i.weekList.length > weekIndex &&
           i.weekList[weekIndex] &&
           i.day == dayIndex) {
-        events.add(ClassOrgainzedData.fromTimeArrangement(
-          i,
-          colorList[i.index % colorList.length],
-          getClassDetail(timeArrangement.indexOf(i)).name,
-        ));
+        events.add(
+          ClassOrgainzedData.fromTimeArrangement(
+            i,
+            colorList[i.index % colorList.length],
+            getClassDetail(timeArrangement.indexOf(i)).name,
+          ),
+        );
       }
     }
 
@@ -607,10 +594,12 @@ END:VTIMEZONE
       int diff = i.startTime!.difference(startDay).inDays;
 
       if (diff ~/ 7 == weekIndex && diff % 7 + 1 == dayIndex) {
-        events.add(ClassOrgainzedData.fromSubject(
-          colorList[subjects.indexOf(i) % colorList.length],
-          i,
-        ));
+        events.add(
+          ClassOrgainzedData.fromSubject(
+            colorList[subjects.indexOf(i) % colorList.length],
+            i,
+          ),
+        );
       }
     }
 
@@ -618,10 +607,12 @@ END:VTIMEZONE
       int diff = i.time[0].difference(startDay).inDays;
 
       if (diff ~/ 7 == weekIndex && diff % 7 + 1 == dayIndex) {
-        events.add(ClassOrgainzedData.fromExperiment(
-          colorList[experiments.indexOf(i) % colorList.length],
-          i,
-        ));
+        events.add(
+          ClassOrgainzedData.fromExperiment(
+            colorList[experiments.indexOf(i) % colorList.length],
+            i,
+          ),
+        );
       }
     }
 
@@ -643,7 +634,11 @@ END:VTIMEZONE
         final arrangedEventEnd = arrangedEvents[i].stop;
 
         if (_checkIsOverlapping(
-            arrangedEventStart, arrangedEventEnd, startTime, endTime)) {
+          arrangedEventStart,
+          arrangedEventEnd,
+          startTime,
+          endTime,
+        )) {
           eventIndex = i;
           break;
         }
@@ -660,7 +655,8 @@ END:VTIMEZONE
         final startDuration = math.min(startTime, arrangedEventStart);
         final endDuration = math.max(endTime, arrangedEventEnd);
 
-        bool shouldNew = (event.stop - event.start) >=
+        bool shouldNew =
+            (event.stop - event.start) >=
             (arrangedEventData.stop - arrangedEventData.start);
 
         final top = startDuration;
@@ -670,10 +666,7 @@ END:VTIMEZONE
         final newEvent = ClassOrgainzedData(
           start: top,
           stop: bottom,
-          data: [
-            ...arrangedEventData.data,
-            ...event.data,
-          ],
+          data: [...arrangedEventData.data, ...event.data],
           color: shouldNew ? event.color : arrangedEventData.color,
           name: shouldNew ? event.name : arrangedEventData.name,
           place: shouldNew ? event.place : arrangedEventData.place,

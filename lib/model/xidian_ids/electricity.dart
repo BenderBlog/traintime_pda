@@ -18,14 +18,11 @@ class ElectricityInfo {
     required this.owe,
   });
 
-  factory ElectricityInfo.empty(
-    DateTime time,
-  ) =>
-      ElectricityInfo(
-        fetchDay: time,
-        remain: "electricity_status.pending",
-        owe: "electricity_status.pending",
-      );
+  factory ElectricityInfo.empty(DateTime time) => ElectricityInfo(
+    fetchDay: time,
+    remain: "electricity_status.pending",
+    owe: "electricity_status.pending",
+  );
 
   factory ElectricityInfo.fromJson(Map<String, dynamic> json) =>
       _$ElectricityInfoFromJson(json);

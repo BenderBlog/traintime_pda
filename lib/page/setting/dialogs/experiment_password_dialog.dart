@@ -21,29 +21,29 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
   /// Experiment Password Text Editing Controller
   final TextEditingController _experimentPasswordController =
       TextEditingController.fromValue(
-    TextEditingValue(
-      text: user_perference
-          .getString(user_perference.Preference.experimentPassword),
-      selection: TextSelection.fromPosition(
-        TextPosition(
-          affinity: TextAffinity.downstream,
-          offset: user_perference
-              .getString(user_perference.Preference.experimentPassword)
-              .length,
+        TextEditingValue(
+          text: user_perference.getString(
+            user_perference.Preference.experimentPassword,
+          ),
+          selection: TextSelection.fromPosition(
+            TextPosition(
+              affinity: TextAffinity.downstream,
+              offset: user_perference
+                  .getString(user_perference.Preference.experimentPassword)
+                  .length,
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   bool _couldView = true;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "setting.change_experiment_title",
-      )),
+      title: Text(
+        FlutterI18n.translate(context, "setting.change_experiment_title"),
+      ),
       content: TextField(
         autofocus: true,
         controller: _experimentPasswordController,
@@ -54,29 +54,24 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
             "setting.change_password_dialog.input_hint",
           ),
           suffixIcon: IconButton(
-              icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _couldView = !_couldView;
-                });
-              }),
+            icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _couldView = !_couldView;
+              });
+            },
+          ),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "cancel",
-          )),
+          child: Text(FlutterI18n.translate(context, "cancel")),
           onPressed: () {
             Navigator.pop<bool>(context, false);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "confirm",
-          )),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
             if (_experimentPasswordController.text.isNotEmpty) {
               user_perference.setString(

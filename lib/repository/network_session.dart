@@ -15,12 +15,7 @@ import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
 
-enum SessionState {
-  fetching,
-  fetched,
-  error,
-  none,
-}
+enum SessionState { fetching, fetched, error, none }
 
 Rx<SessionState> isInit = SessionState.none.obs;
 
@@ -34,24 +29,25 @@ class NetworkSession {
   Future<void> clearCookieJar() => cookieJar.deleteAll();
 
   @protected
-  Dio get dio => Dio(
-        BaseOptions(
-          contentType: Headers.formUrlEncodedContentType,
-          headers: {
-            HttpHeaders.userAgentHeader:
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/130.0.0.0 Safari/537.36",
-          },
-        ),
-      )
+  Dio get dio =>
+      Dio(
+          BaseOptions(
+            contentType: Headers.formUrlEncodedContentType,
+            headers: {
+              HttpHeaders.userAgentHeader:
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/130.0.0.0 Safari/537.36",
+            },
+          ),
+        )
         ..interceptors.add(CookieManager(cookieJar))
         ..interceptors.add(logDioAdapter)
         ..options.connectTimeout = const Duration(seconds: 10)
         ..options.receiveTimeout = const Duration(seconds: 30)
         ..options.followRedirects = false
-        ..options.validateStatus =
-            (status) => status != null && status >= 200 && status < 400;
+        ..options.validateStatus = (status) =>
+            status != null && status >= 200 && status < 400;
 
   static Future<bool> isInSchool() async {
     bool isInSchool = false;
@@ -83,9 +79,7 @@ class NetworkSession {
         "[NetworkSession][initSession] "
         "Fetching...",
       );
-      var response = await dio.get(
-        "http://linux.xidian.edu.cn",
-      );
+      var response = await dio.get("http://linux.xidian.edu.cn");
       if (response.statusCode == 200) {
         isInit.value = SessionState.fetched;
         log.info(

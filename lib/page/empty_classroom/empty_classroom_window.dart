@@ -30,12 +30,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          FlutterI18n.translate(
-            context,
-            "empty_classroom.title",
-          ),
-        ),
+        title: Text(FlutterI18n.translate(context, "empty_classroom.title")),
       ),
       body: FutureBuilder(
         future: places,
@@ -49,9 +44,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
                 }),
               );
             } else {
-              return EmptyClassroomSearchWindow(
-                places: snapshot.data!,
-              );
+              return EmptyClassroomSearchWindow(places: snapshot.data!);
             }
           } else {
             return const CircularProgressIndicator().center();

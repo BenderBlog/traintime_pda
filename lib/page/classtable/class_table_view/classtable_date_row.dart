@@ -24,26 +24,20 @@ class ClassTableDateRow extends StatelessWidget {
       height: midRowHeight,
       padding: const EdgeInsets.symmetric(vertical: 5),
       color: Colors.grey.shade200.withValues(alpha: 0.75),
-      child: Row(children: [
-        Text(
-          FlutterI18n.translate(
-            context,
-            "classtable.month",
-            translationParams: {"month": dateList.first.month.toString()},
-          ),
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-          ),
-        ).center().constrained(width: leftRow),
-        ...List.generate(
-          7,
-          (index) => WeekInfomation(
-            time: dateList[index],
-          ),
-        ),
-      ]),
+      child: Row(
+        children: [
+          Text(
+            FlutterI18n.translate(
+              context,
+              "classtable.month",
+              translationParams: {"month": dateList.first.month.toString()},
+            ),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          ).center().constrained(width: leftRow),
+          ...List.generate(7, (index) => WeekInfomation(time: dateList[index])),
+        ],
+      ),
     );
   }
 }
@@ -51,10 +45,7 @@ class ClassTableDateRow extends StatelessWidget {
 /// The week index info, shows the day and the week.
 class WeekInfomation extends StatelessWidget {
   final DateTime time;
-  const WeekInfomation({
-    super.key,
-    required this.time,
-  });
+  const WeekInfomation({super.key, required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -68,26 +59,20 @@ class WeekInfomation extends StatelessWidget {
         children: [
           Text(
             getWeekString(context, time.weekday - 1),
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
           Text(
-            time.day.toString(),
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isToday ? FontWeight.bold : null,
-              color: isToday
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.black87,
-            ),
-          )
-              .center()
-              .constrained(
-                width: 26,
-                height: 20,
+                time.day.toString(),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isToday ? FontWeight.bold : null,
+                  color: isToday
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.black87,
+                ),
               )
+              .center()
+              .constrained(width: 26, height: 20)
               .decorated(
                 color: isToday
                     ? Theme.of(context).colorScheme.onPrimary

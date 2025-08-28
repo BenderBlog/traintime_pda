@@ -44,92 +44,80 @@ class _LoginWindowState extends State<LoginWindow> {
     required IconData iconData,
     required String hintText,
     Widget? suffixIcon,
-  }) =>
-      InputDecoration(
-        prefixIcon: Icon(iconData),
-        hintText: hintText,
-        suffixIcon: suffixIcon,
-      );
+  }) => InputDecoration(
+    prefixIcon: Icon(iconData),
+    hintText: hintText,
+    suffixIcon: suffixIcon,
+  );
 
   /// Can I see the password?
   bool _couldNotView = true;
 
   Widget contentColumn() => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            controller: _idsAccountController,
-            decoration: _inputDecoration(
-              iconData: MingCuteIcons.mgc_user_3_fill,
-              hintText: FlutterI18n.translate(context, "login.identity_number"),
-            ),
-          ).center(),
-          const SizedBox(height: 16.0),
-          TextField(
-            controller: _idsPasswordController,
-            obscureText: _couldNotView,
-            decoration: _inputDecoration(
-              iconData: MingCuteIcons.mgc_safe_lock_fill,
-              hintText: FlutterI18n.translate(context, "login.password"),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _couldNotView ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _couldNotView = !_couldNotView;
-                  });
-                },
-              ),
-            ),
-          ).center(),
-          SizedBox(height: width / height > 1.0 ? 16.0 : 64.0),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(double.infinity, 56),
-              maximumSize: const Size(double.infinity, 64),
-            ),
-            child: Text(
-              FlutterI18n.translate(context, "login.login"),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20.0,
-              ),
-            ),
-            onPressed: () async {
-              if (_idsPasswordController.text.isNotEmpty) {
-                await login();
-              } else {
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "login.incorrect_password_pattern",
-                  ),
-                );
-              }
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      TextField(
+        controller: _idsAccountController,
+        decoration: _inputDecoration(
+          iconData: MingCuteIcons.mgc_user_3_fill,
+          hintText: FlutterI18n.translate(context, "login.identity_number"),
+        ),
+      ).center(),
+      const SizedBox(height: 16.0),
+      TextField(
+        controller: _idsPasswordController,
+        obscureText: _couldNotView,
+        decoration: _inputDecoration(
+          iconData: MingCuteIcons.mgc_safe_lock_fill,
+          hintText: FlutterI18n.translate(context, "login.password"),
+          suffixIcon: IconButton(
+            icon: Icon(_couldNotView ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _couldNotView = !_couldNotView;
+              });
             },
           ),
-          const SizedBox(height: 8.0),
-          const ButtomButtons(),
-        ],
-      ).constrained(maxWidth: 400);
+        ),
+      ).center(),
+      SizedBox(height: width / height > 1.0 ? 16.0 : 64.0),
+      FilledButton(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(double.infinity, 56),
+          maximumSize: const Size(double.infinity, 64),
+        ),
+        child: Text(
+          FlutterI18n.translate(context, "login.login"),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+        ),
+        onPressed: () async {
+          if (_idsPasswordController.text.isNotEmpty) {
+            await login();
+          } else {
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(
+                context,
+                "login.incorrect_password_pattern",
+              ),
+            );
+          }
+        },
+      ),
+      const SizedBox(height: 8.0),
+      const ButtomButtons(),
+    ],
+  ).constrained(maxWidth: 400);
 
   Future<void> login() async {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
-      msg: FlutterI18n.translate(
-        context,
-        "login.on_login_progress",
-      ),
+      msg: FlutterI18n.translate(context, "login.on_login_progress"),
       max: 100,
       hideValue: true,
       completed: Completed(
-        completedMsg: FlutterI18n.translate(
-          context,
-          "login.complete_login",
-        ),
+        completedMsg: FlutterI18n.translate(context, "login.complete_login"),
       ),
     );
     EhallSession ses = EhallSession();
@@ -209,7 +197,7 @@ class _LoginWindowState extends State<LoginWindow> {
                   context,
                   "login.failed_login_with_code",
                   translationParams: {
-                    "code": e.response!.statusCode.toString()
+                    "code": e.response!.statusCode.toString(),
                   },
                 ),
               );
@@ -220,9 +208,7 @@ class _LoginWindowState extends State<LoginWindow> {
               msg: FlutterI18n.translate(
                 context,
                 "login.failed_login_with_message",
-                translationParams: {
-                  "message": e.message.toString(),
-                },
+                translationParams: {"message": e.message.toString()},
               ),
             );
           }
@@ -234,22 +220,13 @@ class _LoginWindowState extends State<LoginWindow> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                e.toString().substring(
-                      0,
-                      min(
-                        e.toString().length,
-                        120,
-                      ),
-                    ),
+                e.toString().substring(0, min(e.toString().length, 120)),
               ),
             ),
           );
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "login.failed_login_other",
-            ),
+            msg: FlutterI18n.translate(context, "login.failed_login_other"),
           );
         }
       }
@@ -285,27 +262,23 @@ class _LoginWindowState extends State<LoginWindow> {
                   const AppIconWidget().gestures(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => const AboutPage()),
+                        builder: (context) => const AboutPage(),
+                      ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 48,
-                  ),
-                  Expanded(
-                    child: contentColumn(),
-                  ),
+                  const SizedBox(width: 48),
+                  Expanded(child: contentColumn()),
                 ],
               )
             : Column(
                 children: [
                   const AppIconWidget()
-                      .padding(
-                        vertical: kToolbarHeight * 0.75,
-                      )
+                      .padding(vertical: kToolbarHeight * 0.75)
                       .gestures(
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (context) => const AboutPage()),
+                            builder: (context) => const AboutPage(),
+                          ),
                         ),
                       ),
                   contentColumn(),

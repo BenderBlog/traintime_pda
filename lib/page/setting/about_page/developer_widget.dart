@@ -13,47 +13,37 @@ class Developer {
   final String imageUrl;
   final String description;
   final String url;
-  const Developer(
-    this.name,
-    this.imageUrl,
-    this.description,
-    this.url,
-  );
+  const Developer(this.name, this.imageUrl, this.description, this.url);
 }
 
 class DeveloperWidget extends StatelessWidget {
   final Developer developer;
-  const DeveloperWidget({
-    super.key,
-    required this.developer,
-  });
+  const DeveloperWidget({super.key, required this.developer});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.pushDialog(AlertDialog(
-        title: Text(developer.name),
-        content: Text(developer.description.splitMapJoin(
-          " / ",
-          onMatch: (p0) => "\n",
-        )),
-        actions: [
-          TextButton(
-            onPressed: () => launchUrl(
-              Uri.parse(developer.url),
-              mode: LaunchMode.externalApplication,
+      onTap: () => context.pushDialog(
+        AlertDialog(
+          title: Text(developer.name),
+          content: Text(
+            developer.description.splitMapJoin(" / ", onMatch: (p0) => "\n"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => launchUrl(
+                Uri.parse(developer.url),
+                mode: LaunchMode.externalApplication,
+              ),
+              child: const Text("More about this guy"),
             ),
-            child: const Text("More about this guy"),
-          )
-        ],
-      )),
+          ],
+        ),
+      ),
       child: CachedNetworkImage(
         fit: BoxFit.fitHeight,
         imageUrl: developer.imageUrl,
-      ).clipOval().constrained(
-            width: 48,
-            height: 48,
-          ),
+      ).clipOval().constrained(width: 48, height: 48),
     );
   }
 }

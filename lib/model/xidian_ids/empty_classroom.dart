@@ -6,18 +6,13 @@ class EmptyClassroomPlace {
   final String name;
   final String code;
 
-  EmptyClassroomPlace({
-    required this.name,
-    required this.code,
-  });
+  EmptyClassroomPlace({required this.name, required this.code});
 }
 
 class EmptyClassroomData {
   final String name;
   final List<bool> isUsed;
 
-  EmptyClassroomData({
-    required this.name,
-    required this.isUsed,
-  }) : assert(isUsed.length == 10);
+  EmptyClassroomData({required this.name, required this.isUsed})
+    : assert(isUsed.length == 10);
 }

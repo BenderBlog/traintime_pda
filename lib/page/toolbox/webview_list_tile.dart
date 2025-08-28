@@ -8,10 +8,7 @@ import 'package:watermeter/model/toolbox_addresses.dart';
 
 class WebViewListTile extends StatelessWidget {
   final WebViewAddresses data;
-  const WebViewListTile({
-    super.key,
-    required this.data,
-  });
+  const WebViewListTile({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +16,8 @@ class WebViewListTile extends StatelessWidget {
       leading: Icon(data.iconData),
       title: Text(data.name),
       subtitle: Text(data.description),
-      onTap: () => launchUrlString(
-        data.url,
-        mode: LaunchMode.externalApplication,
-      ),
+      onTap: () =>
+          launchUrlString(data.url, mode: LaunchMode.externalApplication),
     );
   }
 }

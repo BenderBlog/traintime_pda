@@ -25,10 +25,7 @@ class LibraryCard extends StatelessWidget {
         if (offline) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "homepage.offline_mode",
-            ),
+            msg: FlutterI18n.translate(context, "homepage.offline_mode"),
           );
         } else {
           context.pushReplacement(const LibraryWindow());
@@ -38,10 +35,7 @@ class LibraryCard extends StatelessWidget {
         () => MainPageCard(
           isLoad: borrow_info.state.value == SessionState.fetching,
           icon: MingCuteIcons.mgc_book_2_line,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.library_card.title",
-          ),
+          text: FlutterI18n.translate(context, "homepage.library_card.title"),
           infoText: Text.rich(
             TextSpan(
               style: const TextStyle(fontSize: 20),
@@ -55,7 +49,7 @@ class LibraryCard extends StatelessWidget {
                         "count": borrow_info.borrowList.length.toString(),
                       },
                     ),
-                  )
+                  ),
                 ] else if (borrow_info.state.value == SessionState.error)
                   TextSpan(
                     text: FlutterI18n.translate(
@@ -69,7 +63,7 @@ class LibraryCard extends StatelessWidget {
                       context,
                       "homepage.library_card.fetching",
                     ),
-                  )
+                  ),
               ],
             ),
           ),
@@ -79,26 +73,26 @@ class LibraryCard extends StatelessWidget {
               child: Text(
                 borrow_info.state.value == SessionState.fetched
                     ? borrow_info.dued == 0
-                        ? FlutterI18n.translate(
-                            context,
-                            "homepage.library_card.no_return",
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            "homepage.library_card.need_return",
-                            translationParams: {
-                              "dued": borrow_info.dued.toString()
-                            },
-                          )
+                          ? FlutterI18n.translate(
+                              context,
+                              "homepage.library_card.no_return",
+                            )
+                          : FlutterI18n.translate(
+                              context,
+                              "homepage.library_card.need_return",
+                              translationParams: {
+                                "dued": borrow_info.dued.toString(),
+                              },
+                            )
                     : borrow_info.state.value == SessionState.error
-                        ? FlutterI18n.translate(
-                            context,
-                            "homepage.library_card.no_info",
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            "homepage.library_card.fetching_info",
-                          ),
+                    ? FlutterI18n.translate(
+                        context,
+                        "homepage.library_card.no_info",
+                      )
+                    : FlutterI18n.translate(
+                        context,
+                        "homepage.library_card.fetching_info",
+                      ),
               ),
             );
           }),

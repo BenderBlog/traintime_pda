@@ -26,12 +26,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          FlutterI18n.translate(
-            context,
-            "experiment.title",
-          ),
-        ),
+        title: Text(FlutterI18n.translate(context, "experiment.title")),
       ),
       body: GetBuilder<ExperimentController>(
         builder: (controller) {
@@ -42,30 +37,22 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
             var done = controller.isFinished(now);
             return TimelineWidget(
               isTitle: [
-                if (doing.isNotEmpty) ...[
-                  true,
-                  false,
-                ],
+                if (doing.isNotEmpty) ...[true, false],
                 true,
                 false,
                 true,
                 false,
-                false
+                false,
               ],
               children: [
                 if (doing.isNotEmpty) ...[
                   TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "experiment.ongoing",
-                    ),
+                    title: FlutterI18n.translate(context, "experiment.ongoing"),
                   ),
                   Column(
                     children: List.generate(
                       doing.length,
-                      (index) => ExperimentInfoCard(
-                        data: doing[index],
-                      ),
+                      (index) => ExperimentInfoCard(data: doing[index]),
                     ),
                   ),
                 ],
@@ -79,9 +66,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                     ? Column(
                         children: List.generate(
                           unDone.length,
-                          (index) => ExperimentInfoCard(
-                            data: unDone[index],
-                          ),
+                          (index) => ExperimentInfoCard(data: unDone[index]),
                         ),
                       )
                     : TimelineTitle(
@@ -91,27 +76,20 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                         ),
                       ),
                 TimelineTitle(
-                  title: FlutterI18n.translate(
-                    context,
-                    "experiment.finished",
-                  ),
+                  title: FlutterI18n.translate(context, "experiment.finished"),
                 ),
                 ExperimentInfoCard(
                   title: FlutterI18n.translate(
                     context,
                     "experiment.score_sum",
-                    translationParams: {
-                      "sum": controller.sum.toString(),
-                    },
+                    translationParams: {"sum": controller.sum.toString()},
                   ),
                 ),
                 done.isNotEmpty
                     ? Column(
                         children: List.generate(
                           done.length,
-                          (index) => ExperimentInfoCard(
-                            data: done[index],
-                          ),
+                          (index) => ExperimentInfoCard(data: done[index]),
                         ),
                       )
                     : TimelineTitle(
@@ -125,10 +103,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
           } else if (controller.status == ExperimentStatus.error) {
             return ReloadWidget(
               function: controller.get,
-              errorStatus: FlutterI18n.translate(
-                context,
-                controller.error,
-              ),
+              errorStatus: FlutterI18n.translate(context, controller.error),
             );
           } else {
             return const Center(child: CircularProgressIndicator());

@@ -7,11 +7,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 
 @immutable
 class FlowEventRow extends StatelessWidget {
-  const FlowEventRow({
-    super.key,
-    required this.child,
-    required this.isTitle,
-  });
+  const FlowEventRow({super.key, required this.child, required this.isTitle});
 
   final Widget child;
   final bool isTitle;
@@ -21,9 +17,7 @@ class FlowEventRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 10,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: <Widget>[
           Padding(
@@ -41,9 +35,7 @@ class FlowEventRow extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: child,
-          ),
+          Expanded(child: child),
         ],
       ),
     );

@@ -116,39 +116,37 @@ class ElectricityCard extends StatelessWidget {
       ),
       child: Obx(
         () => MainPageCard(
-            isLoad: isLoad.value,
-            icon: MingCuteIcons.mgc_flash_line,
-            text: FlutterI18n.translate(
-              context,
-              "homepage.electricity_card.title",
-            ),
-            infoText: Text(
-              electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
-                  ? FlutterI18n.translate(
-                      context,
-                      "homepage.electricity_card.current_electricity",
-                      translationParams: {
-                        "amount": electricityInfo.value.remain,
-                      },
-                    )
-                  : FlutterI18n.translate(
-                      context,
-                      electricityInfo.value.remain,
-                    ),
-              style: const TextStyle(fontSize: 20),
-            ),
-            bottomText: Builder(builder: (context) {
+          isLoad: isLoad.value,
+          icon: MingCuteIcons.mgc_flash_line,
+          text: FlutterI18n.translate(
+            context,
+            "homepage.electricity_card.title",
+          ),
+          infoText: Text(
+            electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
+                ? FlutterI18n.translate(
+                    context,
+                    "homepage.electricity_card.current_electricity",
+                    translationParams: {"amount": electricityInfo.value.remain},
+                  )
+                : FlutterI18n.translate(context, electricityInfo.value.remain),
+            style: const TextStyle(fontSize: 20),
+          ),
+          bottomText: Builder(
+            builder: (context) {
               /// I believe it is not from tomorrow, like Bender lol
               if (!electricityInfo.value.fetchDay.isToday) {
-                return Text(FlutterI18n.translate(
-                  context,
-                  "homepage.electricity_card.cache_notice",
-                  translationParams: {
-                    "date": DateFormat("yyyy-MM-dd HH:mm").format(
-                      electricityInfo.value.fetchDay,
-                    ),
-                  },
-                ).replaceAll("\n", ""));
+                return Text(
+                  FlutterI18n.translate(
+                    context,
+                    "homepage.electricity_card.cache_notice",
+                    translationParams: {
+                      "date": DateFormat(
+                        "yyyy-MM-dd HH:mm",
+                      ).format(electricityInfo.value.fetchDay),
+                    },
+                  ).replaceAll("\n", ""),
+                );
               }
 
               if (electricityInfo.value.owe.contains(RegExp(r'[0-9]'))) {
@@ -162,13 +160,12 @@ class ElectricityCard extends StatelessWidget {
                 );
               }
               return Text(
-                FlutterI18n.translate(
-                  context,
-                  electricityInfo.value.owe,
-                ),
+                FlutterI18n.translate(context, electricityInfo.value.owe),
                 overflow: TextOverflow.ellipsis,
               );
-            })),
+            },
+          ),
+        ),
       ),
     );
   }

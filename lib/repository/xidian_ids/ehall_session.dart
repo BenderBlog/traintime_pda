@@ -77,7 +77,8 @@ class EhallSession extends IDSSession {
       );
       if (!await isLoggedIn()) {
         String location = await super.checkAndLogin(
-          target: "https://ehall.xidian.edu.cn/login?"
+          target:
+              "https://ehall.xidian.edu.cn/login?"
               "service=https://ehall.xidian.edu.cn/new/index.html",
           sliderCaptcha: (String cookieStr) =>
               SliderCaptchaClientProvider(cookie: cookieStr).solve(null),

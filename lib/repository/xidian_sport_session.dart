@@ -219,31 +219,26 @@ class SportSession {
       });
       var response = await require(
         subWebsite: "stuTermScore/uidSelect",
-        body: {
-          "uid": userId,
-          "pageIndex": "1",
-          "pageSize": "100",
-        },
+        body: {"uid": userId, "pageIndex": "1", "pageSize": "100"},
       );
       for (var i in response["data"]) {
         try {
           int latestId = i["id"];
           var classData = await require(
             subWebsite: "stuTeacherCurriculum/selstuTeacherCurriculum",
-            body: {
-              "stuid": userId,
-              "stuTermScoreid": latestId,
-            },
+            body: {"stuid": userId, "stuTermScoreid": latestId},
           ).then((value) => value["data"][0]);
-          toReturn.items.add(SportClassItem.fromData(
-            termName: classData["teacherCurriculumSysTermName"],
-            name: classData["teacherCurriculumTeachingCurriculumName"],
-            teacher: classData["teacherCurriculumSysUserName"],
-            time: classData["teacherCurriculumTeachingSchoolTimeName"],
-            place: classData["teacherCurriculumTeachingAddressName"],
-            score: i["score"],
-            type: i["type"],
-          ));
+          toReturn.items.add(
+            SportClassItem.fromData(
+              termName: classData["teacherCurriculumSysTermName"],
+              name: classData["teacherCurriculumTeachingCurriculumName"],
+              teacher: classData["teacherCurriculumSysUserName"],
+              time: classData["teacherCurriculumTeachingSchoolTimeName"],
+              place: classData["teacherCurriculumTeachingAddressName"],
+              score: i["score"],
+              type: i["type"],
+            ),
+          );
         } catch (e, s) {
           log.handle(e, s);
           continue;
@@ -294,20 +289,13 @@ rjdYZpHh4x98Fg0Q28sp6i2ZoWiGrJDKW29mntVQQiDNhKD
 awb4B45zUwIDAQAB
 -----END PUBLIC KEY-----""";
 
-  final commonHeader = {
-    'channel': 'H5',
-    'version': '99999',
-    'type': '0',
-  };
+  final commonHeader = {'channel': 'H5', 'version': '99999', 'type': '0'};
 
-  Map<String, String> get header => commonHeader
-    ..addAll({
-      "token": token,
-    });
+  Map<String, String> get header => commonHeader..addAll({"token": token});
 
   final commonSignParams = {
     'appId': '3685bc028aaf4e64ad6b5d2349d24ba8',
-    'appSecret': 'e8167ef026cbc5e456ab837d9d6d9254'
+    'appSecret': 'e8167ef026cbc5e456ab837d9d6d9254',
   };
 
   String _getSign(Map<String, dynamic> params) {
@@ -331,10 +319,12 @@ awb4B45zUwIDAQAB
 
   /// Maybe I wrote how to store the data is better.
   Dio get _dio {
-    Dio toReturn = Dio(BaseOptions(
-      baseUrl: baseURL,
-      contentType: Headers.formUrlEncodedContentType,
-    ));
+    Dio toReturn = Dio(
+      BaseOptions(
+        baseUrl: baseURL,
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
     toReturn.interceptors.add(CookieManager(sportCookieJar));
     toReturn.interceptors.add(logDioAdapter);
     return toReturn;
@@ -345,8 +335,11 @@ awb4B45zUwIDAQAB
     required Map<String, dynamic> body,
     bool isForce = false,
   }) async {
-    var response = await _dio.post(subWebsite,
-        data: body, options: Options(headers: _getHead(body)));
+    var response = await _dio.post(
+      subWebsite,
+      data: body,
+      options: Options(headers: _getHead(body)),
+    );
     return response.data;
   }
 
@@ -374,7 +367,7 @@ awb4B45zUwIDAQAB
             preference.getString(preference.Preference.sportPassword),
             rsaKey,
           ),
-          "openid": ""
+          "openid": "",
         },
       );
       if (response["returnCode"] != "200" && response["returnCode"] != 200) {
@@ -392,10 +385,10 @@ awb4B45zUwIDAQAB
   }
 
   Future<String> getTermID() async {
-    var response =
-        await require(subWebsite: "/stuTermPunchRecord/findList", body: {
-      'userId': userId,
-    });
+    var response = await require(
+      subWebsite: "/stuTermPunchRecord/findList",
+      body: {'userId': userId},
+    );
     if (response["returnCode"] == "200") {
       return response["data"][0]["sysTermId"].toString();
     } else {

@@ -27,10 +27,9 @@ class SchoolnetCard extends StatelessWidget {
         () => MainPageCard(
           isLoad: schoolNetStatus.value == SessionState.fetching,
           icon: MingCuteIcons.mgc_wifi_fill,
-          text: preference
-                  .getString(
-                    preference.Preference.schoolNetQueryPassword,
-                  )
+          text:
+              preference
+                  .getString(preference.Preference.schoolNetQueryPassword)
                   .isEmpty
               ? FlutterI18n.translate(
                   context,
@@ -53,10 +52,7 @@ class SchoolnetCard extends StatelessWidget {
                   ),
                   const TextSpan(
                     text: "",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ] else
                   TextSpan(
@@ -73,19 +69,16 @@ class SchoolnetCard extends StatelessWidget {
           bottomText: Text(
             schoolNetStatus.value == SessionState.fetched
                 ? FlutterI18n.translate(
-                    context, "homepage.school_net.remaining",
-                    translationParams: {
-                        "remaining": networkInfo.value!.rest,
-                      })
+                    context,
+                    "homepage.school_net.remaining",
+                    translationParams: {"remaining": networkInfo.value!.rest},
+                  )
                 : schoolNetStatus.value == SessionState.error
-                    ? FlutterI18n.translate(
-                        context,
-                        isError.value,
-                      )
-                    : FlutterI18n.translate(
-                        context,
-                        "homepage.school_net.fetching",
-                      ),
+                ? FlutterI18n.translate(context, isError.value)
+                : FlutterI18n.translate(
+                    context,
+                    "homepage.school_net.fetching",
+                  ),
             overflow: TextOverflow.ellipsis,
           ),
         ),

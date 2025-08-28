@@ -17,13 +17,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-enum ExperimentStatus {
-  cache,
-  fetching,
-  fetched,
-  error,
-  none,
-}
+enum ExperimentStatus { cache, fetching, fetched, error, none }
 
 class ExperimentController extends GetxController {
   static const experimentCacheName = "Experiment.json";
@@ -46,24 +40,25 @@ class ExperimentController extends GetxController {
     DateFormat formatter = DateFormat(HomeArrangement.format);
     isFinished.removeWhere((element) => !element.time.first.isAtSameDayAs(now));
     return isFinished
-        .map((e) => HomeArrangement(
-              name: e.name,
-              place: e.classroom,
-              teacher: e.teacher,
-              startTimeStr: formatter.format(e.time[0]),
-              endTimeStr: formatter.format(e.time[1]),
-            ))
+        .map(
+          (e) => HomeArrangement(
+            name: e.name,
+            place: e.classroom,
+            teacher: e.teacher,
+            startTimeStr: formatter.format(e.time[0]),
+            endTimeStr: formatter.format(e.time[1]),
+          ),
+        )
         .toList();
   }
 
   List<ExperimentData> isFinished(DateTime now) {
     List<ExperimentData> isFinished = List.from(data);
     isFinished.removeWhere((e) => e.time[0].isAfter(now));
-    return isFinished
-      ..sort(
-        (a, b) =>
-            a.time[1].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
-      );
+    return isFinished..sort(
+      (a, b) =>
+          a.time[1].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
+    );
   }
 
   List<ExperimentData> isNotFinished(DateTime now) {
@@ -71,11 +66,10 @@ class ExperimentController extends GetxController {
     isNotFinished.removeWhere(
       (e) => e.time[0].isAtSameMicrosecondAs(now) || e.time[0].isBefore(now),
     );
-    return isNotFinished
-      ..sort(
-        (a, b) =>
-            a.time[0].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
-      );
+    return isNotFinished..sort(
+      (a, b) =>
+          a.time[0].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
+    );
   }
 
   List<ExperimentData> doing(DateTime now) {
@@ -85,11 +79,10 @@ class ExperimentController extends GetxController {
           now.microsecondsSinceEpoch < element.time[0].microsecondsSinceEpoch ||
           now.microsecondsSinceEpoch > element.time[1].microsecondsSinceEpoch,
     );
-    return isNotFinished
-      ..sort(
-        (a, b) =>
-            a.time[1].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
-      );
+    return isNotFinished..sort(
+      (a, b) =>
+          a.time[1].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
+    );
   }
 
   @override
@@ -175,11 +168,13 @@ class ExperimentController extends GetxController {
         if (Platform.isIOS) {
           final api = SaveToGroupIdSwiftApi();
           try {
-            bool result = await api.saveToGroupId(FileToGroupID(
-              appid: preference.appId,
-              fileName: experimentCacheName,
-              data: jsonEncode(data),
-            ));
+            bool result = await api.saveToGroupId(
+              FileToGroupID(
+                appid: preference.appId,
+                fileName: experimentCacheName,
+                data: jsonEncode(data),
+              ),
+            );
             log.info(
               "[ExperimentController][get] "
               "ios Save to public place status: $result.",

@@ -66,44 +66,43 @@ class _SportClassWindowState extends State<SportClassWindow>
             _controller.finishRefresh();
           },
           refreshOnStart: true,
-          child: Obx(
-            () {
-              if (sportClass.value.situation == null) {
-                return sportClass.value.items.isNotEmpty
-                    ? DataList<Widget>(
-                        list: sportClass.value.items
-                            .map((element) => SportClassCard(data: element))
-                            .toList(),
-                        initFormula: (toUse) => toUse,
+          child: Obx(() {
+            if (sportClass.value.situation == null) {
+              return sportClass.value.items.isNotEmpty
+                  ? DataList<Widget>(
+                      list: sportClass.value.items
+                          .map((element) => SportClassCard(data: element))
+                          .toList(),
+                      initFormula: (toUse) => toUse,
+                    )
+                  : EmptyListView(
+                      type: EmptyListViewType.singing,
+                      text: FlutterI18n.translate(
+                        context,
+                        "sport.empty_class_info",
+                      ),
+                    );
+            } else if (sportClass.value.situation ==
+                "sport.situation_fetching") {
+              return const CircularProgressIndicator().center();
+            } else {
+              return ReloadWidget(
+                function: () => _controller.callRefresh(),
+                errorStatus: sportClass.value.situation != null
+                    ? FlutterI18n.translate(
+                        context,
+                        "sport.situation_error",
+                        translationParams: {
+                          "situation": FlutterI18n.translate(
+                            context,
+                            sportClass.value.situation ?? "",
+                          ),
+                        },
                       )
-                    : EmptyListView(
-                        type: EmptyListViewType.singing,
-                        text: FlutterI18n.translate(
-                          context,
-                          "sport.empty_class_info",
-                        ));
-              } else if (sportClass.value.situation ==
-                  "sport.situation_fetching") {
-                return const CircularProgressIndicator().center();
-              } else {
-                return ReloadWidget(
-                  function: () => _controller.callRefresh(),
-                  errorStatus: sportClass.value.situation != null
-                      ? FlutterI18n.translate(
-                          context,
-                          "sport.situation_error",
-                          translationParams: {
-                            "situation": FlutterI18n.translate(
-                              context,
-                              sportClass.value.situation ?? "",
-                            )
-                          },
-                        )
-                      : null,
-                ).center();
-              }
-            },
-          ),
+                    : null,
+              ).center();
+            }
+          }),
         ),
       ),
     );
@@ -112,10 +111,7 @@ class _SportClassWindowState extends State<SportClassWindow>
 
 class SportClassCard extends StatelessWidget {
   final SportClassItem data;
-  const SportClassCard({
-    super.key,
-    required this.data,
-  });
+  const SportClassCard({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +142,7 @@ class SportClassCard extends StatelessWidget {
     return ReXCard(
       title: Text(data.termToShow),
       remaining: [
-        if (data.score.contains(RegExp(r'[0-9]'))) ReXCardRemaining(data.score)
+        if (data.score.contains(RegExp(r'[0-9]'))) ReXCardRemaining(data.score),
       ],
       bottomRow: [
         InformationWithIcon(
@@ -158,10 +154,7 @@ class SportClassCard extends StatelessWidget {
             icon: Icons.person,
             text: data.teacher,
           ).flexible(),
-          InformationWithIcon(
-            icon: Icons.stadium,
-            text: data.place,
-          ).flexible(),
+          InformationWithIcon(icon: Icons.stadium, text: data.place).flexible(),
         ].toRow(),
       ].toColumn(),
     );

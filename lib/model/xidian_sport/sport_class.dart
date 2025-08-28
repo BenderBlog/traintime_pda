@@ -51,7 +51,8 @@ class SportClassItem {
         week = 7;
     }
 
-    String term = "${termDealer.namedGroup("year_start")}-"
+    String term =
+        "${termDealer.namedGroup("year_start")}-"
         "${termDealer.namedGroup("year_end")}-"
         "${termDealer.namedGroup("term")}";
 
@@ -70,17 +71,17 @@ class SportClassItem {
   }
 
   factory SportClassItem.empty() => SportClassItem._(
-        termToShow: "",
-        score: "",
-        term: "",
-        type: "",
-        name: "",
-        teacher: "",
-        start: 0,
-        stop: 0,
-        week: 0,
-        place: "",
-      );
+    termToShow: "",
+    score: "",
+    term: "",
+    type: "",
+    name: "",
+    teacher: "",
+    start: 0,
+    stop: 0,
+    week: 0,
+    place: "",
+  );
 
   SportClassItem._({
     required this.termToShow,

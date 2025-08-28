@@ -30,10 +30,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         if (offline) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "homepage.offline_mode",
-            ),
+            msg: FlutterI18n.translate(context, "homepage.offline_mode"),
           );
         } else {
           switch (school_card_session.isInit.value) {
@@ -43,13 +40,12 @@ class SchoolCardInfoCard extends StatelessWidget {
             case SessionState.error:
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(school_card_session.errorSession.substring(
-                    0,
-                    min(
-                      school_card_session.errorSession.value.length,
-                      120,
+                  content: Text(
+                    school_card_session.errorSession.substring(
+                      0,
+                      min(school_card_session.errorSession.value.length, 120),
                     ),
-                  )),
+                  ),
                 ),
               );
 
@@ -86,21 +82,23 @@ class SchoolCardInfoCard extends StatelessWidget {
               children: [
                 if (school_card_session.isInit.value ==
                     SessionState.fetched) ...[
-                  if (school_card_session.money.value
-                      .contains(RegExp(r'[0-9]')))
+                  if (school_card_session.money.value.contains(
+                    RegExp(r'[0-9]'),
+                  ))
                     TextSpan(
                       text: FlutterI18n.translate(
-                          context, "homepage.school_card_info_card.balance",
-                          translationParams: {
-                            "amount": double.parse(
-                                      school_card_session.money.value,
-                                    ) >=
-                                    10
-                                ? double.parse(school_card_session.money.value)
-                                    .truncate()
-                                    .toString()
-                                : school_card_session.money.value,
-                          }),
+                        context,
+                        "homepage.school_card_info_card.balance",
+                        translationParams: {
+                          "amount":
+                              double.parse(school_card_session.money.value) >=
+                                  10
+                              ? double.parse(
+                                  school_card_session.money.value,
+                                ).truncate().toString()
+                              : school_card_session.money.value,
+                        },
+                      ),
                     )
                   else
                     TextSpan(
@@ -131,14 +129,14 @@ class SchoolCardInfoCard extends StatelessWidget {
                     "homepage.school_card_info_card.bottom_text_success",
                   )
                 : school_card_session.isInit.value == SessionState.error
-                    ? FlutterI18n.translate(
-                        context,
-                        "homepage.school_card_info_card.no_info",
-                      )
-                    : FlutterI18n.translate(
-                        context,
-                        "homepage.school_card_info_card.fetching_info",
-                      ),
+                ? FlutterI18n.translate(
+                    context,
+                    "homepage.school_card_info_card.no_info",
+                  )
+                : FlutterI18n.translate(
+                    context,
+                    "homepage.school_card_info_card.fetching_info",
+                  ),
             overflow: TextOverflow.ellipsis,
           ),
           rightButton: school_card_session.isInit.value == SessionState.fetched
@@ -169,16 +167,13 @@ class QRCodeView extends StatefulWidget {
 }
 
 class _QRCodeViewState extends State<QRCodeView> {
-  Future<Uint8List> qrCode =
-      school_card_session.SchoolCardSession().getQRCode();
+  Future<Uint8List> qrCode = school_card_session.SchoolCardSession()
+      .getQRCode();
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "school_card_window.qr_code",
-      )),
+      title: Text(FlutterI18n.translate(context, "school_card_window.qr_code")),
       content: FutureBuilder<Uint8List>(
         future: qrCode,
         builder: (context, snapshot) {
@@ -196,20 +191,19 @@ class _QRCodeViewState extends State<QRCodeView> {
                         child: Center(child: CircularProgressIndicator()),
                       )
                     : snapshot.hasError
-                        ? SizedBox(
-                            width: 200,
-                            child: Text(FlutterI18n.translate(
-                              context,
-                              "school_card_window.qr_code",
-                              translationParams: {
-                                "info": snapshot.error.toString(),
-                              },
-                            )))
-                        : Image.memory(
-                            snapshot.data!,
-                            width: 200,
-                            height: 200,
+                    ? SizedBox(
+                        width: 200,
+                        child: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "school_card_window.qr_code",
+                            translationParams: {
+                              "info": snapshot.error.toString(),
+                            },
                           ),
+                        ),
+                      )
+                    : Image.memory(snapshot.data!, width: 200, height: 200),
               ),
             ),
           );
@@ -225,7 +219,7 @@ class _QRCodeViewState extends State<QRCodeView> {
           child: Text(
             FlutterI18n.translate(context, "school_card_window.reload"),
           ),
-        )
+        ),
       ],
     );
   }

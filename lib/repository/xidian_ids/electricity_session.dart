@@ -64,77 +64,79 @@ Future<void> update({
   await ElectricitySession()
       .loginPayment(captchaFunction: captchaFunction)
       .then(
-        (value) => Future.wait([
-          Future(() async {
-            try {
-              electricityInfo.value.remain =
-                  "electricity_status.remain_fetching";
-              await ElectricitySession().getElectricity(value);
-            } on DioException catch (e, s) {
-              log.handle(e, s);
-              electricityInfo.value.remain =
-                  "electricity_status.remain_network_issue";
-            } on NotFoundException {
-              electricityInfo.value.remain =
-                  "electricity_status.remain_not_found";
-            } catch (e, s) {
-              log.handle(e, s);
-              electricityInfo.value.remain =
-                  "electricity_status.remain_other_issue";
-            }
-          }),
-          Future(() async {
-            try {
-              electricityInfo.value.owe = "electricity_status.owe_fetching";
-              await ElectricitySession().getOwe(value);
-            } on DioException {
-              log.info(
-                "[PaymentSession][update] "
-                "Network error",
+        (value) =>
+            Future.wait([
+              Future(() async {
+                try {
+                  electricityInfo.value.remain =
+                      "electricity_status.remain_fetching";
+                  await ElectricitySession().getElectricity(value);
+                } on DioException catch (e, s) {
+                  log.handle(e, s);
+                  electricityInfo.value.remain =
+                      "electricity_status.remain_network_issue";
+                } on NotFoundException {
+                  electricityInfo.value.remain =
+                      "electricity_status.remain_not_found";
+                } catch (e, s) {
+                  log.handle(e, s);
+                  electricityInfo.value.remain =
+                      "electricity_status.remain_other_issue";
+                }
+              }),
+              Future(() async {
+                try {
+                  electricityInfo.value.owe = "electricity_status.owe_fetching";
+                  await ElectricitySession().getOwe(value);
+                } on DioException {
+                  log.info(
+                    "[PaymentSession][update] "
+                    "Network error",
+                  );
+                  electricityInfo.value.owe = "electricity_status.owe_issue";
+                } catch (e, s) {
+                  log.handle(e, s);
+                  electricityInfo.value.owe =
+                      "electricity_status.owe_not_found";
+                }
+              }),
+            ]).then((value) async {
+              if (ElectricitySession.isCacheExist) {
+                await ElectricitySession.fileCache.create();
+              }
+              ElectricitySession.fileCache.writeAsStringSync(
+                jsonEncode(electricityInfo.value.toJson()),
               );
-              electricityInfo.value.owe = "electricity_status.owe_issue";
-            } catch (e, s) {
-              log.handle(e, s);
-              electricityInfo.value.owe = "electricity_status.owe_not_found";
-            }
-          })
-        ]).then((value) async {
-          if (ElectricitySession.isCacheExist) {
-            await ElectricitySession.fileCache.create();
-          }
-          ElectricitySession.fileCache.writeAsStringSync(
-            jsonEncode(electricityInfo.value.toJson()),
-          );
-          ElectricitySession.refreshElectricityHistory(electricityInfo.value);
-        }),
+              ElectricitySession.refreshElectricityHistory(
+                electricityInfo.value,
+              );
+            }),
       )
-      .catchError(
-    (e, s) {
-      log.handle(e, s);
-      if (canUseCache) {
-        electricityInfo.value = cache;
-        isCache.value = true;
-        isLoad.value = false;
-        return;
-      }
+      .catchError((e, s) {
+        log.handle(e, s);
+        if (canUseCache) {
+          electricityInfo.value = cache;
+          isCache.value = true;
+          isLoad.value = false;
+          return;
+        }
 
-      if (NeedInfoException().toString().contains(e.toString())) {
-        electricityInfo.value.remain = "electricity_status.need_more_info";
-      } else if ("NotInitalizedException".contains(e.toString())) {
-        electricityInfo.value.remain = e.msg;
-      } else if (NoAccountInfoException().toString().contains(e.toString())) {
-        electricityInfo.value.remain = "electricity_status.need_account";
-      } else if (CaptchaFailedException().toString().contains(e.toString())) {
-        electricityInfo.value.remain = "electricity_status.captcha_failed";
-      } else {
-        electricityInfo.value.remain = "electricity_status.other_issue";
-      }
-      if (electricityInfo.value.owe == "electricity_status.owe_fetching" ||
-          electricityInfo.value.owe == "electricity_status.pending") {
-        electricityInfo.value.owe = "electricity_status.owe_issue_unable";
-      }
-    },
-  );
+        if (NeedInfoException().toString().contains(e.toString())) {
+          electricityInfo.value.remain = "electricity_status.need_more_info";
+        } else if ("NotInitalizedException".contains(e.toString())) {
+          electricityInfo.value.remain = e.msg;
+        } else if (NoAccountInfoException().toString().contains(e.toString())) {
+          electricityInfo.value.remain = "electricity_status.need_account";
+        } else if (CaptchaFailedException().toString().contains(e.toString())) {
+          electricityInfo.value.remain = "electricity_status.captcha_failed";
+        } else {
+          electricityInfo.value.remain = "electricity_status.other_issue";
+        }
+        if (electricityInfo.value.owe == "electricity_status.owe_fetching" ||
+            electricityInfo.value.owe == "electricity_status.pending") {
+          electricityInfo.value.owe = "electricity_status.owe_issue_unable";
+        }
+      });
   isLoad.value = false;
 }
 
@@ -167,11 +169,16 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
 
     var list = <ElectricityInfo>[];
     try {
-      List proto =
-          jsonDecode(ElectricitySession.fileHistory.readAsStringSync());
+      List proto = jsonDecode(
+        ElectricitySession.fileHistory.readAsStringSync(),
+      );
       list.clear();
-      list.addAll(List<ElectricityInfo>.generate(
-          proto.length, (data) => ElectricityInfo.fromJson(proto[data])));
+      list.addAll(
+        List<ElectricityInfo>.generate(
+          proto.length,
+          (data) => ElectricityInfo.fromJson(proto[data]),
+        ),
+      );
     } catch (e, s) {
       log.handle(e, s);
     }
@@ -200,8 +207,9 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     String rawDormLocation = preference.getString(preference.Preference.dorm);
     if (rawDormLocation.isEmpty) throw NoAccountInfoException;
     if (RegExp(r'^\d+$').hasMatch(rawDormLocation)) return rawDormLocation;
-    List<RegExpMatch> nums =
-        RegExp(r"[0-9]+").allMatches(rawDormLocation).toList();
+    List<RegExpMatch> nums = RegExp(
+      r"[0-9]+",
+    ).allMatches(rawDormLocation).toList();
     // 校区
     String accountA = "";
     if (rawDormLocation.contains("北校区")) {
@@ -338,8 +346,18 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       int room = int.parse(accountD.toString());
       if ([4, 24, 49, 51, 55].contains(building)) {
         // 上述楼号的非以下房间不存在南北院电费账号冲突，无需识别码
-        if (!([101, 102, 203, 204, 305, 306, 407, 408, 509, 510]
-            .contains(room))) {
+        if (!([
+          101,
+          102,
+          203,
+          204,
+          305,
+          306,
+          407,
+          408,
+          509,
+          510,
+        ].contains(room))) {
           accountE = "";
         }
       }
@@ -413,14 +431,17 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
 
       String? checkCode = retry == 1
           ? captchaFunction != null
-              ? await captchaFunction(picture)
-              : throw CaptchaFailedException() // The last try
+                ? await captchaFunction(picture)
+                : throw CaptchaFailedException() // The last try
           : await DigitCaptchaClientProvider.infer(
-              DigitCaptchaType.payment, picture);
+              DigitCaptchaType.payment,
+              picture,
+            );
 
       if (checkCode == null) {
         log.info(
-            '[PaymentSession][getOwe] Captcha is impossible to be inferred.');
+          '[PaymentSession][getOwe] Captcha is impossible to be inferred.',
+        );
         retry++; // Do not count this try
         continue;
       }
@@ -442,34 +463,39 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           "[PaymentSession][getOwe] "
           "Newbee detected.",
         );
-        bool isPostGraduate =
-            await PersonalInfoSession().checkWhetherPostgraduate();
+        bool isPostGraduate = await PersonalInfoSession()
+            .checkWhetherPostgraduate();
 
-        await dio.post(value.headers["location"]![0]).then((value) async {
-          await dio.post(
-            "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
-            data: {
-              "tel": isPostGraduate
-                  ? await PersonalInfoSession()
-                      .getInformationFromYjspt(onlyPhone: true)
-                  : await PersonalInfoSession()
-                      .getInformationEhall(onlyPhone: true),
-              "email":
-                  "${preference.getString(preference.Preference.idsAccount)}"
+        await dio
+            .post(value.headers["location"]![0])
+            .then((value) async {
+              await dio.post(
+                "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
+                data: {
+                  "tel": isPostGraduate
+                      ? await PersonalInfoSession().getInformationFromYjspt(
+                          onlyPhone: true,
+                        )
+                      : await PersonalInfoSession().getInformationEhall(
+                          onlyPhone: true,
+                        ),
+                  "email":
+                      "${preference.getString(preference.Preference.idsAccount)}"
                       "@stu.mail.xidian.edu.cn",
-            },
-            options: Options(contentType: Headers.jsonContentType),
-          );
-        }).then((value) async {
-          value = await dio.post(
-            "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
-            data: {
-              "p_Userid": electricityAccount(),
-              "p_Password": password,
-              "factorycode": factorycode,
-            },
-          );
-        });
+                },
+                options: Options(contentType: Headers.jsonContentType),
+              );
+            })
+            .then((value) async {
+              value = await dio.post(
+                "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
+                data: {
+                  "p_Userid": electricityAccount(),
+                  "p_Password": password,
+                  "factorycode": factorycode,
+                },
+              );
+            });
       }
 
       var decodeData = jsonDecode(value.data);
@@ -487,7 +513,8 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     throw NotInitalizedException(lastErrorMessage);
   }
 
-  Future<void> getElectricity((String, String) fetched) => dio.post(
+  Future<void> getElectricity((String, String) fetched) => dio
+      .post(
         "https://payment.xidian.edu.cn/NetWorkUI/checkPayelec",
         data: {
           "addressid": fetched.$1,
@@ -495,25 +522,29 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           'payAmt': 'leftwingpopulism',
           "factorycode": factorycode,
         },
-      ).then((value) {
+      )
+      .then((value) {
         var decodeData = jsonDecode(value.data);
         if (decodeData["returnmsg"] == "连接超时") {
           double balance = double.parse(
-              decodeData["rtmeterInfo"]["Result"]["Meter"]["RemainQty"]);
+            decodeData["rtmeterInfo"]["Result"]["Meter"]["RemainQty"],
+          );
           electricityInfo.value.remain = balance.toString();
         } else {
           throw NotFoundException();
         }
       });
 
-  Future<void> getOwe((String, String) fetched) => dio.post(
+  Future<void> getOwe((String, String) fetched) => dio
+      .post(
         "https://payment.xidian.edu.cn/NetWorkUI/getOwefeeInfo",
         data: {
           "addressid": fetched.$1,
           "liveid": fetched.$2,
           "factorycode": factorycode,
         },
-      ).then((value) {
+      )
+      .then((value) {
         var decodeData = jsonDecode(value.data);
         if (decodeData["returncode"] == "ERROR" &&
             decodeData["returnmsg"] == "电费厂家返回xml消息体异常") {

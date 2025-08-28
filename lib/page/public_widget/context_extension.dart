@@ -7,8 +7,9 @@ import 'package:watermeter/repository/preference.dart';
 
 extension BuildContextExt on BuildContext {
   Future<T?> push<T extends Object?>(Widget page) =>
-      (splitViewKey.currentState ?? Navigator.of(this))
-          .push(MaterialPageRoute<T>(builder: (_) => page));
+      (splitViewKey.currentState ?? Navigator.of(this)).push(
+        MaterialPageRoute<T>(builder: (_) => page),
+      );
 
   Future<T?> pushReplacement<T extends Object?>(Widget page) {
     if (splitViewKey.currentState != null) {
@@ -17,9 +18,9 @@ extension BuildContextExt on BuildContext {
         (route) => route.isFirst && route.isActive,
       );
     } else {
-      return Navigator.of(this).pushReplacement(MaterialPageRoute<T>(
-        builder: (_) => page,
-      ));
+      return Navigator.of(
+        this,
+      ).pushReplacement(MaterialPageRoute<T>(builder: (_) => page));
     }
   }
 
@@ -37,12 +38,11 @@ extension BuildContextExt on BuildContext {
     RouteSettings? routeSettings,
     Offset? anchorPoint,
     TraversalEdgeBehavior? traversalEdgeBehavior,
-  }) =>
-      (splitViewKey.currentState ?? Navigator.of(this)).push(
-        DialogRoute(
-          context: splitViewKey.currentState?.context ?? this,
-          builder: (context) =>
-              Material(type: MaterialType.transparency, child: dialog),
-        ),
-      );
+  }) => (splitViewKey.currentState ?? Navigator.of(this)).push(
+    DialogRoute(
+      context: splitViewKey.currentState?.context ?? this,
+      builder: (context) =>
+          Material(type: MaterialType.transparency, child: dialog),
+    ),
+  );
 }

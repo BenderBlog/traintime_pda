@@ -56,22 +56,26 @@ class NoticeList extends StatelessWidget {
                 ),
               ),
               divider: const Divider(height: 1),
-              child: Builder(builder: (context) {
-                if (bool.tryParse(messages[index].isLink) ?? false) {
-                  return FilledButton.icon(
-                    onPressed: () => launchUrlString(
-                      messages[index].message,
-                      mode: LaunchMode.externalApplication,
-                    ),
-                    label: Text(FlutterI18n.translate(
-                      context,
-                      "homepage.notice_card.open_url",
-                    )),
-                    icon: const Icon(Icons.ads_click),
-                  ).center();
-                }
-                return SelectableText(messages[index].message);
-              }).padding(all: 12),
+              child: Builder(
+                builder: (context) {
+                  if (bool.tryParse(messages[index].isLink) ?? false) {
+                    return FilledButton.icon(
+                      onPressed: () => launchUrlString(
+                        messages[index].message,
+                        mode: LaunchMode.externalApplication,
+                      ),
+                      label: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "homepage.notice_card.open_url",
+                        ),
+                      ),
+                      icon: const Icon(Icons.ads_click),
+                    ).center();
+                  }
+                  return SelectableText(messages[index].message);
+                },
+              ).padding(all: 12),
             );
           }),
         ).scrollable().padding(top: 20),

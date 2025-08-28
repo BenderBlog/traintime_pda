@@ -20,14 +20,9 @@ class ExperimentDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        maxWidth: 360.0,
-      ),
+      constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 4,
-          vertical: 4,
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         elevation: 0,
         color: infoColor.shade100,
         child: Container(

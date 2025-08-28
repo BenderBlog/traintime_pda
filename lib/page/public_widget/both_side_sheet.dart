@@ -20,31 +20,26 @@ class BothSideSheet extends StatefulWidget {
     required Widget child,
     required String title,
     double divider = 480.0,
-  }) =>
-      showGeneralDialog<T>(
-        barrierDismissible: true,
-        context: context,
-        useRootNavigator: false,
-        pageBuilder: (context, animation1, animation2) {
-          return BothSideSheet(
-            title: title,
-            divider: divider,
-            child: child,
-          );
-        },
-        barrierLabel: title,
-        transitionBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: Tween(
-              begin: MediaQuery.of(context).size.width < divider
-                  ? const Offset(0.0, 1.0)
-                  : const Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation),
-            child: child,
-          );
-        },
+  }) => showGeneralDialog<T>(
+    barrierDismissible: true,
+    context: context,
+    useRootNavigator: false,
+    pageBuilder: (context, animation1, animation2) {
+      return BothSideSheet(title: title, divider: divider, child: child);
+    },
+    barrierLabel: title,
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween(
+          begin: MediaQuery.of(context).size.width < divider
+              ? const Offset(0.0, 1.0)
+              : const Offset(1.0, 0.0),
+          end: Offset.zero,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation),
+        child: child,
       );
+    },
+  );
 
   @override
   State<BothSideSheet> createState() => _BothSideSheetState();
@@ -61,27 +56,28 @@ class _BothSideSheetState extends State<BothSideSheet> {
   }
 
   BorderRadius radius(context) => BorderRadius.only(
-        topLeft: const Radius.circular(16),
-        bottomLeft: !(MediaQuery.of(context).size.width < widget.divider)
-            ? const Radius.circular(16)
-            : Radius.zero,
-        topRight: MediaQuery.of(context).size.width < widget.divider
-            ? const Radius.circular(16)
-            : Radius.zero,
-        bottomRight: Radius.zero,
-      );
+    topLeft: const Radius.circular(16),
+    bottomLeft: !(MediaQuery.of(context).size.width < widget.divider)
+        ? const Radius.circular(16)
+        : Radius.zero,
+    topRight: MediaQuery.of(context).size.width < widget.divider
+        ? const Radius.circular(16)
+        : Radius.zero,
+    bottomRight: Radius.zero,
+  );
 
   double get width => MediaQuery.of(context).size.width < widget.divider
       ? MediaQuery.of(context).size.width
       : MediaQuery.of(context).size.width * 0.4 < 360
-          ? 360
-          : MediaQuery.of(context).size.width * 0.4;
+      ? 360
+      : MediaQuery.of(context).size.width * 0.4;
 
   Widget get onTop => MediaQuery.of(context).size.width < widget.divider
       ? GestureDetector(
           onVerticalDragUpdate: (DragUpdateDetails details) {
             setState(() {
-              heightForVertical = MediaQuery.of(context).size.height -
+              heightForVertical =
+                  MediaQuery.of(context).size.height -
                   details.globalPosition.dy;
               if (heightForVertical <
                   MediaQuery.of(context).size.height * 0.4) {
@@ -104,12 +100,11 @@ class _BothSideSheetState extends State<BothSideSheet> {
                   height: 4,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant
-                        .withValues(alpha: 0.4),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -123,10 +118,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),
               ),
-              Text(
-                widget.title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
             ],
           ),
         );
@@ -148,10 +140,12 @@ class _BothSideSheetState extends State<BothSideSheet> {
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal:
-                MediaQuery.of(context).size.width < widget.divider ? 15 : 10,
-            vertical:
-                MediaQuery.of(context).size.width < widget.divider ? 0 : 10,
+            horizontal: MediaQuery.of(context).size.width < widget.divider
+                ? 15
+                : 10,
+            vertical: MediaQuery.of(context).size.width < widget.divider
+                ? 0
+                : 10,
           ),
           child: Scaffold(
             extendBodyBehindAppBar: true,

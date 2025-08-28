@@ -58,35 +58,32 @@ class BorrowListDetail extends StatelessWidget {
     );
 
     return Scaffold(
-      body: Builder(builder: (context) {
-        if (borrow_info.borrowList.isNotEmpty) {
-          return LayoutBuilder(
-            builder: (context, constraints) => AlignedGridView.count(
-              shrinkWrap: true,
-              itemCount: borrowList.length,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 8,
+      body: Builder(
+        builder: (context) {
+          if (borrow_info.borrowList.isNotEmpty) {
+            return LayoutBuilder(
+              builder: (context, constraints) => AlignedGridView.count(
+                shrinkWrap: true,
+                itemCount: borrowList.length,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                crossAxisCount: constraints.maxWidth ~/ 360,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                itemBuilder: (context, index) => borrowList[index],
               ),
-              crossAxisCount: constraints.maxWidth ~/ 360,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              itemBuilder: (context, index) => borrowList[index],
-            ),
-          );
-        } else {
-          return EmptyListView(
-            type: EmptyListViewType.reading,
-            text: FlutterI18n.translate(
-              context,
-              "library.empty_borrow_list",
-            ),
-          );
-        }
-      }),
+            );
+          } else {
+            return EmptyListView(
+              type: EmptyListViewType.reading,
+              text: FlutterI18n.translate(context, "library.empty_borrow_list"),
+            );
+          }
+        },
+      ),
       bottomNavigationBar: BottomAppBar(
-        height:
-            prefs.getString(Preference.localization.key) == "en_US" ? 80 : 50,
+        height: prefs.getString(Preference.localization.key) == "en_US"
+            ? 80
+            : 50,
         child: I18nText(
           "library.borrow_list_info",
           translationParams: {
@@ -95,10 +92,7 @@ class BorrowListDetail extends StatelessWidget {
           },
           child: Text(
             "",
-            maxLines: prefs.getString(
-                      Preference.localization.key,
-                    ) ==
-                    "en_US"
+            maxLines: prefs.getString(Preference.localization.key) == "en_US"
                 ? 2
                 : 1,
           ),

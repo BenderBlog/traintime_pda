@@ -59,10 +59,7 @@ class XDUPlanetDatabase {
   final List<Person> author;
   final DateTime update;
 
-  XDUPlanetDatabase({
-    required this.author,
-    required this.update,
-  });
+  XDUPlanetDatabase({required this.author, required this.update});
 
   factory XDUPlanetDatabase.fromJson(Map<String, dynamic> json) =>
       _$XDUPlanetDatabaseFromJson(json);

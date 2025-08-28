@@ -54,29 +54,19 @@ class CommentPopout extends StatelessWidget {
     return name[account % 1000 % name.length];
   }
 
-  CommentPopout({
-    super.key,
-    required this.id,
-    this.replyTo,
-  });
+  CommentPopout({super.key, required this.id, this.replyTo});
   final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "xdu_planet.comment_title",
-      )),
+      title: Text(FlutterI18n.translate(context, "xdu_planet.comment_title")),
       content: TextField(
         controller: _controller,
         maxLines: 5,
         decoration: InputDecoration(
           hintText: replyTo == null
-              ? FlutterI18n.translate(
-                  context,
-                  "xdu_planet.hint_send_comment",
-                )
+              ? FlutterI18n.translate(context, "xdu_planet.hint_send_comment")
               : FlutterI18n.translate(
                   context,
                   "xdu_planet.reply",
@@ -89,58 +79,45 @@ class CommentPopout extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "cancel",
-          )),
+          child: Text(FlutterI18n.translate(context, "cancel")),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "xdu_planet.send",
-          )),
+          child: Text(FlutterI18n.translate(context, "xdu_planet.send")),
           onPressed: () async {
             if (_controller.text.isEmpty) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "xdu_planet.empty_send",
-                ),
+                msg: FlutterI18n.translate(context, "xdu_planet.empty_send"),
               );
               return;
             }
             var pd = ProgressDialog(context: context);
-            pd.show(
-              msg: FlutterI18n.translate(
-                context,
-                "xdu_planet.sending",
-              ),
-            );
+            pd.show(msg: FlutterI18n.translate(context, "xdu_planet.sending"));
             //var hashedUid = md5.convert(utf8.encode(
             //    "${pref.getString(pref.Preference.idsAccount)}#${pref.getString(pref.Preference.name)}"));
             await PlanetSession()
                 .sendComments(
-              id: id,
-              content: _controller.text,
-              userId: userIdGenerator, //hashedUid.toString(),
-              replyto: replyTo?.ID.toString(),
-            )
+                  id: id,
+                  content: _controller.text,
+                  userId: userIdGenerator, //hashedUid.toString(),
+                  replyto: replyTo?.ID.toString(),
+                )
                 .then((value) {
-              if (context.mounted) {
-                pd.close();
-                Navigator.of(context).pop(true);
-              }
-            }).onError((e, s) {
-              if (context.mounted) {
-                log.error(e.toString());
-                pd.close();
-                Navigator.of(context).pop(false);
-              }
-            });
+                  if (context.mounted) {
+                    pd.close();
+                    Navigator.of(context).pop(true);
+                  }
+                })
+                .onError((e, s) {
+                  if (context.mounted) {
+                    log.error(e.toString());
+                    pd.close();
+                    Navigator.of(context).pop(false);
+                  }
+                });
           },
         ),
       ],

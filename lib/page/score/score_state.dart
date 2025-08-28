@@ -76,22 +76,19 @@ class ScoreState extends ChangeNotifier {
       statuses = {for (var i in scoreData) i.classStatus};
       unPassedSet = {
         for (var i in scoreData)
-          if (i.isFinish && !i.isPassed!) i.name
+          if (i.isFinish && !i.isPassed!) i.name,
       };
 
       /// Fresh the state.
-      isSelected = List<bool>.generate(
-        scoreData.length,
-        (int index) {
-          for (var i in courseIgnore) {
-            if (scoreData[index].name.contains(i)) return false;
-          }
-          for (var i in typesIgnore) {
-            if (scoreData[index].classType.contains(i)) return false;
-          }
-          return true;
-        },
-      );
+      isSelected = List<bool>.generate(scoreData.length, (int index) {
+        for (var i in courseIgnore) {
+          if (scoreData[index].name.contains(i)) return false;
+        }
+        for (var i in typesIgnore) {
+          if (scoreData[index].classType.contains(i)) return false;
+        }
+        return true;
+      });
       state = ScoreFetchState.ok;
     } catch (e, s) {
       log.error("[ScorePageState] Error on fetching score info.", e, s);
@@ -103,10 +100,7 @@ class ScoreState extends ChangeNotifier {
         if (ScoreSession.isScoreListCacheUsed) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "score.cache_message",
-            ),
+            msg: FlutterI18n.translate(context, "score.cache_message"),
           );
         }
       }
@@ -119,11 +113,12 @@ class ScoreState extends ChangeNotifier {
   /// 2. Teacher have not finish uploading scores
   /// 3. Have score below 60 but passed.
   /// 4. Not first time learning this, but still failed.
-  bool _evalCount(Score eval) => !(eval.name.contains("国家英语四级") ||
-      eval.name.contains("国家英语六级") ||
-      !eval.isFinish ||
-      (!eval.isPassed! && !unPassedSet.contains(eval.name)) ||
-      (eval.scoreStatus != "初修" && !eval.isPassed!));
+  bool _evalCount(Score eval) =>
+      !(eval.name.contains("国家英语四级") ||
+          eval.name.contains("国家英语六级") ||
+          !eval.isFinish ||
+          (!eval.isPassed! && !unPassedSet.contains(eval.name)) ||
+          (eval.scoreStatus != "初修" && !eval.isPassed!));
 
   double evalCredit(bool isAll) {
     double totalCredit = 0.0;
@@ -143,7 +138,8 @@ class ScoreState extends ChangeNotifier {
     for (var i = 0; i < isSelected.length; ++i) {
       if (((isSelected[i] == true && isAll == false) || isAll == true) &&
           _evalCount(scoreData[i])) {
-        totalScore += (isGPA ? scoreData[i].gpa : scoreData[i].score!) *
+        totalScore +=
+            (isGPA ? scoreData[i].gpa : scoreData[i].score!) *
             scoreData[i].credit;
       }
     }
@@ -155,8 +151,9 @@ class ScoreState extends ChangeNotifier {
     /// also applies to scores.scoreTable. Since reference whatsoever.
     List<Score> whatever = List.from(scoreData);
     if (_chosenSemester != "") {
-      whatever
-          .removeWhere((element) => element.semesterCode != _chosenSemester);
+      whatever.removeWhere(
+        (element) => element.semesterCode != _chosenSemester,
+      );
     }
     if (_chosenStatus != "") {
       whatever.removeWhere((element) => element.classStatus != _chosenStatus);
@@ -172,13 +169,16 @@ class ScoreState extends ChangeNotifier {
 
   String get unPassed => unPassedSet.isEmpty ? "" : unPassedSet.join(",");
 
-  String bottomInfo(context) =>
-      FlutterI18n.translate(context, "score.summary", translationParams: {
-        "chosen": getSelectedScoreList.length.toString(),
-        "credit": evalCredit(false).toStringAsFixed(2),
-        "avg": evalAvg(false).toStringAsFixed(2),
-        "gpa": evalAvg(false, isGPA: true).toStringAsFixed(2)
-      });
+  String bottomInfo(context) => FlutterI18n.translate(
+    context,
+    "score.summary",
+    translationParams: {
+      "chosen": getSelectedScoreList.length.toString(),
+      "credit": evalCredit(false).toStringAsFixed(2),
+      "avg": evalAvg(false).toStringAsFixed(2),
+      "gpa": evalAvg(false, isGPA: true).toStringAsFixed(2),
+    },
+  );
 
   double get notCoreClass {
     double toReturn = 0.0;

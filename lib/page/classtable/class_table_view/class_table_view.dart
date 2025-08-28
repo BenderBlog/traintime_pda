@@ -56,51 +56,48 @@ class _ClassTableViewState extends State<ClassTableView> {
     if (isRest) {
       List<Widget> thisRow = [];
       for (var index = 1; index <= 7; ++index) {
-        List<ClassOrgainzedData> arrangedEvents =
-            classTableState.getArrangement(
-          weekIndex: widget.index,
-          dayIndex: index,
-        );
+        List<ClassOrgainzedData> arrangedEvents = classTableState
+            .getArrangement(weekIndex: widget.index, dayIndex: index);
 
         /// Choice the day and render it!
         for (var i in arrangedEvents) {
           /// Generate the row.
-          thisRow.add(Positioned(
-            top: blockheight(i.start),
-            height: blockheight(i.stop - i.start),
-            left: leftRow + blockwidth * (index - 1),
-            width: blockwidth,
-            child: ClassCard(detail: i),
-          ));
+          thisRow.add(
+            Positioned(
+              top: blockheight(i.start),
+              height: blockheight(i.stop - i.start),
+              left: leftRow + blockwidth * (index - 1),
+              width: blockwidth,
+              child: ClassCard(detail: i),
+            ),
+          );
         }
       }
 
       if (thisRow.isEmpty &&
           !preference.getBool(preference.Preference.decorated)) {
-        thisRow.add(Center(
-          child: Column(
-            children: [
-              SizedBox(height: blockheight(8)),
-              Image.asset(
-                "assets/art/pda_classtable_empty.png",
-                scale: 2,
-              ),
-              const SizedBox(height: 20),
-              ...FlutterI18n.translate(context, "classtable.no_class")
-                  .split("\n")
-                  .map((e) => Text(e)),
-            ],
-          ),
-        ).padding(left: leftRow));
+        thisRow.add(
+          Center(
+            child: Column(
+              children: [
+                SizedBox(height: blockheight(8)),
+                Image.asset("assets/art/pda_classtable_empty.png", scale: 2),
+                const SizedBox(height: 20),
+                ...FlutterI18n.translate(
+                  context,
+                  "classtable.no_class",
+                ).split("\n").map((e) => Text(e)),
+              ],
+            ),
+          ).padding(left: leftRow),
+        );
       }
 
       return thisRow;
     } else {
       /// Leftest side, the index array.
       return List.generate(13, (index) {
-        double height = blockheight(
-          index != 4 && index != 9 ? 5 : 3,
-        );
+        double height = blockheight(index != 4 && index != 9 ? 5 : 3);
 
         late int indexOfChar;
         if ([0, 1, 2, 3].contains(index)) {
@@ -117,46 +114,42 @@ class _ClassTableViewState extends State<ClassTableView> {
         }
 
         return DefaultTextStyle.merge(
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
           child: Text.rich(
-            TextSpan(children: [
-              if (indexOfChar == -1)
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "classtable.noon_break",
+            TextSpan(
+              children: [
+                if (indexOfChar == -1)
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "classtable.noon_break",
+                    ),
+                    style: const TextStyle(fontSize: 12),
+                  )
+                else if (indexOfChar == -2)
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "classtable.supper_break",
+                    ),
+                    style: const TextStyle(fontSize: 12),
+                  )
+                else ...[
+                  TextSpan(text: "${indexOfChar + 1}\n"),
+                  TextSpan(
+                    text: "${time[indexOfChar * 2]}\n",
+                    style: const TextStyle(fontSize: 8),
                   ),
-                  style: const TextStyle(fontSize: 12),
-                )
-              else if (indexOfChar == -2)
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "classtable.supper_break",
+                  TextSpan(
+                    text: time[indexOfChar * 2 + 1],
+                    style: const TextStyle(fontSize: 8),
                   ),
-                  style: const TextStyle(fontSize: 12),
-                )
-              else ...[
-                TextSpan(text: "${indexOfChar + 1}\n"),
-                TextSpan(
-                  text: "${time[indexOfChar * 2]}\n",
-                  style: const TextStyle(fontSize: 8),
-                ),
-                TextSpan(
-                  text: time[indexOfChar * 2 + 1],
-                  style: const TextStyle(fontSize: 8),
-                ),
+                ],
               ],
-            ]),
+            ),
             textAlign: TextAlign.center,
           ),
-        ).center().constrained(
-              width: leftRow,
-              height: height,
-            );
+        ).center().constrained(width: leftRow, height: height);
       });
     }
   }
@@ -202,18 +195,15 @@ class _ClassTableViewState extends State<ClassTableView> {
 
       /// The rest of the table.
       [
-        classSubRow(false)
-            .toColumn()
-            .decorated(color: Colors.grey.shade200.withValues(alpha: 0.75))
-            .constrained(width: leftRow)
-            .positioned(left: 0),
-        ...classSubRow(true),
-      ]
+            classSubRow(false)
+                .toColumn()
+                .decorated(color: Colors.grey.shade200.withValues(alpha: 0.75))
+                .constrained(width: leftRow)
+                .positioned(left: 0),
+            ...classSubRow(true),
+          ]
           .toStack()
-          .constrained(
-            height: blockheight(61),
-            width: size.maxWidth,
-          )
+          .constrained(height: blockheight(61), width: size.maxWidth)
           .scrollable()
           .expanded(),
     ].toColumn();

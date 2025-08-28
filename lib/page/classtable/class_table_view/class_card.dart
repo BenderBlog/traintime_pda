@@ -23,15 +23,13 @@ class ClassCard extends StatelessWidget {
   MaterialColor get color => detail.color;
   String get name => detail.name;
   String? get place => detail.place;
-  const ClassCard({
-    super.key,
-    required this.detail,
-  });
+  const ClassCard({super.key, required this.detail});
 
   @override
   Widget build(BuildContext context) {
-    ClassTableWidgetState classTableState =
-        ClassTableState.of(context)!.controllers;
+    ClassTableWidgetState classTableState = ClassTableState.of(
+      context,
+    )!.controllers;
 
     /// This is the result of the class info card.
     return Padding(
@@ -62,34 +60,35 @@ class ClassCard extends StatelessWidget {
                       /// The last one indicate whether to delete this stuff.
                       (ClassDetail, TimeArrangement, bool)? toUse =
                           await BothSideSheet.show(
-                        title: FlutterI18n.translate(
-                          context,
-                          "classtable.class_card.title",
-                        ),
-                        child: ArrangementDetail(
-                          information: List.generate(data.length, (index) {
-                            if (data.elementAt(index) is Subject ||
-                                data.elementAt(index) is ExperimentData) {
-                              return data.elementAt(index);
-                            } else {
-                              return (
-                                classTableState.getClassDetail(
-                                  classTableState.timeArrangement
-                                      .indexOf(data.elementAt(index)),
-                                ),
-                                data.elementAt(index),
-                              );
-                            }
-                          }),
-                          currentWeek: classTableState.currentWeek,
-                        ),
-                        context: context,
-                      );
+                            title: FlutterI18n.translate(
+                              context,
+                              "classtable.class_card.title",
+                            ),
+                            child: ArrangementDetail(
+                              information: List.generate(data.length, (index) {
+                                if (data.elementAt(index) is Subject ||
+                                    data.elementAt(index) is ExperimentData) {
+                                  return data.elementAt(index);
+                                } else {
+                                  return (
+                                    classTableState.getClassDetail(
+                                      classTableState.timeArrangement.indexOf(
+                                        data.elementAt(index),
+                                      ),
+                                    ),
+                                    data.elementAt(index),
+                                  );
+                                }
+                              }),
+                              currentWeek: classTableState.currentWeek,
+                            ),
+                            context: context,
+                          );
                       if (context.mounted && toUse != null) {
                         if (toUse.$3) {
-                          await ClassTableState.of(context)!
-                              .controllers
-                              .deleteUserDefinedClass(toUse.$2);
+                          await ClassTableState.of(
+                            context,
+                          )!.controllers.deleteUserDefinedClass(toUse.$2);
                         } else {
                           await Navigator.of(context)
                               .push(
@@ -110,47 +109,48 @@ class ClassCard extends StatelessWidget {
                         }
                       }
                     },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: color.shade900,
-                            fontSize: isPhone(context) ? 12 : 14,
-                          ),
-                        ),
-                        Text(
-                          "@${place ?? FlutterI18n.translate(
-                                context,
-                                "classtable.class_card.unknown_classroom",
-                              )}",
-                          style: TextStyle(
-                            color: color.shade900,
-                            fontSize: isPhone(context) ? 10 : 12,
-                          ),
-                        ).expanded(),
-                        if (data.length > 1)
-                          Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_card.remains_hint",
-                              translationParams: {
-                                "remain_count": (data.length - 1).toString(),
-                              },
+                    child:
+                        Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: color.shade900,
+                                    fontSize: isPhone(context) ? 12 : 14,
+                                  ),
+                                ),
+                                Text(
+                                  "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
+                                  style: TextStyle(
+                                    color: color.shade900,
+                                    fontSize: isPhone(context) ? 10 : 12,
+                                  ),
+                                ).expanded(),
+                                if (data.length > 1)
+                                  Text(
+                                    FlutterI18n.translate(
+                                      context,
+                                      "classtable.class_card.remains_hint",
+                                      translationParams: {
+                                        "remain_count": (data.length - 1)
+                                            .toString(),
+                                      },
+                                    ),
+                                    style: TextStyle(
+                                      color: color.shade900,
+                                      fontSize: isPhone(context) ? 10 : 12,
+                                    ),
+                                  ),
+                              ],
+                            )
+                            .alignment(Alignment.topLeft)
+                            .padding(
+                              horizontal: isPhone(context) ? 2 : 4,
+                              vertical: 4,
                             ),
-                            style: TextStyle(
-                              color: color.shade900,
-                              fontSize: isPhone(context) ? 10 : 12,
-                            ),
-                          ),
-                      ],
-                    ).alignment(Alignment.topLeft).padding(
-                          horizontal: isPhone(context) ? 2 : 4,
-                          vertical: 4,
-                        ),
                   ),
                 ),
               ),
@@ -159,10 +159,7 @@ class ClassCard extends StatelessWidget {
                   clipper: Triangle(),
                   child: Container(
                     color: color.shade300,
-                  ).constrained(
-                    width: 8,
-                    height: 8,
-                  ),
+                  ).constrained(width: 8, height: 8),
                 ).alignment(Alignment.topRight),
             ],
           ),

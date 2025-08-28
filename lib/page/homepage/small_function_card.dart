@@ -24,18 +24,14 @@ class SmallFunctionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return [
-      Icon(
-        icon,
-        size: 32,
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      const SizedBox(height: 4),
-      Text(
-        FlutterI18n.translate(context, nameKey),
-        style: const TextStyle(fontSize: 14),
-        textAlign: TextAlign.center,
-      ),
-    ]
+          Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(height: 4),
+          Text(
+            FlutterI18n.translate(context, nameKey),
+            style: const TextStyle(fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)
         .alignment(Alignment.center)
         .withHomeCardStyle(context)

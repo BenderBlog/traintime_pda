@@ -19,25 +19,33 @@ class SchoolNetPasswordDialog extends StatefulWidget {
 
 class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
   final TextEditingController _schoolNetPasswordController =
-      TextEditingController.fromValue(TextEditingValue(
-    text: preference.getString(preference.Preference.schoolNetQueryPassword),
-    selection: TextSelection.fromPosition(TextPosition(
-      affinity: TextAffinity.downstream,
-      offset: preference
-          .getString(preference.Preference.electricityPassword)
-          .length,
-    )),
-  ));
+      TextEditingController.fromValue(
+        TextEditingValue(
+          text: preference.getString(
+            preference.Preference.schoolNetQueryPassword,
+          ),
+          selection: TextSelection.fromPosition(
+            TextPosition(
+              affinity: TextAffinity.downstream,
+              offset: preference
+                  .getString(preference.Preference.electricityPassword)
+                  .length,
+            ),
+          ),
+        ),
+      );
 
   bool _couldView = true;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "setting.change_schoolnet_password_title",
-      )),
+      title: Text(
+        FlutterI18n.translate(
+          context,
+          "setting.change_schoolnet_password_title",
+        ),
+      ),
       titleTextStyle: TextStyle(
         fontSize: 20,
         color: Theme.of(context).colorScheme.onSurface,
@@ -52,29 +60,24 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
             "setting.change_password_dialog.input_hint",
           ),
           suffixIcon: IconButton(
-              icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _couldView = !_couldView;
-                });
-              }),
+            icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _couldView = !_couldView;
+              });
+            },
+          ),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "cancel",
-          )),
+          child: Text(FlutterI18n.translate(context, "cancel")),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "confirm",
-          )),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
             if (_schoolNetPasswordController.text.isNotEmpty) {
               preference.setString(
