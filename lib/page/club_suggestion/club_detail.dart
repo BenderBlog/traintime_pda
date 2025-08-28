@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:remixicon/remixicon.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/pda_service/club_info.dart';
 import 'package:watermeter/page/club_suggestion/club_image_view.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/pda_service_session.dart';
@@ -157,207 +159,191 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
         ),
       ),
       child: Scaffold(
-        body: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverAppBar(
-              expandedHeight: _expandedHeight,
-              centerTitle: false,
-              pinned: true,
-              title: Opacity(opacity: _opacity, child: Text(widget.info.title)),
-              actions: [
-                IconButton(
-                  onPressed: () async {
-                    await Clipboard.setData(
-                      ClipboardData(text: widget.info.qq),
-                    );
-                    if (context.mounted) {
-                      showToast(
-                        context: context,
-                        msg: FlutterI18n.translate(
-                          context,
-                          "club_promotion.qq_copied",
+        appBar: AppBar(
+          title: Opacity(opacity: _opacity, child: Text(widget.info.title)),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("请问你想如何加群？"),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          await Clipboard.setData(
+                            ClipboardData(text: widget.info.qq),
+                          );
+                          if (context.mounted) {
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                "club_promotion.qq_copied",
+                              ),
+                            );
+                            context.pop();
+                          }
+                        },
+                        child: Text("复制QQ号"),
+                      ),
+                      if (widget.info.qqlink.isNotEmpty)
+                        TextButton(
+                          onPressed: () {
+                            launchUrlString(widget.info.qqlink);
+                            context.pop();
+                          },
+                          child: Text("打开加群链接"),
                         ),
-                      );
-                    }
-                  },
-                  icon: Icon(Icons.chat),
-                ),
-
-                IconButton(
-                  onPressed: () async {
-                    if (widget.info.qqlink.isEmpty) {
-                      showToast(
-                        context: context,
-                        msg: FlutterI18n.translate(
-                          context,
-                          "club_promotion.no_link",
-                        ),
-                      );
-                    }
-                    launchUrlString(widget.info.qqlink);
-                  },
-                  icon: Icon(Icons.link),
-                ),
-              ],
-              elevation: 0,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: EdgeInsetsGeometry.fromLTRB(
-                    0,
-                    kToolbarHeight,
-                    0,
-                    46,
+                    ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                );
+              },
+              icon: Icon(Remix.qq_fill),
+            ),
+          ],
+        ),
+        body: ListView(
+          controller: _scrollController,
+          children: [
+            Padding(
+              padding: EdgeInsetsGeometry.fromLTRB(0, 0, 0, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipOval(
+                    child: Image(
+                      image: widget.info.icon,
+                      height: 100,
+                      width: 100,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    widget.info.title,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(widget.info.intro),
+                  const SizedBox(height: 6),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ClipOval(
-                        child: Image(
-                          image: widget.info.icon,
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        widget.info.title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(widget.info.intro),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ...widget.info.type.map<Widget>(
-                            (type) => Padding(
-                              padding: EdgeInsetsGeometry.symmetric(
-                                horizontal: 2,
-                              ),
-                              child: TagsBoxes(
-                                text: FlutterI18n.translate(
-                                  context,
-                                  type.getTypeName(),
-                                ),
-                              ),
+                      ...widget.info.type.map<Widget>(
+                        (type) => Padding(
+                          padding: EdgeInsetsGeometry.symmetric(horizontal: 2),
+                          child: TagsBoxes(
+                            text: FlutterI18n.translate(
+                              context,
+                              type.getTypeName(),
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-            SliverToBoxAdapter(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight:
-                      MediaQuery.of(context).size.height - kToolbarHeight,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    FutureBuilder<String>(
-                      future: _content,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState != ConnectionState.done) {
-                          return Padding(
-                            padding: EdgeInsetsGeometry.only(bottom: 2),
-                            child: LinearProgressIndicator(),
-                          );
-                        } else {
-                          return SizedBox(height: 6);
-                        }
-                      },
-                    ),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  FutureBuilder<String>(
+                    future: _content,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState != ConnectionState.done) {
+                        return Padding(
+                          padding: EdgeInsetsGeometry.only(bottom: 2),
+                          child: LinearProgressIndicator(),
+                        );
+                      } else {
+                        return SizedBox(height: 6);
+                      }
+                    },
+                  ),
 
-                    if (widget.info.pic > 0) ...[
-                      Container(
-                        height: 300,
-                        constraints: BoxConstraints(maxWidth: 600),
-                        padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadiusGeometry.all(
-                            Radius.circular(12),
-                          ),
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            physics: ClampingScrollPhysics(),
-                            itemCount: widget.info.pic,
-                            itemBuilder: (context, index) => Padding(
-                              padding: EdgeInsetsGeometry.symmetric(
-                                horizontal: 4,
+                  if (widget.info.pic > 0) ...[
+                    Container(
+                      height: 300,
+                      constraints: BoxConstraints(maxWidth: 600),
+                      padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+                      child: ClipRRect(
+                        borderRadius: BorderRadiusGeometry.all(
+                          Radius.circular(12),
+                        ),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: widget.info.pic,
+                          itemBuilder: (context, index) => Padding(
+                            padding: EdgeInsetsGeometry.symmetric(
+                              horizontal: 4,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadiusGeometry.all(
+                                Radius.circular(12),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadiusGeometry.all(
-                                  Radius.circular(12),
-                                ),
-                                child: GestureDetector(
-                                  onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return ClubImageView(
-                                          color: widget.info.color,
-                                          images: _image,
-                                          initalPage: index,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  child: Image(
-                                    image: _image[index],
-                                    height: 300,
+                              child: GestureDetector(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return ClubImageView(
+                                        color: widget.info.color,
+                                        images: _image,
+                                        initalPage: index,
+                                      );
+                                    },
                                   ),
                                 ),
+                                child: Image(image: _image[index], height: 300),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      Divider(color: Colors.transparent),
-                    ],
-                    FutureBuilder<String>(
-                      future: _content,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          try {
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(maxWidth: _maxWidth),
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.only(
-                                  left: 8,
-                                  right: 8,
-                                ),
-                                child: HtmlWidget(
-                                  snapshot.data ??
-                                      '''<p>${FlutterI18n.translate(context, "club_promotion.loading_problem")}</p>''',
-                                ),
-                              ),
-                            );
-                          } catch (e) {
-                            return ReloadWidget(
-                              function: () {
-                                setState(() {
-                                  _content = getClubArticle(widget.info.code);
-                                });
-                              },
-                            );
-                          }
-                        } else {
-                          return SizedBox(height: 0);
-                        }
-                      },
                     ),
+                    Divider(color: Colors.transparent),
                   ],
-                ),
+                  FutureBuilder<String>(
+                    future: _content,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        try {
+                          return ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: _maxWidth),
+                            child: Padding(
+                              padding: EdgeInsetsGeometry.only(
+                                left: 8,
+                                right: 8,
+                              ),
+                              child: HtmlWidget(
+                                snapshot.data ??
+                                    '''<p>${FlutterI18n.translate(context, "club_promotion.loading_problem")}</p>''',
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          return ReloadWidget(
+                            function: () {
+                              setState(() {
+                                _content = getClubArticle(widget.info.code);
+                              });
+                            },
+                          );
+                        }
+                      } else {
+                        return SizedBox(height: 0);
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
           ],

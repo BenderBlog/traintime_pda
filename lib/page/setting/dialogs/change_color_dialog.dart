@@ -22,54 +22,52 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "setting.change_color_dialog.title",
-      )),
+      title: Text(
+        FlutterI18n.translate(context, "setting.change_color_dialog.title"),
+      ),
       content: SingleChildScrollView(
-        child: Column(
-          children: [
-            for (int i = 0; i < ColorSeed.values.length; ++i)
-              RadioListTile<int>(
+        child: RadioGroup(
+          groupValue: preference.getInt(preference.Preference.color),
+          onChanged: (int? value) {
+            setState(() {
+              preference.setInt(preference.Preference.color, value!);
+              ThemeController toChange = Get.put(ThemeController());
+              toChange.onUpdate();
+            });
+          },
+          child: Column(
+            children: List.generate(
+              ColorSeed.values.length,
+              (index) => RadioListTile<int>(
                 title: Row(
                   children: [
-                    Text(FlutterI18n.translate(
-                      context,
-                      "setting.change_color_dialog.${ColorSeed.values[i].label}",
-                    )),
-                    const SizedBox(
-                      width: 10,
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.change_color_dialog.${ColorSeed.values[index].label}",
+                      ),
                     ),
+                    const SizedBox(width: 10),
                     ClipOval(
                       child: Container(
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: pdaColorScheme[i * 2].primary,
+                          color: pdaColorScheme[index * 2].primary,
                         ),
                       ),
                     ),
                   ],
                 ),
-                value: ColorSeed.values[i].index,
-                groupValue: preference.getInt(preference.Preference.color),
-                onChanged: (int? value) {
-                  setState(() {
-                    preference.setInt(preference.Preference.color, value!);
-                    ThemeController toChange = Get.put(ThemeController());
-                    toChange.onUpdate();
-                  });
-                },
+                value: ColorSeed.values[index].index,
               ),
-          ],
+            ),
+          ),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "confirm",
-          )),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () {
             Navigator.pop(context);
           },

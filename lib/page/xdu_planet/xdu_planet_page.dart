@@ -46,48 +46,54 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           try {
-            List<Article> articles = snapshot.data!.author
-                .where(
-                  (e) => selected == "xdu_planet.all" || e.name == selected,
-                )
-                .map((e) => e.article
-                    .map((f) => Article(
-                        title: f.title,
-                        time: f.time,
-                        content: f.content,
-                        url: f.url,
-                        author: e.name))
-                    .toList())
-                .reduce((a, b) => a + b)
-              ..sort(
-                (a, b) => b.time.compareTo(a.time),
-              );
+            List<Article> articles =
+                snapshot.data!.author
+                    .where(
+                      (e) => selected == "xdu_planet.all" || e.name == selected,
+                    )
+                    .map(
+                      (e) => e.article
+                          .map(
+                            (f) => Article(
+                              title: f.title,
+                              time: f.time,
+                              content: f.content,
+                              url: f.url,
+                              author: e.name,
+                            ),
+                          )
+                          .toList(),
+                    )
+                    .reduce((a, b) => a + b)
+                  ..sort((a, b) => b.time.compareTo(a.time));
 
             Widget chooseChip(String e) => TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: selected == e
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.1),
+              style: TextButton.styleFrom(
+                backgroundColor: selected == e
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
+              ),
+              //selected: selected == e,
+              onPressed: () {
+                setState(() => selected = e);
+              },
+              child: Text(
+                FlutterI18n.translate(
+                  context,
+                  e.replaceAll(
+                    RegExp(r'lolicon', caseSensitive: false),
+                    "Illegal Word Detected",
                   ),
-                  //selected: selected == e,
-                  onPressed: () {
-                    setState(() => selected = e);
-                  },
-                  child: Text(
-                    FlutterI18n.translate(context, e),
-                    style: TextStyle(
-                      color: selected == e
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ).padding(
-                  vertical: 0,
-                  horizontal: 4,
-                );
+                ),
+                style: TextStyle(
+                  color: selected == e
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ).padding(vertical: 0, horizontal: 4);
 
             return Scaffold(
               appBar: AppBar(
@@ -105,9 +111,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               ),
               body: DataList(
                 list: articles,
-                initFormula: (article) => ArticleCard(
-                  article: article,
-                ),
+                initFormula: (article) => ArticleCard(article: article),
               ),
             );
           } catch (e) {
@@ -122,14 +126,15 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
           }
         } else {
           return Center(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(FlutterI18n.translate(context, "xdu_planet.loading")),
-            ],
-          ));
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(FlutterI18n.translate(context, "xdu_planet.loading")),
+              ],
+            ),
+          );
         }
       },
     );
@@ -138,56 +143,44 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
 
 class ArticleCard extends StatelessWidget {
   final Article article;
-  const ArticleCard({
-    super.key,
-    required this.article,
-  });
+  const ArticleCard({super.key, required this.article});
 
   @override
   Widget build(BuildContext context) {
     return [
-      TagsBoxes(
-          text: article.author ??
-              FlutterI18n.translate(
-                context,
-                "xdu_planet.unknown_author",
-              )),
-      Text(
-        article.title,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      const SizedBox(height: 4),
-      Flex(
-        direction: Axis.horizontal,
-        children: [
-          InformationWithIcon(
-            icon: Icons.calendar_month,
-            text: DateFormat("yyyy-MM-dd").format(article.articleTime),
-          ).flexible(),
-          InformationWithIcon(
-            icon: Icons.access_time,
-            text: DateFormat("HH:mm:ss").format(article.articleTime),
-          ).flexible(),
-        ],
-      )
-    ]
-        .toColumn(
-          crossAxisAlignment: CrossAxisAlignment.start,
-        )
-        .padding(
-          vertical: 12,
-          horizontal: 14,
-        )
-        .card(
-          elevation: 0,
-        )
+          TagsBoxes(
+            text:
+                article.author?.replaceAll(
+                  RegExp(r'lolicon', caseSensitive: false),
+                  "Illegal Word Detected",
+                ) ??
+                FlutterI18n.translate(context, "xdu_planet.unknown_author"),
+          ),
+          Text(article.title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Flex(
+            direction: Axis.horizontal,
+            children: [
+              InformationWithIcon(
+                icon: Icons.calendar_month,
+                text: DateFormat("yyyy-MM-dd").format(article.articleTime),
+              ).flexible(),
+              InformationWithIcon(
+                icon: Icons.access_time,
+                text: DateFormat("HH:mm:ss").format(article.articleTime),
+              ).flexible(),
+            ],
+          ),
+        ]
+        .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
+        .padding(vertical: 12, horizontal: 14)
+        .card(elevation: 0)
         .gestures(
-      onTap: () {
-        context.pushReplacement(ContentPage(
-          article: article,
-          author: article.author!,
-        ));
-      },
-    );
+          onTap: () {
+            context.pushReplacement(
+              ContentPage(article: article, author: article.author!),
+            );
+          },
+        );
   }
 }

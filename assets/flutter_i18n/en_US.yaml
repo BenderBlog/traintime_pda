@@ -126,6 +126,7 @@ classtable:
       empty_message: "All courses have been scheduled"
       content: "Code {classCode} | Class {classNumber}\nTeacher: {teacher}"
    empty_class_message: "Semester {semester_code} has no class arranged"
+   empty_class_with_exam: "Semester {semester_code} has no class arranged\nbut we have exam info now!\nGo back to mainpage and goto the exam info page."
    week_title: "Week {week}"
    noon_break: "Noon"
    supper_break: "Supper"

@@ -117,6 +117,7 @@ classtable:
         empty_message: "目前全部课程均有时间安排"
         content: "编号: {classCode} | {classNumber} 班\n老师: {teacher}"
     empty_class_message: "{semester_code} 学期没有课程"
+    empty_class_with_exam: "{semester_code} 学期没有课程但是有考试安排！\n请回到主页后下滑点击”考试安排“按钮进入考试安排页面"
     week_title: "第{week}周"
     noon_break: "午休"
     supper_break: "晚休"

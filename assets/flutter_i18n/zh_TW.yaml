@@ -100,6 +100,9 @@ classtable:
 
       老師: {teacher}'
   empty_class_message: '{semester_code} 學期沒有課程'
+  empty_class_with_exam: '{semester_code} 學期沒有課程但是有考試安排！
+
+    請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面'
   week_title: 第{week}周
   noon_break: 午休
   supper_break: 晚休

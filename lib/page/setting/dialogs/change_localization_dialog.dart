@@ -22,54 +22,53 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "setting.localization_dialog.title",
-      )),
+      title: Text(
+        FlutterI18n.translate(context, "setting.localization_dialog.title"),
+      ),
       titleTextStyle: TextStyle(
         fontSize: 20,
         color: Theme.of(context).colorScheme.onSurface,
       ),
       content: SingleChildScrollView(
-        child: Column(
-          children: List<Widget>.generate(
-            Localization.values.length,
-            (index) => RadioListTile<int>(
-              title: Text(FlutterI18n.translate(
-                context,
-                Localization.values[index].toShow,
-              )),
-              value: index,
-              groupValue: Localization.values
-                  .firstWhere(
-                    (index) =>
-                        index.string ==
-                        preference.getString(
-                          preference.Preference.localization,
-                        ),
-                  )
-                  .index,
-              onChanged: (int? value) async {
-                await preference
-                    .setString(
+        child: RadioGroup(
+          groupValue: Localization.values
+              .firstWhere(
+                (index) =>
+                    index.string ==
+                    preference.getString(preference.Preference.localization),
+              )
+              .index,
+          onChanged: (int? value) async {
+            if (value == null) return;
+            await preference
+                .setString(
                   preference.Preference.localization,
-                  Localization.values[index].string,
+                  Localization.values[value].string,
                 )
-                    .then((value) {
+                .then((value) {
                   ThemeController toChange = Get.put(ThemeController());
                   toChange.onUpdate();
                 });
-              },
+          },
+          child: Column(
+            children: List<Widget>.generate(
+              Localization.values.length,
+              (index) => RadioListTile<int>(
+                title: Text(
+                  FlutterI18n.translate(
+                    context,
+                    Localization.values[index].toShow,
+                  ),
+                ),
+                value: index,
+              ),
             ),
           ),
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "confirm",
-          )),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () => Navigator.pop(context),
         ),
       ],
