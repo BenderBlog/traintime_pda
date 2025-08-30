@@ -195,7 +195,7 @@ electricity:
     remain_power: "电量信息"
     owe_info: "欠费信息"
     history: "历史记录"
-    info: "有欠费一般代表水费"
+    info: "有欠费一般代表水费，半夜11:20到午夜0:30左右无法获取数据"
     date: "日期"
     power: "该日0点电量"
     update: "刷新信息"

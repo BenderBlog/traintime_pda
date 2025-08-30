@@ -23,7 +23,7 @@ class ClassTableDateRow extends StatelessWidget {
       /// day shows.
       height: midRowHeight,
       padding: const EdgeInsets.symmetric(vertical: 5),
-      color: Colors.grey.shade200.withValues(alpha: 0.75),
+      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.75),
       child: Row(
         children: [
           Text(
@@ -33,7 +33,10 @@ class ClassTableDateRow extends StatelessWidget {
               translationParams: {"month": dateList.first.month.toString()},
             ),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ).center().constrained(width: leftRow),
           ...List.generate(7, (index) => WeekInfomation(time: dateList[index])),
         ],
@@ -59,7 +62,10 @@ class WeekInfomation extends StatelessWidget {
         children: [
           Text(
             getWeekString(context, time.weekday - 1),
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           Text(
                 time.day.toString(),
@@ -68,7 +74,7 @@ class WeekInfomation extends StatelessWidget {
                   fontWeight: isToday ? FontWeight.bold : null,
                   color: isToday
                       ? Theme.of(context).colorScheme.primary
-                      : Colors.black87,
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               )
               .center()

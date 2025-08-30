@@ -83,7 +83,10 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                 FlutterI18n.translate(
                   context,
                   e.replaceAll(
-                    RegExp(r'lolicon', caseSensitive: false),
+                    RegExp(
+                      r'(lolicon)|(로리콘)|(Лоликон)|(ロリコン)',
+                      caseSensitive: false,
+                    ),
                     "Illegal Word Detected",
                   ),
                 ),
@@ -151,7 +154,10 @@ class ArticleCard extends StatelessWidget {
           TagsBoxes(
             text:
                 article.author?.replaceAll(
-                  RegExp(r'lolicon', caseSensitive: false),
+                  RegExp(
+                    r'(lolicon)|(로리콘)|(Лоликон)|(ロリコン)|(ﾛﾘｺﾝ)|(ろりこん)',
+                    caseSensitive: false,
+                  ),
                   "Illegal Word Detected",
                 ) ??
                 FlutterI18n.translate(context, "xdu_planet.unknown_author"),

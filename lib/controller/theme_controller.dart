@@ -21,10 +21,10 @@ class ThemeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    onUpdate();
+    updateTheme();
   }
 
-  void onUpdate() {
+  void updateTheme() {
     log.info("[ThemeController] Changing color...");
     int index = preference.getInt(preference.Preference.color);
     color = pdaColorScheme.sublist(index * 2, index * 2 + 1);

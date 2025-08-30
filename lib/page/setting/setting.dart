@@ -249,6 +249,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       preference.Preference.brightness,
                     )],
                   ),
+                  // TODO: DEBUG IT
                   trailing: ToggleButtons(
                     isSelected: List<bool>.generate(
                       3,
@@ -257,16 +258,16 @@ class _SettingWindowState extends State<SettingWindow> {
                           preference.getInt(preference.Preference.brightness),
                     ),
                     onPressed: (int value) {
-                      setState(() {
-                        preference
-                            .setInt(preference.Preference.brightness, value)
-                            .then((value) {
+                      preference
+                          .setInt(preference.Preference.brightness, value)
+                          .then((value) {
+                            setState(() {
                               ThemeController toChange = Get.put(
                                 ThemeController(),
                               );
-                              toChange.onUpdate();
+                              toChange.updateTheme();
                             });
-                      });
+                          });
                     },
                     children: const [
                       Icon(Icons.phone_android_rounded),
@@ -834,7 +835,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             ThemeController toChange = Get.put(
                               ThemeController(),
                             );
-                            toChange.onUpdate();
+                            toChange.updateTheme();
 
                             /// Restart app
                             if (mounted) {

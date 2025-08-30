@@ -114,7 +114,10 @@ class _ClassTableViewState extends State<ClassTableView> {
         }
 
         return DefaultTextStyle.merge(
-          style: const TextStyle(fontSize: 14, color: Colors.black87),
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           child: Text.rich(
             TextSpan(
               children: [
@@ -197,7 +200,11 @@ class _ClassTableViewState extends State<ClassTableView> {
       [
             classSubRow(false)
                 .toColumn()
-                .decorated(color: Colors.grey.shade200.withValues(alpha: 0.75))
+                .decorated(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface.withValues(alpha: 0.75),
+                )
                 .constrained(width: leftRow)
                 .positioned(left: 0),
             ...classSubRow(true),

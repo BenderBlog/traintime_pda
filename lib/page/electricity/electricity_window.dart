@@ -60,7 +60,7 @@ class ElectricityWindow extends StatelessWidget {
                       "electricity.cache_notice",
                     ),
                     value: DateFormat(
-                      "yyyy-MM-dd HH:mm:ss",
+                      "yyyy-MM-dd HH:mm",
                     ).format(electricityInfo.value.fetchDay),
                   ),
                   InfoItem(
@@ -70,7 +70,8 @@ class ElectricityWindow extends StatelessWidget {
                       "electricity.remain_power",
                     ),
                     value:
-                        "${FlutterI18n.translate(context, electricityInfo.value.remain)}${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
+                        "${FlutterI18n.translate(context, electricityInfo.value.remain)}"
+                        "${electricityInfo.value.remain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
                   ),
                   InfoItem(
                     icon: Icons.wallet,

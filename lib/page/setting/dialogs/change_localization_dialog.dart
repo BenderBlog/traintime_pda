@@ -47,7 +47,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
                 )
                 .then((value) {
                   ThemeController toChange = Get.put(ThemeController());
-                  toChange.onUpdate();
+                  toChange.updateTheme();
                 });
           },
           child: Column(

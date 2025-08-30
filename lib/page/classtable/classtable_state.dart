@@ -85,6 +85,9 @@ class ClassTableWidgetState with ChangeNotifier {
   List<ExperimentData>? partnerExperiment;
   String? partnerName;
 
+  /// If no class, a special page appears.
+  bool get haveClass => timeArrangement.isNotEmpty && classDetail.isNotEmpty;
+
   /// Render partner code.
   bool _isPartner = false;
 
@@ -531,7 +534,9 @@ END:VTIMEZONE
       classTableController.updateClassTable(isForce: true),
       examController.get(),
       experimentController.get(),
-    ]).then((value) => value.first);
+    ]).then((value) {
+      notifyListeners();
+    });
   }
 
   ClassTableWidgetState({required this.currentWeek, this.partnerClass}) {

@@ -13,7 +13,6 @@ enum Localization {
     string: "zh_TW",
   ),
   english(toShow: "setting.localization_dialog.english", string: "en_US");
-  // english under construction.
 
   const Localization({required this.toShow, this.string = ""});
 
