@@ -30,6 +30,7 @@ extension IsToday on DateTime {
   }
 }
 
+// FIXME: Get account at percise movement.
 Future<void> update({
   bool force = false,
   Future<String> Function(List<int>)? captchaFunction,
@@ -384,7 +385,20 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
   }) async {
     /// If no account
     if (preference.getString(preference.Preference.dorm).isEmpty) {
-      throw NoAccountInfoException();
+      if (!preference.getBool(preference.Preference.role)) {
+        try {
+          String dorm = await PersonalInfoSession().getDormInfoEhall();
+          await preference.setString(preference.Preference.dorm, dorm);
+        } catch (e, s) {
+          log.error(
+            "[ElectricitySession][LoginPayment] Could not fetch dorm info.",
+            e,
+            s,
+          );
+        }
+      } else {
+        throw NoAccountInfoException();
+      }
     }
 
     electricityInfo.value.remain = "electricity_status.remain_fetching";
@@ -463,8 +477,6 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           "[PaymentSession][getOwe] "
           "Newbee detected.",
         );
-        bool isPostGraduate = await PersonalInfoSession()
-            .checkWhetherPostgraduate();
 
         await dio
             .post(value.headers["location"]![0])
@@ -472,13 +484,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
               await dio.post(
                 "https://payment.xidian.edu.cn/NetWorkUI/perfectUserinfo",
                 data: {
-                  "tel": isPostGraduate
-                      ? await PersonalInfoSession().getInformationFromYjspt(
-                          onlyPhone: true,
-                        )
-                      : await PersonalInfoSession().getInformationEhall(
-                          onlyPhone: true,
-                        ),
+                  "tel": "02981891206",
                   "email":
                       "${preference.getString(preference.Preference.idsAccount)}"
                       "@stu.mail.xidian.edu.cn",

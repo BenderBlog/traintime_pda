@@ -6,7 +6,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/preference.dart';
 
 class EmptyClassTablePage extends StatelessWidget {
   const EmptyClassTablePage({super.key});
@@ -37,7 +36,9 @@ class EmptyClassTablePage extends StatelessWidget {
                 ? "classtable.empty_class_message"
                 : "classtable.empty_class_with_exam",
             translationParams: {
-              "semester_code": getString(Preference.currentSemester),
+              "semester_code": ClassTableState.of(
+                context,
+              )!.controllers.semesterCode,
             },
           ),
         ),

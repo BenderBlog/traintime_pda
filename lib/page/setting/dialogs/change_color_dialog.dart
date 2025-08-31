@@ -26,7 +26,6 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
         FlutterI18n.translate(context, "setting.change_color_dialog.title"),
       ),
       content: SingleChildScrollView(
-        // TODO: DEBUG IT
         child: RadioGroup(
           groupValue: preference.getInt(preference.Preference.color),
           onChanged: (int? value) {

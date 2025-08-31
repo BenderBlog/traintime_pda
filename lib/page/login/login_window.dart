@@ -160,9 +160,9 @@ class _LoginWindowState extends State<LoginWindow> {
 
         bool isPostGraduate = await ses.checkWhetherPostgraduate();
         if (isPostGraduate) {
-          await PersonalInfoSession().getInformationFromYjspt();
+          await PersonalInfoSession().getSemesterInfoYjspt();
         } else {
-          await PersonalInfoSession().getInformationEhall();
+          await PersonalInfoSession().getSemesterInfoEhall();
         }
 
         if (mounted) {

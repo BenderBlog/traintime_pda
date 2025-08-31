@@ -37,11 +37,11 @@ Catcher2Options catcherOptions = Catcher2Options(
 );
 
 enum Preference {
-  name(key: "name", type: "String"),
+  //name(key: "name", type: "String"),
   //sex(key: "sex", type: "String"),
-  execution(key: "execution", type: "String"), // 书院
-  institutes(key: "institutes", type: "String"), // 学院
-  subject(key: "subject", type: "String"), // 专业
+  //execution(key: "execution", type: "String"), // 书院
+  //institutes(key: "institutes", type: "String"), // 学院
+  //subject(key: "subject", type: "String"), // 专业
   dorm(key: "dorm", type: "String"), // 宿舍，如为纯数字即为电费账号
   idsAccount(key: "idsAccount", type: "String"), // 一站式帐号
   idsPassword(key: "idsPassword", type: "String"), // 一站式密码
