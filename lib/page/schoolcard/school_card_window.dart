@@ -112,6 +112,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.hasError) {
                   return ReloadWidget(
+                    errorStatus: snapshot.error,
                     function: () => refreshPaidStatus(),
                   ).center();
                 } else if (snapshot.data!.isEmpty) {

@@ -10,10 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/electricity/electricity_window.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
-import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 
 class ElectricityCard extends StatelessWidget {
@@ -21,35 +18,12 @@ class ElectricityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        if (prefs.getString(prefs.Preference.dorm).isEmpty) {
-          showDialog(
-            context: context,
-            builder: (context) => ElectricityAccountDialog(),
-          ).then((value) {
-            if (prefs.getString(prefs.Preference.dorm).isNotEmpty) {
-              update(
-                captchaFunction: (image) => showDialog<String>(
-                  context: context,
-                  builder: (context) => CaptchaInputDialog(image: image),
-                ).then((value) => value ?? ""),
-              );
-            }
-          });
-        } else {
+    return Obx(
+      () => GestureDetector(
+        onTap: () async {
           context.push(ElectricityWindow());
-        }
-      },
-      onLongPress: () => update(
-        force: true,
-        captchaFunction: (image) => showDialog<String>(
-          context: context,
-          builder: (context) => CaptchaInputDialog(image: image),
-        ).then((value) => value ?? ""),
-      ),
-      child: Obx(
-        () => MainPageCard(
+        },
+        child: MainPageCard(
           isLoad: isLoad.value,
           icon: MingCuteIcons.mgc_flash_line,
           text: FlutterI18n.translate(

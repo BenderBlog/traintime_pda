@@ -251,8 +251,8 @@ class _LoginWindowState extends State<LoginWindow> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(
-          left: width / height > 1.0 ? width * 0.2 : widthOfSquare,
-          right: width / height > 1.0 ? width * 0.2 : widthOfSquare,
+          left: width / height > 1.0 ? width * 0.25 : widthOfSquare,
+          right: width / height > 1.0 ? width * 0.25 : widthOfSquare,
           top: kToolbarHeight,
         ),
         child: width / height > 1.0

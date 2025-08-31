@@ -153,6 +153,7 @@ class ReloadWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 16),
             textAlign: TextAlign.center,
           ),
+          SizedBox(height: 8),
           FilledButton(
             onPressed: function,
             child: Text(

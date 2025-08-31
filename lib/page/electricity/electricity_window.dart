@@ -7,7 +7,11 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
+import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 
 class ElectricityWindow extends StatelessWidget {
@@ -22,6 +26,42 @@ class ElectricityWindow extends StatelessWidget {
       body: Obx(() {
         if (isLoad.value) {
           return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!electricityInfo.value.remain.contains(RegExp(r'[0-9]'))) {
+          return ReloadWidget(
+            errorStatus: FlutterI18n.translate(
+              context,
+              electricityInfo.value.remain,
+            ),
+            function: () {
+              if (prefs.getBool(prefs.Preference.role) &&
+                  prefs.getString(prefs.Preference.dorm).isEmpty) {
+                showDialog(
+                  context: context,
+                  builder: (context) => ElectricityAccountDialog(),
+                ).then((value) {
+                  if (prefs.getString(prefs.Preference.dorm).isNotEmpty) {
+                    update(
+                      force: true,
+                      captchaFunction: (image) => showDialog<String>(
+                        context: context,
+                        builder: (context) => CaptchaInputDialog(image: image),
+                      ).then((value) => value ?? ""),
+                    );
+                  }
+                });
+              } else {
+                update(
+                  force: true,
+                  captchaFunction: (image) => showDialog<String>(
+                    context: context,
+                    builder: (context) => CaptchaInputDialog(image: image),
+                  ).then((value) => value ?? ""),
+                );
+              }
+            },
+          ).center();
         }
         return [
               Text(

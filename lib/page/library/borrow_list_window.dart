@@ -34,6 +34,7 @@ class BorrowListWindow extends StatelessWidget {
           case SessionState.error:
           case SessionState.none:
             return ReloadWidget(
+              errorStatus: borrow_info.error,
               function: borrow_info.refreshBorrowList,
             ).center();
         }

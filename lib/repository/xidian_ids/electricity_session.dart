@@ -35,6 +35,9 @@ Future<void> update({
   bool force = false,
   Future<String> Function(List<int>)? captchaFunction,
 }) async {
+  log.info(
+    "[EletricitySession][update] Ready to update electricity info. isForce: $force",
+  );
   isLoad.value = true;
   isCache.value = false;
   electricityInfo.value.fetchDay = DateTime.now();
@@ -43,6 +46,8 @@ Future<void> update({
   bool canUseCache = false;
 
   if (ElectricitySession.isCacheExist) {
+    log.info("[EletricitySession][update] Checking out cache.");
+
     try {
       cache = ElectricityInfo.fromJson(
         jsonDecode(ElectricitySession.fileCache.readAsStringSync()),
@@ -55,13 +60,14 @@ Future<void> update({
   }
 
   if (!force && canUseCache && cache.fetchDay.isToday) {
+    log.info("[EletricitySession][update] Using cache.");
     ElectricitySession.refreshElectricityHistory(cache);
     electricityInfo.value = cache;
     isCache.value = true;
     isLoad.value = false;
     return;
   }
-
+  log.info("[EletricitySession][update] Fetching from Internet.");
   await ElectricitySession()
       .loginPayment(captchaFunction: captchaFunction)
       .then(
