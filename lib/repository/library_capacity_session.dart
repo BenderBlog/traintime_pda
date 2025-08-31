@@ -6,18 +6,18 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:result_dart/result_dart.dart';
 import 'package:watermeter/model/library_capacity.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/message_session.dart';
+import 'package:watermeter/repository/pda_service_session.dart';
 
-Rx<Result<LibraryCapacity>> northStatus =
-    LibraryCapacity(occupancy: 0, availableSeats: 0).toSuccess<Exception>().obs;
-Rx<Result<LibraryCapacity>> southStatus =
-    LibraryCapacity(occupancy: 0, availableSeats: 0).toSuccess<Exception>().obs;
+Rx<Result<LibraryCapacity>> northStatus = LibraryCapacity(
+  occupancy: 0,
+  availableSeats: 0,
+).toSuccess<Exception>().obs;
+Rx<Result<LibraryCapacity>> southStatus = LibraryCapacity(
+  occupancy: 0,
+  availableSeats: 0,
+).toSuccess<Exception>().obs;
 
-enum LibraryCapacityErrorStatus {
-  noDataDiv,
-  notEnoughParams,
-  noNumElement,
-}
+enum LibraryCapacityErrorStatus { noDataDiv, notEnoughParams, noNumElement }
 
 class LibraryCapacityParseException implements Exception {
   final LibraryCapacityErrorStatus variant;
@@ -26,12 +26,14 @@ class LibraryCapacityParseException implements Exception {
 }
 
 Future<void> update() {
-  northStatus = LibraryCapacity(occupancy: 0, availableSeats: 0)
-      .toSuccess<Exception>()
-      .obs;
-  southStatus = LibraryCapacity(occupancy: 0, availableSeats: 0)
-      .toSuccess<Exception>()
-      .obs;
+  northStatus = LibraryCapacity(
+    occupancy: 0,
+    availableSeats: 0,
+  ).toSuccess<Exception>().obs;
+  southStatus = LibraryCapacity(
+    occupancy: 0,
+    availableSeats: 0,
+  ).toSuccess<Exception>().obs;
   log.info("[LibraryCapacity] ready to fetch info.");
   return Future.wait([
     Future(() async {
@@ -61,9 +63,11 @@ Future<Result<LibraryCapacity>> getData({bool isNorthCampus = false}) async {
     final htmlContent = response.data['data']?['div'];
     if (htmlContent == null) {
       //print('错误：在API响应中找不到 "data.div" 字段。');
-      return Failure(LibraryCapacityParseException(
-        variant: LibraryCapacityErrorStatus.noDataDiv,
-      ));
+      return Failure(
+        LibraryCapacityParseException(
+          variant: LibraryCapacityErrorStatus.noDataDiv,
+        ),
+      );
     }
 
     final document = html_parser.parse(htmlContent);
@@ -72,9 +76,11 @@ Future<Result<LibraryCapacity>> getData({bool isNorthCampus = false}) async {
     final items = document.querySelectorAll('ul.eng-tabs-info > li');
     if (items.length < 2) {
       //print('错误：在返回的HTML中未找到足够的数据项。');
-      return Failure(LibraryCapacityParseException(
-        variant: LibraryCapacityErrorStatus.notEnoughParams,
-      ));
+      return Failure(
+        LibraryCapacityParseException(
+          variant: LibraryCapacityErrorStatus.notEnoughParams,
+        ),
+      );
     }
 
     // 7. 提取数字并转换为整数
@@ -83,9 +89,11 @@ Future<Result<LibraryCapacity>> getData({bool isNorthCampus = false}) async {
 
     if (occupancyText == null || seatsText == null) {
       //print('错误：未能从HTML元素中找到包含数字的.num子元素。');
-      return Failure(LibraryCapacityParseException(
-        variant: LibraryCapacityErrorStatus.noNumElement,
-      ));
+      return Failure(
+        LibraryCapacityParseException(
+          variant: LibraryCapacityErrorStatus.noNumElement,
+        ),
+      );
     }
 
     final int occupancy = int.parse(occupancyText);

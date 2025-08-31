@@ -23,8 +23,9 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   @override
   void initState() {
     super.initState();
-    String initialText =
-        user_perference.getString(user_perference.Preference.sportPassword);
+    String initialText = user_perference.getString(
+      user_perference.Preference.sportPassword,
+    );
     _sportPasswordController.text = initialText;
     _sportPasswordController.selection = TextSelection.fromPosition(
       TextPosition(offset: initialText.length),
@@ -41,10 +42,9 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
   Widget build(BuildContext context) {
     return PopScope(
       child: AlertDialog(
-        title: Text(FlutterI18n.translate(
-          context,
-          "setting.change_sport_title",
-        )),
+        title: Text(
+          FlutterI18n.translate(context, "setting.change_sport_title"),
+        ),
         content: TextField(
           autofocus: true,
           controller: _sportPasswordController,
@@ -66,19 +66,13 @@ class _SportPasswordDialogState extends State<SportPasswordDialog> {
         ),
         actions: <Widget>[
           TextButton(
-            child: Text(FlutterI18n.translate(
-              context,
-              "cancel",
-            )),
+            child: Text(FlutterI18n.translate(context, "cancel")),
             onPressed: () {
               Navigator.of(context).pop<bool>(false); // 返回 false
             },
           ),
           TextButton(
-            child: Text(FlutterI18n.translate(
-              context,
-              "confirm",
-            )),
+            child: Text(FlutterI18n.translate(context, "confirm")),
             onPressed: () async {
               if (_sportPasswordController.text.isNotEmpty) {
                 await user_perference.setString(

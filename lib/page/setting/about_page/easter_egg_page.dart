@@ -21,28 +21,17 @@ class _EasterEggPageState extends State<EasterEggPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(
-          context,
-          "easter_egg_robot.appbar",
-        )),
+        title: Text(FlutterI18n.translate(context, "easter_egg_robot.appbar")),
       ),
       body: [
         Image.asset("assets/art/aboutRobots-icon.png"),
         const SizedBox(height: 24),
         Text(
-          FlutterI18n.translate(
-            context,
-            "easter_egg_robot.title",
-          ),
+          FlutterI18n.translate(context, "easter_egg_robot.title"),
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 24),
-        Text(
-          FlutterI18n.translate(
-            context,
-            "easter_egg_robot.contents",
-          ),
-        ),
+        Text(FlutterI18n.translate(context, "easter_egg_robot.contents")),
         Visibility(
           visible: counter <= 1,
           child: TextButton(
@@ -60,12 +49,14 @@ class _EasterEggPageState extends State<EasterEggPage> {
                 );
               }
             },
-            child: Text(FlutterI18n.translate(
-              context,
-              counter == 0
-                  ? "easter_egg_robot.button_one"
-                  : "easter_egg_robot.button_two",
-            )),
+            child: Text(
+              FlutterI18n.translate(
+                context,
+                counter == 0
+                    ? "easter_egg_robot.button_one"
+                    : "easter_egg_robot.button_two",
+              ),
+            ),
           ),
         ),
       ].toColumn().scrollable().center().padding(horizontal: 16).safeArea(),

@@ -29,10 +29,14 @@ class DigitCaptchaClientProvider {
   static num _sampleMin(img.Image image, List<int> bb, double u, double v) {
     int x = _lerp(bb[0] * 1.0, bb[2] - 1.0, u).floor();
     int y = _lerp(bb[1] * 1.0, bb[3] - 1.0, v).floor();
-    num px = min(image.getPixelClamped(x, y + 0).r,
-        image.getPixelClamped(x + 1, y + 0).r);
-    num py = min(image.getPixelClamped(x, y + 1).r,
-        image.getPixelClamped(x + 1, y + 1).r);
+    num px = min(
+      image.getPixelClamped(x, y + 0).r,
+      image.getPixelClamped(x + 1, y + 0).r,
+    );
+    num py = min(
+      image.getPixelClamped(x, y + 1).r,
+      image.getPixelClamped(x + 1, y + 1).r,
+    );
     return min(px, py);
   }
 
@@ -71,7 +75,9 @@ class DigitCaptchaClientProvider {
     img.Image image = img.decodeImage(Uint8List.fromList(imageData))!;
     image = img.grayscale(image);
     image = image.convert(
-        format: img.Format.float32, numChannels: 1); // 0-256 to 0-1
+      format: img.Format.float32,
+      numChannels: 1,
+    ); // 0-256 to 0-1
 
     if (type == DigitCaptchaType.zfw) {
       // Invert the image
@@ -90,7 +96,11 @@ class DigitCaptchaClientProvider {
 
       // Align with the size of payment captcha
       img.Image result = img.Image(
-          width: 200, height: 80, format: img.Format.float32, numChannels: 1);
+        width: 200,
+        height: 80,
+        format: img.Format.float32,
+        numChannels: 1,
+      );
       for (int x = 0; x < result.width; x++) {
         for (int y = 0; y < result.height; y++) {
           double u = x * 1.0 / result.width;
@@ -130,7 +140,9 @@ class DigitCaptchaClientProvider {
   }
 
   static Future<String?> infer(
-      DigitCaptchaType type, List<int> imageData) async {
+    DigitCaptchaType type,
+    List<int> imageData,
+  ) async {
     img.Image? image = _getImage(type, imageData);
 
     if (image == null) {
@@ -141,13 +153,16 @@ class DigitCaptchaClientProvider {
     int dim3 = image.width ~/ 4;
     int classCount = _getClassCount(type);
 
-    var input = List.filled(dim2 * dim3, 0.0)
-        .reshape<double>([1, dim2, dim3, 1]) as List<List<List<List<double>>>>;
-    var output = List.filled(classCount, 0.0).reshape<double>([1, classCount])
-        as List<List<double>>;
+    var input =
+        List.filled(dim2 * dim3, 0.0).reshape<double>([1, dim2, dim3, 1])
+            as List<List<List<List<double>>>>;
+    var output =
+        List.filled(classCount, 0.0).reshape<double>([1, classCount])
+            as List<List<double>>;
 
-    final interpreter =
-        await Interpreter.fromAsset(_getInterpreterAssetName(type));
+    final interpreter = await Interpreter.fromAsset(
+      _getInterpreterAssetName(type),
+    );
     List<int> nums = [];
 
     // Four numbers
@@ -170,22 +185,13 @@ class CaptchaInputDialog extends StatelessWidget {
   final TextEditingController _captchaController = TextEditingController();
   final List<int> image;
 
-  CaptchaInputDialog({
-    super.key,
-    required this.image,
-  });
+  CaptchaInputDialog({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "login.captcha_window.title",
-      )),
-      titleTextStyle: const TextStyle(
-        fontSize: 20,
-        color: Colors.black,
-      ),
+      title: Text(FlutterI18n.translate(context, "login.captcha_window.title")),
+      titleTextStyle: const TextStyle(fontSize: 20, color: Colors.black),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -207,19 +213,13 @@ class CaptchaInputDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "cancel",
-          )),
+          child: Text(FlutterI18n.translate(context, "cancel")),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(
-            context,
-            "confirm",
-          )),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
             if (_captchaController.text.isEmpty) {
               showToast(

@@ -21,17 +21,9 @@ class NetDataRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-            ),
-          ),
+          Text(label, style: const TextStyle(fontSize: 16)),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: color.withValues(alpha: .1),
               borderRadius: BorderRadius.circular(20),
@@ -44,7 +36,7 @@ class NetDataRow extends StatelessWidget {
                 color: color,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

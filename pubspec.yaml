@@ -1,10 +1,10 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.5.0+30
+version: 1.5.1+31
 
-environment:
-  sdk: ">=3.0.0"
+environment:                                                                                                                                                                               
+  sdk: ^3.8.0 
 
 dependencies:
   dio: ^5.0.0
@@ -20,7 +20,7 @@ dependencies:
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.3
   path_provider: ^2.0.11
-  json_annotation: ^4.8.0
+  json_annotation: ^4.9.0
   share_plus: ^10.1.4
   # Deal with html
   html: ^0.15.4
@@ -54,7 +54,8 @@ dependencies:
   styled_widget: ^0.4.1
   file_picker: ^10.1.9
   chinese_font_library: ^1.1.0
-  ming_cute_icons: ^0.0.1
+  ming_cute_icons: ^0.0.7 
+  remixicon: ^1.4.1
   timelines_plus: ^1.0.4
   based_split_view: ^1.2.0
   disclosure: ^2.2.0
@@ -76,6 +77,8 @@ dependencies:
   flutter_widget_from_html_core: any
   fwfh_cached_network_image: ^0.16.0
   fwfh_url_launcher: ^0.16.0
+  # PDA Club Promotion
+  extended_image: ^10.0.1
   # internationalized
   device_info_plus: ^11.4.0
   flutter_i18n: ^0.36.2
@@ -89,7 +92,7 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
   build_runner: ^2.4.8
-  json_serializable: ^6.7.1
+  json_serializable: ^6.10.0
   flutter_lints: ^5.0.0
   change_app_package_name: ^1.1.0
   pigeon: ^25.3.1
@@ -124,5 +127,3 @@ flutter:
     - assets/flutter_i18n/en_US.yaml
     - assets/captcha-solver-payment.tflite
     - assets/captcha-solver-zfw.tflite
-    - assets/guide/
-    - assets/guide/img/

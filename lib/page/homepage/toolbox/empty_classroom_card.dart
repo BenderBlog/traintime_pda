@@ -21,10 +21,7 @@ class EmptyClassroomCard extends StatelessWidget {
         if (offline) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "homepage.offline_mode",
-            ),
+            msg: FlutterI18n.translate(context, "homepage.offline_mode"),
           );
         } else {
           context.pushReplacement(const EmptyClassroomWindow());

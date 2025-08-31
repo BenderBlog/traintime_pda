@@ -51,12 +51,14 @@ class _ClassTableCardItemDescriptor {
 class ClassTableCard extends StatefulWidget {
   const ClassTableCard({super.key});
 
-  static final RxBool simplifiedMode =
-      preference.getBool(preference.Preference.simplifiedClassTimeline).obs;
+  static final RxBool simplifiedMode = preference
+      .getBool(preference.Preference.simplifiedClassTimeline)
+      .obs;
 
   static void reloadSettingsFromPref() {
-    simplifiedMode.value =
-        preference.getBool(preference.Preference.simplifiedClassTimeline);
+    simplifiedMode.value = preference.getBool(
+      preference.Preference.simplifiedClassTimeline,
+    );
   }
 
   @override
@@ -66,39 +68,37 @@ class ClassTableCard extends StatefulWidget {
 class _ClassTableCardState extends State<ClassTableCard> {
   List<_ClassTableCardItemDescriptor> _getItemDescriptors() {
     var currItem = _ClassTableCardItemDescriptor(
-        timeLabelPrefix: FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.current",
-        ),
-        icon: Icons.timelapse_outlined,
-        padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0));
+      timeLabelPrefix: FlutterI18n.translate(
+        context,
+        "homepage.class_table_card.current",
+      ),
+      icon: Icons.timelapse_outlined,
+      padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
+    );
     currItem.addArrangementIfNotNull(current.value);
 
     var nextItem = _ClassTableCardItemDescriptor(
-        timeLabelPrefix: isTomorrow.isTrue
-            ? FlutterI18n.translate(
-                context,
-                "homepage.class_table_card.tomorrow",
-              )
-            : FlutterI18n.translate(
-                context,
-                "homepage.class_table_card.later",
-              ),
-        icon: Icons.schedule_outlined,
-        padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
-        isTomorrow: isTomorrow.isTrue);
+      timeLabelPrefix: isTomorrow.isTrue
+          ? FlutterI18n.translate(context, "homepage.class_table_card.tomorrow")
+          : FlutterI18n.translate(context, "homepage.class_table_card.later"),
+      icon: Icons.schedule_outlined,
+      padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
+      isTomorrow: isTomorrow.isTrue,
+    );
     nextItem.addArrangementIfNotNull(next.value);
 
     var moreItem = _ClassTableCardItemDescriptor(
-        timeLabelPrefix: FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.more",
-        ),
-        icon: Icons.more_time_outlined,
-        padding: const EdgeInsets.fromLTRB(5, 1.5, 0, 10.0),
-        isMultiArrangementsMode: true);
+      timeLabelPrefix: FlutterI18n.translate(
+        context,
+        "homepage.class_table_card.more",
+      ),
+      icon: Icons.more_time_outlined,
+      padding: const EdgeInsets.fromLTRB(5, 1.5, 0, 10.0),
+      isMultiArrangementsMode: true,
+    );
     moreItem.addAllArrangements(
-        arrangement.skip(arrangement.length - remaining.value));
+      arrangement.skip(arrangement.length - remaining.value),
+    );
 
     if (ClassTableCard.simplifiedMode.isFalse) {
       return [currItem, nextItem, moreItem];
@@ -117,95 +117,85 @@ class _ClassTableCardState extends State<ClassTableCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () {
-        List<_ClassTableCardItemDescriptor> itemDesc = _getItemDescriptors();
-        return FixedTimeline.tileBuilder(
-          theme: TimelineThemeData(
-            nodePosition: 0,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          builder: TimelineTileBuilder(
-            itemCount: itemDesc.length,
-            contentsAlign: ContentsAlign.basic,
-            contentsBuilder: (context, index) => Padding(
-              padding: itemDesc[index].padding,
-              child: _ClassTableCardItem(itemDesc[index]),
+    return Obx(() {
+          List<_ClassTableCardItemDescriptor> itemDesc = _getItemDescriptors();
+          return FixedTimeline.tileBuilder(
+            theme: TimelineThemeData(
+              nodePosition: 0,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            indicatorBuilder: (context, index) => Indicator.widget(
-              position: 0,
-              child: Icon(
-                itemDesc[index].icon,
-                color: Theme.of(context).colorScheme.primary,
+            builder: TimelineTileBuilder(
+              itemCount: itemDesc.length,
+              contentsAlign: ContentsAlign.basic,
+              contentsBuilder: (context, index) => Padding(
+                padding: itemDesc[index].padding,
+                child: _ClassTableCardItem(itemDesc[index]),
               ),
+              indicatorBuilder: (context, index) => Indicator.widget(
+                position: 0,
+                child: Icon(
+                  itemDesc[index].icon,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              startConnectorBuilder: (context, index) {
+                if (index == 0) {
+                  return null;
+                }
+                // Use dashedLine between today and tomorrow
+                if (itemDesc[index].isTomorrow) {
+                  return Connector.dashedLine(gap: 4, thickness: 3);
+                }
+                return Connector.solidLine(thickness: 3);
+              },
+              endConnectorBuilder: (context, index) {
+                // Use dashedLine between today and tomorrow
+                if (index + 1 < itemDesc.length &&
+                    itemDesc[index + 1].isTomorrow) {
+                  return Connector.dashedLine(gap: 4, thickness: 3);
+                }
+                return Connector.solidLine(thickness: 3);
+              },
             ),
-            startConnectorBuilder: (context, index) {
-              if (index == 0) {
-                return null;
-              }
-              // Use dashedLine between today and tomorrow
-              if (itemDesc[index].isTomorrow) {
-                return Connector.dashedLine(
-                  gap: 4,
-                  thickness: 3,
-                );
-              }
-              return Connector.solidLine(
-                thickness: 3,
-              );
-            },
-            endConnectorBuilder: (context, index) {
-              // Use dashedLine between today and tomorrow
-              if (index + 1 < itemDesc.length &&
-                  itemDesc[index + 1].isTomorrow) {
-                return Connector.dashedLine(
-                  gap: 4,
-                  thickness: 3,
-                );
-              }
-              return Connector.solidLine(
-                thickness: 3,
-              );
-            },
-          ),
-        );
-      },
-    )
+          );
+        })
         .paddingDirectional(horizontal: 20, vertical: 14)
         .withHomeCardStyle(context)
         .gestures(
-      onTap: () {
-        final c = Get.find<ClassTableController>();
-        switch (c.state) {
-          case ClassTableState.fetched:
-            context.pushReplacement(LayoutBuilder(
-              builder: (context, constraints) => ClassTableWindow(
-                parentContext: context,
-                currentWeek: c.getCurrentWeek(updateTime),
-                constraints: constraints,
-              ),
-            ));
-          case ClassTableState.error:
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "homepage.class_table_card.error_message",
-                translationParams: {"error": c.error.toString()},
-              ),
-            );
-          case ClassTableState.fetching:
-          case ClassTableState.none:
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "homepage.class_table_card.fetching_message",
-              ),
-            );
-        }
-      },
-    );
+          onTap: () {
+            final c = Get.find<ClassTableController>();
+            switch (c.state) {
+              case ClassTableState.fetched:
+                context.pushReplacement(
+                  LayoutBuilder(
+                    builder: (context, constraints) => ClassTableWindow(
+                      parentContext: context,
+                      currentWeek: c.getCurrentWeek(updateTime),
+                      constraints: constraints,
+                    ),
+                  ),
+                );
+              case ClassTableState.error:
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "homepage.class_table_card.error_message",
+                    translationParams: {"error": c.error.toString()},
+                  ),
+                );
+              case ClassTableState.fetching:
+              case ClassTableState.none:
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "homepage.class_table_card.fetching_message",
+                  ),
+                );
+            }
+          },
+        );
   }
 }
 
@@ -219,11 +209,8 @@ class _ClassTableCardItem extends StatelessWidget {
     List<Widget> columns = [
       Text(
         getTimeText(),
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ).alignment(Alignment.centerLeft)
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ).alignment(Alignment.centerLeft),
     ];
 
     if (descriptor.isMultiArrangementsMode) {
@@ -277,7 +264,7 @@ class _ClassTableCardItem extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.normal,
         ),
-      ).alignment(Alignment.centerLeft).expanded()
+      ).alignment(Alignment.centerLeft).expanded(),
     ];
 
     if (arr != null) {
@@ -288,27 +275,30 @@ class _ClassTableCardItem extends StatelessWidget {
   }
 
   Iterable<Widget> getMultiArrangementsColumns(BuildContext context) {
-    return descriptor.displayArrangements.map((arr) => [
-          Text(
-            DateFormat("HH:mm").format(arr.startTime),
-            style: const TextStyle(
-              height: 1.2,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ).alignment(Alignment.topLeft),
-          Text(
-            arr.name,
-            style: const TextStyle(
-              height: 1.1,
-              fontSize: 16,
-              fontWeight: FontWeight.normal,
-            ),
-          ).alignment(Alignment.topLeft).expanded(),
-        ].toRow(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          separator: const SizedBox(width: 8.0),
-        ));
+    return descriptor.displayArrangements.map(
+      (arr) =>
+          [
+            Text(
+              DateFormat("HH:mm").format(arr.startTime),
+              style: const TextStyle(
+                height: 1.2,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ).alignment(Alignment.topLeft),
+            Text(
+              arr.name,
+              style: const TextStyle(
+                height: 1.1,
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+              ),
+            ).alignment(Alignment.topLeft).expanded(),
+          ].toRow(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            separator: const SizedBox(width: 8.0),
+          ),
+    );
   }
 }
 
@@ -327,37 +317,29 @@ class _ClassTableCardArrangementDetail extends StatelessWidget {
     List<Widget> items = [];
 
     if (displayArrangement.place != null) {
-      items.add(createIconText(
-        context,
-        Icons.room,
-        displayArrangement.place!,
-      ));
+      items.add(createIconText(context, Icons.room, displayArrangement.place!));
     }
 
     if (displayArrangement.seat != null) {
-      items.add(createIconText(
-        context,
-        Icons.chair,
-        displayArrangement.seat!.toString(),
-      ));
+      items.add(
+        createIconText(
+          context,
+          Icons.chair,
+          displayArrangement.seat!.toString(),
+        ),
+      );
     }
 
     if (displayArrangement.teacher != null) {
-      items.add(createIconText(
-        context,
-        Icons.person,
-        displayArrangement.teacher!,
-      ));
+      items.add(
+        createIconText(context, Icons.person, displayArrangement.teacher!),
+      );
     }
 
     return items.toRow(separator: const SizedBox(width: 6));
   }
 
-  Widget createIconText(
-    BuildContext context,
-    IconData icon,
-    String text,
-  ) {
+  Widget createIconText(BuildContext context, IconData icon, String text) {
     return [
       Icon(
         icon,
@@ -366,10 +348,7 @@ class _ClassTableCardArrangementDetail extends StatelessWidget {
             : Theme.of(context).colorScheme.onPrimaryFixedVariant,
         size: 18,
       ),
-      Text(
-        text,
-        style: const TextStyle(fontSize: 14),
-      )
+      Text(text, style: const TextStyle(fontSize: 14)),
     ].toRow(separator: const SizedBox(width: 2));
   }
 }

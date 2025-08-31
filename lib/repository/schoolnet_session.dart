@@ -20,13 +20,7 @@ Rx<SessionState> schoolNetStatus = SessionState.none.obs;
 var isError = "".obs;
 
 // NetworkInfo is not controlled by schoolNetStatus, do remember
-enum CurrentUserNetInfoState {
-  fetching,
-  fetched,
-  notSchool,
-  error,
-  none,
-}
+enum CurrentUserNetInfoState { fetching, fetched, notSchool, error, none }
 
 Rxn<NetworkInfo?> currentUserNetInfo = Rxn();
 Rx<CurrentUserNetInfoState> currentUserNetInfoStatus =
@@ -61,9 +55,7 @@ class SchoolnetSession extends NetworkSession {
               'callback': 'jsonp',
               '_': DateTime.now().millisecondsSinceEpoch.toString(),
             },
-            options: Options(
-              responseType: ResponseType.plain,
-            ),
+            options: Options(responseType: ResponseType.plain),
           )
           .then((value) => value.data);
       final jsonString = networkInfoResponse.substring(
@@ -149,8 +141,9 @@ class SchoolnetSession extends NetworkSession {
     // Get login page
     page = await _dio.get("/login");
     // Get csrf and key
-    List<Element> inputs =
-        parse(page.data.toString()).getElementsByTagName("input");
+    List<Element> inputs = parse(
+      page.data.toString(),
+    ).getElementsByTagName("input");
     String csrf = "";
     String key = "";
     for (var i in inputs) {
@@ -174,11 +167,13 @@ class SchoolnetSession extends NetworkSession {
       lastErrorMessage = "";
 
       // Refresh captcha
-      await _dio
-          .get('https://zfw.xidian.edu.cn/site/captcha', queryParameters: {
-        'refresh': 1,
-        '_': DateTime.now().millisecondsSinceEpoch,
-      });
+      await _dio.get(
+        'https://zfw.xidian.edu.cn/site/captcha',
+        queryParameters: {
+          'refresh': 1,
+          '_': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
 
       // Get verifycode
       var picture = await _dio
@@ -190,10 +185,12 @@ class SchoolnetSession extends NetworkSession {
       String failedmsg = "school_net.captcha_failed";
       String? verifycode = retry == 1
           ? captchaFunction != null
-              ? await captchaFunction(picture)
-              : failedmsg // The last try
+                ? await captchaFunction(picture)
+                : failedmsg // The last try
           : await DigitCaptchaClientProvider.infer(
-              DigitCaptchaType.zfw, picture);
+              DigitCaptchaType.zfw,
+              picture,
+            );
 
       // If failed too much time, set error state.
       if (verifycode == failedmsg) {
@@ -211,12 +208,9 @@ class SchoolnetSession extends NetworkSession {
 
       // Encrypt the password
       var rsaKey = RSAKeyParser().parse(key);
-      String encryptedPassword = Encrypter(RSA(
-        publicKey: RSAPublicKey(
-          rsaKey.modulus!,
-          rsaKey.exponent!,
-        ),
-      )).encrypt(password).base64;
+      String encryptedPassword = Encrypter(
+        RSA(publicKey: RSAPublicKey(rsaKey.modulus!, rsaKey.exponent!)),
+      ).encrypt(password).base64;
 
       // Pre-login post
       page = await _dio.post(
@@ -226,12 +220,14 @@ class SchoolnetSession extends NetworkSession {
           "LoginForm[password]": encryptedPassword,
           "LoginForm[verifyCode]": verifycode,
         }),
-        options: Options(headers: {
-          "X-CSRF-Token": csrf,
-          "Accept": "*/*",
-          "Accept-Encoding": "gzip, deflate, br, zstd",
-          "X-Requested-With": "XMLHttpRequest",
-        }),
+        options: Options(
+          headers: {
+            "X-CSRF-Token": csrf,
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
       );
 
       // Check success or not?
@@ -262,12 +258,14 @@ class SchoolnetSession extends NetworkSession {
           "LoginForm[smsCode]": "",
           "LoginForm[verifyCode]": verifycode,
         }),
-        options: Options(headers: {
-          "X-CSRF-Token": csrf,
-          "Accept": "*/*",
-          "Accept-Encoding": "gzip, deflate, br, zstd",
-          "X-Requested-With": "XMLHttpRequest",
-        }),
+        options: Options(
+          headers: {
+            "X-CSRF-Token": csrf,
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
       );
 
       await _getNetworkUsage();

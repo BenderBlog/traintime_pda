@@ -46,7 +46,8 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
           ),
           WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.repair"),
-            url: "https://ids.xidian.edu.cn/authserver/login?service="
+            url:
+                "https://ids.xidian.edu.cn/authserver/login?service="
                 "https%3A%2F%2Fids.xidian.edu.cn%2Fauthserver%2Foauth2.0%2F"
                 "callbackAuthorize%3Fclient_id%3D869608421533880320%26"
                 "redirect_uri%3Dhttp%253A%252F%252Frepair.xidian.edu.cn%252F"

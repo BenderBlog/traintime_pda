@@ -37,27 +37,20 @@ class ExamCard extends StatelessWidget {
           } else if (offline) {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "homepage.offline_mode",
-              ),
+              msg: FlutterI18n.translate(context, "homepage.offline_mode"),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(FlutterI18n.translate(
-                  context,
-                  c.error.toString(),
-                ).substring(
-                  0,
-                  min(
-                    FlutterI18n.translate(
-                      context,
-                      c.error.toString(),
-                    ).length,
-                    120,
+                content: Text(
+                  FlutterI18n.translate(context, c.error.toString()).substring(
+                    0,
+                    min(
+                      FlutterI18n.translate(context, c.error.toString()).length,
+                      120,
+                    ),
                   ),
-                )),
+                ),
               ),
             );
             showToast(

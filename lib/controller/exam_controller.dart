@@ -17,13 +17,7 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-enum ExamStatus {
-  cache,
-  fetching,
-  fetched,
-  error,
-  none,
-}
+enum ExamStatus { cache, fetching, fetched, error, none }
 
 class ExamController extends GetxController {
   static const examDataCacheName = "exam.json";
@@ -38,19 +32,22 @@ class ExamController extends GetxController {
     DateFormat formatter = DateFormat(HomeArrangement.format);
 
     isFinished.removeWhere(
-        (element) => !(element.startTime?.isAtSameDayAs(now) ?? false));
+      (element) => !(element.startTime?.isAtSameDayAs(now) ?? false),
+    );
     return isFinished
-        .map((e) => HomeArrangement(
-              name: "${e.subject}考试",
-              place: e.place,
-              seat: e.seat,
-              startTimeStr: e.startTime != null
-                  ? formatter.format(e.startTime!)
-                  : e.startTimeStr,
-              endTimeStr: e.stopTime != null
-                  ? formatter.format(e.stopTime!)
-                  : e.endTimeStr,
-            ))
+        .map(
+          (e) => HomeArrangement(
+            name: "${e.subject}考试",
+            place: e.place,
+            seat: e.seat,
+            startTimeStr: e.startTime != null
+                ? formatter.format(e.startTime!)
+                : e.startTimeStr,
+            endTimeStr: e.stopTime != null
+                ? formatter.format(e.stopTime!)
+                : e.endTimeStr,
+          ),
+        )
         .toList();
   }
 
@@ -81,12 +78,11 @@ class ExamController extends GetxController {
       return element.startTime!.millisecondsSinceEpoch <=
           now.millisecondsSinceEpoch;
     });
-    return isNotFinished
-      ..sort(
-        (a, b) =>
-            a.startTime!.microsecondsSinceEpoch -
-            b.startTime!.microsecondsSinceEpoch,
-      );
+    return isNotFinished..sort(
+      (a, b) =>
+          a.startTime!.microsecondsSinceEpoch -
+          b.startTime!.microsecondsSinceEpoch,
+    );
   }
 
   @override
@@ -114,7 +110,7 @@ class ExamController extends GetxController {
   @override
   void onReady() async {
     super.onReady();
-    get().then((value) => update());
+    await get();
   }
 
   Future<void> get() async {
@@ -142,17 +138,17 @@ class ExamController extends GetxController {
           "[ExamController][get] "
           "Store to cache.",
         );
-        file.writeAsStringSync(jsonEncode(
-          data.toJson(),
-        ));
+        file.writeAsStringSync(jsonEncode(data.toJson()));
         if (Platform.isIOS) {
           final api = SaveToGroupIdSwiftApi();
           try {
-            bool result = await api.saveToGroupId(FileToGroupID(
-              appid: preference.appId,
-              fileName: "ExamFile.json",
-              data: jsonEncode(data.toJson()),
-            ));
+            bool result = await api.saveToGroupId(
+              FileToGroupID(
+                appid: preference.appId,
+                fileName: "ExamFile.json",
+                data: jsonEncode(data.toJson()),
+              ),
+            );
             log.info(
               "[ExamController][get] "
               "ios Save to public place status: $result.",

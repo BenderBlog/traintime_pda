@@ -28,7 +28,8 @@ class Subject {
   String toString() => "$subject $typeStr $type $time $place $seat\n";
 
   DateTime? get startTime {
-    RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
+    RegExpMatch? match =
+        timeRegExpUnderGraduate.firstMatch(time) ??
         timeRegExpPostGraduate.firstMatch(time);
     if (match == null) return null;
 
@@ -42,7 +43,8 @@ class Subject {
   }
 
   DateTime? get stopTime {
-    RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
+    RegExpMatch? match =
+        timeRegExpUnderGraduate.firstMatch(time) ??
         timeRegExpPostGraduate.firstMatch(time);
     if (match == null) return null;
 
@@ -70,27 +72,32 @@ class Subject {
     required String place,
     String? seat,
   }) {
-    RegExpMatch? match = timeRegExpUnderGraduate.firstMatch(time) ??
+    RegExpMatch? match =
+        timeRegExpUnderGraduate.firstMatch(time) ??
         timeRegExpPostGraduate.firstMatch(time);
     late String startTime, stopTime;
     if (match != null) {
       DateFormat formatter = DateFormat("yyyy-MM-dd HH:mm:ss");
 
-      startTime = formatter.format(DateTime(
-        int.parse(match.namedGroup('year')!),
-        int.parse(match.namedGroup('month')!),
-        int.parse(match.namedGroup('day')!),
-        int.parse(match.namedGroup('hour')!),
-        int.parse(match.namedGroup('minute')!),
-      ));
+      startTime = formatter.format(
+        DateTime(
+          int.parse(match.namedGroup('year')!),
+          int.parse(match.namedGroup('month')!),
+          int.parse(match.namedGroup('day')!),
+          int.parse(match.namedGroup('hour')!),
+          int.parse(match.namedGroup('minute')!),
+        ),
+      );
 
-      stopTime = formatter.format(DateTime(
-        int.parse(match.namedGroup('year')!),
-        int.parse(match.namedGroup('month')!),
-        int.parse(match.namedGroup('day')!),
-        int.parse(match.namedGroup('stopHour')!),
-        int.parse(match.namedGroup('stopMinute')!),
-      ));
+      stopTime = formatter.format(
+        DateTime(
+          int.parse(match.namedGroup('year')!),
+          int.parse(match.namedGroup('month')!),
+          int.parse(match.namedGroup('day')!),
+          int.parse(match.namedGroup('stopHour')!),
+          int.parse(match.namedGroup('stopMinute')!),
+        ),
+      );
     } else {
       startTime = stopTime = "cancel_exam";
     }
@@ -131,10 +138,7 @@ class ToBeArranged {
   @override
   String toString() => "$subject $id\n";
 
-  ToBeArranged({
-    required this.subject,
-    required this.id,
-  });
+  ToBeArranged({required this.subject, required this.id});
 
   factory ToBeArranged.fromJson(Map<String, dynamic> json) =>
       _$ToBeArrangedFromJson(json);
@@ -147,10 +151,7 @@ class ExamData {
   List<Subject> subject;
   List<ToBeArranged> toBeArranged;
 
-  ExamData({
-    required this.subject,
-    required this.toBeArranged,
-  });
+  ExamData({required this.subject, required this.toBeArranged});
 
   factory ExamData.fromJson(Map<String, dynamic> json) =>
       _$ExamDataFromJson(json);

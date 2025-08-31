@@ -5,10 +5,7 @@ class LibraryCapacity {
   final int occupancy;
   final int availableSeats;
 
-  LibraryCapacity({
-    required this.occupancy,
-    required this.availableSeats,
-  });
+  LibraryCapacity({required this.occupancy, required this.availableSeats});
 
   bool get isEmptyData => occupancy == 0 && availableSeats == 0;
 

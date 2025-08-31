@@ -19,32 +19,16 @@ class SportWindow extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(
-            context,
-            "sport.title",
-          )),
+          title: Text(FlutterI18n.translate(context, "sport.title")),
           bottom: TabBar(
             tabs: [
-              Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  "sport.test_score",
-                ),
-              ),
-              Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  "sport.class_info",
-                ),
-              ),
+              Tab(text: FlutterI18n.translate(context, "sport.test_score")),
+              Tab(text: FlutterI18n.translate(context, "sport.class_info")),
             ],
           ),
         ),
         body: const TabBarView(
-          children: [
-            SportScoreWindow(),
-            SportClassWindow(),
-          ],
+          children: [SportScoreWindow(), SportClassWindow()],
         ),
       ),
     );

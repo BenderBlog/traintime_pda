@@ -40,9 +40,7 @@ class ScoreComposeCard extends Dialog {
             TableRow scoreDetail(ComposeDetail i) {
               return TableRow(
                 children: <Widget>[
-                  TableCell(
-                    child: Text(i.content),
-                  ),
+                  TableCell(child: Text(i.content)),
                   TableCell(
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -97,26 +95,15 @@ class ScoreComposeCard extends Dialog {
           bottomRow: [
             [
               Text(
-                "${FlutterI18n.translate(
-                  context,
-                  "score.score_compose_card.credit",
-                )}: ${score.credit}",
+                "${FlutterI18n.translate(context, "score.score_compose_card.credit")}: ${score.credit}",
               ).expanded(flex: 2),
               Text(
-                "${FlutterI18n.translate(
-                  context,
-                  "score.score_compose_card.gpa",
-                )}: ${score.gpa}",
+                "${FlutterI18n.translate(context, "score.score_compose_card.gpa")}: ${score.gpa}",
               ).expanded(flex: 3),
               Text(
-                "${FlutterI18n.translate(
-                  context,
-                  "score.score_compose_card.score",
-                )}: ${score.scoreStr}",
+                "${FlutterI18n.translate(context, "score.score_compose_card.score")}: ${score.scoreStr}",
               ).expanded(flex: 3),
-            ].toRow(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            ),
+            ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
             const SizedBox(height: 8),
             info,
           ].toColumn(crossAxisAlignment: CrossAxisAlignment.center),

@@ -57,8 +57,9 @@ class SchoolCardSession extends IDSSession {
     }
     var src = img.attributes["src"] ?? "";
     // 提取 base64 数据
-    var base64Data =
-        src.replaceAll("data:image/png;base64,", "").replaceAll("\n", "");
+    var base64Data = src
+        .replaceAll("data:image/png;base64,", "")
+        .replaceAll("\n", "");
     if (base64Data.isEmpty) {
       throw Exception("QR data is empty.");
     }
@@ -72,16 +73,18 @@ class SchoolCardSession extends IDSSession {
       initSession();
     }
     List<PaidRecord> toReturn = [];
-    var response = await dio.post(
-      "https://v8scan.xidian.edu.cn/selftrade/queryCardSelfTradeList?openid=$openid",
-      options: Options(contentType: "application/json; charset=utf-8"),
-      data: {
-        "beginDate": begin,
-        "endDate": end,
-        "tradeType": "-1",
-        "openid": openid,
-      },
-    ).then((value) => jsonDecode(value.data));
+    var response = await dio
+        .post(
+          "https://v8scan.xidian.edu.cn/selftrade/queryCardSelfTradeList?openid=$openid",
+          options: Options(contentType: "application/json; charset=utf-8"),
+          data: {
+            "beginDate": begin,
+            "endDate": end,
+            "tradeType": "-1",
+            "openid": openid,
+          },
+        )
+        .then((value) => jsonDecode(value.data));
     for (var i in response["resultData"]) {
       toReturn.add(
         PaidRecord(place: i["mername"], date: i["txdate"], money: i["txamt"]),
@@ -133,7 +136,8 @@ class SchoolCardSession extends IDSSession {
       );
       page = parse(response.data);
 
-      money.value = page
+      money.value =
+          page
               .getElementsByTagName("li")
               .firstOrNull
               ?.children

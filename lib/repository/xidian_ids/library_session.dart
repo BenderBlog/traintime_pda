@@ -18,8 +18,8 @@ Rx<SessionState> state = SessionState.none.obs;
 RxString error = "".obs;
 List<BorrowData> borrowList = [];
 
-Future<void> Function() refreshBorrowList =
-    () => LibrarySession().getBorrowList();
+Future<void> Function() refreshBorrowList = () =>
+    LibrarySession().getBorrowList();
 
 int get dued => borrowList.where((element) => element.lendDay < 0).length;
 int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
@@ -45,33 +45,36 @@ class LibrarySession extends IDSSession {
   */
 
   Options get header => Options(
-        headers: {
-          HttpHeaders.cookieHeader: "jwt=$token; jwtHeader=jwtOpacAuth",
-          "groupCode": groupCode.isEmpty ? "undefined" : groupCode,
-          "jwtOpacAuth": token,
-          HttpHeaders.refererHeader: "https://findxidian.libsp.cn/",
-          HttpHeaders.hostHeader: "findxidian.libsp.cn",
-        },
-      )..contentType = "application/json;charset=utf-8";
+    headers: {
+      HttpHeaders.cookieHeader: "jwt=$token; jwtHeader=jwtOpacAuth",
+      "groupCode": groupCode.isEmpty ? "undefined" : groupCode,
+      "jwtOpacAuth": token,
+      HttpHeaders.refererHeader: "https://findxidian.libsp.cn/",
+      HttpHeaders.hostHeader: "findxidian.libsp.cn",
+    },
+  )..contentType = "application/json;charset=utf-8";
 
   Future<List<BookInfo>> searchBook(String searchWord, int page) async {
     if (searchWord.isEmpty) return [];
-    var rawData = await dio.post(
-      "https://shuwo.xidian.edu.cn/xidian_book/api/search/list.html",
-      data: {
-        "libraryId": 5,
-        "searchWord": searchWord,
-        "searchFiled": "title",
-        "page": page,
-        "searchLocationStatus": 1,
-      },
-    ).then((value) {
-      if (value.data["data"] != null && value.data["data"]["list"] != null) {
-        return value.data["data"]["list"];
-      } else {
-        return [];
-      }
-    });
+    var rawData = await dio
+        .post(
+          "https://shuwo.xidian.edu.cn/xidian_book/api/search/list.html",
+          data: {
+            "libraryId": 5,
+            "searchWord": searchWord,
+            "searchFiled": "title",
+            "page": page,
+            "searchLocationStatus": 1,
+          },
+        )
+        .then((value) {
+          if (value.data["data"] != null &&
+              value.data["data"]["list"] != null) {
+            return value.data["data"]["list"];
+          } else {
+            return [];
+          }
+        });
 
     return List<BookInfo>.generate(
       rawData.length ?? 0,
@@ -87,13 +90,11 @@ class LibrarySession extends IDSSession {
         .post(
           "https://findxidian.libsp.cn/find/lendbook/reNew",
           data: {
-            "loanIds": [loanId]
+            "loanIds": [loanId],
           },
           options: header,
         )
-        .then(
-          (value) => value.data["data"]["result"]?.toString() ?? "遇到错误",
-        );
+        .then((value) => value.data["data"]["result"]?.toString() ?? "遇到错误");
   }
 
   Future<void> getBorrowList() async {
@@ -131,16 +132,18 @@ class LibrarySession extends IDSSession {
               "searchContent": "",
               "sortType": 0,
               "startDate": null,
-              "endDate": null
+              "endDate": null,
             },
             options: header,
           )
           .then((value) => value.data["data"]["searchResult"]);
       borrowList.clear();
-      borrowList.addAll(List<BorrowData>.generate(
-        rawData.length,
-        (index) => BorrowData.fromJson(rawData[index]),
-      ));
+      borrowList.addAll(
+        List<BorrowData>.generate(
+          rawData.length,
+          (index) => BorrowData.fromJson(rawData[index]),
+        ),
+      );
       state.value = SessionState.fetched;
     } catch (e) {
       error.value = e.toString();
@@ -178,44 +181,51 @@ class LibrarySession extends IDSSession {
 
       // God damn, it use js to redirect...
       String toDeal = response.data.toString();
-      String data = RegExp(r'data: "(?<data>.*)",')
-          .firstMatch(toDeal)!
-          .namedGroup("data")!;
-      int time = int.parse(RegExp(r'time: (?<time>[0-9]*),')
-          .firstMatch(toDeal)!
-          .namedGroup("time")!);
-      String enc =
-          RegExp(r'enc: "(?<enc>.*)",').firstMatch(toDeal)!.namedGroup("enc")!;
-      String name = RegExp(r'displayName: "(?<name>.*)",')
-          .firstMatch(toDeal)!
-          .namedGroup("name")!;
-      int userRole = int.parse(RegExp(r'userRole: (?<userRole>[0-9]{1}),')
-          .firstMatch(toDeal)!
-          .namedGroup("userRole")!);
+      String data = RegExp(
+        r'data: "(?<data>.*)",',
+      ).firstMatch(toDeal)!.namedGroup("data")!;
+      int time = int.parse(
+        RegExp(
+          r'time: (?<time>[0-9]*),',
+        ).firstMatch(toDeal)!.namedGroup("time")!,
+      );
+      String enc = RegExp(
+        r'enc: "(?<enc>.*)",',
+      ).firstMatch(toDeal)!.namedGroup("enc")!;
+      String name = RegExp(
+        r'displayName: "(?<name>.*)",',
+      ).firstMatch(toDeal)!.namedGroup("name")!;
+      int userRole = int.parse(
+        RegExp(
+          r'userRole: (?<userRole>[0-9]{1}),',
+        ).firstMatch(toDeal)!.namedGroup("userRole")!,
+      );
 
-      var isSuccess = await dio.get(
-        "https://tyrzfw.chaoxing.com/auth/xidian/cas/login",
-        queryParameters: {
-          "data": data,
-          "time": time,
-          "enc": enc,
-          "displayName": name,
-          "userRole": userRole,
-          "group1": null,
-          "mobilePhone": null,
-        },
-      ).then((value) => jsonDecode(value.data));
+      var isSuccess = await dio
+          .get(
+            "https://tyrzfw.chaoxing.com/auth/xidian/cas/login",
+            queryParameters: {
+              "data": data,
+              "time": time,
+              "enc": enc,
+              "displayName": name,
+              "userRole": userRole,
+              "group1": null,
+              "mobilePhone": null,
+            },
+          )
+          .then((value) => jsonDecode(value.data));
 
       if (!isSuccess["status"]) {
         throw NotFetchLibraryException(
-            message: "Login failed: ${isSuccess["status"]}");
+          message: "Login failed: ${isSuccess["status"]}",
+        );
       }
 
-      response = await dio.get(destinationURL, queryParameters: {
-        "data": data,
-        "time": time,
-        "enc": enc,
-      });
+      response = await dio.get(
+        destinationURL,
+        queryParameters: {"data": data, "time": time, "enc": enc},
+      );
 
       RegExp tokenExp = RegExp(r"jwt=(?<jwt>.*)&");
 

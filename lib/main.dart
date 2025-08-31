@@ -63,9 +63,7 @@ void main() async {
   String username = preference.getString(preference.Preference.idsAccount);
   String password = preference.getString(preference.Preference.idsPassword);
   bool isFirst = username.isEmpty || password.isEmpty;
-  log.info(
-    "isFirstLogin: $isFirst",
-  );
+  log.info("isFirstLogin: $isFirst");
 
   Catcher2(
     rootWidget: MyApp(isFirst: isFirst),
@@ -140,7 +138,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('zh', 'CN'),
           Locale('zh', 'TW'),
-          Locale('en', 'US')
+          Locale('en', 'US'),
         ],
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
@@ -168,8 +166,12 @@ class _MyAppState extends State<MyApp> {
             sliderValueTinted: true,
             inputDecoratorSchemeColor: SchemeColor.primary,
             inputDecoratorIsFilled: true,
-            inputDecoratorContentPadding:
-                EdgeInsetsDirectional.fromSTEB(12, 16, 12, 12),
+            inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(
+              12,
+              16,
+              12,
+              12,
+            ),
             inputDecoratorBackgroundAlpha: 7,
             inputDecoratorBorderSchemeColor: SchemeColor.primary,
             inputDecoratorBorderType: FlexInputBorderType.outline,
@@ -212,13 +214,12 @@ class _MyAppState extends State<MyApp> {
             navigationRailBackgroundSchemeColor: SchemeColor.surface,
             navigationRailLabelType: NavigationRailLabelType.all,
           ),
-          keyColors: const FlexKeyColors(
-            keepPrimary: true,
-          ),
+          keyColors: const FlexKeyColors(keepPrimary: true),
           tones: FlexSchemeVariant.jolly.tones(Brightness.light),
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
-          cupertinoOverrideTheme:
-              const CupertinoThemeData(applyThemeToAll: true),
+          cupertinoOverrideTheme: const CupertinoThemeData(
+            applyThemeToAll: true,
+          ),
         ).useSystemChineseFont(Brightness.light),
         darkTheme: FlexThemeData.dark(
           colors: c.color.last,
@@ -243,8 +244,12 @@ class _MyAppState extends State<MyApp> {
             sliderValueTinted: true,
             inputDecoratorSchemeColor: SchemeColor.primary,
             inputDecoratorIsFilled: true,
-            inputDecoratorContentPadding:
-                EdgeInsetsDirectional.fromSTEB(12, 16, 12, 12),
+            inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(
+              12,
+              16,
+              12,
+              12,
+            ),
             inputDecoratorBackgroundAlpha: 40,
             inputDecoratorBorderSchemeColor: SchemeColor.primary,
             inputDecoratorBorderType: FlexInputBorderType.outline,
@@ -288,8 +293,9 @@ class _MyAppState extends State<MyApp> {
           keyColors: const FlexKeyColors(),
           tones: FlexSchemeVariant.jolly.tones(Brightness.dark),
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
-          cupertinoOverrideTheme:
-              const CupertinoThemeData(applyThemeToAll: true),
+          cupertinoOverrideTheme: const CupertinoThemeData(
+            applyThemeToAll: true,
+          ),
         ).useSystemChineseFont(Brightness.dark),
         themeMode: c.colorState,
         home: DefaultTextStyle.merge(
@@ -315,8 +321,8 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }

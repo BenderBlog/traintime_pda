@@ -20,20 +20,20 @@ class IdsAccountNetInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Obx(() {
-        if (schoolNetStatus.value == SessionState.fetched) {
-          return [
+    if (schoolNetStatus.value == SessionState.fetched) {
+      return [
             // 注意事项
             Text(
-              FlutterI18n.translate(
-                context,
-                "school_net.ids_account_net.notice",
-              ),
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.orange[800],
-                height: 1.4,
-              ),
-            )
+                  FlutterI18n.translate(
+                    context,
+                    "school_net.ids_account_net.notice",
+                  ),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.orange[800],
+                    height: 1.4,
+                  ),
+                )
                 .padding(all: 16)
                 .decorated(
                   color: Colors.orange[50],
@@ -96,9 +96,7 @@ class IdsAccountNetInfo extends StatelessWidget {
                             context,
                             "school_net.ids_account_net.no_device_online",
                           ),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                          ),
+                          style: const TextStyle(color: Colors.grey),
                         ),
                       )
                     : DeviceList(devices: networkInfo.value!.ipList),
@@ -107,59 +105,53 @@ class IdsAccountNetInfo extends StatelessWidget {
             const SizedBox(height: 4),
             FilledButton(
               onPressed: () => update(),
-              child: Text(
-                FlutterI18n.translate(
-                  context,
-                  "school_net.refresh",
-                ),
-              ),
+              child: Text(FlutterI18n.translate(context, "school_net.refresh")),
             ).padding(all: 4),
           ]
-              .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-              .constrained(maxWidth: 480)
-              .padding(all: 12)
-              .scrollable()
-              .center();
-        } else if (schoolNetStatus.value == SessionState.fetching) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (schoolNetStatus.value == SessionState.error &&
-            isError.value == "school_net.empty_password") {
-          return ReloadWidget(
-            errorStatus: FlutterI18n.translate(
-              context,
-              "school_net.empty_password",
-            ),
-            buttonName: FlutterI18n.translate(
-              context,
-              "setting.change_schoolnet_password_title",
-            ),
-            function: () => showDialog(
+          .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
+          .constrained(maxWidth: 480)
+          .padding(all: 12)
+          .scrollable()
+          .center();
+    } else if (schoolNetStatus.value == SessionState.fetching) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (schoolNetStatus.value == SessionState.error &&
+        isError.value == "school_net.empty_password") {
+      return ReloadWidget(
+        errorStatus: FlutterI18n.translate(
+          context,
+          "school_net.empty_password",
+        ),
+        buttonName: FlutterI18n.translate(
+          context,
+          "setting.change_schoolnet_password_title",
+        ),
+        function: () =>
+            showDialog(
               context: context,
               builder: (context) => const SchoolNetPasswordDialog(),
-            ).then(
-              (value) {
-                if (pref
-                    .getString(pref.Preference.schoolNetQueryPassword)
-                    .isNotEmpty) {
-                  update(
-                    captchaFunction: (image) => showDialog<String>(
-                      context: context,
-                      builder: (context) => CaptchaInputDialog(image: image),
-                    ).then((value) => value ?? ""),
-                  );
-                }
-              },
-            ),
-          );
-        } else {
-          return ReloadWidget(
-            function: () => update(
-              captchaFunction: (image) => showDialog<String>(
-                context: context,
-                builder: (context) => CaptchaInputDialog(image: image),
-              ).then((value) => value ?? ""),
-            ),
-          );
-        }
-      });
+            ).then((value) {
+              if (pref
+                  .getString(pref.Preference.schoolNetQueryPassword)
+                  .isNotEmpty) {
+                update(
+                  captchaFunction: (image) => showDialog<String>(
+                    context: context,
+                    builder: (context) => CaptchaInputDialog(image: image),
+                  ).then((value) => value ?? ""),
+                );
+              }
+            }),
+      );
+    } else {
+      return ReloadWidget(
+        function: () => update(
+          captchaFunction: (image) => showDialog<String>(
+            context: context,
+            builder: (context) => CaptchaInputDialog(image: image),
+          ).then((value) => value ?? ""),
+        ),
+      );
+    }
+  });
 }

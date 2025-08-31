@@ -36,8 +36,5 @@ String getWeekString(BuildContext context, int index) {
     'saturday',
     'sunday',
   ];
-  return FlutterI18n.translate(
-    context,
-    "weekday.${weekList[index]}",
-  );
+  return FlutterI18n.translate(context, "weekday.${weekList[index]}");
 }

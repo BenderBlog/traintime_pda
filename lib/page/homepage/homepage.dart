@@ -2,14 +2,12 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:io';
-
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/library_capacity_card.dart';
+import 'package:watermeter/page/homepage/notice_card/club_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -33,7 +31,9 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final Function()? changePage;
+
+  const MainPage({super.key, this.changePage});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -89,10 +89,10 @@ class _MainPageState extends State<MainPage> {
   }
 
   TextStyle textStyle(context) => TextStyle(
-        fontSize: 16,
-        color: Theme.of(context).colorScheme.primary,
-        fontWeight: FontWeight.w700,
-      );
+    fontSize: 16,
+    color: Theme.of(context).colorScheme.primary,
+    fontWeight: FontWeight.w700,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -132,29 +132,26 @@ class _MainPageState extends State<MainPage> {
                       /// TODO: check it
                       c.state == ClassTableState.fetched
                           ? c.getCurrentWeek(updateTime) >= 0 &&
-                                  c.getCurrentWeek(updateTime) <
-                                      c.classTableData.semesterLength
-                              ? FlutterI18n.translate(
-                                  context,
-                                  "homepage.on_weekday",
-                                  translationParams: {
-                                    "current":
-                                        "${c.getCurrentWeek(updateTime) + 1}"
-                                  },
-                                )
-                              : FlutterI18n.translate(
-                                  context,
-                                  "homepage.on_holiday",
-                                )
+                                    c.getCurrentWeek(updateTime) <
+                                        c.classTableData.semesterLength
+                                ? FlutterI18n.translate(
+                                    context,
+                                    "homepage.on_weekday",
+                                    translationParams: {
+                                      "current":
+                                          "${c.getCurrentWeek(updateTime) + 1}",
+                                    },
+                                  )
+                                : FlutterI18n.translate(
+                                    context,
+                                    "homepage.on_holiday",
+                                  )
                           : c.state == ClassTableState.error
-                              ? FlutterI18n.translate(
-                                  context,
-                                  "homepage.load_error",
-                                )
-                              : FlutterI18n.translate(
-                                  context,
-                                  "homepage.loading",
-                                ),
+                          ? FlutterI18n.translate(
+                              context,
+                              "homepage.load_error",
+                            )
+                          : FlutterI18n.translate(context, "homepage.loading"),
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).brightness == Brightness.dark
@@ -172,17 +169,16 @@ class _MainPageState extends State<MainPage> {
           onRefresh: () {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "homepage.loading_message",
-              ),
+              msg: FlutterI18n.translate(context, "homepage.loading_message"),
             );
             update(
-                context: context,
-                sliderCaptcha: (String cookieStr) {
-                  return SliderCaptchaClientProvider(cookie: cookieStr)
-                      .solve(context);
-                });
+              context: context,
+              sliderCaptcha: (String cookieStr) {
+                return SliderCaptchaClientProvider(
+                  cookie: cookieStr,
+                ).solve(context);
+              },
+            );
           },
           header: PhoenixHeader(
             skyColor: Theme.of(context).colorScheme.surface,
@@ -197,34 +193,7 @@ class _MainPageState extends State<MainPage> {
                 const HeaderLocator(),
                 <Widget>[
                   const NoticeCard(),
-                  if (Platform.isLinux)
-                    Text(
-                      FlutterI18n.translate(
-                        context,
-                        "homepage.linux_notice",
-                      ),
-                    )
-                        .center()
-                        .constrained(height: 30)
-                        .paddingDirectional(
-                          horizontal: 16,
-                          vertical: 14,
-                        )
-                        .withHomeCardStyle(context),
-                  if (prefs.getBool(prefs.Preference.role))
-                    Text(
-                      FlutterI18n.translate(
-                        context,
-                        "homepage.postgraduate_notice",
-                      ),
-                    )
-                        .center()
-                        .constrained(height: 30)
-                        .paddingDirectional(
-                          horizontal: 16,
-                          vertical: 14,
-                        )
-                        .withHomeCardStyle(context),
+                  ClubPromotionCard(onTap: widget.changePage),
                   const ClassTableCard(),
                   ...children,
                   GridView.extent(
@@ -233,10 +202,7 @@ class _MainPageState extends State<MainPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: smallFunction,
                   ),
-                ].toColumn().padding(
-                      vertical: 8,
-                      horizontal: 16,
-                    )
+                ].toColumn().padding(vertical: 8, horizontal: 16),
               ],
             ),
           ),

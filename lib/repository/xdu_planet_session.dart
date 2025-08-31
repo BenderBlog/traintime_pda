@@ -27,16 +27,17 @@ class PlanetSession extends NetworkSession {
     required String content,
     required String userId,
     required String? replyto,
-  }) =>
-      dio
-          .post("$commentBase/api/v1/comment/$id",
-              data: {
-                "content": content,
-                "user_id": userId,
-                "reply_to": replyto ?? "",
-              },
-              options: Options(contentType: Headers.jsonContentType))
-          .then((value) => value.data.toString());
+  }) => dio
+      .post(
+        "$commentBase/api/v1/comment/$id",
+        data: {
+          "content": content,
+          "user_id": userId,
+          "reply_to": replyto ?? "",
+        },
+        options: Options(contentType: Headers.jsonContentType),
+      )
+      .then((value) => value.data.toString());
 
   Future<void> auditComments({required int id}) => dio
       .delete("$commentBase/api/v1/comment/$id")

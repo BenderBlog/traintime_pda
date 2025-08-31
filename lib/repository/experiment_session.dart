@@ -12,11 +12,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 
-enum ExperimentFetchStatus {
-  notSchoolNetwork,
-  noPassword,
-  success,
-}
+enum ExperimentFetchStatus { notSchoolNetwork, noPassword, success }
 
 class ExperimentSession extends NetworkSession {
   @override
@@ -26,14 +22,15 @@ class ExperimentSession extends NetworkSession {
     ..options.followRedirects = false
     ..options.responseDecoder = (responseBytes, options, responseBody) async {
       String gbk = await CharsetConverter.availableCharsets().then(
-          (value) => value.firstWhere((element) => element.contains("18030")));
+        (value) => value.firstWhere((element) => element.contains("18030")),
+      );
       return await CharsetConverter.decode(
         gbk,
         Uint8List.fromList(responseBytes),
       );
     }
-    ..options.validateStatus =
-        (status) => status != null && status >= 200 && status < 400;
+    ..options.validateStatus = (status) =>
+        status != null && status >= 200 && status < 400;
 
   static Map<String, String> selectInfo = {};
   String cookieStr = "";
@@ -65,9 +62,7 @@ class ExperimentSession extends NetworkSession {
             },
           ),
         )
-        .then(
-          (value) => value.data,
-        );
+        .then((value) => value.data);
 
     /// Fetch heder
     /// headerGet.allMatches(page).toList();
@@ -121,9 +116,7 @@ class ExperimentSession extends NetworkSession {
               },
             ),
           )
-          .then(
-            (value) => value.data,
-          );
+          .then((value) => value.data);
     }
     var weekInfo = weekGet.allMatches(page).toList();
     var teacherInfo = teacherGet.allMatches(page).toList();
@@ -155,7 +148,8 @@ class ExperimentSession extends NetworkSession {
 
     var loginResponse = await dio.post(
       'http://wlsy.xidian.edu.cn/PhyEws/default.aspx',
-      data: '__EVENTTARGET=&__EVENTARGUMENT=&'
+      data:
+          '__EVENTTARGET=&__EVENTARGUMENT=&'
           '__VIEWSTATE=%2FwEPDwUKMTEzNzM0MjM0OWQYAQUeX19D'
           'b250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFD2xvZ2luMSRidG5Mb2dpbkOuzGVaztce4Ict7jsIJ0F5pUDb%2BsmSbCCrNVSBlPML&'
           '__VIEWSTATEGENERATOR=EE008CD9&'
@@ -218,13 +212,12 @@ class ExperimentSession extends NetworkSession {
             },
           ),
         )
-        .then(
-          (value) => value.data,
-        );
+        .then((value) => value.data);
 
-    var expInfo = parse(data)
-            .getElementById("Orders_ctl00")
-            ?.getElementsByTagName('tr') ??
+    var expInfo =
+        parse(
+          data,
+        ).getElementById("Orders_ctl00")?.getElementsByTagName('tr') ??
         [];
 
     log.debug(

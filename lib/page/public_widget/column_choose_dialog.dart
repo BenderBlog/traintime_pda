@@ -9,27 +9,18 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 class ColumnChooseDialog extends StatelessWidget {
   final List<String> chooseList;
 
-  const ColumnChooseDialog({
-    super.key,
-    required this.chooseList,
-  });
+  const ColumnChooseDialog({super.key, required this.chooseList});
 
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "choose_semester",
-      )),
+      title: Text(FlutterI18n.translate(context, "choose_semester")),
       children: List.generate(
         chooseList.length,
         (index) => SimpleDialogOption(
           onPressed: () => Navigator.of(context).pop<int>(index),
           child: ListTile(
-            title: Text(FlutterI18n.translate(
-              context,
-              chooseList[index],
-            )),
+            title: Text(FlutterI18n.translate(context, chooseList[index])),
           ),
         ),
       ),

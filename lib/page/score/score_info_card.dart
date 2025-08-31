@@ -84,48 +84,44 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
         opacity: _isVisible ? 1.0 : 0.0,
         duration: _duration,
         child: ReXCard(
-            opacity: cardOpacity,
-            title: Text.rich(TextSpan(children: [
-              // TODO: Backend-return Data, unable to change at the moment...
-              if (c.scoreData[widget.mark].scoreStatus != "初修")
-                TextSpan(text: "${c.scoreData[widget.mark].scoreStatus} "),
-              if (c.scoreData[widget.mark].isPassed == false)
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "score.score_info_card.failed",
+          opacity: cardOpacity,
+          title: Text.rich(
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            TextSpan(
+              children: [
+                // TODO: Backend-return Data, unable to change at the moment...
+                if (c.scoreData[widget.mark].scoreStatus != "初修")
+                  TextSpan(text: "${c.scoreData[widget.mark].scoreStatus} "),
+                if (c.scoreData[widget.mark].isPassed == false)
+                  TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "score.score_info_card.failed",
+                    ),
                   ),
-                ),
-              TextSpan(text: c.scoreData[widget.mark].name)
-            ])),
-            remaining: [
-              ReXCardRemaining(c.scoreData[widget.mark].classStatus),
-            ],
-            bottomRow: DefaultTextStyle(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              child: [
-                Text(
-                  "${FlutterI18n.translate(
-                    context,
-                    "score.score_compose_card.credit",
-                  )}: ${c.scoreData[widget.mark].credit}",
-                ).expanded(flex: 2),
-                Text(
-                  "${FlutterI18n.translate(
-                    context,
-                    "score.score_compose_card.gpa",
-                  )}: ${c.scoreData[widget.mark].gpa}",
-                ).expanded(flex: 3),
-                Text(
-                  "${FlutterI18n.translate(
-                    context,
-                    "score.score_compose_card.score",
-                  )}: ${c.scoreData[widget.mark].scoreStr}",
-                ).expanded(flex: 3),
-              ].toRow(),
-            )),
+                TextSpan(text: c.scoreData[widget.mark].name),
+              ],
+            ),
+          ),
+          remaining: [ReXCardRemaining(c.scoreData[widget.mark].classStatus)],
+          bottomRow: DefaultTextStyle(
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            child: [
+              Text(
+                "${FlutterI18n.translate(context, "score.score_compose_card.credit")}: ${c.scoreData[widget.mark].credit}",
+              ).expanded(flex: 2),
+              Text(
+                "${FlutterI18n.translate(context, "score.score_compose_card.gpa")}: ${c.scoreData[widget.mark].gpa}",
+              ).expanded(flex: 3),
+              Text(
+                "${FlutterI18n.translate(context, "score.score_compose_card.score")}: ${c.scoreData[widget.mark].scoreStr}",
+              ).expanded(flex: 3),
+            ].toRow(),
+          ),
+        ),
       ),
     );
   }

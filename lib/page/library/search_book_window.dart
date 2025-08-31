@@ -75,121 +75,92 @@ class _SearchBookWindowState extends State<SearchBookWindow>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-        body: Column(
-      children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: TextFormField(
-            controller: text,
-            decoration: InputDecoration(
-              hintText: FlutterI18n.translate(
-                context,
-                "library.search_here",
+      body: Column(
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: TextFormField(
+              controller: text,
+              decoration: InputDecoration(
+                hintText: FlutterI18n.translate(context, "library.search_here"),
+                prefixIcon: const Icon(Icons.search),
               ),
-              prefixIcon: const Icon(Icons.search),
+              onChanged: (String text) => search.value = text,
+              onFieldSubmitted: (value) => setState(() {
+                searchList.clear();
+                page = 1;
+                noMore = false;
+                searchBook();
+              }),
             ),
-            onChanged: (String text) => search.value = text,
-            onFieldSubmitted: (value) => setState(() {
-              searchList.clear();
-              page = 1;
-              noMore = false;
-              searchBook();
-            }),
-          ),
-        ).padding(
-          vertical: 10,
-          horizontal: 8,
-        ),
-        EasyRefresh(
-          footer: ClassicFooter(
-            dragText: FlutterI18n.translate(
-              context,
-              "drag_text",
+          ).padding(vertical: 10, horizontal: 8),
+          EasyRefresh(
+            footer: ClassicFooter(
+              dragText: FlutterI18n.translate(context, "drag_text"),
+              readyText: FlutterI18n.translate(context, "ready_text"),
+              processingText: FlutterI18n.translate(context, "processing_text"),
+              processedText: FlutterI18n.translate(context, "processed_text"),
+              noMoreText: FlutterI18n.translate(context, "no_more_text"),
+              failedText: FlutterI18n.translate(context, "failed_text"),
+              infiniteOffset: null,
             ),
-            readyText: FlutterI18n.translate(
-              context,
-              "ready_text",
-            ),
-            processingText: FlutterI18n.translate(
-              context,
-              "processing_text",
-            ),
-            processedText: FlutterI18n.translate(
-              context,
-              "processed_text",
-            ),
-            noMoreText: FlutterI18n.translate(
-              context,
-              "no_more_text",
-            ),
-            failedText: FlutterI18n.translate(
-              context,
-              "failed_text",
-            ),
-            infiniteOffset: null,
-          ),
-          onLoad: () async {
-            await searchBook();
-          },
-          child: Obx(() {
-            if (searchList.isNotEmpty) {
-              List<Widget> bookList = List<Widget>.generate(
-                searchList.length,
-                (index) => GestureDetector(
-                  child: BookInfoCard(toUse: searchList[index]),
-                  onTap: () => BothSideSheet.show(
-                    context: context,
-                    title: FlutterI18n.translate(
-                      context,
-                      "library.book_detail",
-                    ),
-                    child: BookDetailCard(
-                      toUse: searchList[index],
+            onLoad: () async {
+              await searchBook();
+            },
+            child: Obx(() {
+              if (searchList.isNotEmpty) {
+                List<Widget> bookList = List<Widget>.generate(
+                  searchList.length,
+                  (index) => GestureDetector(
+                    child: BookInfoCard(toUse: searchList[index]),
+                    onTap: () => BothSideSheet.show(
+                      context: context,
+                      title: FlutterI18n.translate(
+                        context,
+                        "library.book_detail",
+                      ),
+                      child: BookDetailCard(toUse: searchList[index]),
                     ),
                   ),
-                ),
-              );
-              return LayoutBuilder(builder: (context, constraints) {
-                return ListView.builder(
-                  itemCount: bookList.length,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 6 +
-                        (constraints.maxWidth > 496
-                            ? ((constraints.maxWidth - 496) / 2 - 2)
-                            : 0),
-                  ),
-                  itemBuilder: (context, index) => bookList[index],
                 );
-              });
-            } else if (isSearching.value) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (search.value.isNotEmpty) {
-              return EmptyListView(
-                type: EmptyListViewType.reading,
-                text: FlutterI18n.translate(
-                  context,
-                  "library.no_result",
-                ),
-              );
-            } else {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.search,
-                    size: 96,
-                  ),
-                  const Divider(color: Colors.transparent),
-                  Text(FlutterI18n.translate(
-                    context,
-                    "library.please_search",
-                  )),
-                ],
-              );
-            }
-          }),
-        ).expanded(),
-      ],
-    ));
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return ListView.builder(
+                      itemCount: bookList.length,
+                      padding: EdgeInsets.symmetric(
+                        horizontal:
+                            6 +
+                            (constraints.maxWidth > 496
+                                ? ((constraints.maxWidth - 496) / 2 - 2)
+                                : 0),
+                      ),
+                      itemBuilder: (context, index) => bookList[index],
+                    );
+                  },
+                );
+              } else if (isSearching.value) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (search.value.isNotEmpty) {
+                return EmptyListView(
+                  type: EmptyListViewType.reading,
+                  text: FlutterI18n.translate(context, "library.no_result"),
+                );
+              } else {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.search, size: 96),
+                    const Divider(color: Colors.transparent),
+                    Text(
+                      FlutterI18n.translate(context, "library.please_search"),
+                    ),
+                  ],
+                );
+              }
+            }),
+          ).expanded(),
+        ],
+      ),
+    );
   }
 }

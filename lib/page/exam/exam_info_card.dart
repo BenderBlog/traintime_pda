@@ -12,20 +12,15 @@ class ExamInfoCard extends StatelessWidget {
   final Subject? toUse;
   final String? title;
 
-  const ExamInfoCard({
-    super.key,
-    this.toUse,
-    this.title,
-  }) : assert(toUse != null || title != null);
+  const ExamInfoCard({super.key, this.toUse, this.title})
+    : assert(toUse != null || title != null);
 
   @override
   Widget build(BuildContext context) {
     return toUse != null
         ? ReXCard(
             title: Text(toUse!.subject),
-            remaining: [
-              ReXCardRemaining(toUse!.type),
-            ],
+            remaining: [ReXCardRemaining(toUse!.type)],
             bottomRow: Wrap(
               alignment: WrapAlignment.spaceBetween,
               children: [
@@ -51,20 +46,20 @@ class ExamInfoCard extends StatelessWidget {
             ),
           )
         : Text(
-            title!,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ).padding(all: 14).card(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 6,
-              ),
-              elevation: 0,
-              color:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            );
+                title!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              )
+              .padding(all: 14)
+              .card(
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                elevation: 0,
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+              );
   }
 }

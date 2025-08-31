@@ -69,8 +69,11 @@ class IDSSession extends NetworkSession {
     /// Start padding
     int blockSize = 16;
     List<int> dataToPad = [];
-    dataToPad.addAll(utf8.encode(
-        "xidianscriptsxduxidianscriptsxduxidianscriptsxduxidianscriptsxdu$toEnc"));
+    dataToPad.addAll(
+      utf8.encode(
+        "xidianscriptsxduxidianscriptsxduxidianscriptsxduxidianscriptsxdu$toEnc",
+      ),
+    );
     int paddingLength = blockSize - dataToPad.length % blockSize;
     for (var i = 0; i < paddingLength; ++i) {
       dataToPad.add(paddingLength);
@@ -78,9 +81,9 @@ class IDSSession extends NetworkSession {
     String readyToEnc = utf8.decode(dataToPad);
 
     /// Start encrypt.
-    return encrypt.Encrypter(crypt)
-        .encrypt(readyToEnc, iv: encrypt.IV.fromUtf8('xidianscriptsxdu'))
-        .base64;
+    return encrypt.Encrypter(
+      crypt,
+    ).encrypt(readyToEnc, iv: encrypt.IV.fromUtf8('xidianscriptsxdu')).base64;
   }
 
   static const _header = [
@@ -191,15 +194,14 @@ class IDSSession extends NetworkSession {
     /// Start getting data from webpage.
     var page = parse(response);
     var form = page.getElementsByTagName("input")
-      ..removeWhere(
-        (element) => element.attributes["type"] != "hidden",
-      );
+      ..removeWhere((element) => element.attributes["type"] != "hidden");
 
     /// Check whether it need CAPTCHA or not:-P
     /// Used in two captcha.
     String cookieStr = "";
-    var cookie = await cookieJar
-        .loadForRequest(Uri.parse("https://ids.xidian.edu.cn/authserver"));
+    var cookie = await cookieJar.loadForRequest(
+      Uri.parse("https://ids.xidian.edu.cn/authserver"),
+    );
     for (var i in cookie) {
       cookieStr += "${i.name}=${i.value}; ";
     }
@@ -284,9 +286,7 @@ class IDSSession extends NetworkSession {
 
         var page = parse(data.data ?? "");
         var form = page.getElementsByTagName("form")
-          ..removeWhere(
-            (element) => element.id != "continue",
-          );
+          ..removeWhere((element) => element.id != "continue");
         log.info(
           "[IDSSession][login] "
           "form: $form.",
@@ -328,7 +328,8 @@ class IDSSession extends NetworkSession {
 
   Future<bool> checkWhetherPostgraduate() async {
     String location = await checkAndLogin(
-      target: "https://yjspt.xidian.edu.cn/gsapp"
+      target:
+          "https://yjspt.xidian.edu.cn/gsapp"
           "/sys/yjsemaphome/portal/index.do",
       sliderCaptcha: (cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
@@ -336,21 +337,18 @@ class IDSSession extends NetworkSession {
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[checkWhetherPostgraduate] Received location: $location",
-      );
+      log.info("[checkWhetherPostgraduate] Received location: $location");
       response = await dio.get(location);
     }
 
     bool toReturn = await dio
-        .post("https://yjspt.xidian.edu.cn/gsapp"
-            "/sys/yjsemaphome/modules/pubWork/getCanVisitAppList.do")
+        .post(
+          "https://yjspt.xidian.edu.cn/gsapp"
+          "/sys/yjsemaphome/modules/pubWork/getCanVisitAppList.do",
+        )
         .then((value) => value.data["res"] != null);
 
-    preference.setBool(
-      preference.Preference.role,
-      toReturn,
-    );
+    preference.setBool(preference.Preference.role, toReturn);
 
     return toReturn;
   }

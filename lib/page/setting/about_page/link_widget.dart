@@ -10,11 +10,7 @@ class Link {
   final Icon icon;
   final String url;
 
-  const Link({
-    required this.name,
-    required this.icon,
-    required this.url,
-  });
+  const Link({required this.name, required this.icon, required this.url});
 }
 
 class LinkWidget extends StatelessWidget {
@@ -35,10 +31,8 @@ class LinkWidget extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: icon,
       title: Text(name),
-      onTap: () => launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode.externalApplication,
-      ),
+      onTap: () =>
+          launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
     );
   }
 }

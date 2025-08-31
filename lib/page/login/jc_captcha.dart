@@ -55,10 +55,22 @@ class SliderCaptchaClientProvider {
     puzzleData = const Base64Decoder().convert(puzzleBase64);
     pieceData = const Base64Decoder().convert(pieceBase64);
 
-    puzzleImage = Lazy(() => Image.memory(puzzleData!,
-        width: puzzleWidth, height: puzzleHeight, fit: BoxFit.fitWidth));
-    pieceImage = Lazy(() => Image.memory(pieceData!,
-        width: pieceWidth, height: pieceHeight, fit: BoxFit.fitWidth));
+    puzzleImage = Lazy(
+      () => Image.memory(
+        puzzleData!,
+        width: puzzleWidth,
+        height: puzzleHeight,
+        fit: BoxFit.fitWidth,
+      ),
+    );
+    pieceImage = Lazy(
+      () => Image.memory(
+        pieceData!,
+        width: pieceWidth,
+        height: pieceHeight,
+        fit: BoxFit.fitWidth,
+      ),
+    );
   }
 
   Future<void> solve(BuildContext? context, {int retryCount = 20}) async {
@@ -76,9 +88,7 @@ class SliderCaptchaClientProvider {
     // fallback
     if (context != null && context.mounted) {
       await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => CaptchaWidget(provider: this),
-        ),
+        MaterialPageRoute(builder: (context) => CaptchaWidget(provider: this)),
       );
     }
     throw CaptchaSolveFailedException();
@@ -102,8 +112,11 @@ class SliderCaptchaClientProvider {
     return result.data["errorCode"] == 1;
   }
 
-  static double? _trySolve(Uint8List puzzleData, Uint8List pieceData,
-      {int border = 24}) {
+  static double? _trySolve(
+    Uint8List puzzleData,
+    Uint8List pieceData, {
+    int border = 24,
+  }) {
     img.Image? puzzle = img.decodeImage(puzzleData);
     if (puzzle == null) {
       return null;
@@ -126,7 +139,7 @@ class SliderCaptchaClientProvider {
     var templateN = _normalizeImage(piece, xL, yT, widthW, heightW, meanT);
     var colsW = [
       for (var x = xL + 1; x < widthG + 1; ++x)
-        _calculateSum(puzzle, x, yT, 1, heightW)
+        _calculateSum(puzzle, x, yT, 1, heightW),
     ];
     var colsWL = colsW.iterator, colsWR = colsW.iterator;
     double sumW = 0;
@@ -143,8 +156,15 @@ class SliderCaptchaClientProvider {
       colsWL.moveNext();
       colsWR.moveNext();
       sumW = sumW - colsWL.current + colsWR.current;
-      var ncc =
-          _calculateNCC(puzzle, x, yT, widthW, heightW, templateN, sumW / lenW);
+      var ncc = _calculateNCC(
+        puzzle,
+        x,
+        yT,
+        widthW,
+        heightW,
+        templateN,
+        sumW / lenW,
+      );
       if (ncc > nccMax) {
         nccMax = ncc;
         xMax = x;
@@ -169,7 +189,12 @@ class SliderCaptchaClientProvider {
   }
 
   static double _calculateSum(
-      img.Image image, int x, int y, int width, int height) {
+    img.Image image,
+    int x,
+    int y,
+    int width,
+    int height,
+  ) {
     double sum = 0;
     for (var yy = y; yy < y + height; yy++) {
       for (var xx = x; xx < x + width; xx++) {
@@ -180,21 +205,39 @@ class SliderCaptchaClientProvider {
   }
 
   static double _calculateMean(
-      img.Image image, int x, int y, int width, int height) {
+    img.Image image,
+    int x,
+    int y,
+    int width,
+    int height,
+  ) {
     return _calculateSum(image, x, y, width, height) / width / height;
   }
 
   static List<double> _normalizeImage(
-      img.Image image, int x, int y, int width, int height, double mean) {
+    img.Image image,
+    int x,
+    int y,
+    int width,
+    int height,
+    double mean,
+  ) {
     return [
       for (var yy = 0; yy < height; yy++)
         for (var xx = 0; xx < width; xx++)
-          image.getPixel(xx + x, yy + y).luminance - mean
+          image.getPixel(xx + x, yy + y).luminance - mean,
     ];
   }
 
-  static double _calculateNCC(img.Image window, int x, int y, int width,
-      int height, List<double> template, double meanW) {
+  static double _calculateNCC(
+    img.Image window,
+    int x,
+    int y,
+    int width,
+    int height,
+    List<double> template,
+    double meanW,
+  ) {
     double sumWt = 0, sumWw = 0.000001;
     var iT = template.iterator;
     for (var yy = y; yy < y + height; yy++) {
@@ -214,10 +257,7 @@ class CaptchaWidget extends StatefulWidget {
 
   final SliderCaptchaClientProvider provider;
 
-  const CaptchaWidget({
-    super.key,
-    required this.provider,
-  });
+  const CaptchaWidget({super.key, required this.provider});
 
   @override
   State<CaptchaWidget> createState() => _CaptchaWidgetState();
@@ -247,10 +287,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(
-          context,
-          "login.slider_title",
-        )),
+        title: Text(FlutterI18n.translate(context, "login.slider_title")),
       ),
       body: FutureBuilder<SliderCaptchaClientProvider>(
         future: provider,
@@ -272,7 +309,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                       snapshot.data!.puzzleImage!.value,
                       // 拼图层
                       Positioned(
-                        left: _sliderValue * snapshot.data!.puzzleWidth -
+                        left:
+                            _sliderValue * snapshot.data!.puzzleWidth -
                             _offsetValue,
                         child: snapshot.data!.pieceImage!.value,
                       ),

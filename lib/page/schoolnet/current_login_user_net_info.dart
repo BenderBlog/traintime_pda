@@ -25,25 +25,26 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Obx(() {
-        if (currentUserNetInfoStatus.value == CurrentUserNetInfoState.fetched) {
-          final totalBytes = currentUserNetInfo.value!.sumBytes +
-              currentUserNetInfo.value!.remainBytes;
-          final usedPercentage = totalBytes > 0
-              ? currentUserNetInfo.value!.sumBytes / totalBytes
-              : 0;
-          return [
+    if (currentUserNetInfoStatus.value == CurrentUserNetInfoState.fetched) {
+      final totalBytes =
+          currentUserNetInfo.value!.sumBytes +
+          currentUserNetInfo.value!.remainBytes;
+      final usedPercentage = totalBytes > 0
+          ? currentUserNetInfo.value!.sumBytes / totalBytes
+          : 0;
+      return [
             // 注意事项
             Text(
-              FlutterI18n.translate(
-                context,
-                "school_net.current_login_net.notice",
-              ),
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.orange[800],
-                height: 1.4,
-              ),
-            )
+                  FlutterI18n.translate(
+                    context,
+                    "school_net.current_login_net.notice",
+                  ),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.orange[800],
+                    height: 1.4,
+                  ),
+                )
                 .padding(all: 16)
                 .decorated(
                   color: Colors.orange[50],
@@ -83,7 +84,8 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                     context,
                     "school_net.current_login_net.remain",
                   ),
-                  value: '¥'
+                  value:
+                      '¥'
                       '${currentUserNetInfo.value!.userBalance.toStringAsFixed(2)}',
                   valueColor: Colors.green,
                 ),
@@ -105,10 +107,12 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   FlutterI18n.translate(
-                      context, "school_net.current_login_net.used_percent",
-                      translationParams: {
-                        "percent": (usedPercentage * 100).toStringAsFixed(1),
-                      }),
+                    context,
+                    "school_net.current_login_net.used_percent",
+                    translationParams: {
+                      "percent": (usedPercentage * 100).toStringAsFixed(1),
+                    },
+                  ),
                   textAlign: TextAlign.right,
                 ),
                 const SizedBox(height: 8),
@@ -141,41 +145,31 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
             const SizedBox(height: 4),
             FilledButton(
               onPressed: () => SchoolnetSession.getCurrentUserLogin(),
-              child: Text(
-                FlutterI18n.translate(
-                  context,
-                  "school_net.refresh",
-                ),
-              ),
+              child: Text(FlutterI18n.translate(context, "school_net.refresh")),
             ).padding(all: 4),
           ]
-              .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-              .constrained(maxWidth: 480)
-              .padding(all: 12)
-              .scrollable()
-              .center();
-        } else if (currentUserNetInfoStatus.value ==
-            CurrentUserNetInfoState.fetching) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (currentUserNetInfoStatus.value ==
-            CurrentUserNetInfoState.none) {
-          SchoolnetSession.getCurrentUserLogin();
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return ReloadWidget(
-            errorStatus: currentUserNetInfoStatus.value ==
-                    CurrentUserNetInfoState.notSchool
-                ? FlutterI18n.translate(
-                    context,
-                    "school_net.current_login_net.non_schoolnet",
-                  )
-                : null,
-            function: () => SchoolnetSession.getCurrentUserLogin(),
-          );
-        }
-      });
+          .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
+          .constrained(maxWidth: 480)
+          .padding(all: 12)
+          .scrollable()
+          .center();
+    } else if (currentUserNetInfoStatus.value ==
+        CurrentUserNetInfoState.fetching) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (currentUserNetInfoStatus.value == CurrentUserNetInfoState.none) {
+      SchoolnetSession.getCurrentUserLogin();
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return ReloadWidget(
+        errorStatus:
+            currentUserNetInfoStatus.value == CurrentUserNetInfoState.notSchool
+            ? FlutterI18n.translate(
+                context,
+                "school_net.current_login_net.non_schoolnet",
+              )
+            : null,
+        function: () => SchoolnetSession.getCurrentUserLogin(),
+      );
+    }
+  });
 }

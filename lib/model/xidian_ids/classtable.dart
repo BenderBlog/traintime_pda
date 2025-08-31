@@ -7,11 +7,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classtable.g.dart';
 
-enum Source {
-  empty,
-  school,
-  user,
-}
+enum Source { empty, school, user }
 
 @JsonSerializable(explicitToJson: true)
 class NotArrangementClassDetail {
@@ -56,17 +52,10 @@ class ClassDetail {
   String? code; // 课程序号
   String? number; // 班级序号
 
-  ClassDetail({
-    required this.name,
-    this.code,
-    this.number,
-  });
+  ClassDetail({required this.name, this.code, this.number});
 
-  factory ClassDetail.from(ClassDetail e) => ClassDetail(
-        name: e.name,
-        code: e.code,
-        number: e.number,
-      );
+  factory ClassDetail.from(ClassDetail e) =>
+      ClassDetail(name: e.name, code: e.code, number: e.number);
 
   factory ClassDetail.fromJson(Map<String, dynamic> json) =>
       _$ClassDetailFromJson(json);
@@ -151,15 +140,15 @@ class ClassTableData {
   }
 
   ClassTableData.from(ClassTableData c)
-      : this(
-          semesterLength: c.semesterLength,
-          semesterCode: c.semesterCode,
-          termStartDay: c.termStartDay,
-          classDetail: c.classDetail,
-          notArranged: c.notArranged,
-          timeArrangement: c.timeArrangement,
-          classChanges: c.classChanges,
-        );
+    : this(
+        semesterLength: c.semesterLength,
+        semesterCode: c.semesterCode,
+        termStartDay: c.termStartDay,
+        classDetail: c.classDetail,
+        notArranged: c.notArranged,
+        timeArrangement: c.timeArrangement,
+        classChanges: c.classChanges,
+      );
 
   ClassTableData({
     this.semesterLength = 1,
@@ -170,11 +159,11 @@ class ClassTableData {
     List<NotArrangementClassDetail>? notArranged,
     List<TimeArrangement>? timeArrangement,
     List<ClassChange>? classChanges,
-  })  : classDetail = classDetail ?? [],
-        userDefinedDetail = userDefinedDetail ?? [],
-        notArranged = notArranged ?? [],
-        timeArrangement = timeArrangement ?? [],
-        classChanges = classChanges ?? [];
+  }) : classDetail = classDetail ?? [],
+       userDefinedDetail = userDefinedDetail ?? [],
+       notArranged = notArranged ?? [],
+       timeArrangement = timeArrangement ?? [],
+       classChanges = classChanges ?? [];
 
   factory ClassTableData.fromJson(Map<String, dynamic> json) =>
       _$ClassTableDataFromJson(json);
@@ -281,14 +270,16 @@ class ClassChange {
     List<String> originalTeacherCode =
         originalTeacherData?.replaceAll(' ', '').split(RegExp(r',|/')) ?? [];
 
-    originalTeacherCode
-        .retainWhere((element) => element.contains(RegExp(r'([0-9])')));
+    originalTeacherCode.retainWhere(
+      (element) => element.contains(RegExp(r'([0-9])')),
+    );
 
     List<String> newTeacherCode =
         newTeacherData?.replaceAll(' ', '').split(RegExp(r',|/')) ?? [];
 
-    newTeacherCode
-        .retainWhere((element) => element.contains(RegExp(r'([0-9])')));
+    newTeacherCode.retainWhere(
+      (element) => element.contains(RegExp(r'([0-9])')),
+    );
 
     return !listEquals(originalTeacherCode, newTeacherCode);
   }

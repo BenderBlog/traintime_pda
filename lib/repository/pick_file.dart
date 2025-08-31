@@ -10,9 +10,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Future<FilePickerResult?> pickFile({
-  FileType type = FileType.any,
-}) async {
+Future<FilePickerResult?> pickFile({FileType type = FileType.any}) async {
   if (Platform.isAndroid) {
     // On Android 8-10 we must be sure to query for the `storage` permission
     // before engaging an image-based file-picker

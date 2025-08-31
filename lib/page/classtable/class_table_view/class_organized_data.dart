@@ -87,29 +87,28 @@ class ClassOrgainzedData {
   factory ClassOrgainzedData.fromSubject(
     MaterialColor color,
     Subject subject,
-  ) =>
-      ClassOrgainzedData._(
-        data: [(subject)],
-        start: subject.startTime!,
-        stop: subject.stopTime!,
-        color: color,
-        name: "${subject.subject}${subject.type}",
-        place: "${subject.place} "
-            "${subject.seat == null ? "" : "${subject.seat}"}",
-      );
+  ) => ClassOrgainzedData._(
+    data: [(subject)],
+    start: subject.startTime!,
+    stop: subject.stopTime!,
+    color: color,
+    name: "${subject.subject}${subject.type}",
+    place:
+        "${subject.place} "
+        "${subject.seat == null ? "" : "${subject.seat}"}",
+  );
 
   factory ClassOrgainzedData.fromExperiment(
     MaterialColor color,
     ExperimentData exp,
-  ) =>
-      ClassOrgainzedData._(
-        data: [exp],
-        start: exp.time.first,
-        stop: exp.time.last,
-        color: color,
-        name: exp.name,
-        place: exp.classroom,
-      );
+  ) => ClassOrgainzedData._(
+    data: [exp],
+    start: exp.time.first,
+    stop: exp.time.last,
+    color: color,
+    name: exp.name,
+    place: exp.classroom,
+  );
 
   ClassOrgainzedData({
     required this.data,

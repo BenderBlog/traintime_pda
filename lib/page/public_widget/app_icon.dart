@@ -13,9 +13,7 @@ class AppIconWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.all(
-        Radius.circular(29 * size / 120),
-      ),
+      borderRadius: BorderRadius.all(Radius.circular(29 * size / 120)),
       child: Image.asset(
         (Platform.isIOS || Platform.isMacOS)
             ? "assets/Icon-App-iTunes.png"

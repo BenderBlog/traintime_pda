@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_page.dart';
+import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// Intro of the classtable.
 class ClassTableWindow extends StatelessWidget {
@@ -23,9 +23,7 @@ class ClassTableWindow extends StatelessWidget {
     return ClassTableState(
       parentContext: parentContext,
       constraints: constraints,
-      controllers: ClassTableWidgetState(
-        currentWeek: currentWeek,
-      ),
+      controllers: ClassTableWidgetState(currentWeek: currentWeek),
       child: const ClassTablePage(),
     );
   }

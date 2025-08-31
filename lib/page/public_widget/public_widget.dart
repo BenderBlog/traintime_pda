@@ -30,10 +30,7 @@ class TagsBoxes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: backgroundColor ?? Theme.of(context).colorScheme.primary,
         borderRadius: const BorderRadius.all(Radius.circular(9)),
@@ -42,7 +39,8 @@ class TagsBoxes extends StatelessWidget {
         text,
         textScaler: const TextScaler.linear(0.9),
         style: TextStyle(
-          color: textColor ??
+          color:
+              textColor ??
               (Theme.of(context).brightness == Brightness.light
                   ? Colors.white
                   : Colors.black),
@@ -74,10 +72,7 @@ class DataList<T> extends StatelessWidget {
       },
       separatorBuilder: (BuildContext context, int index) =>
           const SizedBox(height: 4),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12.5,
-        vertical: 9.0,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12.5, vertical: 9.0),
     ).safeArea();
   }
 }
@@ -95,15 +90,9 @@ class InformationWithIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 4),
-        Expanded(
-          child: Text(text),
-        ),
+        Expanded(child: Text(text)),
       ],
     );
   }
@@ -120,10 +109,7 @@ Route createRoute(Widget page) {
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
+      return SlideTransition(position: animation.drive(tween), child: child);
     },
   );
 }
@@ -138,14 +124,9 @@ class InfoDetailBox extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(10),
-        ),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        child: child,
-      ),
+      child: Container(padding: const EdgeInsets.all(8), child: child),
     );
   }
 }
@@ -166,21 +147,20 @@ class ReloadWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return [
-      Text(
-        "${FlutterI18n.translate(context, "error_detected")}\n"
-        "${errorStatus != null ? errorStatus.toString() : ""}",
-        style: const TextStyle(fontSize: 16),
-        textAlign: TextAlign.center,
-      ),
-      FilledButton(
-        onPressed: function,
-        child: Text(buttonName ??
-            FlutterI18n.translate(
-              context,
-              "click_to_refresh",
-            )),
-      ),
-    ]
+          Text(
+            "${FlutterI18n.translate(context, "error_detected")}\n"
+            "${errorStatus != null ? errorStatus.toString() : ""}",
+            style: const TextStyle(fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8),
+          FilledButton(
+            onPressed: function,
+            child: Text(
+              buttonName ?? FlutterI18n.translate(context, "click_to_refresh"),
+            ),
+          ),
+        ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)
         .center()
         .padding(horizontal: 20)

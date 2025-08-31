@@ -20,25 +20,28 @@ class ElectricityPasswordDialog extends StatefulWidget {
 class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
   /// Sport Password Text Editing Controller
   final TextEditingController _sportPasswordController =
-      TextEditingController.fromValue(TextEditingValue(
-    text: preference.getString(preference.Preference.electricityPassword),
-    selection: TextSelection.fromPosition(TextPosition(
-      affinity: TextAffinity.downstream,
-      offset: preference
-          .getString(preference.Preference.electricityPassword)
-          .length,
-    )),
-  ));
+      TextEditingController.fromValue(
+        TextEditingValue(
+          text: preference.getString(preference.Preference.electricityPassword),
+          selection: TextSelection.fromPosition(
+            TextPosition(
+              affinity: TextAffinity.downstream,
+              offset: preference
+                  .getString(preference.Preference.electricityPassword)
+                  .length,
+            ),
+          ),
+        ),
+      );
 
   bool _couldView = true;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(
-        context,
-        "setting.electricity_password_setting",
-      )),
+      title: Text(
+        FlutterI18n.translate(context, "setting.electricity_password_setting"),
+      ),
       content: TextField(
         autofocus: true,
         controller: _sportPasswordController,
@@ -56,23 +59,13 @@ class _ElectricityPasswordDialogState extends State<ElectricityPasswordDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(
-            FlutterI18n.translate(
-              context,
-              "cancel",
-            ),
-          ),
+          child: Text(FlutterI18n.translate(context, "cancel")),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(
-            FlutterI18n.translate(
-              context,
-              "confirm",
-            ),
-          ),
+          child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
             if (_sportPasswordController.text.isEmpty) {
               showToast(

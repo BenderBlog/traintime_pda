@@ -30,20 +30,17 @@ class _MarqueeWidgetState extends State<MarqueeWidget> {
   void initState() {
     super.initState();
     _controller = PageController();
-    _timer = Timer.periodic(
-      Duration(seconds: widget.loopSeconds),
-      (timer) {
-        if (_controller.page != null) {
-          if (_controller.page!.round() >= widget.itemCount) {
-            _controller.jumpToPage(0);
-          }
-          _controller.nextPage(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.linear,
-          );
+    _timer = Timer.periodic(Duration(seconds: widget.loopSeconds), (timer) {
+      if (_controller.page != null) {
+        if (_controller.page!.round() >= widget.itemCount) {
+          _controller.jumpToPage(0);
         }
-      },
-    );
+        _controller.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.linear,
+        );
+      }
+    });
   }
 
   @override

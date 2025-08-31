@@ -29,9 +29,7 @@ class TimelineWidget extends StatelessWidget {
               left: isPhone(context) ? 14 : 20,
               top: 16,
               bottom: 16,
-              child: const VerticalDivider(
-                width: 1,
-              ),
+              child: const VerticalDivider(width: 1),
             ),
             ListView.builder(
               padding: EdgeInsets.zero,

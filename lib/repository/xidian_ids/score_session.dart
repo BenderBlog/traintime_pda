@@ -32,13 +32,7 @@ class ScoreSession extends EhallSession {
     String semesterCode,
   ) async {
     if (JXBID == null) {
-      return [
-        ComposeDetail(
-          content: "教学班编号",
-          ratio: "未知",
-          score: "无法查询",
-        )
-      ];
+      return [ComposeDetail(content: "教学班编号", ratio: "未知", score: "无法查询")];
     }
 
     try {
@@ -48,37 +42,36 @@ class ScoreSession extends EhallSession {
       );
 
       if (isScoreListCacheUsed) {
-        log.info(
-          "[ScoreSession][getDetail] Cache detected, need login.",
-        );
+        log.info("[ScoreSession][getDetail] Cache detected, need login.");
 
         var firstPost = await useApp("4768574631264620");
-        log.info(
-          "[ScoreSession] First post: $firstPost.",
-        );
+        log.info("[ScoreSession] First post: $firstPost.");
         await dioEhall.get(firstPost);
       }
 
-      var response = await dio.post(
-          "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
-          data: {
-            "JXBID": JXBID,
-            'XH': pref.getString(pref.Preference.idsAccount),
-            'XNXQDM': semesterCode,
-            'CKLY': 1
-          }).then((value) => value.data);
+      var response = await dio
+          .post(
+            "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
+            data: {
+              "JXBID": JXBID,
+              'XH': pref.getString(pref.Preference.idsAccount),
+              'XNXQDM': semesterCode,
+              'CKLY': 1,
+            },
+          )
+          .then((value) => value.data);
 
       if (response["datas"]["cxkckgcxlrcj"]["rows"][0]["GCXKHLRCJGS"] != null) {
-        List<String> formula = response["datas"]["cxkckgcxlrcj"]["rows"][0]
-                ["GCXKHLRCJGS"]
-            .toString()
-            .split(RegExp(r'( \+ |\*| = )'));
-        List<String> detailList = response["datas"]["cxkckgcxlrcj"]["rows"][0]
-                ["KCGCXKHLRCJ"]
-            .toString()
-            .split(RegExp(r','));
+        List<String> formula =
+            response["datas"]["cxkckgcxlrcj"]["rows"][0]["GCXKHLRCJGS"]
+                .toString()
+                .split(RegExp(r'( \+ |\*| = )'));
+        List<String> detailList =
+            response["datas"]["cxkckgcxlrcj"]["rows"][0]["KCGCXKHLRCJ"]
+                .toString()
+                .split(RegExp(r','));
         Map<String, String> detail = {
-          for (var v in detailList) v.split(':')[0]: v.split(':')[1]
+          for (var v in detailList) v.split(':')[0]: v.split(':')[1],
         };
         int i = 0;
         while (i < formula.length) {
@@ -99,17 +92,9 @@ class ScoreSession extends EhallSession {
 
       return toReturn;
     } catch (e, s) {
-      log.info(
-        "[ScoreSession] Fetch detail error: $e $s.",
-      );
+      log.info("[ScoreSession] Fetch detail error: $e $s.");
 
-      return [
-        ComposeDetail(
-          content: "",
-          ratio: "获取详情失败",
-          score: "",
-        )
-      ];
+      return [ComposeDetail(content: "", ratio: "获取详情失败", score: "")];
     }
   }
 
@@ -138,36 +123,37 @@ class ScoreSession extends EhallSession {
     }
 
     log.info("[ScoreSession][getScoreFromYjspt] Getting the score data.");
-    var getData = await dio.post(
-      "https://yjspt.xidian.edu.cn/gsapp/sys/wdcjapp/modules/wdcj/xscjcx.do",
-      data: {
-        "querySetting": [],
-        'pageSize': 1000,
-        'pageNumber': 1,
-      },
-    ).then((value) => value.data);
+    var getData = await dio
+        .post(
+          "https://yjspt.xidian.edu.cn/gsapp/sys/wdcjapp/modules/wdcj/xscjcx.do",
+          data: {"querySetting": [], 'pageSize': 1000, 'pageNumber': 1},
+        )
+        .then((value) => value.data);
 
     log.info("[ScoreSession][getScoreFromYjspt] Dealing the score data.");
     if (getData["datas"]["xscjcx"]["extParams"]["code"] != 1) {
       throw GetScoreFailedException(
-          getData['datas']['xscjcx']["extParams"]["msg"]);
+        getData['datas']['xscjcx']["extParams"]["msg"],
+      );
     }
     int j = 0;
     for (var i in getData['datas']['xscjcx']['rows']) {
-      toReturn.add(Score(
-        mark: j,
-        name: "${i["KCMC"]}",
-        score: i["DYBFZCJ"],
-        semesterCode: i["XNXQDM_DISPLAY"],
-        credit: i["XF"],
-        classStatus: i["KCLBMC"],
-        scoreTypeCode: int.parse(i["CJFZDM"]),
-        level: i["CJFZDM"] != "0" ? i["CJXSZ"] : null,
-        isPassedStr: i["SFJG"].toString(),
-        classID: i["KCDM"],
-        classType: i['KCLBMC'],
-        scoreStatus: i["KSXZDM_DISPLAY"],
-      ));
+      toReturn.add(
+        Score(
+          mark: j,
+          name: "${i["KCMC"]}",
+          score: i["DYBFZCJ"],
+          semesterCode: i["XNXQDM_DISPLAY"],
+          credit: i["XF"],
+          classStatus: i["KCLBMC"],
+          scoreTypeCode: int.parse(i["CJFZDM"]),
+          level: i["CJFZDM"] != "0" ? i["CJXSZ"] : null,
+          isPassedStr: i["SFJG"].toString(),
+          classID: i["KCDM"],
+          classType: i['KCLBMC'],
+          scoreStatus: i["KSXZDM_DISPLAY"],
+        ),
+      );
       j++;
     }
     return toReturn;
@@ -188,25 +174,25 @@ class ScoreSession extends EhallSession {
       "Ready to log into the system.",
     );
     var firstPost = await useApp("4768574631264620");
-    log.info(
-      "[ScoreSession] First post: $firstPost.",
-    );
+    log.info("[ScoreSession] First post: $firstPost.");
     await dioEhall.get(firstPost);
 
     log.info(
       "[ScoreSession][getScoreFromEhall] "
       "Getting score data.",
     );
-    var getData = await dioEhall.post(
-      "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
-      data: {
-        "*json": 1,
-        "querySetting": json.encode(querySetting),
-        "*order": '+XNXQDM,KCH,KXH',
-        'pageSize': 1000,
-        'pageNumber': 1,
-      },
-    ).then((value) => value.data);
+    var getData = await dioEhall
+        .post(
+          "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
+          data: {
+            "*json": 1,
+            "querySetting": json.encode(querySetting),
+            "*order": '+XNXQDM,KCH,KXH',
+            'pageSize': 1000,
+            'pageNumber': 1,
+          },
+        )
+        .then((value) => value.data);
     log.info(
       "[ScoreSession][getScoreFromEhall] "
       "Dealing with the score data.",
@@ -218,22 +204,24 @@ class ScoreSession extends EhallSession {
     }
     int j = 0;
     for (var i in getData['datas']['xscjcx']['rows']) {
-      toReturn.add(Score(
-        mark: j,
-        name: i["XSKCM"], // 课程名
-        score: i["ZCJ"], // 总成绩
-        semesterCode: i["XNXQDM"], // 学年学期代码
-        credit: i["XF"], // 学分
-        classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
-        classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
-        scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
-        scoreTypeCode: int.parse(
-          i["DJCJLXDM"],
-        ), // 等级成绩类型，01 三级成绩 02 五级成绩 03 两级成绩
-        level: i["DJCJMC"], // 等级成绩
-        isPassedStr: i["SFJG"], // 是否及格
-        classID: i["JXBID"], // 教学班 ID
-      ));
+      toReturn.add(
+        Score(
+          mark: j,
+          name: i["XSKCM"], // 课程名
+          score: i["ZCJ"], // 总成绩
+          semesterCode: i["XNXQDM"], // 学年学期代码
+          credit: i["XF"], // 学分
+          classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
+          classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
+          scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
+          scoreTypeCode: int.parse(
+            i["DJCJLXDM"],
+          ), // 等级成绩类型，01 三级成绩 02 五级成绩 03 两级成绩
+          level: i["DJCJMC"], // 等级成绩
+          isPassedStr: i["SFJG"], // 是否及格
+          classID: i["JXBID"], // 教学班 ID
+        ),
+      );
       j++;
     }
     return toReturn;
@@ -249,8 +237,9 @@ class ScoreSession extends EhallSession {
       "Path at ${supportPath.path}/$scoreListCacheName.",
     );
     if (file.existsSync() && !force) {
-      final timeDiff =
-          DateTime.now().difference(file.lastModifiedSync()).inMinutes;
+      final timeDiff = DateTime.now()
+          .difference(file.lastModifiedSync())
+          .inMinutes;
       log.info(
         "[ScoreSession][getScore] "
         "Cache file found.",

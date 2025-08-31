@@ -2,11 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-enum ScoreFetchState {
-  ok,
-  error,
-  fetching,
-}
+enum ScoreFetchState { ok, error, fetching }
 
 const double cardWidth = 280;
 
@@ -32,12 +28,6 @@ final courseIgnore = [
   '物理实验',
 ];
 
-final typesIgnore = [
-  '通识教育选修课',
-  '集中实践环节',
-  '拓展提高',
-  '通识教育核心课',
-  '专业选修课',
-];
+final typesIgnore = ['通识教育选修课', '集中实践环节', '拓展提高', '通识教育核心课', '专业选修课'];
 
 const notCoreClassType = "公共任选";
