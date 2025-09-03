@@ -39,9 +39,8 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   Color get color => Theme.of(context).colorScheme.primary;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    //controller = ClassTableState.of(context)!.controllers;
+  void initState() {
+    super.initState();
     if (widget.toChange == null) {
       classNameController = TextEditingController();
       teacherNameController = TextEditingController();
