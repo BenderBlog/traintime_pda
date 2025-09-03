@@ -23,6 +23,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
   @override
   void dispose() {
     classTableState.removeListener(() => setState(() {}));
+    classTableState.dispose();
     super.dispose();
   }
 

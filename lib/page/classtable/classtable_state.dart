@@ -57,6 +57,24 @@ class ClassTableState extends InheritedWidget {
 
 /// The controllers and shared datas of the class table.
 class ClassTableWidgetState with ChangeNotifier {
+  ///*******************************************************************///
+  /// Hack on notifyListeners, do not fire when the widget is disposed. ///
+  ///*******************************************************************///
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
+  }
+
   ///****************************///
   /// Following are static data. ///
   /// ***************************///
