@@ -30,4 +30,4 @@ final courseIgnore = [
 
 final typesIgnore = ['通识教育选修课', '集中实践环节', '拓展提高', '通识教育核心课', '专业选修课'];
 
-const notCoreClassType = "公共任选";
+const notCoreClassType = "选修 ";

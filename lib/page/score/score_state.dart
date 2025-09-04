@@ -192,6 +192,16 @@ class ScoreState extends ChangeNotifier {
     return toReturn;
   }
 
+  String get notCoreClassTypeList {
+    List<String> list = List<String>.from(statuses)
+      ..removeWhere((str) => !str.contains(notCoreClassType));
+    String toReturn = list
+        .map((str) => str.replaceAll(RegExp(notCoreClassType), ""))
+        .join("、");
+    // TODO: Use i18n for None
+    return toReturn.isEmpty ? "None" : toReturn;
+  }
+
   set isSelectMode(bool value) {
     _isSelectMod = value;
     notifyListeners();

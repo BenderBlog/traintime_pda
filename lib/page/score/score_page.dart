@@ -249,6 +249,7 @@ class _ScorePageState extends State<ScorePage> {
                                   )
                                 : state.unPassed,
                             "not_core_credit": state.notCoreClass.toString(),
+                            "not_core_type": state.notCoreClassTypeList,
                           },
                         ),
                       ),

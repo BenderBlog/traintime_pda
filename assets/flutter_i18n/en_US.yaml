@@ -497,6 +497,7 @@ score:
          Total credits：{credit_all}
          Unpassed subjects：{unpassed}
          Public elective credits already obtained：{not_core_credit}
+         Public elective credits types：{not_core_type}
          The data provided by this program is for reference only, and the developer is not responsible for its accuracy
    score_compose_card:
       no_detail: "No detailed information provided"

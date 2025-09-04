@@ -180,7 +180,7 @@ electricity:
   remain_power: 電量信息
   owe_info: 欠費信息
   history: 歷史記錄
-  info: 有欠費一般代表水費
+  info: 有欠費一般代表水費，半夜11:20到午夜0:30左右無法獲取數據
   date: 日期
   power: 該日0點電量
   update: 刷新信息
@@ -454,6 +454,8 @@ score:
       未通過科目：{unpassed}
 
       公共選修課已經修得學分：{not_core_credit}
+
+      公共選修課類別：{not_core_type}
 
       本程序提供的數據僅供參考，開發者對其準確性不負責'
   score_compose_card:

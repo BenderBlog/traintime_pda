@@ -211,7 +211,9 @@ class ScoreSession extends EhallSession {
           score: i["ZCJ"], // 总成绩
           semesterCode: i["XNXQDM"], // 学年学期代码
           credit: i["XF"], // 学分
-          classStatus: i["KCXZDM_DISPLAY"], // 课程性质，必修，选修等
+          classStatus: i["XGXKLBDM_DISPLAY"].toString().isEmpty
+              ? i["KCXZDM_DISPLAY"]
+              : "选修 ${i["XGXKLBDM_DISPLAY"]}", // 课程性质，必修，选修等
           classType: i["KCLBDM_DISPLAY"], // 课程类别，公共任选，素质提高等
           scoreStatus: i["CXCKDM_DISPLAY"], // 重修重考等
           scoreTypeCode: int.parse(

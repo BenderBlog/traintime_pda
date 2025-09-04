@@ -480,6 +480,7 @@ score:
             所有科目的学分：{credit_all}
             未通过科目：{unpassed}
             公共选修课已经修得学分：{not_core_credit}
+            公共选修课类别：{not_core_type}
             本程序提供的数据仅供参考，开发者对其准确性不负责
     score_compose_card:
         no_detail: "未提供详情信息"
