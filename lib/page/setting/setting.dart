@@ -40,7 +40,9 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
+    as electricity_session;
+import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -384,24 +386,69 @@ class _SettingWindowState extends State<SettingWindow> {
                       );
                     },
                   ),
-                ] else ...[
-                  ListTile(
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.electricity_account_setting",
-                      ),
-                    ),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => ElectricityAccountDialog(),
-                      );
-                    },
-                  ),
+                  const Divider(),
                 ],
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.electricity_account_setting",
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog<String>(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => ElectricityAccountDialog(
+                        initialAccountNumber: preference.getString(
+                          preference.Preference.electricityAccount,
+                        ),
+                        onFetchFromNetwork: () async {
+                          String dorm = await PersonalInfoSession()
+                              .getDormInfoEhall();
+                          return electricity_session
+                              .ElectricitySession.parseElectricityAccountFromIDS(
+                            dorm,
+                          );
+                        },
+                      ),
+                    ).then((value) async {
+                      if (value == null || value.isEmpty) {
+                        if (context.mounted) {
+                          showToast(
+                            context: context,
+                            msg: FlutterI18n.translate(
+                              context,
+                              "setting.change_electricity_account.no_setting",
+                            ),
+                          );
+                          return;
+                        }
+                      }
+
+                      await preference.setString(
+                        preference.Preference.electricityAccount,
+                        value!,
+                      );
+
+                      electricity_session
+                          .ElectricitySession.clearElectricityHistory();
+
+                      if (context.mounted) {
+                        showToast(
+                          context: context,
+                          msg: FlutterI18n.translate(
+                            context,
+                            "setting.change_electricity_account.successful_setting",
+                          ),
+                        );
+                        electricity_session.update(force: true);
+                        return;
+                      }
+                    });
+                  },
+                ),
                 const Divider(),
                 ListTile(
                   title: Text(
@@ -763,7 +810,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                   "setting.clear_and_restart_dialog.clear",
                                 ),
                               );
-                              Restart.restartApp();
+                              restart();
                             }
                           },
                           child: Text(
@@ -840,7 +887,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             /// Restart app
                             if (mounted) {
                               pd.close();
-                              Restart.restartApp();
+                              restart();
                             }
                           },
                           child: Text(
@@ -866,8 +913,8 @@ void _removeCache() {
     ExamController.examDataCacheName,
     ExperimentController.experimentCacheName,
     ScoreSession.scoreListCacheName,
-    ElectricitySession.electricityCache,
-    ElectricitySession.electricityHistory,
+    electricity_session.ElectricitySession.electricityCache,
+    electricity_session.ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {
@@ -885,8 +932,8 @@ void _removeAll() {
     ExamController.examDataCacheName,
     ExperimentController.experimentCacheName,
     ScoreSession.scoreListCacheName,
-    ElectricitySession.electricityCache,
-    ElectricitySession.electricityHistory,
+    electricity_session.ElectricitySession.electricityCache,
+    electricity_session.ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {

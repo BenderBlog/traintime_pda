@@ -193,13 +193,27 @@ class ScoreState extends ChangeNotifier {
   }
 
   String get notCoreClassTypeList {
-    List<String> list = List<String>.from(statuses)
-      ..removeWhere((str) => !str.contains(notCoreClassType));
-    String toReturn = list
-        .map((str) => str.replaceAll(RegExp(notCoreClassType), ""))
-        .join("、");
-    // TODO: Use i18n for None
-    return toReturn.isEmpty ? "None" : toReturn;
+    Map<String, int> notCoreClassCount = {};
+
+    for (var i in scoreData) {
+      if (i.classStatus.contains(notCoreClassType)) {
+        if (notCoreClassCount[i.classStatus] == null) {
+          notCoreClassCount[i.classStatus] = 1;
+        } else {
+          notCoreClassCount[i.classStatus] =
+              notCoreClassCount[i.classStatus]! + 1;
+        }
+      }
+    }
+
+    String toReturn = notCoreClassCount.keys
+        .map(
+          (k) =>
+              "${k.replaceAll(RegExp(notCoreClassType), "")}"
+              "${notCoreClassCount[k]}分",
+        )
+        .join("；");
+    return toReturn.isEmpty ? "score.none" : toReturn;
   }
 
   set isSelectMode(bool value) {

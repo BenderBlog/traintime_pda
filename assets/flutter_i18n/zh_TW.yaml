@@ -440,6 +440,7 @@ score:
   chosen_semester: 學期 {chosen}
   all_type: 所有類型
   chosen_type: 類型 {type}
+  none: 暫無
   score_choice:
     title: 成績單
     search_hint: 搜索成績記錄
@@ -453,9 +454,7 @@ score:
 
       未通過科目：{unpassed}
 
-      公共選修課已經修得學分：{not_core_credit}
-
-      公共選修課類別：{not_core_type}
+      公共選修課：{not_core_type}
 
       本程序提供的數據僅供參考，開發者對其準確性不負責'
   score_compose_card:
@@ -560,8 +559,56 @@ setting:
   change_electricity_title: 修改電費帳號
   change_electricity_account:
     title: 修改電費帳號
-    input_hint: 請在此輸入賬號
-    blank_input: 輸入空白!
+    campus: 校區
+    northCampus: 北校區
+    southCampus: 南校區
+    unitOrZone: 單元/區號
+    unitCode: 單元號
+    zoneCode: 區號
+    pleaseInput: 請輸入{unitOrZoneCode}
+    successful_fetch: 賬號獲取成功：{accountNumber}
+    failed_fetch: 獲取失敗：{e}
+    account_saved: 賬號已保存：{accountNumber}
+    unknown_coding_pattern: 該樓號編碼規則未知
+    select_building: 選擇樓棟
+    building: 樓棟
+    northern_building: 北棟
+    southern_building: 南棟
+    failed_generate: 生成失敗：{e}
+    building_number: 樓號
+    building_number_hint: '例如: 16, 7, 55'
+    building_number_query: 請輸入樓號
+    yard: 院區
+    yard_hint: 選擇院區
+    northYard: 北院
+    southYard: 南院
+    yard_query: 請選擇院區
+    apartment: 樓棟
+    apartment_hint: 選擇樓棟
+    northApartment: 北樓
+    southApartment: 南樓
+    apartment_query: 請選擇樓棟
+    levelCode: 層號
+    levelCode_query: 請輸入層號
+    roomCode: 房間號
+    roomCode_hint: '例如: 304, 508'
+    roomCode_query: 請輸入房間號
+    account: 電費賬號
+    account_hint: 請輸入或從網絡獲取
+    account_query: 請輸入電費賬號
+    account_length: 賬號長度通常不小於10位
+    fetching: 正在獲取...
+    fetch_from_internet: 從網絡同步
+    save_account: 保存賬號
+    confirm_saving: 確認保存
+    calculate_account: 計算賬號
+    calculate: 計算
+    input: 輸入
+    confirm_account: 請確認賬號：
+    change: 修改
+    cancel: 取消
+    no_setting: 未設置新的電費賬號
+    successful_setting: 已設置新的電費賬號
   change_experiment_title: 修改物理實驗賬號密碼
   change_sport_title: 修改體育系統賬號密碼
   change_password_dialog:

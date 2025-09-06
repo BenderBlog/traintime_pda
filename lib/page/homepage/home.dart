@@ -156,7 +156,28 @@ class _HomePageMasterState extends State<HomePageMaster>
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    Restart.restartApp();
+                    if (Platform.isAndroid || Platform.isIOS) {
+                      Restart.restartApp();
+                    } else {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "setting.need_close_dialog.title",
+                            ),
+                          ),
+                          content: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "setting.need_close_dialog.content",
+                            ),
+                          ),
+                        ),
+                      );
+                    }
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),

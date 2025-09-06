@@ -469,6 +469,7 @@ score:
     chosen_semester: "学期 {chosen}"
     all_type: "所有类型"
     chosen_type: "类型 {type}"
+    none: 暂无
     score_choice:
         title: "成绩单"
         search_hint: "搜索成绩记录"
@@ -479,8 +480,7 @@ score:
             所有科目的均分：{avg_all}
             所有科目的学分：{credit_all}
             未通过科目：{unpassed}
-            公共选修课已经修得学分：{not_core_credit}
-            公共选修课类别：{not_core_type}
+            公共选修课：{not_core_type}
             本程序提供的数据仅供参考，开发者对其准确性不负责
     score_compose_card:
         no_detail: "未提供详情信息"
@@ -595,8 +595,56 @@ setting:
     change_electricity_title: "修改电费帐号"
     change_electricity_account:
         title: "修改电费帐号"
-        input_hint: "请在此输入账号"
-        blank_input: "输入空白!"
+        campus: "校区"
+        northCampus: "北校区"
+        southCampus: "南校区"
+        unitOrZone: "单元/区号"
+        unitCode: "单元号"
+        zoneCode: "区号"
+        pleaseInput: "请输入{unitOrZoneCode}"
+        successful_fetch: "账号获取成功：{accountNumber}"
+        failed_fetch: "获取失败：{e}"
+        account_saved: "账号已保存：{accountNumber}"
+        unknown_coding_pattern: "该楼号编码规则未知"
+        select_building: "选择楼栋"
+        building: "楼栋"
+        northern_building: "北栋"
+        southern_building: "南栋"
+        failed_generate: "生成失败：{e}"
+        building_number: "楼号"
+        building_number_hint: "例如: 16, 7, 55"
+        building_number_query: "请输入楼号"
+        yard: "院区"
+        yard_hint: "选择院区"
+        northYard: "北院"
+        southYard: "南院"
+        yard_query: "请选择院区"
+        apartment: "楼栋"
+        apartment_hint: "选择楼栋"
+        northApartment: "北楼"
+        southApartment: "南楼"
+        apartment_query: "请选择楼栋"
+        levelCode: "层号"
+        levelCode_query: "请输入层号"
+        roomCode: "房间号"
+        roomCode_hint: "例如: 304, 508"
+        roomCode_query: "请输入房间号"
+        account: "电费账号"
+        account_hint: "请输入或从网络获取"
+        account_query: "请输入电费账号"
+        account_length: "账号长度通常不小于10位"
+        fetching: "正在获取..."
+        fetch_from_internet: "从网络同步"
+        save_account: "保存账号"
+        confirm_saving: "确认保存"
+        calculate_account: "计算账号"
+        calculate: "计算"
+        input: "输入"
+        confirm_account: "请确认账号："
+        change: "修改"
+        cancel: "取消"
+        no_setting: "未设置新的电费账号"
+        successful_setting: "已设置新的电费账号"
     change_experiment_title: "修改物理实验账号密码"
     change_sport_title: "修改体育系统账号密码"
     change_password_dialog:
