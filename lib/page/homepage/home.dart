@@ -394,9 +394,19 @@ class _HomePageMasterState extends State<HomePageMaster>
     super.didChangeDependencies();
     if (!refreshAtStart) {
       message.checkMessage();
-      message.checkUpdate().then((value) {
-        if (value ?? false) _showUpdateNotice();
-      });
+      message.checkUpdate().then(
+        (value) {
+          if (value ?? false) _showUpdateNotice();
+        },
+        onError: (e, s) {
+          if (mounted) {
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(context, "setting.fetch_failed"),
+            );
+          }
+        },
+      );
       message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"

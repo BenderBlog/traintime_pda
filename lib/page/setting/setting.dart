@@ -103,7 +103,8 @@ class _SettingWindowState extends State<SettingWindow> {
                 TextSpan(
                   text: Platform.isIOS || Platform.isMacOS
                       ? "XDYou"
-                      : 'Traintime PDA',
+                      // TODO: REMOVE ON RELEASE
+                      : 'Traintime PDA - 今日程',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -251,7 +252,6 @@ class _SettingWindowState extends State<SettingWindow> {
                       preference.Preference.brightness,
                     )],
                   ),
-                  // TODO: DEBUG IT
                   trailing: ToggleButtons(
                     isSelected: List<bool>.generate(
                       3,

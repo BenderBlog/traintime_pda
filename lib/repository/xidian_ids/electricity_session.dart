@@ -114,9 +114,13 @@ Future<void> update({
               ElectricitySession.fileCache.writeAsStringSync(
                 jsonEncode(electricityInfo.value.toJson()),
               );
-              ElectricitySession.refreshElectricityHistory(
-                electricityInfo.value,
-              );
+              if (!electricityInfo.value.remain.contains(
+                "electricity_status",
+              )) {
+                ElectricitySession.refreshElectricityHistory(
+                  electricityInfo.value,
+                );
+              }
             }),
       )
       .catchError((e, s) {
@@ -464,6 +468,8 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     );
 
     await dio.get(nextStop[0]!.replaceAll('"', ""));
+
+    await dio.get("https://payment.xidian.edu.cn/NetWorkUI/showPublic");
 
     String lastErrorMessage = "";
     for (int retry = 5; retry > 0; retry--) {
