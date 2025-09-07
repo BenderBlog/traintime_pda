@@ -30,7 +30,6 @@ extension IsToday on DateTime {
   }
 }
 
-// FIXME: Get account at percise movement.
 Future<void> update({
   bool force = false,
   Future<String> Function(List<int>)? captchaFunction,
@@ -44,6 +43,12 @@ Future<void> update({
 
   late ElectricityInfo cache;
   bool canUseCache = false;
+
+  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
+    if (ElectricitySession.fileCache.existsSync()) {
+      ElectricitySession.fileCache.deleteSync();
+    }
+  }
 
   if (ElectricitySession.isCacheExist) {
     log.info("[EletricitySession][update] Checking out cache.");
