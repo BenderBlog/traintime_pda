@@ -123,10 +123,7 @@ classtable:
     supper_break: "晚休"
     month: "{month}\n月"
     no_class: |-
-        本周暂无安排，请照顾好自己
-        LichtYy was reviewing for exam
-        He saw the tourist guide in the English paper
-        He confused.
+        本周暂无安排，请不要在床上过于慵懒
     class_card:
         title: "日程信息"
         unknown_classroom: "未知教室"

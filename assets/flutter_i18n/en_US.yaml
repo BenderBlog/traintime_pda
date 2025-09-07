@@ -132,10 +132,7 @@ classtable:
    supper_break: "Supper"
    month: "{month}\nmo"
    no_class: |-
-      No schedule arranged in this week, please take care of yourself and be well
-      LichtYy was reviewing for exam
-      He saw the tourist guide in the English paper
-      He confused.
+      No schedule arranged in this week, please do not spend much of your time on bed.
    class_card:
       title: "Schedule Information"
       unknown_classroom: "Unknown classroom"

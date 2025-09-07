@@ -109,13 +109,7 @@ classtable:
   month: '{month}
 
     月'
-  no_class: '本週暫無安排，請照顧好自己
-
-    LichtYy was reviewing for exam
-
-    He saw the tourist guide in the English paper
-
-    He confused.'
+  no_class: 本週暫無安排，請不要在床上過於慵懶
   class_card:
     title: 日程信息
     unknown_classroom: 未知教室

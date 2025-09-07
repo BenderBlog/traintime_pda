@@ -3,7 +3,7 @@
 
  - art
     - CP1919.svg.vec：基于 CP1919.svg 制作，公有领域
-    - pda_classtable_empty.png：LichtYy
+    - pda_classtable_empty.png：LichtYy（第一版），安同开源社区（第二版，CC-BY-SA）
     - pda_empty_cover: ZCWzy
     - pda_girl_<.*>_ver<.*>: Benderblog，PDA 娘（历史版本）
     - pda_girl_default: Benderblog，PDA 娘（目前版本，配合开发代号）
