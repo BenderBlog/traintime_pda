@@ -247,6 +247,7 @@ homepage:
         midnight: "深宵了 我在陪你"
     # homepage.dart
     loading: "正在加载"
+    loaded: "加载成功"
     load_error: "加载错误"
     on_holiday: "当前在假期中"
     on_weekday: "当前为第 {current} 周"

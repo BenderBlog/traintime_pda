@@ -223,6 +223,7 @@ homepage:
     night: 晚上好 祝你好夢
     midnight: 深宵了 我在陪你
   loading: 正在加載
+  loaded: 加載成功
   load_error: 加載錯誤
   on_holiday: 當前在假期中
   on_weekday: 當前為第 {current} 周

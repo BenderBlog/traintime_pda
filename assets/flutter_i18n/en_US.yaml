@@ -258,6 +258,7 @@ homepage:
       midnight: "It's late at night, I'm here with you."
    # homepage.dart
    loading: "Loading"
+   loaded: "Message updated"
    load_error: "Something wrong"
    on_holiday: "Currently on holiday"
    on_weekday: "Currently week {current}"

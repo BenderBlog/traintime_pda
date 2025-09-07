@@ -490,7 +490,6 @@ class _HomePageMasterState extends State<HomePageMaster>
         },
       ),
       bottomNavigationBar: NavigationBar(
-        height: 64,
         destinations: destinations
             .map(
               (e) => NavigationDestination(
@@ -502,7 +501,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             )
             .toList(),
         selectedIndex: _selectedIndex,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        //labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         onDestinationSelected: (int index) {
           if (_selectedIndex != index) {
             setState(() {
