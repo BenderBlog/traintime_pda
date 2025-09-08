@@ -1,6 +1,7 @@
 // Copyright 2025 BenderBlog Rodriguez and contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+/*
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:result_dart/result_dart.dart';
@@ -111,3 +112,4 @@ Future<Result<LibraryCapacity>> getData({bool isNorthCampus = false}) async {
     return e.toFailure();
   }
 }
+*/

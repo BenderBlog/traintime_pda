@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
-import 'package:watermeter/page/homepage/library_capacity_card.dart';
 import 'package:watermeter/page/homepage/notice_card/club_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -69,6 +68,7 @@ class _MainPageState extends State<MainPage> {
     ],
     const ToolboxCard(),
   ];
+
   String get _now {
     DateTime now = DateTime.now();
 
@@ -137,7 +137,7 @@ class _MainPageState extends State<MainPage> {
                 centerTitle: false,
                 titlePadding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 10,
+                  vertical: 12,
                 ),
                 title: GetBuilder<ClassTableController>(
                   builder: (c) => Column(
@@ -200,7 +200,7 @@ class _MainPageState extends State<MainPage> {
                 const ClassTableCard(),
                 ElectricityCard(),
                 LibraryCard(),
-                LibraryCapacityCard(),
+                //LibraryCapacityCard(),
                 SchoolCardInfoCard(),
                 SchoolnetCard(),
                 MediaQuery.removePadding(

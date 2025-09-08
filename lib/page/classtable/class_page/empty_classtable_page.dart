@@ -27,7 +27,7 @@ class EmptyClassTablePage extends StatelessWidget {
       ),
       body: [
         EmptyListView(
-          type: EmptyListViewType.defaultimg,
+          type: EmptyListViewType.rolling,
           text: FlutterI18n.translate(
             context,
             ClassTableState.of(
@@ -73,7 +73,7 @@ class EmptyClassTablePage extends StatelessWidget {
             ),
           ),
         ),
-      ].toColumn(),
+      ].toColumn(mainAxisAlignment: MainAxisAlignment.center),
     );
   }
 }

@@ -11,6 +11,22 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
 class ScoreState extends ChangeNotifier {
+  /// Hack on notifyListeners, do not fire when the widget is disposed.
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
+  }
+
   /// Score fetch state.
   ScoreFetchState state = ScoreFetchState.fetching;
 
