@@ -2,7 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
@@ -40,21 +39,25 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  late EasyRefreshController _controller;
+
   @override
   void initState() {
+    super.initState();
     Get.put(ClassTableController());
     Get.put(ExamController());
     Get.put(ExperimentController());
-    super.initState();
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
   }
 
-  final List<Widget> children = const [
-    ElectricityCard(),
-    LibraryCard(),
-    LibraryCapacityCard(),
-    SchoolCardInfoCard(),
-    SchoolnetCard(),
-  ];
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   final List<Widget> smallFunction = [
     const ScoreCard(),
@@ -66,7 +69,6 @@ class _MainPageState extends State<MainPage> {
     ],
     const ToolboxCard(),
   ];
-
   String get _now {
     DateTime now = DateTime.now();
 
@@ -97,115 +99,123 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ExtendedNestedScrollView(
-        onlyOneScrollInBody: true,
-        pinnedHeaderSliverHeightBuilder: () {
-          return MediaQuery.of(context).padding.top + kToolbarHeight;
+      body: EasyRefresh(
+        controller: _controller,
+        header: MaterialHeader(
+          position: IndicatorPosition.locator,
+          safeArea: true,
+        ),
+        onRefresh: () async {
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(context, "homepage.loading_message"),
+          );
+          await update(
+            context: context,
+            sliderCaptcha: (String cookieStr) {
+              return SliderCaptchaClientProvider(
+                cookie: cookieStr,
+              ).solve(context);
+            },
+          );
+          if (context.mounted) {
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(context, "homepage.loaded"),
+            );
+            _controller.finishRefresh();
+            _controller.resetHeader();
+          }
         },
-        headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
-          SliverAppBar(
-            centerTitle: false,
-            expandedHeight: 160,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
               centerTitle: false,
-              titlePadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              title: GetBuilder<ClassTableController>(
-                builder: (c) => Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      FlutterI18n.translate(context, _now),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? null
-                            : Theme.of(context).colorScheme.primary,
+              expandedHeight: 160,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: false,
+                titlePadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                title: GetBuilder<ClassTableController>(
+                  builder: (c) => Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        FlutterI18n.translate(context, _now),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? null
+                              : Theme.of(context).colorScheme.primary,
+                        ),
                       ),
-                    ),
-                    Text(
-                      /// TODO: check it
-                      c.state == ClassTableState.fetched
-                          ? c.getCurrentWeek(updateTime) >= 0 &&
-                                    c.getCurrentWeek(updateTime) <
-                                        c.classTableData.semesterLength
-                                ? FlutterI18n.translate(
-                                    context,
-                                    "homepage.on_weekday",
-                                    translationParams: {
-                                      "current":
-                                          "${c.getCurrentWeek(updateTime) + 1}",
-                                    },
-                                  )
-                                : FlutterI18n.translate(
-                                    context,
-                                    "homepage.on_holiday",
-                                  )
-                          : c.state == ClassTableState.error
-                          ? FlutterI18n.translate(
-                              context,
-                              "homepage.load_error",
-                            )
-                          : FlutterI18n.translate(context, "homepage.loading"),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? null
-                            : Theme.of(context).colorScheme.primary,
+                      Text(
+                        c.state == ClassTableState.fetched
+                            ? c.getCurrentWeek(updateTime) >= 0 &&
+                                      c.getCurrentWeek(updateTime) <
+                                          c.classTableData.semesterLength
+                                  ? FlutterI18n.translate(
+                                      context,
+                                      "homepage.on_weekday",
+                                      translationParams: {
+                                        "current":
+                                            "${c.getCurrentWeek(updateTime) + 1}",
+                                      },
+                                    )
+                                  : FlutterI18n.translate(
+                                      context,
+                                      "homepage.on_holiday",
+                                    )
+                            : c.state == ClassTableState.error
+                            ? FlutterI18n.translate(
+                                context,
+                                "homepage.load_error",
+                              )
+                            : FlutterI18n.translate(
+                                context,
+                                "homepage.loading",
+                              ),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? null
+                              : Theme.of(context).colorScheme.primary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-        body: EasyRefresh(
-          onRefresh: () {
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(context, "homepage.loading_message"),
-            );
-            update(
-              context: context,
-              sliderCaptcha: (String cookieStr) {
-                return SliderCaptchaClientProvider(
-                  cookie: cookieStr,
-                ).solve(context);
-              },
-            );
-          },
-          header: PhoenixHeader(
-            skyColor: Theme.of(context).colorScheme.surface,
-            position: IndicatorPosition.locator,
-            safeArea: true,
-          ),
-          child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: ListView(
-              children: [
-                const HeaderLocator(),
-                <Widget>[
-                  const NoticeCard(),
-                  ClubPromotionCard(onTap: widget.changePage),
-                  const ClassTableCard(),
-                  ...children,
-                  GridView.extent(
+            const HeaderLocator.sliver(),
+            SliverToBoxAdapter(
+              child: <Widget>[
+                const NoticeCard(),
+                ClubPromotionCard(onTap: widget.changePage),
+                const ClassTableCard(),
+                ElectricityCard(),
+                LibraryCard(),
+                LibraryCapacityCard(),
+                SchoolCardInfoCard(),
+                SchoolnetCard(),
+                MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: GridView.extent(
                     maxCrossAxisExtent: 96,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     children: smallFunction,
                   ),
-                ].toColumn().padding(vertical: 8, horizontal: 16),
-              ],
+                ),
+              ].toColumn().padding(vertical: 8, horizontal: 16),
             ),
-          ),
+          ],
         ),
       ),
     );

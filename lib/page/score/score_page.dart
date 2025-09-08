@@ -249,6 +249,10 @@ class _ScorePageState extends State<ScorePage> {
                                   )
                                 : state.unPassed,
                             "not_core_credit": state.notCoreClass.toString(),
+                            "not_core_type": FlutterI18n.translate(
+                              context,
+                              state.notCoreClassTypeList,
+                            ),
                           },
                         ),
                       ),

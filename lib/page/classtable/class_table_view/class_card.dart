@@ -1,6 +1,6 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
-// SPDX-License-Identifier: MPL-2.0 OR  Apache-2.0
+// SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -113,13 +113,15 @@ class ClassCard extends StatelessWidget {
                         Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  name,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: color.shade900,
-                                    fontSize: isPhone(context) ? 12 : 14,
+                                Flexible(
+                                  child: Text(
+                                    name,
+                                    style: TextStyle(
+                                      color: color.shade900,
+                                      fontSize: isPhone(context) ? 12 : 14,
+                                    ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.clip,
                                   ),
                                 ),
                                 Text(
@@ -128,7 +130,7 @@ class ClassCard extends StatelessWidget {
                                     color: color.shade900,
                                     fontSize: isPhone(context) ? 10 : 12,
                                   ),
-                                ).expanded(),
+                                ),
                                 if (data.length > 1)
                                   Text(
                                     FlutterI18n.translate(

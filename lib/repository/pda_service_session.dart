@@ -46,7 +46,8 @@ Future<void> checkMessage() => messageLock.synchronized(() async {
           ),
         );
     file.writeAsStringSync(jsonEncode(toAdd));
-  } catch (e) {
+  } catch (e, s) {
+    log.error("[checkMessage] Error occured!", e, s);
     if (isExist) {
       List data = jsonDecode(file.readAsStringSync());
       toAdd = List<NoticeMessage>.generate(
@@ -110,7 +111,7 @@ Future<void> getClubList() => clubLock.synchronized(() async {
       })
       .onError((e, s) {
         log.error("[getClubList] Error occured!", e, s);
-        clubError.value = e;
+        clubError.value = e.toString();
         clubState.value = SessionState.error;
       });
 });

@@ -132,10 +132,7 @@ classtable:
    supper_break: "Supper"
    month: "{month}\nmo"
    no_class: |-
-      No schedule arranged in this week, please take care of yourself and be well
-      LichtYy was reviewing for exam
-      He saw the tourist guide in the English paper
-      He confused.
+      No schedule arranged in this week, please do not spend much of your time on bed.
    class_card:
       title: "Schedule Information"
       unknown_classroom: "Unknown classroom"
@@ -258,6 +255,7 @@ homepage:
       midnight: "It's late at night, I'm here with you."
    # homepage.dart
    loading: "Loading"
+   loaded: "Message updated"
    load_error: "Something wrong"
    on_holiday: "Currently on holiday"
    on_weekday: "Currently week {current}"
@@ -486,6 +484,7 @@ score:
    chosen_semester: "{chosen}"
    all_type: "All types"
    chosen_type: "{type}"
+   none: "None"
    score_choice:
       title: "Transcript"
       search_hint: "Search for score records"
@@ -496,7 +495,7 @@ score:
          Overall average：{avg_all}
          Total credits：{credit_all}
          Unpassed subjects：{unpassed}
-         Public elective credits already obtained：{not_core_credit}
+         Public selective：{not_core_type}
          The data provided by this program is for reference only, and the developer is not responsible for its accuracy
    score_compose_card:
       no_detail: "No detailed information provided"
@@ -611,8 +610,56 @@ setting:
    change_electricity_title: "Modify electricity account"
    change_electricity_account:
       title: "Modify electricity account"
-      input_hint: "Please input account here"
-      blank_input: "Blank input!"
+      campus: "Campus"
+      northCampus: "Northern Campus"
+      southCampus: "Southern Campus"
+      unitOrZone: "Unit  / Zone"
+      unitCode: "Unit"
+      zoneCode: "Zone"
+      pleaseInput: "Please input {unitOrZoneCode}"
+      successful_fetch: "Successful fetching account: {accountNumber}"
+      failed_fetch: "Failed to fetch: {e}"
+      account_saved: "Account saved：{accountNumber}"
+      unknown_coding_pattern: "Unknown coding pattern"
+      select_building: "Select Building"
+      building: "Building"
+      northern_building: "Northern Building"
+      southern_building: "Southern Building"
+      failed_generate: "Failed to generate: {e}"
+      building_number: "Building number"
+      building_number_hint: "eg: 16, 7, 55"
+      building_number_query: "Please input building No."
+      yard: "Yard"
+      yard_hint: "Select Yard"
+      northYard: "North Yard"
+      southYard: "South Yard"
+      yard_query: "Please select yard"
+      apartment: "Apartment"
+      apartment_hint: "Select Apartment"
+      northApartment: "North Apartment"
+      southApartment: "South Apartment"
+      apartment_query: "Please select apartment"
+      levelCode: "Floor number"
+      levelCode_query: "Floor number"
+      roomCode: "Room code"
+      roomCode_hint: "eg: 304, 508"
+      roomCode_query: "Please input room code"
+      account: "Electricity Account"
+      account_hint: "Please enter your account"
+      account_query: "Please input your account"
+      account_length: "Account length is larger than 10"
+      fetching: "Fetching..."
+      fetch_from_internet: "Sync from backend"
+      save_account: "Save account"
+      confirm_saving: "Confirm account"
+      calculate_account: "Calculate account"
+      calculate: "Calculate"
+      input: "Input"
+      confirm_account: "Confirm your account: "
+      change: "Edit"
+      cancel: "Cancel"
+      no_setting: "No new electricity account set"
+      successful_setting: "Successfully setting new electricity account"
    change_experiment_title: "Modify physics experiment account password"
    change_sport_title: "Modify sports system account password"
    change_password_dialog:
@@ -651,7 +698,7 @@ setting:
       ka-mate-ka-ora: "Internationalization: English correction"
       lhx-666-cool: "Support: Windows and Linux build scripts"
       lichtyy: "Design: color pattern and blank page picture"
-      lqsy-y: "Support: Promotion Picture"
+      lqsy-h: "Support: Promotion Picture"
       lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
       mrbrilliant2046: "Support: Provided the school net user guide / Internationalization: English correction"
       nancunchild: "Development: library search function / Internationalization: English correction"

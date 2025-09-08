@@ -30,7 +30,6 @@ extension IsToday on DateTime {
   }
 }
 
-// FIXME: Get account at percise movement.
 Future<void> update({
   bool force = false,
   Future<String> Function(List<int>)? captchaFunction,
@@ -44,6 +43,12 @@ Future<void> update({
 
   late ElectricityInfo cache;
   bool canUseCache = false;
+
+  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
+    if (ElectricitySession.fileCache.existsSync()) {
+      ElectricitySession.fileCache.deleteSync();
+    }
+  }
 
   if (ElectricitySession.isCacheExist) {
     log.info("[EletricitySession][update] Checking out cache.");
@@ -114,9 +119,13 @@ Future<void> update({
               ElectricitySession.fileCache.writeAsStringSync(
                 jsonEncode(electricityInfo.value.toJson()),
               );
-              ElectricitySession.refreshElectricityHistory(
-                electricityInfo.value,
-              );
+              if (!electricityInfo.value.remain.contains(
+                "electricity_status",
+              )) {
+                ElectricitySession.refreshElectricityHistory(
+                  electricityInfo.value,
+                );
+              }
             }),
       )
       .catchError((e, s) {
@@ -167,6 +176,15 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     r'"http://payment.xidian.edu.cn/NetWorkUI/(.*?)"',
   );
 
+  static void clearElectricityHistory() {
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      return;
+    }
+
+    ElectricitySession.fileHistory.deleteSync();
+    ElectricitySession.fileHistory.createSync();
+  }
+
   // Read the cached list
   // Input an electricity info will refresh the list
   static void refreshElectricityHistory(ElectricityInfo? info) {
@@ -210,173 +228,182 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
 
   /// The way to get the electricity number.
   /// Refrence here: https://see.xidian.edu.cn/html/news/9179.html
-  static String electricityAccount() {
-    String rawDormLocation = preference.getString(preference.Preference.dorm);
-    if (rawDormLocation.isEmpty) throw NoAccountInfoException;
-    if (RegExp(r'^\d+$').hasMatch(rawDormLocation)) return rawDormLocation;
-    List<RegExpMatch> nums = RegExp(
-      r"[0-9]+",
-    ).allMatches(rawDormLocation).toList();
-    // 校区
-    String accountA = "";
-    if (rawDormLocation.contains("北校区")) {
-      accountA = "1";
-    } else {
-      accountA = "2";
-    }
-    // 楼号
-    String accountB = "";
-    // 区号
-    String accountC = "";
-    // 房间号
-    String accountD = "";
-    // 识别码
-    String accountE = "";
-    int building = -1;
-
-    // 南校区学生公寓的情况
-    if (accountA == "2") {
+  static String parseElectricityAccountFromIDS(String rawDormLocation) {
+    try {
+      // String rawDormLocation = preference.getString(preference.Preference.dorm);
+      // if (rawDormLocation.isEmpty) throw NoAccountInfoException;
+      // if (RegExp(r'^\d+$').hasMatch(rawDormLocation)) return rawDormLocation;
+      List<RegExpMatch> nums = RegExp(
+        r"[0-9]+",
+      ).allMatches(rawDormLocation).toList();
+      // 校区
+      String accountA = "";
+      if (rawDormLocation.contains("北校区")) {
+        accountA = "1";
+      } else {
+        accountA = "2";
+      }
       // 楼号
-      accountB = nums[0][0]!.toString().padLeft(3, "0");
-      building = int.parse(nums[0][0]!.toString());
-      // 南校区1～4#公寓的房间分区编号，则C段首位按区编码，第二位按层编码；D段首位编码为0
-      if ([1, 2, 3, 4].contains(building)) {
-        // 层号
-        accountC += nums[1][0]!.toString();
-        // 区号
-        accountC = nums[2][0]!.toString() + accountC;
-        // 宿舍号
-        accountD = nums[3][0]!.toString().padLeft(4, "0");
-      }
-      // 南校区5、8、9、10、11、12、14#公寓的房间分区编号
-      // 则C段首位编码为0，第二位按区编码；D段首位编码同区号
-      if ([5, 8, 9, 10, 11, 12, 14].contains(building)) {
-        // 区号
-        accountC = nums[2][0]!.toString().padLeft(2, "0");
-        // 宿舍号
-        accountD = nums[3][0]!.toString().padLeft(4, nums[2][0]!);
-      }
-      // 南校区6、7#公寓不分区，C段编码默认为00；D段首位编码默认为0
-      if ([6, 7].contains(building)) {
-        accountC = "00";
-        accountD = nums[2][0]!.toString().padLeft(4, "0");
-      }
-      // 南校区13、15#公寓不分区，C段编码默认为01；D段首位编码默认为1
-      if ([13, 15].contains(building)) {
-        accountC = "01";
-        accountD = nums[2][0]!.toString().padLeft(4, "1");
-      }
-      // 南校区19-22#公寓不分区，C段编码默认为01；D段首位编码默认为层号
-      if ([19, 20, 21, 22].contains(building)) {
-        // 区号
-        accountC = "01";
-        // 宿舍号
-        accountD = nums[2][0]!.toString().padLeft(4, nums[1][0]!.toString());
-      }
-      // 南校区18#分北楼和南楼两栋，北楼C段为20，南楼C段为10;
-      // D段首位编码默认为层号
-      if ([18].contains(building)) {
-        if (rawDormLocation.contains("南楼")) {
-          accountC = "10";
-        } else {
-          accountC = "20";
-        }
-        // 宿舍号
-        accountD = nums[2][0]!.toString().padLeft(4, nums[1][0]!.toString());
-      }
-    } else {
-      // 北校区公寓的情况
-      // 楼号
-      accountB = nums[0][0]!.toString().padLeft(3, "0");
-      building = int.parse(nums[0][0]!.toString());
+      String accountB = "";
+      // 区号
+      String accountC = "";
+      // 房间号
+      String accountD = "";
       // 识别码
-      // 用于解决北校区北院与北校区南院不同户同时具有相同楼号、区号、房间号的冲突情况
-      // 当楼号是 4,7,9,12-14,24,47-49,51-53,55# 时，识别码北院为 2 南院为 1；
-      // 当楼号是 11# 时，识别码北院为 1 南院为 2；
-      // 下文代码仅为判断南北院使用，后续才会对未冲突情况进行识别码的删除
-      if ([4, 24, 47, 48, 49, 51, 52, 53, 55].contains(building)) {
-        if (rawDormLocation.contains("南院")) {
-          accountE = "1";
-        } else {
-          accountE = "2";
+      String accountE = "";
+      int building = -1;
+
+      // 南校区学生公寓的情况
+      if (accountA == "2") {
+        // 楼号
+        accountB = nums[0][0]!.toString().padLeft(3, "0");
+        building = int.parse(nums[0][0]!.toString());
+        // 南校区1～4#公寓的房间分区编号，则C段首位按区编码，第二位按层编码；D段首位编码为0
+        if ([1, 2, 3, 4].contains(building)) {
+          // 层号
+          accountC += nums[1][0]!.toString();
+          // 区号
+          accountC = nums[2][0]!.toString() + accountC;
+          // 宿舍号
+          accountD = nums[3][0]!.toString().padLeft(4, "0");
         }
-      } else if ([11].contains(building)) {
-        if (rawDormLocation.contains("南院")) {
-          accountE = "2";
-        } else {
-          accountE = "1";
+        // 南校区5、8、9、10、11、12、14#公寓的房间分区编号
+        // 则C段首位编码为0，第二位按区编码；D段首位编码同区号
+        if ([5, 8, 9, 10, 11, 12, 14].contains(building)) {
+          // 区号
+          accountC = nums[2][0]!.toString().padLeft(2, "0");
+          // 宿舍号
+          accountD = nums[3][0]!.toString().padLeft(4, nums[2][0]!);
+        }
+        // 南校区6、7#公寓不分区，C段编码默认为00；D段首位编码默认为0
+        if ([6, 7].contains(building)) {
+          accountC = "00";
+          accountD = nums[2][0]!.toString().padLeft(4, "0");
+        }
+        // 南校区13、15#公寓不分区，C段编码默认为01；D段首位编码默认为1
+        if ([13, 15].contains(building)) {
+          accountC = "01";
+          accountD = nums[2][0]!.toString().padLeft(4, "1");
+        }
+        // 南校区19-22#公寓不分区，C段编码默认为01；D段首位编码默认为层号
+        if ([19, 20, 21, 22].contains(building)) {
+          // 区号
+          accountC = "01";
+          // 宿舍号
+          accountD = nums[2][0]!.toString().padLeft(4, nums[1][0]!.toString());
+        }
+        // 南校区18#分北楼和南楼两栋，北楼C段为20，南楼C段为10;
+        // D段首位编码默认为层号
+        if ([18].contains(building)) {
+          if (rawDormLocation.contains("南楼")) {
+            accountC = "10";
+          } else {
+            accountC = "20";
+          }
+          // 宿舍号
+          accountD = nums[2][0]!.toString().padLeft(4, nums[1][0]!.toString());
         }
       } else {
-        // 其余楼号不可能需要使用识别码
-        accountE = "";
-      }
-      // 下面处理区号和宿舍号
-      // 北校区 21,24,28,47-49,51-53,55# 的情况
-      if ([21, 24, 28, 47, 48, 49, 51, 52, 53, 55].contains(building)) {
-        if (accountE != "1") {
-          // 当该楼不属于南院时，单元号与层号相同
-          // 则 C 段首位编码为 0，第二位按单元编码；D 段按房间号编码，首位补 0
-          // 区号
+        // 北校区公寓的情况
+        // 楼号
+        accountB = nums[0][0]!.toString().padLeft(3, "0");
+        building = int.parse(nums[0][0]!.toString());
+        // 识别码
+        // 用于解决北校区北院与北校区南院不同户同时具有相同楼号、区号、房间号的冲突情况
+        // 当楼号是 4,7,9,12-14,24,47-49,51-53,55# 时，识别码北院为 2 南院为 1；
+        // 当楼号是 11# 时，识别码北院为 1 南院为 2；
+        // 下文代码仅为判断南北院使用，后续才会对未冲突情况进行识别码的删除
+        if ([4, 24, 47, 48, 49, 51, 52, 53, 55].contains(building)) {
+          if (rawDormLocation.contains("南院")) {
+            accountE = "1";
+          } else {
+            accountE = "2";
+          }
+        } else if ([11].contains(building)) {
+          if (rawDormLocation.contains("南院")) {
+            accountE = "2";
+          } else {
+            accountE = "1";
+          }
+        } else {
+          // 其余楼号不可能需要使用识别码
+          accountE = "";
+        }
+        // 下面处理区号和宿舍号
+        // 北校区 21,24,28,47-49,51-53,55# 的情况
+        if ([21, 24, 28, 47, 48, 49, 51, 52, 53, 55].contains(building)) {
+          if (accountE != "1") {
+            // 当该楼不属于南院时，单元号与层号相同
+            // 则 C 段首位编码为 0，第二位按单元编码；D 段按房间号编码，首位补 0
+            // 区号
+            accountC = nums[1][0]!.toString().padLeft(2, "0");
+            // 宿舍号，这样获取保准能用
+            accountD = nums[2][0]!.toString().length == 1
+                ? nums[3][0]!.toString().padLeft(4, "0")
+                : nums[2][0]!.toString().padLeft(4, "0");
+          } else {
+            // 当该楼属于南院时，有单元划分
+            // 则 C 段首位编码为 0，第二位按单元编码；D 段按房间号编码，首位补 0
+            // 单元号即区号
+            accountC = nums[1][0]!.toString().padLeft(2, "0");
+            // 宿舍号
+            accountD = nums[3][0]!.toString().padLeft(4, "0");
+          }
+        }
+        // 北校区 4,94-98# 的情况
+        if ([4, 94, 95, 96, 97, 98].contains(building)) {
+          // C 段首位编码为 0，第二位按层编码；D 段按房间号编码，首位补 0
+          // 层号即区号
+          accountC = nums[1][0]!.toString().padLeft(2, "0");
+          // 宿舍号
+          accountD = nums[2][0]!.toString().padLeft(4, "0");
+        }
+        // 北校区包括 16-17# 公寓在内的其余楼号，一般具有单元划分
+        // 则 C 段按单元门编码，前补 0；D 段按房间号编码，前补 0
+        if ([16, 17].contains(building) || (accountC == "" && accountD == "")) {
+          // 单元号即区号
           accountC = nums[1][0]!.toString().padLeft(2, "0");
           // 宿舍号，这样获取保准能用
           accountD = nums[2][0]!.toString().length == 1
               ? nums[3][0]!.toString().padLeft(4, "0")
               : nums[2][0]!.toString().padLeft(4, "0");
-        } else {
-          // 当该楼属于南院时，有单元划分
-          // 则 C 段首位编码为 0，第二位按单元编码；D 段按房间号编码，首位补 0
-          // 单元号即区号
-          accountC = nums[1][0]!.toString().padLeft(2, "0");
-          // 宿舍号
-          accountD = nums[3][0]!.toString().padLeft(4, "0");
+        }
+        // 对非冲突房间进行删除识别码操作
+        int room = int.parse(accountD.toString());
+        if ([4, 24, 49, 51, 55].contains(building)) {
+          // 上述楼号的非以下房间不存在南北院电费账号冲突，无需识别码
+          if (!([
+            101,
+            102,
+            203,
+            204,
+            305,
+            306,
+            407,
+            408,
+            509,
+            510,
+          ].contains(room))) {
+            accountE = "";
+          }
+        }
+        if ([47, 48, 52, 53].contains(building)) {
+          // 上述楼号的非以下房间不存在南北院电费账号冲突，无需识别码
+          if (!([101, 102, 103, 104].contains(room))) {
+            accountE = "";
+          }
         }
       }
-      // 北校区 4,94-98# 的情况
-      if ([4, 94, 95, 96, 97, 98].contains(building)) {
-        // C 段首位编码为 0，第二位按层编码；D 段按房间号编码，首位补 0
-        // 层号即区号
-        accountC = nums[1][0]!.toString().padLeft(2, "0");
-        // 宿舍号
-        accountD = nums[2][0]!.toString().padLeft(4, "0");
-      }
-      // 北校区包括 16-17# 公寓在内的其余楼号，一般具有单元划分
-      // 则 C 段按单元门编码，前补 0；D 段按房间号编码，前补 0
-      if ([16, 17].contains(building) || (accountC == "" && accountD == "")) {
-        // 单元号即区号
-        accountC = nums[1][0]!.toString().padLeft(2, "0");
-        // 宿舍号，这样获取保准能用
-        accountD = nums[2][0]!.toString().length == 1
-            ? nums[3][0]!.toString().padLeft(4, "0")
-            : nums[2][0]!.toString().padLeft(4, "0");
-      }
-      // 对非冲突房间进行删除识别码操作
-      int room = int.parse(accountD.toString());
-      if ([4, 24, 49, 51, 55].contains(building)) {
-        // 上述楼号的非以下房间不存在南北院电费账号冲突，无需识别码
-        if (!([
-          101,
-          102,
-          203,
-          204,
-          305,
-          306,
-          407,
-          408,
-          509,
-          510,
-        ].contains(room))) {
-          accountE = "";
-        }
-      }
-      if ([47, 48, 52, 53].contains(building)) {
-        // 上述楼号的非以下房间不存在南北院电费账号冲突，无需识别码
-        if (!([101, 102, 103, 104].contains(room))) {
-          accountE = "";
-        }
-      }
-    }
 
-    return accountA + accountB + accountC + accountD + accountE;
+      return accountA + accountB + accountC + accountD + accountE;
+    } catch (e, s) {
+      log.error(
+        "[ElectricitySession][parseElectricityAccountFromIDS] Failed to parse electricity account!",
+        e,
+        s,
+      );
+      throw AccountFailedParseException();
+    }
   }
 
   /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
@@ -389,15 +416,23 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
   Future<(String, String)> loginPayment({
     required Future<String> Function(List<int>)? captchaFunction,
   }) async {
-    /// If no account
-    if (preference.getString(preference.Preference.dorm).isEmpty) {
+    String electricityAccount = preference.getString(
+      preference.Preference.electricityAccount,
+    );
+
+    if (electricityAccount.isEmpty) {
       if (!preference.getBool(preference.Preference.role)) {
         try {
           String dorm = await PersonalInfoSession().getDormInfoEhall();
-          await preference.setString(preference.Preference.dorm, dorm);
+          electricityAccount =
+              ElectricitySession.parseElectricityAccountFromIDS(dorm);
+          await preference.setString(
+            preference.Preference.electricityAccount,
+            electricityAccount,
+          );
         } catch (e, s) {
           log.error(
-            "[ElectricitySession][LoginPayment] Could not fetch dorm info.",
+            "[ElectricitySession][LoginPayment] Could not fetch electricity account.",
             e,
             s,
           );
@@ -439,6 +474,8 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
 
     await dio.get(nextStop[0]!.replaceAll('"', ""));
 
+    await dio.get("https://payment.xidian.edu.cn/NetWorkUI/showPublic");
+
     String lastErrorMessage = "";
     for (int retry = 5; retry > 0; retry--) {
       // New stuff, captcha code...
@@ -471,7 +508,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       var value = await dio.post(
         "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
         data: {
-          "p_Userid": rsaEncrypt(electricityAccount()),
+          "p_Userid": rsaEncrypt(electricityAccount),
           "p_Password": rsaEncrypt(password),
           "checkCode": rsaEncrypt(checkCode),
           "factorycode": factorycode,
@@ -502,7 +539,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
               value = await dio.post(
                 "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
                 data: {
-                  "p_Userid": electricityAccount(),
+                  "p_Userid": electricityAccount,
                   "p_Password": password,
                   "factorycode": factorycode,
                 },
@@ -579,5 +616,7 @@ class NotInitalizedException implements Exception {
 }
 
 class NoAccountInfoException implements Exception {}
+
+class AccountFailedParseException implements Exception {}
 
 class CaptchaFailedException implements Exception {}

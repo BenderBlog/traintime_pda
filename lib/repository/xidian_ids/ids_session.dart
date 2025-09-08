@@ -98,14 +98,13 @@ class IDSSession extends NetworkSession {
   ];
 
   String _parsePasswordWrongMsg(String html) {
-    var form = parse(html).getElementsByClassName("span")
-      ..removeWhere((element) => element.id != "showErrorTip");
-    var msg = form.firstOrNull?.children[0].innerHtml ?? "登录遇到问题";
+    var form = parse(html).getElementById("showErrorTip");
+    var msg = form?.text ?? "登录遇到问题";
 
     // Simplify the error message because there is no '找回密码' button here XD.
     // "用户名或密码有误，用户名为工号/学号，如果确认用户名无误，请点‘找回密码’自助重置密码。"
     if (msg.contains(RegExp(r"(用户名|密码).*误", unicode: true, dotAll: true))) {
-      msg = "用户名或密码有误。";
+      msg = "用户名或密码有误";
     }
     return msg;
   }

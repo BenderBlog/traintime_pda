@@ -156,7 +156,28 @@ class _HomePageMasterState extends State<HomePageMaster>
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    Restart.restartApp();
+                    if (Platform.isAndroid || Platform.isIOS) {
+                      Restart.restartApp();
+                    } else {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "setting.need_close_dialog.title",
+                            ),
+                          ),
+                          content: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "setting.need_close_dialog.content",
+                            ),
+                          ),
+                        ),
+                      );
+                    }
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),
@@ -373,9 +394,19 @@ class _HomePageMasterState extends State<HomePageMaster>
     super.didChangeDependencies();
     if (!refreshAtStart) {
       message.checkMessage();
-      message.checkUpdate().then((value) {
-        if (value ?? false) _showUpdateNotice();
-      });
+      message.checkUpdate().then(
+        (value) {
+          if (value ?? false) _showUpdateNotice();
+        },
+        onError: (e, s) {
+          if (mounted) {
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(context, "setting.fetch_failed"),
+            );
+          }
+        },
+      );
       message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
@@ -459,7 +490,6 @@ class _HomePageMasterState extends State<HomePageMaster>
         },
       ),
       bottomNavigationBar: NavigationBar(
-        height: 64,
         destinations: destinations
             .map(
               (e) => NavigationDestination(
@@ -471,7 +501,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             )
             .toList(),
         selectedIndex: _selectedIndex,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        //labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         onDestinationSelected: (int index) {
           if (_selectedIndex != index) {
             setState(() {

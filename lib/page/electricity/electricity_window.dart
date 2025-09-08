@@ -13,6 +13,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
+import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 class ElectricityWindow extends StatelessWidget {
   const ElectricityWindow({super.key});
@@ -36,12 +37,27 @@ class ElectricityWindow extends StatelessWidget {
             ),
             function: () {
               if (prefs.getBool(prefs.Preference.role) &&
-                  prefs.getString(prefs.Preference.dorm).isEmpty) {
+                  prefs
+                      .getString(prefs.Preference.electricityAccount)
+                      .isEmpty) {
                 showDialog(
                   context: context,
-                  builder: (context) => ElectricityAccountDialog(),
+                  builder: (context) => ElectricityAccountDialog(
+                    initialAccountNumber: prefs.getString(
+                      prefs.Preference.electricityAccount,
+                    ),
+                    onFetchFromNetwork: () async {
+                      String dorm = await PersonalInfoSession()
+                          .getDormInfoEhall();
+                      return ElectricitySession.parseElectricityAccountFromIDS(
+                        dorm,
+                      );
+                    },
+                  ),
                 ).then((value) {
-                  if (prefs.getString(prefs.Preference.dorm).isNotEmpty) {
+                  if (prefs
+                      .getString(prefs.Preference.electricityAccount)
+                      .isNotEmpty) {
                     update(
                       force: true,
                       captchaFunction: (image) => showDialog<String>(
@@ -91,7 +107,7 @@ class ElectricityWindow extends StatelessWidget {
                       context,
                       "electricity.account",
                     ),
-                    value: ElectricitySession.electricityAccount().toString(),
+                    value: prefs.getString(prefs.Preference.electricityAccount),
                   ),
                   InfoItem(
                     icon: Icons.cached,

@@ -303,6 +303,7 @@ class _MyAppState extends State<MyApp> {
           child: widget.isFirst ? const LoginWindow() : const HomePage(),
         ),
         builder: (context, widget) {
+          // TODO: change error widget
           Catcher2.addDefaultErrorWidget(
             showStacktrace: true,
             title: "Unexpected problem:P",
