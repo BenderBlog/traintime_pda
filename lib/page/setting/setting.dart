@@ -101,10 +101,9 @@ class _SettingWindowState extends State<SettingWindow> {
             TextSpan(
               children: [
                 TextSpan(
-                  text: Platform.isIOS || Platform.isMacOS
+                  text: Platform.isIOS || Platform.isMacOS || Platform.isAndroid
                       ? "XDYou"
-                      // TODO: REMOVE ON RELEASE
-                      : 'Traintime PDA - 今日程',
+                      : 'Traintime PDA',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

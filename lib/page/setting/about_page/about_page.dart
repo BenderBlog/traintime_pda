@@ -23,12 +23,11 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  // The Whole In a Silent Way Album
-  final String urlOthers = "https://www.bilibili.com/video/BV1pX4y1Q7vV";
+  final String urlOthers =
+      "https://www.bilibili.com/video/BV1pX4y1Q7vV/?t=1096.0";
 
-  // Right Off - Theme From John Jackson (Also played at the beginning of Agharta Disc 2)
   final String urlApple =
-      "https://www.bilibili.com/video/BV1xs4y1Q7b6?t=2690.6";
+      "https://www.bilibili.com/video/BV1mx411S7Y5/?t=877.8&p=6";
 
   List<Developer> getDevelopers() => [
     Developer(
@@ -249,14 +248,15 @@ class _AboutPageState extends State<AboutPage> {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: Platform.isIOS || Platform.isMacOS
+                    text:
+                        Platform.isIOS || Platform.isMacOS || Platform.isAndroid
                         ? "XDYou"
                         : "Traintime PDA",
                   ),
                   TextSpan(text: " v${preference.packageInfo.version}\n"),
                   TextSpan(
                     text:
-                        "${Platform.isIOS || Platform.isMacOS ? "Right Off" : "In A Silent Way Album"} - Agharta Edition",
+                        "${Platform.isIOS || Platform.isMacOS ? "It's About That Time " : "In A Slient Way"} - Hanao Edition",
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -310,7 +310,8 @@ class _AboutPageState extends State<AboutPage> {
         ),
         onTap: () => showLicensePage(
           context: context,
-          applicationName: Platform.isIOS || Platform.isMacOS
+          applicationName:
+              Platform.isIOS || Platform.isMacOS || Platform.isAndroid
               ? "XDYou"
               : "Traintime PDA",
           applicationVersion:

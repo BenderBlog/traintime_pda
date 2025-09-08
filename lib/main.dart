@@ -143,7 +143,9 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
         navigatorKey: preference.debuggerKey,
-        title: Platform.isIOS || Platform.isMacOS ? "XDYou" : 'Traintime PDA',
+        title: Platform.isIOS || Platform.isMacOS || Platform.isAndroid
+            ? "XDYou"
+            : 'Traintime PDA',
         theme: FlexThemeData.light(
           colors: c.color.first,
           usedColors: 1,
