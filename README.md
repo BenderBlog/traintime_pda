@@ -1,6 +1,6 @@
 <div align="center">
 <img src="./assets/icon.png" style="border-radius:10px; margin:10px; width:120px" alt="XDYou">
-<h1>Traintime PDA</h1>
+<h1>Traintime PDA / XDYou</h1>
 
 [![Release downloads](https://img.shields.io/github/downloads/BenderBlog/traintime_pda/total.svg)](https://GitHub.com/BenderBlog/traintime_pda/releases/) ![Android Version](https://img.shields.io/badge/Android%20API-23%2B-green)
 
@@ -55,10 +55,10 @@ XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息�
 ## 编译环境
 
 ```bash
-Flutter 3.32.2 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 8defaa71a7 (5 天前) • 2025-06-04 11:02:51 -0700
-Engine • revision 1091508939 (9 天前) • 2025-05-30 12:17:36 -0700
-Tools • Dart 3.8.1 • DevTools 2.45.1
+Flutter 3.35.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision a402d9a437 (6 days ago) • 2025-09-03 14:54:31 -0700
+Engine • hash 672c59cfa87c8070c20ba2cd1a6c2a1baf5cf08b (revision ddf47dd3ff) (5 days ago) • 2025-09-03 20:02:13.000Z
+Tools • Dart 3.9.2 • DevTools 2.48.0
 ```
 
 ## 授权信息

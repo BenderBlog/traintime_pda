@@ -1,10 +1,10 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.5.1+31
+version: 1.5.2+32
 
-environment:                                                                                                                                                                               
-  sdk: ^3.8.0 
+environment:
+  sdk: ^3.8.0
 
 dependencies:
   dio: ^5.0.0
@@ -54,7 +54,7 @@ dependencies:
   styled_widget: ^0.4.1
   file_picker: ^10.1.9
   chinese_font_library: ^1.1.0
-  ming_cute_icons: ^0.0.7 
+  ming_cute_icons: ^0.0.7
   remixicon: ^1.4.1
   timelines_plus: ^1.0.4
   based_split_view: ^1.2.0

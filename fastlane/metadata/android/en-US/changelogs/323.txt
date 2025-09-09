@@ -1,0 +1,7 @@
+Notice: The name of the software has been changed to XDYou
+
+1. Club suggestion
+2. Electricity rewrite to allow everyone change their dorm.
+3. Serveral bug fix
+
+All functions are implemented by @BenderBlog, thanks @LQSY-H and 对策府库 for promoting my software.
