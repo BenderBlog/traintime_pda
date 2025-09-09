@@ -1,4 +1,4 @@
-Traintime PDA，iOS 平台称 XDYou，是为西电学生设计的开源信息查询软件。
+XDYou，代码称为 Traintime PDA，是为西电学生设计的开源信息查询软件。
 
 最新稳定版：v1.5.0+30
 

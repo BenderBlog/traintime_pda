@@ -1,6 +1,6 @@
-"Traintime PDA" is a Free and Open Source personal data assistant for XDU students.
+"XDYou" is a Free and Open Source personal data assistant for XDU students.
 
-The XDYou app in the Apple App Store have the same codebase as this.
+This software is originally called "Traintime PDA".
 
  - Both undergraduates and postgraduates are supported.
  - View classtable with exam arrangement and experiment arrangement, also set your idol as the background, or exchange the classtable with your sweetie.

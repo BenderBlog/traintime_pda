@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-enum EmptyListViewType { reading, singing, defaultimg }
+enum EmptyListViewType { reading, singing, rolling, defaultimg }
 
 class EmptyListView extends StatelessWidget {
   final String text;
@@ -16,6 +16,8 @@ class EmptyListView extends StatelessWidget {
         return "assets/art/pda_girl_reading.png";
       case EmptyListViewType.singing:
         return "assets/art/pda_girl_singing.png";
+      case EmptyListViewType.rolling:
+        return "assets/art/pda_classtable_empty.png";
       default:
         return "assets/art/pda_girl_default.png";
     }

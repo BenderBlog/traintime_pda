@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
@@ -74,13 +73,13 @@ class _EmptyClassroomSearchWindowState
 
   @override
   void initState() {
-    String lastchosenClassroom = preference.getString(
+    String lastChosenClassroom = preference.getString(
       preference.Preference.emptyClassroomLastChoice,
     );
     EmptyClassroomPlace? toGet;
-    if (lastchosenClassroom.isNotEmpty) {
+    if (lastChosenClassroom.isNotEmpty) {
       for (var i in widget.places) {
-        if (i.code == lastchosenClassroom) toGet = i;
+        if (i.code == lastChosenClassroom) toGet = i;
       }
     }
     toGet ??= widget.places.first;
@@ -98,8 +97,8 @@ class _EmptyClassroomSearchWindowState
 
   Widget getIcon(bool isUsed, {int? index}) =>
       Container(
-        width: 18,
-        height: 18,
+        width: 20,
+        height: 20,
         decoration: BoxDecoration(
           color: isUsed
               ? Theme.of(context).colorScheme.primary
@@ -111,7 +110,7 @@ class _EmptyClassroomSearchWindowState
                 index.toString(),
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  fontSize: 12,
+                  fontSize: 14,
                   color: isUsed
                       ? Theme.of(context).colorScheme.onPrimary
                       : Theme.of(context).colorScheme.primary,
@@ -244,7 +243,7 @@ class _EmptyClassroomSearchWindowState
               ].toRow(mainAxisAlignment: MainAxisAlignment.center),
             ]
             .toColumn()
-            .padding(horizontal: 14, top: 8, bottom: 6)
+            .padding(horizontal: 14, top: 8, bottom: 12)
             .constrained(maxWidth: 480),
         if (state == SessionState.fetching)
           const CircularProgressIndicator().center().expanded()
@@ -255,68 +254,63 @@ class _EmptyClassroomSearchWindowState
             }),
           ).expanded()
         else
-          DataTable2(
-            dividerThickness: 0,
-            columnSpacing: 0,
-            horizontalMargin: 6,
-            headingRowHeight: 0,
-            columns: [
-              DataColumn2(
-                label: Text(
-                  FlutterI18n.translate(context, "empty_classroom.classroom"),
-                ).center(),
-                fixedWidth: 100,
-              ),
-              DataColumn2(label: const Text('1-4').center(), fixedWidth: 100),
-              DataColumn2(label: const Text('5-8').center(), fixedWidth: 100),
-              DataColumn2(label: const Text('9-10').center(), fixedWidth: 50),
-            ],
-            rows: List<DataRow>.generate(
-              data.length,
-              (index) => DataRow(
-                cells: [
-                  DataCell(
-                    Text(
-                      data[index].name,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ).center(),
-                  ),
-                  DataCell(
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 4.0,
-                      children: List.generate(
-                        4,
-                        (i) => getIcon(data[index].isUsed[i], index: i + 1),
-                      ),
-                    ).center(),
-                  ),
-                  DataCell(
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 4.0,
-                      children: List.generate(
-                        4,
-                        (i) => getIcon(data[index].isUsed[i + 4], index: i + 5),
-                      ),
-                    ).center(),
-                  ),
-                  DataCell(
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 4.0,
-                      children: List.generate(
-                        2,
-                        (i) => getIcon(data[index].isUsed[i + 8], index: i + 9),
-                      ),
-                    ).center(),
-                  ),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: ListView.separated(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final item = data[index];
+                return Row(
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: Text(
+                        item.name,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ).center(),
+                    ),
+                    Flexible(
+                      flex: 4,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4.0,
+                        children: List.generate(
+                          4,
+                          (i) => getIcon(item.isUsed[i], index: i + 1),
+                        ),
+                      ).center(),
+                    ),
+                    Flexible(
+                      flex: 4,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4.0,
+                        children: List.generate(
+                          4,
+                          (i) => getIcon(item.isUsed[i + 4], index: i + 5),
+                        ),
+                      ).center(),
+                    ),
+                    Flexible(
+                      flex: 2,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4.0,
+                        children: List.generate(
+                          2,
+                          (i) => getIcon(item.isUsed[i + 8], index: i + 9),
+                        ),
+                      ).center(),
+                    ),
+                  ],
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  SizedBox(height: 12),
             ),
-          ).constrained(maxWidth: sheetMaxWidth).center().safeArea().expanded(),
+          ).constrained(maxWidth: sheetMaxWidth).center().expanded(),
       ],
     );
   }

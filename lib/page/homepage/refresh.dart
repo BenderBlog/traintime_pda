@@ -19,8 +19,6 @@ import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/schoolnet_session.dart' as school_net;
-import 'package:watermeter/repository/library_capacity_session.dart'
-    as library_capacity;
 
 DateTime updateTime = DateTime.now();
 
@@ -100,7 +98,6 @@ Future<void> update({
       Future(() => school_card_session.SchoolCardSession().initSession()),
       Future(() => electricity.update()),
       Future(() => school_net.update()),
-      Future(() => library_capacity.update()),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(
         "[homepage Update]"
