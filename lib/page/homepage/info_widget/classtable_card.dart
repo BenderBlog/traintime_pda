@@ -186,13 +186,25 @@ class _ClassTableCardState extends State<ClassTableCard> {
                 );
               case ClassTableState.fetching:
               case ClassTableState.none:
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "homepage.class_table_card.fetching_message",
-                  ),
-                );
+                if (c.classTableFile.existsSync()) {
+                  context.pushReplacement(
+                    LayoutBuilder(
+                      builder: (context, constraints) => ClassTableWindow(
+                        parentContext: context,
+                        currentWeek: c.getCurrentWeek(updateTime),
+                        constraints: constraints,
+                      ),
+                    ),
+                  );
+                } else {
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "homepage.class_table_card.fetching_message",
+                    ),
+                  );
+                }
             }
           },
         );

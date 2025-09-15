@@ -558,6 +558,9 @@ END:VTIMEZONE
   }
 
   ClassTableWidgetState({required this.currentWeek, this.partnerClass}) {
+    ever<int>(classTableController.refreshTick, (_) {
+      notifyListeners();
+    });
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {

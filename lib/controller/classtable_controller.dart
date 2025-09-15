@@ -22,6 +22,7 @@ class ClassTableController extends GetxController {
   // Classtable state
   String? error;
   ClassTableState state = ClassTableState.none;
+  final RxInt refreshTick = 0.obs;
 
   // Classtable Data
   late File classTableFile;
@@ -325,6 +326,7 @@ class ClassTableController extends GetxController {
 
       state = ClassTableState.fetched;
       error = null;
+      refreshTick.value++;
       update();
     } catch (e, s) {
       log.warning(e, s);
