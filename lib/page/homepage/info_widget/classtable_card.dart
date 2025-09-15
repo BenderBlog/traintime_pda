@@ -168,10 +168,13 @@ class _ClassTableCardState extends State<ClassTableCard> {
               case ClassTableState.fetched:
                 context.pushReplacement(
                   LayoutBuilder(
-                    builder: (context, constraints) => ClassTableWindow(
-                      parentContext: context,
-                      currentWeek: c.getCurrentWeek(updateTime),
-                      constraints: constraints,
+                    builder: (context, constraints) => GetBuilder<
+                        ClassTableController>(
+                      builder: (_) => ClassTableWindow(
+                        parentContext: context,
+                        currentWeek: c.getCurrentWeek(updateTime),
+                        constraints: constraints,
+                      ),
                     ),
                   ),
                 );
@@ -189,10 +192,13 @@ class _ClassTableCardState extends State<ClassTableCard> {
                 if (c.classTableFile.existsSync()) {
                   context.pushReplacement(
                     LayoutBuilder(
-                      builder: (context, constraints) => ClassTableWindow(
-                        parentContext: context,
-                        currentWeek: c.getCurrentWeek(updateTime),
-                        constraints: constraints,
+                      builder: (context, constraints) => GetBuilder<
+                          ClassTableController>(
+                        builder: (_) => ClassTableWindow(
+                          parentContext: context,
+                          currentWeek: c.getCurrentWeek(updateTime),
+                          constraints: constraints,
+                        ),
                       ),
                     ),
                   );
