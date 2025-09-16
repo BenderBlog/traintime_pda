@@ -9,7 +9,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:encrypt/encrypt.dart';
+import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/repository/logger.dart';

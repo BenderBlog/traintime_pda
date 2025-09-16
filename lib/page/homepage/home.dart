@@ -12,7 +12,7 @@ import 'package:content_resolver/content_resolver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/club_suggestion/club_suggestion.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';

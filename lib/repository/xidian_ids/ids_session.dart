@@ -9,7 +9,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
