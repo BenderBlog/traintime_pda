@@ -170,9 +170,9 @@ class _AboutPageState extends State<AboutPage> {
     ),
     Developer(
       "Ray Flores",
-      "https://raay.xyz/wp-content/uploads/2023/07/4882705B-3C57-4B46-A3DA-F75C2E0DCE5B.jpeg",
+      "https://sns-avatar-qc.xhscdn.com/avatar/65fb96e24f8a7c5709c421f2.jpg",
       FlutterI18n.translate(context, "setting.about_page.ray"),
-      "https://raay.xyz/",
+      "https://www.xiaohongshu.com/user/profile/63d293990000000026010075",
     ),
     Developer(
       "shadowyingyi",

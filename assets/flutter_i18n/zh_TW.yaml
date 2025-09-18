@@ -169,11 +169,13 @@ club_promotion:
 electricity:
   title: 水電信息
   power_title: 餘額信息
-  cache_notice: 上次獲取時間
+  cache_notice: 獲取時間
   account: 電費賬號
   remain_power: 電量信息
   owe_info: 欠費信息
   history: 歷史記錄
+  daily_usage: 平均每日用量
+  not_enough_data: 數據量不足以用於渲染
   info: 有欠費一般代表水費，半夜11:20到午夜0:30左右無法獲取數據
   date: 日期
   power: 該日0點電量

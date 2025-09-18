@@ -203,6 +203,8 @@ electricity:
    remain_power: "Remain power"
    owe_info: "Arrears"
    history: "Billing History"
+   daily_usage: "Average usage per day"
+   not_enough_data: "Not enough data for rendering graph"
    info: "Arrears generally indicate water fees"
    date: "Date"
    power: "Remaining"

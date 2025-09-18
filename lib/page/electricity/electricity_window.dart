@@ -161,227 +161,258 @@ class ElectricityWindow extends StatelessWidget {
               InfoCard(
                 title: FlutterI18n.translate(context, "electricity.history"),
                 children: [
-                  Container(
-                    height: 220,
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: graphic.Chart(
-                      data: (() {
-                        final Map<String, Map<String, dynamic>> daily = {};
-                        for (final info in historyElectricityInfo) {
-                          final numStr = info.remain.replaceAll(
-                            RegExp(r'[^0-9\.\-]'),
-                            '',
-                          );
-                          final v = double.tryParse(numStr);
-                          if (v == null) continue;
-                          final dayKey = DateFormat(
-                            'yyyy-MM-dd',
-                          ).format(info.fetchDay);
-                          final dayTime = DateTime(
-                            info.fetchDay.year,
-                            info.fetchDay.month,
-                            info.fetchDay.day,
-                          );
-                          final existing = daily[dayKey];
-                          if (existing == null ||
-                              v > (existing['power'] as num)) {
-                            daily[dayKey] = {
-                              'time': dayTime,
-                              'day': DateFormat('MM-dd').format(dayTime),
-                              'power': v,
-                            };
-                          }
+                  Builder(
+                    builder: (context) {
+                      final Map<String, Map<String, dynamic>> daily = {};
+                      for (final info in historyElectricityInfo) {
+                        final numStr = info.remain.replaceAll(
+                          RegExp(r'[^0-9\.\-]'),
+                          '',
+                        );
+                        final v = double.tryParse(numStr);
+                        if (v == null) continue;
+                        final dayKey = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(info.fetchDay);
+                        final dayTime = DateTime(
+                          info.fetchDay.year,
+                          info.fetchDay.month,
+                          info.fetchDay.day,
+                        );
+                        final existing = daily[dayKey];
+                        if (existing == null ||
+                            v > (existing['power'] as num)) {
+                          daily[dayKey] = {
+                            'time': dayTime,
+                            'day': DateFormat('MM-dd').format(dayTime),
+                            'power': v,
+                          };
                         }
-                        final list = daily.values.toList()
-                          ..sort(
-                            (a, b) => (a['time'] as DateTime).compareTo(
-                              b['time'] as DateTime,
-                            ),
-                          );
-                        return list;
-                      })(),
-                      variables: {
-                        'day': graphic.Variable(
-                          accessor: (Map map) => map['day'] as String,
-                        ),
-                        'power': graphic.Variable(
-                          accessor: (Map map) => map['power'] as num,
-                          scale: graphic.LinearScale(
-                            //nice: true,
-                          ),
-                        ),
-                      },
-                      axes: [
-                        graphic.Defaults.horizontalAxis,
-                        graphic.Defaults.verticalAxis,
-                      ],
-                      marks: [
-                        graphic.LineMark(
-                          position:
-                              graphic.Varset('day') * graphic.Varset('power'),
-                          shape: graphic.ShapeEncode(
-                            value: graphic.BasicLineShape(smooth: true),
-                          ),
-                          color: graphic.ColorEncode(
-                            value: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        graphic.PointMark(
-                          position:
-                              graphic.Varset('day') * graphic.Varset('power'),
-                          size: graphic.SizeEncode(value: 2),
-                          color: graphic.ColorEncode(
-                            value: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                      selections: {
-                        'hover': graphic.PointSelection(
-                          on: {graphic.GestureType.hover},
-                          dim: graphic.Dim.x,
-                        ),
-                      },
-                      tooltip: graphic.TooltipGuide(selections: {'hover'}),
-                      crosshair: graphic.CrosshairGuide(selections: {'hover'}),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(
-                      '逐日用电量',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  (() {
-                    // 以“每天最小读数”代表该日（遇到一天多次记录时取最小值）
-                    final Map<String, double> dayMin = {};
-                    for (final info in historyElectricityInfo) {
-                      final numStr = info.remain.replaceAll(
-                        RegExp(r'[^0-9\.\-]'),
-                        '',
-                      );
-                      final v = double.tryParse(numStr);
-                      if (v == null) continue;
-                      final key = DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(info.fetchDay);
-                      if (!dayMin.containsKey(key) || v < dayMin[key]!) {
-                        dayMin[key] = v;
                       }
-                    }
-                    // 计算“每日用电量”（相邻两天的正向消耗差），生成逐日柱状数据
-                    final keys = dayMin.keys.toList()
-                      ..sort((a, b) => a.compareTo(b));
-                    final List<Map<String, dynamic>> barData = [];
-                    for (int i = 1; i < keys.length; i++) {
-                      final prev = dayMin[keys[i - 1]]!;
-                      final curr = dayMin[keys[i]]!;
-                      final diff = prev - curr; // 前一日最小读数 - 当日最小读数（允许为负）
-                      final dt = DateFormat('yyyy-MM-dd').parse(keys[i]);
-                      final dtPrev = DateFormat(
-                        'yyyy-MM-dd',
-                      ).parse(keys[i - 1]);
-                      final range =
-                          "${DateFormat('M-d').format(DateTime(dtPrev.year, dtPrev.month, dtPrev.day))}~\n${DateFormat('M-d').format(DateTime(dt.year, dt.month, dt.day))}";
-                      barData.add({'range': range, 'cons': diff});
-                    }
-                    // 若只有一个有效数据（或无正向消耗差），不展示
-                    if (barData.length <= 1) {
-                      return const SizedBox.shrink();
-                    }
-                    // 配色与尺寸参考上方折线图：背景 onPrimary，高度 220
-                    // 使用分段归一化：将原始 cons 映射到 [-0.3, 0.7]（负区 30%、正区 70%）
-                    num minCons = barData.first['cons'] as num;
-                    num maxCons = barData.first['cons'] as num;
-                    for (final e in barData) {
-                      final c = e['cons'] as num;
-                      if (c < minCons) minCons = c;
-                      if (c > maxCons) maxCons = c;
-                    }
-                    final num posMax = maxCons > 0 ? maxCons : 0;
-                    final num negAbs = minCons < 0 ? -minCons : 0;
-                    final List<Map<String, dynamic>> plotData = barData.map((
-                      e,
-                    ) {
-                      final cons = e['cons'] as num;
-                      final double consPlot = cons >= 0
-                          ? (posMax == 0 ? 0 : (cons / posMax) * 0.7)
-                          : (negAbs == 0 ? 0 : (cons / negAbs) * 0.3);
-                      return {
-                        'range': e['range'],
-                        'cons': cons,
-                        'consPlot': consPlot,
-                      };
-                    }).toList();
+                      final list = daily.values.toList()
+                        ..sort(
+                          (a, b) => (a['time'] as DateTime).compareTo(
+                            b['time'] as DateTime,
+                          ),
+                        );
+                      return graphic.Chart(
+                            data: list,
+                            variables: {
+                              'day': graphic.Variable(
+                                accessor: (Map map) => map['day'] as String,
+                              ),
+                              'power': graphic.Variable(
+                                accessor: (Map map) => map['power'] as num,
+                                scale: graphic.LinearScale(
+                                  //nice: true,
+                                ),
+                              ),
+                            },
+                            axes: [
+                              graphic.Defaults.horizontalAxis,
+                              graphic.Defaults.verticalAxis,
+                            ],
+                            marks: [
+                              graphic.LineMark(
+                                position:
+                                    graphic.Varset('day') *
+                                    graphic.Varset('power'),
+                                shape: graphic.ShapeEncode(
+                                  value: graphic.BasicLineShape(smooth: true),
+                                ),
+                                color: graphic.ColorEncode(
+                                  value: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              graphic.PointMark(
+                                position:
+                                    graphic.Varset('day') *
+                                    graphic.Varset('power'),
+                                size: graphic.SizeEncode(value: 2),
+                                color: graphic.ColorEncode(
+                                  value: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                            selections: {
+                              'hover': graphic.PointSelection(
+                                on: {graphic.GestureType.hover},
+                                dim: graphic.Dim.x,
+                              ),
+                            },
+                            tooltip: graphic.TooltipGuide(
+                              selections: {'hover'},
+                            ),
+                            crosshair: graphic.CrosshairGuide(
+                              selections: {'hover'},
+                            ),
+                          )
+                          .decorated(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            borderRadius: BorderRadius.circular(12),
+                          )
+                          .padding(top: 4)
+                          .constrained(height: 220);
+                    },
+                  ),
+                ],
+              ),
+              InfoCard(
+                title: FlutterI18n.translate(
+                  context,
+                  "electricity.daily_usage",
+                ),
+                children: [
+                  Builder(
+                    builder: (context) {
+                      // 以“每天最小读数”代表该日（遇到一天多次记录时取最小值）
+                      final Map<String, double> dayMin = {};
+                      for (final info in historyElectricityInfo) {
+                        final numStr = info.remain.replaceAll(
+                          RegExp(r'[^0-9\.\-]'),
+                          '',
+                        );
+                        final v = double.tryParse(numStr);
+                        if (v == null) continue;
+                        final key = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(info.fetchDay);
+                        if (!dayMin.containsKey(key) || v < dayMin[key]!) {
+                          dayMin[key] = v;
+                        }
+                      }
+                      // 计算“每日用电量”（相邻两天的正向消耗差），生成逐日柱状数据
+                      final keys = dayMin.keys.toList()
+                        ..sort((a, b) => a.compareTo(b));
+                      final List<Map<String, dynamic>> barData = [];
+                      for (int i = 1; i < keys.length; i++) {
+                        final prev = dayMin[keys[i - 1]]!;
+                        final curr = dayMin[keys[i]]!;
+                        final diff = prev - curr; // 前一日最小读数 - 当日最小读数（允许为负）
+                        final dt = DateFormat('yyyy-MM-dd').parse(keys[i]);
+                        final dtPrev = DateFormat(
+                          'yyyy-MM-dd',
+                        ).parse(keys[i - 1]);
+                        final range =
+                            "${DateFormat('M-d').format(DateTime(dtPrev.year, dtPrev.month, dtPrev.day))}~\n${DateFormat('M-d').format(DateTime(dt.year, dt.month, dt.day))}";
+                        barData.add({'range': range, 'cons': diff});
+                      }
+                      // 统一容器，内部内容根据数据量切换
+                      late final Widget content;
+                      late final double? height;
+                      if (barData.length <= 1) {
+                        height = null;
+                        content = Text(
+                          FlutterI18n.translate(
+                            context,
+                            "electricity.not_enough_data",
+                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                        );
+                      } else {
+                        height = 220.0;
+                        // 使用分段归一化：将原始 cons 映射到 [-0.3, 0.7]（负区 30%、正区 70%）
+                        num minCons = barData.first['cons'] as num;
+                        num maxCons = barData.first['cons'] as num;
+                        for (final e in barData) {
+                          final c = e['cons'] as num;
+                          if (c < minCons) minCons = c;
+                          if (c > maxCons) maxCons = c;
+                        }
+                        final num posMax = maxCons > 0 ? maxCons : 0;
+                        final num negAbs = minCons < 0 ? -minCons : 0;
+                        final List<Map<String, dynamic>> plotData = barData.map(
+                          (e) {
+                            final cons = e['cons'] as num;
+                            final double consPlot = cons >= 0
+                                ? (posMax == 0 ? 0 : (cons / posMax) * 0.7)
+                                : (negAbs == 0 ? 0 : (cons / negAbs) * 0.3);
+                            return {
+                              'range': e['range'],
+                              'cons': cons,
+                              'consPlot': consPlot,
+                            };
+                          },
+                        ).toList();
 
-                    return Container(
-                      height: 220,
-                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: graphic.Chart(
-                        data: plotData,
-                        variables: {
-                          'range': graphic.Variable(
-                            accessor: (Map map) => map['range'] as String,
-                          ),
-                          'consPlot': graphic.Variable(
-                            accessor: (Map map) => map['consPlot'] as num,
-                            scale: graphic.LinearScale(
-                              min: -0.3,
-                              max: 0.7,
-                              tickCount: 6,
-                              // 轴标签映射回原始用量值，使读数与计算一致
-                              formatter: (num v) {
-                                if (v == 0) return '0';
-                                if (v > 0) {
-                                  final num orig = (posMax == 0)
-                                      ? 0
-                                      : (v / 0.7) * posMax;
-                                  return orig.toStringAsFixed(2);
-                                } else {
-                                  final num orig = (negAbs == 0)
-                                      ? 0
-                                      : (v / 0.3) * negAbs;
-                                  return orig.toStringAsFixed(2);
-                                }
-                              },
+                        content = graphic.Chart(
+                          data: plotData,
+                          variables: {
+                            'range': graphic.Variable(
+                              accessor: (Map map) => map['range'] as String,
                             ),
-                          ),
-                        },
-                        axes: [
-                          graphic.Defaults.horizontalAxis,
-                          graphic.Defaults.verticalAxis,
-                        ],
-                        marks: [
-                          // 竖向柱状图：类目在 X 轴，数值在 Y 轴
-                          graphic.IntervalMark(
-                            position:
-                                graphic.Varset('range') *
-                                graphic.Varset('consPlot'),
-                            color: graphic.ColorEncode(
-                              value: Theme.of(context).colorScheme.primary,
+                            'consPlot': graphic.Variable(
+                              accessor: (Map map) => map['consPlot'] as num,
+                              scale: graphic.LinearScale(
+                                min: -0.3,
+                                max: 0.7,
+                                tickCount: 6,
+                                // 轴标签映射回原始用量值，使读数与计算一致
+                                formatter: (num v) {
+                                  if (v == 0) return '0';
+                                  if (v > 0) {
+                                    final num orig = (posMax == 0)
+                                        ? 0
+                                        : (v / 0.7) * posMax;
+                                    return orig.toStringAsFixed(2);
+                                  } else {
+                                    final num orig = (negAbs == 0)
+                                        ? 0
+                                        : (v / 0.3) * negAbs;
+                                    return orig.toStringAsFixed(2);
+                                  }
+                                },
+                              ),
                             ),
+                          },
+                          axes: [
+                            graphic.Defaults.horizontalAxis,
+                            graphic.Defaults.verticalAxis,
+                          ],
+                          marks: [
+                            // 竖向柱状图：类目在 X 轴，数值在 Y 轴
+                            graphic.IntervalMark(
+                              position:
+                                  graphic.Varset('range') *
+                                  graphic.Varset('consPlot'),
+                              color: graphic.ColorEncode(
+                                value: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                          selections: {
+                            'barHover': graphic.PointSelection(
+                              on: {graphic.GestureType.hover},
+                              dim: graphic.Dim.x,
+                            ),
+                          },
+                          tooltip: graphic.TooltipGuide(
+                            selections: {'barHover'},
                           ),
-                        ],
-                        selections: {
-                          'barHover': graphic.PointSelection(
-                            on: {graphic.GestureType.hover},
-                            dim: graphic.Dim.x,
-                          ),
-                        },
-                        tooltip: graphic.TooltipGuide(selections: {'barHover'}),
-                      ),
-                    );
-                  })(),
+                        );
+                      }
+                      return Container(
+                        height: height,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.fromLTRB(
+                          8,
+                          8,
+                          8,
+                          height == null ? 8 : 24,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: content,
+                      );
+                    },
+                  ).padding(top: 4),
                 ],
               ),
               const SizedBox(height: 4),
