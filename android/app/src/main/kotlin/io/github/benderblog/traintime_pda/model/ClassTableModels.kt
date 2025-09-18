@@ -6,8 +6,8 @@
 
 package io.github.benderblog.traintime_pda.model
 
-import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 object ClassTableConstants {
@@ -15,7 +15,6 @@ object ClassTableConstants {
     const val USER_CLASS_FILE_NAME = "UserClass.json"
     const val EXAM_FILE_NAME = "exam.json"
     const val EXPERIMENT_FILE_NAME = "Experiment.json"
-    // TODO: Add experiment file
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
     // Be attention to the changes of SharedPreferencesPlugin.SHARED_PREFERENCES_NAME.
@@ -55,6 +54,7 @@ object ClassTableWidgetKeys {
     const val SP_FILE_NAME = "class_table_widget"
 }
 
+@Serializable
 data class TimeLineItem(
     val type: Source = Source.SCHOOL,
     val name: String,
@@ -77,10 +77,9 @@ data class TimeLineItem(
     }
 }
 
+@Serializable
 data class UserDefinedClassData(
-    @SerializedName("userDefinedDetail")
     val userDefinedDetail: List<ClassDetail>,
-    @SerializedName("timeArrangement")
     val timeArrangement: List<TimeArrangement>,
 ) {
     companion object {
@@ -90,20 +89,14 @@ data class UserDefinedClassData(
     }
 }
 
+@Serializable
 data class ClassTableData(
-    @SerializedName("semesterLength")
     val semesterLength: Int,
-    @SerializedName("semesterCode")
     val semesterCode: String,
-    @SerializedName("termStartDay")
     val termStartDay: String,
-    @SerializedName("classDetail")
     val classDetail: List<ClassDetail>,
-    @SerializedName("userDefinedDetail")
     val userDefinedDetail: List<ClassDetail>,
-    @SerializedName("notArranged")
     val notArranged: List<NotArrangedClassDetail>,
-    @SerializedName("timeArrangement")
     val timeArrangement: List<TimeArrangement>,
 ) {
     companion object {
@@ -123,58 +116,50 @@ data class ClassTableData(
         }
 }
 
+@Serializable
 data class ClassDetail(
-    @SerializedName("name")
     val name: String,
-    @SerializedName("code")
     val code: String?,
-    @SerializedName("number")
     val number: String?
 )
 
 //just a stub (It is useless for class table.)
 class NotArrangedClassDetail
 
+@Serializable
 enum class Source(val rawValue: String) {
-    @SerializedName("empty")
+    @SerialName("empty")
     EMPTY("empty"),
 
-    @SerializedName("school")
+    @SerialName("school")
     SCHOOL("school"),
 
-    @SerializedName("experiment")
+    @SerialName("experiment")
     EXPERIMENT("experiment"),
 
-    @SerializedName("exam")
+    @SerialName("exam")
     EXAM("exam"),
 
-    @SerializedName("user")
+    @SerialName("user")
     USER("user"),
 }
 
+@Serializable
 data class TimeArrangement(
-    @SerializedName("index")
     val index: Int,
-    @SerializedName("week_list")
     val weekList: List<Boolean>,
-    @SerializedName("teacher")
     val teacher: String?,
-    @SerializedName("day")
     val day: Int,
-    @SerializedName("start")
     val start: Int,
-    @SerializedName("stop")
     val stop: Int,
-    @SerializedName("source")
     val source: Source,
-    @SerializedName("classroom")
     val classroom: String?,
 ) {
     val step: Int = stop - start
 }
 
+@Serializable
 data class ExamData(
-    @SerializedName("subject")
     val subject: List<Subject>
 ) {
     companion object {
@@ -182,18 +167,13 @@ data class ExamData(
     }
 }
 
+@Serializable
 data class Subject(
-    @SerializedName("subject")
     val subject: String,
-    @SerializedName("typeStr")
     val typeStr: String,
-    @SerializedName("startTimeStr")
     val startTimeStr: String,
-    @SerializedName("endTimeStr")
     val endTimeStr: String,
-    @SerializedName("place")
     val place: String,
-    @SerializedName("seat")
     val seat: String,
 )
 
@@ -211,20 +191,16 @@ val Subject.endTime: LocalDateTime?
         null
     }
 
+@Serializable
 data class ExperimentData(
-    @SerializedName("name")
     val name: String,
-    @SerializedName("classroom")
     val classroom: String,
-    @SerializedName("date")
     val date: String,
-    @SerializedName("timeStr")
     val timeStr: String,
-    @SerializedName("teacher")
     val teacher: String,
 )
 
-class ExperimentDataListToken : TypeToken<List<ExperimentData>>()
+//class ExperimentDataListToken : TypeToken<List<ExperimentData>>()
 
 val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
     get() {

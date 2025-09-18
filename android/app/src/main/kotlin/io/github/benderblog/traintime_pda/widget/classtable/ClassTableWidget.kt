@@ -142,7 +142,7 @@ class ClassTableWidget : GlanceAppWidget() {
         val prefs = currentState.preferences
         isShowingToday = prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
         Log.d(tag,
-            "Will load day: "+
+            "Will load day: " +
                     "${day.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}, " +
                     "isShowingToday: $isShowingToday."
          )
@@ -169,7 +169,7 @@ class ClassTableWidget : GlanceAppWidget() {
             // 读取 ClassTableDataHolder 里面的 errorMessage
             if (errorMessage == null) {
                 errorMessage = dataProvider.getErrorMessage()
-                Log.e(tag, "Error during data loading prep: ${errorMessage}")
+                Log.e(tag, "Error during data loading prep: $errorMessage")
             }
 
             if (errorMessage != null) {
@@ -448,7 +448,7 @@ class ClassTableWidget : GlanceAppWidget() {
                 ),
                 TimeLineItem(
                     type = Source.EXPERIMENT,
-                    name = "一个超级没用但是必须要显示的实验课程哦",
+                    name = "关于对机器人进行调试和发电处理的实验课程",
                     teacher = "BenderBlog",
                     place = "B-102",
                     startTime = LocalDateTime.now(),
@@ -457,7 +457,7 @@ class ClassTableWidget : GlanceAppWidget() {
                 ),
                 TimeLineItem(
                     type = Source.SCHOOL,
-                    name = "二次元绘画课",
+                    name = "女装和化妆练习课",
                     teacher = "小赵",
                     place = "B-102",
                     startTime = LocalDateTime.now(),

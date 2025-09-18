@@ -7,7 +7,6 @@ package io.github.benderblog.traintime_pda.widget.classtable
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.google.gson.Gson
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,9 +32,6 @@ object ClassTableDataHolder {
         @Synchronized set
 
     @JvmStatic
-    val gson: Gson = Gson()
-
-    @JvmStatic
     var weekSwift: Long = 0
         @Synchronized set
 
@@ -57,6 +53,8 @@ object ClassTableDataHolder {
             experimentJsonData = loadFileContent(context, ClassTableConstants.EXPERIMENT_FILE_NAME)
             Log.d(TAG, "Experiment JSON loaded: ${experimentJsonData != null}")
 
+            Log.d(TAG, "Finished loading data from files.")
+
             Log.d(TAG, "Loading weekSwift from SharedPreferences...")
             try {
                 val configPrefs: SharedPreferences = context.getSharedPreferences(
@@ -74,8 +72,6 @@ object ClassTableDataHolder {
                 weekSwift = 0L
             }
             Log.d(TAG, "Finished loading weekSwift.")
-
-            Log.d(TAG, "Finished loading data from files.")
         }
     }
 

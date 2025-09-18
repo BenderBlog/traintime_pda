@@ -11,13 +11,13 @@ import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ExamData
 import io.github.benderblog.traintime_pda.model.ExperimentData
-import io.github.benderblog.traintime_pda.model.ExperimentDataListToken
 import io.github.benderblog.traintime_pda.model.Source
 import io.github.benderblog.traintime_pda.model.TimeLineItem
 import io.github.benderblog.traintime_pda.model.UserDefinedClassData
 import io.github.benderblog.traintime_pda.model.endTime
 import io.github.benderblog.traintime_pda.model.startTime
 import io.github.benderblog.traintime_pda.model.timeRange
+import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -98,7 +98,7 @@ class ClassTableWidgetDataProvider {
                 it.isNotBlank()
             }?.let {
                 try {
-                    ClassTableDataHolder.gson.fromJson(it, ClassTableData::class.java)
+                    Json.decodeFromString<ClassTableData>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse schoolClassJsonData", e)
                     null
@@ -110,7 +110,7 @@ class ClassTableWidgetDataProvider {
                 it.isNotBlank()
             }?.let {
                 try {
-                    ClassTableDataHolder.gson.fromJson(it, UserDefinedClassData::class.java)
+                    Json.decodeFromString<UserDefinedClassData>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse userDefinedClassJsonData", e)
                     null
@@ -122,7 +122,7 @@ class ClassTableWidgetDataProvider {
                 it.isNotBlank()
             }?.let {
                 try {
-                    ClassTableDataHolder.gson.fromJson(it, ExamData::class.java)
+                    Json.decodeFromString<ExamData>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse examJsonData", e)
                     null
@@ -134,10 +134,7 @@ class ClassTableWidgetDataProvider {
                 it.isNotBlank()
             }?.let {
                 try {
-                    ClassTableDataHolder.gson.fromJson<List<ExperimentData>>(
-                        it,
-                        ExperimentDataListToken().type
-                    )
+                    Json.decodeFromString<List<ExperimentData>>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse experimentJsonData", e)
                     null

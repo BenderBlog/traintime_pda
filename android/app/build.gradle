@@ -98,7 +98,6 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.20"
     implementation 'com.google.android.material:material:1.8.0'
-    implementation 'com.google.code.gson:gson:2.13.1'
 
     // Ref. https://github.com/tensorflow/flutter-tflite/issues/278
     implementation "org.tensorflow:tensorflow-lite-gpu-api:+"
@@ -109,6 +108,8 @@ dependencies {
     implementation 'androidx.glance:glance-appwidget:1.1.1'
     implementation 'androidx.glance:glance-appwidget-preview:1.1.1'
     implementation 'androidx.glance:glance-preview:1.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0'
 }
 
 ext.abiCodes = ["x86_64": 1, "armeabi-v7a": 2, "arm64-v8a": 3]
