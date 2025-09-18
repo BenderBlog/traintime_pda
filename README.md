@@ -67,7 +67,7 @@ Tools • Dart 3.9.2 • DevTools 2.48.0
 
 本代码库附带 XDYou 的图标和开屏图，该图标和开屏图仅作为标识 iOS 授权者编译版本而使用。
 
-编译产物中，Android 和其他平台产物称为 Traintime PDA，为自由软件。iOS 平台产物称为 XDYou，由于附带 XDYou 图标和开屏图，不允许非授权者以 XDYou 名义分发。
+编译产物中，Android 和 iOS 平台编译产物称为 XDYou，其中 Android 平台是自由软件，iOS 平台需要遵循[XDYou 软件最终用户许可协议](./docs/xdyou_eula.md)分发。App Store 上架时候需要填写 EULA ，因此不得不自行编写了个在 MPL 基础上基本无约束的 EULA 来应付了事。
 
 ## 感谢名单
 
