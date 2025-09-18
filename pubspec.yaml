@@ -35,7 +35,6 @@ dependencies:
   flex_color_scheme: ^8.0.1
   # Others
   url_launcher: ^6.1.6
-  #jiffy: ^6.3.2
   time: ^2.1.5
   auto_size_text: ^3.0.0
   restart_app: ^1.2.1
@@ -62,6 +61,7 @@ dependencies:
   content_resolver: ^0.3.3
   permission_handler: ^12.0.0+1
   result_dart: ^2.1.1
+  graphic: ^2.6.0
   # Output to system calendar
   device_calendar: ^4.3.3
   # Homepage Widget
