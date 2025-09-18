@@ -18,13 +18,17 @@ enum YardLocation { south, north }
 
 enum ApartmentLocation { south, north }
 
+/// A dialog used to input electricity account.
+/// Saving logic have implemented, if success, return true, else return false.
 class ElectricityAccountDialog extends StatefulWidget {
   final Future<String> Function()? onFetchFromNetwork;
+  final Future<void> Function(String) onSaveAccount;
   final String? initialAccountNumber;
 
   const ElectricityAccountDialog({
     super.key,
     this.onFetchFromNetwork,
+    required this.onSaveAccount,
     this.initialAccountNumber,
   });
 
@@ -45,7 +49,7 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
 
   CampusLocation _selectedCampus = CampusLocation.south;
   String _generatedAccountPreview = '';
-  InputMode _currentMode = InputMode.generator;
+  InputMode _currentMode = InputMode.manual;
   bool _isConfirming = false;
   bool _isFetching = false;
 
@@ -63,7 +67,7 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
     if (widget.initialAccountNumber != null &&
         widget.initialAccountNumber!.isNotEmpty) {
       _manualInputController.text = widget.initialAccountNumber!;
-      _currentMode = InputMode.manual;
+      //_currentMode = InputMode.manual;
     }
   }
 
@@ -185,9 +189,17 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
     }
   }
 
-  void _saveAccount(String accountNumber) {
+  Future<void> _saveAccount(String accountNumber) async {
     log.info("[ElectricityAccountDialog] Final account: $accountNumber");
-    Navigator.of(context).pop(accountNumber);
+    await widget.onSaveAccount(accountNumber);
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  void _quitWithoutSave() {
+    log.info("[ElectricityAccountDialog] User aborted.");
+    Navigator.of(context).pop<bool>(false);
   }
 
   String? _generateAccountNumber() {
@@ -546,7 +558,7 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
                         color: Colors.white,
                       ),
                     )
-                  : const Icon(Icons.sync_rounded),
+                  : const Icon(Icons.sync_rounded, color: Colors.white),
               label: Text(
                 FlutterI18n.translate(
                   context,
@@ -580,7 +592,7 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
 
     if (_isConfirming) {
       return ElevatedButton.icon(
-        icon: const Icon(Icons.check_circle_outline),
+        icon: const Icon(Icons.check_circle_outline, color: Colors.white),
         label: Text(
           FlutterI18n.translate(
             context,
@@ -624,22 +636,22 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
             SegmentedButton<InputMode>(
               segments: <ButtonSegment<InputMode>>[
                 ButtonSegment<InputMode>(
-                  value: InputMode.generator,
-                  icon: Icon(Icons.smart_toy_outlined),
-                  label: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.change_electricity_account.calculate",
-                    ),
-                  ),
-                ),
-                ButtonSegment<InputMode>(
                   value: InputMode.manual,
                   icon: Icon(Icons.edit_outlined),
                   label: Text(
                     FlutterI18n.translate(
                       context,
                       "setting.change_electricity_account.input",
+                    ),
+                  ),
+                ),
+                ButtonSegment<InputMode>(
+                  value: InputMode.generator,
+                  icon: Icon(Icons.smart_toy_outlined),
+                  label: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.change_electricity_account.calculate",
                     ),
                   ),
                 ),
@@ -729,7 +741,7 @@ class _ElectricityAccountDialogState extends State<ElectricityAccountDialog> {
               "setting.change_electricity_account.cancel",
             ),
           ),
-          onPressed: () => Navigator.of(context).pop(null),
+          onPressed: () => _quitWithoutSave(),
         ),
         _buildActionButton(),
       ],

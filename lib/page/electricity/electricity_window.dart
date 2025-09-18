@@ -7,12 +7,14 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
+    as electricity_session;
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 class ElectricityWindow extends StatelessWidget {
@@ -35,14 +37,19 @@ class ElectricityWindow extends StatelessWidget {
               context,
               electricityInfo.value.remain,
             ),
-            function: () {
-              if (prefs.getBool(prefs.Preference.role) &&
-                  prefs
-                      .getString(prefs.Preference.electricityAccount)
-                      .isEmpty) {
-                showDialog(
+            function: () async {
+              if (prefs
+                  .getString(prefs.Preference.electricityAccount)
+                  .isEmpty) {
+                bool? isSaved = await showDialog<bool?>(
                   context: context,
                   builder: (context) => ElectricityAccountDialog(
+                    onSaveAccount: (accountNumber) async {
+                      await prefs.setString(
+                        prefs.Preference.electricityAccount,
+                        accountNumber,
+                      );
+                    },
                     initialAccountNumber: prefs.getString(
                       prefs.Preference.electricityAccount,
                     ),
@@ -54,27 +61,34 @@ class ElectricityWindow extends StatelessWidget {
                       );
                     },
                   ),
-                ).then((value) {
-                  if (prefs
-                      .getString(prefs.Preference.electricityAccount)
-                      .isNotEmpty) {
-                    update(
-                      force: true,
-                      captchaFunction: (image) => showDialog<String>(
-                        context: context,
-                        builder: (context) => CaptchaInputDialog(image: image),
-                      ).then((value) => value ?? ""),
-                    );
-                  }
-                });
-              } else {
-                update(
-                  force: true,
-                  captchaFunction: (image) => showDialog<String>(
-                    context: context,
-                    builder: (context) => CaptchaInputDialog(image: image),
-                  ).then((value) => value ?? ""),
                 );
+
+                if (isSaved != true) {
+                  if (context.mounted) {
+                    showToast(
+                      context: context,
+                      msg: FlutterI18n.translate(
+                        context,
+                        "setting.change_electricity_account.no_setting",
+                      ),
+                    );
+                    return;
+                  }
+                }
+              }
+
+              electricity_session.ElectricitySession.clearElectricityHistory();
+
+              if (context.mounted) {
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "setting.change_electricity_account.successful_setting",
+                  ),
+                );
+                electricity_session.update(force: true);
+                return;
               }
             },
           ).center();

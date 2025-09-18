@@ -396,10 +396,16 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () {
-                    showDialog<String>(
+                    showDialog<bool>(
                       barrierDismissible: false,
                       context: context,
                       builder: (context) => ElectricityAccountDialog(
+                        onSaveAccount: (accountNumber) async {
+                          await preference.setString(
+                            preference.Preference.electricityAccount,
+                            accountNumber,
+                          );
+                        },
                         initialAccountNumber: preference.getString(
                           preference.Preference.electricityAccount,
                         ),
@@ -413,7 +419,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         },
                       ),
                     ).then((value) async {
-                      if (value == null || value.isEmpty) {
+                      if (value != true) {
                         if (context.mounted) {
                           showToast(
                             context: context,
@@ -425,11 +431,6 @@ class _SettingWindowState extends State<SettingWindow> {
                           return;
                         }
                       }
-
-                      await preference.setString(
-                        preference.Preference.electricityAccount,
-                        value!,
-                      );
 
                       electricity_session
                           .ElectricitySession.clearElectricityHistory();
