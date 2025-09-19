@@ -21,7 +21,7 @@ class ToggleDayAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        Log.d("[PDA ClassTableWidget][ToggleDayAction]", "ToggleDayAction triggered for $glanceId")
+        Log.i("[PDA ClassTableWidget][ToggleDayAction]", "ToggleDayAction triggered for $glanceId")
 
         updateAppWidgetState(
             context,
@@ -30,15 +30,15 @@ class ToggleDayAction : ActionCallback {
         ) { prefs ->
             val currentIsShowToday = prefs.preferences
                 .getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
-            Log.d("[PDA ClassTableWidget][ToggleDayAction]", "Current showToday value: $currentIsShowToday")
+            Log.i("[PDA ClassTableWidget][ToggleDayAction]", "Current showToday value: $currentIsShowToday")
 
             val newIsShowToday = !currentIsShowToday
-            Log.d("[PDA ClassTableWidget][ToggleDayAction]", "New showToday value: $newIsShowToday")
+            Log.i("[PDA ClassTableWidget][ToggleDayAction]", "New showToday value: $newIsShowToday")
 
             prefs.preferences.edit {
                 putBoolean(ClassTableWidgetKeys.SHOW_TODAY, newIsShowToday)
             }
-            Log.d("[PDA ClassTableWidget][ToggleDayAction]", "Set showToday value to: $newIsShowToday")
+            Log.i("[PDA ClassTableWidget][ToggleDayAction]", "Set showToday value to: $newIsShowToday")
 
             prefs
         }

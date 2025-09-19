@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_classtable_description">日程組件</string>
+    <string name="widget_classtable_date_loading">加載中……</string>
+    <string name="widget_classtable_title">XDYou 日程信息</string>
+    <string name="widget_classtable_no_arrangement">目前沒有安排</string>
+    <string name="classtable_day_switcher_decription">切換顯示日期</string>
+    <string name="widget_classtable_on_holiday">假期中</string>
+    <string name="widget_classtable_on_error">在 %1$s 遇到錯誤：%2$s</string>
+    <string name="widget_classtable_unknown_error">未知錯誤</string>
+    <string name="widget_classtable_load_data_error">%1$s 數據加載故障，%2$s</string>
+    <string name="widget_classtable_week_identifier">第 %1$d 周</string>
+    <string name="widget_classtable_calculate_index_error">計算 %1$s 處的索引時出現問題</string>
+    <string name="widget_classtable_parse_term_start_time_error">無法解析學期開始日期格式</string>
+</resources>

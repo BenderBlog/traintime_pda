@@ -11,24 +11,25 @@ import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 
 object ClassTableDataHolder {
 
     @JvmStatic
-    var schoolClassJsonData: String? = null
+    var schoolClassJsonData: Result<String?> = Result.success(null)
         @Synchronized set
 
     @JvmStatic
-    var userDefinedClassJsonData: String? = null
+    var userDefinedClassJsonData: Result<String?> = Result.success(null)
         @Synchronized set
 
     @JvmStatic
-    var examJsonData: String? = null
+    var examJsonData: Result<String?> = Result.success(null)
         @Synchronized set
 
     @JvmStatic
-    var experimentJsonData: String? = null
+    var experimentJsonData: Result<String?> = Result.success(null)
         @Synchronized set
 
     @JvmStatic
@@ -39,23 +40,58 @@ object ClassTableDataHolder {
 
     suspend fun loadData(context: Context) {
         withContext(Dispatchers.IO) {
-            Log.d(TAG, "Starting to load data from files...")
+            Log.i(TAG, "Starting to load data from files...")
 
-            schoolClassJsonData = loadFileContent(context, ClassTableConstants.CLASS_FILE_NAME)
-            Log.d(TAG, "School Class JSON loaded: ${schoolClassJsonData != null}")
+            schoolClassJsonData = loadFileContent(
+                context,
+                ClassTableConstants.CLASS_FILE_NAME
+            )
+            Log.i(
+                TAG,
+                "School Class JSON loaded, isSuccess: ${schoolClassJsonData.isSuccess}, " +
+                        "length: ${schoolClassJsonData.getOrNull()?.length ?: 0}"
+            )
 
-            examJsonData = loadFileContent(context, ClassTableConstants.EXAM_FILE_NAME)
-            Log.d(TAG, "Exam JSON loaded: ${examJsonData != null}")
 
-            userDefinedClassJsonData = loadFileContent(context, ClassTableConstants.USER_CLASS_FILE_NAME)
-            Log.d(TAG, "User Class JSON loaded: ${userDefinedClassJsonData != null}")
+            examJsonData = loadFileContent(
+                context,
+                ClassTableConstants.EXAM_FILE_NAME
+            )
+            Log.i(
+                TAG,
+                "Exam JSON loaded, isSuccess: ${examJsonData.isSuccess}, " +
+                        "length: ${examJsonData.getOrNull()?.length ?: 0}"
+            )
 
-            experimentJsonData = loadFileContent(context, ClassTableConstants.EXPERIMENT_FILE_NAME)
-            Log.d(TAG, "Experiment JSON loaded: ${experimentJsonData != null}")
+            userDefinedClassJsonData = loadFileContent(
+                context,
+                ClassTableConstants.USER_CLASS_FILE_NAME
+            )
+            Log.i(
+                TAG,
+                "User Class JSON loaded, isSuccess: ${userDefinedClassJsonData.isSuccess} " +
+                        "length: ${userDefinedClassJsonData.getOrNull()?.length ?: 0}"
+            )
 
-            Log.d(TAG, "Finished loading data from files.")
+            loadFileContent(context, ClassTableConstants.EXPERIMENT_FILE_NAME).fold(
+                onSuccess = { experimentJsonData = Result.success(it) },
+                onFailure = {
+                    experimentJsonData = if (it is FileNotFoundException) {
+                        Result.success(null)
+                    } else {
+                        Result.failure(it)
+                    }
+                }
+            )
+            Log.i(
+                TAG,
+                "Experiment JSON loaded, isSuccess: ${experimentJsonData.isSuccess} " +
+                    "length: ${experimentJsonData.getOrNull()?.length ?: 0}"
+            )
 
-            Log.d(TAG, "Loading weekSwift from SharedPreferences...")
+            Log.i(TAG, "Finished loading data from files.")
+
+            Log.i(TAG, "Loading weekSwift from SharedPreferences...")
             try {
                 val configPrefs: SharedPreferences = context.getSharedPreferences(
                     ClassTableConstants.CONFIG_SHARED_PREFS_NAME,
@@ -66,30 +102,35 @@ object ClassTableDataHolder {
                     0L
                 )
                 weekSwift = loadedWeekSwift
-                Log.d(TAG, "Loaded weekSwift from SharedPreferences: $weekSwift")
+                Log.i(TAG, "Loaded weekSwift from SharedPreferences: $weekSwift")
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading weekSwift from SharedPreferences. Using default value 0L.", e)
                 weekSwift = 0L
             }
-            Log.d(TAG, "Finished loading weekSwift.")
+            Log.i(TAG, "Finished loading weekSwift.")
         }
     }
 
-    private fun loadFileContent(context: Context, fileName: String): String? {
+    private fun loadFileContent(context: Context, fileName: String): Result<String> {
         return try {
             val file = File(context.filesDir, fileName)
-            if (file.exists() && file.canRead()) {
-                file.readText()
-            } else {
-                Log.w(TAG, "File '$fileName' does not exist or cannot be read.")
-                null
+            if (!file.exists()) {
+               return Result.failure(FileNotFoundException())
             }
+            if (!file.canRead()) {
+                return Result.failure(IOException(
+                    "File '$fileName' cannot be read."
+                ))
+            }
+            val text = file.readText()
+            Log.i(TAG, "Text length: ${text.length}")
+            Result.success(text)
         } catch (e: IOException) {
             Log.e(TAG, "IOException while reading file '$fileName'", e)
-            null
+            Result.failure(e)
         } catch (e: Exception) {
             Log.e(TAG, "Unexpected error while reading file '$fileName'", e)
-            null
+            Result.failure(e)
         }
     }
 }

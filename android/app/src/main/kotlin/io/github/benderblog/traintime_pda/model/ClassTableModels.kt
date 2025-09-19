@@ -6,6 +6,7 @@
 
 package io.github.benderblog.traintime_pda.model
 
+import android.util.Log
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -105,11 +106,12 @@ data class ClassTableData(
 ) {
     companion object {
         val EMPTY = ClassTableData(
-            0, "", "2024-1-1",
+            0, "", "2024-01-01",
             emptyList(), emptyList(), emptyList(),
         )
     }
 
+    // Should never go wrong.
     fun getClassName(arrangement: TimeArrangement): String =
         when (arrangement.source) {
             Source.SCHOOL -> classDetail[arrangement.index].name
@@ -183,18 +185,20 @@ data class Subject(
     val seat: String?,
 )
 
-val Subject.startTime: LocalDateTime?
+val Subject.startTime: Result<LocalDateTime>
     get() = try {
-        LocalDateTime.parse(startTimeStr)
+        Result.success(LocalDateTime.parse(startTimeStr))
     } catch (e: Exception) {
-        null
+        Log.e("[PDA ClassTableWidget][Subject]", "Failed to parse startTimeStr: $startTimeStr", e)
+        Result.failure(e)
     }
 
-val Subject.endTime: LocalDateTime?
+val Subject.endTime: Result<LocalDateTime>
     get() = try {
-        LocalDateTime.parse(endTimeStr)
+        Result.success(LocalDateTime.parse(endTimeStr))
     } catch (e: Exception) {
-        null
+        Log.e("[PDA ClassTableWidget][Subject]", "Failed to parse endTimeStr: $endTimeStr", e)
+        Result.failure(e)
     }
 
 @Serializable
@@ -209,7 +213,7 @@ data class ExperimentData(
 val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
     get() {
         /// Return is month/day/year , hope not change...
-        val dateNums: List<Int> = date.split('/').map { it ->
+        val dateNumbers: List<Int> = date.split('/').map { it ->
             it.toInt()
         }
 
@@ -219,28 +223,28 @@ val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
 
         if (timeStr.contains("15")) {
             startTime = LocalDateTime.of(
-                dateNums[2],
-                dateNums[0],
-                dateNums[1],
+                dateNumbers[2],
+                dateNumbers[0],
+                dateNumbers[1],
                 15,55,0,
             )
             stopTime = LocalDateTime.of(
-                dateNums[2],
-                dateNums[0],
-                dateNums[1],
+                dateNumbers[2],
+                dateNumbers[0],
+                dateNumbers[1],
                 18,10,0,
             )
         } else {
             startTime = LocalDateTime.of(
-                dateNums[2],
-                dateNums[0],
-                dateNums[1],
+                dateNumbers[2],
+                dateNumbers[0],
+                dateNumbers[1],
                 18,30,0,
             )
             stopTime = LocalDateTime.of(
-                dateNums[2],
-                dateNums[0],
-                dateNums[1],
+                dateNumbers[2],
+                dateNumbers[0],
+                dateNumbers[1],
                 20,45,0,
             )
         }

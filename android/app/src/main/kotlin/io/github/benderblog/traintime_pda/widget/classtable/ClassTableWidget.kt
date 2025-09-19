@@ -101,20 +101,20 @@ class ClassTableWidget : GlanceAppWidget() {
     }
 
     override suspend fun onDelete(context: Context, glanceId: GlanceId) {
-        Log.d(tag, "onDelete() triggered on $glanceId.")
+        Log.i(tag, "onDelete() triggered on $glanceId.")
         super.onDelete(context, glanceId)
         try {
             updateAppWidgetState(context, HomeWidgetGlanceStateDefinition(), glanceId) { prefs ->
                 prefs.preferences.edit {
                     remove(ClassTableWidgetKeys.SHOW_TODAY)
                 }
-                Log.d(tag, "Key ${ClassTableWidgetKeys.SHOW_TODAY} terminated.")
+                Log.i(tag, "Key ${ClassTableWidgetKeys.SHOW_TODAY} terminated.")
                 prefs
             }
         } catch (e: Exception) {
             Log.e(tag, "Error updating state in onDelete for $glanceId: ${e.message}", e)
         }
-        Log.d(tag, "Goodbye widget $glanceId.")
+        Log.i(tag, "Goodbye widget $glanceId.")
     }
 
     @Composable
@@ -123,7 +123,7 @@ class ClassTableWidget : GlanceAppWidget() {
         val context = LocalContext.current
         val glanceId = LocalGlanceId.current
         val dataProvider = remember { ClassTableWidgetDataProvider() }
-        Log.d(tag, "Content triggered.")
+        Log.i(tag, "Content triggered.")
 
         // 组件状态
         var currentWeekIndex by remember { mutableIntStateOf(-1) }
@@ -133,7 +133,7 @@ class ClassTableWidget : GlanceAppWidget() {
         var isShowingToday by remember { mutableStateOf(false) }
         var widgetState by remember { mutableStateOf(ClassTableWidgetLoadState.LOADING) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
-        Log.d(tag, "Content state initialized.")
+        Log.i(tag, "Content state initialized.")
 
         // 获取当前日期
         val day = LocalDateTime.now()
@@ -141,7 +141,7 @@ class ClassTableWidget : GlanceAppWidget() {
         // 加载显示今天还是明天
         val prefs = currentState.preferences
         isShowingToday = prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
-        Log.d(tag,
+        Log.i(tag,
             "Will load day: " +
                     "${day.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}, " +
                     "isShowingToday: $isShowingToday."
@@ -150,7 +150,7 @@ class ClassTableWidget : GlanceAppWidget() {
         LaunchedEffect(key1 = glanceId) {
             widgetState = ClassTableWidgetLoadState.LOADING
             errorMessage = null
-            Log.d(tag, "LaunchedEffect triggered.")
+            Log.i(tag, "LaunchedEffect triggered.")
 
             // 加载数据
             withContext(Dispatchers.IO) {
@@ -161,7 +161,8 @@ class ClassTableWidget : GlanceAppWidget() {
                     Log.e(tag, "Error during data loading prep: ${e.message}", e)
                     errorMessage = context.getString(
                         R.string.widget_classtable_load_data_error,
-                        e.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+                        "data loading prep",
+                        e.message ?: context.getString(R.string.widget_classtable_unknown_error)
                     )
                 }
             }
@@ -186,7 +187,7 @@ class ClassTableWidget : GlanceAppWidget() {
             tomorrowWeekIndex = dataProvider.getTomorrowWeekIndex()
 
             widgetState = ClassTableWidgetLoadState.FINISHED
-            Log.d(tag, "LaunchedEffect finished.")
+            Log.i(tag, "LaunchedEffect finished.")
         }
 
         ClassTableWidgetGlanceView(
@@ -315,12 +316,9 @@ class ClassTableWidget : GlanceAppWidget() {
                             ClassTableWidgetLoadState.FINISHED ->
                                 context.getString(R.string.widget_classtable_no_arrangement)
                             ClassTableWidgetLoadState.ERROR ->
-                                context.getString(
-                                    R.string.widget_classtable_on_error,
-                                    errorMessage ?: context.getString(
+                                errorMessage ?: context.getString(
                                         R.string.widget_classtable_unknown_error
                                     )
-                                )
                         }
 
                         Column(

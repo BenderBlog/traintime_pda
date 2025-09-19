@@ -41,7 +41,7 @@ class ClassTableWidgetDataProvider {
     private val tag = "[PDA ClassTableWidget][ClassTableWidgetDataProvider]"
 
     fun reloadData(currentTime: LocalDateTime, context: Context) {
-        Log.d(tag, "reloadData() called.")
+        Log.i(tag, "reloadData() called.")
         todayArrangements.clear()
         tomorrowArrangements.clear()
         errorMessage = null
@@ -53,7 +53,7 @@ class ClassTableWidgetDataProvider {
             loadBasicConfig(currentTime, context)
 
             if (curWeekIndex >= 0 && todayIndex >= 0) {
-                Log.d(tag, "Loading data for today (Week: $curWeekIndex, Day: $todayIndex)")
+                Log.i(tag, "Loading data for today (Week: $curWeekIndex, Day: $todayIndex)")
                 loadOneDayClass(curWeekIndex, todayIndex, todayArrangements)
                 loadOneDayExam(LocalDateTime.now(), todayArrangements)
                 loadOneDayExperiment(LocalDateTime.now(), todayArrangements)
@@ -64,7 +64,7 @@ class ClassTableWidgetDataProvider {
                     tomorrowDayIndex = 1
                     tomorrowWeekIndex += 1
                 }
-                Log.d(tag, "Loading data for tomorrow (Week: $tomorrowWeekIndex, Day: $tomorrowDayIndex)")
+                Log.i(tag, "Loading data for tomorrow (Week: $tomorrowWeekIndex, Day: $tomorrowDayIndex)")
 
                 loadOneDayClass(tomorrowWeekIndex, tomorrowDayIndex, tomorrowArrangements)
                 loadOneDayExam(LocalDateTime.now().plusDays(1), tomorrowArrangements)
@@ -73,15 +73,18 @@ class ClassTableWidgetDataProvider {
                 sortArrangements()
             }
         } catch (e: Exception) {
-            Log.e("ClassDataProvider", "Error during reloadData", e)
-            errorMessage = e.localizedMessage ?: context.getString(
-                R.string.widget_classtable_unknown_error
+            Log.e(tag, "Error during reloadData", e)
+            val specificError = e.message ?: context.getString(R.string.widget_classtable_unknown_error)
+            errorMessage = context.getString(
+                R.string.widget_classtable_on_error,
+                "reloadData",
+                specificError
             )
             todayArrangements.clear()
             tomorrowArrangements.clear()
         }
 
-        Log.d("ClassDataProvider", "reloadData() finished. Error: $errorMessage")
+        Log.i(tag, "reloadData() finished. Error: $errorMessage")
     }
 
     fun getTomorrowItems(): List<TimeLineItem> = tomorrowArrangements
@@ -91,63 +94,133 @@ class ClassTableWidgetDataProvider {
     fun getErrorMessage(): String? = errorMessage
 
     private fun loadBasicConfig(currentTime: LocalDateTime, context: Context) {
+        val lenientJson = Json { ignoreUnknownKeys = true }
         try {
-            Log.d(tag, "loadBasicConfig() triggered")
-            // initialize data
-            val schoolClassTableData = ClassTableDataHolder.schoolClassJsonData?.takeIf {
+            Log.i(tag, "loadBasicConfig() triggered")
+
+            val schoolClassTableData = ClassTableDataHolder.schoolClassJsonData.getOrElse {
+                Log.e(tag, "Failed to load schoolClassJsonData", it)
+                errorMessage = context.getString(
+                    R.string.widget_classtable_on_error,
+                    "loading SchoolJsonData",
+                    it.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+                )
+                return
+            }?.takeIf {
+                Log.i(tag, "schoolClassJsonData is not blank: ${it.isNotBlank()}")
                 it.isNotBlank()
             }?.let {
                 try {
-                    Json.decodeFromString<ClassTableData>(it)
+                    lenientJson.decodeFromString<ClassTableData>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse schoolClassJsonData", e)
-                    null
+                    errorMessage = context.getString(
+                        R.string.widget_classtable_on_error,
+                        "parsing SchoolJsonData",
+                        e.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                    )
+                    return
                 }
             } ?: ClassTableData.EMPTY
-            Log.d(tag, "schoolClassJsonData loaded.")
+            Log.i(
+                tag,
+                "schoolClassTableData loaded, " +
+                        "semester code: ${schoolClassTableData.semesterCode}, " +
+                        "begin time: ${schoolClassTableData.termStartDay}, " +
+                        "semester length: ${schoolClassTableData.semesterLength}, " +
+                        "class detail length: ${schoolClassTableData.classDetail.size}, " +
+                        "time arrangement length: ${schoolClassTableData.timeArrangement.size}"
+            )
 
-            val userDefinedClassData = ClassTableDataHolder.userDefinedClassJsonData?.takeIf {
+            val userDefinedClassData = ClassTableDataHolder.userDefinedClassJsonData.getOrElse {
+                Log.e(tag, "Failed to load userDefinedClassJsonData", it)
+                errorMessage = context.getString(
+                    R.string.widget_classtable_on_error,
+                    "loading UserDefinedClassJsonData",
+                    it.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                )
+                return
+            }?.takeIf {
+                Log.i(tag, "userDefinedClassJsonData is not blank: ${it.isNotBlank()}")
                 it.isNotBlank()
             }?.let {
                 try {
-                    Json.decodeFromString<UserDefinedClassData>(it)
+                    lenientJson.decodeFromString<UserDefinedClassData>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse userDefinedClassJsonData", e)
-                    null
+                    errorMessage = context.getString(
+                        R.string.widget_classtable_on_error,
+                        "parsing UserDefinedClassJsonData",
+                        e.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                    )
+                    return
                 }
             } ?: UserDefinedClassData.EMPTY
-            Log.d(tag, "userDefinedClassJsonData loaded.")
+            Log.i(
+                tag,
+                "userDefinedClassJsonData loaded, " +
+                        "userDefinedDetail length: ${userDefinedClassData.userDefinedDetail.size}, " +
+                        "time arrangement length: ${userDefinedClassData.timeArrangement.size}"
+            )
 
-            examData = ClassTableDataHolder.examJsonData?.takeIf {
+            examData = ClassTableDataHolder.examJsonData.getOrElse {
+                Log.e(tag, "Failed to load examJsonData", it)
+                errorMessage = context.getString(
+                    R.string.widget_classtable_on_error,
+                    "loading ExamJsonData",
+                    it.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                )
+                return
+            }?.takeIf {
+                Log.i(tag, "examJsonData is not blank: ${it.isNotBlank()}")
                 it.isNotBlank()
             }?.let {
                 try {
-                    Json.decodeFromString<ExamData>(it)
+                    lenientJson.decodeFromString<ExamData>(it)
                 } catch (e: Exception) {
                     Log.e(tag, "Failed to parse examJsonData", e)
-                    null
+                    errorMessage = context.getString(
+                        R.string.widget_classtable_on_error,
+                        "parsing ExamJsonData",
+                        e.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                    )
+                    return
                 }
             } ?: ExamData.EMPTY
-            Log.d(tag, "examJsonData loaded.")
+            Log.i(tag, "examJsonData loaded, subject length: ${examData.subject.size}")
 
-            experimentData = ClassTableDataHolder.experimentJsonData?.takeIf {
+            experimentData = ClassTableDataHolder.experimentJsonData.getOrElse {
+                Log.e(tag, "Failed to load ExperimentData", it)
+                errorMessage = context.getString(
+                    R.string.widget_classtable_on_error,
+                    "loading ExperimentData",
+                    it.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                )
+                return
+            }?.takeIf {
+                Log.i(tag, "experimentJsonData is not blank: ${it.isNotBlank()}")
                 it.isNotBlank()
             }?.let {
                 try {
-                    Json.decodeFromString<List<ExperimentData>>(it)
+                    lenientJson.decodeFromString<List<ExperimentData>>(it)
                 } catch (e: Exception) {
-                    Log.e(tag, "Failed to parse experimentJsonData", e)
-                    null
+                    Log.e(tag, "Failed to parse ExperimentData", e)
+                    errorMessage = context.getString(
+                        R.string.widget_classtable_on_error,
+                        "parsing ExperimentData",
+                        e.message ?: context.getString(R.string.widget_classtable_unknown_error)
+                    )
+                    return
                 }
             } ?: emptyList()
-            Log.d(tag, "experimentJsonData loaded.")
+            Log.i(tag, "experimentJsonData loaded, data length: ${experimentData.size}")
 
             // merge class table with user added class
             classTableData = schoolClassTableData.copy(
                 userDefinedDetail = userDefinedClassData.userDefinedDetail,
                 timeArrangement = schoolClassTableData.timeArrangement + userDefinedClassData.timeArrangement,
             )
-            Log.d(tag, "Class table merged.")
+            Log.i(tag, "Class table merged.")
 
             // calculate day index of today
             val termStartDayStr = classTableData.termStartDay
@@ -160,13 +233,13 @@ class ClassTableWidgetDataProvider {
                 }
                 return
             }
-            Log.d(tag, "Term start day: $termStartDayStr")
+            Log.i(tag, "Term start day: $termStartDayStr")
 
             try {
                 val weekOffset = ClassTableDataHolder.weekSwift
                 val dateFormat = DateTimeFormatter.ofPattern(ClassTableConstants.DATE_FORMAT_STR, Locale.getDefault())
                 val startDay = LocalDateTime.parse(termStartDayStr, dateFormat).plusWeeks(weekOffset)
-                Log.d(tag, "Effective start day (after weekSwift $weekOffset): $startDay")
+                Log.i(tag, "Effective start day (after weekSwift $weekOffset): $startDay")
 
                 var deltaDays = ChronoUnit.DAYS.between(startDay, currentTime)
                 if (deltaDays < 0) {
@@ -181,12 +254,12 @@ class ClassTableWidgetDataProvider {
 
                 curWeekIndex = (deltaDays / 7).toInt()
                 todayIndex = currentTime.dayOfWeek.value
-                Log.d(tag, "Calculation finished. curWeekIndex: $curWeekIndex, todayIndex: $todayIndex")
+                Log.i(tag, "Calculation finished. curWeekIndex: $curWeekIndex, todayIndex: $todayIndex")
             } catch (e: Exception) {
                 Log.e(tag, "Error calculating date indices", e)
                 errorMessage = context.getString(
                     R.string.widget_classtable_calculate_index_error,
-                    e.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+                    e.message ?: context.getString(R.string.widget_classtable_unknown_error)
                 )
                 curWeekIndex = -1
                 todayIndex = -1
@@ -202,10 +275,10 @@ class ClassTableWidgetDataProvider {
                 R.string.widget_classtable_parse_term_start_time_error,
             )
         } catch (e: Exception) {
-            Log.e(tag, "Error calculating date indices", e)
+            Log.e(tag, "Error calculating date indices (outer catch)", e)
             errorMessage = context.getString(
                 R.string.widget_classtable_calculate_index_error,
-                e.localizedMessage ?: context.getString(R.string.widget_classtable_unknown_error)
+                e.message ?: context.getString(R.string.widget_classtable_unknown_error)
             )
         }
     }
@@ -254,15 +327,16 @@ class ClassTableWidgetDataProvider {
     private fun loadOneDayExam(
         date: LocalDateTime,
         arrangements: MutableList<TimeLineItem>
-    ) {
+    ) : Result<Unit> {
         val curYear: Int = date.year
         val curMonth: Int = date.monthValue
         val curDay: Int = date.dayOfMonth
         for (subject in examData.subject) {
-            val startTime = subject.startTime
-            val endTime = subject.endTime
-            if (startTime == null || endTime == null) {
-                continue
+            val startTime = subject.startTime.getOrElse {
+                return Result.failure(it)
+            }
+            val endTime = subject.endTime.getOrElse {
+                return Result.failure(it)
             }
             if (startTime.year == curYear
                 && startTime.monthValue == curMonth
@@ -281,6 +355,7 @@ class ClassTableWidgetDataProvider {
                 )
             }
         }
+        return Result.success(Unit)
     }
 
     private fun loadOneDayExperiment(
@@ -312,12 +387,7 @@ class ClassTableWidgetDataProvider {
     }
 
     private fun sortArrangements() {
-        fun MutableList<TimeLineItem>.sortByStartTime() {
-            this.sortBy {
-                it.startTime
-            }
-        }
-        todayArrangements.sortByStartTime()
-        tomorrowArrangements.sortByStartTime()
+        todayArrangements.sortBy { it.startTime }
+        tomorrowArrangements.sortBy { it.startTime }
     }
 }
