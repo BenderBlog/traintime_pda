@@ -272,7 +272,7 @@ class ClassTableWidgetDataProvider {
                     TimeLineItem(
                         type = Source.EXAM,
                         name = subject.subject,
-                        teacher = subject.seat,
+                        teacher = subject.seat ?: "未知",
                         place = subject.place,
                         startTime = startTime,
                         endTime = endTime,

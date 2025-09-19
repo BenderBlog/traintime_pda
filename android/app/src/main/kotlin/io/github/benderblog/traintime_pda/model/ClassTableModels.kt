@@ -6,8 +6,10 @@
 
 package io.github.benderblog.traintime_pda.model
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import java.time.LocalDateTime
 
 object ClassTableConstants {
@@ -51,10 +53,9 @@ object ClassTableConstants {
 
 object ClassTableWidgetKeys {
     const val SHOW_TODAY = "show_today"
-    const val SP_FILE_NAME = "class_table_widget"
+    //const val SP_FILE_NAME = "class_table_widget"
 }
 
-@Serializable
 data class TimeLineItem(
     val type: Source = Source.SCHOOL,
     val name: String,
@@ -89,20 +90,23 @@ data class UserDefinedClassData(
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonIgnoreUnknownKeys
 data class ClassTableData(
     val semesterLength: Int,
     val semesterCode: String,
     val termStartDay: String,
     val classDetail: List<ClassDetail>,
     val userDefinedDetail: List<ClassDetail>,
-    val notArranged: List<NotArrangedClassDetail>,
     val timeArrangement: List<TimeArrangement>,
+    // ClassChanges has been omitted here since calculated in time main app.
+    // NotArrangedClassDetail has been omitted here since useless.
 ) {
     companion object {
         val EMPTY = ClassTableData(
             0, "", "2024-1-1",
-            emptyList(), emptyList(), emptyList(), emptyList(),
+            emptyList(), emptyList(), emptyList(),
         )
     }
 
@@ -123,58 +127,60 @@ data class ClassDetail(
     val number: String?
 )
 
-//just a stub (It is useless for class table.)
-class NotArrangedClassDetail
-
 @Serializable
-enum class Source(val rawValue: String) {
+enum class Source {
     @SerialName("empty")
-    EMPTY("empty"),
+    EMPTY,
 
     @SerialName("school")
-    SCHOOL("school"),
+    SCHOOL,
 
     @SerialName("experiment")
-    EXPERIMENT("experiment"),
+    EXPERIMENT,
 
     @SerialName("exam")
-    EXAM("exam"),
+    EXAM,
 
     @SerialName("user")
-    USER("user"),
+    USER,
 }
 
 @Serializable
 data class TimeArrangement(
     val index: Int,
+    @SerialName("week_list")
     val weekList: List<Boolean>,
     val teacher: String?,
     val day: Int,
     val start: Int,
     val stop: Int,
     val source: Source,
-    val classroom: String?,
-) {
-    val step: Int = stop - start
-}
+    val classroom: String? = null,
+)
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonIgnoreUnknownKeys
 data class ExamData(
     val subject: List<Subject>
+    // ToBeArranged has been omitted here since useless here.
 ) {
     companion object {
         val EMPTY = ExamData(emptyList())
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonIgnoreUnknownKeys
 data class Subject(
     val subject: String,
     val typeStr: String,
+    // time has been omitted here since calculated by main app.
     val startTimeStr: String,
     val endTimeStr: String,
     val place: String,
-    val seat: String,
+    val seat: String?,
 )
 
 val Subject.startTime: LocalDateTime?
@@ -199,8 +205,6 @@ data class ExperimentData(
     val timeStr: String,
     val teacher: String,
 )
-
-//class ExperimentDataListToken : TypeToken<List<ExperimentData>>()
 
 val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
     get() {
