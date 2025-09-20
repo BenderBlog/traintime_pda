@@ -55,7 +55,7 @@ class _BothSideSheetState extends State<BothSideSheet> {
     super.didChangeDependencies();
   }
 
-  BorderRadius radius(context) => BorderRadius.only(
+  BorderRadius radius(BuildContext context) => BorderRadius.only(
     topLeft: const Radius.circular(16),
     bottomLeft: !(MediaQuery.of(context).size.width < widget.divider)
         ? const Radius.circular(16)

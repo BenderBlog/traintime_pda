@@ -237,7 +237,7 @@ class _AboutPageState extends State<AboutPage> {
     ),
   ];
 
-  Widget _title(context) {
+  Widget _title(BuildContext context) {
     return [
           const AppIconWidget(),
           const Divider(color: Colors.transparent),
@@ -292,7 +292,7 @@ class _AboutPageState extends State<AboutPage> {
     ).center(),
   );
 
-  Widget _moreList(context) => ReXCard(
+  Widget _moreList(BuildContext context) => ReXCard(
     title: Text(
       FlutterI18n.translate(context, "setting.about_page.title"),
     ).padding(bottom: 8).center(),
@@ -347,7 +347,7 @@ class _AboutPageState extends State<AboutPage> {
     ].toList().toColumn(),
   );
 
-  Widget _versionHint(context) => ReXCard(
+  Widget _versionHint(BuildContext context) => ReXCard(
     title: Text(
       FlutterI18n.translate(context, "setting.easter_egg_page"),
     ).padding(bottom: 8).center(),

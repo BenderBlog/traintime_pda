@@ -28,14 +28,14 @@ class EmptyClassroomSession extends EhallSession {
     "builder": "equal",
   };
 
-  Map<String, dynamic> weekCountSetting(weekCount) => {
+  Map<String, dynamic> weekCountSetting(dynamic weekCount) => {
     "name": "ZC",
     "value": weekCount,
     "linkOpt": "AND",
     "builder": "equal",
   };
 
-  Map<String, dynamic> weekDaySetting(weekDay) => {
+  Map<String, dynamic> weekDaySetting(dynamic weekDay) => {
     "name": "ZC",
     "value": weekDay,
     "linkOpt": "AND",

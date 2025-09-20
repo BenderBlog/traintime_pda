@@ -185,7 +185,7 @@ class ScoreState extends ChangeNotifier {
 
   String get unPassed => unPassedSet.isEmpty ? "" : unPassedSet.join(",");
 
-  String bottomInfo(context) => FlutterI18n.translate(
+  String bottomInfo(BuildContext context) => FlutterI18n.translate(
     context,
     "score.summary",
     translationParams: {

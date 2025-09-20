@@ -90,7 +90,7 @@ class _MainPageState extends State<MainPage> {
     return "homepage.time_string.midnight";
   }
 
-  TextStyle textStyle(context) => TextStyle(
+  TextStyle textStyle(BuildContext context) => TextStyle(
     fontSize: 16,
     color: Theme.of(context).colorScheme.primary,
     fontWeight: FontWeight.w700,

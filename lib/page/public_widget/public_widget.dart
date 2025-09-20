@@ -9,8 +9,8 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 /// Check the width
-bool isPhone(context) => MediaQuery.of(context).size.width < 480;
-bool isDesktop(context) => MediaQuery.of(context).size.width > 840;
+bool isPhone(BuildContext context) => MediaQuery.of(context).size.width < 480;
+bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width > 840;
 const double sheetMaxWidth = 480;
 
 /// Use it to show the small items.

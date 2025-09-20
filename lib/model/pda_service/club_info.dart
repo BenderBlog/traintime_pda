@@ -18,9 +18,9 @@ enum ClubType {
   all, // 所有
 }
 
-String qqFromJson(data) => data.toString();
+String qqFromJson(String data) => data.toString();
 
-List<ClubType> toTypeList(type) =>
+List<ClubType> toTypeList(String type) =>
     type.toString().split('|').map<ClubType>((value) {
       if (value == "tech") {
         return ClubType.tech;
@@ -56,7 +56,7 @@ extension Name on ClubType {
   }
 }
 
-Color fromJsonToColor(color) {
+Color fromJsonToColor(String color) {
   String value = color.toString();
   if (value == "red") {
     return Colors.red;
