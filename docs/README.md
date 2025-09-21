@@ -5,14 +5,14 @@ XDYou，代码称为 Traintime PDA，是为西电学生设计的开源信息查�
 
 ## 软件下载
 
- - [安卓版本下载（提供商：F-Droid 清华镜像站）](https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo/io.github.benderblog.traintime_pda_303.apk)
+ - [安卓版本下载（提供商：F-Droid 清华镜像站）](https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo/io.github.benderblog.traintime_pda_323.apk)
  - [安卓和桌面版本下载（提供商：Github Release）](https://github.com/BenderBlog/traintime_pda/releases)
  - [苹果版本唯一官方版本下载（提供商：App Store）](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
 
 ## 特性概览
 
 1. 支持查看本科生和研究生的课程信息，成绩信息，考试信息。
-2. 查看日程表：包括课程信息，考试信息。顺便把你偶像的图片设成背景。（以及导入你对象的课表，写完真虐心啊）
+2. 查看日程表：包括课程信息，考试信息。顺便把你偶像的图片设成背景。
 3. 查看体育信息：体育课程信息和体测成绩记录。（打卡机在人世间完成了一个轮回）
 4. 查看宿舍电量，顺手交电费同时可以查看过去七次获取的记录。（研究生需要自行输入电费账号）
 5. 查看成绩，包括可以自行选择科目计算均分。
