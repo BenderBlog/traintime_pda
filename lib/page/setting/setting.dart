@@ -927,7 +927,6 @@ void _removeAll() {
   for (var value in [
     ClassTableFile.schoolClassName,
     ClassTableFile.userDefinedClassName,
-    ClassTableFile.partnerClassName,
     ClassTableFile.decorationName,
     ExamController.examDataCacheName,
     ExperimentController.experimentCacheName,

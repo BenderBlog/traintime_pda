@@ -7,8 +7,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
-
 import 'package:path_provider/path_provider.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
@@ -19,9 +19,7 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
@@ -172,130 +170,16 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
-  Future<void> importPartnerData() async {
-    log.info(
-      "classTableState.havePartner in importPartnerData: "
-      "${classTableState.havePartner}",
-    );
-
-    if (classTableState.havePartner) {
-      bool? confirm = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(FlutterI18n.translate(context, "confirm_title")),
-          content: Text(
-            FlutterI18n.translate(
-              context,
-              "classtable.partner_classtable.override_dialog",
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(FlutterI18n.translate(context, "cancel")),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(FlutterI18n.translate(context, "confirm")),
-            ),
-          ],
-        ),
-      );
-      if (context.mounted && confirm != true) {
-        return;
-      }
-    }
-
-    String? result = "";
-
-    try {
-      result = await pickFile().then((value) => value?.files.single.path ?? "");
-      if (mounted && result.isEmpty) {
-        showToast(
-          context: context,
-          msg: FlutterI18n.translate(
-            context,
-            "classtable.partner_classtable.no_file",
-          ),
-        );
-      }
-    } on MissingStoragePermissionException {
-      if (mounted) {
-        showToast(
-          context: context,
-          msg: FlutterI18n.translate(
-            context,
-            "classtable.partner_classtable.no_permission",
-          ),
-        );
-      }
-    }
-
-    if (mounted) {
-      try {
-        String source = File.fromUri(Uri.parse(result!)).readAsStringSync();
-        bool isSuccess = classTableState.decodePartnerClass(source).$5;
-        if (isSuccess) {
-          File(
-            "${supportPath.path}/${ClassTableFile.partnerClassName}",
-          ).writeAsStringSync(source);
-          classTableState.updatePartnerClass();
-        }
-      } catch (error, stacktrace) {
-        log.error(
-          "Error occured while importing partner class.",
-          error,
-          stacktrace,
-        );
-        showToast(
-          context: context,
-          msg: FlutterI18n.translate(
-            context,
-            "classtable.partner_classtable.problem",
-          ),
-        );
-        return;
-      }
-      showToast(
-        context: context,
-        msg: FlutterI18n.translate(
-          context,
-          "classtable.partner_classtable.success",
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          classTableState.isPartner
-              ? FlutterI18n.translate(
-                  context,
-                  "classtable.partner_page_title",
-                  translationParams: {
-                    "partner_name": classTableState.partnerName ?? "Sweetie",
-                  },
-                )
-              : FlutterI18n.translate(context, "classtable.page_title"),
-        ),
+        title: Text(FlutterI18n.translate(context, "classtable.page_title")),
         leading: BackButton(
           onPressed: () =>
               Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
         ),
         actions: [
-          if (classTableState.havePartner)
-            IconButton(
-              onPressed: () =>
-                  classTableState.isPartner = !classTableState.isPartner,
-              icon: Icon(
-                classTableState.isPartner
-                    ? Icons.favorite
-                    : Icons.favorite_border,
-              ),
-            ),
           PopupMenuButton<String>(
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
               PopupMenuItem<String>(
@@ -316,72 +200,42 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   ),
                 ),
               ),
-              if (!classTableState.isPartner) ...[
-                PopupMenuItem<String>(
-                  value: 'C',
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.popup_menu.add_class",
-                    ),
+              PopupMenuItem<String>(
+                value: 'C',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.add_class",
                   ),
                 ),
-                PopupMenuItem<String>(
-                  value: 'D',
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.popup_menu.generate_ical",
-                    ),
+              ),
+              PopupMenuItem<String>(
+                value: 'D',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.generate_ical",
                   ),
                 ),
-                PopupMenuItem<String>(
-                  value: 'H',
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.popup_menu.output_to_system",
-                    ),
+              ),
+              PopupMenuItem<String>(
+                value: 'H',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.output_to_system",
                   ),
                 ),
-                PopupMenuItem<String>(
-                  value: 'I',
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.popup_menu.refresh_classtable",
-                    ),
+              ),
+              PopupMenuItem<String>(
+                value: 'I',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.refresh_classtable",
                   ),
                 ),
-                PopupMenuItem<String>(
-                  value: 'E',
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.popup_menu.generate_partner_file",
-                    ),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'F',
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.popup_menu.import_partner_file",
-                    ),
-                  ),
-                ),
-                if (classTableState.havePartner)
-                  PopupMenuItem<String>(
-                    value: 'G',
-                    child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "classtable.popup_menu.delete_partner_file",
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ],
             onSelected: (String action) async {
               final box = context.findRenderObject() as RenderBox?;
@@ -433,7 +287,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   }
                   break;
                 case 'D':
-                case 'E':
                   try {
                     await showDialog(
                       context: context,
@@ -464,83 +317,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       String fileName =
                           "classtable-"
                           "${DateFormat("yyyyMMddTHHmmss").format(DateTime.now())}-"
-                          "${classTableState.semesterCode}";
-                      String sweetheartName = "";
-                      if (action == 'D') {
-                        fileName += ".ics";
-                      } else {
-                        TextEditingController controller =
-                            TextEditingController();
-                        sweetheartName =
-                            await showDialog<String>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    "classtable.partner_classtable.name_dialog.title",
-                                  ),
-                                ),
-                                content: TextField(
-                                  autofocus: true,
-                                  controller: controller,
-                                  maxLines: 1,
-                                  decoration: InputDecoration(
-                                    hintText: FlutterI18n.translate(
-                                      context,
-                                      "classtable.partner_classtable.name_dialog.hint",
-                                    ),
-                                    border: const OutlineInputBorder(),
-                                  ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(
-                                      FlutterI18n.translate(
-                                        context,
-                                        "classtable.partner_classtable.name_dialog.cancel",
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      Navigator.of(context).pop(null);
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text(
-                                      FlutterI18n.translate(
-                                        context,
-                                        "classtable.partner_classtable.name_dialog.accept",
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      if (controller.text.isEmpty) {
-                                        showToast(
-                                          context: context,
-                                          msg: FlutterI18n.translate(
-                                            context,
-                                            "classtable.partner_classtable.name_dialog.blank_input",
-                                          ),
-                                        );
-                                      } else {
-                                        Navigator.of(
-                                          context,
-                                        ).pop(controller.text);
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ) ??
-                            "Sweetie";
-
-                        if (context.mounted) {
-                          fileName += "-$sweetheartName.erc";
-                        }
-                      }
-                      if ((Platform.isLinux ||
-                              Platform.isMacOS ||
-                              Platform.isWindows) &&
-                          context.mounted) {
+                          "${classTableState.semesterCode}"
+                          ".ics";
+                      if (Platform.isLinux ||
+                          Platform.isMacOS ||
+                          Platform.isWindows) {
                         String?
                         resultFilePath = await FilePicker.platform.saveFile(
                           dialogTitle: FlutterI18n.translate(
@@ -548,9 +329,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                             "classtable.partner_classtable.save_dialog.title",
                           ),
                           fileName: fileName,
-                          allowedExtensions: [
-                            if (action == 'D') "ics" else "erc",
-                          ],
+                          allowedExtensions: ["ics"],
                           lockParentWindow: true,
                         );
                         if (resultFilePath != null) {
@@ -558,15 +337,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           if (!(await file.exists())) {
                             await file.create();
                           }
-                          if (action == "D") {
-                            await file.writeAsString(
-                              classTableState.iCalenderStr,
-                            );
-                          } else {
-                            await file.writeAsString(
-                              classTableState.ercStr(sweetheartName),
-                            );
-                          }
+                          await file.writeAsString(
+                            classTableState.iCalenderStr,
+                          );
                         }
                       } else {
                         String tempPath = await getTemporaryDirectory().then(
@@ -576,20 +349,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         if (!(await file.exists())) {
                           await file.create();
                         }
-                        if (action == "D") {
-                          await file.writeAsString(
-                            classTableState.iCalenderStr,
-                          );
-                        } else {
-                          await file.writeAsString(
-                            classTableState.ercStr(sweetheartName),
-                          );
-                        }
-                        await Share.shareXFiles(
-                          [XFile("$tempPath/$fileName")],
-                          sharePositionOrigin:
-                              box!.localToGlobal(Offset.zero) & box.size,
+                        await file.writeAsString(classTableState.iCalenderStr);
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            files: [XFile("$tempPath/$fileName")],
+                            sharePositionOrigin:
+                                box!.localToGlobal(Offset.zero) & box.size,
+                          ),
                         );
+
                         await file.delete();
                       }
                     }
@@ -614,49 +382,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     }
                   }
                   break;
-                case 'F':
-                  await importPartnerData();
-                case 'G':
-                  bool? isDelete = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.partner_classtable.delete_dialog.title",
-                        ),
-                      ),
-                      content: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.partner_classtable.delete_dialog.message",
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: Text(FlutterI18n.translate(context, "cancel")),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          child: Text(
-                            FlutterI18n.translate(context, "confirm"),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-
-                  if (context.mounted && isDelete == true) {
-                    classTableState.deletePartnerClass();
-                    showToast(
-                      context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-                        "classtable.partner_classtable.delete_dialog.success_message",
-                      ),
-                    );
-                  }
                 case 'H':
                   await classTableState
                       .outputToCalendar(() async {

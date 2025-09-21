@@ -44,14 +44,6 @@
 					<string>xdyou</string>
 				</array>
 			</dict>
-			<dict>
-				<key>CFBundleTypeRole</key>
-				<string>Editor</string>
-				<key>CFBundleURLSchemes</key>
-				<array>
-					<string>ShareMedia-$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-				</array>
-			</dict>
 		</array>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -62,7 +54,7 @@
 		<key>LSSupportsOpeningDocumentsInPlace</key>
 		<true/>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>调取你的相册来选择课程表背景图。</string>
+		<string>To select image for ClassTableView's background.</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIBackgroundModes</key>
