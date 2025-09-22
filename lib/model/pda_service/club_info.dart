@@ -18,7 +18,7 @@ enum ClubType {
   all, // 所有
 }
 
-String qqFromJson(String data) => data.toString();
+String qqFromJson(dynamic data) => data.toString();
 
 List<ClubType> toTypeList(String type) =>
     type.toString().split('|').map<ClubType>((value) {

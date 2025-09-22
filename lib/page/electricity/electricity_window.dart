@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
@@ -162,50 +164,49 @@ class ElectricityWindow extends StatelessWidget {
                 title: FlutterI18n.translate(context, "electricity.history"),
                 children: [
                   Builder(
-                    builder: (context) {
-                      final Map<String, Map<String, dynamic>> daily = {};
-                      for (final info in historyElectricityInfo) {
-                        final numStr = info.remain.replaceAll(
-                          RegExp(r'[^0-9\.\-]'),
-                          '',
-                        );
-                        final v = double.tryParse(numStr);
-                        if (v == null) continue;
-                        final dayKey = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(info.fetchDay);
-                        final dayTime = DateTime(
-                          info.fetchDay.year,
-                          info.fetchDay.month,
-                          info.fetchDay.day,
-                        );
-                        final existing = daily[dayKey];
-                        if (existing == null ||
-                            v > (existing['power'] as num)) {
-                          daily[dayKey] = {
-                            'time': dayTime,
-                            'day': DateFormat('MM-dd').format(dayTime),
-                            'power': v,
-                          };
-                        }
-                      }
-                      final list = daily.values.toList()
-                        ..sort(
-                          (a, b) => (a['time'] as DateTime).compareTo(
-                            b['time'] as DateTime,
-                          ),
-                        );
-                      return graphic.Chart(
-                            data: list,
+                        builder: (context) {
+                          final SplayTreeMap<DateTime, double> daily =
+                              SplayTreeMap();
+                          for (final info in historyElectricityInfo) {
+                            // Parsing number
+                            // TODO: REWRITE TO GET THE LATEST DATA INSTEAD OF
+                            // THE SMALLEST
+                            final numStr = info.remain.replaceAll(
+                              RegExp(r'[^0-9\.\-]'),
+                              '',
+                            );
+                            final v = double.tryParse(numStr);
+                            if (v == null) continue;
+
+                            final dayTime = DateTime(
+                              info.fetchDay.year,
+                              info.fetchDay.month,
+                              info.fetchDay.day,
+                            );
+                            if (!daily.containsKey(dayTime) ||
+                                v >= daily[dayTime]!) {
+                              daily[dayTime] = v;
+                            }
+                          }
+
+                          return graphic.Chart<Map<DateTime, double>>(
+                            data: daily.entries
+                                .map((entry) => {entry.key: entry.value})
+                                .toList(),
                             variables: {
                               'day': graphic.Variable(
-                                accessor: (Map map) => map['day'] as String,
+                                accessor: (Map<DateTime, double> map) =>
+                                    map.keys.first,
+                                scale: graphic.TimeScale(
+                                  formatter: (v) => "${v.month}-${v.day}",
+                                  min: daily.keys.first,
+                                  max: daily.keys.last,
+                                ),
                               ),
                               'power': graphic.Variable(
-                                accessor: (Map map) => map['power'] as num,
-                                scale: graphic.LinearScale(
-                                  //nice: true,
-                                ),
+                                accessor: (Map<DateTime, double> map) =>
+                                    map.values.first,
+                                scale: graphic.LinearScale(),
                               ),
                             },
                             axes: [
@@ -218,7 +219,7 @@ class ElectricityWindow extends StatelessWidget {
                                     graphic.Varset('day') *
                                     graphic.Varset('power'),
                                 shape: graphic.ShapeEncode(
-                                  value: graphic.BasicLineShape(smooth: true),
+                                  value: graphic.BasicLineShape(),
                                 ),
                                 color: graphic.ColorEncode(
                                   value: Theme.of(context).colorScheme.primary,
@@ -239,6 +240,10 @@ class ElectricityWindow extends StatelessWidget {
                                 on: {graphic.GestureType.hover},
                                 dim: graphic.Dim.x,
                               ),
+                              'touchMove': graphic.PointSelection(
+                                on: {graphic.GestureType.hover},
+                                dim: graphic.Dim.x,
+                              ),
                             },
                             tooltip: graphic.TooltipGuide(
                               selections: {'hover'},
@@ -246,15 +251,18 @@ class ElectricityWindow extends StatelessWidget {
                             crosshair: graphic.CrosshairGuide(
                               selections: {'hover'},
                             ),
-                          )
-                          .decorated(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            borderRadius: BorderRadius.circular(12),
-                          )
-                          .padding(top: 4)
-                          .constrained(height: 220);
-                    },
-                  ),
+                            coord: graphic.RectCoord(
+                              horizontalRange: [0.1, 0.9],
+                            ),
+                          ).constrained(height: 220);
+                        },
+                      )
+                      .padding(vertical: 12, horizontal: 16)
+                      .decorated(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        borderRadius: BorderRadius.circular(12),
+                      )
+                      .padding(top: 4),
                 ],
               ),
               InfoCard(
@@ -264,155 +272,125 @@ class ElectricityWindow extends StatelessWidget {
                 ),
                 children: [
                   Builder(
-                    builder: (context) {
-                      // 以“每天最小读数”代表该日（遇到一天多次记录时取最小值）
-                      final Map<String, double> dayMin = {};
-                      for (final info in historyElectricityInfo) {
-                        final numStr = info.remain.replaceAll(
-                          RegExp(r'[^0-9\.\-]'),
-                          '',
-                        );
-                        final v = double.tryParse(numStr);
-                        if (v == null) continue;
-                        final key = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(info.fetchDay);
-                        if (!dayMin.containsKey(key) || v < dayMin[key]!) {
-                          dayMin[key] = v;
-                        }
-                      }
-                      // 计算“每日用电量”（相邻两天的正向消耗差），生成逐日柱状数据
-                      final keys = dayMin.keys.toList()
-                        ..sort((a, b) => a.compareTo(b));
-                      final List<Map<String, dynamic>> barData = [];
-                      for (int i = 1; i < keys.length; i++) {
-                        final prev = dayMin[keys[i - 1]]!;
-                        final curr = dayMin[keys[i]]!;
-                        final diff = prev - curr; // 前一日最小读数 - 当日最小读数（允许为负）
-                        final dt = DateFormat('yyyy-MM-dd').parse(keys[i]);
-                        final dtPrev = DateFormat(
-                          'yyyy-MM-dd',
-                        ).parse(keys[i - 1]);
-                        final range =
-                            "${DateFormat('M-d').format(DateTime(dtPrev.year, dtPrev.month, dtPrev.day))}~\n${DateFormat('M-d').format(DateTime(dt.year, dt.month, dt.day))}";
-                        barData.add({'range': range, 'cons': diff});
-                      }
-                      // 统一容器，内部内容根据数据量切换
-                      late final Widget content;
-                      late final double? height;
-                      if (barData.length <= 1) {
-                        height = null;
-                        content = Text(
-                          FlutterI18n.translate(
-                            context,
-                            "electricity.not_enough_data",
-                          ),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
+                        builder: (context) {
+                          // Record the smallest record of the day.
+                          final SplayTreeMap<DateTime, double> dayMin =
+                              SplayTreeMap();
+                          for (final info in historyElectricityInfo) {
+                            final numStr = info.remain.replaceAll(
+                              RegExp(r'[^0-9\.\-]'),
+                              '',
+                            );
+                            final v = double.tryParse(numStr);
+                            final dayTime = DateTime(
+                              info.fetchDay.year,
+                              info.fetchDay.month,
+                              info.fetchDay.day,
+                            );
+                            if (v == null) continue;
+                            if (!dayMin.containsKey(dayTime) ||
+                                v < dayMin[dayTime]!) {
+                              dayMin[dayTime] = v;
+                            }
+                          }
+                          // If only one day, unable to parse.
+                          if (dayMin.keys.length <= 1) {
+                            return Text(
+                              FlutterI18n.translate(
+                                context,
+                                "electricity.not_enough_data",
+                              ),
+                              style: TextStyle(
                                 color: Theme.of(
                                   context,
                                 ).colorScheme.onSurfaceVariant,
                               ),
-                        );
-                      } else {
-                        height = 220.0;
-                        // 使用分段归一化：将原始 cons 映射到 [-0.3, 0.7]（负区 30%、正区 70%）
-                        num minCons = barData.first['cons'] as num;
-                        num maxCons = barData.first['cons'] as num;
-                        for (final e in barData) {
-                          final c = e['cons'] as num;
-                          if (c < minCons) minCons = c;
-                          if (c > maxCons) maxCons = c;
-                        }
-                        final num posMax = maxCons > 0 ? maxCons : 0;
-                        final num negAbs = minCons < 0 ? -minCons : 0;
-                        final List<Map<String, dynamic>> plotData = barData.map(
-                          (e) {
-                            final cons = e['cons'] as num;
-                            final double consPlot = cons >= 0
-                                ? (posMax == 0 ? 0 : (cons / posMax) * 0.7)
-                                : (negAbs == 0 ? 0 : (cons / negAbs) * 0.3);
-                            return {
-                              'range': e['range'],
-                              'cons': cons,
-                              'consPlot': consPlot,
-                            };
-                          },
-                        ).toList();
+                            );
+                          }
 
-                        content = graphic.Chart(
-                          data: plotData,
-                          variables: {
-                            'range': graphic.Variable(
-                              accessor: (Map map) => map['range'] as String,
-                            ),
-                            'consPlot': graphic.Variable(
-                              accessor: (Map map) => map['consPlot'] as num,
-                              scale: graphic.LinearScale(
-                                min: -0.3,
-                                max: 0.7,
-                                tickCount: 6,
-                                // 轴标签映射回原始用量值，使读数与计算一致
-                                formatter: (num v) {
-                                  if (v == 0) return '0';
-                                  if (v > 0) {
-                                    final num orig = (posMax == 0)
-                                        ? 0
-                                        : (v / 0.7) * posMax;
-                                    return orig.toStringAsFixed(2);
-                                  } else {
-                                    final num orig = (negAbs == 0)
-                                        ? 0
-                                        : (v / 0.3) * negAbs;
-                                    return orig.toStringAsFixed(2);
-                                  }
-                                },
+                          // Daily usage of the electricity
+                          // TODO: CHANGE KEY FROM STRING TO (DATETIME DATETIME)
+                          final keys = dayMin.keys.toList();
+                          final List<Map<String, double>> plotData = [];
+                          double max = 0.0;
+                          for (int i = 1; i < keys.length; i++) {
+                            final dt = keys[i];
+                            final dtPrev = keys[i - 1];
+                            final curr = dayMin[keys[i]]!;
+                            final prev = dayMin[keys[i - 1]]!;
+                            print("$prev $curr");
+                            final dayDiff = DateTime(dt.year, dt.month, dt.day)
+                                .difference(
+                                  DateTime(
+                                    dtPrev.year,
+                                    dtPrev.month,
+                                    dtPrev.day,
+                                  ),
+                                )
+                                .inDays;
+                            final diff = (prev - curr) / dayDiff;
+                            if (diff < 0) continue;
+                            if (diff > max) max = diff;
+                            final range =
+                                "${dtPrev.month}-${dtPrev.day}~\n"
+                                "${dt.month}-${dt.day}";
+                            plotData.add({range: diff});
+                          }
+
+                          print(plotData);
+
+                          return graphic.Chart<Map<String, double>>(
+                            data: plotData,
+                            variables: {
+                              'range': graphic.Variable(
+                                accessor: (map) => map.keys.first,
                               ),
-                            ),
-                          },
-                          axes: [
-                            graphic.Defaults.horizontalAxis,
-                            graphic.Defaults.verticalAxis,
-                          ],
-                          marks: [
-                            // 竖向柱状图：类目在 X 轴，数值在 Y 轴
-                            graphic.IntervalMark(
-                              position:
-                                  graphic.Varset('range') *
-                                  graphic.Varset('consPlot'),
-                              color: graphic.ColorEncode(
-                                value: Theme.of(context).colorScheme.primary,
+                              'consPlot': graphic.Variable(
+                                accessor: (map) => map.values.first,
+                                scale: graphic.LinearScale(
+                                  min: 0.0,
+                                  max: max,
+                                  formatter: (v) => v.toStringAsFixed(2),
+                                ),
                               ),
+                            },
+                            axes: [
+                              graphic.Defaults.horizontalAxis,
+                              graphic.Defaults.verticalAxis,
+                            ],
+                            marks: [
+                              graphic.IntervalMark(
+                                position:
+                                    graphic.Varset('range') *
+                                    graphic.Varset('consPlot'),
+                                color: graphic.ColorEncode(
+                                  value: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                            selections: {
+                              'barHover': graphic.PointSelection(
+                                on: {graphic.GestureType.hover},
+                                dim: graphic.Dim.x,
+                              ),
+                              'touchMove': graphic.PointSelection(
+                                on: {graphic.GestureType.hover},
+                                dim: graphic.Dim.x,
+                              ),
+                            },
+                            tooltip: graphic.TooltipGuide(
+                              selections: {'barHover'},
                             ),
-                          ],
-                          selections: {
-                            'barHover': graphic.PointSelection(
-                              on: {graphic.GestureType.hover},
-                              dim: graphic.Dim.x,
-                            ),
-                          },
-                          tooltip: graphic.TooltipGuide(
-                            selections: {'barHover'},
-                          ),
-                        );
-                      }
-                      return Container(
-                        height: height,
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.fromLTRB(
-                          8,
-                          8,
-                          8,
-                          height == null ? 8 : 24,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: content,
-                      );
-                    },
-                  ).padding(top: 4),
+                            coord: graphic.RectCoord(transposed: true),
+                          ).constrained(height: 220);
+                        },
+                      )
+                      .padding(vertical: 12, horizontal: 16)
+                      .decorated(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        borderRadius: BorderRadius.circular(12),
+                      )
+                      .padding(top: 4),
                 ],
               ),
               const SizedBox(height: 4),
