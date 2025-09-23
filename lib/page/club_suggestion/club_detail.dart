@@ -117,7 +117,7 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
   final List<ImageProvider> _image = [];
 
   static const _expandedHeight = 310.0;
-  static const _maxWidth = 800.0;
+  static const _maxWidth = sheetMaxWidth;
 
   double _opacity = 0.0;
 
