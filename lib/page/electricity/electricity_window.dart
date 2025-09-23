@@ -96,6 +96,7 @@ class ElectricityWindow extends StatelessWidget {
             },
           ).center();
         }
+
         return [
               Text(
                     FlutterI18n.translate(context, "electricity.info"),
@@ -113,7 +114,9 @@ class ElectricityWindow extends StatelessWidget {
                   )
                   .padding(vertical: 8, horizontal: 4)
                   .width(double.infinity)
-                  .constrained(maxWidth: sheetMaxWidth),
+                  .constrained(maxWidth: sheetMaxWidth)
+                  .center(),
+
               InfoCard(
                 iconData: Icons.info,
                 title: FlutterI18n.translate(
@@ -161,7 +164,8 @@ class ElectricityWindow extends StatelessWidget {
                     ),
                   ),
                 ],
-              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+
               InfoCard(
                 iconData: Icons.history,
                 title: FlutterI18n.translate(context, "electricity.history"),
@@ -266,7 +270,8 @@ class ElectricityWindow extends StatelessWidget {
                       )
                       .padding(top: 4),
                 ],
-              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+
               InfoCard(
                 iconData: Icons.bar_chart,
                 title: FlutterI18n.translate(
@@ -416,7 +421,8 @@ class ElectricityWindow extends StatelessWidget {
                       )
                       .padding(top: 4),
                 ],
-              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+
               FilledButton(
                     onPressed: () => update(force: true),
                     child: Text(
@@ -425,14 +431,18 @@ class ElectricityWindow extends StatelessWidget {
                   )
                   .padding(horizontal: 4, vertical: 8)
                   .width(double.infinity)
-                  .constrained(maxWidth: sheetMaxWidth),
-              Image.asset("assets/art/pda_girl_default.png"),
+                  .constrained(maxWidth: sheetMaxWidth)
+                  .center(),
+
+              Image.asset(
+                "assets/art/pda_girl_default.png",
+              ).padding(bottom: 16),
             ]
             .toColumn(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
             )
-            .scrollable(padding: EdgeInsets.fromLTRB(12, 12, 12, 28));
+            .scrollable(padding: EdgeInsets.all(12));
       }),
     );
   }

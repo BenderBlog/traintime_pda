@@ -41,48 +41,54 @@ class IdsAccountNetInfo extends StatelessWidget {
                 )
                 .padding(vertical: 8, horizontal: 4)
                 .width(double.infinity)
-                .constrained(maxWidth: sheetMaxWidth),
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
 
             // 用户信息卡片
             InfoCard(
-              title: FlutterI18n.translate(
-                context,
-                "school_net.ids_account_net.overview",
-              ),
-              children: [
-                InfoItem(
-                  icon: Icons.person,
-                  label: FlutterI18n.translate(
+                  iconData: Icons.info,
+                  title: FlutterI18n.translate(
                     context,
-                    "school_net.ids_account_net.account",
+                    "school_net.ids_account_net.overview",
                   ),
-                  value: pref.getString(pref.Preference.idsAccount),
-                ),
-                InfoItem(
-                  icon: Icons.data_usage,
-                  label: FlutterI18n.translate(
-                    context,
-                    "school_net.ids_account_net.used",
-                  ),
-                  value: networkInfo.value!.used,
-                  valueColor: Colors.green,
-                ),
-                InfoItem(
-                  icon: Icons.account_balance_wallet,
-                  label: FlutterI18n.translate(
-                    context,
-                    "school_net.ids_account_net.remain",
-                  ),
-                  value: networkInfo.value!.rest,
-                  valueColor: Colors.green,
-                ),
-              ],
-            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+                  children: [
+                    InfoItem(
+                      icon: Icons.person,
+                      label: FlutterI18n.translate(
+                        context,
+                        "school_net.ids_account_net.account",
+                      ),
+                      value: pref.getString(pref.Preference.idsAccount),
+                    ),
+                    InfoItem(
+                      icon: Icons.data_usage,
+                      label: FlutterI18n.translate(
+                        context,
+                        "school_net.ids_account_net.used",
+                      ),
+                      value: networkInfo.value!.used,
+                      valueColor: Colors.green,
+                    ),
+                    InfoItem(
+                      icon: Icons.account_balance_wallet,
+                      label: FlutterI18n.translate(
+                        context,
+                        "school_net.ids_account_net.remain",
+                      ),
+                      value: networkInfo.value!.rest,
+                      valueColor: Colors.green,
+                    ),
+                  ],
+                )
+                .padding(vertical: 4)
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
 
             if (networkInfo.value?.ipList.isNotEmpty ?? false)
-              _DeviceListLite(
-                devices: networkInfo.value!.ipList,
-              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+              _DeviceListLite(devices: networkInfo.value!.ipList)
+                  .padding(vertical: 4)
+                  .constrained(maxWidth: sheetMaxWidth)
+                  .center(),
 
             FilledButton(
                   onPressed: () => update(),
@@ -92,7 +98,8 @@ class IdsAccountNetInfo extends StatelessWidget {
                 )
                 .padding(horizontal: 4, vertical: 8)
                 .width(double.infinity)
-                .constrained(maxWidth: sheetMaxWidth),
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
           ]
           .toColumn(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,13 +168,13 @@ class _DeviceListLite extends StatelessWidget {
               FlutterI18n.translate(context, "school_net.device_list.ip"),
               style: headerStyle,
               textAlign: TextAlign.center,
-            ).expanded(flex: 4),
+            ).expanded(flex: 3),
 
             Text(
               FlutterI18n.translate(context, "school_net.device_list.time"),
               style: headerStyle,
               textAlign: TextAlign.center,
-            ).expanded(flex: 3),
+            ).expanded(flex: 4),
 
             Text(
               FlutterI18n.translate(context, "school_net.device_list.remain"),
@@ -188,12 +195,12 @@ class _DeviceListLite extends StatelessWidget {
               d.$1,
               style: cellStyle,
               textAlign: TextAlign.center,
-            ).expanded(flex: 4),
+            ).expanded(flex: 3),
             Text(
               d.$3,
               style: cellStyle,
               textAlign: TextAlign.center,
-            ).expanded(flex: 3),
+            ).expanded(flex: 4),
             Text(
               d.$2,
               style: cellStyle,

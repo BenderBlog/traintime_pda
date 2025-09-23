@@ -53,7 +53,8 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                 )
                 .padding(vertical: 8, horizontal: 4)
                 .width(double.infinity)
-                .constrained(maxWidth: sheetMaxWidth),
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
 
             // 用户信息卡片
             InfoCard(
@@ -91,57 +92,61 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                   valueColor: Colors.green,
                 ),
               ],
-            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
 
             // 流量使用卡片
             InfoCard(
-              title: FlutterI18n.translate(
-                context,
-                "school_net.current_login_net.usage_situation",
-              ),
-              children: [
-                const SizedBox(height: 8),
-                LinearProgressIndicator(
-                  value: usedPercentage.clamp(0.0, 1.0).toDouble(),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  FlutterI18n.translate(
+                  title: FlutterI18n.translate(
                     context,
-                    "school_net.current_login_net.used_percent",
-                    translationParams: {
-                      "percent": (usedPercentage * 100).toStringAsFixed(1),
-                    },
+                    "school_net.current_login_net.usage_situation",
                   ),
-                  textAlign: TextAlign.right,
-                ),
-                const SizedBox(height: 8),
-                NetDataRow(
-                  label: FlutterI18n.translate(
-                    context,
-                    "school_net.current_login_net.used",
-                  ),
-                  value: formatBytes(currentUserNetInfo.value!.sumBytes),
-                  color: Colors.redAccent,
-                ),
-                NetDataRow(
-                  label: FlutterI18n.translate(
-                    context,
-                    "school_net.current_login_net.remain_count",
-                  ),
-                  value: formatBytes(currentUserNetInfo.value!.remainBytes),
-                  color: Colors.green,
-                ),
-                NetDataRow(
-                  label: FlutterI18n.translate(
-                    context,
-                    "school_net.current_login_net.total",
-                  ),
-                  value: formatBytes(totalBytes),
-                  color: Colors.blue,
-                ),
-              ],
-            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+                  children: [
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: usedPercentage.clamp(0.0, 1.0).toDouble(),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "school_net.current_login_net.used_percent",
+                        translationParams: {
+                          "percent": (usedPercentage * 100).toStringAsFixed(1),
+                        },
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                    const SizedBox(height: 8),
+                    NetDataRow(
+                      label: FlutterI18n.translate(
+                        context,
+                        "school_net.current_login_net.used",
+                      ),
+                      value: formatBytes(currentUserNetInfo.value!.sumBytes),
+                      color: Colors.redAccent,
+                    ),
+                    NetDataRow(
+                      label: FlutterI18n.translate(
+                        context,
+                        "school_net.current_login_net.remain_count",
+                      ),
+                      value: formatBytes(currentUserNetInfo.value!.remainBytes),
+                      color: Colors.green,
+                    ),
+                    NetDataRow(
+                      label: FlutterI18n.translate(
+                        context,
+                        "school_net.current_login_net.total",
+                      ),
+                      value: formatBytes(totalBytes),
+                      color: Colors.blue,
+                    ),
+                  ],
+                )
+                .padding(vertical: 4)
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
+
             FilledButton(
                   onPressed: () => SchoolnetSession.getCurrentUserLogin(),
                   child: Text(
@@ -150,7 +155,8 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                 )
                 .padding(horizontal: 4, vertical: 8)
                 .width(double.infinity)
-                .constrained(maxWidth: sheetMaxWidth),
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
           ]
           .toColumn(
             crossAxisAlignment: CrossAxisAlignment.center,
