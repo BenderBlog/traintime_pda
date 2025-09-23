@@ -5,21 +5,36 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 class InfoCard extends StatelessWidget {
+  final IconData? iconData;
   final String title;
   final List<Widget> children;
 
-  const InfoCard({super.key, required this.title, required this.children});
+  const InfoCard({
+    super.key,
+    this.iconData,
+    required this.title,
+    required this.children,
+  });
 
   @override
   Widget build(BuildContext context) {
     return [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
+          [
+            if (iconData != null)
+              Icon(
+                iconData,
+                color: Theme.of(context).primaryColor,
+              ).padding(right: 8),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+                textBaseline: TextBaseline.ideographic,
+              ),
             ),
-          ),
+          ].toRow(crossAxisAlignment: CrossAxisAlignment.center),
+
           const SizedBox(height: 8),
           ...children,
         ]

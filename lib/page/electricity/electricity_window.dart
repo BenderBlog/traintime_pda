@@ -113,6 +113,7 @@ class ElectricityWindow extends StatelessWidget {
                   )
                   .padding(all: 4),
               InfoCard(
+                iconData: Icons.info,
                 title: FlutterI18n.translate(
                   context,
                   "electricity.power_title",
@@ -161,6 +162,7 @@ class ElectricityWindow extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               InfoCard(
+                iconData: Icons.history,
                 title: FlutterI18n.translate(context, "electricity.history"),
                 children: [
                   Builder(
@@ -265,6 +267,7 @@ class ElectricityWindow extends StatelessWidget {
                 ],
               ),
               InfoCard(
+                iconData: Icons.bar_chart,
                 title: FlutterI18n.translate(
                   context,
                   "electricity.daily_usage",
