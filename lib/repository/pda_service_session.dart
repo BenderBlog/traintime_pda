@@ -2,8 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:convert';
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
@@ -17,7 +15,6 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
-RxList<NoticeMessage> messages = <NoticeMessage>[].obs;
 Rx<UpdateMessage?> updateMessage = Rx<UpdateMessage?>(null);
 RxList<ClubInfo> clubList = <ClubInfo>[].obs;
 Rx<SessionState> clubState = SessionState.none.obs;
@@ -30,39 +27,6 @@ const url = "https://legacy.superbart.top/traintime_pda_backend";
 final messageLock = Lock(reentrant: false);
 final updateLock = Lock(reentrant: false);
 final clubLock = Lock(reentrant: false);
-
-Future<void> checkMessage() => messageLock.synchronized(() async {
-  var file = File("${supportPath.path}/Notice.json");
-  bool isExist = await file.exists();
-  List<NoticeMessage> toAdd = [];
-
-  try {
-    toAdd = await dio
-        .get("$url/message.json")
-        .then(
-          (value) => List<NoticeMessage>.generate(
-            value.data.length,
-            (index) => NoticeMessage.fromJson(value.data[index]),
-          ),
-        );
-    file.writeAsStringSync(jsonEncode(toAdd));
-  } catch (e, s) {
-    log.error("[checkMessage] Error occured!", e, s);
-    if (isExist) {
-      List data = jsonDecode(file.readAsStringSync());
-      toAdd = List<NoticeMessage>.generate(
-        data.length,
-        (index) => NoticeMessage.fromJson(data[index]),
-      );
-    } else {
-      toAdd = [];
-    }
-  }
-
-  messages.clear();
-  messages.addAll(toAdd);
-  // Add cache.
-});
 
 Future<bool?> checkUpdate() => updateLock.synchronized<bool?>(() async {
   updateMessage.value = null;

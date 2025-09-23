@@ -27,23 +27,3 @@ class UpdateMessage {
 
   Map<String, dynamic> toJson() => _$UpdateMessageToJson(this);
 }
-
-@JsonSerializable(explicitToJson: true)
-class NoticeMessage {
-  final String title;
-  final String message;
-  final String isLink;
-  final String type;
-
-  NoticeMessage({
-    required this.title,
-    required this.message,
-    required this.isLink,
-    required this.type,
-  });
-
-  factory NoticeMessage.fromJson(Map<String, dynamic> json) =>
-      _$NoticeMessageFromJson(json);
-
-  Map<String, dynamic> toJson() => _$NoticeMessageToJson(this);
-}

@@ -25,19 +25,3 @@ Map<String, dynamic> _$UpdateMessageToJson(UpdateMessage instance) =>
       'github': instance.github,
       'fdroid': instance.fdroid,
     };
-
-NoticeMessage _$NoticeMessageFromJson(Map<String, dynamic> json) =>
-    NoticeMessage(
-      title: json['title'] as String,
-      message: json['message'] as String,
-      isLink: json['isLink'] as String,
-      type: json['type'] as String,
-    );
-
-Map<String, dynamic> _$NoticeMessageToJson(NoticeMessage instance) =>
-    <String, dynamic>{
-      'title': instance.title,
-      'message': instance.message,
-      'isLink': instance.isLink,
-      'type': instance.type,
-    };

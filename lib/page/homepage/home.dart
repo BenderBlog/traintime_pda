@@ -217,7 +217,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!refreshAtStart) {
-      message.checkMessage();
       message.checkUpdate().then(
         (value) {
           if (value ?? false) _showUpdateNotice();

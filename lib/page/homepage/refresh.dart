@@ -72,7 +72,6 @@ Future<void> update({
   required Future<void> Function(String) sliderCaptcha,
 }) async {
   // Update data
-  message.checkMessage();
   message.getClubList();
 
   // Retry Login
