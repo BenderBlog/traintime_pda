@@ -14,5 +14,5 @@ class EmptyClassroomData {
   final List<bool> isUsed;
 
   EmptyClassroomData({required this.name, required this.isUsed})
-    : assert(isUsed.length == 10);
+    : assert(isUsed.length == 11);
 }

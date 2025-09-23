@@ -294,12 +294,12 @@ class _EmptyClassroomSearchWindowState
                       ).center(),
                     ),
                     Flexible(
-                      flex: 2,
+                      flex: 3,
                       child: Wrap(
                         alignment: WrapAlignment.center,
                         spacing: 4.0,
                         children: List.generate(
-                          2,
+                          3,
                           (i) => getIcon(item.isUsed[i + 8], index: i + 9),
                         ),
                       ).center(),

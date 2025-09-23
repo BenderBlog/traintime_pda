@@ -127,7 +127,7 @@ class EmptyClassroomSession extends EhallSession {
                     .replaceAll(RegExp(r'[(（]'), "\n")
                     .replaceAll(RegExp(r'[)）]'), ""),
                 isUsed: List.generate(
-                  10,
+                  11,
                   (index) => i["JC${index + 1}"].toString().contains("1_"),
                   growable: false,
                 ),
