@@ -59,7 +59,7 @@ class _EasterEggPageState extends State<EasterEggPage> {
             ),
           ),
         ),
-      ].toColumn().scrollable().center().padding(horizontal: 16).safeArea(),
+      ].toColumn().scrollable().center().padding(horizontal: 16),
     );
   }
 }

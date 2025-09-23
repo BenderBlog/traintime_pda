@@ -209,7 +209,7 @@ class _ContentPageState extends State<ContentPage> {
                                             "${snapshot.data![index].statusStr}",
                                         child: Text(
                                           snapshot.data![index].content,
-                                        ).safeArea(),
+                                        ),
                                       ),
                                     ),
                                     Row(
@@ -407,8 +407,7 @@ class _ContentPageState extends State<ContentPage> {
                 ),
               )
               .center()
-              .scrollable()
-              .safeArea(),
+              .scrollable(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           bool? result = await showDialog<bool>(

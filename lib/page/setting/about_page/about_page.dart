@@ -412,6 +412,7 @@ class _AboutPageState extends State<AboutPage> {
                   [
                     _developerList,
                     _moreList(context),
+                    _versionHint(context).padding(bottom: 14),
                   ].toColumn().scrollable().flexible(flex: 1),
                 ]
                 .toRow(
@@ -425,7 +426,7 @@ class _AboutPageState extends State<AboutPage> {
                   _title(context),
                   _developerList,
                   _moreList(context),
-                  _versionHint(context),
+                  _versionHint(context).padding(bottom: 14),
                 ]
                 .toColumn(mainAxisAlignment: MainAxisAlignment.center)
                 .padding(horizontal: 16)
@@ -434,7 +435,7 @@ class _AboutPageState extends State<AboutPage> {
                 .center();
           }
         },
-      ).safeArea(),
+      ),
     );
   }
 }

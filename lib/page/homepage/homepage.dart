@@ -197,10 +197,10 @@ class _MainPageState extends State<MainPage> {
                 ClubPromotionCard(onTap: widget.changePage),
                 const ClassTableCard(),
                 ElectricityCard(),
+                SchoolnetCard(),
                 LibraryCard(),
                 //LibraryCapacityCard(),
                 SchoolCardInfoCard(),
-                SchoolnetCard(),
                 MediaQuery.removePadding(
                   context: context,
                   removeTop: true,

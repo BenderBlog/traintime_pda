@@ -137,7 +137,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                         },
                       ),
                     ],
-                  ).safeArea();
+                  );
                 } else {
                   return EmptyListView(
                     type: EmptyListViewType.defaultimg,

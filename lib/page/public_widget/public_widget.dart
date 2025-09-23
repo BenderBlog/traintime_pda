@@ -73,7 +73,7 @@ class DataList<T> extends StatelessWidget {
       separatorBuilder: (BuildContext context, int index) =>
           const SizedBox(height: 4),
       padding: const EdgeInsets.symmetric(horizontal: 12.5, vertical: 9.0),
-    ).safeArea();
+    );
   }
 }
 

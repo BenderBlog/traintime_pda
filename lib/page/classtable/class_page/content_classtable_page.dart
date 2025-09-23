@@ -181,6 +181,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         ),
         actions: [
           PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
               PopupMenuItem<String>(
                 value: 'A',
