@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as search_book;
 import 'package:watermeter/model/xidian_ids/library.dart';
@@ -77,23 +78,25 @@ class _SearchBookWindowState extends State<SearchBookWindow>
     return Scaffold(
       body: Column(
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: TextFormField(
-              controller: text,
-              decoration: InputDecoration(
-                hintText: FlutterI18n.translate(context, "library.search_here"),
-                prefixIcon: const Icon(Icons.search),
-              ),
-              onChanged: (String text) => search.value = text,
-              onFieldSubmitted: (value) => setState(() {
-                searchList.clear();
-                page = 1;
-                noMore = false;
-                searchBook();
-              }),
-            ),
-          ).padding(vertical: 10, horizontal: 8),
+          TextFormField(
+                controller: text,
+                decoration: InputDecoration(
+                  hintText: FlutterI18n.translate(
+                    context,
+                    "library.search_here",
+                  ),
+                  prefixIcon: const Icon(Icons.search),
+                ),
+                onChanged: (String text) => search.value = text,
+                onFieldSubmitted: (value) => setState(() {
+                  searchList.clear();
+                  page = 1;
+                  noMore = false;
+                  searchBook();
+                }),
+              )
+              .padding(horizontal: 16, vertical: 12)
+              .constrained(maxWidth: sheetMaxWidth),
           EasyRefresh(
             footer: ClassicFooter(
               dragText: FlutterI18n.translate(context, "drag_text"),
@@ -123,20 +126,13 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                     ),
                   ),
                 );
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    return ListView.builder(
-                      itemCount: bookList.length,
-                      padding: EdgeInsets.symmetric(
-                        horizontal:
-                            6 +
-                            (constraints.maxWidth > 496
-                                ? ((constraints.maxWidth - 496) / 2 - 2)
-                                : 0),
-                      ),
-                      itemBuilder: (context, index) => bookList[index],
-                    );
-                  },
+                return ListView.builder(
+                  itemCount: bookList.length,
+                  itemBuilder: (context, index) => bookList[index]
+                      .padding(horizontal: 12, vertical: 2)
+                      .width(double.infinity)
+                      .constrained(width: sheetMaxWidth)
+                      .center(),
                 );
               } else if (isSearching.value) {
                 return const Center(child: CircularProgressIndicator());
