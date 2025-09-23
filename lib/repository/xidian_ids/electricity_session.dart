@@ -204,12 +204,13 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           (data) => ElectricityInfo.fromJson(proto[data]),
         ),
       );
+      list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
     } catch (e, s) {
       log.handle(e, s);
     }
 
     if (info != null) {
-      if (list.length > 7) {
+      if (list.length > 14) {
         list.removeAt(0);
       }
       if (!(list.isNotEmpty &&

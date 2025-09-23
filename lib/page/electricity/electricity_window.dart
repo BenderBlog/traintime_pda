@@ -167,15 +167,10 @@ class ElectricityWindow extends StatelessWidget {
                         builder: (context) {
                           final SplayTreeMap<DateTime, double> daily =
                               SplayTreeMap();
+                          // Parsing number, store the latest data.
+                          // Notice that the historyElectricityInfo have sorted.
                           for (final info in historyElectricityInfo) {
-                            // Parsing number
-                            // TODO: REWRITE TO GET THE LATEST DATA INSTEAD OF
-                            // THE SMALLEST
-                            final numStr = info.remain.replaceAll(
-                              RegExp(r'[^0-9\.\-]'),
-                              '',
-                            );
-                            final v = double.tryParse(numStr);
+                            final v = double.tryParse(info.remain);
                             if (v == null) continue;
 
                             final dayTime = DateTime(
@@ -183,10 +178,10 @@ class ElectricityWindow extends StatelessWidget {
                               info.fetchDay.month,
                               info.fetchDay.day,
                             );
-                            if (!daily.containsKey(dayTime) ||
-                                v >= daily[dayTime]!) {
-                              daily[dayTime] = v;
-                            }
+                            // If historyElectricityInfo have not sorted,
+                            // This line should be rewrite to ensure that the
+                            // latest data have been fetched.
+                            daily[dayTime] = v;
                           }
 
                           return graphic.Chart<Map<DateTime, double>>(
@@ -198,9 +193,13 @@ class ElectricityWindow extends StatelessWidget {
                                 accessor: (Map<DateTime, double> map) =>
                                     map.keys.first,
                                 scale: graphic.TimeScale(
-                                  formatter: (v) => "${v.month}-${v.day}",
-                                  min: daily.keys.first,
-                                  max: daily.keys.last,
+                                  formatter: (v) => "${v.month}.${v.day}",
+                                  min: daily.keys.length <= 1
+                                      ? null
+                                      : daily.keys.first,
+                                  max: daily.keys.length <= 1
+                                      ? null
+                                      : daily.keys.last,
                                 ),
                               ),
                               'power': graphic.Variable(
@@ -236,25 +235,25 @@ class ElectricityWindow extends StatelessWidget {
                               ),
                             ],
                             selections: {
-                              'hover': graphic.PointSelection(
+                              'pointMouse': graphic.PointSelection(
                                 on: {graphic.GestureType.hover},
-                                dim: graphic.Dim.x,
+                                //devices: {PointerDeviceKind.mouse},
                               ),
-                              'touchMove': graphic.PointSelection(
-                                on: {graphic.GestureType.hover},
-                                dim: graphic.Dim.x,
+                              'pointTouch': graphic.PointSelection(
+                                on: {
+                                  graphic.GestureType.tapDown,
+                                  graphic.GestureType.tapUp,
+                                },
+                                //devices: {graphic.PointerDeviceKind.touch},
                               ),
                             },
                             tooltip: graphic.TooltipGuide(
-                              selections: {'hover'},
-                            ),
-                            crosshair: graphic.CrosshairGuide(
-                              selections: {'hover'},
+                              selections: {'pointMouse', 'pointTouch'},
                             ),
                             coord: graphic.RectCoord(
                               horizontalRange: [0.1, 0.9],
                             ),
-                          ).constrained(height: 220);
+                          ).constrained(height: 300);
                         },
                       )
                       .padding(vertical: 12, horizontal: 16)
@@ -277,17 +276,13 @@ class ElectricityWindow extends StatelessWidget {
                           final SplayTreeMap<DateTime, double> dayMin =
                               SplayTreeMap();
                           for (final info in historyElectricityInfo) {
-                            final numStr = info.remain.replaceAll(
-                              RegExp(r'[^0-9\.\-]'),
-                              '',
-                            );
-                            final v = double.tryParse(numStr);
+                            final v = double.tryParse(info.remain);
+                            if (v == null) continue;
                             final dayTime = DateTime(
                               info.fetchDay.year,
                               info.fetchDay.month,
                               info.fetchDay.day,
                             );
-                            if (v == null) continue;
                             if (!dayMin.containsKey(dayTime) ||
                                 v < dayMin[dayTime]!) {
                               dayMin[dayTime] = v;
@@ -300,25 +295,26 @@ class ElectricityWindow extends StatelessWidget {
                                 context,
                                 "electricity.not_enough_data",
                               ),
+                              textAlign: TextAlign.center,
+
                               style: TextStyle(
                                 color: Theme.of(
                                   context,
                                 ).colorScheme.onSurfaceVariant,
                               ),
-                            );
+                            ).width(double.infinity);
                           }
 
                           // Daily usage of the electricity
-                          // TODO: CHANGE KEY FROM STRING TO (DATETIME DATETIME)
                           final keys = dayMin.keys.toList();
                           final List<Map<String, double>> plotData = [];
                           double max = 0.0;
+                          double min = double.maxFinite;
                           for (int i = 1; i < keys.length; i++) {
                             final dt = keys[i];
                             final dtPrev = keys[i - 1];
                             final curr = dayMin[keys[i]]!;
                             final prev = dayMin[keys[i - 1]]!;
-                            print("$prev $curr");
                             final dayDiff = DateTime(dt.year, dt.month, dt.day)
                                 .difference(
                                   DateTime(
@@ -331,13 +327,12 @@ class ElectricityWindow extends StatelessWidget {
                             final diff = (prev - curr) / dayDiff;
                             if (diff < 0) continue;
                             if (diff > max) max = diff;
-                            final range =
-                                "${dtPrev.month}-${dtPrev.day}~\n"
-                                "${dt.month}-${dt.day}";
-                            plotData.add({range: diff});
+                            if (diff < min) min = diff;
+                            plotData.add({
+                              "${dtPrev.month}.${dtPrev.day}~${dt.month}.${dt.day} ":
+                                  diff,
+                            });
                           }
-
-                          print(plotData);
 
                           return graphic.Chart<Map<String, double>>(
                             data: plotData,
@@ -348,8 +343,8 @@ class ElectricityWindow extends StatelessWidget {
                               'consPlot': graphic.Variable(
                                 accessor: (map) => map.values.first,
                                 scale: graphic.LinearScale(
-                                  min: 0.0,
-                                  max: max,
+                                  min: min * 0.6,
+                                  max: max * 1.15,
                                   formatter: (v) => v.toStringAsFixed(2),
                                 ),
                               ),
@@ -360,6 +355,12 @@ class ElectricityWindow extends StatelessWidget {
                             ],
                             marks: [
                               graphic.IntervalMark(
+                                label: graphic.LabelEncode(
+                                  encoder: (tuple) => graphic.Label(
+                                    (tuple['consPlot'] as double)
+                                        .toStringAsFixed(2),
+                                  ),
+                                ),
                                 position:
                                     graphic.Varset('range') *
                                     graphic.Varset('consPlot'),
@@ -370,12 +371,13 @@ class ElectricityWindow extends StatelessWidget {
                             ],
                             selections: {
                               'barHover': graphic.PointSelection(
-                                on: {graphic.GestureType.hover},
-                                dim: graphic.Dim.x,
-                              ),
-                              'touchMove': graphic.PointSelection(
-                                on: {graphic.GestureType.hover},
-                                dim: graphic.Dim.x,
+                                on: {
+                                  graphic.GestureType.hover,
+                                  graphic.GestureType.tapDown,
+                                  graphic.GestureType.tapUp,
+                                  graphic.GestureType.longPressMoveUpdate,
+                                  graphic.GestureType.scaleUpdate,
+                                },
                               ),
                             },
                             tooltip: graphic.TooltipGuide(
@@ -385,7 +387,7 @@ class ElectricityWindow extends StatelessWidget {
                           ).constrained(height: 220);
                         },
                       )
-                      .padding(vertical: 12, horizontal: 16)
+                      .padding(vertical: 12, left: 28, right: 20)
                       .decorated(
                         color: Theme.of(context).colorScheme.onPrimary,
                         borderRadius: BorderRadius.circular(12),
