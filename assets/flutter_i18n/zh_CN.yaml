@@ -334,15 +334,14 @@ homepage:
         exam_fetching: "请稍候，正在获取考试信息"
         exam_error: "遇到错误，请联系开发者"
     school_net:
-        title: "校园网余量"
+        title: "已用 {usage}"
         no_password: "无校园网密码，点击设置"
         failed: "获取校园网流量信息失败"
         fetching: "正在获取校园网流量信息"
-        remaining: "当前余量 {remaining}"
+        remaining: "下次结算 {remaining}"
     club_promotion:
         failed: "社团信息获取失败"
         fetching: "社团信息清单正在加载"
-
 
 # 图书馆
 library:

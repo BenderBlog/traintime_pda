@@ -48,11 +48,10 @@ class SchoolnetCard extends StatelessWidget {
                     text: FlutterI18n.translate(
                       context,
                       "homepage.school_net.title",
+                      translationParams: {
+                        "usage": networkInfo.value!.used.replaceAll("G", " GB"),
+                      },
                     ),
-                  ),
-                  const TextSpan(
-                    text: "",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ] else
                   TextSpan(
@@ -71,7 +70,9 @@ class SchoolnetCard extends StatelessWidget {
                 ? FlutterI18n.translate(
                     context,
                     "homepage.school_net.remaining",
-                    translationParams: {"remaining": networkInfo.value!.rest},
+                    translationParams: {
+                      "remaining": networkInfo.value!.charged,
+                    },
                   )
                 : schoolNetStatus.value == SessionState.error
                 ? FlutterI18n.translate(context, isError.value)

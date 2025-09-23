@@ -170,19 +170,18 @@ classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
 
-
 # 社团介绍
 club_promotion:
    type:
-       tech: "Tech"
-       acg: "ACG"
-       union: "Official"
-       profit: "Commercial"
-       sport: "Sport"
-       art: "Culture"
-       unknown: "Unknown"
-       game: "Game"
-       all: "All"
+      tech: "Tech"
+      acg: "ACG"
+      union: "Official"
+      profit: "Commercial"
+      sport: "Sport"
+      art: "Culture"
+      unknown: "Unknown"
+      game: "Game"
+      all: "All"
    wrong_param: "Wrong Parameter"
    no_group_info: "No Club info"
    loading: "Loading"
@@ -192,7 +191,6 @@ club_promotion:
    no_link: "No group invite link provided"
    loading_problem: "Error on loading page"
    picture_preview: "Picture"
-
 
 # 电量窗口
 electricity:
@@ -345,11 +343,11 @@ homepage:
       exam_fetching: "Fetching exam information, please wait"
       exam_error: "An error occurred, please contact the developer"
    school_net:
-      title: "School Net Usage"
+      title: "Used {usage}"
       no_password: "The query password is not set, click to set up"
       failed: "Failed to get the school net usage info"
       fetching: "Fetching the school net usage info"
-      remaining: "Remaining {remaining}"
+      remaining: "Clearing at {remaining}"
    club_promotion:
       failed: "Failed to fetch club info"
       fetching: "Fetching club info"
@@ -387,12 +385,12 @@ library:
 
 # 图书馆入馆状态信息卡
 library_card:
-    title: "Library status"
-    fetching: "Fetching"
-    northern_library: "Northern Library"
-    southern_library: "Southern Library"
-    people: "People: {people}"
-    seat: "Seats: {seat}"
+   title: "Library status"
+   fetching: "Fetching"
+   northern_library: "Northern Library"
+   southern_library: "Southern Library"
+   people: "People: {people}"
+   seat: "Seats: {seat}"
 
 # 登录界面
 login:
@@ -840,7 +838,7 @@ easter_egg_apple: |-
 
 easter_egg_others: |-
    Enjoy your life, dude!
-   
+
 # Firefox about:robots.
 easter_egg_robot:
    # Futurama Bender: "Kill all human, except you(fry), meatbag!"

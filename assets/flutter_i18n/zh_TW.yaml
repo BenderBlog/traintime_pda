@@ -310,11 +310,11 @@ homepage:
     exam_fetching: 請稍候，正在獲取考試信息
     exam_error: 遇到錯誤，請聯繫開發者
   school_net:
-    title: 校園網餘量
+    title: 已用 {usage}
     no_password: 無校園網密碼，點擊設置
     failed: 獲取校園網流量信息失敗
     fetching: 正在獲取校園網流量信息
-    remaining: 當前餘量 {remaining}
+    remaining: 下次結算 {remaining}
   club_promotion:
     failed: 社團信息獲取失敗
     fetching: 社團信息清單正在加載

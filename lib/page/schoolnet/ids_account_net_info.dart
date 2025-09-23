@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/schoolnet/device_list.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -80,30 +79,10 @@ class IdsAccountNetInfo extends StatelessWidget {
               ],
             ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
 
-            // 在线设备列表卡片
-            InfoCard(
-              title: FlutterI18n.translate(
-                context,
-                "school_net.ids_account_net.current_online",
-                translationParams: {
-                  "length": networkInfo.value!.ipList.length.toString(),
-                },
-              ),
-              children: [
-                networkInfo.value!.ipList.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "school_net.ids_account_net.no_device_online",
-                          ),
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      )
-                    : DeviceList(devices: networkInfo.value!.ipList),
-              ],
-            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+            if (networkInfo.value?.ipList.isNotEmpty ?? false)
+              _DeviceListLite(
+                devices: networkInfo.value!.ipList,
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
 
             FilledButton(
                   onPressed: () => update(),
@@ -161,4 +140,68 @@ class IdsAccountNetInfo extends StatelessWidget {
       );
     }
   });
+}
+
+class _DeviceListLite extends StatelessWidget {
+  final List<(String, String, String)> devices;
+  const _DeviceListLite({required this.devices});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final headerStyle = theme.textTheme.bodyLarge?.copyWith(
+      fontWeight: FontWeight.w600,
+      color: theme.colorScheme.onPrimary,
+    );
+    final cellStyle = theme.textTheme.bodyMedium;
+
+    return [
+      [
+            Text(
+              FlutterI18n.translate(context, "school_net.device_list.ip"),
+              style: headerStyle,
+              textAlign: TextAlign.center,
+            ).expanded(flex: 4),
+
+            Text(
+              FlutterI18n.translate(context, "school_net.device_list.time"),
+              style: headerStyle,
+              textAlign: TextAlign.center,
+            ).expanded(flex: 3),
+
+            Text(
+              FlutterI18n.translate(context, "school_net.device_list.remain"),
+              style: headerStyle,
+              textAlign: TextAlign.center,
+            ).expanded(flex: 3),
+          ]
+          .toRow()
+          .padding(vertical: 10)
+          .backgroundColor(theme.colorScheme.primary),
+
+      ...List<Widget>.generate(devices.length, (index) {
+        final d = devices[index];
+        return [
+          const Divider(height: 1),
+          [
+            Text(
+              d.$1,
+              style: cellStyle,
+              textAlign: TextAlign.center,
+            ).expanded(flex: 4),
+            Text(
+              d.$3,
+              style: cellStyle,
+              textAlign: TextAlign.center,
+            ).expanded(flex: 3),
+            Text(
+              d.$2,
+              style: cellStyle,
+              textAlign: TextAlign.center,
+            ).expanded(flex: 3),
+          ].toRow().padding(vertical: 10),
+        ].toColumn();
+      }),
+    ].toColumn().card(elevation: 0);
+  }
 }
