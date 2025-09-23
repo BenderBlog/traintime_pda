@@ -11,7 +11,7 @@ import 'package:styled_widget/styled_widget.dart';
 /// Check the width
 bool isPhone(BuildContext context) => MediaQuery.of(context).size.width < 480;
 bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width > 840;
-const double sheetMaxWidth = 480;
+const double sheetMaxWidth = 600;
 
 /// Use it to show the small items.
 class TagsBoxes extends StatelessWidget {

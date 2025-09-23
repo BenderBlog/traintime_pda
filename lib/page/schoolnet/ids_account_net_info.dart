@@ -40,8 +40,10 @@ class IdsAccountNetInfo extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.orange[200]!),
                 )
-                .padding(all: 4),
-            const SizedBox(height: 4),
+                .padding(vertical: 8, horizontal: 4)
+                .width(double.infinity)
+                .constrained(maxWidth: sheetMaxWidth),
+
             // 用户信息卡片
             InfoCard(
               title: FlutterI18n.translate(
@@ -76,8 +78,8 @@ class IdsAccountNetInfo extends StatelessWidget {
                   valueColor: Colors.green,
                 ),
               ],
-            ),
-            const SizedBox(height: 4),
+            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+
             // 在线设备列表卡片
             InfoCard(
               title: FlutterI18n.translate(
@@ -101,18 +103,23 @@ class IdsAccountNetInfo extends StatelessWidget {
                       )
                     : DeviceList(devices: networkInfo.value!.ipList),
               ],
-            ),
-            const SizedBox(height: 4),
+            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
+
             FilledButton(
-              onPressed: () => update(),
-              child: Text(FlutterI18n.translate(context, "school_net.refresh")),
-            ).padding(all: 4),
+                  onPressed: () => update(),
+                  child: Text(
+                    FlutterI18n.translate(context, "school_net.refresh"),
+                  ),
+                )
+                .padding(horizontal: 4, vertical: 8)
+                .width(double.infinity)
+                .constrained(maxWidth: sheetMaxWidth),
           ]
-          .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-          .constrained(maxWidth: 480)
-          .padding(all: 12)
-          .scrollable()
-          .center();
+          .toColumn(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+          )
+          .scrollable(padding: EdgeInsets.all(12));
     } else if (schoolNetStatus.value == SessionState.fetching) {
       return const Center(child: CircularProgressIndicator());
     } else if (schoolNetStatus.value == SessionState.error &&

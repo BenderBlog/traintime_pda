@@ -111,7 +111,9 @@ class ElectricityWindow extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.orange[200]!),
                   )
-                  .padding(all: 4),
+                  .padding(vertical: 8, horizontal: 4)
+                  .width(double.infinity)
+                  .constrained(maxWidth: sheetMaxWidth),
               InfoCard(
                 iconData: Icons.info,
                 title: FlutterI18n.translate(
@@ -159,8 +161,7 @@ class ElectricityWindow extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 4),
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
               InfoCard(
                 iconData: Icons.history,
                 title: FlutterI18n.translate(context, "electricity.history"),
@@ -265,7 +266,7 @@ class ElectricityWindow extends StatelessWidget {
                       )
                       .padding(top: 4),
                 ],
-              ),
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
               InfoCard(
                 iconData: Icons.bar_chart,
                 title: FlutterI18n.translate(
@@ -347,7 +348,7 @@ class ElectricityWindow extends StatelessWidget {
                                 accessor: (map) => map.values.first,
                                 scale: graphic.LinearScale(
                                   min: min * 0.6,
-                                  max: max * 1.15,
+                                  max: max * 1.05,
                                   formatter: (v) => v.toStringAsFixed(2),
                                 ),
                               ),
@@ -397,21 +398,23 @@ class ElectricityWindow extends StatelessWidget {
                       )
                       .padding(top: 4),
                 ],
-              ),
-              const SizedBox(height: 4),
+              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
               FilledButton(
-                onPressed: () => update(force: true),
-                child: Text(
-                  FlutterI18n.translate(context, "electricity.update"),
-                ),
-              ).padding(all: 4),
+                    onPressed: () => update(force: true),
+                    child: Text(
+                      FlutterI18n.translate(context, "electricity.update"),
+                    ),
+                  )
+                  .padding(horizontal: 4, vertical: 8)
+                  .width(double.infinity)
+                  .constrained(maxWidth: sheetMaxWidth),
               Image.asset("assets/art/pda_girl_default.png"),
             ]
-            .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-            .constrained(maxWidth: 480)
-            .padding(left: 12, right: 12, top: 12, bottom: 28)
-            .scrollable()
-            .center();
+            .toColumn(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+            )
+            .scrollable(padding: EdgeInsets.fromLTRB(12, 12, 12, 28));
       }),
     );
   }

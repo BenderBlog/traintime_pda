@@ -51,8 +51,9 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.orange[200]!),
                 )
-                .padding(all: 4),
-            const SizedBox(height: 4),
+                .padding(vertical: 8, horizontal: 4)
+                .width(double.infinity)
+                .constrained(maxWidth: sheetMaxWidth),
 
             // 用户信息卡片
             InfoCard(
@@ -90,8 +91,7 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                   valueColor: Colors.green,
                 ),
               ],
-            ),
-            const SizedBox(height: 4),
+            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
 
             // 流量使用卡片
             InfoCard(
@@ -141,18 +141,22 @@ class CurrentLoginUserNetInfo extends StatelessWidget {
                   color: Colors.blue,
                 ),
               ],
-            ),
-            const SizedBox(height: 4),
+            ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth),
             FilledButton(
-              onPressed: () => SchoolnetSession.getCurrentUserLogin(),
-              child: Text(FlutterI18n.translate(context, "school_net.refresh")),
-            ).padding(all: 4),
+                  onPressed: () => SchoolnetSession.getCurrentUserLogin(),
+                  child: Text(
+                    FlutterI18n.translate(context, "school_net.refresh"),
+                  ),
+                )
+                .padding(horizontal: 4, vertical: 8)
+                .width(double.infinity)
+                .constrained(maxWidth: sheetMaxWidth),
           ]
-          .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-          .constrained(maxWidth: 480)
-          .padding(all: 12)
-          .scrollable()
-          .center();
+          .toColumn(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+          )
+          .scrollable(padding: EdgeInsets.all(12));
     } else if (currentUserNetInfoStatus.value ==
         CurrentUserNetInfoState.fetching) {
       return const Center(child: CircularProgressIndicator());
