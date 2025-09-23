@@ -292,6 +292,7 @@ class ElectricityWindow extends StatelessWidget {
                               dayMin[dayTime] = v;
                             }
                           }
+
                           // If only one day, unable to parse.
                           if (dayMin.keys.length <= 1) {
                             return Text(
@@ -336,6 +337,23 @@ class ElectricityWindow extends StatelessWidget {
                               "${dtPrev.month}.${dtPrev.day}~${dt.month}.${dt.day} ":
                                   diff,
                             });
+                          }
+
+                          // If no record, we cannot render it.
+                          if (plotData.isEmpty) {
+                            return Text(
+                              FlutterI18n.translate(
+                                context,
+                                "electricity.not_enough_data",
+                              ),
+                              textAlign: TextAlign.center,
+
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                            ).width(double.infinity);
                           }
 
                           return graphic.Chart<Map<String, double>>(
