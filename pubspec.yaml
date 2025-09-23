@@ -41,7 +41,6 @@ dependencies:
   calendar_date_picker2: ^2.0.0
   cached_network_image: ^3.2.3
   qr_flutter: ^4.1.0
-  data_table_2: ^2.5.1
   flutter_native_splash: ^2.3.1
   get:
   provider: ^6.1.5

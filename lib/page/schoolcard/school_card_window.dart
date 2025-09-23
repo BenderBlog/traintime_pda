@@ -12,7 +12,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
@@ -124,67 +123,86 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                     ),
                   );
                 } else {
-                  return DataTable2(
-                    columnSpacing: 0,
-                    horizontalMargin: 6,
-                    columns: [
-                      DataColumn2(
-                        size: ColumnSize.S,
-                        label: Center(
-                          child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "school_card_window.store_name",
-                            ),
-                          ),
-                        ),
+                  final theme = Theme.of(context);
+                  final headerStyle = theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  );
+                  final cellStyle = theme.textTheme.bodyMedium;
+
+                  final headerRow = [
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "school_card_window.store_name",
                       ),
-                      DataColumn2(
-                        size: ColumnSize.S,
-                        label: Center(
-                          child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "school_card_window.balance",
-                            ),
-                          ),
-                        ),
+                      style: headerStyle,
+                      textAlign: TextAlign.center,
+                    ).expanded(flex: 3),
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "school_card_window.balance",
                       ),
-                      DataColumn2(
-                        size: ColumnSize.L,
-                        label: Center(
-                          child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "school_card_window.time_with_sum",
-                              translationParams: {
-                                "sum": moneySunUp(snapshot.data!),
-                              },
-                            ),
-                          ),
+                      style: headerStyle,
+                      textAlign: TextAlign.center,
+                    ).expanded(flex: 2),
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "school_card_window.time_with_sum",
+                        translationParams: {"sum": moneySunUp(snapshot.data!)},
+                      ),
+                      style: headerStyle,
+                      textAlign: TextAlign.center,
+                    ).expanded(flex: 4),
+                  ].toRow().padding(vertical: 10);
+
+                  final dataRows = List<Widget>.generate(
+                    snapshot.data!.length,
+                    (index) {
+                      final record = snapshot.data![index];
+                      return [
+                        if (index != 0)
+                          const Divider(
+                            height: 1,
+                          ).constrained(width: sheetMaxWidth),
+                        [
+                              Text(
+                                record.place,
+                                style: cellStyle,
+                                textAlign: TextAlign.center,
+                              ).expanded(flex: 3),
+                              Text(
+                                record.money,
+                                style: cellStyle,
+                                textAlign: TextAlign.center,
+                              ).expanded(flex: 2),
+                              Text(
+                                record.date,
+                                style: cellStyle,
+                                textAlign: TextAlign.center,
+                              ).expanded(flex: 4),
+                            ]
+                            .toRow()
+                            .padding(vertical: 10)
+                            .constrained(width: sheetMaxWidth),
+                      ].toColumn().width(double.infinity);
+                    },
+                  );
+
+                  return Column(
+                    children: [
+                      headerRow.constrained(width: sheetMaxWidth),
+                      const Divider(
+                        height: 1,
+                      ).constrained(width: sheetMaxWidth),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(children: dataRows),
                         ),
                       ),
                     ],
-                    rows: List<DataRow>.generate(
-                      snapshot.data!.length,
-                      (index) => DataRow(
-                        cells: [
-                          DataCell(
-                            Text(
-                              snapshot.data![index].place,
-                              textAlign: TextAlign.center,
-                            ).center(),
-                          ),
-                          DataCell(
-                            Center(child: Text(snapshot.data![index].money)),
-                          ),
-                          DataCell(
-                            Center(child: Text(snapshot.data![index].date)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ).constrained(maxWidth: sheetMaxWidth).center();
+                  );
                 }
               } else {
                 return const CircularProgressIndicator().center();
