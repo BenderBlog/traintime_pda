@@ -10,6 +10,7 @@
 
 import WidgetKit
 import SwiftUI
+import OSLog
 
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
@@ -18,6 +19,10 @@ private let experimentFile = "Experiment.json"
 private let swiftFile = "WeekSwift.txt"
 private let format = "yyyy-MM-dd HH:mm:ss"
 private let myDateFormatter = DateFormatter()
+let logger = Logger(
+  subsystem: "xyz.superbart.xdyou",
+  category: "ClassTableWidget"
+)
 
 struct StartDayFetchError : Error {}
 
@@ -27,13 +32,40 @@ enum ArrangementType : String {
     case experiment = "实\n验"
 }
 
+enum ErrorType : Int {
+   case none
+   case course
+   case exam
+   case experiment
+   case others
+}
+
+struct SimpleEntry: TimelineEntry {
+    var date : Date
+    var currentWeek : Int
+    let arrangement : [TimeLineStructItems]
+    var errorType : ErrorType
+    var error : String?
+}
+
+struct TimeLineStructItems {
+    var type : ArrangementType
+    var name : String
+    var teacher : String
+    var place : String
+    var start_time : Date
+    var end_time : Date
+    var colorIndex : Int
+}
+
 struct Provider: TimelineProvider {
-    
     func placeholder(in context: Context) -> SimpleEntry {
         return SimpleEntry(
             date: Date(),
             currentWeek: -1,
-            arrangement: []
+            arrangement: [],
+            errorType: .none,
+            error: nil
         )
     }
 
@@ -47,6 +79,7 @@ struct Provider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         var arrangement : [TimeLineStructItems] = []
         
+        // Fetch the current day, and calculate tomorrow if system allow and user query it
         var day = Date()
         var currentWeekToStore = -1
         let calendar = Calendar.current
@@ -54,10 +87,12 @@ struct Provider: TimelineProvider {
             day = calendar.date(byAdding: .day, value: 1, to: day)!
         }
         
+        // Initalize json decoder and date formatter
         let decoder = JSONDecoder()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
+        // Get content from widget group id
         let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: widgetGroupId
         )!
@@ -65,53 +100,54 @@ struct Provider: TimelineProvider {
         // Deal with ClassTable data
         do {
             // Read data
-            print("getting classtable data")
+            logger.info("Getting courses data...")
             let fileURL = containerURL.appendingPathComponent(classTableFile)
             let jsonData = try Data(contentsOf: fileURL)
             let classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
             
             // Fetch start day
-            var startDay : Date? = dateFormatter.date(from: classData.termStartDay)
-            if startDay == nil {
+            guard var startDay = dateFormatter.date(from: classData.termStartDay) else {
                 throw StartDayFetchError()
             }
+            logger.info("Term start day is \(startDay)")
             
-            // With swift
-            var classSwift : Int = 0
+            // Add start day with swift
+            var weekSwift : Int = 0
             do {
                 let swiftData = try String(
                     contentsOf: containerURL.appendingPathComponent(swiftFile),
                     encoding: .utf8
                 )
-                classSwift = Int(swiftData) ?? 0
+                weekSwift = Int(swiftData) ?? 0
             } catch {
-                print(String(describing: error))
+                logger.warning("Could not fetch week swift, set to 0 by default. Error detail: \(String(describing: error))")
             }
-            print("swift: \(classSwift)")
+            logger.info("Week swift is \(weekSwift)")
 
             var dateComponent = DateComponents()
-            dateComponent.day = 7 * classSwift
-            startDay = Calendar.current.date(byAdding: dateComponent, to: startDay!)
+            dateComponent.day = 7 * weekSwift
+            startDay = Calendar.current.date(byAdding: dateComponent, to: startDay)!
 
             // Current week and others
-            let components = calendar.dateComponents([.day], from: startDay!, to: day)
+            let components = calendar.dateComponents([.day], from: startDay, to: day)
             var delta = components.day!
             if delta < 0 {
                 delta = -7
             }
             let currentWeek : Int = delta / 7
-            var index : Int = calendar.component(.weekday, from: day)
-            if index == 1 {
-                index = 7
+            // Caution: .weekday starts from Sunday!
+            var dayInWeek : Int = calendar.component(.weekday, from: day)
+            if dayInWeek == 1 {
+                dayInWeek = 7
             } else {
-                index -= 1
+                dayInWeek -= 1
             }
+            logger.info("Start day is \(String(describing: startDay)), currentWeek is \(currentWeek) and dayOfWeek is \(dayInWeek)")
             
-            print("startDay: \(String(describing: startDay)) currentWeek: \(currentWeek) index: \(index)")
             if currentWeek >= 0 && currentWeek < classData.semesterLength {
                 currentWeekToStore = currentWeek
                 for i in classData.timeArrangement {
-                    if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == index {
+                    if i.week_list.count > currentWeek && i.week_list[currentWeek] && i.day == dayInWeek {
                         let startData = TimeInt[(i.start - 1) * 2]
                         let stopData = TimeInt[(i.stop - 1) * 2 + 1]
                         arrangement.append(TimeLineStructItems(
@@ -137,12 +173,25 @@ struct Provider: TimelineProvider {
                 }
             }
         } catch {
-            print("classtable error: \(String(describing: error))")
+            logger.error("Fetch courses error: \(String(describing: error))")
+            let entries = [
+                SimpleEntry(
+                    date: Date(),
+                    currentWeek: currentWeekToStore,
+                    arrangement: [],
+                    errorType: .course,
+                    error: String(describing: error)
+                )
+            ]
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+            return
         }
         
         // Deal with exam data
         do {
             // Read data
+            logger.info("Getting exam data...")
             let fileURL = containerURL.appendingPathComponent(examFile)
             let jsonData = try Data(contentsOf: fileURL)
             let examData : ExamData = try decoder.decode(ExamData.self, from: jsonData)
@@ -167,128 +216,185 @@ struct Provider: TimelineProvider {
                 }
             }
         } catch {
-            print("exam error: \(String(describing: error))")
+            logger.error("Fetch exam error: \(String(describing: error))")
+            let entries = [
+                SimpleEntry(
+                    date: Date(),
+                    currentWeek: currentWeekToStore,
+                    arrangement: [],
+                    errorType: .exam,
+                    error: String(describing: error)
+                )
+            ]
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+            return
         }
         
         // Deal with experiment data
         do {
             // Read data
+            logger.info("Getting experiment data...")
             let fileURL = containerURL.appendingPathComponent(experimentFile)
-            let jsonData = try Data(contentsOf: fileURL)
-            let experimentData : [ExperimentData] = try decoder.decode([ExperimentData].self, from: jsonData)
-            
-            let components = calendar.dateComponents([.day,.month,.year], from: day)
-            let day = components.day
-            let month = components.month
-            let year = components.year
-            
-            // Today data
-            for i in experimentData {
-                let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
-                if thisDay.year == year && thisDay.month == month && thisDay.day == day {
-                    arrangement.append(TimeLineStructItems(
-                        type: .experiment,
-                        name: i.name,
-                        teacher: i.teacher,
-                        place: i.classroom,
-                        start_time: i.startTime,
-                        end_time: i.endTime,
-                        colorIndex: experimentData.firstIndex(where: {$0 === i}) ?? 0
-                    ))
+            if let jsonData = try? Data(contentsOf: fileURL) {
+                let experimentData : [ExperimentData] = try decoder.decode([ExperimentData].self, from: jsonData)
+                
+                let components = calendar.dateComponents([.day,.month,.year], from: day)
+                let day = components.day
+                let month = components.month
+                let year = components.year
+                
+                for i in experimentData {
+                    let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
+                    if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                        arrangement.append(TimeLineStructItems(
+                            type: .experiment,
+                            name: i.name,
+                            teacher: i.teacher,
+                            place: i.classroom,
+                            start_time: i.startTime,
+                            end_time: i.endTime,
+                            colorIndex: experimentData.firstIndex(where: {$0 === i}) ?? 0
+                        ))
+                    }
                 }
+            } else {
+                logger.warning("No experiment data file, will ignore it")
             }
         } catch {
-            print("experiment error: \(String(describing: error))")
+            logger.error("Fetch experiment error: \(String(describing: error))")
+            let entries = [
+                SimpleEntry(
+                    date: Date(),
+                    currentWeek: currentWeekToStore,
+                    arrangement: [],
+                    errorType: .experiment,
+                    error: String(describing: error)
+                )
+            ]
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+            return
+
         }
         
         // Order
         arrangement.sort(by: {$0.start_time < $1.start_time})
-
-        print("arrangement: \(arrangement.count)")
+        logger.info("Successfully fetcn arrangement data, it have \(arrangement.count) item(s)")
         
-        var entryDates : Set<Date?> = []
+        // Generate timelines
+        var entryDates : Set<Date> = []
         var entries: [SimpleEntry] = []
         for todayItem in arrangement {
             entryDates.insert(todayItem.start_time)
             entryDates.insert(todayItem.end_time)
         }
         if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value == true {
-            print("isTomorrow")
+            logger.info("User wants tomorrow's arrangements")
             entries.append(SimpleEntry(
                 date: Date(),
                 currentWeek: currentWeekToStore,
-                arrangement: arrangement
+                arrangement: arrangement,
+                errorType: .none,
+                error: nil
             ))
         } else if arrangement.isEmpty {
-            print("Noitem")
+            logger.info("Arrangement data have no items")
             entries.append(SimpleEntry(
                 date: Date(),
                 currentWeek: currentWeekToStore,
-                arrangement: arrangement
+                arrangement: arrangement,
+                errorType: .none,
+                error: nil
+
             ))
         } else {
-            print("isToday")
+            logger.info("User wants today's arrangements, will remove occured arrangements")
             for entryDate in entryDates {
-                if (entryDate == nil) {
-                    continue
-                }
-                print("\(String(describing: entryDate?.formatted()))")
-                var toShow : [TimeLineStructItems] = []
-                for arr in arrangement {
-                    print("\(arr.end_time.formatted()) \(arr.end_time > entryDate!)")
-                    if arr.end_time > entryDate! {
-                        toShow.append(arr)
-                    }
-                }
                 entries.append(SimpleEntry(
-                    date: entryDate!,
+                    date: entryDate,
                     currentWeek: currentWeekToStore,
-                    arrangement: toShow
+                    arrangement: arrangement.filter{
+                        element in return element.end_time > entryDate
+                    },
+                    errorType: .none,
+                    error: nil
                 ))
                 print("\(entries)")
             }
         }
         
-        print("Updating timeline")
+        logger.info("Updating timeline")
         let timeline = Timeline(entries: entries, policy: .atEnd)
         completion(timeline)
     }
 }
 
-struct SimpleEntry: TimelineEntry {
-    var date : Date
-    var currentWeek : Int
-    let arrangement : [TimeLineStructItems]
-}
 
-// Data struct
-struct TimeLineStructItems {
-    var type : ArrangementType
-    var name : String
-    var teacher : String
-    var place : String
-    var start_time : Date
-    var end_time : Date
-    var colorIndex : Int
-}
 
 struct ClasstableWidgetEntryView : View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var widgetFamily
     @Environment(\.colorScheme) var colorScheme
-    
+
+        
     init(entry: Provider.Entry) {
         self.entry = entry
     }
     
-    var body: some View {
+    @ViewBuilder
+    private func errorContentView() -> some View {
+        let errorMessage = switch entry.errorType {
+        case .course:
+            NSLocalizedString("error_course", comment: "Failed to load course data.")
+        case .exam:
+            NSLocalizedString("error_exam", comment: "Failed to load exam data.")
+        case .experiment:
+            NSLocalizedString("error_experiment", comment: "Failed to load experiment data.")
+        case .others:
+            NSLocalizedString("error_other", comment: "An unexpected error occurred.")
+        case .none:
+            ""
+        }
+        VStack(alignment: .leading) {
+            HStack(alignment: .firstTextBaseline) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(
+                        colorScheme == .dark ? .white :
+                            Color(hexString: "#314e7a")
+                    )
+                Text(errorMessage)
+                    .font(.system(size: 18))
+                    .fontWeight(.medium)
+                    .foregroundStyle(
+                        colorScheme == .dark ? .white :
+                            Color(hexString: "#314e7a")
+                    )
+            }
+            Text(entry.error ?? "No message about this error.")
+                    .foregroundStyle(
+                        colorScheme == .dark ? .white :
+                            Color(hexString: "#314e7a")
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        }.padding()
+        
+    }
+    
+    
+    private func normalContentView() -> some View {
+                
+        // Calculate the date arrangements will show
         var day = Date()
         let calendar = Calendar.current
-        //let array = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
+        
         if #available(iOS 17.0, macOS 13.0, tvOS 17.0, watchOS 10.0, *), IsTomorrowManager.value {
-            print("isTomorrow")
+            logger.info("Will show tomorrow's arrangments")
             day = calendar.date(byAdding: .day, value: 1, to: day)!
         }
+        
+        // Generate title screen
         var title = NSLocalizedString("title", comment: "Title of the widget")
         if (widgetFamily != .systemSmall) {
             title = "XDYou ".appending(title)
@@ -312,21 +418,21 @@ struct ClasstableWidgetEntryView : View {
                         .fontWeight(.medium)
                         .foregroundStyle(
                             colorScheme == .dark ? .white :
-                            Color(hexString: "#314e7a")
+                                Color(hexString: "#314e7a")
                         )
                     Text(
                         "\(dateFormatter.string(from: day))" +
                         " \(entry.currentWeek >= 0 ? "\(weekOfSemester)" : "")"
                     ).font(.system(size: 10))
-                     .foregroundStyle(Color(hexString: "#abbed1"))
+                        .foregroundStyle(Color(hexString: "#abbed1"))
                 }
                 if #available(iOS 17.0, macOS 13.0, tvOS 17.0, watchOS 10.0, *) {
                     Spacer()
                     Button(intent: IsTomorrowIntent()) {
                         Image(
                             systemName: IsTomorrowManager.value ?
-                                        "chevron.backward" :
-                                        "chevron.forward"
+                            "chevron.backward" :
+                                "chevron.forward"
                         )
                     }.buttonStyle(.plain)
                 }
@@ -342,7 +448,7 @@ struct ClasstableWidgetEntryView : View {
                         i in EventItem(entry.arrangement[i])
                     }
                 }
-
+                
                 Spacer()
             } else {
                 let text = Text(NSLocalizedString("no_arrangement", comment: "No arrangment")).foregroundStyle(Color(hexString: "#abbed1"))
@@ -362,6 +468,17 @@ struct ClasstableWidgetEntryView : View {
                     }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
             }
+        }.padding()
+    }
+
+    
+    var body: some View {
+        Group {
+            if entry.errorType != .none {
+                errorContentView()
+            } else {
+                normalContentView()
+            }
         }
     }
 }
@@ -376,10 +493,10 @@ struct ClasstableWidget: Widget {
                     .containerBackground(Color("WidgetBackground"), for: .widget)
             } else {
                 ClasstableWidgetEntryView(entry: entry)
-                    .padding()
                     .background(Color("WidgetBackground"))
             }
         }
+        .contentMarginsDisabled()
         .configurationDisplayName(NSLocalizedString("widget_title", comment: "Widget Title"))
         .description(NSLocalizedString("widget_description", comment: "Widget Description"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
@@ -394,7 +511,16 @@ struct ClasstableWidget: Widget {
     SimpleEntry(
         date: Date.now,
         currentWeek: -1,
-        arrangement: []
+        arrangement: [],
+        errorType: .others,
+        error: "Testing error"
+    )
+    SimpleEntry(
+        date: Date.now,
+        currentWeek: -1,
+        arrangement: [],
+        errorType: .none,
+        error: nil
     )
     SimpleEntry(
         date: Date.now,
@@ -407,7 +533,10 @@ struct ClasstableWidget: Widget {
             start_time: Date.now,
             end_time: Date.now,
             colorIndex: 1
-        )]
+        )],
+        errorType: .none,
+        error: nil
+
     )
     SimpleEntry(
         date: Date.now,
@@ -431,6 +560,8 @@ struct ClasstableWidget: Widget {
                 end_time: Date.now,
                 colorIndex: 2
             )
-        ]
+        ],
+        errorType: .none,
+        error: nil
     )
 }
