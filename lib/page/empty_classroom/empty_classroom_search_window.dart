@@ -254,63 +254,61 @@ class _EmptyClassroomSearchWindowState
             }),
           ).expanded()
         else
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: ListView.separated(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final item = data[index];
-                return Row(
-                  children: [
-                    Flexible(
-                      flex: 3,
-                      child: Text(
-                        item.name,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ).center(),
-                    ),
-                    Flexible(
-                      flex: 4,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 4.0,
-                        children: List.generate(
-                          4,
-                          (i) => getIcon(item.isUsed[i], index: i + 1),
-                        ),
-                      ).center(),
-                    ),
-                    Flexible(
-                      flex: 4,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 4.0,
-                        children: List.generate(
-                          4,
-                          (i) => getIcon(item.isUsed[i + 4], index: i + 5),
-                        ),
-                      ).center(),
-                    ),
-                    Flexible(
-                      flex: 3,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 4.0,
-                        children: List.generate(
-                          3,
-                          (i) => getIcon(item.isUsed[i + 8], index: i + 9),
-                        ),
-                      ).center(),
-                    ),
-                  ],
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  SizedBox(height: 12),
-            ),
-          ).constrained(maxWidth: sheetMaxWidth).center().expanded(),
+          ListView.separated(
+            itemCount: data.length,
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+            itemBuilder: (context, index) {
+              final item = data[index];
+              return Row(
+                children: [
+                  Flexible(
+                    flex: 3,
+                    child: Text(
+                      item.name,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ).center(),
+                  ),
+                  Flexible(
+                    flex: 4,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 4.0,
+                      children: List.generate(
+                        4,
+                        (i) => getIcon(item.isUsed[i], index: i + 1),
+                      ),
+                    ).center(),
+                  ),
+                  Flexible(
+                    flex: 4,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 4.0,
+                      children: List.generate(
+                        4,
+                        (i) => getIcon(item.isUsed[i + 4], index: i + 5),
+                      ),
+                    ).center(),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 4.0,
+                      children: List.generate(
+                        3,
+                        (i) => getIcon(item.isUsed[i + 8], index: i + 9),
+                      ),
+                    ).center(),
+                  ),
+                ],
+              ).constrained(maxWidth: sheetMaxWidth).center();
+            },
+            separatorBuilder: (BuildContext context, int index) =>
+                SizedBox(height: 12),
+          ).expanded(),
       ],
     );
   }
