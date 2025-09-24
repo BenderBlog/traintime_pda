@@ -24,10 +24,9 @@ class AboutPage extends StatefulWidget {
 
 class _AboutPageState extends State<AboutPage> {
   final String urlOthers =
-      "https://www.bilibili.com/video/BV1pX4y1Q7vV/?t=1096.0";
+      "https://www.bilibili.com/video/BV1mDKPzxEGj?t=1501.1";
 
-  final String urlApple =
-      "https://www.bilibili.com/video/BV1mx411S7Y5/?t=877.8&p=6";
+  final String urlApple = "https://www.bilibili.com/video/BV1ACKMeMEUW";
 
   List<Developer> getDevelopers() => [
     Developer(
@@ -256,7 +255,8 @@ class _AboutPageState extends State<AboutPage> {
                   TextSpan(text: " v${preference.packageInfo.version}\n"),
                   TextSpan(
                     text:
-                        "${Platform.isIOS || Platform.isMacOS ? "It's About That Time " : "In A Slient Way"} - Hanao Edition",
+                        "${Platform.isIOS || Platform.isMacOS ? "O Grande Amor" : "Para Machucar Meu Coração"}"
+                        " - Tropical Iced Tea Edition",
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -373,7 +373,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           icon: const Icon(Icons.headphones),
         ),
-      ].toRow(mainAxisAlignment: MainAxisAlignment.center),
+      ].toRow(mainAxisAlignment: MainAxisAlignment.center).padding(bottom: 8),
       Text(
         FlutterI18n.translate(
           context,
@@ -382,14 +382,6 @@ class _AboutPageState extends State<AboutPage> {
               : "easter_egg_others",
         ),
       ),
-      SizedBox(height: 20),
-      Image.asset(
-        Platform.isIOS || Platform.isMacOS
-            ? "assets/art/pda_girl_reading.png"
-            : "assets/art/pda_girl_singing.png",
-      ),
-      SizedBox(height: 20),
-      Text("It takes a long time to sound like yourself."),
     ].toColumn(),
   );
 
@@ -406,14 +398,16 @@ class _AboutPageState extends State<AboutPage> {
                       MediaQuery.sizeOf(context).height >
                   1) {
             return [
-                  [_title(context)]
+                  [_title(context), _developerList]
                       .toColumn(mainAxisAlignment: MainAxisAlignment.center)
+                      .padding(vertical: 8)
+                      .scrollable()
                       .flexible(flex: 1),
-                  [
-                    _developerList,
-                    _moreList(context),
-                    _versionHint(context).padding(bottom: 14),
-                  ].toColumn().scrollable().flexible(flex: 1),
+                  [_moreList(context), _versionHint(context)]
+                      .toColumn()
+                      .padding(vertical: 8)
+                      .scrollable()
+                      .flexible(flex: 1),
                 ]
                 .toRow(
                   mainAxisAlignment: MainAxisAlignment.center,

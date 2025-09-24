@@ -111,9 +111,9 @@ flutter:
     - assets/art/pda_empty_cover.jpg
     - assets/art/pda_classtable_empty.png
     - assets/art/pda_girl_default.png
-    - assets/art/pda_girl_singing.png
+#    - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.png
-    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
+#    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/flutter_i18n/en_US.yaml

@@ -14,8 +14,6 @@ class EmptyListView extends StatelessWidget {
     switch (type) {
       case EmptyListViewType.reading:
         return "assets/art/pda_girl_reading.png";
-      case EmptyListViewType.singing:
-        return "assets/art/pda_girl_singing.png";
       case EmptyListViewType.rolling:
         return "assets/art/pda_classtable_empty.png";
       default:
