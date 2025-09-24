@@ -55,6 +55,9 @@
             android:value="2" />
     </application>
 
+    <!-- For network usage -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- For outputing class to system calendar -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />

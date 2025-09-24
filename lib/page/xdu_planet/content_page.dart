@@ -5,8 +5,6 @@
 // Content page of XDU Planet.
 
 import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
