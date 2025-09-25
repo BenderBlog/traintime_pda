@@ -7,9 +7,13 @@
     <string name="classtable_day_switcher_decription">ClassTable Day Switcher</string>
     <string name="widget_classtable_on_holiday">On Holiday</string>
     <string name="widget_classtable_week_identifier">Week %1$d</string>
-    <string name="widget_classtable_on_error">Error occurred on %1$s: %2$s</string>
+    <string name="widget_classtable_on_error">Error on %1$s</string>
     <string name="widget_classtable_unknown_error">Unknown error</string>
-    <string name="widget_classtable_load_data_error">Failed to load data %1$s. %2$s</string>
     <string name="widget_classtable_calculate_index_error">Problem on calculating index at %1$s</string>
     <string name="widget_classtable_parse_term_start_time_error">Failed to parse the term start day</string>
+    <string name="widget_classtable_error_course">course info</string>
+    <string name="widget_classtable_error_course_user_defined">user defined info</string>
+    <string name="widget_classtable_error_experience">experiment info</string>
+    <string name="widget_classtable_error_exam">exam info</string>
+    <string name="widget_classtable_error_other">other issues</string>
 </resources>

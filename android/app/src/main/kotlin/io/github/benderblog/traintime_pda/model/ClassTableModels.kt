@@ -112,21 +112,18 @@ data class ClassTableData(
     }
 
     // Should never go wrong.
-    fun getClassName(arrangement: TimeArrangement): String =
-        when (arrangement.source) {
-            Source.SCHOOL -> classDetail[arrangement.index].name
-            Source.USER -> userDefinedDetail[arrangement.index].name
-            Source.EXAM -> "Unknown Exam"
-            Source.EXPERIMENT -> "Unknown Experiment"
-            Source.EMPTY -> "Unknown Empty"
-        }
+    fun getClassName(arrangement: TimeArrangement): String = when (arrangement.source) {
+        Source.SCHOOL -> classDetail[arrangement.index].name
+        Source.USER -> userDefinedDetail[arrangement.index].name
+        Source.EXAM -> "Unknown Exam"
+        Source.EXPERIMENT -> "Unknown Experiment"
+        Source.EMPTY -> "Unknown Empty"
+    }
 }
 
 @Serializable
 data class ClassDetail(
-    val name: String,
-    val code: String?,
-    val number: String?
+    val name: String, val code: String?, val number: String?
 )
 
 @Serializable
@@ -150,8 +147,7 @@ enum class Source {
 @Serializable
 data class TimeArrangement(
     val index: Int,
-    @SerialName("week_list")
-    val weekList: List<Boolean>,
+    @SerialName("week_list") val weekList: List<Boolean>,
     val teacher: String?,
     val day: Int,
     val start: Int,
@@ -166,11 +162,7 @@ data class TimeArrangement(
 data class ExamData(
     val subject: List<Subject>
     // ToBeArranged has been omitted here since useless here.
-) {
-    companion object {
-        val EMPTY = ExamData(emptyList())
-    }
-}
+)
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -226,26 +218,26 @@ val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
                 dateNumbers[2],
                 dateNumbers[0],
                 dateNumbers[1],
-                15,55,0,
+                15, 55, 0,
             )
             stopTime = LocalDateTime.of(
                 dateNumbers[2],
                 dateNumbers[0],
                 dateNumbers[1],
-                18,10,0,
+                18, 10, 0,
             )
         } else {
             startTime = LocalDateTime.of(
                 dateNumbers[2],
                 dateNumbers[0],
                 dateNumbers[1],
-                18,30,0,
+                18, 30, 0,
             )
             stopTime = LocalDateTime.of(
                 dateNumbers[2],
                 dateNumbers[0],
                 dateNumbers[1],
-                20,45,0,
+                20, 45, 0,
             )
         }
 
