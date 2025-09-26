@@ -7,9 +7,13 @@
     <string name="classtable_day_switcher_decription">切换显示日期</string>
     <string name="widget_classtable_on_holiday">假期中</string>
     <string name="widget_classtable_week_identifier">第 %1$d 周</string>
-    <string name="widget_classtable_on_error">在 %1$s 遇到错误：%2$s</string>
+    <string name="widget_classtable_on_error">在%1$s遇到错误</string>
     <string name="widget_classtable_unknown_error">未知错误</string>
-    <string name="widget_classtable_load_data_error">%1$s 数据加载故障，%2$s</string>
     <string name="widget_classtable_calculate_index_error">计算 %1$s 处的索引时出现问题</string>
     <string name="widget_classtable_parse_term_start_time_error">无法解析学期开始日期格式</string>
+    <string name="widget_classtable_error_course">获取课程信息</string>
+    <string name="widget_classtable_error_course_user_defined">获取用户定义课程信息</string>
+    <string name="widget_classtable_error_experience">获取实验信息</string>
+    <string name="widget_classtable_error_exam">获取考试信息</string>
+    <string name="widget_classtable_error_other">其他方面</string>
 </resources>

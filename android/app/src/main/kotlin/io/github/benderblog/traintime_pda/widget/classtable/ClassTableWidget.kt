@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,6 +78,7 @@ class ClassTableWidget : GlanceAppWidget() {
             Content(currentState())
         }
     }
+
     override val sizeMode = SizeMode.Exact
 
     companion object {
@@ -119,72 +119,41 @@ class ClassTableWidget : GlanceAppWidget() {
 
     @Composable
     private fun Content(currentState: HomeWidgetGlanceState) {
-        // 数据来源
+        // Data Source
         val context = LocalContext.current
         val glanceId = LocalGlanceId.current
         val dataProvider = remember { ClassTableWidgetDataProvider() }
         Log.i(tag, "Content triggered.")
 
-        // 组件状态
-        var currentWeekIndex by remember { mutableIntStateOf(-1) }
-        var tomorrowWeekIndex by remember { mutableIntStateOf(-1)}
-        var schedulesToday by remember { mutableStateOf<List<TimeLineItem>>(emptyList()) }
-        var schedulesTomorrow by remember { mutableStateOf<List<TimeLineItem>>(emptyList()) }
+        // Widget State
         var isShowingToday by remember { mutableStateOf(false) }
         var widgetState by remember { mutableStateOf(ClassTableWidgetLoadState.LOADING) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
         Log.i(tag, "Content state initialized.")
 
-        // 获取当前日期
-        val day = LocalDateTime.now()
-
-        // 加载显示今天还是明天
+        // Check whether today or tomorrow's data should be loaded
         val prefs = currentState.preferences
         isShowingToday = prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
-        Log.i(tag,
-            "Will load day: " +
-                    "${day.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}, " +
-                    "isShowingToday: $isShowingToday."
-         )
+        Log.i(tag, "isShowingToday: $isShowingToday.")
 
         LaunchedEffect(key1 = glanceId) {
             widgetState = ClassTableWidgetLoadState.LOADING
             errorMessage = null
             Log.i(tag, "LaunchedEffect triggered.")
 
-            // 加载数据
+            // Load data
             withContext(Dispatchers.IO) {
-                try {
-                    ClassTableDataHolder.loadData(context)
-                    dataProvider.reloadData(day, context)
-                } catch (e: Exception) {
-                    Log.e(tag, "Error during data loading prep: ${e.message}", e)
-                    errorMessage = context.getString(
-                        R.string.widget_classtable_load_data_error,
-                        "data loading prep",
-                        e.message ?: context.getString(R.string.widget_classtable_unknown_error)
-                    )
-                }
+                ClassTableDataHolder.loadData(context)
+                dataProvider.reloadData(isShowingToday, context)
             }
 
-            // 读取 ClassTableDataHolder 里面的 errorMessage
-            if (errorMessage == null) {
-                errorMessage = dataProvider.getErrorMessage()
+            // Read status from dataProvider
+            if (dataProvider.getLoadingState() != ClassTableWidgetLoadState.FINISHED) {
                 Log.e(tag, "Error during data loading prep: $errorMessage")
-            }
-
-            if (errorMessage != null) {
-                widgetState = ClassTableWidgetLoadState.ERROR
+                widgetState = dataProvider.getLoadingState()
+                errorMessage = dataProvider.getErrorMessage()
                 return@LaunchedEffect
             }
-
-            // 加载日程
-            schedulesToday = dataProvider.getTodayItems()
-            schedulesTomorrow = dataProvider.getTomorrowItems()
-
-            // 加载当前周次
-            currentWeekIndex = dataProvider.getCurrentWeekIndex()
-            tomorrowWeekIndex = dataProvider.getTomorrowWeekIndex()
 
             widgetState = ClassTableWidgetLoadState.FINISHED
             Log.i(tag, "LaunchedEffect finished.")
@@ -193,12 +162,10 @@ class ClassTableWidget : GlanceAppWidget() {
         ClassTableWidgetGlanceView(
             widgetState,
             errorMessage,
-            currentWeekIndex,
-            tomorrowWeekIndex,
-            day,
+            dataProvider.getWeekIndex(),
+            dataProvider.getCurrentTime(),
             isShowingToday,
-            schedulesToday,
-            schedulesTomorrow
+            dataProvider.getTimeLineItems()
         )
     }
 
@@ -206,18 +173,15 @@ class ClassTableWidget : GlanceAppWidget() {
     private fun ClassTableWidgetGlanceView(
         status: ClassTableWidgetLoadState,
         errorMessage: String?,
-        currentWeekIndex: Int,
-        tomorrowWeekIndex: Int,
-        day: LocalDateTime,
+        weekIndex: Int,
+        time: LocalDateTime,
         isShowingToday: Boolean,
-        schedulesToday: List<TimeLineItem>,
-        schedulesTomorrow: List<TimeLineItem>
+        schedules: List<TimeLineItem>,
     ) {
         val context = LocalContext.current
 
-        // 根据本地化生成日期格式化器
+        // Format date
         val locale = Locale.current
-
         val formatter = if (locale.language == "zh") {
             DateTimeFormatter.ofPattern(
                 "M月d日 E", locale.platformLocale
@@ -229,15 +193,15 @@ class ClassTableWidget : GlanceAppWidget() {
         }
 
         GlanceTheme {
-            Scaffold (
+            Scaffold(
                 backgroundColor = GlanceTheme.colors.widgetBackground,
-            ){
+            ) {
                 Column(modifier = GlanceModifier.padding(6.dp)) {
                     // The title part
-                    Row (
-                        modifier =  GlanceModifier.fillMaxWidth().padding(top = 4.dp),
+                    Row(
+                        modifier = GlanceModifier.fillMaxWidth().padding(top = 4.dp),
                         verticalAlignment = Alignment.Vertical.CenterVertically,
-                    ){
+                    ) {
                         Column(modifier = GlanceModifier.defaultWeight().padding(vertical = 4.dp)) {
                             Text(
                                 context.getString(R.string.widget_classtable_title),
@@ -249,19 +213,13 @@ class ClassTableWidget : GlanceAppWidget() {
                             )
 
                             Text(
-                                "${day.plusDays(if (!isShowingToday) 1 else 0).format(formatter)} " +
-                                        if (currentWeekIndex < 0)
-                                            context.getString(R.string.widget_classtable_on_holiday)
-                                        else
-                                            context.getString(
-                                                R.string.widget_classtable_week_identifier,
-                                                if (isShowingToday) {
-                                                    currentWeekIndex + 1
-                                                } else {
-                                                    tomorrowWeekIndex + 1
-                                                }
-                                            ),
-                                style = TextStyle(
+                                "${
+                                    time.plusDays(if (!isShowingToday) 1 else 0).format(formatter)
+                                } " + if (status != ClassTableWidgetLoadState.FINISHED) ""
+                                else if (weekIndex < 0) context.getString(R.string.widget_classtable_on_holiday)
+                                else context.getString(
+                                    R.string.widget_classtable_week_identifier, weekIndex + 1
+                                ), style = TextStyle(
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 10.sp,
                                     color = GlanceTheme.colors.primary
@@ -270,15 +228,13 @@ class ClassTableWidget : GlanceAppWidget() {
                         }
                         if (status != ClassTableWidgetLoadState.LOADING) {
                             Box(
-                                modifier = GlanceModifier
-                                    .clickable(onClick = actionRunCallback<ToggleDayAction>())
+                                modifier = GlanceModifier.clickable(onClick = actionRunCallback<ToggleDayAction>())
                             ) {
                                 Image(
                                     provider = ImageProvider(
                                         if (isShowingToday) {
                                             R.drawable.ic_next_day
-                                        }
-                                        else {
+                                        } else {
                                             R.drawable.ic_prev_day
                                         }
                                     ),
@@ -291,35 +247,30 @@ class ClassTableWidget : GlanceAppWidget() {
                     }
 
                     // The remaining part
-                    val schedulesToShow = if (isShowingToday) schedulesToday else schedulesTomorrow
-                    if (status == ClassTableWidgetLoadState.FINISHED && schedulesToShow.isNotEmpty()) {
-                        LazyColumn(modifier = GlanceModifier.fillMaxSize().padding(vertical = 6.dp)) {
-                            items(schedulesToShow.size) { item ->
-                                Box(modifier = GlanceModifier.padding(
-                                    bottom = if (item == schedulesToShow.size - 1) 0.dp else 6.dp)
+                    if (status == ClassTableWidgetLoadState.FINISHED && schedules.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = GlanceModifier.fillMaxSize().padding(vertical = 6.dp)
+                        ) {
+                            items(schedules.size) { item ->
+                                Box(
+                                    modifier = GlanceModifier.padding(
+                                        bottom = if (item == schedules.size - 1) 0.dp else 6.dp
+                                    )
                                 ) {
-                                    ScheduleRow(item = schedulesToShow[item])
+                                    ScheduleRow(item = schedules[item])
                                 }
                             }
                         }
-                    } else {
-                        // For the remaining part
-                        val icon = when (status) {
-                            ClassTableWidgetLoadState.LOADING -> ImageProvider(R.drawable.ic_classtable_refresh)
-                            ClassTableWidgetLoadState.ERROR -> ImageProvider(R.drawable.ic_classtable_error)
-                            ClassTableWidgetLoadState.FINISHED -> ImageProvider(R.drawable.ic_classtable_no_course)
-                        }
+                    } else if (status == ClassTableWidgetLoadState.LOADING || status == ClassTableWidgetLoadState.FINISHED) {
+                        val icon = ImageProvider(
+                            if (status == ClassTableWidgetLoadState.LOADING) R.drawable.ic_classtable_refresh
+                            else R.drawable.ic_classtable_no_course
+                        )
 
-                        val textDefault = when (status) {
-                            ClassTableWidgetLoadState.LOADING ->
-                                context.getString(R.string.widget_classtable_date_loading)
-                            ClassTableWidgetLoadState.FINISHED ->
-                                context.getString(R.string.widget_classtable_no_arrangement)
-                            ClassTableWidgetLoadState.ERROR ->
-                                errorMessage ?: context.getString(
-                                        R.string.widget_classtable_unknown_error
-                                    )
-                        }
+                        val textDefault = context.getString(
+                            if (status == ClassTableWidgetLoadState.LOADING) R.string.widget_classtable_date_loading
+                            else R.string.widget_classtable_no_arrangement
+                        )
 
                         Column(
                             modifier = GlanceModifier.fillMaxSize(),
@@ -334,10 +285,49 @@ class ClassTableWidget : GlanceAppWidget() {
                             )
                             Spacer(modifier = GlanceModifier.size(8.dp))
                             Text(
-                                textDefault,
-                                style = TextStyle(
-                                    fontSize = 13.sp,
-                                    color = GlanceTheme.colors.primary
+                                textDefault, style = TextStyle(
+                                    fontSize = 13.sp, color = GlanceTheme.colors.primary
+                                )
+                            )
+                        }
+                    } else {
+                        val icon = ImageProvider(R.drawable.ic_classtable_error)
+                        val titleText = context.getString(
+                            when (status) {
+                                ClassTableWidgetLoadState.ERROR_COURSE -> R.string.widget_classtable_error_course
+                                ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED -> R.string.widget_classtable_error_course_user_defined
+                                ClassTableWidgetLoadState.ERROR_EXPERIMENT -> R.string.widget_classtable_error_experience
+                                ClassTableWidgetLoadState.ERROR_EXAM -> R.string.widget_classtable_error_exam
+                                ClassTableWidgetLoadState.ERROR_OTHER -> R.string.widget_classtable_error_other
+                                else -> R.string.widget_classtable_unknown_error
+                            }
+                        )
+                        Column(
+                            modifier = GlanceModifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
+                                Image(
+                                    provider = icon,
+                                    colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
+                                    modifier = GlanceModifier.size(13.dp),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = GlanceModifier.size(4.dp))
+                                Text(
+                                    context.getString(
+                                        R.string.widget_classtable_on_error, titleText
+                                    ), style = TextStyle(
+                                        fontSize = 13.sp, color = GlanceTheme.colors.primary
+                                    )
+                                )
+                            }
+                            Text(
+                                errorMessage ?: context.getString(
+                                    R.string.widget_classtable_unknown_error,
+                                ), style = TextStyle(
+                                    fontSize = 13.sp, color = GlanceTheme.colors.primary
                                 )
                             )
                         }
@@ -350,27 +340,21 @@ class ClassTableWidget : GlanceAppWidget() {
     @Composable
     private fun ScheduleRow(item: TimeLineItem) {
         val color = Color(indicatorColorList[item.colorIndex % indicatorColorList.size])
-        val colorProvider = ColorProvider(color,color)
+        val colorProvider = ColorProvider(color, color)
 
         Row(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .padding(6.dp)
-                .cornerRadius(8.dp)
+            modifier = GlanceModifier.fillMaxSize().padding(6.dp).cornerRadius(8.dp)
                 .background(color.copy(alpha = 0.15f)),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Text(
-                "${item.startTimeStr}\n${item.endTimeStr}",
-                style = TextStyle(
+                "${item.startTimeStr}\n${item.endTimeStr}", style = TextStyle(
                     fontSize = 12.sp,
                     color = colorProvider,
-                ),
-                modifier = GlanceModifier.padding(end = 6.dp)
+                ), modifier = GlanceModifier.padding(end = 6.dp)
             )
-            Spacer(modifier =
-                GlanceModifier.width(6.dp)
-                    .cornerRadius(4.dp)
+            Spacer(
+                modifier = GlanceModifier.width(6.dp).cornerRadius(4.dp)
                     .background(color.copy(alpha = 0.6f))
             )
             Column(
@@ -378,20 +362,14 @@ class ClassTableWidget : GlanceAppWidget() {
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
                 Text(
-                    item.name,
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = colorProvider
-                    ),
-                    maxLines = 1
+                    item.name, style = TextStyle(
+                        fontSize = 14.sp, color = colorProvider
+                    ), maxLines = 1
                 )
                 Text(
-                    "${item.place} ${item.teacher}",
-                    style = TextStyle(
-                        fontSize = 10.sp,
-                        color = colorProvider
-                    ),
-                    maxLines = 1
+                    "${item.place} ${item.teacher}", style = TextStyle(
+                        fontSize = 10.sp, color = colorProvider
+                    ), maxLines = 1
                 )
             }
 
@@ -409,14 +387,12 @@ class ClassTableWidget : GlanceAppWidget() {
     @Composable
     fun NoSchedulePreview() {
         ClassTableWidgetGlanceView(
-            ClassTableWidgetLoadState.FINISHED,
+            ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED,
             "测试错误信号发出",
-            -1,
             -1,
             LocalDateTime.now(),
             true,
             emptyList(),
-            emptyList()
         )
     }
 
@@ -431,7 +407,6 @@ class ClassTableWidget : GlanceAppWidget() {
             ClassTableWidgetLoadState.FINISHED,
             "测试错误信号发出",
             -1,
-            -1,
             LocalDateTime.now(),
             true,
             arrayOf(
@@ -443,8 +418,7 @@ class ClassTableWidget : GlanceAppWidget() {
                     startTime = LocalDateTime.now(),
                     endTime = LocalDateTime.now(),
                     colorIndex = 0,
-                ),
-                TimeLineItem(
+                ), TimeLineItem(
                     type = Source.EXPERIMENT,
                     name = "关于对机器人进行调试和发电处理的实验课程",
                     teacher = "BenderBlog",
@@ -452,8 +426,7 @@ class ClassTableWidget : GlanceAppWidget() {
                     startTime = LocalDateTime.now(),
                     endTime = LocalDateTime.now(),
                     colorIndex = 1,
-                ),
-                TimeLineItem(
+                ), TimeLineItem(
                     type = Source.SCHOOL,
                     name = "女装和化妆练习课",
                     teacher = "小赵",
@@ -461,8 +434,7 @@ class ClassTableWidget : GlanceAppWidget() {
                     startTime = LocalDateTime.now(),
                     endTime = LocalDateTime.now(),
                     colorIndex = 2,
-                ),
-                TimeLineItem(
+                ), TimeLineItem(
                     type = Source.SCHOOL,
                     name = "英语课",
                     teacher = "不知道",
@@ -470,8 +442,7 @@ class ClassTableWidget : GlanceAppWidget() {
                     startTime = LocalDateTime.now(),
                     endTime = LocalDateTime.now(),
                     colorIndex = 3,
-                ),
-                TimeLineItem(
+                ), TimeLineItem(
                     type = Source.SCHOOL,
                     name = "英语课",
                     teacher = "不知道",
@@ -479,8 +450,7 @@ class ClassTableWidget : GlanceAppWidget() {
                     startTime = LocalDateTime.now(),
                     endTime = LocalDateTime.now(),
                     colorIndex = 4,
-                ),
-                TimeLineItem(
+                ), TimeLineItem(
                     type = Source.SCHOOL,
                     name = "英语课",
                     teacher = "不知道",
@@ -490,9 +460,7 @@ class ClassTableWidget : GlanceAppWidget() {
                     colorIndex = 5,
                 )
             ).toList(),
-            emptyList()
         )
     }
-
 }
 
