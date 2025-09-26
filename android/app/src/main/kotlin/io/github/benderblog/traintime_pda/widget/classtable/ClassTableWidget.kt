@@ -136,10 +136,10 @@ class ClassTableWidget : GlanceAppWidget() {
         isShowingToday = prefs.getBoolean(ClassTableWidgetKeys.SHOW_TODAY, true)
         Log.i(tag, "isShowingToday: $isShowingToday.")
 
-        LaunchedEffect(key1 = glanceId) {
+        LaunchedEffect(key1 = isShowingToday, key2=glanceId) {
             widgetState = ClassTableWidgetLoadState.LOADING
             errorMessage = null
-            Log.i(tag, "LaunchedEffect triggered.")
+            Log.i(tag, "LaunchedEffect triggered by isShowingToday: $isShowingToday, with glaceId $glanceId")
 
             // Load data
             withContext(Dispatchers.IO) {
@@ -463,4 +463,3 @@ class ClassTableWidget : GlanceAppWidget() {
         )
     }
 }
-
