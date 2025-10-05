@@ -99,14 +99,14 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                         ),
                       ),
               ],
-            ).safeArea();
+            );
           } else if (controller.status == ExperimentStatus.error) {
             return ReloadWidget(
               function: controller.get,
               errorStatus: FlutterI18n.translate(context, controller.error),
-            );
+            ).center();
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return CircularProgressIndicator().center();
           }
         },
       ),

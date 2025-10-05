@@ -5,9 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Flutter: Attach to Device",
+            "type": "dart",
+            "request": "attach"
+        },
+        {
             "name": "watermeter",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "env": {
+                "HTTP_PROXY": "http://127.0.0.1:11081",
+                "HTTPS_PROXY": "http://127.0.0.1:11081",
+                "NO_PROXY": "localhost,127.0.0.1"
+            }
         },
         {
             "name": "watermeter (profile mode)",
@@ -20,6 +30,6 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
-        }
+        },
     ]
 }

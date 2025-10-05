@@ -12,6 +12,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -21,6 +22,7 @@ import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart'
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
+import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -44,6 +46,7 @@ import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity_session;
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
+import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -745,6 +748,23 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => context.push(TalkerScreen(talker: log)),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    "测试实验系统功能", //FlutterI18n.translate(context, "setting.check_logger"),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => SysjSession().getDataFromSysj().onError((e, s) {
+                    if (context.mounted) {
+                      showToast(context: context, msg: "实验系统功能测试失败");
+                      log.error("Failed to test experiment crawlers", e, s);
+                    }
+                    return (
+                      ExperimentFetchStatus.notSchoolNetwork,
+                      <ExperimentData>[],
+                    );
+                  }),
                 ),
                 const Divider(),
                 ListTile(

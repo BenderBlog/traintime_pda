@@ -51,9 +51,11 @@ class NetworkSession {
 
   static Future<bool> isInSchool() async {
     bool isInSchool = false;
-    Dio dio = Dio()..options.connectTimeout = const Duration(seconds: 5);
+    Dio dio = Dio()
+      ..interceptors.add(logDioAdapter)
+      ..options.connectTimeout = const Duration(seconds: 30);
     await dio
-        .get("http://linux.xidian.edu.cn")
+        .get("https://rs.xidian.edu.cn/")
         .then((value) => isInSchool = true)
         .onError((error, stackTrace) => isInSchool = false);
     return isInSchool;

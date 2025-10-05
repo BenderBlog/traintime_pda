@@ -131,9 +131,9 @@ class ExperimentSession extends NetworkSession {
   }
 
   Future<(ExperimentFetchStatus, List<ExperimentData>)> getData() async {
-    if (await NetworkSession.isInSchool() == false) {
-      return (ExperimentFetchStatus.notSchoolNetwork, <ExperimentData>[]);
-    }
+    // if (await NetworkSession.isInSchool() == false) {
+    //   return (ExperimentFetchStatus.notSchoolNetwork, <ExperimentData>[]);
+    // }
 
     if (preference
         .getString(preference.Preference.experimentPassword)
