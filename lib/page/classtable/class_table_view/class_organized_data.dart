@@ -101,10 +101,12 @@ class ClassOrgainzedData {
   factory ClassOrgainzedData.fromExperiment(
     MaterialColor color,
     ExperimentData exp,
+    DateTime start,
+    DateTime stop,
   ) => ClassOrgainzedData._(
     data: [exp],
-    start: exp.time.first,
-    stop: exp.time.last,
+    start: start,
+    stop: stop,
     color: color,
     name: exp.name,
     place: exp.classroom,

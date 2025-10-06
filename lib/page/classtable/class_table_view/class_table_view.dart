@@ -5,8 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/time_list.dart';
 
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
@@ -140,11 +140,11 @@ class _ClassTableViewState extends State<ClassTableView> {
                 else ...[
                   TextSpan(text: "${indexOfChar + 1}\n"),
                   TextSpan(
-                    text: "${time[indexOfChar * 2]}\n",
+                    text: "${timeList[indexOfChar * 2]}\n",
                     style: const TextStyle(fontSize: 8),
                   ),
                   TextSpan(
-                    text: time[indexOfChar * 2 + 1],
+                    text: timeList[indexOfChar * 2 + 1],
                     style: const TextStyle(fontSize: 8),
                   ),
                 ],

@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/model/home_arrangement.dart';
@@ -63,8 +64,8 @@ class ClassTableController extends GetxController {
                   updateTime.year,
                   updateTime.month,
                   updateTime.day,
-                  int.parse(time[(i.start - 1) * 2].split(':')[0]),
-                  int.parse(time[(i.start - 1) * 2].split(':')[1]),
+                  int.parse(timeList[(i.start - 1) * 2].split(':')[0]),
+                  int.parse(timeList[(i.start - 1) * 2].split(':')[1]),
                 ),
               ),
               endTimeStr: formatter.format(
@@ -72,8 +73,8 @@ class ClassTableController extends GetxController {
                   updateTime.year,
                   updateTime.month,
                   updateTime.day,
-                  int.parse(time[(i.stop - 1) * 2 + 1].split(':')[0]),
-                  int.parse(time[(i.stop - 1) * 2 + 1].split(':')[1]),
+                  int.parse(timeList[(i.stop - 1) * 2 + 1].split(':')[0]),
+                  int.parse(timeList[(i.stop - 1) * 2 + 1].split(':')[1]),
                 ),
               ),
             ),

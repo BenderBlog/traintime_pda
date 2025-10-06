@@ -6,48 +6,28 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'experiment.g.dart';
 
+enum ExperimentType { physics, others }
+
 @JsonSerializable(explicitToJson: true)
 class ExperimentData {
+  final ExperimentType type;
   final String name;
-  final String score;
+  final String? score;
   final String classroom;
-  final String date;
+  final List<(DateTime, DateTime)> timeRanges;
   // final String week;
-  final String timeStr;
   final String teacher;
-  final String reference;
+  final String? reference;
 
   const ExperimentData({
+    required this.type,
     required this.name,
-    required this.score,
+    this.score,
     required this.classroom,
-    required this.date,
-    //required this.week,
-    required this.timeStr,
+    required this.timeRanges,
     required this.teacher,
-    required this.reference,
+    this.reference,
   });
-
-  List<DateTime> get time {
-    /// Return is month/day/year, hope not change...
-    List<int> dateNums = List<int>.generate(
-      date.split('/').length,
-      (index) => int.parse(date.split('/')[index]),
-    );
-
-    /// And the time arrangement too.
-    if (timeStr.contains("15")) {
-      return [
-        DateTime(dateNums[2], dateNums[0], dateNums[1], 15, 55, 00),
-        DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 10, 00),
-      ]; // Afternoon 15:55～18:10
-    } else {
-      return [
-        DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 30, 00),
-        DateTime(dateNums[2], dateNums[0], dateNums[1], 20, 45, 00),
-      ]; // Evening 18:30～20:45
-    }
-  }
 
   factory ExperimentData.fromJson(Map<String, dynamic> json) =>
       _$ExperimentDataFromJson(json);

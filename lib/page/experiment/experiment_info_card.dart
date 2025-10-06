@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -21,12 +20,15 @@ class ExperimentInfoCard extends StatelessWidget {
         if (data != null) {
           return ReXCard(
             title: Text(data!.name),
-            remaining: [ReXCardRemaining(data!.score)],
+            remaining: [
+              if (data!.score != null) ReXCardRemaining(data!.score!),
+            ],
             bottomRow: Column(
               children: [
+                // TODO: Change Time Display Pattern
                 InformationWithIcon(
                   icon: Icons.access_time_filled_rounded,
-                  text: "${data!.date} ${data!.timeStr}",
+                  text: "${data!.timeRanges}",
                 ),
                 Flex(
                   direction: Axis.horizontal,
@@ -45,18 +47,14 @@ class ExperimentInfoCard extends StatelessWidget {
                         text: data!.teacher,
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: InformationWithIcon(
-                        icon: Icons.book,
-                        text: data!.reference.isNotEmpty
-                            ? data!.reference
-                            : FlutterI18n.translate(
-                                context,
-                                "experiment.not_provided",
-                              ),
+                    if (data!.reference == null && data!.reference!.isNotEmpty)
+                      Expanded(
+                        flex: 1,
+                        child: InformationWithIcon(
+                          icon: Icons.book,
+                          text: data!.reference!,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],

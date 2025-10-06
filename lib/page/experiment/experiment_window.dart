@@ -41,7 +41,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 true,
                 false,
                 true,
-                false,
+                // false,
                 false,
               ],
               children: [
@@ -78,13 +78,13 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 TimelineTitle(
                   title: FlutterI18n.translate(context, "experiment.finished"),
                 ),
-                ExperimentInfoCard(
-                  title: FlutterI18n.translate(
-                    context,
-                    "experiment.score_sum",
-                    translationParams: {"sum": controller.sum.toString()},
-                  ),
-                ),
+                // ExperimentInfoCard(
+                //   title: FlutterI18n.translate(
+                //     context,
+                //     "experiment.score_sum",
+                //     translationParams: {"sum": controller.sum.toString()},
+                //   ),
+                // ),
                 done.isNotEmpty
                     ? Column(
                         children: List.generate(

@@ -20,69 +20,86 @@ import 'package:watermeter/repository/preference.dart' as preference;
 enum ExperimentStatus { cache, fetching, fetched, error, none }
 
 class ExperimentController extends GetxController {
-  static const experimentCacheName = "Experiment.json";
+  /// NOTE: Rename from Experiment to avoid "data structure immigration"
+  static const experimentCacheName = "Experiments.json";
 
   ExperimentStatus status = ExperimentStatus.none;
   String error = "";
   late List<ExperimentData> data;
   late File file;
 
-  int get sum {
-    int score = 0;
-    for (var i in data) {
-      if (!i.score.contains("未录入")) score += int.parse(i.score);
-    }
-    return score;
-  }
+  // int get sum {
+  //   int score = 0;
+  //   for (var i in data) {
+  //     if (!i.score.contains("未录入")) score += int.parse(i.score);
+  //   }
+  //   return score;
+  // }
 
   List<HomeArrangement> getExperimentOfDay(DateTime now) {
-    List<ExperimentData> isFinished = List.from(data);
+    List<HomeArrangement> toReturn = [];
     DateFormat formatter = DateFormat(HomeArrangement.format);
-    isFinished.removeWhere((element) => !element.time.first.isAtSameDayAs(now));
-    return isFinished
-        .map(
-          (e) => HomeArrangement(
-            name: e.name,
-            place: e.classroom,
-            teacher: e.teacher,
-            startTimeStr: formatter.format(e.time[0]),
-            endTimeStr: formatter.format(e.time[1]),
+
+    for (final experiment in data) {
+      for (final timeRange in experiment.timeRanges) {
+        if (!timeRange.$1.isAtSameDayAs(now)) continue;
+        toReturn.add(
+          HomeArrangement(
+            name: experiment.name,
+            place: experiment.classroom,
+            teacher: experiment.teacher,
+            startTimeStr: formatter.format(timeRange.$1),
+            endTimeStr: formatter.format(timeRange.$2),
           ),
-        )
-        .toList();
+        );
+      }
+    }
+
+    return toReturn;
   }
 
   List<ExperimentData> isFinished(DateTime now) {
-    List<ExperimentData> isFinished = List.from(data);
-    isFinished.removeWhere((e) => e.time[0].isAfter(now));
-    return isFinished..sort(
-      (a, b) =>
-          a.time[1].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
-    );
+    Set<ExperimentData> toReturn = {};
+
+    for (final experiment in data) {
+      for (final timeRange in experiment.timeRanges) {
+        if (now.isAfter(timeRange.$2)) {
+          toReturn.add(experiment);
+        }
+      }
+    }
+
+    return toReturn.toList();
   }
 
   List<ExperimentData> isNotFinished(DateTime now) {
-    List<ExperimentData> isNotFinished = List.from(data);
-    isNotFinished.removeWhere(
-      (e) => e.time[0].isAtSameMicrosecondAs(now) || e.time[0].isBefore(now),
-    );
-    return isNotFinished..sort(
-      (a, b) =>
-          a.time[0].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
-    );
+    Set<ExperimentData> toReturn = {};
+
+    for (final experiment in data) {
+      for (final timeRange in experiment.timeRanges) {
+        if (now.isBefore(timeRange.$1)) {
+          toReturn.add(experiment);
+        }
+      }
+    }
+
+    return toReturn.toList();
   }
 
   List<ExperimentData> doing(DateTime now) {
-    List<ExperimentData> isNotFinished = List.from(data);
-    isNotFinished.removeWhere(
-      (element) =>
-          now.microsecondsSinceEpoch < element.time[0].microsecondsSinceEpoch ||
-          now.microsecondsSinceEpoch > element.time[1].microsecondsSinceEpoch,
-    );
-    return isNotFinished..sort(
-      (a, b) =>
-          a.time[1].microsecondsSinceEpoch - b.time[1].microsecondsSinceEpoch,
-    );
+    Set<ExperimentData> toReturn = {};
+
+    for (final experiment in data) {
+      for (final timeRange in experiment.timeRanges) {
+        if (now.isAtSameDayAs(timeRange.$1) &&
+            now.isAfter(timeRange.$1) &&
+            now.isBefore(timeRange.$2)) {
+          toReturn.add(experiment);
+        }
+      }
+    }
+
+    return toReturn.toList();
   }
 
   @override

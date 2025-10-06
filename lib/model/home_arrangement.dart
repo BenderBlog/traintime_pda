@@ -6,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'home_arrangement.g.dart';
 
-/// This is for the main page applet.
+/// This is for the classtable applet.
 /// [startTime] and [endTime] must be stored with the following format
 // 'yyyy-MM-dd HH:mm:ss'
 @JsonSerializable(explicitToJson: true)

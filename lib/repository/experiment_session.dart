@@ -234,8 +234,26 @@ class ExperimentSession extends NetworkSession {
         "expTds have ${expTds.length}.",
       );
 
+      String date = expTds[4].getElementsByTagName("span").first.innerHtml;
+      List<int> dateNums = List<int>.generate(
+        date.split('/').length,
+        (index) => int.parse(date.split('/')[index]),
+      );
+
+      String timeStr = expTds[3].getElementsByTagName("span").first.innerHtml;
+      (DateTime, DateTime) timeRange = timeStr.contains("15")
+          ? (
+              DateTime(dateNums[2], dateNums[0], dateNums[1], 15, 55, 00),
+              DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 10, 00),
+            )
+          : (
+              DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 30, 00),
+              DateTime(dateNums[2], dateNums[0], dateNums[1], 20, 45, 00),
+            ); // Evening 18:30～20:45
+
       toReturn.add(
         ExperimentData(
+          type: ExperimentType.physics,
           name: expTds[1]
               .getElementsByClassName("linkSmallBold")
               .first
@@ -243,8 +261,7 @@ class ExperimentSession extends NetworkSession {
               .replaceAll('（3学时）', ''),
           score: expTds[7].getElementsByTagName("span").first.innerHtml,
           classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
-          date: expTds[4].getElementsByTagName("span").first.innerHtml,
-          timeStr: expTds[3].getElementsByTagName("span").first.innerHtml,
+          timeRanges: [timeRange],
           reference: expTds[9].getElementsByTagName("span").first.innerHtml,
           teacher: await teacher(
             time: expTds[3].getElementsByTagName("span").first.innerHtml,

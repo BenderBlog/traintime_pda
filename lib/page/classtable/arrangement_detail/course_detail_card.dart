@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
@@ -113,7 +114,7 @@ class ClassDetailCard extends StatelessWidget {
                 str:
                     "${getWeekString(context, timeArrangement.day - 1)}"
                     "${FlutterI18n.translate(context, "classtable.course_detail_card.class_period", translationParams: {"start": timeArrangement.start.toString(), "stop": timeArrangement.stop.toString()})} "
-                    "${time[(timeArrangement.start - 1) * 2]}-${time[(timeArrangement.stop - 1) * 2 + 1]}",
+                    "${timeList[(timeArrangement.start - 1) * 2]}-${timeList[(timeArrangement.stop - 1) * 2 + 1]}",
                 infoColor: infoColor,
               ),
 

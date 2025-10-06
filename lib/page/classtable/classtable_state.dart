@@ -13,6 +13,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -199,8 +200,8 @@ class ClassTableWidgetState with ChangeNotifier {
           "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name} - 老师：${i.teacher ?? "未知"}";
       String? location = i.classroom ?? "待定";
 
-      List<String> startTime = time[(i.start - 1) * 2].split(":");
-      List<String> stopTime = time[(i.stop - 1) * 2 + 1].split(":");
+      List<String> startTime = timeList[(i.start - 1) * 2].split(":");
+      List<String> stopTime = timeList[(i.stop - 1) * 2 + 1].split(":");
 
       DayOfWeek getDayOfWeek(int day) {
         switch (day) {
@@ -282,16 +283,18 @@ class ClassTableWidgetState with ChangeNotifier {
       );
     }
 
-    for (var i in experiments) {
-      events.add(
-        Event(
-          null,
-          title: "${i.name}@${i.classroom}}",
-          start: TZDateTime.from(i.time.first, currentLocation),
-          end: TZDateTime.from(i.time.last, currentLocation),
-          location: i.classroom,
-        ),
-      );
+    for (var experiment in experiments) {
+      for (var j in experiment.timeRanges) {
+        events.add(
+          Event(
+            null,
+            title: "${experiment.name}@${experiment.classroom}}",
+            start: TZDateTime.from(j.$1, currentLocation),
+            end: TZDateTime.from(j.$2, currentLocation),
+            location: experiment.classroom,
+          ),
+        );
+      }
     }
     return events;
   }
@@ -498,16 +501,23 @@ END:VTIMEZONE
       }
     }
 
-    for (final i in experiments) {
-      int diff = i.time[0].difference(startDay).inDays;
+    for (final experiment in experiments) {
+      for (final timeRange in experiment.timeRanges) {
+        if (timeRange.$1.isBefore(startDay)) {
+          continue;
+        }
+        int diff = timeRange.$1.difference(startDay).inDays;
 
-      if (diff ~/ 7 == weekIndex && diff % 7 + 1 == dayIndex) {
-        events.add(
-          ClassOrgainzedData.fromExperiment(
-            colorList[experiments.indexOf(i) % colorList.length],
-            i,
-          ),
-        );
+        if (diff ~/ 7 == weekIndex && diff % 7 + 1 == dayIndex) {
+          events.add(
+            ClassOrgainzedData.fromExperiment(
+              colorList[experiments.indexOf(experiment) % colorList.length],
+              experiment,
+              timeRange.$1,
+              timeRange.$2,
+            ),
+          );
+        }
       }
     }
 

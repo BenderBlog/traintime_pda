@@ -8,14 +8,14 @@ part of 'club_info.dart';
 
 ClubInfo _$ClubInfoFromJson(Map<String, dynamic> json) => ClubInfo(
   code: json['code'] as String,
-  type: toTypeList(json['type']),
+  type: toTypeList(json['type'] as String),
   title: json['title'] as String,
   intro: json['intro'] as String,
   description: json['description'] as String,
   qq: qqFromJson(json['qq']),
   pic: (json['pic'] as num).toInt(),
   qqlink: json['qqlink'] as String,
-  color: fromJsonToColor(json['color']),
+  color: fromJsonToColor(json['color'] as String),
 );
 
 Map<String, dynamic> _$ClubInfoToJson(ClubInfo instance) => <String, dynamic>{
@@ -39,4 +39,5 @@ const _$ClubTypeEnumMap = {
   ClubType.art: 'art',
   ClubType.game: 'game',
   ClubType.unknown: 'unknown',
+  ClubType.all: 'all',
 };

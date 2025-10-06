@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -160,45 +161,122 @@ class SysjSession extends IDSSession {
         weekdays.add(dateStr);
       });
 
-      /// TODO: USE getElementFromTags to clearify the data get from the table
-      table.querySelectorAll('tbody tr').asMap().forEach((rowIndex, row) {
-        var periodElement = row.querySelector('th span');
-        if (periodElement == null) return;
+      for (int weekDay = 1; weekDay <= 7; ++weekDay) {
+        for (int classIndex = 1; classIndex <= 13; ++classIndex) {
+          String cellContent =
+              table
+                  .querySelector("td[do-labReservation='$weekDay,$classIndex']")
+                  ?.innerHtml
+                  .trim() ??
+              "";
 
-        String periodName = periodElement.innerHtml.split('<font>')[0].trim();
+          if (cellContent.isEmpty ||
+              !cellContent.contains('课程：') ||
+              !cellContent.contains('实验室：') ||
+              !cellContent.contains('教师：')) {
+            continue;
+          }
 
-        row.querySelectorAll('td').asMap().forEach((cellIndex, cell) {
-          String cellContent = cell.innerHtml.trim();
+          List<String> contentList = cellContent.split('\n')
+            ..removeWhere((e) => e.isEmpty)
+            ..map((e) => e.trim());
+          String name = contentList[0].replaceAll("课程：", "");
+          String classroom = contentList[1].replaceAll("实验室：", "");
+          String teacher = contentList[2].replaceAll("教师：", "");
 
-          if (cellContent.isEmpty) return;
-          if (cellContent.contains('课程：') ||
-              cellContent.contains('实验室：') ||
-              cellContent.contains('教师：')) {
-            /// TODO: CHECK ALL [cellIndex] and [rowIndex] stuff.
-            List<String> dateNums = weekdays[cellIndex].split('/');
-            String date = "${dateNums[1]}/${dateNums[2]}/${dateNums[0]}";
+          List<int> dateNums = weekdays[weekDay - 1]
+              .split('-')
+              .map<int>((e) => int.parse(e))
+              .toList();
+          List<int> startTimeList = timeList[(classIndex - 1) * 2]
+              .split(":")
+              .map<int>((e) => int.parse(e))
+              .toList();
+          List<int> endTimeList = timeList[(classIndex - 1) * 2 + 1]
+              .split(":")
+              .map<int>((e) => int.parse(e))
+              .toList();
+          DateTime startTime = DateTime(
+            dateNums[0],
+            dateNums[1],
+            dateNums[2],
+            startTimeList[0],
+            startTimeList[1],
+          );
+          DateTime endTime = DateTime(
+            dateNums[0],
+            dateNums[1],
+            dateNums[2],
+            endTimeList[0],
+            endTimeList[1],
+          );
 
-            String timeStr = "$date $periodName";
-
-            List<String> contentList = cellContent.split('\n')
+          while (classIndex < 13) {
+            String nextCellContent =
+                table
+                    .querySelector(
+                      "td[do-labReservation='$weekDay,${classIndex + 1}']",
+                    )
+                    ?.innerHtml
+                    .trim() ??
+                "";
+            if (nextCellContent.isEmpty ||
+                (!nextCellContent.contains('课程：') ||
+                    !nextCellContent.contains('实验室：') ||
+                    !nextCellContent.contains('教师：'))) {
+              break;
+            }
+            List<String> nextContentList = cellContent.split('\n')
               ..removeWhere((e) => e.isEmpty)
               ..map((e) => e.trim());
+            if (nextContentList[0].replaceAll("课程：", "") == name &&
+                nextContentList[1].replaceAll('实验室：', "") == classroom &&
+                nextContentList[1].replaceAll('教师：', "") == teacher) {
+              // Actually +1 for next day, then -1 to match the index of the array
+              List<int> newEndTimeList = timeList[classIndex * 2 + 1]
+                  .split(":")
+                  .map<int>((e) => int.parse(e))
+                  .toList();
+              endTime = DateTime(
+                dateNums[0],
+                dateNums[1],
+                dateNums[2],
+                newEndTimeList[0],
+                newEndTimeList[1],
+              );
+            }
+            classIndex++;
+          }
 
+          // If the list have no data related to this name, lab or teacher, just add it.
+          int dataWithSameInfoIndex = experimentData.indexWhere(
+            (e) =>
+                e.name == name &&
+                e.classroom == classroom &&
+                e.teacher == teacher,
+          );
+          if (experimentData.isEmpty || dataWithSameInfoIndex == -1) {
             experimentData.add(
               ExperimentData(
-                name: contentList[0].replaceAll("课程：", ""),
-                score: "",
-                classroom: contentList[1].replaceAll("实验室：", ""),
-                date: date,
-                timeStr: timeStr,
-                teacher: contentList[2].replaceAll("教师：", ""),
-                reference: "",
+                type: ExperimentType.others,
+                name: name,
+                classroom: classroom,
+                timeRanges: [(startTime, endTime)],
+                teacher: teacher,
               ),
             );
+            continue;
           }
-        });
-      });
+
+          experimentData[dataWithSameInfoIndex].timeRanges.add((
+            startTime,
+            endTime,
+          ));
+        }
+      }
     }
+
+    print(experimentData);
 
     return (ExperimentFetchStatus.success, experimentData);
   }
