@@ -33,4 +33,17 @@ class ExperimentData {
       _$ExperimentDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExperimentDataToJson(this);
+
+  @override
+  String toString() {
+    return 'ExperimentData('
+        'type: $type, '
+        'name: $name, '
+        'score: ${score ?? "N/A"}, '
+        'classroom: $classroom, '
+        'timeRanges: ${timeRanges.map((range) => "[${range.$1.toIso8601String()} - ${range.$2.toIso8601String()}]").join(", ")}, '
+        'teacher: $teacher, '
+        'reference: ${reference ?? "N/A"}'
+        ')';
+  }
 }

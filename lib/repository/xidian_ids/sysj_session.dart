@@ -12,6 +12,7 @@ import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -19,10 +20,10 @@ class SysjSession extends IDSSession {
   /// These are from sysj.xidian.edu.cn's js file
   Future<(ExperimentFetchStatus, List<ExperimentData>)>
   getDataFromSysj() async {
-    // if (!(await NetworkSession.isInSchool())) {
-    //   log.info("[SysjSession][getDataFromSysj] Not in schoolnet.");
-    //   throw NotSchoolNetworkException();
-    // }
+    if (!(await NetworkSession.isInSchool())) {
+      log.info("[SysjSession][getDataFromSysj] Not in schoolnet.");
+      return (ExperimentFetchStatus.notSchoolNetwork, <ExperimentData>[]);
+    }
 
     Response firstRequest = await dio.get(
       "https://sysj.xidian.edu.cn/xidian/test",
@@ -135,19 +136,23 @@ class SysjSession extends IDSSession {
 
     List<ExperimentData> experimentData = [];
 
-    for (int i = 1; i <= 25; ++i) {
+    const experimentNameMark = '???student.timetable.course???：';
+    const experimentClassroomMark = '???schedule.course.lab???：';
+    const experimentTeacherMark = '???student.timetable.teacher???：';
+
+    for (int i = 11; i <= 13; ++i) {
       Document classTableHtml = await dio
           .post(
             "https://sysj.xidian.edu.cn/xidian/StudentCurrWeekTimetable",
-            data: {"weeks": i},
+            data: "weeks=$i",
           )
           .then((value) {
-            log.debug(value.data.toString().trim());
             return parse(value.data.toString().trim());
           });
 
       List<Element> tables = classTableHtml.getElementsByTagName("table");
       if (tables.length < 2) {
+        log.info("[SysjSession][getDataFromSysj] No tables at week $i");
         continue;
       }
 
@@ -171,18 +176,31 @@ class SysjSession extends IDSSession {
               "";
 
           if (cellContent.isEmpty ||
-              !cellContent.contains('课程：') ||
-              !cellContent.contains('实验室：') ||
-              !cellContent.contains('教师：')) {
+              !cellContent.contains(experimentNameMark) ||
+              !cellContent.contains(experimentClassroomMark) ||
+              !cellContent.contains(experimentTeacherMark)) {
             continue;
           }
+
+          log.info(
+            "[SysjSession][getDataFromSysj] cellContent of week $weekDay class $classIndex is $cellContent",
+          );
 
           List<String> contentList = cellContent.split('\n')
             ..removeWhere((e) => e.isEmpty)
             ..map((e) => e.trim());
-          String name = contentList[0].replaceAll("课程：", "");
-          String classroom = contentList[1].replaceAll("实验室：", "");
-          String teacher = contentList[2].replaceAll("教师：", "");
+          String name = contentList[0]
+              .replaceAll(experimentNameMark, "")
+              .trim()
+              .replaceAll("<br>", "");
+          String classroom = contentList[1]
+              .replaceAll(experimentClassroomMark, "")
+              .trim()
+              .replaceAll("<br>", "");
+          String teacher = contentList[2]
+              .replaceAll(experimentTeacherMark, "")
+              .trim()
+              .replaceAll("<br>", "");
 
           List<int> dateNums = weekdays[weekDay - 1]
               .split('-')
@@ -220,31 +238,36 @@ class SysjSession extends IDSSession {
                     ?.innerHtml
                     .trim() ??
                 "";
-            if (nextCellContent.isEmpty ||
-                (!nextCellContent.contains('课程：') ||
-                    !nextCellContent.contains('实验室：') ||
-                    !nextCellContent.contains('教师：'))) {
+            log.info(
+              "[SysjSession][getDataFromSysj] fetching next class, "
+              "nextCellContent of week $weekDay class $classIndex is $cellContent",
+            );
+
+            if (cellContent != nextCellContent) {
+              log.info(
+                "[SysjSession][getDataFromSysj] fetching next class, "
+                "not match the last one, break looping",
+              );
               break;
             }
-            List<String> nextContentList = cellContent.split('\n')
-              ..removeWhere((e) => e.isEmpty)
-              ..map((e) => e.trim());
-            if (nextContentList[0].replaceAll("课程：", "") == name &&
-                nextContentList[1].replaceAll('实验室：', "") == classroom &&
-                nextContentList[1].replaceAll('教师：', "") == teacher) {
-              // Actually +1 for next day, then -1 to match the index of the array
-              List<int> newEndTimeList = timeList[classIndex * 2 + 1]
-                  .split(":")
-                  .map<int>((e) => int.parse(e))
-                  .toList();
-              endTime = DateTime(
-                dateNums[0],
-                dateNums[1],
-                dateNums[2],
-                newEndTimeList[0],
-                newEndTimeList[1],
-              );
-            }
+
+            // Actually +1 for next day, then -1 to match the index of the array
+            List<int> newEndTimeList = timeList[classIndex * 2 + 1]
+                .split(":")
+                .map<int>((e) => int.parse(e))
+                .toList();
+            endTime = DateTime(
+              dateNums[0],
+              dateNums[1],
+              dateNums[2],
+              newEndTimeList[0],
+              newEndTimeList[1],
+            );
+            log.info(
+              "[SysjSession][getDataFromSysj] fetching next class, "
+              "new endTime $endTime",
+            );
+
             classIndex++;
           }
 
@@ -256,15 +279,15 @@ class SysjSession extends IDSSession {
                 e.teacher == teacher,
           );
           if (experimentData.isEmpty || dataWithSameInfoIndex == -1) {
-            experimentData.add(
-              ExperimentData(
-                type: ExperimentType.others,
-                name: name,
-                classroom: classroom,
-                timeRanges: [(startTime, endTime)],
-                teacher: teacher,
-              ),
+            final newData = ExperimentData(
+              type: ExperimentType.others,
+              name: name,
+              classroom: classroom,
+              timeRanges: [(startTime, endTime)],
+              teacher: teacher,
             );
+            log.info("[SysjSession][getDataFromSysj] Added: $newData");
+            experimentData.add(newData);
             continue;
           }
 
@@ -272,11 +295,14 @@ class SysjSession extends IDSSession {
             startTime,
             endTime,
           ));
+          log.info(
+            "[SysjSession][getDataFromSysj] Updated: ${experimentData[dataWithSameInfoIndex]}",
+          );
         }
       }
     }
 
-    print(experimentData);
+    log.debug(experimentData);
 
     return (ExperimentFetchStatus.success, experimentData);
   }

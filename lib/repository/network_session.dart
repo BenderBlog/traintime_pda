@@ -54,10 +54,17 @@ class NetworkSession {
     Dio dio = Dio()
       ..interceptors.add(logDioAdapter)
       ..options.connectTimeout = const Duration(seconds: 30);
-    await dio
-        .get("https://rs.xidian.edu.cn/")
-        .then((value) => isInSchool = true)
-        .onError((error, stackTrace) => isInSchool = false);
+    isInSchool = await dio
+        .get("https://rs.xidian.edu.cn/cas/login.php")
+        .then((value) => true)
+        .onError((error, stackTrace) {
+          log.warning(
+            "[isSchoolNet] Current net is not schoolnet.",
+            error,
+            stackTrace,
+          );
+          return false;
+        });
     return isInSchool;
   }
 
