@@ -154,8 +154,10 @@ void updateCurrentData() {
         examController.status == ExamStatus.cache) {
       toAdd.addAll(examController.getExamOfDate(tomorrow));
     }
-    if (experimentController.status == ExperimentStatus.fetched ||
-        experimentController.status == ExperimentStatus.cache) {
+    if ((experimentController.physicsStatus == ExperimentStatus.fetched ||
+            experimentController.physicsStatus == ExperimentStatus.cache) ||
+        (experimentController.otherStatus == ExperimentStatus.fetched ||
+            experimentController.otherStatus == ExperimentStatus.cache)) {
       toAdd.addAll(experimentController.getExperimentOfDay(tomorrow));
     }
   } else {
@@ -167,8 +169,10 @@ void updateCurrentData() {
         examController.status == ExamStatus.cache) {
       toAdd.addAll(examController.getExamOfDate(updateTime));
     }
-    if (experimentController.status == ExperimentStatus.fetched ||
-        experimentController.status == ExperimentStatus.cache) {
+    if ((experimentController.physicsStatus == ExperimentStatus.fetched ||
+            experimentController.physicsStatus == ExperimentStatus.cache) ||
+        (experimentController.otherStatus == ExperimentStatus.fetched ||
+            experimentController.otherStatus == ExperimentStatus.cache)) {
       toAdd.addAll(experimentController.getExperimentOfDay(updateTime));
     }
     toAdd.removeWhere((element) => !updateTime.isBefore(element.endTime));

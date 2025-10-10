@@ -16,25 +16,25 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 
 enum ExperimentStatus { cache, fetching, fetched, error, none }
 
 class ExperimentController extends GetxController {
   /// NOTE: Rename from Experiment to avoid "data structure immigration"
-  static const experimentCacheName = "Experiments.json";
+  static const physicsCacheName = "PhysicsExperiment.json";
+  static const otherCacheName = "OtherExperiment.json";
 
-  ExperimentStatus status = ExperimentStatus.none;
-  String error = "";
-  late List<ExperimentData> data;
-  late File file;
+  ExperimentStatus physicsStatus = ExperimentStatus.none;
+  ExperimentStatus otherStatus = ExperimentStatus.none;
 
-  // int get sum {
-  //   int score = 0;
-  //   for (var i in data) {
-  //     if (!i.score.contains("未录入")) score += int.parse(i.score);
-  //   }
-  //   return score;
-  // }
+  String physicsStatusError = "";
+  String otherStatusError = "";
+
+  List<ExperimentData> data = [];
+
+  late File physicsCacheFile;
+  late File otherCacheFile;
 
   List<HomeArrangement> getExperimentOfDay(DateTime now) {
     List<HomeArrangement> toReturn = [];
@@ -59,47 +59,69 @@ class ExperimentController extends GetxController {
   }
 
   List<ExperimentData> isFinished(DateTime now) {
-    Set<ExperimentData> toReturn = {};
+    List<ExperimentData> toReturn = [];
 
+    bool isQualified((DateTime, DateTime) timeRange) =>
+        now.isAfter(timeRange.$2);
     for (final experiment in data) {
-      for (final timeRange in experiment.timeRanges) {
-        if (now.isAfter(timeRange.$2)) {
-          toReturn.add(experiment);
-        }
-      }
+      bool containsDoing = experiment.timeRanges.where(isQualified).isNotEmpty;
+      if (!containsDoing) continue;
+      ExperimentData toAdd = experiment;
+      experiment.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
+      toReturn.add(toAdd);
     }
 
-    return toReturn.toList();
+    toReturn.sort(
+      (a, b) => a.timeRanges.first.$1
+          .difference(b.timeRanges.first.$1)
+          .inMicroseconds,
+    );
+
+    return toReturn;
   }
 
-  List<ExperimentData> isNotFinished(DateTime now) {
-    Set<ExperimentData> toReturn = {};
+  List<ExperimentData> isNotStarted(DateTime now) {
+    List<ExperimentData> toReturn = [];
 
+    bool isQualified((DateTime, DateTime) timeRange) =>
+        now.isBefore(timeRange.$1);
     for (final experiment in data) {
-      for (final timeRange in experiment.timeRanges) {
-        if (now.isBefore(timeRange.$1)) {
-          toReturn.add(experiment);
-        }
-      }
+      bool containsDoing = experiment.timeRanges.where(isQualified).isNotEmpty;
+      if (!containsDoing) continue;
+      ExperimentData toAdd = experiment;
+      experiment.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
+      toReturn.add(toAdd);
     }
 
-    return toReturn.toList();
+    toReturn.sort(
+      (a, b) => a.timeRanges.first.$1
+          .difference(b.timeRanges.first.$1)
+          .inMicroseconds,
+    );
+
+    return toReturn;
   }
 
   List<ExperimentData> doing(DateTime now) {
-    Set<ExperimentData> toReturn = {};
+    List<ExperimentData> toReturn = [];
 
+    bool isQualified((DateTime, DateTime) timeRange) =>
+        now.isAfter(timeRange.$1) && now.isBefore(timeRange.$2);
     for (final experiment in data) {
-      for (final timeRange in experiment.timeRanges) {
-        if (now.isAtSameDayAs(timeRange.$1) &&
-            now.isAfter(timeRange.$1) &&
-            now.isBefore(timeRange.$2)) {
-          toReturn.add(experiment);
-        }
-      }
+      bool containsDoing = experiment.timeRanges.where(isQualified).isNotEmpty;
+      if (!containsDoing) continue;
+      ExperimentData toAdd = experiment;
+      experiment.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
+      toReturn.add(toAdd);
     }
 
-    return toReturn.toList();
+    toReturn.sort(
+      (a, b) => a.timeRanges.first.$1
+          .difference(b.timeRanges.first.$1)
+          .inMicroseconds,
+    );
+
+    return toReturn;
   }
 
   @override
@@ -109,22 +131,35 @@ class ExperimentController extends GetxController {
       "[ExamController][onInit] "
       "Path at ${supportPath.path}.",
     );
-    file = File("${supportPath.path}/$experimentCacheName");
-    bool isExist = file.existsSync();
 
+    physicsCacheFile = File("${supportPath.path}/$physicsCacheName");
+    bool isExist = physicsCacheFile.existsSync();
     if (isExist) {
       log.info(
         "[ExamController][onInit] "
-        "Init from cache.",
+        "Init physics experiment from cache.",
       );
-      List<dynamic> toDecode = jsonDecode(file.readAsStringSync());
+      List<dynamic> toDecode = jsonDecode(physicsCacheFile.readAsStringSync());
       data = List<ExperimentData>.generate(
         toDecode.length,
         (index) => ExperimentData.fromJson(toDecode[index]),
       );
-      status = ExperimentStatus.cache;
-    } else {
-      data = [];
+      physicsStatus = ExperimentStatus.cache;
+    }
+
+    otherCacheFile = File("${supportPath.path}/$otherCacheName");
+    isExist = otherCacheFile.existsSync();
+    if (isExist) {
+      log.info(
+        "[ExamController][onInit] "
+        "Init other experiment from cache.",
+      );
+      List<dynamic> toDecode = jsonDecode(otherCacheFile.readAsStringSync());
+      data = List<ExperimentData>.generate(
+        toDecode.length,
+        (index) => ExperimentData.fromJson(toDecode[index]),
+      );
+      physicsStatus = ExperimentStatus.cache;
     }
   }
 
@@ -134,12 +169,12 @@ class ExperimentController extends GetxController {
     get();
   }
 
-  Future<void> get() async {
-    ExperimentStatus previous = status;
-    status = ExperimentStatus.fetching;
-    update();
+  Future<List<ExperimentData>> getPhysicsExperiment() async {
+    ExperimentStatus previous = physicsStatus;
+    physicsStatus = ExperimentStatus.fetching;
+    List<ExperimentData> toReturn = [];
     log.info(
-      "[ExperimentController][get] "
+      "[ExperimentController][getPhysicsExperiment] "
       "Fetching data from Internet.",
     );
     try {
@@ -147,49 +182,124 @@ class ExperimentController extends GetxController {
           await ExperimentSession().getData();
       if (returnedData.$1 == ExperimentFetchStatus.notSchoolNetwork) {
         log.warning(
-          "[ExperimentController][get] "
+          "[ExperimentController][getPhysicsExperiment] "
           "Not in school exception",
         );
-        error = "not_school_network";
+        physicsStatusError = "not_school_network";
       } else if (returnedData.$1 == ExperimentFetchStatus.noPassword) {
         log.warning(
-          "[ExperimentController][get] "
+          "[ExperimentController][getPhysicsExperiment] "
           "Do not find experiment password",
         );
-        error = "experiment_controller.no_password";
+        physicsStatusError = "experiment_controller.no_password";
       } else {
-        data = returnedData.$2;
-        status = ExperimentStatus.fetched;
-        error = "";
+        toReturn.addAll(returnedData.$2);
+        physicsStatus = ExperimentStatus.fetched;
+        physicsStatusError = "";
       }
     } on LoginFailedException catch (e, s) {
       log.handle(e, s);
       if (e.msg != null && e.msg!.isNotEmpty) {
-        error = e.msg!;
+        physicsStatusError = e.msg!;
       } else {
-        error = "experiment_controller.login_failed";
+        physicsStatusError = "experiment_controller.login_failed";
       }
     } on DioException catch (e, s) {
       log.handle(e, s);
-      error = "network_error";
+      physicsStatusError = "network_error";
     } catch (e, s) {
       log.handle(e, s);
-      error = "error_detect";
+      physicsStatusError = "error_detect";
     } finally {
-      if (status == ExperimentStatus.fetched) {
+      if (physicsStatus == ExperimentStatus.fetched) {
         log.info(
-          "[ExperimentController][get] "
+          "[ExperimentController][getPhysicsExperiment] "
           "Store to cache.",
         );
-        file.writeAsStringSync(jsonEncode(data));
+        physicsCacheFile.writeAsStringSync(jsonEncode(toReturn));
         if (Platform.isIOS) {
           final api = SaveToGroupIdSwiftApi();
           try {
             bool result = await api.saveToGroupId(
               FileToGroupID(
                 appid: preference.appId,
-                fileName: experimentCacheName,
-                data: jsonEncode(data),
+                fileName: physicsCacheName,
+                data: jsonEncode(toReturn),
+              ),
+            );
+            log.info(
+              "[ExperimentController][getPhysicsExperiment] "
+              "ios Save to public place status: $result.",
+            );
+          } catch (e, s) {
+            log.handle(e, s);
+          }
+        }
+      } else if (previous == ExperimentStatus.cache) {
+        physicsStatus = ExperimentStatus.cache;
+      } else {
+        physicsStatus = ExperimentStatus.error;
+      }
+    }
+    return toReturn;
+  }
+
+  Future<List<ExperimentData>> getOtherExperiment() async {
+    ExperimentStatus previous = otherStatus;
+    otherStatus = ExperimentStatus.fetching;
+    List<ExperimentData> toReturn = [];
+    log.info(
+      "[ExperimentController][getOtherExperiment] "
+      "Fetching data from Internet.",
+    );
+    try {
+      (ExperimentFetchStatus, List<ExperimentData>) returnedData =
+          await SysjSession().getDataFromSysj();
+      if (returnedData.$1 == ExperimentFetchStatus.notSchoolNetwork) {
+        log.warning(
+          "[ExperimentController][getOtherExperiment] "
+          "Not in school exception",
+        );
+        otherStatusError = "not_school_network";
+      } else if (returnedData.$1 == ExperimentFetchStatus.noPassword) {
+        log.warning(
+          "[ExperimentController][getOtherExperiment] "
+          "Do not find experiment password",
+        );
+        otherStatusError = "experiment_controller.no_password";
+      } else {
+        toReturn.addAll(returnedData.$2);
+        otherStatus = ExperimentStatus.fetched;
+        otherStatusError = "";
+      }
+    } on LoginFailedException catch (e, s) {
+      log.handle(e, s);
+      if (e.msg != null && e.msg!.isNotEmpty) {
+        otherStatusError = e.msg!;
+      } else {
+        otherStatusError = "experiment_controller.login_failed";
+      }
+    } on DioException catch (e, s) {
+      log.handle(e, s);
+      otherStatusError = "network_error";
+    } catch (e, s) {
+      log.handle(e, s);
+      otherStatusError = "error_detect";
+    } finally {
+      if (otherStatus == ExperimentStatus.fetched) {
+        log.info(
+          "[ExperimentController][getOtherExperiment] "
+          "Store to cache.",
+        );
+        otherCacheFile.writeAsStringSync(jsonEncode(toReturn));
+        if (Platform.isIOS) {
+          final api = SaveToGroupIdSwiftApi();
+          try {
+            bool result = await api.saveToGroupId(
+              FileToGroupID(
+                appid: preference.appId,
+                fileName: otherCacheName,
+                data: jsonEncode(toReturn),
               ),
             );
             log.info(
@@ -201,11 +311,23 @@ class ExperimentController extends GetxController {
           }
         }
       } else if (previous == ExperimentStatus.cache) {
-        status = ExperimentStatus.cache;
+        otherStatus = ExperimentStatus.cache;
       } else {
-        status = ExperimentStatus.error;
+        otherStatus = ExperimentStatus.error;
+      }
+    }
+    return toReturn;
+  }
+
+  Future<void> get() async {
+    await Future.wait([getPhysicsExperiment(), getOtherExperiment()]).then((
+      values,
+    ) {
+      data.clear();
+      for (final value in values) {
+        data.addAll(value);
       }
       update();
-    }
+    });
   }
 }

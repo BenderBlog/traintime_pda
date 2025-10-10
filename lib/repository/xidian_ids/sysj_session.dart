@@ -140,7 +140,7 @@ class SysjSession extends IDSSession {
     const experimentClassroomMark = '???schedule.course.lab???：';
     const experimentTeacherMark = '???student.timetable.teacher???：';
 
-    for (int i = 11; i <= 13; ++i) {
+    for (int i = 1; i <= 25; ++i) {
       Document classTableHtml = await dio
           .post(
             "https://sysj.xidian.edu.cn/xidian/StudentCurrWeekTimetable",

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -25,16 +26,33 @@ class ExperimentInfoCard extends StatelessWidget {
             ],
             bottomRow: Column(
               children: [
-                // TODO: Change Time Display Pattern
-                InformationWithIcon(
-                  icon: Icons.access_time_filled_rounded,
-                  text: "${data!.timeRanges}",
+                Builder(
+                  builder: (context) {
+                    final dateFormatter = DateFormat("yyyy-MM-dd");
+                    final timeFormatter = DateFormat("HH:mm");
+
+                    return InformationWithIcon(
+                      icon: Icons.access_time_filled_rounded,
+                      text: data!.timeRanges
+                          .map<String>((timeRange) {
+                            final firstDate = timeRange.$1;
+                            final secondDate = timeRange.$2;
+                            final dateStr = dateFormatter.format(firstDate);
+                            final startTimeStr = timeFormatter.format(
+                              firstDate,
+                            );
+                            final endTimeStr = timeFormatter.format(secondDate);
+                            return "$dateStr $startTimeStr-$endTimeStr";
+                          })
+                          .join("\n"),
+                    );
+                  },
                 ),
                 Flex(
                   direction: Axis.horizontal,
                   children: [
                     Expanded(
-                      flex: 1,
+                      flex: 2,
                       child: InformationWithIcon(
                         icon: Icons.room,
                         text: data!.classroom,
@@ -47,14 +65,14 @@ class ExperimentInfoCard extends StatelessWidget {
                         text: data!.teacher,
                       ),
                     ),
-                    if (data!.reference == null && data!.reference!.isNotEmpty)
-                      Expanded(
-                        flex: 1,
-                        child: InformationWithIcon(
-                          icon: Icons.book,
-                          text: data!.reference!,
-                        ),
-                      ),
+                    // if (data!.reference?.isNotEmpty ?? false)
+                    //   Expanded(
+                    //     flex: 1,
+                    //     child: InformationWithIcon(
+                    //       icon: Icons.book,
+                    //       text: data!.reference!,
+                    //     ),
+                    //   ),
                   ],
                 ),
               ],

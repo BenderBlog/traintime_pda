@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
@@ -41,31 +42,43 @@ class ExperimentDetailCard extends StatelessWidget {
               const SizedBox(height: 6),
               [
                 CustomListTile(
-                  icon: Icons.room,
-                  str: experiment.classroom,
-                  infoColor: infoColor,
-                ).flexible(),
-                CustomListTile(
                   icon: Icons.person,
                   str: experiment.teacher,
                   infoColor: infoColor,
                 ).flexible(),
-              ].toRow(),
-              if (experiment.reference != null)
                 CustomListTile(
-                  icon: Icons.book,
-                  str: experiment.reference!,
+                  icon: Icons.room,
+                  str: experiment.classroom,
                   infoColor: infoColor,
-                ),
+                ).flexible(),
+              ].toRow(),
+              //  if (experiment.reference != null)
+              //    CustomListTile(
+              //      icon: Icons.book,
+              //      str: experiment.reference!,
+              //      infoColor: infoColor,
+              //    ),
+              Builder(
+                builder: (context) {
+                  final dateFormatter = DateFormat("yyyy-MM-dd");
+                  final timeFormatter = DateFormat("HH:mm");
 
-              /// TODO: Rewrite time display
-              /*
-              CustomListTile(
-                icon: Icons.access_time_filled_outlined,
-                str: experiment.timeStr,
-                infoColor: infoColor,
+                  return CustomListTile(
+                    icon: Icons.access_time_filled_outlined,
+                    infoColor: infoColor,
+                    str: experiment.timeRanges
+                        .map<String>((timeRange) {
+                          final firstDate = timeRange.$1;
+                          final secondDate = timeRange.$2;
+                          final dateStr = dateFormatter.format(firstDate);
+                          final startTimeStr = timeFormatter.format(firstDate);
+                          final endTimeStr = timeFormatter.format(secondDate);
+                          return "$dateStr $startTimeStr-$endTimeStr";
+                        })
+                        .join("\n"),
+                  );
+                },
               ),
-              */
             ],
           ),
         ),

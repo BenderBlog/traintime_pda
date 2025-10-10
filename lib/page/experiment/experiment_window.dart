@@ -30,10 +30,12 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
       ),
       body: GetBuilder<ExperimentController>(
         builder: (controller) {
-          if (controller.status == ExperimentStatus.fetched ||
-              controller.status == ExperimentStatus.cache) {
+          if ((controller.physicsStatus == ExperimentStatus.fetched ||
+                  controller.physicsStatus == ExperimentStatus.cache) ||
+              (controller.otherStatus == ExperimentStatus.fetched ||
+                  controller.otherStatus == ExperimentStatus.cache)) {
             var doing = controller.doing(now);
-            var unDone = controller.isNotFinished(now);
+            var unDone = controller.isNotStarted(now);
             var done = controller.isFinished(now);
             return TimelineWidget(
               isTitle: [
@@ -100,10 +102,14 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                       ),
               ],
             );
-          } else if (controller.status == ExperimentStatus.error) {
+          } else if (controller.physicsStatus == ExperimentStatus.error &&
+              controller.otherStatus == ExperimentStatus.error) {
             return ReloadWidget(
               function: controller.get,
-              errorStatus: FlutterI18n.translate(context, controller.error),
+              errorStatus: FlutterI18n.translate(
+                context,
+                "${controller.physicsStatusError} ${controller.otherStatusError}",
+              ),
             ).center();
           } else {
             return CircularProgressIndicator().center();
