@@ -29,7 +29,7 @@ dependencies:
   easy_refresh: ^3.3.0+1
   sn_progress_dialog: ^1.1.3
   fluttertoast: ^9.0.0
-  flex_color_scheme: ^8.0.1
+  flex_color_scheme: ^8.3.0
   # Others
   url_launcher: ^6.1.6
   time: ^2.1.5
