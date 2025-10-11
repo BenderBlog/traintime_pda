@@ -60,7 +60,10 @@ class ExperimentDetailCard extends StatelessWidget {
               //    ),
               Builder(
                 builder: (context) {
-                  final dateFormatter = DateFormat("yyyy-MM-dd");
+                  final dateFormatter = DateFormat(
+                    'y/M/d EEEE',
+                    Localizations.localeOf(context).toLanguageTag(),
+                  );
                   final timeFormatter = DateFormat("HH:mm");
 
                   return CustomListTile(

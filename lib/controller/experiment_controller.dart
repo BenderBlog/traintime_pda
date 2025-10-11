@@ -66,8 +66,8 @@ class ExperimentController extends GetxController {
     for (final experiment in data) {
       bool containsDoing = experiment.timeRanges.where(isQualified).isNotEmpty;
       if (!containsDoing) continue;
-      ExperimentData toAdd = experiment;
-      experiment.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
+      ExperimentData toAdd = ExperimentData.from(experiment);
+      toAdd.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
       toReturn.add(toAdd);
     }
 
@@ -88,8 +88,8 @@ class ExperimentController extends GetxController {
     for (final experiment in data) {
       bool containsDoing = experiment.timeRanges.where(isQualified).isNotEmpty;
       if (!containsDoing) continue;
-      ExperimentData toAdd = experiment;
-      experiment.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
+      ExperimentData toAdd = ExperimentData.from(experiment);
+      toAdd.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
       toReturn.add(toAdd);
     }
 
@@ -110,8 +110,8 @@ class ExperimentController extends GetxController {
     for (final experiment in data) {
       bool containsDoing = experiment.timeRanges.where(isQualified).isNotEmpty;
       if (!containsDoing) continue;
-      ExperimentData toAdd = experiment;
-      experiment.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
+      ExperimentData toAdd = ExperimentData.from(experiment);
+      toAdd.timeRanges.removeWhere((timeRange) => !isQualified(timeRange));
       toReturn.add(toAdd);
     }
 
@@ -172,6 +172,7 @@ class ExperimentController extends GetxController {
   Future<List<ExperimentData>> getPhysicsExperiment() async {
     ExperimentStatus previous = physicsStatus;
     physicsStatus = ExperimentStatus.fetching;
+    update();
     List<ExperimentData> toReturn = [];
     log.info(
       "[ExperimentController][getPhysicsExperiment] "
@@ -247,6 +248,7 @@ class ExperimentController extends GetxController {
   Future<List<ExperimentData>> getOtherExperiment() async {
     ExperimentStatus previous = otherStatus;
     otherStatus = ExperimentStatus.fetching;
+    update();
     List<ExperimentData> toReturn = [];
     log.info(
       "[ExperimentController][getOtherExperiment] "

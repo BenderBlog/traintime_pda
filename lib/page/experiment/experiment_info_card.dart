@@ -28,8 +28,11 @@ class ExperimentInfoCard extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final dateFormatter = DateFormat("yyyy-MM-dd");
-                    final timeFormatter = DateFormat("HH:mm");
+                    final dateFormatter = DateFormat(
+                      'y/M/d EEEE',
+                      Localizations.localeOf(context).toLanguageTag(),
+                    );
+                    final timeFormatter = DateFormat("HH:mm:ss");
 
                     return InformationWithIcon(
                       icon: Icons.access_time_filled_rounded,
@@ -42,7 +45,7 @@ class ExperimentInfoCard extends StatelessWidget {
                               firstDate,
                             );
                             final endTimeStr = timeFormatter.format(secondDate);
-                            return "$dateStr $startTimeStr-$endTimeStr";
+                            return "$dateStr $startTimeStr~$endTimeStr";
                           })
                           .join("\n"),
                     );

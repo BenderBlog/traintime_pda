@@ -16,7 +16,7 @@ error_detect: 遇到錯誤，請查看日誌
 query_failed: 查詢失敗
 not_school_network: 沒有在校園網環境
 experiment_controller:
-  no_password: 沒有物理實驗密碼
+  no_password: 沒有物理實驗密碼，請到設置中進行設置
   login_failed: 登錄失敗
 cancel_exam: 取消考試資格:P
 login_process:
@@ -202,7 +202,7 @@ exam:
     all_arranged: 目前所有科目均已安排考試
     subtitle: '編號: {id}'
 experiment:
-  title: 物理實驗
+  title: 實驗信息
   ongoing: 正在進行實驗
   not_finished: 未完成實驗
   all_finished: 所有實驗全部完成
@@ -210,6 +210,11 @@ experiment:
   score_sum: 目前分數總和：{sum}
   none_finished: 目前沒有已經完成的實驗
   not_provided: 未提供
+  error_physics: 獲取物理實驗信息時發生錯誤：{info}
+  error_other: 獲取其他實驗信息時發生錯誤：{info}
+  cache_hint: 目前加載緩存狀況：{info}
+  physics_experiment: 物理實驗
+  other_experiment: 其他實驗
 homepage:
   time_string:
     morning: 早上好 準備出發
@@ -301,7 +306,7 @@ homepage:
     creative: 雙創競賽
     empty_classroom: 空閒教室
     exam: 考試安排
-    experiment: 物理實驗
+    experiment: 實驗信息
     score: 成績查詢
     sport: 體育信息
     schoolnet: 網絡查詢

@@ -46,4 +46,14 @@ class ExperimentData {
         'reference: ${reference ?? "N/A"}'
         ')';
   }
+
+  factory ExperimentData.from(ExperimentData src) => ExperimentData(
+    type: src.type,
+    name: src.name,
+    score: src.score,
+    classroom: src.classroom,
+    timeRanges: src.timeRanges.toList(),
+    teacher: src.teacher,
+    reference: src.reference,
+  );
 }

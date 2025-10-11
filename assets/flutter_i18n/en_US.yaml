@@ -31,7 +31,7 @@ error_detect: "An error has occurred,"
 query_failed: "Query failed"
 not_school_network: "Not on the Campus Network"
 experiment_controller:
-   no_password: "Experiment password is not set"
+   no_password: "Experiment password is not set, please set up one in the setting"
    login_failed: "Login failed"
 cancel_exam: "Disqualified to exam :P"
 login_process:
@@ -235,7 +235,7 @@ exam:
 
 # 物理实验
 experiment:
-   title: "Physics Experiment"
+   title: "Experiment Info"
    ongoing: "Ongoing experiment"
    not_finished: "Experiments to be done"
    all_finished: "All experiments have been completed"
@@ -243,6 +243,11 @@ experiment:
    score_sum: "Total score: {sum}"
    none_finished: "None of the experiments have been completed"
    not_provided: "Not provided"
+   error_physics: "Error on fetching physics experiments: {info}"
+   error_other: "Error on fetching other experiments: {info}"
+   cache_hint: "Loaded cache: {info}"
+   physics_experiment: "physics experiments"
+   other_experiment: "other experiments"
 
 # 主页
 homepage:

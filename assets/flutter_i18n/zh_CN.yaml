@@ -26,7 +26,7 @@ error_detect: "遇到错误，请查看日志"
 query_failed: "查询失败"
 not_school_network: "没有在校园网环境"
 experiment_controller:
-    no_password: "没有物理实验密码"
+    no_password: "没有物理实验密码，请到设置中进行设置"
     login_failed: "登录失败"
 cancel_exam: "取消考试资格:P"
 login_process:
@@ -224,9 +224,9 @@ exam:
         all_arranged: "目前所有科目均已安排考试"
         subtitle: "编号: {id}"
 
-# 物理实验
+# 实验信息
 experiment:
-    title: "物理实验"
+    title: "实验信息"
     ongoing: "正在进行实验"
     not_finished: "未完成实验"
     all_finished: "所有实验全部完成"
@@ -234,6 +234,12 @@ experiment:
     score_sum: "目前分数总和：{sum}"
     none_finished: "目前没有已经完成的实验"
     not_provided: "未提供"
+    error_physics: "获取物理实验信息时发生错误：{info}"
+    error_other: "获取其他实验信息时发生错误：{info}"
+    cache_hint: "目前加载缓存状况：{info}"
+    physics_experiment: "物理实验"
+    other_experiment: "其他实验"
+    
 
 # 主页
 homepage:
@@ -325,7 +331,7 @@ homepage:
         creative: "双创竞赛"
         empty_classroom: "空闲教室"
         exam: "考试安排"
-        experiment: "物理实验"
+        experiment: "实验信息"
         score: "成绩查询"
         sport: "体育信息"
         schoolnet: "网络查询"
