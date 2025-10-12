@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:charset_converter/charset_converter.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
+import 'package:watermeter/repository/experiment_score/image_recognition.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart';
@@ -226,6 +227,16 @@ class ExperimentSession extends NetworkSession {
     );
 
     List<ExperimentData> toReturn = [];
+
+    final scoreImageRecognitionService = ImageRecognitionService();
+
+    final scoreResults = await scoreImageRecognitionService.recognizeAllScores();
+    for (var entry in scoreResults.entries) {
+      log.debug(
+        '${entry.key}: ${entry.value.label} (confidence: ${entry.value.confidence})',
+      );
+    }
+
     for (var i in expInfo) {
       var expTds = i.getElementsByTagName('td');
       if (expTds.isEmpty) continue;
@@ -251,15 +262,17 @@ class ExperimentSession extends NetworkSession {
               DateTime(dateNums[2], dateNums[0], dateNums[1], 20, 45, 00),
             ); // Evening 18:30～20:45
 
+      final name = expTds[1]
+          .getElementsByClassName("linkSmallBold")
+          .first
+          .innerHtml
+          .replaceAll('（3学时）', '');
+
       toReturn.add(
         ExperimentData(
           type: ExperimentType.physics,
-          name: expTds[1]
-              .getElementsByClassName("linkSmallBold")
-              .first
-              .innerHtml
-              .replaceAll('（3学时）', ''),
-          score: expTds[7].getElementsByTagName("span").first.innerHtml,
+          name: name,
+          score: scoreResults[name]!.confidence >= 0.95 ? scoreResults[name]!.label :  '$scoreResults[name]!.label(分数结果置信度较低)',
           classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
           timeRanges: [timeRange],
           reference: expTds[9].getElementsByTagName("span").first.innerHtml,

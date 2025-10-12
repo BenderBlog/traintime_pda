@@ -29,7 +29,7 @@ dependencies:
   easy_refresh: ^3.3.0+1
   sn_progress_dialog: ^1.1.3
   fluttertoast: ^9.0.0
-  flex_color_scheme: ^8.0.1
+  flex_color_scheme: ^8.3.0
   # Others
   url_launcher: ^6.1.6
   time: ^2.1.5
@@ -74,6 +74,7 @@ dependencies:
     sdk: flutter
   intl:
   timezone: ^0.9.4
+  pool: ^1.5.2
 
 dev_dependencies:
   flutter_test:
@@ -113,3 +114,4 @@ flutter:
     - assets/flutter_i18n/en_US.yaml
     - assets/captcha-solver-payment.tflite
     - assets/captcha-solver-zfw.tflite
+    - assets/experiment_score/cache
