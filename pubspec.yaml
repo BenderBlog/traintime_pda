@@ -74,6 +74,7 @@ dependencies:
     sdk: flutter
   intl:
   timezone: ^0.9.4
+  pool: ^1.5.2
 
 dev_dependencies:
   flutter_test:
@@ -113,3 +114,4 @@ flutter:
     - assets/flutter_i18n/en_US.yaml
     - assets/captcha-solver-payment.tflite
     - assets/captcha-solver-zfw.tflite
+    - assets/experiment_score/cache
