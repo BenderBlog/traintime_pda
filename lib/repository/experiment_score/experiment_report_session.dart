@@ -11,31 +11,42 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 
 class ExperimentReportSession extends NetworkSession {
+  // Cache the Dio instance to avoid recreating it
+  Dio? _dioInstance;
+
   @override
-  Dio get dio => Dio()
-    ..interceptors.add(logDioAdapter)
-    ..options.contentType = Headers.formUrlEncodedContentType
-    ..options.followRedirects = false
-    ..options.responseDecoder = (responseBytes, options, responseBody) async {
-      // Check if the response is JSON by looking at the first character
-      // JSON responses start with '{' or '['
-      if (responseBytes.isNotEmpty && 
-          (responseBytes[0] == 0x7B || responseBytes[0] == 0x5B)) {
-        // This is JSON, decode as UTF-8
-        return utf8.decode(responseBytes);
-      }
-      
-      // For HTML pages, use GBK/GB18030 decoding
-      String gbk = await CharsetConverter.availableCharsets().then(
-        (value) => value.firstWhere((element) => element.contains("18030")),
-      );
-      return await CharsetConverter.decode(
-        gbk,
-        Uint8List.fromList(responseBytes),
-      );
+  Dio get dio {
+    if (_dioInstance != null) {
+      return _dioInstance!;
     }
-    ..options.validateStatus = (status) =>
-        status != null && status >= 200 && status < 400;
+
+    _dioInstance = Dio()
+      ..interceptors.add(logDioAdapter)
+      ..options.contentType = Headers.formUrlEncodedContentType
+      ..options.followRedirects = false
+      ..options.responseDecoder = (responseBytes, options, responseBody) async {
+        // Check if the response is JSON by looking at the first character
+        // JSON responses start with '{' or '['
+        if (responseBytes.isNotEmpty && 
+            (responseBytes[0] == 0x7B || responseBytes[0] == 0x5B)) {
+          // This is JSON, decode as UTF-8
+          return utf8.decode(responseBytes);
+        }
+        
+        // For HTML pages, use GBK/GB18030 decoding
+        String gbk = await CharsetConverter.availableCharsets().then(
+          (value) => value.firstWhere((element) => element.contains("18030")),
+        );
+        return await CharsetConverter.decode(
+          gbk,
+          Uint8List.fromList(responseBytes),
+        );
+      }
+      ..options.validateStatus = (status) =>
+          status != null && status >= 200 && status < 400;
+
+    return _dioInstance!;
+  }
 
   /// Get the score image from the report system
   Future<Map<String, String>> getScoreImageUrls(
@@ -90,6 +101,15 @@ class ExperimentReportSession extends NetworkSession {
     if (match != null) {
       sid = match.group(1) ?? '';
       cookieStr = 'UNI_GUI_SESSION_ID=$sid';
+    }
+
+    // Validate that we got a valid session ID
+    if (sid.isEmpty) {
+      log.error(
+        "[experiment_report_session][getScoreImageUrls]",
+        "Failed to extract session ID from response",
+      );
+      throw Exception('Failed to extract session ID from login page');
     }
 
     log.debug(
@@ -154,7 +174,7 @@ class ExperimentReportSession extends NetworkSession {
     var resizePostData =
         'Ajax=1&IsEvent=1&Obj=O0&Evt=resize&this=O0&w=311&h=255&_S_ID=$sid&_seq_=3&_uo_=O0';
 
-    dio.post(
+    await dio.post(
       'http://wlsy.xidian.edu.cn/wgyreport/wgyreport.dll/HandleEvent',
       data: resizePostData,
       options: Options(

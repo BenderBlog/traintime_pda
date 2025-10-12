@@ -85,7 +85,13 @@ class RecognitionResult {
 
 /// Image recognition service for experiment scores
 class ImageRecognitionService {
-  final ExperimentReportSession _session = ExperimentReportSession();
+  // Use lazy initialization to avoid creating session until needed
+  ExperimentReportSession? _session;
+  ExperimentReportSession get session {
+    _session ??= ExperimentReportSession();
+    return _session!;
+  }
+
   List<ImageFeatureCache>? _corpusCache;
 
   /// Load precomputed corpus from assets (only features, no images)
@@ -257,7 +263,7 @@ class ImageRecognitionService {
         'Downloading image...',
       );
 
-      final queryImage = await _session.downloadAndDecodeImage(imageUrl);
+      final queryImage = await session.downloadAndDecodeImage(imageUrl);
 
       log.info(
         '[ImageRecognitionService][recognizeFromUrl]',
@@ -315,7 +321,7 @@ class ImageRecognitionService {
             'Processing image ${i + 1}/${imageUrls.length}...',
           );
 
-          final image = await _session.downloadAndDecodeImage(imageUrls[i]);
+          final image = await session.downloadAndDecodeImage(imageUrls[i]);
           final queryFeatures = _computeImageFeatures(image);
           final result = _findBestMatch(queryFeatures);
           
@@ -389,7 +395,7 @@ class ImageRecognitionService {
         'Fetching score image URLs...',
       );
 
-      final urls = await _session.getScoreImageUrls(account, password);
+      final urls = await session.getScoreImageUrls(account, password);
 
       log.info(
         '[ImageRecognitionService][getScoreImageUrls]',
