@@ -17,7 +17,7 @@ import io.github.benderblog.traintime_pda.model.TimeLineItem
 import io.github.benderblog.traintime_pda.model.UserDefinedClassData
 import io.github.benderblog.traintime_pda.model.endTime
 import io.github.benderblog.traintime_pda.model.startTime
-import io.github.benderblog.traintime_pda.model.timeRange
+import io.github.benderblog.traintime_pda.model.timeRanges
 import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -171,27 +171,51 @@ class ClassTableWidgetDataProvider {
             }
             Log.i(tag, "examJsonData loaded, subject length: ${examData.subject.size}")
 
-            experimentData = ClassTableDataHolder.experimentJsonData.getOrElse {
-                Log.e(tag, "Failed to load ExperimentData", it)
-                widgetState = ClassTableWidgetLoadState.ERROR_EXPERIMENT
+            val physicsExperimentData = ClassTableDataHolder.physicsExperimentJsonData.getOrElse {
+                Log.e(tag, "Failed to load PhysicsExperimentData", it)
+                widgetState = ClassTableWidgetLoadState.ERROR_PHYSICS_EXPERIMENT
                 errorMessage = it.localizedMessage ?: it.message
                         ?: context.getString(R.string.widget_classtable_unknown_error)
                 return
             }?.takeIf {
-                Log.i(tag, "experimentJsonData is not blank: ${it.isNotBlank()}")
+                Log.i(tag, "physicsExperimentJsonData is not blank: ${it.isNotBlank()}")
                 it.isNotBlank()
             }?.let {
                 try {
                     lenientJson.decodeFromString<List<ExperimentData>>(it)
                 } catch (e: Exception) {
-                    Log.e(tag, "Failed to parse ExperimentData", e)
-                    widgetState = ClassTableWidgetLoadState.ERROR_EXPERIMENT
+                    Log.e(tag, "Failed to parse PhysicsExperimentData", e)
+                    widgetState = ClassTableWidgetLoadState.ERROR_PHYSICS_EXPERIMENT
                     errorMessage = e.localizedMessage ?: e.message
                             ?: context.getString(R.string.widget_classtable_unknown_error)
                     return
                 }
             } ?: emptyList()
-            Log.i(tag, "experimentJsonData loaded, data length: ${experimentData.size}")
+            Log.i(tag, "physicsExperimentJsonData loaded, data length: ${physicsExperimentData.size}")
+
+            val otherExperimentData = ClassTableDataHolder.otherExperimentJsonData.getOrElse {
+                Log.e(tag, "Failed to load OtherExperimentData", it)
+                widgetState = ClassTableWidgetLoadState.ERROR_OTHER_EXPERIMENT
+                errorMessage = it.localizedMessage ?: it.message
+                        ?: context.getString(R.string.widget_classtable_unknown_error)
+                return
+            }?.takeIf {
+                Log.i(tag, "otherExperimentJsonData is not blank: ${it.isNotBlank()}")
+                it.isNotBlank()
+            }?.let {
+                try {
+                    lenientJson.decodeFromString<List<ExperimentData>>(it)
+                } catch (e: Exception) {
+                    Log.e(tag, "Failed to parse OtherExperimentData", e)
+                    widgetState = ClassTableWidgetLoadState.ERROR_OTHER_EXPERIMENT
+                    errorMessage = e.localizedMessage ?: e.message
+                            ?: context.getString(R.string.widget_classtable_unknown_error)
+                    return
+                }
+            } ?: emptyList()
+            Log.i(tag, "otherExperimentJsonData loaded, data length: ${otherExperimentData.size}")
+
+            experimentData = physicsExperimentData + otherExperimentData
 
             // merge class table with user added class
             classTableData = schoolClassTableData.copy(
@@ -331,19 +355,20 @@ class ClassTableWidgetDataProvider {
         val curMonth: Int = currentTime.monthValue
         val curDay: Int = currentTime.dayOfMonth
         for (data in experimentData) {
-            val targetCalendar = data.timeRange.first
-            if (targetCalendar.year == curYear && targetCalendar.monthValue == curMonth && targetCalendar.dayOfMonth == curDay) {
-                timeLineItem.add(
-                    TimeLineItem(
-                        type = Source.EXPERIMENT,
-                        name = data.name,
-                        teacher = data.teacher,
-                        place = data.classroom,
-                        startTime = data.timeRange.first,
-                        endTime = data.timeRange.second,
-                        colorIndex = experimentData.indexOf(data)
+            for (timeRange in data.timeRanges) {
+                if (timeRange.first.year == curYear && timeRange.first.monthValue == curMonth && timeRange.first.dayOfMonth == curDay) {
+                    timeLineItem.add(
+                        TimeLineItem(
+                            type = Source.EXPERIMENT,
+                            name = data.name,
+                            teacher = data.teacher,
+                            place = data.classroom,
+                            startTime = timeRange.first,
+                            endTime = timeRange.second,
+                            colorIndex = experimentData.indexOf(data),
+                        )
                     )
-                )
+                }
             }
         }
     }

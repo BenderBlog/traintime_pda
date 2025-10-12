@@ -296,7 +296,8 @@ class ClassTableWidget : GlanceAppWidget() {
                             when (status) {
                                 ClassTableWidgetLoadState.ERROR_COURSE -> R.string.widget_classtable_error_course
                                 ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED -> R.string.widget_classtable_error_course_user_defined
-                                ClassTableWidgetLoadState.ERROR_EXPERIMENT -> R.string.widget_classtable_error_experience
+                                ClassTableWidgetLoadState.ERROR_PHYSICS_EXPERIMENT -> R.string.widget_classtable_error_physics_experience
+                                ClassTableWidgetLoadState.ERROR_OTHER_EXPERIMENT -> R.string.widget_classtable_error_other_experience
                                 ClassTableWidgetLoadState.ERROR_EXAM -> R.string.widget_classtable_error_exam
                                 ClassTableWidgetLoadState.ERROR_OTHER -> R.string.widget_classtable_error_other
                                 else -> R.string.widget_classtable_unknown_error
@@ -317,7 +318,7 @@ class ClassTableWidget : GlanceAppWidget() {
                                 Spacer(modifier = GlanceModifier.size(4.dp))
                                 Text(
                                     context.getString(
-                                        R.string.widget_classtable_on_error, titleText
+                                        R.string.widget_classtable_on_error, titleText, ""
                                     ), style = TextStyle(
                                         fontSize = 13.sp, color = GlanceTheme.colors.primary
                                     )

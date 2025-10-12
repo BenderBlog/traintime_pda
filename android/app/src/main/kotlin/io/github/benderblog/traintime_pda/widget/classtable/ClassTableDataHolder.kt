@@ -29,7 +29,11 @@ object ClassTableDataHolder {
         @Synchronized set
 
     @JvmStatic
-    var experimentJsonData: Result<String?> = Result.success(null)
+    var physicsExperimentJsonData: Result<String?> = Result.success(null)
+        @Synchronized set
+
+    @JvmStatic
+    var otherExperimentJsonData: Result<String?> = Result.success(null)
         @Synchronized set
 
     @JvmStatic
@@ -72,8 +76,8 @@ object ClassTableDataHolder {
                 "User Class JSON loaded, isSuccess: ${userDefinedClassJsonData.isSuccess} " + "length: ${userDefinedClassJsonData.getOrNull()?.length ?: 0}"
             )
 
-            experimentJsonData = loadFileContent(
-                context, ClassTableConstants.EXPERIMENT_FILE_NAME
+            physicsExperimentJsonData = loadFileContent(
+                context, ClassTableConstants.PHYSICS_EXPERIMENT_FILE_NAME
             ).fold(onSuccess = { Result.success(it) }, onFailure = {
                 if (it is FileNotFoundException) {
                     Result.success(null)
@@ -83,7 +87,21 @@ object ClassTableDataHolder {
             })
             Log.i(
                 TAG,
-                "Experiment JSON loaded, isSuccess: ${experimentJsonData.isSuccess} " + "length: ${experimentJsonData.getOrNull()?.length ?: 0}"
+                "Physics Experiment JSON loaded, isSuccess: ${physicsExperimentJsonData.isSuccess} " + "length: ${physicsExperimentJsonData.getOrNull()?.length ?: 0}"
+            )
+
+            otherExperimentJsonData = loadFileContent(
+                context, ClassTableConstants.OTHER_EXPERIMENT_FILE_NAME
+            ).fold(onSuccess = { Result.success(it) }, onFailure = {
+                if (it is FileNotFoundException) {
+                    Result.success(null)
+                } else {
+                    Result.failure(it)
+                }
+            })
+            Log.i(
+                TAG,
+                "Other Experiment JSON loaded, isSuccess: ${otherExperimentJsonData.isSuccess} " + "length: ${otherExperimentJsonData.getOrNull()?.length ?: 0}"
             )
 
             Log.i(TAG, "Finished loading data from files.")

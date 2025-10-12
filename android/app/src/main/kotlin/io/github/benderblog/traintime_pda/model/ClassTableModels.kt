@@ -17,7 +17,8 @@ object ClassTableConstants {
     const val CLASS_FILE_NAME = "ClassTable.json"
     const val USER_CLASS_FILE_NAME = "UserClass.json"
     const val EXAM_FILE_NAME = "exam.json"
-    const val EXPERIMENT_FILE_NAME = "Experiment.json"
+    const val PHYSICS_EXPERIMENT_FILE_NAME = "PhysicsExperiment.json"
+    const val OTHER_EXPERIMENT_FILE_NAME = "OtherExperiment.json"
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
     // Be attention to the changes of SharedPreferencesPlugin.SHARED_PREFERENCES_NAME.
@@ -197,50 +198,15 @@ val Subject.endTime: Result<LocalDateTime>
 data class ExperimentData(
     val name: String,
     val classroom: String,
-    val date: String,
-    val timeStr: String,
+    @SerialName("timeRanges")
+    val timeRangesMap: List<Map<String, @Serializable(with = LocalDateTimeSerializer::class) LocalDateTime>>,
     val teacher: String,
 )
 
-val ExperimentData.timeRange: Pair<LocalDateTime, LocalDateTime>
+val ExperimentData.timeRanges: List<Pair<LocalDateTime, LocalDateTime>>
     get() {
-        /// Return is month/day/year , hope not change...
-        val dateNumbers: List<Int> = date.split('/').map { it ->
-            it.toInt()
+        return timeRangesMap.map {
+            it -> Pair(it["$1"]!!, it["$2"]!!)
         }
-
-        /// And the time arrangement too.
-        lateinit var startTime: LocalDateTime
-        lateinit var stopTime: LocalDateTime
-
-        if (timeStr.contains("15")) {
-            startTime = LocalDateTime.of(
-                dateNumbers[2],
-                dateNumbers[0],
-                dateNumbers[1],
-                15, 55, 0,
-            )
-            stopTime = LocalDateTime.of(
-                dateNumbers[2],
-                dateNumbers[0],
-                dateNumbers[1],
-                18, 10, 0,
-            )
-        } else {
-            startTime = LocalDateTime.of(
-                dateNumbers[2],
-                dateNumbers[0],
-                dateNumbers[1],
-                18, 30, 0,
-            )
-            stopTime = LocalDateTime.of(
-                dateNumbers[2],
-                dateNumbers[0],
-                dateNumbers[1],
-                20, 45, 0,
-            )
-        }
-
-        return Pair(startTime, stopTime)
     }
 
