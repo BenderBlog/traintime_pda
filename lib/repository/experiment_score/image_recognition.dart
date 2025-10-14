@@ -70,17 +70,19 @@ class RecognitionResult {
   final double confidence;
   final double mse;
   final double ssim;
+  final bool isPredicted;
 
   const RecognitionResult({
     required this.label,
     required this.confidence,
     required this.mse,
     required this.ssim,
+    required this.isPredicted
   });
 
   @override
   String toString() =>
-      'RecognitionResult(label: $label, confidence: ${confidence.toStringAsFixed(4)}, mse: ${mse.toStringAsFixed(2)}, ssim: ${ssim.toStringAsFixed(4)})';
+      'RecognitionResult(label: $label, confidence: ${confidence.toStringAsFixed(4)}, mse: ${mse.toStringAsFixed(2)}, ssim: ${ssim.toStringAsFixed(4)}, isPredicted: $isPredicted)';
 }
 
 /// Image recognition service for experiment scores
@@ -191,7 +193,10 @@ class ImageRecognitionService {
     final varianceScore = varianceDiff / 10000.0; // Normalize variance
 
     // 3. Histogram correlation (chi-square distance)
+    // Calculate total pixels for normalization
+    final totalPixels = query.histogram.reduce((a, b) => a + b);
     var histogramDiff = 0.0;
+    
     for (var i = 0; i < 256; i++) {
       final q = query.histogram[i];
       final c = corpus.histogram[i];
@@ -200,7 +205,9 @@ class ImageRecognitionService {
         histogramDiff += (diff * diff) / (q + c);
       }
     }
-    final histogramScore = histogramDiff / 256.0;
+    
+    // Normalize chi-square by total pixels to get a 0-1 range
+    final histogramScore = histogramDiff / totalPixels;
 
     // Weighted combination
     final score = meanScore * 0.2 + varianceScore * 0.2 + histogramScore * 0.6;
@@ -228,21 +235,34 @@ class ImageRecognitionService {
         confidence: 0.0,
         mse: double.infinity,
         ssim: 0.0,
+        isPredicted: false,
       );
     }
 
     final matchedCache = _corpusCache![bestIdx];
     final label = matchedCache.label;
+    
+    // Check if the matched image is a predicted image
+    // Predicted images have filenames ending with .predicted.png
+    final isPredicted = matchedCache.path.toLowerCase().endsWith('.predicted.png');
 
     // Convert similarity score to confidence (0-1 range)
     // Lower score = higher confidence
-    final confidence = 1.0 / (1.0 + bestScore * 10);
+    // Formula: confidence = 1 / (1 + score * k)
+    // With k=2.0, the mapping is:
+    //   score=0.00 -> confidence=1.000 (perfect match)
+    //   score=0.01 -> confidence=0.980 (nearly perfect)
+    //   score=0.05 -> confidence=0.909 (excellent)
+    //   score=0.10 -> confidence=0.833 (very good)
+    //   score=0.50 -> confidence=0.500 (moderate)
+    final confidence = 1.0 / (1.0 + bestScore * 2.0);
 
     return RecognitionResult(
       label: label,
       confidence: confidence,
       mse: bestScore * 10000, // Approximate MSE for logging
       ssim: confidence, // Approximate SSIM for logging
+      isPredicted: isPredicted,
     );
   }
 
@@ -342,6 +362,7 @@ class ImageRecognitionService {
               confidence: 0.0,
               mse: double.infinity,
               ssim: 0.0,
+              isPredicted: false,
             ),
           );
         }

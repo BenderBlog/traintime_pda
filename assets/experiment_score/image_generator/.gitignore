@@ -1,0 +1,28 @@
+# Build results
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test outputs
+examples/
+test_output.png
+output.png
+*.bmp
+*.jpg
+*.jpeg
+*.gif
+*.tiff
+
+# .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Windows
+Thumbs.db
+Desktop.ini

@@ -88,29 +88,39 @@ ImageFeatureCache computeImageFeatures(String imagePath) {
 
 /// Scan the specific folder, and precalculate all the images' feature and save them in the cache file.
 Future<void> precomputeAndCache(String folderPath, String cacheFilePath) async {
-  final dir = Directory(folderPath);
-  if (!dir.existsSync()) {
-    throw FileSystemException('Directory does not exist', folderPath);
-  }
+  await precomputeAndCacheMultiple([folderPath], cacheFilePath);
+}
 
-  final imageFiles = dir
-      .listSync(recursive: false)
-      .whereType<File>()
-      .where((f) => ['.png', '.jpg', '.jpeg', '.webp', '.bmp'].contains(p.extension(f.path).toLowerCase()))
-      .toList();
-
-  stdout.writeln('Found ${imageFiles.length} images in $folderPath');
-
+/// Scan multiple folders, and precalculate all the images' features and save them in the cache file.
+Future<void> precomputeAndCacheMultiple(List<String> folderPaths, String cacheFilePath) async {
   final features = <ImageFeatureCache>[];
-  for (var file in imageFiles) {
-    try {
-      stdout.write('Processing ${p.basename(file.path)}... ');
-      final feature = computeImageFeatures(file.path);
-      features.add(feature);
-      stdout.writeln('✓');
-    } catch (e) {
-      stdout.writeln('✗ Error: $e');
+
+  for (var folderPath in folderPaths) {
+    final dir = Directory(folderPath);
+    if (!dir.existsSync()) {
+      stdout.writeln('⚠ Warning: Directory does not exist: $folderPath');
+      continue;
     }
+
+    final imageFiles = dir
+        .listSync(recursive: false)
+        .whereType<File>()
+        .where((f) => ['.png', '.jpg', '.jpeg', '.webp', '.bmp'].contains(p.extension(f.path).toLowerCase()))
+        .toList();
+
+    stdout.writeln('Found ${imageFiles.length} images in $folderPath');
+
+    for (var file in imageFiles) {
+      try {
+        stdout.write('Processing ${p.basename(file.path)}... ');
+        final feature = computeImageFeatures(file.path);
+        features.add(feature);
+        stdout.writeln('✓');
+      } catch (e) {
+        stdout.writeln('✗ Error: $e');
+      }
+    }
+    stdout.writeln('');
   }
 
   // Save into the file
@@ -119,7 +129,8 @@ Future<void> precomputeAndCache(String folderPath, String cacheFilePath) async {
     File(cacheFilePath).createSync(recursive: true);
   }
   await File(cacheFilePath).writeAsString(json);
-  stdout.writeln('Cache saved to $cacheFilePath (${features.length} images)');
+  stdout.writeln('Cache saved to $cacheFilePath');
+  stdout.writeln('Total: ${features.length} images from ${folderPaths.length} folder(s)');
 }
 
 /// Load feature from cache
@@ -158,10 +169,44 @@ Future<bool> isCacheValid(String folderPath, String cacheFilePath) async {
 }
 
 
-void main(List<String> args) async{
+void main(List<String> args) async {
   if (args.isEmpty) {
-    print("Empty argument inputted.");
+    print("用法:");
+    print("  单个文件夹: dart run gen_cache.dart <folder_path> <cache_file>");
+    print("  多个文件夹: dart run gen_cache.dart <folder1> <folder2> ... <folderN> <cache_file>");
+    print("");
+    print("示例:");
+    print("  dart run gen_cache.dart scores cache");
+    print("  dart run gen_cache.dart scores predict cache");
     return;
   }
-  await precomputeAndCache(args[0], args[1]);
+  
+  if (args.length < 2) {
+    print("错误: 参数不足");
+    print("至少需要一个文件夹路径和一个缓存文件路径");
+    return;
+  }
+  
+  // 最后一个参数是缓存文件路径，其余都是文件夹路径
+  final cacheFilePath = args.last;
+  final folderPaths = args.sublist(0, args.length - 1);
+  
+  stdout.writeln('');
+  stdout.writeln('=' * 60);
+  stdout.writeln('图像特征缓存生成器');
+  stdout.writeln('=' * 60);
+  stdout.writeln('文件夹数量: ${folderPaths.length}');
+  for (var i = 0; i < folderPaths.length; i++) {
+    stdout.writeln('  [$i+1] ${folderPaths[i]}');
+  }
+  stdout.writeln('缓存文件: $cacheFilePath');
+  stdout.writeln('=' * 60);
+  stdout.writeln('');
+  
+  await precomputeAndCacheMultiple(folderPaths, cacheFilePath);
+  
+  stdout.writeln('');
+  stdout.writeln('=' * 60);
+  stdout.writeln('✓ 完成！');
+  stdout.writeln('=' * 60);
 }
