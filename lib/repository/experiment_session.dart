@@ -268,11 +268,20 @@ class ExperimentSession extends NetworkSession {
           .innerHtml
           .replaceAll('（3学时）', '');
 
+      final score;
+      if (scoreResults[name]!.confidence >= 0.95) {
+        score = scoreResults[name]!.label;
+      } else if (scoreResults[name]!.confidence >= 0.7 && scoreResults[name]!.isPredicted == true) {
+        score = '${scoreResults[name]!.label}(基于PDA预测)';
+      } else {
+        score = '识别失败(请联系PDA项目组)';
+      }
+
       toReturn.add(
         ExperimentData(
           type: ExperimentType.physics,
           name: name,
-          score: scoreResults[name]!.confidence >= 0.95 ? scoreResults[name]!.label :  '$scoreResults[name]!.label(分数结果置信度较低)',
+          score: score,
           classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
           timeRanges: [timeRange],
           reference: expTds[9].getElementsByTagName("span").first.innerHtml,

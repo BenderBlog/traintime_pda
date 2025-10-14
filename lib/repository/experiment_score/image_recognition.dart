@@ -37,22 +37,9 @@ class ImageFeatureCache {
       );
 
   /// Extract the label from the image path
-  /// Examples:
-  /// - "path/to/6_5.png" -> "6.5" (decimal score)
-  /// - "path/to/95.png" -> "95" (integer score)
-  /// - "path/to/not_update.png" -> "未上传" (not uploaded)
-  /// - "path/to/updated.png" -> "已上传" (uploaded)
   String get label {
     final fileName = path.split('/').last.split('\\').last;
     final nameWithoutExt = fileName.split('.').first;
-    
-    // Handle special status cases
-    if (nameWithoutExt == 'not_update') {
-      return '未上传';
-    }
-    if (nameWithoutExt == 'updated') {
-      return '已上传';
-    }
     
     // Handle decimal scores: "6_5" -> "6.5"
     if (nameWithoutExt.contains('_')) {

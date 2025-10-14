@@ -18,4 +18,6 @@
   "licenser.author": "BenderBlog Rodriguez and contributors",
   "licenser.license": "MPLv2",
   "licenser.useSPDXLicenseFormat": true,
+    "dart.flutterSdkPath": "C:\\Users\\20277\\.puro\\envs\\pda\\flutter",
+    "dart.sdkPath": "C:\\Users\\20277\\.puro\\envs\\pda\\flutter\\bin\\cache\\dart-sdk"
 }
