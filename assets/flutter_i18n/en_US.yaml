@@ -248,6 +248,11 @@ experiment:
    cache_hint: "Loaded cache: {info}"
    physics_experiment: "physics experiments"
    other_experiment: "other experiments"
+   tap_for_score: "Click to view scores"
+   your_score: "Your Score: "
+   send_mail: "Send"
+   score_hint_1: "Your score is not in the XDYou score recognition database, so it was not recognized properly."
+   score_hint_2: "If you wish to contribute to the development of XDYou, you can click the send email button, and we will add your score to the recognition database!"
 
 # 主页
 homepage:

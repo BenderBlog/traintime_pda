@@ -215,6 +215,11 @@ experiment:
   cache_hint: 目前加載緩存狀況：{info}
   physics_experiment: 物理實驗
   other_experiment: 其他實驗
+  tap_for_score: 點擊查看分數
+  your_score: 您的分數：
+  send_mail: 發送郵件
+  score_hint_1: 您的分數不在 XDYou 分數識別庫中，因此它沒有被正常識別。
+  score_hint_2: 如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！
 homepage:
   time_string:
     morning: 早上好 準備出發

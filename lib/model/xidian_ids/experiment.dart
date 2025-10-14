@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:watermeter/repository/experiment_score/image_recognition.dart';
 
 part 'experiment.g.dart';
 
@@ -12,7 +13,11 @@ enum ExperimentType { physics, others }
 class ExperimentData {
   final ExperimentType type;
   final String name;
-  final String? score;
+  @JsonKey(
+    fromJson: _recognitionResultFromJson,
+    toJson: _recognitionResultToJson,
+  )
+  final RecognitionResult? score;
   final String classroom;
   final List<(DateTime, DateTime)> timeRanges;
   // final String week;
@@ -39,7 +44,7 @@ class ExperimentData {
     return 'ExperimentData('
         'type: $type, '
         'name: $name, '
-        'score: ${score ?? "N/A"}, '
+        'score: ${score?.label ?? "N/A"}, '
         'classroom: $classroom, '
         'timeRanges: ${timeRanges.map((range) => "[${range.$1.toIso8601String()} - ${range.$2.toIso8601String()}]").join(", ")}, '
         'teacher: $teacher, '
@@ -56,4 +61,33 @@ class ExperimentData {
     teacher: src.teacher,
     reference: src.reference,
   );
+}
+
+// JSON converter helper functions for RecognitionResult
+// Supports migration from old String? format to new RecognitionResult? format
+RecognitionResult? _recognitionResultFromJson(dynamic json) {
+  if (json == null) return null;
+  
+  // Handle old format: score was a String
+  if (json is String) {
+    // Migrate old string score to new RecognitionResult format
+    // Old string scores are assumed to be found and valid
+    return RecognitionResult(
+      label: '',
+      found: false,
+      rawUrl: '', // No URL available in old format
+    );
+  }
+  
+  // Handle new format: score is a Map (RecognitionResult)
+  if (json is Map<String, dynamic>) {
+    return RecognitionResult.fromJson(json);
+  }
+  
+  // Invalid format
+  return null;
+}
+
+Map<String, dynamic>? _recognitionResultToJson(RecognitionResult? result) {
+  return result?.toJson();
 }
