@@ -233,7 +233,7 @@ class ExperimentSession extends NetworkSession {
     final scoreResults = await scoreImageRecognitionService.recognizeAllScores();
     for (var entry in scoreResults.entries) {
       log.debug(
-        '${entry.key}: ${entry.value.label} (confidence: ${entry.value.confidence})',
+        '${entry.key}: ${entry.value.label} (found: ${entry.value.found})',
       );
     }
 
@@ -272,7 +272,7 @@ class ExperimentSession extends NetworkSession {
         ExperimentData(
           type: ExperimentType.physics,
           name: name,
-          score: scoreResults[name]!.confidence >= 0.95 ? scoreResults[name]!.label :  '$scoreResults[name]!.label(分数结果置信度较低)',
+          score: scoreResults[name],
           classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
           timeRanges: [timeRange],
           reference: expTds[9].getElementsByTagName("span").first.innerHtml,

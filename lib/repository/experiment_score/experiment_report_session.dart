@@ -339,6 +339,11 @@ class ExperimentReportSession extends NetworkSession {
     }
   }
 
+  /// Download image bytes (public method for MD5 calculation)
+  Future<Uint8List> downloadImageBytes(String url) async {
+    return await _downloadImageBytes(url);
+  }
+
   /// Download the images from urls and turn it into Image Object
   Future<img.Image> downloadAndDecodeImage(String url) async {
     final bytes = await _downloadImageBytes(url);

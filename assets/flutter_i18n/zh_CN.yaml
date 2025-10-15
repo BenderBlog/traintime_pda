@@ -239,6 +239,11 @@ experiment:
     cache_hint: "目前加载缓存状况：{info}"
     physics_experiment: "物理实验"
     other_experiment: "其他实验"
+    tap_for_score: "点击查看分数"
+    your_score: "您的分数："
+    send_mail: "发送邮件"
+    score_hint_1: "您的分数不在 XDYou 分数识别库中，因此它没有被正常识别。"
+    score_hint_2: "如果您希望为 XDYou 的发展贡献一份自己的力量，您可以点击发送邮件按钮，我们将您的分数加入识别库！"
     
 
 # 主页
