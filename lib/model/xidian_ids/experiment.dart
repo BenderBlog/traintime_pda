@@ -69,14 +69,12 @@ RecognitionResult? _recognitionResultFromJson(dynamic json) {
   if (json == null) return null;
   
   // Handle old format: score was a String
+  // Return null to trigger data refresh in ExperimentController
   if (json is String) {
-    // Migrate old string score to new RecognitionResult format
-    // Old string scores are assumed to be found and valid
-    return RecognitionResult(
-      label: '',
-      found: false,
-      rawUrl: '', // No URL available in old format
-    );
+    // Mark as old format by returning null
+    // This will be detected in ExperimentController.onInit() 
+    // and trigger a refresh to fetch new data with proper RecognitionResult
+    return null;
   }
   
   // Handle new format: score is a Map (RecognitionResult)
