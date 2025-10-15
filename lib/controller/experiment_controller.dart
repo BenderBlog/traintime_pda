@@ -139,12 +139,40 @@ class ExperimentController extends GetxController {
         "[ExamController][onInit] "
         "Init physics experiment from cache.",
       );
-      List<dynamic> toDecode = jsonDecode(physicsCacheFile.readAsStringSync());
-      data = List<ExperimentData>.generate(
-        toDecode.length,
-        (index) => ExperimentData.fromJson(toDecode[index]),
-      );
-      physicsStatus = ExperimentStatus.cache;
+      try {
+        List<dynamic> toDecode = jsonDecode(physicsCacheFile.readAsStringSync());
+        var physicsData = List<ExperimentData>.generate(
+          toDecode.length,
+          (index) => ExperimentData.fromJson(toDecode[index]),
+        );
+        
+        // Check if cache contains old format data (score field was migrated from String)
+        // Old format will have been converted to null by _recognitionResultFromJson
+        var rawJson = toDecode.firstOrNull;
+        bool hasOldFormat = rawJson != null && 
+                           rawJson['score'] != null && 
+                           rawJson['score'] is String;
+        
+        if (hasOldFormat) {
+          log.info(
+            "[ExamController][onInit] "
+            "Detected old String format in physics cache, will trigger refresh.",
+          );
+          // Delete old cache file to force refresh
+          physicsCacheFile.deleteSync();
+          physicsStatus = ExperimentStatus.none;
+        } else {
+          data = physicsData;
+          physicsStatus = ExperimentStatus.cache;
+        }
+      } catch (e, s) {
+        log.handle(e, s);
+        log.warning(
+          "[ExamController][onInit] "
+          "Failed to parse physics cache, will refresh.",
+        );
+        physicsStatus = ExperimentStatus.none;
+      }
     }
 
     otherCacheFile = File("${supportPath.path}/$otherCacheName");
@@ -154,12 +182,39 @@ class ExperimentController extends GetxController {
         "[ExamController][onInit] "
         "Init other experiment from cache.",
       );
-      List<dynamic> toDecode = jsonDecode(otherCacheFile.readAsStringSync());
-      data = List<ExperimentData>.generate(
-        toDecode.length,
-        (index) => ExperimentData.fromJson(toDecode[index]),
-      );
-      physicsStatus = ExperimentStatus.cache;
+      try {
+        List<dynamic> toDecode = jsonDecode(otherCacheFile.readAsStringSync());
+        var otherData = List<ExperimentData>.generate(
+          toDecode.length,
+          (index) => ExperimentData.fromJson(toDecode[index]),
+        );
+        
+        // Check if cache contains old format data
+        var rawJson = toDecode.firstOrNull;
+        bool hasOldFormat = rawJson != null && 
+                           rawJson['score'] != null && 
+                           rawJson['score'] is String;
+        
+        if (hasOldFormat) {
+          log.info(
+            "[ExamController][onInit] "
+            "Detected old String format in other cache, will trigger refresh.",
+          );
+          // Delete old cache file to force refresh
+          otherCacheFile.deleteSync();
+          otherStatus = ExperimentStatus.none;
+        } else {
+          data.addAll(otherData);
+          otherStatus = ExperimentStatus.cache;
+        }
+      } catch (e, s) {
+        log.handle(e, s);
+        log.warning(
+          "[ExamController][onInit] "
+          "Failed to parse other cache, will refresh.",
+        );
+        otherStatus = ExperimentStatus.none;
+      }
     }
   }
 

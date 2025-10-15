@@ -21,6 +21,25 @@ class ReXCard extends StatelessWidget {
     this.opacity = 1.0,
   });
 
+  Widget _buildRemainingItem(ReXCardRemaining item) {
+    final text = Text(
+      item.text,
+      style: TextStyle(
+        color: item.color,
+        fontWeight: item.isBold ? FontWeight.w700 : null,
+      ),
+    );
+
+    if (item.onTap != null) {
+      return InkWell(
+        onTap: item.onTap,
+        child: text,
+      );
+    }
+
+    return text;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -44,26 +63,10 @@ class ReXCard extends StatelessWidget {
                     if (remaining.isNotEmpty)
                       Row(
                         children: [
-                          Text(
-                            remaining.first.text,
-                            style: TextStyle(
-                              color: remaining.first.color,
-                              fontWeight: remaining.first.isBold
-                                  ? FontWeight.w700
-                                  : null,
-                            ),
-                          ),
+                          _buildRemainingItem(remaining.first),
                           for (int i = 1; i < remaining.length; ++i) ...[
                             const VerticalDivider(width: 8),
-                            Text(
-                              remaining[i].text,
-                              style: TextStyle(
-                                color: remaining[i].color,
-                                fontWeight: remaining[i].isBold
-                                    ? FontWeight.w700
-                                    : null,
-                              ),
-                            ),
+                            _buildRemainingItem(remaining[i]),
                           ],
                         ],
                       ),
@@ -88,5 +91,12 @@ class ReXCardRemaining {
   final String text;
   final Color? color;
   final bool isBold;
-  ReXCardRemaining(this.text, {this.color, this.isBold = false});
+  final VoidCallback? onTap;
+  
+  ReXCardRemaining(
+    this.text, {
+    this.color,
+    this.isBold = false,
+    this.onTap,
+  });
 }
