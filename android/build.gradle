@@ -5,16 +5,6 @@ plugins {
 
 allprojects {
     repositories {
-        // 使用阿里云镜像
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/central' }
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        
-        // 备用镜像
-        maven { url 'https://repo1.maven.org/maven2/' }
-        
-        // 原始仓库作为后备
         google()
         mavenCentral()
     }
