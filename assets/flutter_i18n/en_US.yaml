@@ -240,6 +240,7 @@ experiment:
    not_finished: "Experiments to be done"
    all_finished: "All experiments have been completed"
    finished: "Completed experiments"
+   score_info: "{score} (predicted)"
    score_sum: "Total score: {sum}"
    none_finished: "None of the experiments have been completed"
    not_provided: "Not provided"
@@ -248,11 +249,13 @@ experiment:
    cache_hint: "Loaded cache: {info}"
    physics_experiment: "physics experiments"
    other_experiment: "other experiments"
-   tap_for_score: "Click to view scores"
+   tap_for_score: "Failed to detect the score"
    your_score: "Your Score: "
    send_mail: "Send"
+   score_hint_0: "You can tap on the score info on the score card to check out the original score data"
    score_hint_1: "Your score is not in the XDYou score recognition database, so it was not recognized properly."
    score_hint_2: "If you wish to contribute to the development of XDYou, you can click the send email button, and we will add your score to the recognition database!"
+   score_hint_3: "Due to the lack of data for recognization, it is necessary to check twice."
 
 # 主页
 homepage:

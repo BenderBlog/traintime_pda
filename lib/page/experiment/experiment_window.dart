@@ -85,7 +85,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 isTitle: [
                   if (controller.physicsStatus == ExperimentStatus.error) false,
                   if (controller.otherStatus == ExperimentStatus.error) false,
-                  if (doing.isNotEmpty) ...[true, false],
+                  false, if (doing.isNotEmpty) ...[true, false],
                   true,
                   false,
                   true,
@@ -119,6 +119,18 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                         },
                       ),
                     ),
+                  ExperimentInfoCard(
+                    title: FlutterI18n.translate(
+                      context,
+                      "experiment.score_hint_0",
+                      translationParams: {
+                        "info": FlutterI18n.translate(
+                          context,
+                          controller.otherStatusError,
+                        ),
+                      },
+                    ),
+                  ),
                   if (doing.isNotEmpty) ...[
                     TimelineTitle(
                       title: FlutterI18n.translate(

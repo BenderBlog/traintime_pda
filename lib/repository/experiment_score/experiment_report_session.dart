@@ -26,20 +26,29 @@ class ExperimentReportSession extends NetworkSession {
       ..options.responseDecoder = (responseBytes, options, responseBody) async {
         // Check if the response is JSON by looking at the first character
         // JSON responses start with '{' or '['
-        if (responseBytes.isNotEmpty && 
+        if (responseBytes.isNotEmpty &&
             (responseBytes[0] == 0x7B || responseBytes[0] == 0x5B)) {
+          log.info("[ExperimentReportSession][dio] Return data is json");
           // This is JSON, decode as UTF-8
           return utf8.decode(responseBytes);
         }
-        
+
+        log.info("[ExperimentReportSession][dio] Return data is html text");
         // For HTML pages, use GBK/GB18030 decoding
-        String gbk = await CharsetConverter.availableCharsets().then(
-          (value) => value.firstWhere((element) => element.contains("18030")),
-        );
-        return await CharsetConverter.decode(
-          gbk,
-          Uint8List.fromList(responseBytes),
-        );
+        if (options.headers[HttpHeaders.contentTypeHeader].toString().contains(
+          'gb',
+        )) {
+          log.info("[ExperimentReportSession][dio] GBK detected");
+          String gbk = await CharsetConverter.availableCharsets().then(
+            (value) => value.firstWhere((element) => element.contains("18030")),
+          );
+          return await CharsetConverter.decode(
+            gbk,
+            Uint8List.fromList(responseBytes),
+          );
+        }
+
+        return String.fromCharCodes(responseBytes);
       }
       ..options.validateStatus = (status) =>
           status != null && status >= 200 && status < 400;

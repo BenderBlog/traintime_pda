@@ -25,22 +25,27 @@ class ExperimentInfoCard extends StatelessWidget {
             title: Text(data!.name),
             remaining: [
               if (data!.score != null)
-                data!.score!.found
-                  ? ReXCardRemaining(data!.score!.label)
-                  : ReXCardRemaining(
-                      FlutterI18n.translate(
-                        context,
-                        "experiment.tap_for_score",
-                      ),
-                      isBold: true,
-                      onTap: () {
-                        _showAlertDialog(
+                ReXCardRemaining(
+                  data!.score!.found
+                      ? FlutterI18n.translate(
                           context,
-                          data!.name,
-                          data!.score?.rawUrl ?? '',
-                        );
-                      },
-                    ),
+                          "experiment.score_info",
+                          translationParams: {"score": data!.score!.label},
+                        )
+                      : FlutterI18n.translate(
+                          context,
+                          "experiment.tap_for_score",
+                        ),
+                  isBold: true,
+                  onTap: () {
+                    _showAlertDialog(
+                      context,
+                      data!.score!.found,
+                      data!.name,
+                      data!.score?.rawUrl ?? '',
+                    );
+                  },
+                ),
             ],
             bottomRow: Column(
               children: [
@@ -121,6 +126,7 @@ class ExperimentInfoCard extends StatelessWidget {
 
   Future<void> _showAlertDialog(
     BuildContext context,
+    bool isFound,
     String title,
     String imageUrl,
   ) async {
@@ -134,11 +140,20 @@ class ExperimentInfoCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(FlutterI18n.translate(context, "experiment.score_hint_1")),
+                Text(
+                  FlutterI18n.translate(
+                    context,
+                    isFound
+                        ? "experiment.score_hint_3"
+                        : "experiment.score_hint_1",
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Text(FlutterI18n.translate(context, "experiment.your_score")),
+                    Text(
+                      FlutterI18n.translate(context, "experiment.your_score"),
+                    ),
                     ConstrainedBox(
                       constraints: const BoxConstraints(
                         maxHeight: 300,
@@ -178,9 +193,10 @@ class ExperimentInfoCard extends StatelessWidget {
                 FlutterI18n.translate(context, "experiment.send_mail"),
               ),
               onPressed: () async {
-                final subject = Uri.encodeComponent("XDYou 图片识别追加");
+                final subject = Uri.encodeComponent("XDYou 物理实验图片识别追加");
                 final body = Uri.encodeComponent(imageUrl);
-                final mailto = 'mailto:?subject=$subject&body=$body';
+                final mailto =
+                    'mailto:superbart_chen@qq.com?subject=$subject&body=$body';
                 await launchUrlString(
                   mailto,
                   mode: LaunchMode.externalApplication,

@@ -231,6 +231,7 @@ experiment:
     not_finished: "未完成实验"
     all_finished: "所有实验全部完成"
     finished: "已完成实验"
+    score_info: "{score} (推测)"
     score_sum: "目前分数总和：{sum}"
     none_finished: "目前没有已经完成的实验"
     not_provided: "未提供"
@@ -239,12 +240,13 @@ experiment:
     cache_hint: "目前加载缓存状况：{info}"
     physics_experiment: "物理实验"
     other_experiment: "其他实验"
-    tap_for_score: "点击查看分数"
+    tap_for_score: "成绩未识别出来"
     your_score: "您的分数："
     send_mail: "发送邮件"
+    score_hint_0: "您可点击卡片上的成绩字段来查看原始成绩数据"
     score_hint_1: "您的分数不在 XDYou 分数识别库中，因此它没有被正常识别。"
     score_hint_2: "如果您希望为 XDYou 的发展贡献一份自己的力量，您可以点击发送邮件按钮，我们将您的分数加入识别库！"
-    
+    score_hint_3: "目前识别库数据不全，请您务必核对一下。"
 
 # 主页
 homepage:
