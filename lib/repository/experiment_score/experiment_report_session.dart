@@ -313,7 +313,7 @@ class ExperimentReportSession extends NetworkSession {
   }
 
   /// Extract the score from urls
-  Future<Uint8List> _downloadImageBytes(String url) async {
+  Future<Uint8List> downloadImageBytes(String url) async {
     try {
       final response = await dio.get<List<int>>(
         url,
@@ -337,24 +337,5 @@ class ExperimentReportSession extends NetworkSession {
       );
       throw Exception('Failed to download $url: $e');
     }
-  }
-
-  /// Download image bytes (public method for MD5 calculation)
-  Future<Uint8List> downloadImageBytes(String url) async {
-    return await _downloadImageBytes(url);
-  }
-
-  /// Download the images from urls and turn it into Image Object
-  Future<img.Image> downloadAndDecodeImage(String url) async {
-    final bytes = await _downloadImageBytes(url);
-    final decoded = img.decodeImage(bytes);
-    if (decoded == null) {
-      log.error(
-        '[experiment_report_session][downloadAndDecodeImage]',
-        'Cannot decode image from $url',
-      );
-      throw FormatException('Cannot decode image from $url');
-    }
-    return decoded;
   }
 }

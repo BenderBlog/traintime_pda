@@ -74,7 +74,6 @@ dependencies:
     sdk: flutter
   intl:
   timezone: ^0.9.4
-  pool: ^1.5.2
 
 dev_dependencies:
   flutter_test:

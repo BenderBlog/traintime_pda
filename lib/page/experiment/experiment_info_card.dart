@@ -24,7 +24,8 @@ class ExperimentInfoCard extends StatelessWidget {
           return ReXCard(
             title: Text(data!.name),
             remaining: [
-              (data!.score != null && data!.score!.found)
+              if (data!.score != null)
+                data!.score!.found
                   ? ReXCardRemaining(data!.score!.label)
                   : ReXCardRemaining(
                       FlutterI18n.translate(
