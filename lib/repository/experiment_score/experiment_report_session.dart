@@ -6,7 +6,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:charset_converter/charset_converter.dart';
 import 'package:dio/dio.dart';
-import 'package:image/image.dart' as img;
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 

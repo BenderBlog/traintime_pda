@@ -44,7 +44,7 @@ class ExperimentData {
     return 'ExperimentData('
         'type: $type, '
         'name: $name, '
-        'score: ${score?.label ?? "N/A"}, '
+        'score: ${score?.toString() ?? "N/A"}, '
         'classroom: $classroom, '
         'timeRanges: ${timeRanges.map((range) => "[${range.$1.toIso8601String()} - ${range.$2.toIso8601String()}]").join(", ")}, '
         'teacher: $teacher, '
