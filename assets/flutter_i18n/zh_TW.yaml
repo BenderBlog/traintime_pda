@@ -218,6 +218,7 @@ experiment:
   other_experiment: 其他實驗
   tap_for_score: 成績未識別出來
   your_score: 您的分數：
+  predict_score: 推測分數：{score}
   send_mail: 發送郵件
   score_hint_0: 您可點擊卡片上的成績字段來查看原始成績數據
   score_hint_1: 您的分數不在 XDYou 分數識別庫中，因此它沒有被正常識別。
@@ -653,11 +654,12 @@ setting:
     elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導
     godhu777777: 國際化：繁體中文轉換代碼和彩蛋代碼 / 開發：優化導出日曆文件大小
     hancl777: 國際化：繁體中文轉換代碼
+    hazuki-keatsu: 開發：物理實驗成績查詢和識別
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
     ka-mate-ka-ora: 國際化：軟件英語翻譯優化
     lhx-666-cool: 支持：Windows 和 Linux 構建腳本
-    lichtyy: 設計：配色，空白頁面貼圖
+    lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
     lqsy-h: 支持：推文宣傳圖片製作
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
@@ -690,10 +692,7 @@ setting:
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
       v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
-      one at https://mozilla.org/MPL/2.0/.
-
-
-      注意：XDYou 不可以隨意分發！'
+      one at https://mozilla.org/MPL/2.0/.'
     beian: 備案號
     sign_android: 安卓簽名
     title: 關於本軟件

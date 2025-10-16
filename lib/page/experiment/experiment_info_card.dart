@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/repository/experiment_score/image_recognition.dart';
 
 class ExperimentInfoCard extends StatelessWidget {
   final ExperimentData? data;
@@ -42,7 +43,7 @@ class ExperimentInfoCard extends StatelessWidget {
                       context,
                       data!.score!.found,
                       data!.name,
-                      data!.score?.rawUrl ?? '',
+                      data!.score,
                     );
                   },
                 ),
@@ -78,12 +79,20 @@ class ExperimentInfoCard extends StatelessWidget {
                   direction: Axis.horizontal,
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: data!.reference?.isNotEmpty ?? false ? 3 : 4,
                       child: InformationWithIcon(
                         icon: Icons.room,
                         text: data!.classroom,
                       ),
                     ),
+                    if (data!.reference?.isNotEmpty ?? false)
+                      Expanded(
+                        flex: 1,
+                        child: InformationWithIcon(
+                          icon: Icons.book,
+                          text: data!.reference!,
+                        ),
+                      ),
                     Expanded(
                       flex: 1,
                       child: InformationWithIcon(
@@ -91,14 +100,6 @@ class ExperimentInfoCard extends StatelessWidget {
                         text: data!.teacher,
                       ),
                     ),
-                    // if (data!.reference?.isNotEmpty ?? false)
-                    //   Expanded(
-                    //     flex: 1,
-                    //     child: InformationWithIcon(
-                    //       icon: Icons.book,
-                    //       text: data!.reference!,
-                    //     ),
-                    //   ),
                   ],
                 ),
               ],
@@ -128,7 +129,7 @@ class ExperimentInfoCard extends StatelessWidget {
     BuildContext context,
     bool isFound,
     String title,
-    String imageUrl,
+    RecognitionResult? recognition,
   ) async {
     await showDialog(
       context: context,
@@ -154,13 +155,14 @@ class ExperimentInfoCard extends StatelessWidget {
                     Text(
                       FlutterI18n.translate(context, "experiment.your_score"),
                     ),
-                    ConstrainedBox(
+                    Container(
                       constraints: const BoxConstraints(
                         maxHeight: 300,
                         maxWidth: 300,
                       ),
+                      decoration: BoxDecoration(color: Colors.white),
                       child: Image.network(
-                        imageUrl,
+                        recognition?.rawUrl ?? "",
                         scale: 0.75,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
@@ -182,6 +184,14 @@ class ExperimentInfoCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
+                if (recognition?.found ?? false)
+                  Text(
+                    FlutterI18n.translate(
+                      context,
+                      "experiment.predict_score",
+                      translationParams: {"score": recognition!.label},
+                    ),
+                  ),
                 Divider(),
                 Text(FlutterI18n.translate(context, "experiment.score_hint_2")),
               ],
@@ -194,7 +204,10 @@ class ExperimentInfoCard extends StatelessWidget {
               ),
               onPressed: () async {
                 final subject = Uri.encodeComponent("XDYou 物理实验图片识别追加");
-                final body = Uri.encodeComponent(imageUrl);
+                final body = Uri.encodeComponent(
+                  '''图片链接：${recognition?.rawUrl ?? ":P"}
+                识别分数：${recognition?.label}''',
+                );
                 final mailto =
                     'mailto:superbart_chen@qq.com?subject=$subject&body=$body';
                 await launchUrlString(

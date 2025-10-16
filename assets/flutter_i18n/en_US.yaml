@@ -251,6 +251,7 @@ experiment:
    other_experiment: "other experiments"
    tap_for_score: "Failed to detect the score"
    your_score: "Your Score: "
+   predict_score: "Predict score: {score}"
    send_mail: "Send"
    score_hint_0: "You can tap on the score info on the score card to check out the original score data"
    score_hint_1: "Your score is not in the XDYou score recognition database, so it was not recognized properly."
@@ -706,11 +707,12 @@ setting:
       elliot: "Internationalization: English translation / Development guidance: on partner classtable development"
       godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar"
       hancl777: "Internationalization: Traditional Chinese conversion code"
+      hazuki-keatsu: "Development: Physics experiment score query and recognization"
       hawa130: "Design: Class info card"
       hhzm: "Development: electricity fee inquiry account calculation"
       ka-mate-ka-ora: "Internationalization: English correction"
       lhx-666-cool: "Support: Windows and Linux build scripts"
-      lichtyy: "Design: color pattern and blank page picture"
+      lichtyy: "Design: color pattern and blank page picture / Development: HTML reader for the experiment system"
       lqsy-h: "Support: Promotion Picture"
       lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
       mrbrilliant2046: "Support: Provided the school net user guide / Internationalization: English correction"
@@ -740,9 +742,7 @@ setting:
          Copyright 2025 Traintime PDA authors.
 
          The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.
-
-         Notice: XDYou is not a freely distribute software!
-      beian: "ICP record number"
+      beian: "ICP record code"
       sign_android: "Android signature"
       title: "About this APP"
 
