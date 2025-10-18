@@ -10,7 +10,7 @@
 
 ## 已经收集到的分数数据
 
-| 成绩 | 文件名 | 哈希值 |
+| 成绩 | 文件名 | 哈希值(MD5) |
 |-------|-------|-------|
 | 已上传 | __CF0429053BE1624B0AE557A2 | 536e85894cd73e97799457238821a0d4 |
 | 未上传 | __2B0A2898A8636392D36D4FD3 | 96df69201f754f554aded7076618b049 |
@@ -44,8 +44,8 @@
 
 ~~~plaintext
 experiment_score/
-├── calculate_md5.py        # 预计算 MD5 值
-├── calculate_md5.dart      # 预计算 MD5 值
+├── calculate_md5.py        # 预计算哈希值
+├── calculate_md5.dart      # 预计算哈希值
 ├── README.md               # README 文件
 ├── cache                   # 预计算数据，用于提升计算速度（本质是JSON）
 └── scores/                 # 图片信息原数据
@@ -54,11 +54,11 @@ experiment_score/
 ### 如何生成预计算文件
 
 ~~~bash
-dart run .\calculate_md5.dart scores <target_file_name>
+dart run ./calculate_fnv1a.dart scores <target_file_name>
 ~~~
 
 ~~~bash
-python3 ./calculate_md5.py
+python3 ./calculate_fnv1a.py scores <target_file_name>
 ~~~
 
 ### 接下来的任务
