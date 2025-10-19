@@ -12,7 +12,6 @@ import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class ExperimentWindow extends StatefulWidget {
@@ -52,37 +51,15 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                     controller.physicsStatus == ExperimentStatus.cache) ||
                 (controller.otherStatus == ExperimentStatus.fetched ||
                     controller.otherStatus == ExperimentStatus.cache)) {
-              /// Show cache notice
-              if (controller.physicsStatus == ExperimentStatus.cache ||
-                  controller.otherStatus == ExperimentStatus.cache) {
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "experiment.cache_hint",
-                    translationParams: {
-                      "info": [
-                        if (controller.physicsStatus == ExperimentStatus.cache)
-                          FlutterI18n.translate(
-                            context,
-                            "experiment.physics_experiment",
-                          ),
-                        if (controller.otherStatus == ExperimentStatus.cache)
-                          FlutterI18n.translate(
-                            context,
-                            "experiment.other_experiment",
-                          ),
-                      ].join("; "),
-                    },
-                  ),
-                );
-              }
-
               var doing = controller.doing(now);
               var unDone = controller.isNotStarted(now);
               var done = controller.isFinished(now);
               return TimelineWidget(
                 isTitle: [
+                  /// Show cache notice
+                  if (controller.physicsStatus == ExperimentStatus.cache ||
+                      controller.otherStatus == ExperimentStatus.cache)
+                    false,
                   if (controller.physicsStatus == ExperimentStatus.error) false,
                   if (controller.otherStatus == ExperimentStatus.error) false,
                   false, if (doing.isNotEmpty) ...[true, false],
@@ -93,6 +70,31 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                   false,
                 ],
                 children: [
+                  if (controller.physicsStatus == ExperimentStatus.cache ||
+                      controller.otherStatus == ExperimentStatus.cache)
+                    ExperimentInfoCard(
+                      title: FlutterI18n.translate(
+                        context,
+                        "experiment.cache_hint",
+                        translationParams: {
+                          "info": [
+                            if (controller.physicsStatus ==
+                                ExperimentStatus.cache)
+                              FlutterI18n.translate(
+                                context,
+                                "experiment.physics_experiment",
+                              ),
+                            if (controller.otherStatus ==
+                                ExperimentStatus.cache)
+                              FlutterI18n.translate(
+                                context,
+                                "experiment.other_experiment",
+                              ),
+                          ].join(" & "),
+                        },
+                      ),
+                    ),
+
                   if (controller.physicsStatus == ExperimentStatus.error)
                     ExperimentInfoCard(
                       title: FlutterI18n.translate(

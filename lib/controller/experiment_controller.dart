@@ -140,19 +140,22 @@ class ExperimentController extends GetxController {
         "Init physics experiment from cache.",
       );
       try {
-        List<dynamic> toDecode = jsonDecode(physicsCacheFile.readAsStringSync());
+        List<dynamic> toDecode = jsonDecode(
+          physicsCacheFile.readAsStringSync(),
+        );
         var physicsData = List<ExperimentData>.generate(
           toDecode.length,
           (index) => ExperimentData.fromJson(toDecode[index]),
         );
-        
+
         // Check if cache contains old format data (score field was migrated from String)
         // Old format will have been converted to null by _recognitionResultFromJson
         var rawJson = toDecode.firstOrNull;
-        bool hasOldFormat = rawJson != null && 
-                           rawJson['score'] != null && 
-                           rawJson['score'] is String;
-        
+        bool hasOldFormat =
+            rawJson != null &&
+            rawJson['score'] != null &&
+            rawJson['score'] is String;
+
         if (hasOldFormat) {
           log.info(
             "[ExamController][onInit] "
@@ -162,7 +165,7 @@ class ExperimentController extends GetxController {
           physicsCacheFile.deleteSync();
           physicsStatus = ExperimentStatus.none;
         } else {
-          data = physicsData;
+          data.addAll(physicsData);
           physicsStatus = ExperimentStatus.cache;
         }
       } catch (e, s) {
@@ -188,13 +191,14 @@ class ExperimentController extends GetxController {
           toDecode.length,
           (index) => ExperimentData.fromJson(toDecode[index]),
         );
-        
+
         // Check if cache contains old format data
         var rawJson = toDecode.firstOrNull;
-        bool hasOldFormat = rawJson != null && 
-                           rawJson['score'] != null && 
-                           rawJson['score'] is String;
-        
+        bool hasOldFormat =
+            rawJson != null &&
+            rawJson['score'] != null &&
+            rawJson['score'] is String;
+
         if (hasOldFormat) {
           log.info(
             "[ExamController][onInit] "
@@ -241,7 +245,48 @@ class ExperimentController extends GetxController {
           "[ExperimentController][getPhysicsExperiment] "
           "Not in school exception",
         );
-        physicsStatusError = "not_school_network";
+        if (physicsCacheFile.existsSync()) {
+          log.info(
+            "[ExamController][getPhysicsExperiment] "
+            "Try to get physics experiment from cache.",
+          );
+          try {
+            List<dynamic> toDecode = jsonDecode(
+              physicsCacheFile.readAsStringSync(),
+            );
+            var physicsData = List<ExperimentData>.generate(
+              toDecode.length,
+              (index) => ExperimentData.fromJson(toDecode[index]),
+            );
+
+            // Check if cache contains old format data (score field was migrated from String)
+            // Old format will have been converted to null by _recognitionResultFromJson
+            var rawJson = toDecode.firstOrNull;
+            bool hasOldFormat =
+                rawJson != null &&
+                rawJson['score'] != null &&
+                rawJson['score'] is String;
+
+            if (hasOldFormat) {
+              log.info(
+                "[ExamController][getPhysicsExperiment] "
+                "Detected old String format in physics cache.",
+              );
+              // Delete old cache file to force refresh
+              physicsCacheFile.deleteSync();
+            } else {
+              toReturn.addAll(physicsData);
+              physicsStatus = ExperimentStatus.cache;
+            }
+          } catch (e, s) {
+            log.handle(e, s);
+            log.warning(
+              "[ExamController][getPhysicsExperiment] "
+              "Failed to parse physics cache.",
+            );
+            physicsStatusError = "not_school_network";
+          }
+        }
       } else if (returnedData.$1 == ExperimentFetchStatus.noPassword) {
         log.warning(
           "[ExperimentController][getPhysicsExperiment] "
@@ -317,7 +362,47 @@ class ExperimentController extends GetxController {
           "[ExperimentController][getOtherExperiment] "
           "Not in school exception",
         );
-        otherStatusError = "not_school_network";
+
+        if (otherCacheFile.existsSync()) {
+          log.info(
+            "[ExamController][getOtherExperiment] "
+            "Init other experiment from cache.",
+          );
+          try {
+            List<dynamic> toDecode = jsonDecode(
+              otherCacheFile.readAsStringSync(),
+            );
+            var otherData = List<ExperimentData>.generate(
+              toDecode.length,
+              (index) => ExperimentData.fromJson(toDecode[index]),
+            );
+
+            // Check if cache contains old format data
+            var rawJson = toDecode.firstOrNull;
+            bool hasOldFormat =
+                rawJson != null &&
+                rawJson['score'] != null &&
+                rawJson['score'] is String;
+
+            if (hasOldFormat) {
+              log.info(
+                "[ExamController][getOtherExperiment] "
+                "Detected old String format in other cache.",
+              );
+              otherCacheFile.deleteSync();
+            } else {
+              toReturn.addAll(otherData);
+              otherStatus = ExperimentStatus.cache;
+            }
+          } catch (e, s) {
+            log.handle(e, s);
+            log.warning(
+              "[ExamController][getOtherExperiment] "
+              "Failed to parse other cache.",
+            );
+            otherStatusError = "not_school_network";
+          }
+        }
       } else if (returnedData.$1 == ExperimentFetchStatus.noPassword) {
         log.warning(
           "[ExperimentController][getOtherExperiment] "
@@ -384,6 +469,10 @@ class ExperimentController extends GetxController {
       for (final value in values) {
         data.addAll(value);
       }
+      log.info(
+        "[ExperimentController] Current status: "
+        "phy $physicsStatus oth $otherStatus",
+      );
       update();
     });
   }

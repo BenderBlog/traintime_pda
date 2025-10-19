@@ -139,10 +139,12 @@ void updateCurrentData() {
 
   log.info(
     "[updateCurrentData]"
-    "Update classtable, updateTime: $updateTime, "
-    "isTomorrow: ${classTableController.isTomorrow(updateTime)} "
-    "classTableControllerState: ${classTableController.state} "
-    "examControllerState: ${ExamStatus.fetched}",
+    "Update classtable, updateTime: $updateTime\n"
+    "isTomorrow: ${classTableController.isTomorrow(updateTime)}\n"
+    "classTableControllerState: ${classTableController.state}\n"
+    "examControllerState: ${examController.status}\n"
+    "physicsExperimentState: ${experimentController.physicsStatus}\n"
+    "otherExperimentState: ${experimentController.otherStatus}",
   );
   if (classTableController.isTomorrow(updateTime)) {
     DateTime tomorrow = updateTime.add(const Duration(days: 1));

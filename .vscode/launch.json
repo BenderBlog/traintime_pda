@@ -13,11 +13,11 @@
             "name": "watermeter",
             "request": "launch",
             "type": "dart",
-            "env": {
-                "HTTP_PROXY": "http://127.0.0.1:11081",
-                "HTTPS_PROXY": "http://127.0.0.1:11081",
-                "NO_PROXY": "localhost,127.0.0.1"
-            }
+            // "env": {
+            //     "HTTP_PROXY": "http://127.0.0.1:11081",
+            //     "HTTPS_PROXY": "http://127.0.0.1:11081",
+            //     "NO_PROXY": "localhost,127.0.0.1"
+            // }
         },
         {
             "name": "watermeter (profile mode)",
