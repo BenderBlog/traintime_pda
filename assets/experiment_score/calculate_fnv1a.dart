@@ -34,9 +34,9 @@ void main(List<String> arguments) async {
         print('正在计算: $relativePath');
 
         // 计算哈希值
-        final md5Hash = await _calculatePixelFNV1A(entity);
+        final hash = await _calculatePixelFNV1A(entity);
         fileHashes[relativePath.substring(0, relativePath.length - 4)] =
-            md5Hash;
+            hash;
       }
     }
 
