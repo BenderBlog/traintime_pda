@@ -75,9 +75,7 @@ class ExperimentReportSession extends NetworkSession {
     final getHeaders = {
       ...commonHeaders,
       HttpHeaders.acceptHeader:
-          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      'Upgrade-Insecure-Requests': '1',
-      'X-Requested-With': 'XMLHttpRequest',
+          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     };
 
     final postHeaders = {
@@ -103,13 +101,18 @@ class ExperimentReportSession extends NetworkSession {
     );
 
     // Extract the Session ID from html
-    var responseData = initQuest.data.toString();
-    var sidRegex = RegExp(r'(\d+_[a-zA-Z0-9]+111D[a-fA-F0-9]+)');
-    var match = sidRegex.firstMatch(responseData);
-    if (match != null) {
-      sid = match.group(1) ?? '';
-      cookieStr = 'UNI_GUI_SESSION_ID=$sid';
-    }
+    sid = initQuest.headers["session_id"]?[0] ?? "";
+    // BenderBlog: At risk, we persume only one cookie or one cookie string here.
+    cookieStr = initQuest.headers[HttpHeaders.cookieHeader]?[0] ?? "";
+
+    // BenderBlog: Prevent using regex here.
+    // var responseData = initQuest.data.toString();
+    // var sidRegex = RegExp(r'_S_ID=(?<cookieStr>[a-zA-Z0-9_]+)');
+    // var match = sidRegex.firstMatch(responseData);
+    // if (match != null) {
+    //   sid = match.namedGroup("cookieStr") ?? '';
+    //   cookieStr = 'UNI_GUI_SESSION_ID=$sid';
+    // }
 
     // Validate that we got a valid session ID
     if (sid.isEmpty) {
@@ -122,7 +125,6 @@ class ExperimentReportSession extends NetworkSession {
 
     log.debug(
       "[experiment_report_session][getScoreImageUrls] "
-      "[initQuest Data - Length: ${responseData.length}]\n${responseData.substring(0, responseData.length > 500 ? 500 : responseData.length)}...\n"
       "[Cookie String]\n$cookieStr\n"
       "[Session ID]\n$sid\n",
     );
