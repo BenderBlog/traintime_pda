@@ -46,7 +46,7 @@ class ImageRecognitionService {
     return _session!;
   }
 
-  Map<String, String>? _scoreHashes;
+  Map<String, int>? _scoreHashes;
 
   /// Ensure score hashes are loaded from assets
   Future<void> _ensureHashesLoaded() async {
@@ -63,7 +63,7 @@ class ImageRecognitionService {
       );
       final decoded = jsonDecode(hashData) as Map<String, dynamic>;
       _scoreHashes = decoded.map(
-        (key, value) => MapEntry(key, value as String),
+        (key, value) => MapEntry(key, value as int),
       );
 
       log.info(
