@@ -18,7 +18,7 @@ def calculate_pixel_fnv1a(file_path):
             r, g, b, a = pixel[0], pixel[1], pixel[2], pixel[3]
             
             if a == 255:
-                pixel_bytes.extend([r, g, b, a])
+                pixel_bytes.extend([r, g, b])
     
     hash_value = 0x811C9DC5
     for byte in pixel_bytes:

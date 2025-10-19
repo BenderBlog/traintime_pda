@@ -80,7 +80,6 @@ Future<int> _calculatePixelFNV1A(File file) async {
           pixel.r.toInt(),
           pixel.g.toInt(),
           pixel.b.toInt(),
-          pixel.a.toInt(),
         ]);
       }
     }
