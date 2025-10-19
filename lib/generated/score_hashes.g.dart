@@ -1,5 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// This file is auto-generated from score_hashes.json
+// This file is auto-generated from score images
+// Generated at: 2025-10-19T23:51:54.986680
 
 /// Pre-computed FNV1a hashes for experiment score images
 /// Maps score label to FNV1a hash value
