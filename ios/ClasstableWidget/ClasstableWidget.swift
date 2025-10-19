@@ -15,7 +15,8 @@ import OSLog
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
 private let examFile = "ExamFile.json"
-private let experimentFile = "Experiment.json"
+private let physicsExperimentFile = "PhysicsExperiment.json"
+private let otherExperimentFile = "OtherExperiment.json"
 private let swiftFile = "WeekSwift.txt"
 private let format = "yyyy-MM-dd HH:mm:ss"
 private let myDateFormatter = DateFormatter()
@@ -231,11 +232,11 @@ struct Provider: TimelineProvider {
             return
         }
         
-        // Deal with experiment data
+        // Deal with other experiment data
         do {
             // Read data
-            logger.info("Getting experiment data...")
-            let fileURL = containerURL.appendingPathComponent(experimentFile)
+            logger.info("Getting other experiment data...")
+            let fileURL = containerURL.appendingPathComponent(otherExperimentFile)
             if let jsonData = try? Data(contentsOf: fileURL) {
                 let experimentData : [ExperimentData] = try decoder.decode([ExperimentData].self, from: jsonData)
                 
@@ -245,24 +246,75 @@ struct Provider: TimelineProvider {
                 let year = components.year
                 
                 for i in experimentData {
-                    let thisDay = calendar.dateComponents([.day,.month,.year],from: i.startTime)
-                    if thisDay.year == year && thisDay.month == month && thisDay.day == day {
-                        arrangement.append(TimeLineStructItems(
-                            type: .experiment,
-                            name: i.name,
-                            teacher: i.teacher,
-                            place: i.classroom,
-                            start_time: i.startTime,
-                            end_time: i.endTime,
-                            colorIndex: experimentData.firstIndex(where: {$0 === i}) ?? 0
-                        ))
+                    for timeRange in i.timeRanges {
+                        let thisDay = calendar.dateComponents([.day,.month,.year], from: timeRange.0)
+                        if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                            arrangement.append(TimeLineStructItems(
+                                type: .experiment,
+                                name: i.name,
+                                teacher: i.teacher,
+                                place: i.classroom,
+                                start_time: timeRange.0,
+                                end_time: timeRange.1,
+                                colorIndex: experimentData.firstIndex(where: {$0 === i}) ?? 0
+                            ))
+                        }
                     }
                 }
             } else {
-                logger.warning("No experiment data file, will ignore it")
+                logger.warning("No other experiment data file, will ignore it")
             }
         } catch {
-            logger.error("Fetch experiment error: \(String(describing: error))")
+            logger.error("Fetch other experiment error: \(String(describing: error))")
+            let entries = [
+                SimpleEntry(
+                    date: Date(),
+                    currentWeek: currentWeekToStore,
+                    arrangement: [],
+                    errorType: .experiment,
+                    error: String(describing: error)
+                )
+            ]
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+            return
+
+        }
+        
+        // Deal with physics experiment data
+        do {
+            // Read data
+            logger.info("Getting physics experiment data...")
+            let fileURL = containerURL.appendingPathComponent(physicsExperimentFile)
+            if let jsonData = try? Data(contentsOf: fileURL) {
+                let experimentData : [ExperimentData] = try decoder.decode([ExperimentData].self, from: jsonData)
+                
+                let components = calendar.dateComponents([.day,.month,.year], from: day)
+                let day = components.day
+                let month = components.month
+                let year = components.year
+                
+                for i in experimentData {
+                    for timeRange in i.timeRanges {
+                        let thisDay = calendar.dateComponents([.day,.month,.year], from: timeRange.0)
+                        if thisDay.year == year && thisDay.month == month && thisDay.day == day {
+                            arrangement.append(TimeLineStructItems(
+                                type: .experiment,
+                                name: i.name,
+                                teacher: i.teacher,
+                                place: i.classroom,
+                                start_time: timeRange.0,
+                                end_time: timeRange.1,
+                                colorIndex: experimentData.firstIndex(where: {$0 === i}) ?? 0
+                            ))
+                        }
+                    }
+                }
+            } else {
+                logger.warning("No physics experiment data file, will ignore it")
+            }
+        } catch {
+            logger.error("Fetch physics experiment error: \(String(describing: error))")
             let entries = [
                 SimpleEntry(
                     date: Date(),

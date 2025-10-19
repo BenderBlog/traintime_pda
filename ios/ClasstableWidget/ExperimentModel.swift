@@ -13,55 +13,34 @@ import Foundation
 class ExperimentData : Codable {
     var name : String
     var classroom : String
-    var date : String
-    var timeStr : String
+    var timeRangesMap : [[String: String]]
     var teacher : String
-    
-    var startTime : Date {
-        get {
-            var dateNums : [Int] = []
-            let splitedDate = date.components(separatedBy: "/")
-            for i in splitedDate {
-                dateNums.append(Int(i) ?? 0)
-            }
 
-            let calendar = Calendar.init(identifier: .gregorian)
-            var components = DateComponents()
-            components.year = dateNums[2]
-            components.month = dateNums[0]
-            components.day = dateNums[1]
-            if (timeStr.contains("15")) {
-                components.hour = 15
-                components.minute = 55
-            } else {
-                components.hour = 18
-                components.minute = 30
-            }
-            return calendar.date(from: components)!
-        }
+    private enum CodingKeys: String, CodingKey {
+        case name
+        case classroom
+        case timeRangesMap = "timeRanges"
+        case teacher
     }
-    
-    var endTime : Date {
-        get {
-            var dateNums : [Int] = []
-            let splitedDate = date.components(separatedBy: "/")
-            for i in splitedDate {
-                dateNums.append(Int(i) ?? 0)
-            }
 
-            let calendar = Calendar.init(identifier: .gregorian)
-            var components = DateComponents()
-            components.year = dateNums[2]
-            components.month = dateNums[0]
-            components.day = dateNums[1]
-            if (timeStr.contains("15")) {
-                components.hour = 18
-                components.minute = 10
-            } else {
-                components.hour = 20
-                components.minute = 45
+    var timeRanges: [(Date, Date)] {
+        var toReturn: [(Date, Date)] = []
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        for data in timeRangesMap {
+            let startTimeStr = data["$1"]
+            let stopTimeStr = data["$2"]
+            if startTimeStr == nil || stopTimeStr == nil {
+                continue
             }
-            return calendar.date(from: components)!
+            let startTime = dateFormatter.date(from: startTimeStr!)
+            let stopTime = dateFormatter.date(from: stopTimeStr!)
+            if startTime == nil || stopTime == nil {
+                continue
+            }
+            toReturn.append((startTime!, stopTime!))
         }
+        return toReturn
     }
 }

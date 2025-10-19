@@ -194,7 +194,9 @@ val Subject.endTime: Result<LocalDateTime>
         Result.failure(e)
     }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonIgnoreUnknownKeys
 data class ExperimentData(
     val name: String,
     val classroom: String,
