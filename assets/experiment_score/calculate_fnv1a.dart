@@ -25,7 +25,7 @@ void main(List<String> arguments) async {
   final outputPath = arguments.length > 1 ? arguments[1] : 'score_hashes.json';
 
   try {
-    // 计算所有文件的MD5并收集结果
+    // 计算所有文件的哈希值并收集结果
     final Map<String, int> fileHashes = {};
     await for (final entity in directory.list(recursive: true)) {
       if (entity is File) {
