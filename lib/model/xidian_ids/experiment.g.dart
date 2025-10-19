@@ -10,7 +10,7 @@ ExperimentData _$ExperimentDataFromJson(Map<String, dynamic> json) =>
     ExperimentData(
       type: $enumDecode(_$ExperimentTypeEnumMap, json['type']),
       name: json['name'] as String,
-      score: _recognitionResultFromJson(json['score'] as Map<String, dynamic>?),
+      score: _recognitionResultFromJson(json['score']),
       classroom: json['classroom'] as String,
       timeRanges: (json['timeRanges'] as List<dynamic>)
           .map(

@@ -113,4 +113,3 @@ flutter:
     - assets/flutter_i18n/en_US.yaml
     - assets/captcha-solver-payment.tflite
     - assets/captcha-solver-zfw.tflite
-    - assets/experiment_score/score_hashes.json

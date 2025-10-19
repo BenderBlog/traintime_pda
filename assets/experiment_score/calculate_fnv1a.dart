@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:crypto/crypto.dart';
+import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as path;
 
 void main(List<String> arguments) async {
@@ -25,17 +25,18 @@ void main(List<String> arguments) async {
   final outputPath = arguments.length > 1 ? arguments[1] : 'score_hashes.json';
 
   try {
-    // 计算所有文件的MD5并收集结果
-    final Map<String, String> fileHashes = {};
+    // 计算所有文件的哈希值并收集结果
+    final Map<String, int> fileHashes = {};
     await for (final entity in directory.list(recursive: true)) {
       if (entity is File) {
         // 获取相对路径作为文件名标识
         final relativePath = path.relative(entity.path, from: directoryPath);
         print('正在计算: $relativePath');
-        
-        // 计算MD5
-        final md5Hash = await _calculateFileMd5(entity);
-        fileHashes[relativePath.substring(0, relativePath.length - 4)] = md5Hash;
+
+        // 计算哈希值
+        final hash = await _calculatePixelFNV1A(entity);
+        fileHashes[relativePath.substring(0, relativePath.length - 4)] =
+            hash;
       }
     }
 
@@ -53,9 +54,42 @@ void main(List<String> arguments) async {
   }
 }
 
-/// 计算单个文件的MD5哈希值
-Future<String> _calculateFileMd5(File file) async {
-  final inputStream = file.openRead();
-  final digest = await md5.bind(inputStream).first;
-  return digest.toString();
+/// 计算单个文件的FNV哈希值
+Future<int> _calculatePixelFNV1A(File file) async {
+  final bytes = file.readAsBytesSync();
+
+  // 解码图片为 image 库的 Image 对象
+  final image = img.decodeImage(bytes);
+  if (image == null) {
+    throw Exception("img.decodeImage(bytes) return null. Unsupported format.");
+  }
+
+  // 遍历像素，提取RGB通道
+  final width = 50;
+  final height = 20;
+  final pixelBytes = <int>[];
+
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      final pixel = image.getPixel(x, y);
+
+      final a = pixel.a.toInt();
+      if (a == 255) {
+        // ignore the transparent pixel to reduce the calculation
+        pixelBytes.addAll([
+          pixel.r.toInt(),
+          pixel.g.toInt(),
+          pixel.b.toInt(),
+        ]);
+      }
+    }
+  }
+
+  var _hash = 0x811C9DC5;
+  for (var p in pixelBytes) {
+    _hash ^= p;
+    _hash = (_hash * 0x01000193) & 0xFFFFFFFF;
+  }
+
+  return _hash;
 }

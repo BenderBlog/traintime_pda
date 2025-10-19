@@ -1,0 +1,26 @@
+targets:
+  $default:
+    sources:
+      - $package$              # 包的元数据
+      - lib/$lib$              # lib 目录的元数据
+      - lib/**                 # lib 下的所有文件
+      - tool/**                # tool 下的所有文件（包含生成器）
+      - assets/**              # assets 下的所有文件（包含图片）
+      - pubspec.yaml           # 用作触发器
+    builders:
+      watermeter|score_hashes:
+        enabled: true
+        generate_for:
+          - pubspec.yaml         # 当 pubspec.yaml 改变时触发
+        
+builders:
+  score_hashes:
+    import: "tool/generators/score_hashes_generator.dart"
+    builder_factories: ["scoreHashesBuilder"]
+    build_extensions:
+      pubspec.yaml:                              # 输入：pubspec.yaml（触发器）
+        - lib/generated/score_hashes.g.dart      # 输出：生成的常量文件
+    auto_apply: root_package
+    build_to: source
+    required_inputs:                             # 声明需要的资源文件
+      - assets/experiment_score/scores/**
