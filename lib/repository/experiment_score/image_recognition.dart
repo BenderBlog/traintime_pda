@@ -1,12 +1,14 @@
 // Copyright 2025 Hazuki Keatsu.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:watermeter/repository/experiment_score/experiment_report_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+
+// generated score image fnv hashes
+import 'package:watermeter/generated/score_hashes.g.dart';
 
 /// Score recognition result
 class RecognitionResult {
@@ -58,13 +60,7 @@ class ImageRecognitionService {
         'Loading score hashes from assets...',
       );
 
-      final hashData = await rootBundle.loadString(
-        'assets/experiment_score/score_hashes.json',
-      );
-      final decoded = jsonDecode(hashData) as Map<String, dynamic>;
-      _scoreHashes = decoded.map(
-        (key, value) => MapEntry(key, value as int),
-      );
+      _scoreHashes = kScoreHashes;
 
       log.info(
         '[ImageRecognitionService]',

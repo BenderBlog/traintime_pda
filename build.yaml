@@ -1,0 +1,20 @@
+targets:
+  $default:
+    sources:
+      - lib/model/**
+      - assets/experiment_score/score_hashes.json
+    builders:
+      watermeter|score_hashes:
+        enabled: true
+        generate_for:
+          - assets/experiment_score/score_hashes.json
+
+builders:
+  score_hashes:
+    import: "tool/generators/score_hashes_generator.dart"
+    builder_factories: ["scoreHashesBuilder"]
+    build_extensions:
+      ^assets/experiment_score/{{}}.json:
+        - lib/generated/{{}}.g.dart
+    auto_apply: root_package
+    build_to: source

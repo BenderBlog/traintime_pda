@@ -60,7 +60,3 @@ dart run ./calculate_fnv1a.dart scores <target_file_name>
 ~~~bash
 python3 ./calculate_fnv1a.py scores <target_file_name>
 ~~~
-
-### 接下来的任务
-
-利用 dart 的 build runner，直接生成代码，免去读取 json 的障碍。
