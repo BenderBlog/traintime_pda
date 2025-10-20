@@ -25,9 +25,8 @@ class ExperimentData : Codable {
 
     var timeRanges: [(Date, Date)] {
         var toReturn: [(Date, Date)] = []
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"        
         for data in timeRangesMap {
             let startTimeStr = data["$1"]
             let stopTimeStr = data["$2"]
