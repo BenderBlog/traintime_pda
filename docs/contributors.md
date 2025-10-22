@@ -46,88 +46,99 @@ too mysterious to tell here
 繁体中文转换脚本  
 too mysterious to tell here
 
-12. hawa130  
+12. Hazuki Keatsu  
+物理实验成绩检测脚本
+He plays electric guitar.
+
+13. hawa130  
 设计了一个页面  
 向算卦机器人求问：我的对象今年会有吗？  
 回答：也许对象会让你意想不到。
 
-13. hhzm  
+1.  hhzm  
 电费功能的一个小模块  
 [某个游戏的突出吉祥物](http://mzh.moegirl.tw/%E7%96%BE%E6%97%8B%E9%BC%AC)   
 非计算机专业
 
-14. lhx-666-cool  
+1. Ka-mate-ka-ora  
+英语翻译校对  
+Knowledge itself is a crime, so does P-Group game.
+
+2.  lhx-666-cool  
 Windows 和 Linux 打包脚本  
 “小红书天天就对一些小细节不依不饶，真就看脸的时代吧？”
 
-15. LichtYy  
+1.  LichtYy  
 程序配色  
 🏳️   🏳️  
 ✋😭✋
 
-16. lsy223622  
+1.  LQSY-H  
+推文宣传图片制作  
+@凌琼碎玉 在小红书收获了7010次赞与收藏，查看Ta的主页>> https://xhslink.com/m/8ZyTLZ8zry6
+
+1.  lsy223622  
 设计图标和起名  
 XDUClassVideoDownloader  
 非计算机系
 
+1.  MrBrilliant2046  
+提供网络查询手册  
+因某些原因被列入重点观察对象
 
-17. MrBrilliant2046
-提供网络查询手册
-因某些原因被列入重点观察对象。
-
-18. NancunCloud  
+1.  NancunCloud  
 搜索书籍功能  
 还有更多的东西……（被关机  
 非计算机系
 
-19. Pairman  
+1.  Pairman  
 成绩缓存功能  
 [这个表情包原型到底是谁啊？](https://www.zhihu.com/question/525265891)
 
-20. ReveierXu  
+1.  ReveierXu  
 设计卡片，研究生版本赞助  
 RX is god, because its symbol is on the road south of the comprehensive building...
 
-21. Rrrilac  
+1.  Rrrilac  
 电费查询  
 too mysterious to tell here
 
-22. Ray  
+1.  Ray  
 开屏画面等  
 之前：“有 xxx 未尝不好”  
 之后：好暖的声音啊  
 非计算机系
 
-23. shadouyangyi  
+1.  shadouyangyi  
 广告业务两次  
 **本段图片因涉及某个蒲公英头像人物已经被删除**  
 非计算机系
 
-24. stalomeow  
+1.  stalomeow  
 主页设计，异步登录等  
 too mysterious to tell here
 
-25. xenode  
+1.  xenode  
 设置页面设计  
 灵梦油库里
 
-26. Xiue233  
+1.  Xiue233  
 安卓小部件  
 [某个青春动画片](https://mzh.moegirl.org.cn/%E8%B4%A5%E7%8A%AC%E5%A5%B3%E4%B8%BB%E5%A4%AA%E5%A4%9A%E4%BA%86%EF%BC%81)
 
-27. xizi  
+1.  xizi  
 研究生版本赞助  
 [某日本三个可爱的东西](https://zh.moegirl.tw/Chiikawa)  
 非计算机系，贡献者年龄最大者（研三）
 
-28. wirsbf  
+1.  wirsbf  
 修复问题  
 too mysterous to tell here
 
-29. ZCWzy  
+1.  ZCWzy  
 修复问题，研究生版本赞助  
 “我要用博得之门3男同创死各位” 
 
-30. ZYar-er
+1.  ZYar-er
 优化一个快捷方式  
 BRAVO GOLF ZERO ECHO X-RAY NOVEMBER

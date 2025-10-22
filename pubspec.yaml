@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.5.3+33
+version: 1.5.4+34
 
 environment:
   sdk: ^3.8.0
@@ -105,9 +105,9 @@ flutter:
     - assets/art/pda_empty_cover.jpg
     - assets/art/pda_classtable_empty.png
     - assets/art/pda_girl_default.png
-#    - assets/art/pda_girl_singing.png
+    #    - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.png
-#    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
+    #    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/flutter_i18n/en_US.yaml
