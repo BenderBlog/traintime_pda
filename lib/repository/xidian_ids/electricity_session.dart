@@ -551,6 +551,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       var decodeData = jsonDecode(value.data);
       if (decodeData["returncode"] == "ERROR") {
         lastErrorMessage = decodeData["returnmsg"];
+        if (lastErrorMessage == "用户名或密码错误") break;
         continue;
       }
 
