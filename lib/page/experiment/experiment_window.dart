@@ -9,6 +9,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/experiment/experiment_info_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
+import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
@@ -47,168 +48,192 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
         ),
         body: Builder(
           builder: (context) {
-            if ((controller.physicsStatus == ExperimentStatus.fetched ||
-                    controller.physicsStatus == ExperimentStatus.cache) ||
-                (controller.otherStatus == ExperimentStatus.fetched ||
-                    controller.otherStatus == ExperimentStatus.cache)) {
-              var doing = controller.doing(now);
-              var unDone = controller.isNotStarted(now);
-              var done = controller.isFinished(now);
-              return TimelineWidget(
-                isTitle: [
-                  /// Show cache notice
-                  if (controller.physicsStatus == ExperimentStatus.cache ||
-                      controller.otherStatus == ExperimentStatus.cache)
-                    false,
-                  if (controller.physicsStatus == ExperimentStatus.error) false,
-                  if (controller.otherStatus == ExperimentStatus.error) false,
-                  false, if (doing.isNotEmpty) ...[true, false],
-                  true,
-                  false,
-                  true,
-                  // false,
-                  false,
-                ],
+            var ps = controller.physicsStatus;
+            var os = controller.otherStatus;
+            if (ps != ExperimentStatus.error &&
+                os != ExperimentStatus.error &&
+                ps != ExperimentStatus.none &&
+                os != ExperimentStatus.none) {
+              final isLoading =
+                  ps == ExperimentStatus.fetching ||
+                  os == ExperimentStatus.fetching;
+              return Stack(
                 children: [
-                  if (controller.physicsStatus == ExperimentStatus.cache ||
-                      controller.otherStatus == ExperimentStatus.cache)
-                    ExperimentInfoCard(
-                      title: FlutterI18n.translate(
-                        context,
-                        "experiment.cache_hint",
-                        translationParams: {
-                          "info": [
-                            if (controller.physicsStatus ==
-                                ExperimentStatus.cache)
-                              FlutterI18n.translate(
-                                context,
-                                "experiment.physics_experiment",
-                              ),
-                            if (controller.otherStatus ==
-                                ExperimentStatus.cache)
-                              FlutterI18n.translate(
-                                context,
-                                "experiment.other_experiment",
-                              ),
-                          ].join(" & "),
-                        },
-                      ),
-                    ),
-
-                  if (controller.physicsStatus == ExperimentStatus.error)
-                    ExperimentInfoCard(
-                      title: FlutterI18n.translate(
-                        context,
-                        "experiment.error_physics",
-                        translationParams: {
-                          "info": FlutterI18n.translate(
-                            context,
-                            controller.physicsStatusError,
-                          ),
-                        },
-                      ),
-                    ),
-                  if (controller.otherStatus == ExperimentStatus.error)
-                    ExperimentInfoCard(
-                      title: FlutterI18n.translate(
-                        context,
-                        "experiment.error_other",
-                        translationParams: {
-                          "info": FlutterI18n.translate(
-                            context,
-                            controller.otherStatusError,
-                          ),
-                        },
-                      ),
-                    ),
-                  ExperimentInfoCard(
-                    title: FlutterI18n.translate(
-                      context,
-                      "experiment.score_hint_0",
-                      translationParams: {
-                        "info": FlutterI18n.translate(
-                          context,
-                          controller.otherStatusError,
-                        ),
-                      },
-                    ),
+                  Column(
+                    children: [
+                      if (isLoading) const SizedBox(height: kTextTabBarHeight),
+                      Expanded(child: buildExperimentList(controller)),
+                    ],
                   ),
-                  if (doing.isNotEmpty) ...[
-                    TimelineTitle(
-                      title: FlutterI18n.translate(
+                  if (isLoading)
+                    LoadingAlerter(
+                      isLoading: true,
+                      hint: FlutterI18n.translate(
                         context,
-                        "experiment.ongoing",
+                        "experiment.fetching_hint",
                       ),
+                      opacity: 0.15,
+                      showOverlay: true,
                     ),
-                    Column(
-                      children: List.generate(
-                        doing.length,
-                        (index) => ExperimentInfoCard(data: doing[index]),
-                      ),
-                    ),
-                  ],
-                  TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "experiment.not_finished",
-                    ),
-                  ),
-                  unDone.isNotEmpty
-                      ? Column(
-                          children: List.generate(
-                            unDone.length,
-                            (index) => ExperimentInfoCard(data: unDone[index]),
-                          ),
-                        )
-                      : TimelineTitle(
-                          title: FlutterI18n.translate(
-                            context,
-                            "experiment.all_finished",
-                          ),
-                        ),
-                  TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "experiment.finished",
-                    ),
-                  ),
-                  // ExperimentInfoCard(
-                  //   title: FlutterI18n.translate(
-                  //     context,
-                  //     "experiment.score_sum",
-                  //     translationParams: {"sum": controller.sum.toString()},
-                  //   ),
-                  // ),
-                  done.isNotEmpty
-                      ? Column(
-                          children: List.generate(
-                            done.length,
-                            (index) => ExperimentInfoCard(data: done[index]),
-                          ),
-                        )
-                      : TimelineTitle(
-                          title: FlutterI18n.translate(
-                            context,
-                            "experiment.none_finished",
-                          ),
-                        ),
                 ],
               );
-            } else if (controller.physicsStatus == ExperimentStatus.error &&
-                controller.otherStatus == ExperimentStatus.error) {
-              return ReloadWidget(
-                function: controller.get,
-                errorStatus: FlutterI18n.translate(
-                  context,
-                  "${controller.physicsStatusError} ${controller.otherStatusError}",
-                ),
-              ).center();
             } else {
-              return CircularProgressIndicator().center();
+              if (ps == ExperimentStatus.error &&
+                  os == ExperimentStatus.error) {
+                return ReloadWidget(
+                  function: controller.get,
+                  errorStatus: FlutterI18n.translate(
+                    context,
+                    "${controller.physicsStatusError} ${controller.otherStatusError}",
+                  ),
+                ).center();
+              } else if (ps == ExperimentStatus.fetched ||
+                  os == ExperimentStatus.fetched ||
+                  ps == ExperimentStatus.cache ||
+                  os == ExperimentStatus.cache) {
+                return buildExperimentList(controller);
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
             }
           },
         ),
       ),
+    );
+  }
+
+  Widget buildExperimentList(ExperimentController controller) {
+    var doing = controller.doing(now);
+    var unDone = controller.isNotStarted(now);
+    var done = controller.isFinished(now);
+    return TimelineWidget(
+      isTitle: [
+        /// Show cache notice
+        if (controller.physicsStatus == ExperimentStatus.cache ||
+            controller.otherStatus == ExperimentStatus.cache)
+          false,
+        if (controller.physicsStatus == ExperimentStatus.error) false,
+        if (controller.otherStatus == ExperimentStatus.error) false,
+        false, if (doing.isNotEmpty) ...[true, false],
+        true,
+        false,
+        true,
+        // false,
+        false,
+      ],
+      children: [
+        if (controller.physicsStatus == ExperimentStatus.cache ||
+            controller.otherStatus == ExperimentStatus.cache)
+          ExperimentInfoCard(
+            title: FlutterI18n.translate(
+              context,
+              "experiment.cache_hint",
+              translationParams: {
+                "info": [
+                  if (controller.physicsStatus == ExperimentStatus.cache)
+                    FlutterI18n.translate(
+                      context,
+                      "experiment.physics_experiment",
+                    ),
+                  if (controller.otherStatus == ExperimentStatus.cache)
+                    FlutterI18n.translate(
+                      context,
+                      "experiment.other_experiment",
+                    ),
+                ].join(" & "),
+              },
+            ),
+          ),
+
+        if (controller.physicsStatus == ExperimentStatus.error)
+          ExperimentInfoCard(
+            title: FlutterI18n.translate(
+              context,
+              "experiment.error_physics",
+              translationParams: {
+                "info": FlutterI18n.translate(
+                  context,
+                  controller.physicsStatusError,
+                ),
+              },
+            ),
+          ),
+        if (controller.otherStatus == ExperimentStatus.error)
+          ExperimentInfoCard(
+            title: FlutterI18n.translate(
+              context,
+              "experiment.error_other",
+              translationParams: {
+                "info": FlutterI18n.translate(
+                  context,
+                  controller.otherStatusError,
+                ),
+              },
+            ),
+          ),
+        ExperimentInfoCard(
+          title: FlutterI18n.translate(
+            context,
+            "experiment.score_hint_0",
+            translationParams: {
+              "info": FlutterI18n.translate(
+                context,
+                controller.otherStatusError,
+              ),
+            },
+          ),
+        ),
+        if (doing.isNotEmpty) ...[
+          TimelineTitle(
+            title: FlutterI18n.translate(context, "experiment.ongoing"),
+          ),
+          Column(
+            children: List.generate(
+              doing.length,
+              (index) => ExperimentInfoCard(data: doing[index]),
+            ),
+          ),
+        ],
+        TimelineTitle(
+          title: FlutterI18n.translate(context, "experiment.not_finished"),
+        ),
+        unDone.isNotEmpty
+            ? Column(
+                children: List.generate(
+                  unDone.length,
+                  (index) => ExperimentInfoCard(data: unDone[index]),
+                ),
+              )
+            : TimelineTitle(
+                title: FlutterI18n.translate(
+                  context,
+                  "experiment.all_finished",
+                ),
+              ),
+        TimelineTitle(
+          title: FlutterI18n.translate(context, "experiment.finished"),
+        ),
+        // ExperimentInfoCard(
+        //   title: FlutterI18n.translate(
+        //     context,
+        //     "experiment.score_sum",
+        //     translationParams: {"sum": controller.sum.toString()},
+        //   ),
+        // ),
+        done.isNotEmpty
+            ? Column(
+                children: List.generate(
+                  done.length,
+                  (index) => ExperimentInfoCard(data: done[index]),
+                ),
+              )
+            : TimelineTitle(
+                title: FlutterI18n.translate(
+                  context,
+                  "experiment.none_finished",
+                ),
+              ),
+      ],
     );
   }
 }

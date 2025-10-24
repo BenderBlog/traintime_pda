@@ -220,6 +220,7 @@ experiment:
   your_score: 您的分數：
   predict_score: 推測分數：{score}
   send_mail: 發送郵件
+  fetching_hint: 您現在看到的是緩存數據。正在後臺獲取更新數據中...
   score_hint_0: 您可點擊卡片上的成績字段來查看原始成績數據
   score_hint_1: 您的分數不在 XDYou 分數識別庫中，因此它沒有被正常識別。
   score_hint_2: 如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！
