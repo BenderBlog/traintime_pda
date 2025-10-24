@@ -62,10 +62,82 @@ class LoadingAlerter extends StatefulWidget {
   State<LoadingAlerter> createState() => _LoadingAlerterState();
 }
 
-class _LoadingAlerterState extends State<LoadingAlerter> {
+class _LoadingAlerterState extends State<LoadingAlerter>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
+  late Animation<Offset> _slideAnimation;
+  bool _shouldShow = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: widget.opacity,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, -1.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut, 
+    ));
+    
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.dismissed) {
+        setState(() {
+          _shouldShow = false;
+        });
+      }
+    });
+    
+    if (widget.isLoading) {
+      _shouldShow = true;
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(LoadingAlerter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isLoading != oldWidget.isLoading) {
+      if (widget.isLoading) {
+        setState(() {
+          _shouldShow = true;
+        });
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    }
+    if (widget.opacity != oldWidget.opacity) {
+      _opacityAnimation = Tween<double>(
+        begin: 0.0,
+        end: widget.opacity,
+      ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ));
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (!widget.isLoading) {
+    if (!_shouldShow) {
       return const SizedBox.shrink();
     }
 
@@ -76,34 +148,37 @@ class _LoadingAlerterState extends State<LoadingAlerter> {
       top: 0,
       left: 0,
       right: 0,
-      child: SizedBox(
-        height: kTextTabBarHeight,
-        child: Container(
-          decoration: DecoratedBox(decoration: BoxDecoration(
-            color: colorScheme.errorContainer,
-          )).decoration,
-          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  widget.hint,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onErrorContainer,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: SizedBox(
+          height: kTextTabBarHeight,
+          child: Container(
+            decoration: DecoratedBox(decoration: BoxDecoration(
+              color: colorScheme.errorContainer,
+            )).decoration,
+            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.hint,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  color: colorScheme.primary,
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: colorScheme.primary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -119,8 +194,13 @@ class _LoadingAlerterState extends State<LoadingAlerter> {
       children: [
         Positioned.fill(
           child: IgnorePointer(
-            child: Container(
-              color: Colors.black.withAlpha((widget.opacity * 255).toInt()),
+            child: AnimatedBuilder(
+              animation: _opacityAnimation,
+              builder: (context, child) {
+                return Container(
+                  color: Colors.black.withAlpha((_opacityAnimation.value * 255).toInt()),
+                );
+              },
             ),
           ),
         ),

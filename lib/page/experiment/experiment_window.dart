@@ -61,20 +61,23 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 children: [
                   Column(
                     children: [
-                      if (isLoading) const SizedBox(height: kTextTabBarHeight),
+                      AnimatedContainer(
+                        height: isLoading ? kTextTabBarHeight : 0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
                       Expanded(child: buildExperimentList(controller)),
                     ],
                   ),
-                  if (isLoading)
-                    LoadingAlerter(
-                      isLoading: true,
-                      hint: FlutterI18n.translate(
-                        context,
-                        "experiment.fetching_hint",
-                      ),
-                      opacity: 0.15,
-                      showOverlay: true,
+                  LoadingAlerter(
+                    isLoading: isLoading,
+                    hint: FlutterI18n.translate(
+                      context,
+                      "experiment.fetching_hint",
                     ),
+                    opacity: 0.15,
+                    showOverlay: true,
+                  ),
                 ],
               );
             } else {
