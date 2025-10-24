@@ -1,0 +1,8 @@
+Notice: Partner classtable has removed, duo to a plugin which could not fit the latest SDK.
+
+1. Check timetable while class info is loading @chitao1234
+2. Rewrite some logic code in Android app widget & iOS WidgetKit @BenderBlog
+3. Electricity history record graph and average usage graph @BenderBlog @BrackRat
+4. Rewrite some page to fit scrolling in wide screen @BenderBlog
+5. New sysj system with some experiment info @BenderBlog @LichtYy
+6. New physics experiment score detection algorithm @hazuki-keatsu

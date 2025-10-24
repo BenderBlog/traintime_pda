@@ -1,0 +1,8 @@
+注：本版本移除搭子课表功能，因为与该功能相关的一个库无法适配最新的 SDK。
+
+1. 课表加载时候仍可查看日程表 @chitao1234
+2. 重写 Android 和 iOS 小组件部分逻辑 @BenderBlog
+3. 电量历史记录和平均使用情况查看图表 @BenderBlog @BrackRat
+4. 部分页面重写，适配宽屏滚动 @BenderBlog
+5. 适配实验设计系统，获取该系统上的实验信息 @BenderBlog @LichtYy
+6. 初步实现物理实验成绩检测 @hazuki-keatsu

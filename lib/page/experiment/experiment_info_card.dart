@@ -79,7 +79,7 @@ class ExperimentInfoCard extends StatelessWidget {
                   direction: Axis.horizontal,
                   children: [
                     Expanded(
-                      flex: data!.reference?.isNotEmpty ?? false ? 3 : 4,
+                      flex: data!.reference?.isNotEmpty ?? false ? 1 : 2,
                       child: InformationWithIcon(
                         icon: Icons.room,
                         text: data!.classroom,
