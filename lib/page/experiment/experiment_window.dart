@@ -48,15 +48,19 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
         ),
         body: Builder(
           builder: (context) {
-            var ps = controller.physicsStatus;
-            var os = controller.otherStatus;
-            if (ps != ExperimentStatus.error &&
-                os != ExperimentStatus.error &&
-                ps != ExperimentStatus.none &&
-                os != ExperimentStatus.none) {
+            // The status of physics experiments controller
+            var physicsStatus = controller.physicsStatus;
+
+            // The status of other experiments controller
+            var otherStatus = controller.otherStatus;
+            
+            if (physicsStatus != ExperimentStatus.error &&
+                otherStatus != ExperimentStatus.error &&
+                physicsStatus != ExperimentStatus.none &&
+                otherStatus != ExperimentStatus.none) {
               final isLoading =
-                  ps == ExperimentStatus.fetching ||
-                  os == ExperimentStatus.fetching;
+                  physicsStatus == ExperimentStatus.fetching ||
+                  otherStatus == ExperimentStatus.fetching;
               return Stack(
                 children: [
                   Column(
@@ -81,8 +85,8 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 ],
               );
             } else {
-              if (ps == ExperimentStatus.error &&
-                  os == ExperimentStatus.error) {
+              if (physicsStatus == ExperimentStatus.error &&
+                  otherStatus == ExperimentStatus.error) {
                 return ReloadWidget(
                   function: controller.get,
                   errorStatus: FlutterI18n.translate(
@@ -90,10 +94,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                     "${controller.physicsStatusError} ${controller.otherStatusError}",
                   ),
                 ).center();
-              } else if (ps == ExperimentStatus.fetched ||
-                  os == ExperimentStatus.fetched ||
-                  ps == ExperimentStatus.cache ||
-                  os == ExperimentStatus.cache) {
+              } else if (physicsStatus == ExperimentStatus.fetched ||
+                  otherStatus == ExperimentStatus.fetched ||
+                  physicsStatus == ExperimentStatus.cache ||
+                  otherStatus == ExperimentStatus.cache) {
                 return buildExperimentList(controller);
               } else {
                 return const Center(child: CircularProgressIndicator());
