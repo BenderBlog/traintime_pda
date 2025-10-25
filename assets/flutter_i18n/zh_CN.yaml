@@ -244,6 +244,7 @@ experiment:
     your_score: "您的分数："
     predict_score: "推测分数：{score}"
     send_mail: "发送邮件"
+    fetching_hint: "您现在看到的是缓存数据。正在后台获取更新数据中..."
     score_hint_0: "您可点击卡片上的成绩字段来查看原始成绩数据"
     score_hint_1: "您的分数不在 XDYou 分数识别库中，因此它没有被正常识别。"
     score_hint_2: "如果您希望为 XDYou 的发展贡献一份自己的力量，您可以点击发送邮件按钮，我们将您的分数加入识别库！"
