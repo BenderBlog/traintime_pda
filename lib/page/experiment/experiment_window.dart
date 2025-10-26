@@ -53,7 +53,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
 
             // The status of other experiments controller
             var otherStatus = controller.otherStatus;
-            
+
             if (physicsStatus != ExperimentStatus.error &&
                 otherStatus != ExperimentStatus.error &&
                 physicsStatus != ExperimentStatus.none &&
@@ -89,10 +89,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                   otherStatus == ExperimentStatus.error) {
                 return ReloadWidget(
                   function: controller.get,
-                  errorStatus: FlutterI18n.translate(
-                    context,
-                    "${controller.physicsStatusError} ${controller.otherStatusError}",
-                  ),
+                  // Check translate is ok?
+                  errorStatus:
+                      "Physics: ${FlutterI18n.translate(context, controller.physicsStatusError)}\n"
+                      "Others: ${FlutterI18n.translate(context, controller.otherStatusError)}",
                 ).center();
               } else if (physicsStatus == ExperimentStatus.fetched ||
                   otherStatus == ExperimentStatus.fetched ||
