@@ -229,7 +229,6 @@ class ExperimentController extends GetxController {
   }
 
   Future<List<ExperimentData>> getPhysicsExperiment() async {
-    ExperimentStatus previous = physicsStatus;
     physicsStatus = ExperimentStatus.fetching;
     update();
     List<ExperimentData> toReturn = [];
@@ -247,7 +246,7 @@ class ExperimentController extends GetxController {
         );
         if (physicsCacheFile.existsSync()) {
           log.info(
-            "[ExamController][getPhysicsExperiment] "
+            "[ExperimentController][getPhysicsExperiment] "
             "Try to get physics experiment from cache.",
           );
           try {
@@ -269,19 +268,24 @@ class ExperimentController extends GetxController {
 
             if (hasOldFormat) {
               log.info(
-                "[ExamController][getPhysicsExperiment] "
-                "Detected old String format in physics cache.",
+                "[ExperimentController][getPhysicsExperiment] "
+                "Old format detected, detectin old String format in physics cache.",
               );
               // Delete old cache file to force refresh
               physicsCacheFile.deleteSync();
             } else {
+              log.info(
+                "[ExperimentController][getPhysicsExperiment] "
+                "Loading data from cache.",
+              );
               toReturn.addAll(physicsData);
               physicsStatus = ExperimentStatus.cache;
             }
           } catch (e, s) {
-            log.handle(e, s);
-            log.warning(
-              "[ExamController][getPhysicsExperiment] "
+            log.handle(
+              e,
+              s,
+              "[ExperimentController][getPhysicsExperiment] "
               "Failed to parse physics cache.",
             );
             physicsStatusError = "not_school_network";
@@ -336,7 +340,7 @@ class ExperimentController extends GetxController {
             log.handle(e, s);
           }
         }
-      } else if (previous == ExperimentStatus.cache) {
+      } else if (physicsStatus == ExperimentStatus.cache) {
         physicsStatus = ExperimentStatus.cache;
       } else {
         physicsStatus = ExperimentStatus.error;
@@ -346,7 +350,6 @@ class ExperimentController extends GetxController {
   }
 
   Future<List<ExperimentData>> getOtherExperiment() async {
-    ExperimentStatus previous = otherStatus;
     otherStatus = ExperimentStatus.fetching;
     update();
     List<ExperimentData> toReturn = [];
@@ -386,18 +389,23 @@ class ExperimentController extends GetxController {
 
             if (hasOldFormat) {
               log.info(
-                "[ExamController][getOtherExperiment] "
-                "Detected old String format in other cache.",
+                "[ExperimentController][getOtherExperiment] "
+                "Old format detected, detectin old String format in physics cache.",
               );
               otherCacheFile.deleteSync();
             } else {
+              log.info(
+                "[ExperimentController][getOtherExperiment] "
+                "Loading data from cache.",
+              );
               toReturn.addAll(otherData);
               otherStatus = ExperimentStatus.cache;
             }
           } catch (e, s) {
-            log.handle(e, s);
-            log.warning(
-              "[ExamController][getOtherExperiment] "
+            log.handle(
+              e,
+              s,
+              "[ExperimentController][getOtherExperiment] "
               "Failed to parse other cache.",
             );
             otherStatusError = "not_school_network";
@@ -428,6 +436,7 @@ class ExperimentController extends GetxController {
       log.handle(e, s);
       otherStatusError = "error_detect";
     } finally {
+      log.info("[ExperimentController][getOtherExperiment] Update triggered");
       if (otherStatus == ExperimentStatus.fetched) {
         log.info(
           "[ExperimentController][getOtherExperiment] "
@@ -452,7 +461,7 @@ class ExperimentController extends GetxController {
             log.handle(e, s);
           }
         }
-      } else if (previous == ExperimentStatus.cache) {
+      } else if (otherStatus == ExperimentStatus.cache) {
         otherStatus = ExperimentStatus.cache;
       } else {
         otherStatus = ExperimentStatus.error;
