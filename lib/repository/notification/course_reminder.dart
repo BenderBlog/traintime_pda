@@ -69,17 +69,24 @@ class CourseReminder {
       final int weekIndex = payload['weekIndex'] ?? 0;
 
       // Jump to class table page with the week of the notified course
-      // Note: We don't have BuildContext and BoxConstraints here,
-      // so we use Get.to() with a placeholder that will be replaced by the actual layout
-      Get.to(() => LayoutBuilder(
-        builder: (context, constraints) => ClassTableWindow(
-          parentContext: context,
-          currentWeek: weekIndex,
-          constraints: constraints,
-        ),
-      ));
-      
-      log.info('[CourseReminder] Navigated to class table, week: $weekIndex');
+      // Due to the unused widget of GetMaterialApp, use navigatorKey(debuggerKey) to navigate without context dependency
+      final navigator = preference.debuggerKey.currentState;
+      if (navigator != null) {
+        navigator.push(
+          MaterialPageRoute(
+            builder: (context) => LayoutBuilder(
+              builder: (context, constraints) => ClassTableWindow(
+                parentContext: context,
+                currentWeek: weekIndex,
+                constraints: constraints,
+              ),
+            ),
+          ),
+        );
+        log.info('[CourseReminder] Navigated to class table, week: $weekIndex');
+      } else {
+        log.warning('[CourseReminder] Navigator not available');
+      }
     } catch (e, stackTrace) {
       log.error(
         '[CourseReminder] Failed to parse notification payload',

@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -120,12 +122,21 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
       final now = DateTime.now();
       final testId = mode == NotificationMode.normal ? 99990 : 99991;
 
+      final payload = {
+            'type': 'course_reminder',
+            'className': 'test',
+            'weekIndex': 1,
+            'weekday': 1,
+            'startClass': 1,
+          };
+
       await _notificationBase.scheduleNotification(
         id: testId,
         title: '测试通知 (${mode == NotificationMode.normal ? '普通' : '增强'})',
         body: '${mode.name}模式测试\n${now.hour}:${now.minute}:${now.second}',
         scheduledTime: now.add(const Duration(seconds: 2)),
         mode: mode,
+        payload: jsonEncode(payload),
       );
 
       if (mounted) {
@@ -457,7 +468,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                 const Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    '发送测试通知（2秒后触发，ID: 99990/99991）',
+                    '发送测试通知（2秒后触发，ID: 99990/99991），payLoad=[\'type\': \'course_reminder\']',
                     style: TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ),
