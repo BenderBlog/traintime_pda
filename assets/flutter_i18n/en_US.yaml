@@ -582,6 +582,8 @@ setting:
       notification_disabled_hint: "All scheduled notifications will be cancelled when disabled"
       update_schedule: "Update Notification Schedule"
       update_schedule_hint: "Reschedule notifications based on the latest course data"
+      view_the_instructions: "View the instructions"
+      view_the_instructions_hint: "Check more instructions to ensure that you can see the notifications sent by the program"
       permission_section: "Permission Status"
       notification_permission: "Notification Permission"
       permission_granted: "Granted"

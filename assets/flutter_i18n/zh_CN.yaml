@@ -567,6 +567,8 @@ setting:
         notification_disabled_hint: "关闭后将取消所有已安排的通知"
         update_schedule: "更新通知日程"
         update_schedule_hint: "根据最新的课程数据重新安排通知"
+        view_the_instructions: "查看使用说明"
+        view_the_instructions_hint: "查看更多使用说明确保您能看到程序发出的通知"
         # 权限状态
         permission_section: "权限状态"
         notification_permission: "通知权限"

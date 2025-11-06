@@ -530,6 +530,8 @@ setting:
     notification_disabled_hint: 關閉後將取消所有已安排的通知
     update_schedule: 更新通知日程
     update_schedule_hint: 根據最新的課程數據重新安排通知
+    view_the_instructions: 查看使用說明
+    view_the_instructions_hint: 查看更多使用說明確保您能看到程序發出的通知
     permission_section: 權限狀態
     notification_permission: 通知權限
     permission_granted: 已授予
