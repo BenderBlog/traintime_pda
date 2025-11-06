@@ -66,14 +66,10 @@
 
         <!-- To use foreground services -->
         <service
-        android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
-        android:exported="false"
-        android:stopWithTask="false"
-        android:foregroundServiceType="<foreground service types>">
-
-        <!-- To bypass DnD mode -->
-        <!-- https://pub.dev/packages/flutter_local_notifications#bypassing-do-not-disturb-dnd -->
-        <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+            android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
+            android:exported="false"
+            android:stopWithTask="false"
+            android:foregroundServiceType="specialUse"/>
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
@@ -97,4 +93,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Notification Permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- To bypass DnD mode -->
+    <!-- https://pub.dev/packages/flutter_local_notifications#bypassing-do-not-disturb-dnd -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 </manifest>

@@ -518,6 +518,69 @@ setting:
   electricity_account_setting: 電費賬號設置
   schoolnet_password_setting: 校園網帳號密碼設置
   schoolnet_password_description: 不設置查看不了網費
+  notification_setting: 通知設置
+  course_reminder_setting: 課前通知設置
+  course_reminder_description: 設置課前提醒通知
+  notification_page:
+    title: 課前通知設置
+    load_failed: '加載設置失敗: {error}'
+    function_section: 通知功能
+    enable_notification: 啟用課前通知
+    notification_scheduled: 已安排 {count} 個通知
+    notification_disabled_hint: 關閉後將取消所有已安排的通知
+    update_schedule: 更新通知日程
+    update_schedule_hint: 根據最新的課程數據重新安排通知
+    permission_section: 權限狀態
+    notification_permission: 通知權限
+    permission_granted: 已授予
+    permission_denied: 未授予
+    request_permission: 請求權限
+    dnd_permission: 勿擾模式跳過權限
+    dnd_permission_granted: 已授予（增強模式可用）
+    dnd_permission_denied: 未授予（增強模式不可用）
+    system_settings: 系統通知設置
+    system_settings_hint: 打開系統設置檢查通知配置
+    permission_granted_msg: 通知權限已授予
+    permission_denied_msg: 通知權限被拒絕，請在系統設置中開啟
+    dnd_permission_granted_msg: 勿擾模式跳過權限已授予
+    dnd_permission_denied_msg: 權限被拒絕，請在系統設置中開啟
+    mode_section: 通知模式
+    normal_mode: 正常模式
+    normal_mode_hint: 普通的課前提醒通知
+    enhanced_mode: 增強模式
+    enhanced_mode_hint_android: 跳過勿擾模式發起通知（需要額外權限）
+    enhanced_mode_hint_ios: 增強通知模式（iOS不支持跳過勿擾）
+    reminder_section: 提醒設置
+    minutes_before: 提前提醒時間
+    minutes_before_hint: 課前提前提醒的時間設置
+    minutes_unit: 分鐘
+    days_to_schedule: 計劃通知天數
+    days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
+    days_unit: 天
+    instruction_section: 使用說明
+    instruction_1: • 首次開啟時會自動安排未來幾天的課前提醒
+    instruction_2: • 每次打開應用時會自動檢查並更新通知日程
+    instruction_3: • 增強模式可以在勿擾模式下發起通知（僅Android）
+    instruction_4: • 修改設置後會自動重新安排所有通知
+    settings_guide_title: 通知設置提示
+    settings_guide_content: '為了確保您能及時收到課前提醒，請確保：
+
+
+      1. 開啟了應用的通知權限
+
+      2. 開啟了通知的聲音提示
+
+      3. 開啟了懸浮通知（橫幅通知）
+
+      4. 如果使用增強模式，需要授予勿擾模式跳過權限'
+    got_it: 知道了
+    open_settings: 打開系統設置
+    no_classtable_data: 請先獲取課程表數據
+    schedule_success: 已安排 {count} 個課前提醒
+    schedule_failed: '安排通知失敗: {error}'
+    cancel_all_success: 已取消所有課前提醒
+    reschedule_success: 已重新安排 {count} 個課前提醒
+    reschedule_failed: '重新安排通知失敗: {error}'
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面

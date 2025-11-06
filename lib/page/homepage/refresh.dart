@@ -10,6 +10,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/repository/notification/course_reminder.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
 import 'package:watermeter/repository/pda_service_session.dart' as message;
@@ -19,6 +20,7 @@ import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/schoolnet_session.dart' as school_net;
+import 'package:watermeter/repository/preference.dart' as preference;
 
 DateTime updateTime = DateTime.now();
 
@@ -106,6 +108,29 @@ Future<void> update({
       updateCurrentData();
     }),
   ]);
+
+  // 验证和更新课程通知
+  _validateCourseNotifications();
+}
+
+/// 验证和更新课程通知（在后台静默执行）
+Future<void> _validateCourseNotifications() async {
+  try {
+    // 检查通知是否启用
+    final isEnabled = preference.prefs.getBool('notification_enabled') ?? false;
+    if (!isEnabled) {
+      return;
+    }
+
+    final courseReminder = CourseReminder();
+    await courseReminder.initialize();
+    await courseReminder.validateAndUpdateNotifications();
+
+    log.info('[_validateCourseNotifications] Course notifications validated successfully');
+  } catch (e, stackTrace) {
+    log.error('[_validateCourseNotifications] Failed to validate course notifications', e, stackTrace);
+    // 静默失败，不影响主流程
+  }
 }
 
 /// Originally updateOnAppResumed
