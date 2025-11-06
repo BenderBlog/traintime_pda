@@ -274,26 +274,26 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ),
                             if (n.title != null) ...[
                               const SizedBox(height: 4),
-                              Text('标题:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text('标题:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               Text(
-                                n.title ?? '',
+                                n.title!,
                                 style: const TextStyle(fontSize: 11),
                               ),
                             ],
                             if (n.body != null) ...[
                               const SizedBox(height: 4),
-                              Text('内容:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text('内容:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               Text(
-                                n.body ?? '',
+                                n.body!,
                                 style: const TextStyle(fontSize: 11),
                                 overflow: TextOverflow.clip,
                               ),
                             ],
                             if (n.payload != null) ...[
                               const SizedBox(height: 4),
-                              Text('载荷:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text('载荷:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               Text(
-                                n.payload ?? '',
+                                n.payload!,
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontFamily: 'monospace',
@@ -357,26 +357,26 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ),
                             if (n.title != null) ...[
                               const SizedBox(height: 4),
-                              Text('标题:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text('标题:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               Text(
-                                n.title ?? '',
+                                n.title!,
                                 style: const TextStyle(fontSize: 11),
                               ),
                             ],
                             if (n.body != null) ...[
                               const SizedBox(height: 4),
-                              Text('内容:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text('内容:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               Text(
-                                n.body ?? "",
+                                n.body!,
                                 style: const TextStyle(fontSize: 11),
                                 overflow: TextOverflow.clip,
                               ),
                             ],
                             if (n.payload != null) ...[
                               const SizedBox(height: 4),
-                              Text('载荷:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text('载荷:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               Text(
-                                n.payload ?? '',
+                                n.payload!,
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontFamily: 'monospace',

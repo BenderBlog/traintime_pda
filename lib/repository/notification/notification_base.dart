@@ -205,10 +205,12 @@ class NotificationBase {
           mode == NotificationMode.enhanced
               ? 'course_reminder_enhanced'
               : 'course_reminder_normal',
-          mode == NotificationMode.enhanced ? 'course_reminder_enhanced' : 'course_reminder_normal',
+          mode == NotificationMode.enhanced 
+              ? 'Course Reminder (Enhanced)' 
+              : 'Course Reminder',
           channelDescription: mode == NotificationMode.enhanced
-              ? 'Reminder notification for the start of the course (Skip Do not disturb mode)'
-              : 'Reminder notification for the start of the course',
+              ? 'Course reminder notifications that can override Do Not Disturb mode'
+              : 'Course reminder notifications for upcoming classes',
           importance: Importance.high,
           priority: Priority.high,
           // Skip DnD in the enhanced mode

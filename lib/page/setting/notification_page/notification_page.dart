@@ -798,7 +798,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     ),
                   ),
                 ),
-                if (kDebugMode) NotificationTestWidget(),
+                if (kDebugMode) const NotificationTestWidget(),
               ],
             ),
     );

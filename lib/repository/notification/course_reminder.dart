@@ -27,6 +27,19 @@ class CourseReminder {
 
   static const int _notificationIdPrefix = 10000;
 
+  /// Simple translation helper for notifications (without BuildContext)
+  /// Returns text based on locale: zh_CN (Simplified), zh_TW (Traditional), en (English)
+  String _translate(String zhCN, String zhTW, String en) {
+    final locale = preference.prefs.getString('locale') ?? 'zh_CN';
+    if (locale.startsWith('en')) {
+      return en;
+    } else if (locale == 'zh_TW') {
+      return zhTW;
+    } else {
+      return zhCN; // Default to Simplified Chinese
+    }
+  }
+
   /// Initiate Notification Base
   Future<void> initialize() async {
     await _notificationBase.initialize(
@@ -213,17 +226,26 @@ class CourseReminder {
             weekIndex,
           );
 
-          // Build notification body
-          // TODO: i18n
-          String title = '课前提醒：${classDetail.name}';
-          String body = '$minutesBefore分钟后开始上课';
+          // Build notification body with i18n support
+          String title = _translate(
+            '课前提醒：${classDetail.name}',
+            '課前提醒：${classDetail.name}',
+            'Course Reminder: ${classDetail.name}',
+          );
+          
+          String body = _translate(
+            '$minutesBefore分钟后开始上课',
+            '$minutesBefore分鐘後開始上課',
+            'Class starts in $minutesBefore minutes',
+          );
+          
           if (timeArrangement.classroom != null &&
               timeArrangement.classroom!.isNotEmpty) {
-            body += '\n地点：${timeArrangement.classroom}';
+            body += '\n${_translate('地点：', '地點：', 'Location: ')}${timeArrangement.classroom}';
           }
           if (timeArrangement.teacher != null &&
               timeArrangement.teacher!.isNotEmpty) {
-            body += '\n教师：${timeArrangement.teacher}';
+            body += '\n${_translate('教师：', '教師：', 'Teacher: ')}${timeArrangement.teacher}';
           }
 
           // Build payload（Used for the click event）
