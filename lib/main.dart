@@ -28,6 +28,7 @@ import 'package:watermeter/page/login/login_window.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
 void main() async {
   // Make sure the library is initialized.
@@ -55,6 +56,10 @@ void main() async {
   preference.prefs = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
+
+  // Initialize notification service
+  await CourseReminderService().initialize();
+  log.info("Notification service initialized.");
 
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
