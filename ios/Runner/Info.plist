@@ -92,5 +92,7 @@
 		<string>Access contacts for event attendee editing.</string>
 		<key>NSCalendarsFullAccessUsageDescription</key>
 		<string>Access most functions for calendar viewing and editing.</string>
+		<key>NSUserNotificationUsageDescription</key>
+		<string>To send notification before the classes start</string>
 	</dict>
 </plist>
