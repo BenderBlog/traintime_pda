@@ -9,8 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/notification/course_reminder.dart';
-import 'package:watermeter/repository/notification/notification_base.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
 /// 通知测试组件 - 用于调试通知功能
 class NotificationTestWidget extends StatefulWidget {
@@ -21,8 +20,7 @@ class NotificationTestWidget extends StatefulWidget {
 }
 
 class _NotificationTestWidgetState extends State<NotificationTestWidget> {
-  final NotificationBase _notificationBase = NotificationBase();
-  final CourseReminder _courseReminder = CourseReminder();
+  final _courseReminder = CourseReminderService();
 
   List<PendingNotificationRequest> _allNotifications = [];
   List<PendingNotificationRequest> _courseNotifications = [];
@@ -61,7 +59,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
     });
 
     try {
-      _allNotifications = await _notificationBase.getPendingNotifications();
+      _allNotifications = await _courseReminder.getPendingNotifications();
 
       const int notificationIdPrefix = 10000;
       final int minId = notificationIdPrefix * 10000;
@@ -91,7 +89,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
 
   Future<void> _cancelNotification(int id) async {
     try {
-      await _notificationBase.cancelNotification(id);
+      await _courseReminder.cancelNotification(id);
       if (mounted) {
         showToast(context: context, msg: '已取消通知 ID: $id');
       }
@@ -117,25 +115,24 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
     }
   }
 
-  Future<void> _sendTest(NotificationMode mode) async {
+  Future<void> _sendTest() async {
     try {
       final now = DateTime.now();
-      final testId = mode == NotificationMode.normal ? 99990 : 99991;
+      final testId = 99990;
 
       final payload = {
-            'type': 'course_reminder',
-            'className': 'test',
-            'weekIndex': 1,
-            'weekday': 1,
-            'startClass': 1,
-          };
+        'type': 'course_reminder',
+        'className': 'test',
+        'weekIndex': 1,
+        'weekday': 1,
+        'startClass': 1,
+      };
 
-      await _notificationBase.scheduleNotification(
+      await _courseReminder.scheduleNotification(
         id: testId,
-        title: '测试通知 (${mode == NotificationMode.normal ? '普通' : '增强'})',
-        body: '${mode.name}模式测试\n${now.hour}:${now.minute}:${now.second}',
+        title: '测试通知 ',
+        body: '测试\n${now.hour}:${now.minute}:${now.second}',
         scheduledTime: now.add(const Duration(seconds: 2)),
-        mode: mode,
         payload: jsonEncode(payload),
       );
 
@@ -166,12 +163,11 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
 
       final delay = int.tryParse(_delayController.text) ?? 5;
 
-      await _notificationBase.scheduleNotification(
+      await _courseReminder.scheduleNotification(
         id: id,
         title: _titleController.text,
         body: _bodyController.text,
         scheduledTime: DateTime.now().add(Duration(seconds: delay)),
-        mode: NotificationMode.normal,
       );
 
       if (mounted) {
@@ -285,7 +281,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ),
                             if (n.title != null) ...[
                               const SizedBox(height: 4),
-                              const Text('标题:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text(
+                                '标题:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Text(
                                 n.title!,
                                 style: const TextStyle(fontSize: 11),
@@ -293,7 +295,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ],
                             if (n.body != null) ...[
                               const SizedBox(height: 4),
-                              const Text('内容:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text(
+                                '内容:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Text(
                                 n.body!,
                                 style: const TextStyle(fontSize: 11),
@@ -302,7 +310,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ],
                             if (n.payload != null) ...[
                               const SizedBox(height: 4),
-                              const Text('载荷:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text(
+                                '载荷:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Text(
                                 n.payload!,
                                 style: const TextStyle(
@@ -368,7 +382,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ),
                             if (n.title != null) ...[
                               const SizedBox(height: 4),
-                              const Text('标题:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text(
+                                '标题:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Text(
                                 n.title!,
                                 style: const TextStyle(fontSize: 11),
@@ -376,7 +396,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ],
                             if (n.body != null) ...[
                               const SizedBox(height: 4),
-                              const Text('内容:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text(
+                                '内容:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Text(
                                 n.body!,
                                 style: const TextStyle(fontSize: 11),
@@ -385,7 +411,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                             ],
                             if (n.payload != null) ...[
                               const SizedBox(height: 4),
-                              const Text('载荷:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const Text(
+                                '载荷:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Text(
                                 n.payload!,
                                 style: const TextStyle(
@@ -437,38 +469,21 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _sendTest(NotificationMode.normal),
-                        icon: const Icon(
-                          Icons.notifications_outlined,
-                          size: 18,
-                        ),
-                        label: const Text('普通', style: TextStyle(fontSize: 13)),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _sendTest(),
+                    icon: const Icon(Icons.notifications_outlined, size: 18),
+                    label: const Text('发起通知', style: TextStyle(fontSize: 13)),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _sendTest(NotificationMode.enhanced),
-                        icon: const Icon(Icons.notifications_active, size: 18),
-                        label: const Text('增强', style: TextStyle(fontSize: 13)),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    '发送测试通知（2秒后触发，ID: 99990/99991），payLoad=[\'type\': \'course_reminder\']',
+                    '发送测试通知（2秒后触发，ID: 99990），payLoad=[\'type\': \'course_reminder\']',
                     style: TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ),
@@ -581,7 +596,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (color ?? Colors.grey).withOpacity(0.1),
+        color: (color ?? Colors.grey).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

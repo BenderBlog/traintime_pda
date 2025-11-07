@@ -534,24 +534,14 @@ setting:
     view_the_instructions_hint: 查看更多使用說明確保您能看到程序發出的通知
     permission_section: 權限狀態
     notification_permission: 通知權限
+    exact_alarm_permission: 精確時鐘權限
     permission_granted: 已授予
     permission_denied: 未授予
     request_permission: 請求權限
-    dnd_permission: 勿擾模式跳過權限
-    dnd_permission_granted: 已授予（增強模式可用）
-    dnd_permission_denied: 未授予（增強模式不可用）
     system_settings: 系統通知設置
     system_settings_hint: 打開系統設置檢查通知配置
-    permission_granted_msg: 通知權限已授予
-    permission_denied_msg: 通知權限被拒絕，請在系統設置中開啟
-    dnd_permission_granted_msg: 勿擾模式跳過權限已授予
-    dnd_permission_denied_msg: 權限被拒絕，請在系統設置中開啟
-    mode_section: 通知模式
-    normal_mode: 正常模式
-    normal_mode_hint: 普通的課前提醒通知
-    enhanced_mode: 增強模式
-    enhanced_mode_hint_android: 跳過勿擾模式發起通知（需要額外權限）
-    enhanced_mode_hint_ios: 增強通知模式（iOS不支持跳過勿擾）
+    permission_granted_msg: 權限已授予
+    permission_denied_msg: 權限被拒絕，請在系統設置中開啟
     reminder_section: 提醒設置
     minutes_before: 提前提醒時間
     minutes_before_hint: 課前提前提醒的時間設置
@@ -559,14 +549,8 @@ setting:
     days_to_schedule: 計劃通知天數
     days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
     days_unit: 天
-    instruction_section: 使用說明
-    instruction_1: • 首次開啟時會自動安排未來幾天的課前提醒
-    instruction_2: • 每次打開應用時會自動檢查並更新通知日程
-    instruction_3: • 增強模式可以在勿擾模式下發起通知（僅Android）
-    instruction_4: • 修改設置後會自動重新安排所有通知
     settings_guide_title: 通知設置提示
-    settings_guide_content: '為了確保您能及時收到課前提醒，請確保：
-
+    settings_guide_content_1: '為了確保您能及時收到課前提醒，請確保：
 
       1. 開啟了應用的通知權限
 
@@ -574,7 +558,14 @@ setting:
 
       3. 開啟了懸浮通知（橫幅通知）
 
-      4. 如果使用增強模式，需要授予勿擾模式跳過權限'
+      4. 非原生安卓用戶，開啟自啟動和關閉電源優化'
+    settings_guide_content_2: '課前提醒模塊運行機制：
+
+      1. 首次開啟時自動安排未來幾天的課前提醒
+
+      2. 每次打開應用時自動檢查並更新通知日程
+
+      3. 修改設置後自動重新安排所有通知'
     got_it: 知道了
     open_settings: 打開系統設置
     no_classtable_data: 請先獲取課程表數據

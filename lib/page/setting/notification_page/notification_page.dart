@@ -14,8 +14,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/notification_page/notification_test_widget.dart';
-import 'package:watermeter/repository/notification/course_reminder.dart';
-import 'package:watermeter/repository/notification/notification_base.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class NotificationSettingsPage extends StatefulWidget {
@@ -27,13 +26,11 @@ class NotificationSettingsPage extends StatefulWidget {
 }
 
 class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
-  final NotificationBase _notificationBase = NotificationBase();
-  final CourseReminder _courseMinder = CourseReminder();
+  final _courseMinder = CourseReminderService();
 
   bool _isEnabled = false;
   bool _hasNotificationPermission = false;
-  bool _hasDndPermission = false;
-  NotificationMode _mode = NotificationMode.normal;
+  bool _hasExactAlarmPermission = false;
   int _minutesBefore = 5;
   int _daysToSchedule = 7;
   bool _isLoading = true;
@@ -52,7 +49,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
     try {
       // Initiation
-      await _notificationBase.initialize();
       await _courseMinder.initialize();
 
       // Load settings
@@ -62,23 +58,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _daysToSchedule =
           preference.prefs.getInt('notification_days_to_schedule') ?? 7;
 
-      String modeStr =
-          preference.prefs.getString('notification_mode') ?? 'normal';
-      _mode = modeStr == 'enhanced'
-          ? NotificationMode.enhanced
-          : NotificationMode.normal;
-
-      // If the platform is not Android, switch to normal mode
-      if (!Platform.isAndroid && _mode == NotificationMode.enhanced) {
-        _mode = NotificationMode.normal;
-        await preference.prefs.setString('notification_mode', 'normal');
-      }
-
       // Check permission
-      _hasNotificationPermission = await _notificationBase
+      _hasNotificationPermission = await _courseMinder
           .checkNotificationPermission();
       if (Platform.isAndroid) {
-        _hasDndPermission = await _notificationBase.checkDndPermission();
       }
 
       // Get the number of notifications to be sent
@@ -103,14 +86,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
-  Future<void> _requestNotificationPermission() async {
-    final granted = await _notificationBase.requestNotificationPermission();
+  Future<void> _requestPermission() async {
+    final notificationPermissionGranted = await _courseMinder.requestNotificationPermission();
+    final exactAlarmGranted = await _courseMinder.requestExactAlarmPermission();
     if (mounted) {
       setState(() {
-        _hasNotificationPermission = granted;
+        _hasNotificationPermission = notificationPermissionGranted;
+        _hasExactAlarmPermission = exactAlarmGranted;
       });
 
-      if (granted) {
+      if (notificationPermissionGranted && exactAlarmGranted) {
         showToast(
           context: context,
           msg: FlutterI18n.translate(
@@ -130,35 +115,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
-  Future<void> _requestDndPermission() async {
-    if (!Platform.isAndroid) return;
-
-    final granted = await _notificationBase.requestDndPermission();
-    if (mounted) {
-      setState(() {
-        _hasDndPermission = granted;
-      });
-
-      if (granted) {
-        showToast(
-          context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.dnd_permission_granted_msg',
-          ),
-        );
-      } else {
-        showToast(
-          context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.dnd_permission_denied_msg',
-          ),
-        );
-      }
-    }
-  }
-
   void _showNotificationSettingsGuide() {
     showDialog(
       context: context,
@@ -169,11 +125,23 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             'setting.notification_page.settings_guide_title',
           ),
         ),
-        content: Text(
-          FlutterI18n.translate(
-            context,
-            'setting.notification_page.settings_guide_content',
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              FlutterI18n.translate(
+                context,
+                'setting.notification_page.settings_guide_content_1',
+              ),
+            ),
+            Divider(),
+            Text(
+              FlutterI18n.translate(
+                context,
+                'setting.notification_page.settings_guide_content_2',
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -188,7 +156,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _notificationBase.openNotificationSettings();
+              _courseMinder.openNotificationSettings();
             },
             child: Text(
               FlutterI18n.translate(
@@ -205,18 +173,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   Future<void> _toggleNotification(bool value) async {
     if (value) {
       if (!_hasNotificationPermission) {
-        await _requestNotificationPermission();
+        await _requestPermission();
         return;
       }
 
       _showNotificationSettingsGuide();
-
-      // If it is in enhanced mode and there is no DnD permission, request permission
-      if (_mode == NotificationMode.enhanced &&
-          Platform.isAndroid &&
-          !_hasDndPermission) {
-        await _requestDndPermission();
-      }
 
       // Arrange notification
       setState(() {
@@ -243,7 +204,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         await _courseMinder.scheduleNotificationsFromCourseData(
           daysToSchedule: _daysToSchedule,
           minutesBefore: _minutesBefore,
-          mode: _mode,
         );
 
         await preference.prefs.setBool('notification_enabled', true);
@@ -301,37 +261,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
-  Future<void> _changeMode(NotificationMode? mode) async {
-    if (mode == null || mode == _mode) return;
-
-    // If it is not an Android platform, switching to the enhanced mode is not allowed
-    if (!Platform.isAndroid && mode == NotificationMode.enhanced) {
-      return;
-    }
-
-    // If you switch to enhanced mode and do not have DnD permissions, request permissions
-    if (mode == NotificationMode.enhanced &&
-        Platform.isAndroid &&
-        !_hasDndPermission) {
-      await _requestDndPermission();
-      // Do not switch modes if no permission is obtained
-      if (!_hasDndPermission) {
-        return;
-      }
-    }
-
-    setState(() {
-      _mode = mode;
-    });
-
-    await preference.prefs.setString('notification_mode', mode.name);
-
-    // If the notification has been enabled, reschedule
-    if (_isEnabled) {
-      await _rescheduleNotifications();
-    }
-  }
-
   Future<void> _changeMinutesBefore(int value) async {
     setState(() {
       _minutesBefore = value;
@@ -368,7 +297,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       await _courseMinder.scheduleNotificationsFromCourseData(
         daysToSchedule: _daysToSchedule,
         minutesBefore: _minutesBefore,
-        mode: _mode,
       );
 
       _pendingCount = await _courseMinder.getPendingCourseNotificationsCount();
@@ -415,392 +343,278 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         title: Text(
           FlutterI18n.translate(context, 'setting.notification_page.title'),
         ),
+        actions: [
+          if (_isLoading)
+            Container(
+              margin: EdgeInsets.only(right: 16),
+              width: 24,
+              height: 24,
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+        ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Function switch
+          ReXCard(
+            title: _buildListSubtitle(
+              FlutterI18n.translate(
+                context,
+                'setting.notification_page.function_section',
+              ),
+            ),
+            remaining: const [],
+            bottomRow: Column(
               children: [
-                // Function switch
-                ReXCard(
-                  title: _buildListSubtitle(
+                ListTile(
+                  title: Text(
                     FlutterI18n.translate(
                       context,
-                      'setting.notification_page.function_section',
+                      'setting.notification_page.enable_notification',
                     ),
                   ),
-                  remaining: const [],
-                  bottomRow: Column(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          FlutterI18n.translate(
+                  subtitle: Text(
+                    _isEnabled
+                        ? FlutterI18n.translate(
                             context,
-                            'setting.notification_page.enable_notification',
-                          ),
-                        ),
-                        subtitle: Text(
-                          _isEnabled
-                              ? FlutterI18n.translate(
-                                  context,
-                                  'setting.notification_page.notification_scheduled',
-                                  translationParams: {
-                                    'count': _pendingCount.toString(),
-                                  },
-                                )
-                              : FlutterI18n.translate(
-                                  context,
-                                  'setting.notification_page.notification_disabled_hint',
-                                ),
-                        ),
-                        trailing: Switch(
-                          value: _isEnabled,
-                          onChanged: _toggleNotification,
-                        ),
-                      ),
-                      ListTile(
-                        title: Text(
-                          FlutterI18n.translate(
+                            'setting.notification_page.notification_scheduled',
+                            translationParams: {
+                              'count': _pendingCount.toString(),
+                            },
+                          )
+                        : FlutterI18n.translate(
                             context,
-                            'setting.notification_page.view_the_instructions',
+                            'setting.notification_page.notification_disabled_hint',
                           ),
-                        ),
-                        subtitle: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.view_the_instructions_hint',
-                          ),
-                        ),
-                        trailing: const Icon(Icons.navigate_next),
-                        onTap: () => _showNotificationSettingsGuide(),
-                      ),
-                      if (_isEnabled && _pendingCount > 0)
-                        ListTile(
-                          title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.update_schedule',
-                            ),
-                          ),
-                          subtitle: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.update_schedule_hint',
-                            ),
-                          ),
-                          trailing: const Icon(Icons.refresh),
-                          onTap: _rescheduleNotifications,
-                        ),
-                    ],
+                  ),
+                  trailing: Switch(
+                    value: _isEnabled,
+                    onChanged: _toggleNotification,
                   ),
                 ),
-
-                // Notification mode
-                ReXCard(
-                  title: _buildListSubtitle(
+                ListTile(
+                  title: Text(
                     FlutterI18n.translate(
                       context,
-                      'setting.notification_page.mode_section',
+                      'setting.notification_page.view_the_instructions',
                     ),
                   ),
-                  remaining: const [],
-                  bottomRow: RadioGroup<NotificationMode>(
-                    groupValue: _mode,
-                    onChanged: _changeMode,
-                    child: Column(
-                      children: [
-                        RadioListTile<NotificationMode>(
-                          title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.normal_mode',
-                            ),
-                          ),
-                          subtitle: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.normal_mode_hint',
-                            ),
-                          ),
-                          value: NotificationMode.normal,
-                        ),
-                        const Divider(),
-                        RadioListTile<NotificationMode>(
-                          title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.enhanced_mode',
-                            ),
-                            style: Platform.isAndroid
-                                ? null
-                                : TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.38),
-                                  ),
-                          ),
-                          subtitle: Text(
-                            Platform.isAndroid
-                                ? FlutterI18n.translate(
-                                    context,
-                                    'setting.notification_page.enhanced_mode_hint_android',
-                                  )
-                                : FlutterI18n.translate(
-                                    context,
-                                    'setting.notification_page.enhanced_mode_hint_ios',
-                                  ),
-                            style: Platform.isAndroid
-                                ? null
-                                : TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.38),
-                                  ),
-                          ),
-                          value: NotificationMode.enhanced,
-                          enabled: Platform.isAndroid,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Reminder setting
-                ReXCard(
-                  title: _buildListSubtitle(
+                  subtitle: Text(
                     FlutterI18n.translate(
                       context,
-                      'setting.notification_page.reminder_section',
+                      'setting.notification_page.view_the_instructions_hint',
                     ),
                   ),
-                  remaining: const [],
-                  bottomRow: Column(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.minutes_before',
-                          ),
-                        ),
-                        subtitle: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.minutes_before_hint',
-                          ),
-                        ),
-                        trailing: DropdownButton<int>(
-                          value: _minutesBefore,
-                          items: [5, 10, 15, 20, 30]
-                              .map(
-                                (value) => DropdownMenuItem(
-                                  value: value,
-                                  child: Text(
-                                    '$value ${FlutterI18n.translate(context, "setting.notification_page.minutes_unit")}',
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              _changeMinutesBefore(value);
-                            }
-                          },
-                        ),
-                      ),
-                      const Divider(),
-                      ListTile(
-                        title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.days_to_schedule',
-                          ),
-                        ),
-                        subtitle: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.days_to_schedule_hint',
-                          ),
-                        ),
-                        trailing: DropdownButton<int>(
-                          value: _daysToSchedule,
-                          items: [3, 7, 14, 30]
-                              .map(
-                                (value) => DropdownMenuItem(
-                                  value: value,
-                                  child: Text(
-                                    '$value ${FlutterI18n.translate(context, "setting.notification_page.days_unit")}',
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              _changeDaysToSchedule(value);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () => _showNotificationSettingsGuide(),
                 ),
-
-                // Permission state
-                ReXCard(
-                  title: _buildListSubtitle(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.permission_section',
-                    ),
-                  ),
-                  remaining: const [],
-                  bottomRow: Column(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.notification_permission',
-                          ),
-                        ),
-                        subtitle: Text(
-                          _hasNotificationPermission
-                              ? FlutterI18n.translate(
-                                  context,
-                                  'setting.notification_page.permission_granted',
-                                )
-                              : FlutterI18n.translate(
-                                  context,
-                                  'setting.notification_page.permission_denied',
-                                ),
-                        ),
-                        trailing: _hasNotificationPermission
-                            ? Icon(
-                                Icons.check_circle,
-                                color: Theme.of(context).colorScheme.primary,
-                              )
-                            : TextButton(
-                                onPressed: _requestNotificationPermission,
-                                child: Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    'setting.notification_page.request_permission',
-                                  ),
-                                ),
-                              ),
+                if (_isEnabled && _pendingCount > 0)
+                  ListTile(
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.update_schedule',
                       ),
-                      if (Platform.isAndroid) ...[
-                        const Divider(),
-                        ListTile(
-                          title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.dnd_permission',
-                            ),
-                          ),
-                          subtitle: Text(
-                            _hasDndPermission
-                                ? FlutterI18n.translate(
-                                    context,
-                                    'setting.notification_page.dnd_permission_granted',
-                                  )
-                                : FlutterI18n.translate(
-                                    context,
-                                    'setting.notification_page.dnd_permission_denied',
-                                  ),
-                          ),
-                          trailing: _hasDndPermission
-                              ? Icon(
-                                  Icons.check_circle,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : TextButton(
-                                  onPressed: _requestDndPermission,
-                                  child: Text(
-                                    FlutterI18n.translate(
-                                      context,
-                                      'setting.notification_page.request_permission',
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      ],
-                      const Divider(),
-                      ListTile(
-                        title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.system_settings',
-                          ),
-                        ),
-                        subtitle: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.system_settings_hint',
-                          ),
-                        ),
-                        trailing: const Icon(Icons.settings),
-                        onTap: () =>
-                            _notificationBase.openNotificationSettings(),
+                    ),
+                    subtitle: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.update_schedule_hint',
                       ),
-                    ],
-                  ),
-                ),
-
-                // Hinter
-                ReXCard(
-                  title: _buildListSubtitle(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.instruction_section',
                     ),
+                    trailing: const Icon(Icons.refresh),
+                    onTap: _rescheduleNotifications,
                   ),
-                  remaining: const [],
-                  bottomRow: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.instruction_1',
-                          ),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.instruction_2',
-                          ),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.instruction_3',
-                          ),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.instruction_4',
-                          ),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (kDebugMode) const NotificationTestWidget(),
               ],
             ),
+          ),
+
+          // Reminder setting
+          ReXCard(
+            title: _buildListSubtitle(
+              FlutterI18n.translate(
+                context,
+                'setting.notification_page.reminder_section',
+              ),
+            ),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.minutes_before',
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.minutes_before_hint',
+                    ),
+                  ),
+                  trailing: DropdownButton<int>(
+                    value: _minutesBefore,
+                    items: [5, 10, 15, 20, 30]
+                        .map(
+                          (value) => DropdownMenuItem(
+                            value: value,
+                            child: Text(
+                              '$value ${FlutterI18n.translate(context, "setting.notification_page.minutes_unit")}',
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        _changeMinutesBefore(value);
+                      }
+                    },
+                  ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.days_to_schedule',
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.days_to_schedule_hint',
+                    ),
+                  ),
+                  trailing: DropdownButton<int>(
+                    value: _daysToSchedule,
+                    items: [3, 7, 14, 30]
+                        .map(
+                          (value) => DropdownMenuItem(
+                            value: value,
+                            child: Text(
+                              '$value ${FlutterI18n.translate(context, "setting.notification_page.days_unit")}',
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        _changeDaysToSchedule(value);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Permission state
+          ReXCard(
+            title: _buildListSubtitle(
+              FlutterI18n.translate(
+                context,
+                'setting.notification_page.permission_section',
+              ),
+            ),
+            remaining: const [],
+            bottomRow: Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.notification_permission',
+                    ),
+                  ),
+                  subtitle: Text(
+                    _hasNotificationPermission
+                        ? FlutterI18n.translate(
+                            context,
+                            'setting.notification_page.permission_granted',
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            'setting.notification_page.permission_denied',
+                          ),
+                  ),
+                  trailing: _hasNotificationPermission
+                      ? Icon(
+                          Icons.check_circle,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : TextButton(
+                          onPressed: _requestPermission,
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              'setting.notification_page.request_permission',
+                            ),
+                          ),
+                        ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.exact_alarm_permission',
+                    ),
+                  ),
+                  subtitle: Text(
+                    _hasExactAlarmPermission
+                        ? FlutterI18n.translate(
+                            context,
+                            'setting.notification_page.permission_granted',
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            'setting.notification_page.permission_denied',
+                          ),
+                  ),
+                  trailing: _hasExactAlarmPermission
+                      ? Icon(
+                          Icons.check_circle,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : TextButton(
+                          onPressed: _requestPermission,
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              'setting.notification_page.request_permission',
+                            ),
+                          ),
+                        ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.system_settings',
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.system_settings_hint',
+                    ),
+                  ),
+                  trailing: const Icon(Icons.settings),
+                  onTap: () => _courseMinder.openNotificationSettings(),
+                ),
+              ],
+            ),
+          ),
+          if (kDebugMode || true) const NotificationTestWidget(),
+        ],
+      ),
     );
   }
 }

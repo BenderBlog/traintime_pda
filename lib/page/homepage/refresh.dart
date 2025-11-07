@@ -10,7 +10,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/repository/notification/course_reminder.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
 import 'package:watermeter/repository/pda_service_session.dart' as message;
@@ -122,7 +122,7 @@ Future<void> _validateCourseNotifications() async {
       return;
     }
 
-    final courseReminder = CourseReminder();
+    final courseReminder = CourseReminderService();
     await courseReminder.initialize();
     await courseReminder.validateAndUpdateNotifications();
 
