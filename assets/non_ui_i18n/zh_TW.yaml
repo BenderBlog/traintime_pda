@@ -1,0 +1,6 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777
+course_reminder:
+  title: 課前提醒：{name}
+  body: '{time} 分鐘後開始上課'
+  location: 地點：{location}
+  teacher: 教師：{teacher}

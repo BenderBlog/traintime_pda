@@ -19,6 +19,7 @@ import 'package:watermeter/repository/permission_handler/exact_alarm_permission_
 import 'package:watermeter/repository/permission_handler/notification_permission_handler.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/generated/non_ui_i18n.g.dart';
 
 /// Course Reminder Service implementation
 class CourseReminderService extends NotificationService {
@@ -34,18 +35,6 @@ class CourseReminderService extends NotificationService {
   });
 
   static const int _notificationIdPrefix = 10000;
-
-  /// Simple translation helper for notifications (without BuildContext)
-  String _translate(String zhCN, String zhTW, String en) {
-    final locale = preference.prefs.getString('locale') ?? 'zh_CN';
-    if (locale.startsWith('en')) {
-      return en;
-    } else if (locale == 'zh_TW') {
-      return zhTW;
-    } else {
-      return zhCN; // Default to Simplified Chinese
-    }
-  }
 
   @override
   void handleNotificationTap(NotificationResponse response) {
@@ -282,27 +271,29 @@ class CourseReminderService extends NotificationService {
             weekIndex,
           );
 
-          String title = _translate(
-            '课前提醒：${classDetail.name}',
-            '課前提醒：${classDetail.name}',
-            'Course Reminder: ${classDetail.name}',
+          var locale = preference.prefs.getString('locale') ?? 'zh_CN';
+
+          String title = NonUII18n.translate(
+            locale,
+            'course_reminder.title',
+            translateParams: {'name': classDetail.name},
           );
 
-          String body = _translate(
-            '$minutesBefore分钟后开始上课',
-            '$minutesBefore分鐘後開始上課',
-            'Class starts in $minutesBefore minutes',
+          String body = NonUII18n.translate(
+            locale,
+            'course_reminder.body',
+            translateParams: {'time': minutesBefore},
           );
 
           if (timeArrangement.classroom != null &&
               timeArrangement.classroom!.isNotEmpty) {
             body +=
-                '\n${_translate('地点：', '地點：', 'Location: ')}${timeArrangement.classroom}';
+                '\n${NonUII18n.translate(locale, 'course_reminder.location')}${timeArrangement.classroom}';
           }
           if (timeArrangement.teacher != null &&
               timeArrangement.teacher!.isNotEmpty) {
             body +=
-                '\n${_translate('教师：', '教師：', 'Teacher: ')}${timeArrangement.teacher}';
+                '\n${NonUII18n.translate(locale, 'course_reminder.teacher')}${timeArrangement.teacher}';
           }
 
           Map<String, dynamic> payload = {
