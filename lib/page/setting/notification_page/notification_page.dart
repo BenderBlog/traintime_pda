@@ -61,6 +61,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       // Check permission
       _hasNotificationPermission = await _courseMinder
           .checkNotificationPermission();
+      _hasExactAlarmPermission = await _courseMinder
+          .checkExactAlarmPermission();
       if (Platform.isAndroid) {
       }
 
@@ -127,6 +129,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               FlutterI18n.translate(
@@ -612,7 +615,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ],
             ),
           ),
-          if (kDebugMode || true) const NotificationTestWidget(),
+          if (kDebugMode) const NotificationTestWidget(),
         ],
       ),
     );

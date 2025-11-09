@@ -123,7 +123,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
       final payload = {
         'type': 'course_reminder',
         'className': 'test',
-        'weekIndex': 1,
+        'weekIndex': 9,
         'weekday': 1,
         'startClass': 1,
       };

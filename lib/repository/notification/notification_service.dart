@@ -7,10 +7,10 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/permission_handler/permission_handler_base.dart';
 
 /// Abstract base class for managing notifications.
 ///
@@ -20,6 +20,14 @@ import 'package:watermeter/repository/logger.dart';
 abstract class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  final PermissionHandlerBase notificationPermissionHandler;
+  final PermissionHandlerBase exactAlarmPermissionHandler;
+
+  NotificationService({
+    required this.notificationPermissionHandler,
+    required this.exactAlarmPermissionHandler,
+  });
   
   @protected
   bool initialized = false;
@@ -90,120 +98,24 @@ abstract class NotificationService {
 
   /// Requests notification permissions from the user.
   Future<bool> requestNotificationPermission() async {
-    try {
-      if (Platform.isAndroid) {
-        final status = await Permission.notification.request();
-        return status.isGranted;
-      } else if (Platform.isIOS) {
-        final bool? result = await flutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>()
-            ?.requestPermissions(
-              alert: true,
-              badge: true,
-              sound: true,
-            );
-        return result ?? false;
-      }
-      return false;
-    } catch (e, stackTrace) {
-      log.error(
-        'Failed to request notification permission',
-        e,
-        stackTrace,
-      );
-      return false;
-    }
+    return await notificationPermissionHandler.requestPermission();
   }
 
   /// Checks if notification permissions have been granted.
   Future<bool> checkNotificationPermission() async {
-    try {
-      if (Platform.isAndroid) {
-        return await Permission.notification.isGranted;
-      } else if (Platform.isIOS) {
-        final bool? result = await flutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>()
-            ?.checkPermissions()
-            .then((settings) => settings?.isEnabled ?? false);
-        return result ?? false;
-      }
-      return false;
-    } catch (e, stackTrace) {
-      log.error(
-        'Failed to check notification permission',
-        e,
-        stackTrace,
-      );
-      return false;
-    }
+    return await notificationPermissionHandler.checkPermission();
   }
-
-  // /// Requests Do Not Disturb (DND) permission (Android only).
-  // Future<bool> requestDndPermission() async {
-  //   if (!Platform.isAndroid) return false;
-
-  //   try {
-  //     final status = await Permission.accessNotificationPolicy.request();
-  //     return status.isGranted;
-  //   } catch (e, stackTrace) {
-  //     log.error(
-  //       'Failed to request DND permission',
-  //       e,
-  //       stackTrace,
-  //     );
-  //     return false;
-  //   }
-  // }
-
-  // /// Checks if Do Not Disturb (DND) permission has been granted (Android only).
-  // Future<bool> checkDndPermission() async {
-  //   if (!Platform.isAndroid) return false;
-
-  //   try {
-  //     return await Permission.accessNotificationPolicy.isGranted;
-  //   } catch (e, stackTrace) {
-  //     log.error(
-  //       'Failed to check DND permission',
-  //       e,
-  //       stackTrace,
-  //     );
-  //     return false;
-  //   }
-  // }
 
   /// Requests schedule exact alarm permission (Android only).
   Future<bool> requestExactAlarmPermission() async {
     if (!Platform.isAndroid) return true; // Not applicable on other platforms
-
-    try {
-      final status = await Permission.scheduleExactAlarm.request();
-      return status.isGranted;
-    } catch (e, stackTrace) {
-      log.error(
-        'Failed to request exact alarm permission',
-        e,
-        stackTrace,
-      );
-      return false;
-    }
+    return await exactAlarmPermissionHandler.requestPermission();
   }
 
   /// Checks if schedule exact alarm permission has been granted (Android only).
   Future<bool> checkExactAlarmPermission() async {
     if (!Platform.isAndroid) return true; // Not applicable on other platforms
-
-    try {
-      return await Permission.scheduleExactAlarm.isGranted;
-    } catch (e, stackTrace) {
-      log.error(
-        'Failed to check exact alarm permission',
-        e,
-        stackTrace,
-      );
-      return false;
-    }
+    return await exactAlarmPermissionHandler.checkPermission();
   }
 
   /// Retrieves a list of all pending (scheduled) notifications.
@@ -265,14 +177,6 @@ abstract class NotificationService {
 
   /// Opens the app's notification settings page.
   Future<void> openNotificationSettings() async {
-    try {
-      await openAppSettings();
-    } catch (e, stackTrace) {
-      log.error(
-        'Failed to open notification settings',
-        e,
-        stackTrace,
-      );
-    }
+    await notificationPermissionHandler.openAppSettings();
   }
 }

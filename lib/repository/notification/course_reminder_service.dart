@@ -15,14 +15,23 @@ import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
+import 'package:watermeter/repository/permission_handler/exact_alarm_permission_handler.dart';
+import 'package:watermeter/repository/permission_handler/notification_permission_handler.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/classtable/classtable.dart';
 
 /// Course Reminder Service implementation
 class CourseReminderService extends NotificationService {
-  static final CourseReminderService _instance = CourseReminderService._internal();
+  static final CourseReminderService _instance =
+      CourseReminderService._internal(
+        notificationPermissionHandler: NotificationPermissionHandler(),
+        exactAlarmPermissionHandler: ExactAlarmPermissionHandler(),
+      );
   factory CourseReminderService() => _instance;
-  CourseReminderService._internal();
+  CourseReminderService._internal({
+    required super.notificationPermissionHandler,
+    required super.exactAlarmPermissionHandler,
+  });
 
   static const int _notificationIdPrefix = 10000;
 
@@ -41,7 +50,7 @@ class CourseReminderService extends NotificationService {
   @override
   void handleNotificationTap(NotificationResponse response) {
     log.info('[CourseReminderService] Notification tapped');
-    
+
     if (response.payload == null || response.payload!.isEmpty) {
       log.warning('[CourseReminderService] No payload in notification');
       return;
@@ -58,6 +67,7 @@ class CourseReminderService extends NotificationService {
 
       final int weekIndex = payload['weekIndex'] ?? 0;
 
+      // TODO: This function will fail if the app is started from cold state.
       final navigator = preference.debuggerKey.currentState;
       if (navigator != null) {
         navigator.push(
@@ -71,7 +81,9 @@ class CourseReminderService extends NotificationService {
             ),
           ),
         );
-        log.info('[CourseReminderService] Navigated to class table, week: $weekIndex');
+        log.info(
+          '[CourseReminderService] Navigated to class table, week: $weekIndex',
+        );
       } else {
         log.warning('[CourseReminderService] Navigator not available');
       }
@@ -99,14 +111,17 @@ class CourseReminderService extends NotificationService {
     }
 
     try {
-      final tz.TZDateTime tzScheduledTime =
-          tz.TZDateTime.from(scheduledTime, tz.local);
+      final tz.TZDateTime tzScheduledTime = tz.TZDateTime.from(
+        scheduledTime,
+        tz.local,
+      );
 
       if (Platform.isAndroid) {
         final androidDetails = AndroidNotificationDetails(
           'course_reminder',
           'Course Reminder',
-          channelDescription: 'Course reminder notifications for upcoming classes',
+          channelDescription:
+              'Course reminder notifications for upcoming classes',
           importance: Importance.max,
           priority: Priority.max,
           audioAttributesUsage: AudioAttributesUsage.notification,
@@ -137,9 +152,7 @@ class CourseReminderService extends NotificationService {
           sound: 'default',
         );
 
-        const notificationDetails = NotificationDetails(
-          iOS: iosDetails,
-        );
+        const notificationDetails = NotificationDetails(iOS: iosDetails);
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
           id,
@@ -156,11 +169,7 @@ class CourseReminderService extends NotificationService {
 
       log.info('Scheduled course notification $id at $scheduledTime');
     } catch (e, stackTrace) {
-      log.error(
-        'Failed to schedule course notification',
-        e,
-        stackTrace,
-      );
+      log.error('Failed to schedule course notification', e, stackTrace);
       rethrow;
     }
   }
@@ -258,8 +267,9 @@ class CourseReminderService extends NotificationService {
             continue;
           }
 
-          DateTime notificationTime =
-              classStartTime.subtract(Duration(minutes: minutesBefore));
+          DateTime notificationTime = classStartTime.subtract(
+            Duration(minutes: minutesBefore),
+          );
 
           if (notificationTime.isBefore(now)) {
             continue;
@@ -278,20 +288,22 @@ class CourseReminderService extends NotificationService {
             '課前提醒：${classDetail.name}',
             'Course Reminder: ${classDetail.name}',
           );
-          
+
           String body = _translate(
             '$minutesBefore分钟后开始上课',
             '$minutesBefore分鐘後開始上課',
             'Class starts in $minutesBefore minutes',
           );
-          
+
           if (timeArrangement.classroom != null &&
               timeArrangement.classroom!.isNotEmpty) {
-            body += '\n${_translate('地点：', '地點：', 'Location: ')}${timeArrangement.classroom}';
+            body +=
+                '\n${_translate('地点：', '地點：', 'Location: ')}${timeArrangement.classroom}';
           }
           if (timeArrangement.teacher != null &&
               timeArrangement.teacher!.isNotEmpty) {
-            body += '\n${_translate('教师：', '教師：', 'Teacher: ')}${timeArrangement.teacher}';
+            body +=
+                '\n${_translate('教师：', '教師：', 'Teacher: ')}${timeArrangement.teacher}';
           }
 
           Map<String, dynamic> payload = {
@@ -317,7 +329,11 @@ class CourseReminderService extends NotificationService {
       log.info('Scheduled $scheduledCount course reminder notifications');
       await _saveScheduleConfig(daysToSchedule, minutesBefore);
     } catch (e, stackTrace) {
-      log.error('Failed to schedule course reminder notifications', e, stackTrace);
+      log.error(
+        'Failed to schedule course reminder notifications',
+        e,
+        stackTrace,
+      );
       rethrow;
     }
   }
@@ -339,7 +355,9 @@ class CourseReminderService extends NotificationService {
         return parsed[0] != -1;
       }).toList();
 
-      log.info('Found ${courseNotifications.length} pending course reminder notifications');
+      log.info(
+        'Found ${courseNotifications.length} pending course reminder notifications',
+      );
 
       DateTime now = DateTime.now();
       DateTime semesterStartDate = DateTime.parse(data.termStartDay);
@@ -377,7 +395,9 @@ class CourseReminderService extends NotificationService {
       }
 
       if (invalidNotificationIds.isNotEmpty) {
-        log.info('Cancelled ${invalidNotificationIds.length} invalid notifications');
+        log.info(
+          'Cancelled ${invalidNotificationIds.length} invalid notifications',
+        );
       }
 
       final config = await _loadScheduleConfig();
@@ -392,7 +412,9 @@ class CourseReminderService extends NotificationService {
             .fold(-1, (max, week) => week > max ? week : max);
 
         if (maxWeekInNotifications < endWeek) {
-          log.info('Scheduling additional notifications to reach week $endWeek');
+          log.info(
+            'Scheduling additional notifications to reach week $endWeek',
+          );
           await scheduleNotificationsFromCourseData(
             daysToSchedule: daysToSchedule,
             minutesBefore: config['minutesBefore'] ?? 5,
@@ -417,7 +439,9 @@ class CourseReminderService extends NotificationService {
         await cancelNotification(notification.id);
       }
 
-      log.info('Cancelled ${courseNotifications.length} course reminder notifications');
+      log.info(
+        'Cancelled ${courseNotifications.length} course reminder notifications',
+      );
     } catch (e, stackTrace) {
       log.error('Failed to cancel course notifications', e, stackTrace);
       rethrow;
@@ -429,24 +453,28 @@ class CourseReminderService extends NotificationService {
     int daysToSchedule,
     int minutesBefore,
   ) async {
-    await preference.prefs.setInt('notification_days_to_schedule', daysToSchedule);
+    await preference.prefs.setInt(
+      'notification_days_to_schedule',
+      daysToSchedule,
+    );
     await preference.prefs.setInt('notification_minutes_before', minutesBefore);
   }
 
   /// Load the config
   Future<Map<String, dynamic>?> _loadScheduleConfig() async {
-    final daysToSchedule = preference.prefs.getInt('notification_days_to_schedule');
-    final minutesBefore = preference.prefs.getInt('notification_minutes_before');
+    final daysToSchedule = preference.prefs.getInt(
+      'notification_days_to_schedule',
+    );
+    final minutesBefore = preference.prefs.getInt(
+      'notification_minutes_before',
+    );
     final modeStr = preference.prefs.getString('notification_mode');
 
     if (daysToSchedule == null || minutesBefore == null || modeStr == null) {
       return null;
     }
 
-    return {
-      'daysToSchedule': daysToSchedule,
-      'minutesBefore': minutesBefore,
-    };
+    return {'daysToSchedule': daysToSchedule, 'minutesBefore': minutesBefore};
   }
 
   /// Get the number of scheduled course reminder notifications
