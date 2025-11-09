@@ -15,7 +15,7 @@ class NonUII18n {
     "en_US": {
       "course_reminder": {
         "title": "Pre-class Reminder: {name}",
-        "body": "Class starts in {minutes} minutes",
+        "body": "Class starts in {time} minutes",
         "location": "Location: {location}",
         "teacher": "Teacher: {teacher}",
       },

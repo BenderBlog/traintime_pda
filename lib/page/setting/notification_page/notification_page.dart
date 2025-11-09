@@ -334,6 +334,23 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
+  Future<void> _deleteAllSchedules() async {
+    await _courseMinder.cancelAllCourseNotifications();
+
+    if (mounted) {
+      setState(() {
+        _pendingCount = 0;
+      });
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          'setting.notification_page.delete_all_success',
+        ),
+      );
+    }
+  }
+
   Widget _buildListSubtitle(String text) => Text(
     text,
     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -416,7 +433,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => _showNotificationSettingsGuide(),
                 ),
-                if (_isEnabled && _pendingCount > 0)
+                if (_isEnabled)
                   ListTile(
                     title: Text(
                       FlutterI18n.translate(
@@ -432,6 +449,23 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     ),
                     trailing: const Icon(Icons.refresh),
                     onTap: _rescheduleNotifications,
+                  ),
+                if (_isEnabled && _pendingCount > 0)
+                  ListTile(
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.delete_all_schedule',
+                      ),
+                    ),
+                    subtitle: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.delete_all_schedule_hint',
+                      ),
+                    ),
+                    trailing: Icon(Icons.delete, color: Theme.of(context).colorScheme.error,),
+                    onTap: _deleteAllSchedules,
                   ),
               ],
             ),

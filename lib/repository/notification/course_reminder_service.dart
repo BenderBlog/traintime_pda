@@ -271,7 +271,12 @@ class CourseReminderService extends NotificationService {
             weekIndex,
           );
 
-          var locale = preference.prefs.getString('locale') ?? 'zh_CN';
+          // Get current locale from preference
+          String locale = preference.getString(preference.Preference.localization);
+          // If localization is not set or empty, default to zh_CN
+          if (locale.isEmpty) {
+            locale = 'zh_CN';
+          }
 
           String title = NonUII18n.translate(
             locale,
@@ -282,18 +287,18 @@ class CourseReminderService extends NotificationService {
           String body = NonUII18n.translate(
             locale,
             'course_reminder.body',
-            translateParams: {'time': minutesBefore},
+            translateParams: {'time': minutesBefore.toString()},
           );
 
           if (timeArrangement.classroom != null &&
               timeArrangement.classroom!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location')}${timeArrangement.classroom}';
+                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": timeArrangement.classroom!})}';
           }
           if (timeArrangement.teacher != null &&
               timeArrangement.teacher!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher')}${timeArrangement.teacher}';
+                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": timeArrangement.teacher!})}';
           }
 
           Map<String, dynamic> payload = {
