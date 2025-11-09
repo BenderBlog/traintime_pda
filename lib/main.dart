@@ -22,6 +22,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/network_session.dart' as repo_general;
+import 'package:watermeter/repository/notification/notification_registrar.dart'
+    show registeredNotificationServices;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
@@ -58,7 +60,9 @@ void main() async {
   );
 
   // Initialize notification service
-  await CourseReminderService().initialize();
+  for (var service in registeredNotificationServices) {
+    await service.initialize();
+  }
   log.info("Notification service initialized.");
 
   // Load package info.
@@ -79,7 +83,9 @@ void main() async {
 
   // Handle app launch from notification
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-    await CourseReminderService().handleAppLaunchFromNotification();
+    for (var service in registeredNotificationServices) {
+      await service.handleAppLaunchFromNotification();
+    }
   });
 }
 
