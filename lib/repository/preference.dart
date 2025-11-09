@@ -68,7 +68,19 @@ enum Preference {
   emptyClassroomLastChoice(
     key: "emptyClassroomLastChoice",
     type: "String",
-  ); // 空闲教室最后一次选择
+  ), // 空闲教室最后一次选择
+  enableCourseReminder(
+    key: "enableCourseReminder",
+    type: "bool",
+  ), // 课程提醒开关
+  minutesBefore(
+    key: "minutesBefore",
+    type: "int",
+  ), // 课程提前提醒时间
+  daysToSchedule(
+    key: "daysToSchedule",
+    type: "int",
+  ); // 预设提醒天数
 
   const Preference({required this.key, this.type = "String"});
 

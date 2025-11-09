@@ -4,7 +4,6 @@
 
 // Course reminder notification settings page
 
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -39,6 +38,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   void initState() {
     super.initState();
+    // Load settings
+    _isEnabled = preference.getBool(preference.Preference.enableCourseReminder);
+    _minutesBefore = preference.getInt(preference.Preference.minutesBefore);
+    _daysToSchedule = preference.getInt(preference.Preference.daysToSchedule);
+
     _loadSettings();
   }
 
@@ -51,20 +55,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       // Initiation
       await _courseMinder.initialize();
 
-      // Load settings
-      _isEnabled = preference.prefs.getBool('notification_enabled') ?? false;
-      _minutesBefore =
-          preference.prefs.getInt('notification_minutes_before') ?? 5;
-      _daysToSchedule =
-          preference.prefs.getInt('notification_days_to_schedule') ?? 7;
-
       // Check permission
       _hasNotificationPermission = await _courseMinder
           .checkNotificationPermission();
       _hasExactAlarmPermission = await _courseMinder
           .checkExactAlarmPermission();
-      if (Platform.isAndroid) {
-      }
 
       // Get the number of notifications to be sent
       _pendingCount = await _courseMinder.getPendingCourseNotificationsCount();
@@ -89,7 +84,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _requestPermission() async {
-    final notificationPermissionGranted = await _courseMinder.requestNotificationPermission();
+    final notificationPermissionGranted = await _courseMinder
+        .requestNotificationPermission();
     final exactAlarmGranted = await _courseMinder.requestExactAlarmPermission();
     if (mounted) {
       setState(() {
@@ -209,7 +205,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           minutesBefore: _minutesBefore,
         );
 
-        await preference.prefs.setBool('notification_enabled', true);
+        await preference.setBool(
+          preference.Preference.enableCourseReminder,
+          true,
+        );
         _pendingCount = await _courseMinder
             .getPendingCourseNotificationsCount();
 
@@ -246,7 +245,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       }
     } else {
       await _courseMinder.cancelAllCourseNotifications();
-      await preference.prefs.setBool('notification_enabled', false);
+      await preference.setBool(
+        preference.Preference.enableCourseReminder,
+        false,
+      );
 
       if (mounted) {
         setState(() {
@@ -269,7 +271,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _minutesBefore = value;
     });
 
-    await preference.prefs.setInt('notification_minutes_before', value);
+    await preference.setInt(preference.Preference.minutesBefore, value);
 
     // If the notification has been enabled, reschedule
     if (_isEnabled) {
@@ -282,7 +284,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _daysToSchedule = value;
     });
 
-    await preference.prefs.setInt('notification_days_to_schedule', value);
+    await preference.setInt(preference.Preference.daysToSchedule, value);
 
     // If the notification has been enabled, reschedule
     if (_isEnabled) {
@@ -464,7 +466,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         'setting.notification_page.delete_all_schedule_hint',
                       ),
                     ),
-                    trailing: Icon(Icons.delete, color: Theme.of(context).colorScheme.error,),
+                    trailing: Icon(
+                      Icons.delete,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                     onTap: _deleteAllSchedules,
                   ),
               ],
