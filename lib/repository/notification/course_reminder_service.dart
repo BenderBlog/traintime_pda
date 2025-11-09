@@ -67,7 +67,6 @@ class CourseReminderService extends NotificationService {
 
       final int weekIndex = payload['weekIndex'] ?? 0;
 
-      // TODO: This function will fail if the app is started from cold state.
       final navigator = preference.debuggerKey.currentState;
       if (navigator != null) {
         navigator.push(

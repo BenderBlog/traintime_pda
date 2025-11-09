@@ -76,6 +76,11 @@ void main() async {
     releaseConfig: preference.catcherOptions,
     navigatorKey: preference.debuggerKey,
   );
+
+  // Handle app launch from notification
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await CourseReminderService().handleAppLaunchFromNotification();
+  });
 }
 
 class MyApp extends StatefulWidget {

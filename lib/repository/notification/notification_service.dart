@@ -84,6 +84,20 @@ abstract class NotificationService {
   /// taps on a notification.
   void handleNotificationTap(NotificationResponse response);
 
+  /// Handle app launch from notification tap.
+  /// 
+  /// This should be called during app startup to process any notification
+  /// that launched the app.
+  Future<void> handleAppLaunchFromNotification() async {
+    final NotificationAppLaunchDetails? launchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    if (launchDetails != null &&
+        launchDetails.didNotificationLaunchApp &&
+        launchDetails.notificationResponse != null) {
+      handleNotificationTap(launchDetails.notificationResponse!);
+    }
+  }
+
   /// Abstract method to schedule a notification.
   ///
   /// Subclasses must implement this to provide specific details for
