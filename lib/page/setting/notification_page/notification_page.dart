@@ -24,6 +24,9 @@ class NotificationSettingsPage extends StatefulWidget {
       _NotificationSettingsPageState();
 }
 
+const kDefaultMinutesBeforeOptions = [5, 10, 15, 20, 30];
+const kDefaultDaysToScheduleOptions = [3, 7, 14, 30];
+
 class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   final _courseMinder = CourseReminderService();
 
@@ -40,8 +43,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     super.initState();
     // Load settings
     _isEnabled = preference.getBool(preference.Preference.enableCourseReminder);
-    _minutesBefore = preference.getInt(preference.Preference.minutesBefore);
-    _daysToSchedule = preference.getInt(preference.Preference.daysToSchedule);
+
+    _minutesBefore = preference.getInt(preference.Preference.courseReminderMinutesBefore);
+    _daysToSchedule = preference.getInt(preference.Preference.courseReminderDaysToSchedule);
+
+    if (kDefaultMinutesBeforeOptions.contains(_minutesBefore) ==
+        false) {
+      _minutesBefore = 5;
+    }
+
+    if (kDefaultDaysToScheduleOptions.contains(_daysToSchedule) ==
+        false) {
+      _daysToSchedule = 7;
+    }
 
     _loadSettings();
   }
@@ -271,7 +285,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _minutesBefore = value;
     });
 
-    await preference.setInt(preference.Preference.minutesBefore, value);
+    await preference.setInt(preference.Preference.courseReminderMinutesBefore, value);
 
     // If the notification has been enabled, reschedule
     if (_isEnabled) {
@@ -284,7 +298,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _daysToSchedule = value;
     });
 
-    await preference.setInt(preference.Preference.daysToSchedule, value);
+    await preference.setInt(preference.Preference.courseReminderDaysToSchedule, value);
 
     // If the notification has been enabled, reschedule
     if (_isEnabled) {
@@ -502,7 +516,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ),
                   trailing: DropdownButton<int>(
                     value: _minutesBefore,
-                    items: [5, 10, 15, 20, 30]
+                    items: kDefaultMinutesBeforeOptions
                         .map(
                           (value) => DropdownMenuItem(
                             value: value,
@@ -535,7 +549,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ),
                   trailing: DropdownButton<int>(
                     value: _daysToSchedule,
-                    items: [3, 7, 14, 30]
+                    items: kDefaultDaysToScheduleOptions
                         .map(
                           (value) => DropdownMenuItem(
                             value: value,

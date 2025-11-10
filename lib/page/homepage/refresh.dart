@@ -20,7 +20,6 @@ import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/schoolnet_session.dart' as school_net;
-import 'package:watermeter/repository/preference.dart' as preference;
 
 DateTime updateTime = DateTime.now();
 
@@ -109,28 +108,13 @@ Future<void> update({
     }),
   ]);
 
-  // 验证和更新课程通知
-  _validateCourseNotifications();
-}
-
-/// 验证和更新课程通知（在后台静默执行）
-Future<void> _validateCourseNotifications() async {
-  try {
-    // 检查通知是否启用
-    final isEnabled = preference.prefs.getBool('notification_enabled') ?? false;
-    if (!isEnabled) {
-      return;
-    }
-
-    final courseReminder = CourseReminderService();
-    await courseReminder.initialize();
-    await courseReminder.validateAndUpdateNotifications();
-
-    log.info('[_validateCourseNotifications] Course notifications validated successfully');
-  } catch (e, stackTrace) {
-    log.error('[_validateCourseNotifications] Failed to validate course notifications', e, stackTrace);
-    // 静默失败，不影响主流程
+  if (CourseReminderService().isInitialized) {
+    CourseReminderService().validateAndUpdateNotifications();
+  } else {
+    await CourseReminderService().initialize();
+    CourseReminderService().validateAndUpdateNotifications();
   }
+  
 }
 
 /// Originally updateOnAppResumed

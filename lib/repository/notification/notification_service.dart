@@ -32,6 +32,8 @@ abstract class NotificationService {
   @protected
   bool initialized = false;
 
+  bool get isInitialized => initialized;
+
   /// Initializes the notification service.
   ///
   /// This must be called before any other methods. It sets up the

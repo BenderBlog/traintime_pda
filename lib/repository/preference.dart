@@ -73,12 +73,12 @@ enum Preference {
     key: "enableCourseReminder",
     type: "bool",
   ), // 课程提醒开关
-  minutesBefore(
-    key: "minutesBefore",
+  courseReminderMinutesBefore(
+    key: "courseReminderMinutesBefore",
     type: "int",
   ), // 课程提前提醒时间
-  daysToSchedule(
-    key: "daysToSchedule",
+  courseReminderDaysToSchedule(
+    key: "courseReminderDaysToSchedule",
     type: "int",
   ); // 预设提醒天数
 

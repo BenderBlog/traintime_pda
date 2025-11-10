@@ -22,15 +22,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/network_session.dart' as repo_general;
-import 'package:watermeter/repository/notification/notification_registrar.dart'
-    show registeredNotificationServices;
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
 void main() async {
   // Make sure the library is initialized.
@@ -60,10 +58,19 @@ void main() async {
   );
 
   // Initialize notification service
-  for (var service in registeredNotificationServices) {
-    await service.initialize();
-  }
+  CourseReminderService().initialize();
   log.info("Notification service initialized.");
+
+  // Validate and update notifications on app start (checks locale changes, invalid notifications, etc.)
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    try {
+      await CourseReminderService().initialize();
+      await CourseReminderService().validateAndUpdateNotifications();
+      log.info("Notifications validated and updated on app start.");
+    } catch (e, stackTrace) {
+      log.error("Failed to validate notifications on app start", e, stackTrace);
+    }
+  });
 
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
@@ -83,9 +90,7 @@ void main() async {
 
   // Handle app launch from notification
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-    for (var service in registeredNotificationServices) {
-      await service.handleAppLaunchFromNotification();
-    }
+    CourseReminderService().handleAppLaunchFromNotification();
   });
 }
 
