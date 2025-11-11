@@ -57,10 +57,6 @@ void main() async {
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
 
-  // Initialize notification service
-  CourseReminderService().initialize();
-  log.info("Notification service initialized.");
-
   // Validate and update notifications on app start (checks locale changes, invalid notifications, etc.)
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     try {
