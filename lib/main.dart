@@ -57,17 +57,6 @@ void main() async {
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
 
-  // Validate and update notifications on app start (checks locale changes, invalid notifications, etc.)
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    try {
-      await CourseReminderService().initialize();
-      await CourseReminderService().validateAndUpdateNotifications();
-      log.info("Notifications validated and updated on app start.");
-    } catch (e, stackTrace) {
-      log.error("Failed to validate notifications on app start", e, stackTrace);
-    }
-  });
-
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
 

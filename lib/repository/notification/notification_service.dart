@@ -84,6 +84,9 @@ abstract class NotificationService {
   ///
   /// Subclasses must implement this to define behavior when a user
   /// taps on a notification.
+  /// 
+  /// If you wanna use this method, please call
+  /// [handleAppLaunchFromNotification] of your instance to make it work.
   void handleNotificationTap(NotificationResponse response);
 
   /// Handle app launch from notification tap.
