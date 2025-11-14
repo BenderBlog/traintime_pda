@@ -11,8 +11,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
 import 'package:watermeter/repository/permission_handler/exact_alarm_permission_handler.dart';
@@ -232,7 +234,7 @@ class CourseReminderService extends NotificationService
     }
   }
 
-  /// Generate the notification ID
+  /// Generate the notification ID for course
   int _generateNotificationId(int weekday, int startClass, int weekIndex) {
     return _notificationIdPrefix * 10000 +
         weekday * 10000 +
@@ -307,8 +309,7 @@ class CourseReminderService extends NotificationService
     return locale;
   }
 
-  /// Schedule notification by the course data
-  Future<void> scheduleNotificationsFromCourseData({
+  Future<void> _scheduleNotificationFromCourseData({
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
@@ -441,6 +442,148 @@ class CourseReminderService extends NotificationService
         stackTrace,
       );
       rethrow;
+    }
+  }
+
+  Future<void> _scheduleNotificationFromExperimentData({
+    int daysToSchedule = 7,
+    int minutesBefore = 5,
+  }) async {
+    log.info(
+      '[CourseReminderService] [scheduleNotificationsFromExperimentData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
+    );
+    try {
+      ExperimentController controller;
+      try {
+        controller = Get.find<ExperimentController>();
+      } catch (e) {
+        log.error(
+          '[CourseReminderService] [scheduleNotificationsFromExperimentData] ExperimentController not found',
+          e,
+        );
+        return;
+      }
+
+      final List<ExperimentData> experiments = controller.data;
+
+      if (experiments.isEmpty) {
+        log.warning('[CourseReminderService] [scheduleNotificationsFromExperimentData] Experiment data not available, cannot schedule notifications');
+        return;
+      }
+
+      DateTime now = DateTime.now();
+      DateTime endDate = now.add(Duration(days: daysToSchedule));
+
+      log.info(
+        '[CourseReminderService] [scheduleNotificationsFromExperimentData] Scheduling experiments from now until ${endDate.toString()}',
+      );
+
+      int scheduledCount = 0;
+
+      for (int experimentIndex = 0; experimentIndex < experiments.length; experimentIndex++) {
+        final experiment = experiments[experimentIndex];
+
+        for (int timeRangeIndex = 0; timeRangeIndex < experiment.timeRanges.length; timeRangeIndex++) {
+          final timeRange = experiment.timeRanges[timeRangeIndex];
+          final experimentStartTime = timeRange.$1;
+
+          // Skip if experiment is in the past or beyond the schedule range
+          if (experimentStartTime.isBefore(now) || experimentStartTime.isAfter(endDate)) {
+            continue;
+          }
+
+          DateTime notificationTime = experimentStartTime.subtract(
+            Duration(minutes: minutesBefore),
+          );
+
+          // Skip if notification time is in the past
+          if (notificationTime.isBefore(now)) {
+            continue;
+          }
+
+          // Use a unique ID based on experiment start time to avoid conflicts
+          // Format: prefix + hash of (experimentIndex, timeRangeIndex, startTime)
+          int notificationId = _notificationIdPrefix * 10000 +
+              (experimentIndex * 1000 + timeRangeIndex) % 100000000;
+
+          String locale = _getCurrentLocale();
+
+          // Use course_reminder translation keys to treat experiments as courses
+          String title = NonUII18n.translate(
+            locale,
+            'course_reminder.title',
+            translateParams: {'name': experiment.name},
+          );
+
+          String body = NonUII18n.translate(
+            locale,
+            'course_reminder.body',
+            translateParams: {'time': minutesBefore.toString()},
+          );
+
+          if (experiment.classroom.isNotEmpty) {
+            body +=
+                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": experiment.classroom})}';
+          }
+          if (experiment.teacher.isNotEmpty) {
+            body +=
+                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": experiment.teacher})}';
+          }
+
+          Map<String, dynamic> payload = {
+            'type': 'course_reminder',
+            'className': experiment.name,
+            'experimentIndex': experimentIndex,
+            'timeRangeIndex': timeRangeIndex,
+            'isExperiment': true,
+          };
+
+          await scheduleNotification(
+            id: notificationId,
+            title: title,
+            body: body,
+            scheduledTime: notificationTime,
+            payload: jsonEncode(payload),
+          );
+
+          scheduledCount++;
+        }
+      }
+
+      log.info('[CourseReminderService] [scheduleNotificationsFromExperimentData] Scheduled $scheduledCount experiment reminder notifications');
+    } catch (e, stackTrace) {
+      log.error(
+        '[CourseReminderService] [scheduleNotificationsFromExperimentData] Failed to schedule experiment reminder notifications',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Schedule notification by the course data (includes experiments)
+  Future<void> scheduleNotificationsFromCourseData({
+    int daysToSchedule = 7,
+    int minutesBefore = 5,
+  }) async {
+    try {
+      // Schedule course and experiment notifications in parallel
+      await Future.wait([
+        _scheduleNotificationFromCourseData(
+          daysToSchedule: daysToSchedule,
+          minutesBefore: minutesBefore,
+        ),
+        if (preference.getBool(preference.Preference.courseReminderEnableExperimentNotifications)) _scheduleNotificationFromExperimentData(
+          daysToSchedule: daysToSchedule,
+          minutesBefore: minutesBefore,
+        ),
+      ]);
+    } catch (e, stackTrace) {
+      log.error(
+        '[CourseReminderService] [scheduleNotificationsFromCourseData] Failed to schedule notifications from course data',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -580,13 +723,13 @@ class CourseReminderService extends NotificationService
     }
   }
 
-  /// Cancel all the course reminder notification
+  /// Cancel all the course reminder notification (includes experiments)
   Future<void> cancelAllCourseNotifications() async {
     try {
       final pendingNotifications = await getPendingNotifications();
       final courseNotifications = pendingNotifications.where((n) {
-        final parsed = _parseNotificationId(n.id);
-        return parsed[0] != -1;
+        // All notifications with IDs starting with _notificationIdPrefix are course-related
+        return n.id >= _notificationIdPrefix * 10000;
       });
 
       for (var notification in courseNotifications) {
@@ -594,7 +737,7 @@ class CourseReminderService extends NotificationService
       }
 
       log.info(
-        'Cancelled ${courseNotifications.length} course reminder notifications',
+        'Cancelled ${courseNotifications.length} course reminder notifications (includes experiments)',
       );
     } catch (e, stackTrace) {
       log.error('Failed to cancel course notifications', e, stackTrace);
@@ -648,13 +791,13 @@ class CourseReminderService extends NotificationService
     };
   }
 
-  /// Get the number of scheduled course reminder notifications
+  /// Get the number of scheduled course reminder notifications (includes experiments)
   Future<int> getPendingCourseNotificationsCount() async {
     try {
       final pendingNotifications = await getPendingNotifications();
       return pendingNotifications.where((n) {
-        final parsed = _parseNotificationId(n.id);
-        return parsed[0] != -1;
+        // All notifications with IDs starting with _notificationIdPrefix are course-related
+        return n.id >= _notificationIdPrefix * 10000;
       }).length;
     } catch (e, stackTrace) {
       log.error('Failed to get pending notifications count', e, stackTrace);

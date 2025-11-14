@@ -37,23 +37,29 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   int _daysToSchedule = 7;
   bool _isLoading = true;
   int _pendingCount = 0;
+  bool _enableExperimentNotifications = false;
 
   @override
   void initState() {
     super.initState();
     // Load settings
     _isEnabled = preference.getBool(preference.Preference.enableCourseReminder);
+    _enableExperimentNotifications = preference.getBool(
+      preference.Preference.courseReminderEnableExperimentNotifications,
+    );
 
-    _minutesBefore = preference.getInt(preference.Preference.courseReminderMinutesBefore);
-    _daysToSchedule = preference.getInt(preference.Preference.courseReminderDaysToSchedule);
+    _minutesBefore = preference.getInt(
+      preference.Preference.courseReminderMinutesBefore,
+    );
+    _daysToSchedule = preference.getInt(
+      preference.Preference.courseReminderDaysToSchedule,
+    );
 
-    if (kDefaultMinutesBeforeOptions.contains(_minutesBefore) ==
-        false) {
+    if (kDefaultMinutesBeforeOptions.contains(_minutesBefore) == false) {
       _minutesBefore = 5;
     }
 
-    if (kDefaultDaysToScheduleOptions.contains(_daysToSchedule) ==
-        false) {
+    if (kDefaultDaysToScheduleOptions.contains(_daysToSchedule) == false) {
       _daysToSchedule = 7;
     }
 
@@ -285,7 +291,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _minutesBefore = value;
     });
 
-    await preference.setInt(preference.Preference.courseReminderMinutesBefore, value);
+    await preference.setInt(
+      preference.Preference.courseReminderMinutesBefore,
+      value,
+    );
 
     // If the notification has been enabled, reschedule
     if (_isEnabled) {
@@ -298,7 +307,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       _daysToSchedule = value;
     });
 
-    await preference.setInt(preference.Preference.courseReminderDaysToSchedule, value);
+    await preference.setInt(
+      preference.Preference.courseReminderDaysToSchedule,
+      value,
+    );
 
     // If the notification has been enabled, reschedule
     if (_isEnabled) {
@@ -501,6 +513,41 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             remaining: const [],
             bottomRow: Column(
               children: [
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.experiment_reminder',
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      'setting.notification_page.experiment_reminder_hint',
+                    ),
+                  ),
+                  trailing: Switch(
+                    value: _enableExperimentNotifications,
+                    onChanged: (value) async {
+                      setState(() {
+                        _enableExperimentNotifications = value;
+                      });
+                      
+                      await preference.setBool(
+                        preference
+                            .Preference
+                            .courseReminderEnableExperimentNotifications,
+                        value,
+                      );
+                      
+                      if (_isEnabled) {
+                        // Reschedule notifications to include/exclude experiments
+                        await _rescheduleNotifications();
+                      }
+                    },
+                  ),
+                ),
+                const Divider(),
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(

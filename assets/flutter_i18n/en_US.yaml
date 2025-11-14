@@ -598,6 +598,8 @@ setting:
       permission_granted_msg: "Permission granted"
       permission_denied_msg: "Permission denied, please enable it in system settings"
       reminder_section: "Reminder Settings"
+      experiment_reminder: "Include the physics experiments"
+      experiment_reminder_hint: "Enable this option to add the physics experiment to the Pre-class Reminder"
       minutes_before: "Advance Reminder Time"
       minutes_before_hint: "The time setting for pre-class reminders"
       minutes_unit: "minutes"

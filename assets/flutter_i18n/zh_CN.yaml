@@ -585,6 +585,8 @@ setting:
         permission_denied_msg: "权限被拒绝，请在系统设置中开启"
         # 提醒设置
         reminder_section: "提醒设置"
+        experiment_reminder: "将物理实验加入课程提醒"
+        experiment_reminder_hint: "将物理实验的时间安排一并加入课前提醒系统"
         minutes_before: "提前提醒时间"
         minutes_before_hint: "课前提前提醒的时间设置"
         minutes_unit: "分钟"

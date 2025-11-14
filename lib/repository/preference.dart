@@ -80,7 +80,11 @@ enum Preference {
   courseReminderDaysToSchedule(
     key: "courseReminderDaysToSchedule",
     type: "int",
-  ); // 预设提醒天数
+  ), // 预设提醒天数
+  courseReminderEnableExperimentNotifications(
+    key: "courseReminderEnableExperimentNotifications",
+    type: "bool",
+  ); // 是否启用实验提醒
 
   const Preference({required this.key, this.type = "String"});
 
