@@ -242,21 +242,6 @@ class CourseReminderService extends NotificationService
         weekIndex;
   }
 
-  /// Parse Notification ID
-  List<int> _parseNotificationId(int id) {
-    if (id < _notificationIdPrefix * 10000) {
-      return [-1, -1, -1];
-    }
-
-    int remaining = id - _notificationIdPrefix * 10000;
-    int weekday = remaining ~/ 10000;
-    remaining = remaining % 10000;
-    int startClass = remaining ~/ 100;
-    int weekIndex = remaining % 100;
-
-    return [weekday, startClass, weekIndex];
-  }
-
   /// Calculate the start time of the class
   DateTime _calculateClassStartTime(
     DateTime semesterStartDate,
@@ -620,104 +605,40 @@ class CourseReminderService extends NotificationService
         return;
       }
 
+      // Load configuration
+      final config = await _loadScheduleConfig();
+      final int daysToSchedule = config?['daysToSchedule'] ?? 7;
+      final int minutesBefore = config?['minutesBefore'] ?? 5;
+      
       // Check if locale has changed
       final currentLocale = _getCurrentLocale();
-      final config = await _loadScheduleConfig();
+      final lastLocale = config?['lastLocale'] as String?;
       
-      if (config != null && config['lastLocale'] != null) {
-        final lastLocale = config['lastLocale'] as String;
-        
-        if (lastLocale != currentLocale) {
-          log.info(
-            '[CourseReminderService] [validateAndUpdateNotifications] Locale changed from $lastLocale to $currentLocale, rescheduling all notifications...',
-          );
-          
-          await cancelAllCourseNotifications();
-          await scheduleNotificationsFromCourseData(
-            daysToSchedule: config['daysToSchedule'] ?? 7,
-            minutesBefore: config['minutesBefore'] ?? 5,
-          );
-          
-          log.info(
-            '[CourseReminderService] [validateAndUpdateNotifications] All notifications rescheduled with new locale',
-          );
-          return;
-        }
+      if (lastLocale != null && lastLocale != currentLocale) {
+        log.info(
+          '[CourseReminderService] [validateAndUpdateNotifications] Locale changed from $lastLocale to $currentLocale',
+        );
       }
 
-      final pendingNotifications = await getPendingNotifications();
-      final courseNotifications = pendingNotifications.where((n) {
-        final parsed = _parseNotificationId(n.id);
-        return parsed[0] != -1;
-      }).toList();
+      // Simplified approach: cancel all and reschedule
+      // This handles all cases: locale change, course updates, expired notifications, etc.
+      log.info(
+        '[CourseReminderService] [validateAndUpdateNotifications] Cancelling all existing notifications...',
+      );
+      await cancelAllCourseNotifications();
 
       log.info(
-        '[CourseReminderService] [validateAndUpdateNotifications] Found ${courseNotifications.length} pending course reminder notifications',
+        '[CourseReminderService] [validateAndUpdateNotifications] Rescheduling notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
+      );
+      await scheduleNotificationsFromCourseData(
+        daysToSchedule: daysToSchedule,
+        minutesBefore: minutesBefore,
       );
 
-      DateTime now = DateTime.now();
-      DateTime semesterStartDate = DateTime.parse(data.termStartDay);
-
-      List<int> invalidNotificationIds = [];
-      for (var notification in courseNotifications) {
-        List<int> parsed = _parseNotificationId(notification.id);
-        int weekday = parsed[0];
-        int startClass = parsed[1];
-        int weekIndex = parsed[2];
-
-        bool found = data.timeArrangement.any((ta) {
-          if (ta.day == weekday &&
-              ta.start == startClass &&
-              weekIndex < ta.weekList.length &&
-              ta.weekList[weekIndex]) {
-            DateTime classStartTime = _calculateClassStartTime(
-              semesterStartDate,
-              weekIndex,
-              weekday,
-              startClass,
-            );
-            return classStartTime.isAfter(now);
-          }
-          return false;
-        });
-
-        if (!found) {
-          invalidNotificationIds.add(notification.id);
-        }
-      }
-
-      for (var id in invalidNotificationIds) {
-        await cancelNotification(id);
-      }
-
-      if (invalidNotificationIds.isNotEmpty) {
-        log.info(
-          '[CourseReminderService] [validateAndUpdateNotifications] Cancelled ${invalidNotificationIds.length} invalid notifications',
-        );
-      }
-
-      // Check if we need to schedule additional notifications
-      // Use config if available, otherwise use default values
-      int daysToSchedule = config?['daysToSchedule'] ?? 7;
-      int minutesBefore = config?['minutesBefore'] ?? 5;
-      
-      DateTime endDate = now.add(Duration(days: daysToSchedule));
-      int endWeek = controller.getCurrentWeek(endDate);
-
-      int maxWeekInNotifications = courseNotifications
-          .where((n) => !invalidNotificationIds.contains(n.id))
-          .map((n) => _parseNotificationId(n.id)[2])
-          .fold(-1, (max, week) => week > max ? week : max);
-
-      if (maxWeekInNotifications < endWeek) {
-        log.info(
-          '[CourseReminderService] [validateAndUpdateNotifications] Scheduling additional notifications to reach week $endWeek',
-        );
-        await scheduleNotificationsFromCourseData(
-          daysToSchedule: daysToSchedule,
-          minutesBefore: minutesBefore,
-        );
-      }
+      final newCount = await getPendingCourseNotificationsCount();
+      log.info(
+        '[CourseReminderService] [validateAndUpdateNotifications] Successfully rescheduled $newCount notifications',
+      );
     } catch (e, stackTrace) {
       log.error('[CourseReminderService] [validateAndUpdateNotifications] Failed to validate and update notifications', e, stackTrace);
     }

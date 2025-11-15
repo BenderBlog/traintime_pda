@@ -16,6 +16,8 @@ import 'package:watermeter/page/setting/notification_page/notification_test_widg
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
+const renderTestWidgetForce = true;
+
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
 
@@ -715,7 +717,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ],
             ),
           ),
-          if (kDebugMode) const NotificationTestWidget(),
+          if (kDebugMode || renderTestWidgetForce) const NotificationTestWidget(),
         ],
       ),
     );
