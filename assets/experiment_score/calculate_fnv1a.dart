@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:image/image.dart' as img;
@@ -35,8 +37,7 @@ void main(List<String> arguments) async {
 
         // 计算哈希值
         final hash = await _calculatePixelFNV1A(entity);
-        fileHashes[relativePath.substring(0, relativePath.length - 4)] =
-            hash;
+        fileHashes[relativePath.substring(0, relativePath.length - 4)] = hash;
       }
     }
 
@@ -76,20 +77,16 @@ Future<int> _calculatePixelFNV1A(File file) async {
       final a = pixel.a.toInt();
       if (a == 255) {
         // ignore the transparent pixel to reduce the calculation
-        pixelBytes.addAll([
-          pixel.r.toInt(),
-          pixel.g.toInt(),
-          pixel.b.toInt(),
-        ]);
+        pixelBytes.addAll([pixel.r.toInt(), pixel.g.toInt(), pixel.b.toInt()]);
       }
     }
   }
 
-  var _hash = 0x811C9DC5;
+  var hash = 0x811C9DC5;
   for (var p in pixelBytes) {
-    _hash ^= p;
-    _hash = (_hash * 0x01000193) & 0xFFFFFFFF;
+    hash ^= p;
+    hash = (hash * 0x01000193) & 0xFFFFFFFF;
   }
 
-  return _hash;
+  return hash;
 }
