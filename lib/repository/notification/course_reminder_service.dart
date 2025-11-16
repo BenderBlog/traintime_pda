@@ -266,6 +266,31 @@ class CourseReminderService extends NotificationService
     );
   }
 
+  /// Calculate which class period the time corresponds to
+  /// Returns the class index (1-based), or 1 if no match found
+  int _calculateClassPeriodFromTime(DateTime time) {
+    final timeInMinutes = time.hour * 60 + time.minute;
+    
+    // Find the closest matching class start time
+    int closestClass = 1;
+    int minDifference = 999999;
+    
+    for (int i = 0; i < timeList.length; i += 2) {
+      final classIndex = (i ~/ 2) + 1; // Convert to 1-based class number
+      final timeStr = timeList[i];
+      final parts = timeStr.split(':');
+      final classStartMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      
+      final difference = (timeInMinutes - classStartMinutes).abs();
+      if (difference < minDifference) {
+        minDifference = difference;
+        closestClass = classIndex;
+      }
+    }
+    
+    return closestClass;
+  }
+
   String _getCurrentLocale() {
     // Get current locale from preference
     String locale = preference.getString(preference.Preference.localization);
@@ -402,8 +427,6 @@ class CourseReminderService extends NotificationService
             'type': 'course_reminder',
             'className': classDetail.name,
             'weekIndex': weekIndex,
-            'weekday': timeArrangement.day,
-            'startClass': timeArrangement.start,
           };
 
           await scheduleNotification(
@@ -438,9 +461,9 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [scheduleNotificationsFromExperimentData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
     try {
-      ExperimentController controller;
+      ExperimentController experimentController;
       try {
-        controller = Get.find<ExperimentController>();
+        experimentController = Get.find<ExperimentController>();
       } catch (e) {
         log.error(
           '[CourseReminderService] [scheduleNotificationsFromExperimentData] ExperimentController not found',
@@ -449,7 +472,17 @@ class CourseReminderService extends NotificationService
         return;
       }
 
-      final List<ExperimentData> experiments = controller.data;
+      // Get ClassTableController to calculate week index
+      ClassTableController? classTableController;
+      try {
+        classTableController = Get.find<ClassTableController>();
+      } catch (e) {
+        log.warning(
+          '[CourseReminderService] [scheduleNotificationsFromExperimentData] ClassTableController not found, week index will not be calculated',
+        );
+      }
+
+      final List<ExperimentData> experiments = experimentController.data;
 
       if (experiments.isEmpty) {
         log.warning('[CourseReminderService] [scheduleNotificationsFromExperimentData] Experiment data not available, cannot schedule notifications');
@@ -486,10 +519,20 @@ class CourseReminderService extends NotificationService
             continue;
           }
 
+          // Calculate week index based on experiment start time
+          int weekIndex = 0;
+          if (classTableController != null) {
+            weekIndex = classTableController.getCurrentWeek(experimentStartTime);
+            if (weekIndex < 0) weekIndex = 0;
+          }
+
+          int weekday = experimentStartTime.weekday; // 1=Mon, 7=Sun
+          
+          // Calculate which class period this experiment corresponds to
+          int startClass = _calculateClassPeriodFromTime(experimentStartTime);
+
           // Use a unique ID based on experiment start time to avoid conflicts
-          // Format: prefix + hash of (experimentIndex, timeRangeIndex, startTime)
-          int notificationId = _notificationIdPrefix * 10000 +
-              (experimentIndex * 1000 + timeRangeIndex) % 100000000;
+          int notificationId = _generateNotificationId(weekday, startClass, weekIndex);
 
           String locale = _getCurrentLocale();
 
@@ -518,9 +561,7 @@ class CourseReminderService extends NotificationService
           Map<String, dynamic> payload = {
             'type': 'course_reminder',
             'className': experiment.name,
-            'experimentIndex': experimentIndex,
-            'timeRangeIndex': timeRangeIndex,
-            'isExperiment': true,
+            'weekIndex': weekIndex,
           };
 
           await scheduleNotification(

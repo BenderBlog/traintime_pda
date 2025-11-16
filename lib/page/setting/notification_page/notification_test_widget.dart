@@ -124,8 +124,6 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
         'type': 'course_reminder',
         'className': 'test',
         'weekIndex': 9,
-        'weekday': 1,
-        'startClass': 1,
       };
 
       await _courseReminder.scheduleNotification(
