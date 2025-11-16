@@ -1,11 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // This file is auto-generated from score images
-// Generated at: 2025-10-19T23:51:54.986680
+// Generated at: 2025-11-15T22:39:59.843786
 
 /// Pre-computed FNV1a hashes for experiment score images
 /// Maps score label to FNV1a hash value
 const Map<String, int> kScoreHashes = {
   '0': 3531432063,
+  '5': 3417863369,
   '5.5': 1879675493,
   '6': 1633340036,
   '6.5': 406889604,
