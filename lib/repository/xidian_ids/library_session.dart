@@ -54,7 +54,11 @@ class LibrarySession extends IDSSession {
     },
   )..contentType = "application/json;charset=utf-8";
 
-  Future<List<BookInfo>> searchBook(String searchWord, int page) async {
+  Future<List<BookInfo>> searchBook(
+    String searchWord, 
+    int page, {
+    String searchField = "title",
+  }) async {
     if (searchWord.isEmpty) return [];
     var rawData = await dio
         .post(
@@ -62,7 +66,7 @@ class LibrarySession extends IDSSession {
           data: {
             "libraryId": 5,
             "searchWord": searchWord,
-            "searchFiled": "title",
+            "searchFiled": searchField,
             "page": page,
             "searchLocationStatus": 1,
           },

@@ -337,6 +337,13 @@ library:
   title: 圖書館信息
   borrow_state_title: 借書狀態
   search_book_title: 查詢藏書
+  search_field_title: 搜索欄位
+  search_field_keyword_option: 任意詞
+  search_field_title_option: 標題
+  search_field_author_option: 作者
+  search_field_isbn_option: ISBN
+  search_field_barcode_option: 條碼號
+  search_field_callno_option: 索書號
   not_provided: 未提供相關信息
   author: '作者 '
   publish_house: '出版社 '
