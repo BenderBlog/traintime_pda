@@ -61,17 +61,13 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
     try {
       _allNotifications = await _courseReminder.getPendingNotifications();
 
-      const int notificationIdPrefix = 10000;
-      final int minId = notificationIdPrefix * 10000;
-      final int maxId = minId + 100000;
+      _courseNotifications = _allNotifications.where(
+        (n) => CourseReminderService.isCourseReminderNotificationId(n.id),
+      ).toList();
 
-      _courseNotifications = _allNotifications.where((n) {
-        return n.id >= minId && n.id < maxId;
-      }).toList();
-
-      _otherNotifications = _allNotifications.where((n) {
-        return n.id < minId || n.id >= maxId;
-      }).toList();
+      _otherNotifications = _allNotifications.where(
+        (n) => !CourseReminderService.isCourseReminderNotificationId(n.id),
+      ).toList();
 
       if (mounted) setState(() {});
     } catch (e) {

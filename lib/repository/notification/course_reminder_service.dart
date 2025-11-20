@@ -5,6 +5,7 @@
 // Course reminder notification service implementation
 
 import 'dart:convert';
+import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -38,6 +39,12 @@ class CourseReminderService extends NotificationService
   }) {
     WidgetsBinding.instance.addObserver(this);
   }
+
+  static const int _notificationIdPrefix = 10;
+  static const int _notificationIdBase = 10000000;
+  static const int _notificationRandomMin = 10;
+  static const int _notificationRandomRange = 90;
+  final Random _random = Random();
 
   @override
   void didChangeLocales(List<Locale>? locales) {
@@ -105,8 +112,6 @@ class CourseReminderService extends NotificationService
       );
     }
   }
-
-  static const int _notificationIdPrefix = 10000;
 
   @override
   void handleNotificationTap(NotificationResponse response) {
@@ -236,10 +241,23 @@ class CourseReminderService extends NotificationService
 
   /// Generate the notification ID for course
   int _generateNotificationId(int weekday, int startClass, int weekIndex) {
-    return _notificationIdPrefix * 10000 +
+    // return _notificationIdPrefix * 10000 +
+    //     weekday * 10000 +
+    //     startClass * 100 +
+    //     weekIndex;
+    final randomSuffix =
+        _random.nextInt(_notificationRandomRange) + _notificationRandomMin;
+    return _notificationIdPrefix * _notificationIdBase +
+        weekIndex * 100000 +
         weekday * 10000 +
         startClass * 100 +
-        weekIndex;
+        randomSuffix;
+  }
+
+  static bool isCourseReminderNotificationId(int id) {
+    final int minId = _notificationIdPrefix * _notificationIdBase;
+    final int maxId = (_notificationIdPrefix + 1) * _notificationIdBase;
+    return id >= minId && id < maxId;
   }
 
   /// Calculate the start time of the class
@@ -689,10 +707,9 @@ class CourseReminderService extends NotificationService
   Future<void> cancelAllCourseNotifications() async {
     try {
       final pendingNotifications = await getPendingNotifications();
-      final courseNotifications = pendingNotifications.where((n) {
-        // All notifications with IDs starting with _notificationIdPrefix are course-related
-        return n.id >= _notificationIdPrefix * 10000;
-      });
+      final courseNotifications = pendingNotifications.where(
+        (n) => CourseReminderService.isCourseReminderNotificationId(n.id),
+      );
 
       for (var notification in courseNotifications) {
         await cancelNotification(notification.id);
@@ -757,10 +774,9 @@ class CourseReminderService extends NotificationService
   Future<int> getPendingCourseNotificationsCount() async {
     try {
       final pendingNotifications = await getPendingNotifications();
-      return pendingNotifications.where((n) {
-        // All notifications with IDs starting with _notificationIdPrefix are course-related
-        return n.id >= _notificationIdPrefix * 10000;
-      }).length;
+      return pendingNotifications.where(
+        (n) => CourseReminderService.isCourseReminderNotificationId(n.id),
+      ).length;
     } catch (e, stackTrace) {
       log.error('Failed to get pending notifications count', e, stackTrace);
       return 0;
