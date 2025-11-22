@@ -606,6 +606,7 @@ setting:
         cancel_all_success: "已取消所有课前提醒"
         reschedule_success: "已重新安排 {count} 个课前提醒"
         reschedule_failed: "重新安排通知失败: {error}"
+    notification_debug_page: "通知服务调试页面"
     # 课表相关设置
     classtable_setting: "课表相关设置"
     background: "开启课表背景图"

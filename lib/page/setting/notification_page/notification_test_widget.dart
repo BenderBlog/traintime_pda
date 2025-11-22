@@ -9,22 +9,21 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/repository/notification/notification_service.dart';
 
 /// 通知测试组件 - 用于调试通知功能
 class NotificationTestWidget extends StatefulWidget {
-  const NotificationTestWidget({super.key});
+  final NotificationService notificationService;
+  const NotificationTestWidget({super.key, required this.notificationService});
 
   @override
   State<NotificationTestWidget> createState() => _NotificationTestWidgetState();
 }
 
 class _NotificationTestWidgetState extends State<NotificationTestWidget> {
-  final _courseReminder = CourseReminderService();
+  late final NotificationService _courseReminder;
 
   List<PendingNotificationRequest> _allNotifications = [];
-  List<PendingNotificationRequest> _courseNotifications = [];
-  List<PendingNotificationRequest> _otherNotifications = [];
   bool _isLoading = false;
 
   final TextEditingController _idController = TextEditingController();
@@ -37,10 +36,12 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   final TextEditingController _delayController = TextEditingController(
     text: '5',
   );
+  final TextEditingController _payloadController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _courseReminder = widget.notificationService;
     _loadNotifications();
   }
 
@@ -50,6 +51,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
     _titleController.dispose();
     _bodyController.dispose();
     _delayController.dispose();
+    _payloadController.dispose();
     super.dispose();
   }
 
@@ -60,15 +62,6 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
 
     try {
       _allNotifications = await _courseReminder.getPendingNotifications();
-
-      _courseNotifications = _allNotifications.where(
-        (n) => CourseReminderService.isCourseReminderNotificationId(n.id),
-      ).toList();
-
-      _otherNotifications = _allNotifications.where(
-        (n) => !CourseReminderService.isCourseReminderNotificationId(n.id),
-      ).toList();
-
       if (mounted) setState(() {});
     } catch (e) {
       if (mounted) {
@@ -99,9 +92,9 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
 
   Future<void> _cancelAll() async {
     try {
-      await _courseReminder.cancelAllCourseNotifications();
+      await _courseReminder.cancelAllNotifications();
       if (mounted) {
-        showToast(context: context, msg: '已清除所有课程通知');
+        showToast(context: context, msg: '已清除所有通知');
       }
       await _loadNotifications();
     } catch (e) {
@@ -155,18 +148,54 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
         return;
       }
 
+      final title = _titleController.text.trim();
+      if (title.isEmpty) {
+        showToast(context: context, msg: '请输入标题');
+        return;
+      }
+
+      final body = _bodyController.text.trim();
+      if (body.isEmpty) {
+        showToast(context: context, msg: '请输入内容');
+        return;
+      }
+
       final delay = int.tryParse(_delayController.text) ?? 5;
+      final payloadText = _payloadController.text.trim();
+
+      // 验证 payload JSON 格式（如果不为空）
+      String? payload;
+      if (payloadText.isNotEmpty) {
+        try {
+          jsonDecode(payloadText);
+          payload = payloadText;
+        } catch (e) {
+          if (mounted) {
+            showToast(context: context, msg: 'Payload 必须是有效的 JSON 格式');
+          }
+          return;
+        }
+      }
 
       await _courseReminder.scheduleNotification(
         id: id,
-        title: _titleController.text,
-        body: _bodyController.text,
+        title: title,
+        body: body,
         scheduledTime: DateTime.now().add(Duration(seconds: delay)),
+        payload: payload,
       );
 
       if (mounted) {
         showToast(context: context, msg: '已创建 ID:$id ($delay秒后)');
       }
+
+      // 清空表单
+      _idController.clear();
+      _titleController.text = '测试通知标题';
+      _bodyController.text = '这是一条测试通知内容';
+      _delayController.text = '5';
+      _payloadController.clear();
+
       await _loadNotifications();
     } catch (e) {
       if (mounted) {
@@ -179,7 +208,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   Widget build(BuildContext context) {
     return ReXCard(
       title: Text(
-        '通知调试工具(Release 模式隐藏)',
+        '通知调试工具(${widget.notificationService.runtimeType})',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ).padding(bottom: 8).center(),
       remaining: const [],
@@ -214,135 +243,14 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                         Icons.notifications,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildStatItem(
-                        '课程通知',
-                        _courseNotifications.length.toString(),
-                        Icons.school,
-                        color: Colors.blue,
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 const Divider(),
 
-                // 其他通知列表
-                if (_otherNotifications.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      '其他通知列表',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  ..._otherNotifications.map(
-                    (n) => Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'ID: ${n.id}',
-                                    style: const TextStyle(
-                                      fontFamily: 'monospace',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete_outline,
-                                    size: 18,
-                                  ),
-                                  onPressed: () => _cancelNotification(n.id),
-                                  tooltip: '删除',
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                              ],
-                            ),
-                            if (n.title != null) ...[
-                              const SizedBox(height: 4),
-                              const Text(
-                                '标题:',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                n.title!,
-                                style: const TextStyle(fontSize: 11),
-                              ),
-                            ],
-                            if (n.body != null) ...[
-                              const SizedBox(height: 4),
-                              const Text(
-                                '内容:',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                n.body!,
-                                style: const TextStyle(fontSize: 11),
-                                overflow: TextOverflow.clip,
-                              ),
-                            ],
-                            if (n.payload != null) ...[
-                              const SizedBox(height: 4),
-                              const Text(
-                                '载荷:',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                n.payload!,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontFamily: 'monospace',
-                                ),
-                                overflow: TextOverflow.clip,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Divider(),
-                ],
-
-                // 课程通知列表
-                if (_courseNotifications.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      '课程通知列表',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  ..._courseNotifications.map(
+                // 通知列表
+                if (_allNotifications.isNotEmpty) ...[
+                  ..._allNotifications.map(
                     (n) => Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: Padding(
@@ -432,7 +340,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                     child: OutlinedButton.icon(
                       onPressed: _cancelAll,
                       icon: const Icon(Icons.delete_sweep, size: 18),
-                      label: const Text('清除全部课程通知'),
+                      label: const Text('清除全部通知'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.red,
                       ),
@@ -443,7 +351,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                     padding: EdgeInsets.symmetric(vertical: 16),
                     child: Center(
                       child: Text(
-                        '暂无课程通知',
+                        '暂无通知',
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ),
@@ -563,6 +471,29 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                   ),
                   maxLines: 2,
                   style: const TextStyle(fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _payloadController,
+                  decoration: const InputDecoration(
+                    labelText: 'Payload (JSON)',
+                    hintText: '{"key": "value"}',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                  maxLines: 3,
+                  style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    '(可选) 必须是有效的 JSON 格式',
+                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(

@@ -4,7 +4,6 @@
 
 // Course reminder notification settings page
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
@@ -12,11 +11,8 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/setting/notification_page/notification_test_widget.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-
-const renderTestWidgetForce = true;
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -717,7 +713,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ],
             ),
           ),
-          if (kDebugMode || renderTestWidgetForce) const NotificationTestWidget(),
         ],
       ),
     );

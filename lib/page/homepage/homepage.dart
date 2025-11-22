@@ -57,9 +57,15 @@ class _MainPageState extends State<MainPage> {
       try {
         await CourseReminderService().initialize();
         await CourseReminderService().validateAndUpdateNotifications();
-        log.info("Notifications validated and updated after homepage initialization.");
+        log.info(
+          "Notifications validated and updated after homepage initialization.",
+        );
       } catch (e, stackTrace) {
-        log.error("Failed to validate notifications after homepage initialization", e, stackTrace);
+        log.error(
+          "Failed to validate notifications after homepage initialization",
+          e,
+          stackTrace,
+        );
       }
     });
   }

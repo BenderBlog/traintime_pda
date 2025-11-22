@@ -617,6 +617,7 @@ setting:
       cancel_all_success: "All pre-class reminders cancelled"
       reschedule_success: "Rescheduled {count} pre-class reminders"
       reschedule_failed: "Failed to reschedule notifications: {error}"
+      notification_debug_page: "Notification Services Debug Page"
    # 课表相关设置
    classtable_setting: "Class Schedule Related"
    background: "Background image"

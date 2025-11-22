@@ -17,6 +17,10 @@ import 'package:watermeter/repository/permission_handler/permission_handler_base
 /// This class provides a common interface and basic implementation for
 /// notification functionalities, intended to be extended by specific
 /// notification services (e.g., course reminders).
+/// 
+/// Attention: Every Subclass inherits from this should add the subclass 
+/// in the [NotificationRegistrar](./notification_registrar.dart)
+/// to make sure the initialization and event handle.
 abstract class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();

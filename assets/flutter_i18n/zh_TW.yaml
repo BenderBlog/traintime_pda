@@ -579,6 +579,7 @@ setting:
     cancel_all_success: 已取消所有課前提醒
     reschedule_success: 已重新安排 {count} 個課前提醒
     reschedule_failed: '重新安排通知失敗: {error}'
+  notification_debug_page: 通知服務調試頁面
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面
