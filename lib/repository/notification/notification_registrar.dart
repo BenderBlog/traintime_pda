@@ -29,7 +29,7 @@ class NotificationServiceRegistrar {
     if (!_notificationServices.contains(notificationService)) {
       _notificationServices.add(notificationService);
     }
-    log.info("[NotificationRegistrar][register] Register a NotificationService <${notificationService.runtimeType}>");
+    log.info("[NotificationRegistrar][register] Register a NotificationService <${notificationService.runtimeType.toString()}>");
   }
 
   /// The function for unregistering NotificationServices
@@ -39,9 +39,9 @@ class NotificationServiceRegistrar {
   bool unregister(NotificationService notificationService) {
     final isSuccess = _notificationServices.remove(notificationService);
     if (isSuccess) {
-      log.info("[NotificationRegistrar][unregister] Unregister a NotificationService <${notificationService.runtimeType}> successfully");
+      log.info("[NotificationRegistrar][unregister] Unregister a NotificationService <${notificationService.runtimeType.toString()}> successfully");
     } else {
-      log.warning("[NotificationRegistrar][unregister] Fail to unregister a NotificationService <${notificationService.runtimeType}>");
+      log.warning("[NotificationRegistrar][unregister] Fail to unregister a NotificationService <${notificationService.runtimeType.toString()}>");
     }
     return isSuccess;
   }

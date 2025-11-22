@@ -46,6 +46,57 @@ abstract class NotificationService {
     if (initialized) return;
 
     try {
+      // Check and request notification permission before initializing.
+      // We don't abort initialization if permission is denied, but we log
+      // warnings so callers can react accordingly.
+      try {
+        final hasPermission = await checkNotificationPermission();
+        if (!hasPermission) {
+          final granted = await requestNotificationPermission();
+          if (!granted) {
+            log.warning(
+              'Notification permission not granted for ${runtimeType.toString()}',
+            );
+          } else {
+            log.info(
+              'Notification permission granted for ${runtimeType.toString()}',
+            );
+          }
+        }
+      } catch (e, st) {
+        log.error(
+          'Failed to check/request notification permission for ${runtimeType.toString()}',
+          e,
+          st,
+        );
+      }
+
+      // On Android, also check/request the exact alarm permission which may
+      // be required for exact scheduling while idle.
+      if (Platform.isAndroid) {
+        try {
+          final hasExact = await checkExactAlarmPermission();
+          if (!hasExact) {
+            final grantedExact = await requestExactAlarmPermission();
+            if (!grantedExact) {
+              log.warning(
+                'Exact alarm permission not granted for ${runtimeType.toString()}',
+              );
+            } else {
+              log.info(
+                'Exact alarm permission granted for ${runtimeType.toString()}',
+              );
+            }
+          }
+        } catch (e, st) {
+          log.error(
+            'Failed to check/request exact alarm permission for ${runtimeType.toString()}',
+            e,
+            st,
+          );
+        }
+      }
+
       // Initialize time zone data
       tz.initializeTimeZones();
       final effectiveTimeZone = timeZone ?? 'Asia/Shanghai';

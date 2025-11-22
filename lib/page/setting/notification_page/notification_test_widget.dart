@@ -208,7 +208,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   Widget build(BuildContext context) {
     return ReXCard(
       title: Text(
-        '通知调试工具(${widget.notificationService.runtimeType})',
+        '通知调试工具(${widget.notificationService.runtimeType.toString()})',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ).padding(bottom: 8).center(),
       remaining: const [],
