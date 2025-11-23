@@ -1,6 +1,19 @@
 {
   "sourceLanguage" : "zh-Hans",
   "strings" : {
+    "%@" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "date_formatter" : {
       "comment" : "A date formatter",
       "extractionState" : "manual",
@@ -120,6 +133,9 @@
           }
         }
       }
+    },
+    "IsTomorrow Task" : {
+
     },
     "no_arrangement" : {
       "comment" : "No arrangement hint",

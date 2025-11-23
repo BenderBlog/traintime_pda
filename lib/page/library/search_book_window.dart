@@ -16,6 +16,51 @@ import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 
+enum SearchField {
+  keyWord,
+  title,
+  author,
+  isbn,
+  barcode,
+  callNo,
+}
+
+extension SearchFieldExtension on SearchField {
+  String get apiValue {
+    switch (this) {
+      case SearchField.keyWord:
+        return "keyWord";
+      case SearchField.title:
+        return "title";
+      case SearchField.isbn:
+        return "isbn";
+      case SearchField.author:
+        return "author";
+      case SearchField.barcode:
+        return "barcode";
+      case SearchField.callNo:
+        return "callNo";
+    }
+  }
+
+  String getLabel(BuildContext context) {
+    switch (this) {
+      case SearchField.keyWord:
+        return FlutterI18n.translate(context, "library.search_field_keyword_option");
+      case SearchField.title:
+        return FlutterI18n.translate(context, "library.search_field_title_option");
+      case SearchField.isbn:
+        return FlutterI18n.translate(context, "library.search_field_isbn_option");
+      case SearchField.author:
+        return FlutterI18n.translate(context, "library.search_field_author_option");
+      case SearchField.barcode:
+        return FlutterI18n.translate(context, "library.search_field_barcode_option");
+      case SearchField.callNo:
+        return FlutterI18n.translate(context, "library.search_field_callno_option");
+    }
+  }
+}
+
 class SearchBookWindow extends StatefulWidget {
   const SearchBookWindow({super.key});
 
@@ -27,6 +72,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
     with AutomaticKeepAliveClientMixin {
   var searchList = <BookInfo>[].obs;
   var search = "".obs;
+  var selectedSearchField = SearchField.keyWord.obs;
   int page = 1;
   bool noMore = false;
   var isSearching = false.obs;
@@ -55,6 +101,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
       List<BookInfo> get = await search_book.LibrarySession().searchBook(
         search.value,
         page,
+        searchField: selectedSearchField.value.apiValue,
       );
       if (get.isEmpty) {
         noMore = true;
@@ -78,6 +125,34 @@ class _SearchBookWindowState extends State<SearchBookWindow>
     return Scaffold(
       body: Column(
         children: [
+          // Search field selector and input
+          Row(
+            children: [
+              Obx(() => DropdownButtonFormField<SearchField>(
+                value: selectedSearchField.value,
+                decoration: InputDecoration(
+                  labelText: FlutterI18n.translate(
+                    context,
+                    "library.search_field_title",
+                  ),
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                ),
+                items: SearchField.values
+                    .map((SearchField field) => DropdownMenuItem<SearchField>(
+                      value: field,
+                      child: Text(field.getLabel(context)),
+                    ))
+                    .toList(),
+                onChanged: (SearchField? newValue) {
+                  if (newValue != null) {
+                    selectedSearchField.value = newValue;
+                  }
+                },
+              )).padding(horizontal: 8, vertical: 8).expanded(),
+              const SizedBox(width: 8),
+            ],
+          ).padding(horizontal: 8),
           TextFormField(
                 controller: text,
                 decoration: InputDecoration(
