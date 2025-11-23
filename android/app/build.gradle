@@ -46,6 +46,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -99,6 +100,14 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.20"
     implementation 'com.google.android.material:material:1.8.0'
+
+    // Core library desugaring for flutter_local_notifications
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+
+    // Add the WindowManager library to avoid crashing on Android 12L and above
+    // Ref. https://pub.dev/packages/flutter_local_notifications#-android-setup
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
 
     // Ref. https://github.com/tensorflow/flutter-tflite/issues/278
     implementation "org.tensorflow:tensorflow-lite-gpu-api:+"

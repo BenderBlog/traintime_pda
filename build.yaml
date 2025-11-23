@@ -12,6 +12,10 @@ targets:
         enabled: true
         generate_for:
           - pubspec.yaml         # 当 pubspec.yaml 改变时触发
+      watermeter|non_ui_i18n:
+        enabled: true
+        generate_for:
+          - assets/non_ui_i18n/README.md  # 使用 README.md 作为触发器，生成单个文件
         
 builders:
   score_hashes:
@@ -24,3 +28,14 @@ builders:
     build_to: source
     required_inputs:                             # 声明需要的资源文件
       - assets/experiment_score/scores/**
+
+  non_ui_i18n:
+    import: "tool/generators/non_ui_i18n_generator.dart"
+    builder_factories: ["nonUII18nBuilder"]
+    build_extensions:
+      README.md:                                    # 输入：README.md
+        - lib/generated/non_ui_i18n.g.dart         # 输出：统一的生成文件
+    auto_apply: root_package
+    build_to: source
+    required_inputs:
+      - assets/non_ui_i18n/**

@@ -22,6 +22,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/network_session.dart' as repo_general;
+import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
@@ -71,6 +72,21 @@ void main() async {
     releaseConfig: preference.catcherOptions,
     navigatorKey: preference.debuggerKey,
   );
+
+  // Initialize notification services
+  try {
+    await NotificationServiceRegistrar().initializeAllServices();
+
+    // Handle app launch from notification
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final services = NotificationServiceRegistrar().getAllServices();
+      await Future.wait(
+        services.map((service) => service.handleAppLaunchFromNotification()),
+      );
+    });
+  } catch (e) {
+    log.error('Failed to initialize notification services', e);
+  }
 }
 
 class MyApp extends StatefulWidget {

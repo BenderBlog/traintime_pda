@@ -23,6 +23,8 @@ import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
 import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
@@ -49,6 +51,23 @@ class _MainPageState extends State<MainPage> {
       controlFinishRefresh: true,
       controlFinishLoad: true,
     );
+
+    // Validate and update notifications after controllers are initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await CourseReminderService().initialize();
+        await CourseReminderService().validateAndUpdateNotifications();
+        log.info(
+          "Notifications validated and updated after homepage initialization.",
+        );
+      } catch (e, stackTrace) {
+        log.error(
+          "Failed to validate notifications after homepage initialization",
+          e,
+          stackTrace,
+        );
+      }
+    });
   }
 
   @override
