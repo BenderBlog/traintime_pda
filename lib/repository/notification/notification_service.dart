@@ -28,9 +28,15 @@ abstract class NotificationService {
   final PermissionHandlerBase notificationPermissionHandler;
   final PermissionHandlerBase exactAlarmPermissionHandler;
 
+  // Platform specific notification details configuration
+  final AndroidNotificationDetails? androidNotificationDetails;
+  final DarwinNotificationDetails? darwinNotificationDetails;
+
   NotificationService({
     required this.notificationPermissionHandler,
     required this.exactAlarmPermissionHandler,
+    this.androidNotificationDetails,
+    this.darwinNotificationDetails,
   });
   
   @protected

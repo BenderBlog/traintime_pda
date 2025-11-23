@@ -31,11 +31,30 @@ class CourseReminderService extends NotificationService
       CourseReminderService._internal(
         notificationPermissionHandler: NotificationPermissionHandler(),
         exactAlarmPermissionHandler: ExactAlarmPermissionHandler(),
+        androidNotificationDetails: const AndroidNotificationDetails(
+          'course_reminder',
+          'Course Reminder',
+          channelDescription:
+              'Course reminder notifications for upcoming classes',
+          importance: Importance.max,
+          priority: Priority.max,
+          audioAttributesUsage: AudioAttributesUsage.notification,
+          playSound: true,
+          enableVibration: true,
+        ),
+        darwinNotificationDetails: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+          sound: 'default',
+        ),
       );
   factory CourseReminderService() => _instance;
   CourseReminderService._internal({
     required super.notificationPermissionHandler,
     required super.exactAlarmPermissionHandler,
+    super.androidNotificationDetails,
+    super.darwinNotificationDetails,
   }) {
     WidgetsBinding.instance.addObserver(this);
   }
@@ -182,20 +201,8 @@ class CourseReminderService extends NotificationService
       );
 
       if (Platform.isAndroid) {
-        final androidDetails = AndroidNotificationDetails(
-          'course_reminder',
-          'Course Reminder',
-          channelDescription:
-              'Course reminder notifications for upcoming classes',
-          importance: Importance.max,
-          priority: Priority.max,
-          audioAttributesUsage: AudioAttributesUsage.notification,
-          playSound: true,
-          enableVibration: true,
-        );
-
         final notificationDetails = NotificationDetails(
-          android: androidDetails,
+          android: androidNotificationDetails,
         );
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -210,14 +217,7 @@ class CourseReminderService extends NotificationService
           payload: payload,
         );
       } else if (Platform.isIOS) {
-        const iosDetails = DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-          sound: 'default',
-        );
-
-        const notificationDetails = NotificationDetails(iOS: iosDetails);
+        final notificationDetails = NotificationDetails(iOS: darwinNotificationDetails);
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
           id,

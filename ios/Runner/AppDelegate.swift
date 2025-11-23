@@ -13,10 +13,6 @@ import flutter_local_notifications
           GeneratedPluginRegistrant.register(with: registry)
       }
 
-      if #available(iOS 10.0, *) {
-        UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
-      }
-
       GeneratedPluginRegistrant.register(with: self)
       
       let controller = window?.rootViewController as! FlutterViewController
@@ -24,18 +20,5 @@ import flutter_local_notifications
       SaveToGroupIdSwiftApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: api)
       
       return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-  
-  @available(iOS 12.0, *)
-  override func userNotificationCenter(
-      _ center: UNUserNotificationCenter,
-      openSettingsFor notification: UNNotification?
-  ) {
-      let controller = window?.rootViewController as! FlutterViewController
-      let channel = FlutterMethodChannel(
-          name: "com.example.flutter_local_notifications_example/settings",
-          binaryMessenger: controller.binaryMessenger)
-
-      channel.invokeMethod("showNotificationSettings", arguments: nil)
   }
 }
