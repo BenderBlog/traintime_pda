@@ -26,7 +26,9 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   List<PendingNotificationRequest> _allNotifications = [];
   bool _isLoading = false;
 
-  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _idController = TextEditingController(
+    text: '99990'
+  );
   final TextEditingController _titleController = TextEditingController(
     text: '测试通知标题',
   );
@@ -36,7 +38,9 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   final TextEditingController _delayController = TextEditingController(
     text: '5',
   );
-  final TextEditingController _payloadController = TextEditingController();
+  final TextEditingController _payloadController = TextEditingController(
+    text: '{"type": "course_reminder","className": "test","weekIndex": 9}'
+  );
 
   @override
   void initState() {
@@ -190,11 +194,11 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
       }
 
       // 清空表单
-      _idController.clear();
+      _idController.text = '99990';
       _titleController.text = '测试通知标题';
       _bodyController.text = '这是一条测试通知内容';
       _delayController.text = '5';
-      _payloadController.clear();
+      _payloadController.text = '{"type": "course_reminder","className": "test","weekIndex": 9}';
 
       await _loadNotifications();
     } catch (e) {
@@ -385,7 +389,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
                 const Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    '发送测试通知（2秒后触发，ID: 99990），payLoad=[\'type\': \'course_reminder\']',
+                    '发送测试通知（2秒后触发，ID: 99990），payLoad={"type": "course_reminder","className": "test","weekIndex": 9,}',
                     style: TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ),
