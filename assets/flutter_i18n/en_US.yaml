@@ -402,8 +402,7 @@ library:
    search_book_window:
    search_here: "Search here"
    book_detail: "Book details"
-   no_result: "No result"
-   please_search: "Please search above"
+   no_result: "No result, change parameter or start your search"
 
 # 图书馆入馆状态信息卡
 library_card:

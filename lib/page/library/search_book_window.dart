@@ -16,14 +16,7 @@ import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 
-enum SearchField {
-  keyWord,
-  title,
-  author,
-  isbn,
-  barcode,
-  callNo,
-}
+enum SearchField { keyWord, title, author, isbn, barcode, callNo }
 
 extension SearchFieldExtension on SearchField {
   String get apiValue {
@@ -46,17 +39,35 @@ extension SearchFieldExtension on SearchField {
   String getLabel(BuildContext context) {
     switch (this) {
       case SearchField.keyWord:
-        return FlutterI18n.translate(context, "library.search_field_keyword_option");
+        return FlutterI18n.translate(
+          context,
+          "library.search_field_keyword_option",
+        );
       case SearchField.title:
-        return FlutterI18n.translate(context, "library.search_field_title_option");
+        return FlutterI18n.translate(
+          context,
+          "library.search_field_title_option",
+        );
       case SearchField.isbn:
-        return FlutterI18n.translate(context, "library.search_field_isbn_option");
+        return FlutterI18n.translate(
+          context,
+          "library.search_field_isbn_option",
+        );
       case SearchField.author:
-        return FlutterI18n.translate(context, "library.search_field_author_option");
+        return FlutterI18n.translate(
+          context,
+          "library.search_field_author_option",
+        );
       case SearchField.barcode:
-        return FlutterI18n.translate(context, "library.search_field_barcode_option");
+        return FlutterI18n.translate(
+          context,
+          "library.search_field_barcode_option",
+        );
       case SearchField.callNo:
-        return FlutterI18n.translate(context, "library.search_field_callno_option");
+        return FlutterI18n.translate(
+          context,
+          "library.search_field_callno_option",
+        );
     }
   }
 }
@@ -127,40 +138,27 @@ class _SearchBookWindowState extends State<SearchBookWindow>
         children: [
           // Search field selector and input
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Obx(() => DropdownButtonFormField<SearchField>(
-                value: selectedSearchField.value,
-                decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    "library.search_field_title",
-                  ),
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                ),
-                items: SearchField.values
-                    .map((SearchField field) => DropdownMenuItem<SearchField>(
-                      value: field,
-                      child: Text(field.getLabel(context)),
-                    ))
-                    .toList(),
-                onChanged: (SearchField? newValue) {
-                  if (newValue != null) {
-                    selectedSearchField.value = newValue;
-                  }
-                },
-              )).padding(horizontal: 8, vertical: 8).expanded(),
-              const SizedBox(width: 8),
-            ],
-          ).padding(horizontal: 8),
-          TextFormField(
+              TextFormField(
                 controller: text,
                 decoration: InputDecoration(
                   hintText: FlutterI18n.translate(
                     context,
                     "library.search_here",
                   ),
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: false,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (String text) => search.value = text,
                 onFieldSubmitted: (value) => setState(() {
@@ -169,9 +167,30 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                   noMore = false;
                   searchBook();
                 }),
-              )
-              .padding(horizontal: 16, vertical: 12)
-              .constrained(maxWidth: sheetMaxWidth),
+              ).flexible(flex: 2),
+              const SizedBox(width: 8),
+              Obx(
+                () => DropdownButtonHideUnderline(
+                  child: DropdownButton<SearchField>(
+                    value: selectedSearchField.value,
+                    items: SearchField.values
+                        .map(
+                          (SearchField field) => DropdownMenuItem<SearchField>(
+                            value: field,
+                            child: Text(field.getLabel(context)),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (SearchField? newValue) {
+                      if (newValue != null) {
+                        selectedSearchField.value = newValue;
+                      }
+                    },
+                  ),
+                ),
+              ).flexible(),
+            ],
+          ).padding(vertical: 8).constrained(maxWidth: sheetMaxWidth),
           EasyRefresh(
             footer: ClassicFooter(
               dragText: FlutterI18n.translate(context, "drag_text"),
@@ -211,21 +230,10 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                 );
               } else if (isSearching.value) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (search.value.isNotEmpty) {
+              } else {
                 return EmptyListView(
                   type: EmptyListViewType.reading,
                   text: FlutterI18n.translate(context, "library.no_result"),
-                );
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.search, size: 96),
-                    const Divider(color: Colors.transparent),
-                    Text(
-                      FlutterI18n.translate(context, "library.please_search"),
-                    ),
-                  ],
                 );
               }
             }),

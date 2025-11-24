@@ -337,10 +337,10 @@ library:
   title: 圖書館信息
   borrow_state_title: 借書狀態
   search_book_title: 查詢藏書
-  search_field_title: 搜索欄位
+  search_field_title: 搜索字段
   search_field_keyword_option: 任意詞
   search_field_title_option: 標題
-  search_field_author_option: 作者
+  search_field_author_option: 責任者
   search_field_isbn_option: ISBN
   search_field_barcode_option: 條碼號
   search_field_callno_option: 索書號
@@ -369,8 +369,7 @@ library:
   search_book_window: null
   search_here: 在此搜索
   book_detail: 書籍詳細信息
-  no_result: 沒有結果
-  please_search: 請在上面搜索框搜索
+  no_result: 沒有結果，請修改搜索參數或者開始你的搜索
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取
