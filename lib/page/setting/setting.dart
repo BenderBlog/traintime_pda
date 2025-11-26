@@ -22,6 +22,8 @@ import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart'
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
+import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
+import 'package:watermeter/page/setting/notification_page/notification_page.dart';
 import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -500,6 +502,35 @@ class _SettingWindowState extends State<SettingWindow> {
               ],
             ),
           ),
+          if (Platform.isAndroid || Platform.isIOS)
+            ReXCard(
+              title: _buildListSubtitle(
+                FlutterI18n.translate(context, "setting.notification_setting"),
+              ),
+              remaining: const [],
+              bottomRow: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.course_reminder_setting",
+                      ),
+                    ),
+                    subtitle: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.course_reminder_description",
+                      ),
+                    ),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () {
+                      context.push(const NotificationSettingsPage());
+                    },
+                  ),
+                ],
+              ),
+            ),
           ReXCard(
             title: _buildListSubtitle(
               FlutterI18n.translate(context, "setting.classtable_setting"),
@@ -749,6 +780,15 @@ class _SettingWindowState extends State<SettingWindow> {
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => context.push(TalkerScreen(talker: log)),
                 ),
+                const Divider(),
+                if (Platform.isAndroid || Platform.isIOS)
+                  ListTile(
+                    title: Text(
+                      FlutterI18n.translate(context, "setting.notification_debug_page"),
+                    ),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () => context.push(NotificationDebugPage()),
+                  ),
                 const Divider(),
                 ListTile(
                   title: Text(

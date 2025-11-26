@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 
 import 'package:watermeter/repository/localization.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ChangeLanguageDialog extends StatefulWidget {
@@ -49,6 +50,15 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
                   ThemeController toChange = Get.put(ThemeController());
                   toChange.updateTheme();
                 });
+            
+            // To update course reminders according to new localization
+            await CourseReminderService().cancelAllCourseNotifications();
+            await CourseReminderService().scheduleNotificationsFromCourseData(
+              daysToSchedule:
+                  preference.prefs.getInt('notification_days_to_schedule') ?? 7,
+              minutesBefore:
+                  preference.prefs.getInt('notification_minutes_before') ?? 5,
+            );
           },
           child: Column(
             children: List<Widget>.generate(

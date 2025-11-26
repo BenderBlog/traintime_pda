@@ -524,6 +524,68 @@ setting:
   electricity_account_setting: 電費賬號設置
   schoolnet_password_setting: 校園網帳號密碼設置
   schoolnet_password_description: 不設置查看不了網費
+  notification_setting: 通知設置
+  course_reminder_setting: 課前通知設置
+  course_reminder_description: 設置課前提醒通知
+  notification_page:
+    title: 課前通知設置
+    load_failed: '加載設置失敗: {error}'
+    function_section: 通知功能
+    enable_notification: 啟用課前通知
+    notification_scheduled: 已安排 {count} 個通知
+    notification_disabled_hint: 關閉後將取消所有已安排的通知
+    update_schedule: 更新通知日程
+    update_schedule_hint: 根據最新的課程數據重新安排通知
+    view_the_instructions: 查看使用說明
+    view_the_instructions_hint: 查看更多使用說明確保您能看到程序發出的通知
+    delete_all_schedule: 刪除通知日程
+    delete_all_schedule_hint: 這個操作會刪除所有已經安排的日程，但是您可以再次點擊更新通知日程來重新添加
+    delete_all_success: 刪除操作成功
+    permission_section: 權限狀態
+    notification_permission: 通知權限
+    exact_alarm_permission: 精確時鐘權限
+    permission_granted: 已授予
+    permission_denied: 未授予
+    request_permission: 請求權限
+    system_settings: 系統通知設置
+    system_settings_hint: 打開系統設置檢查通知配置
+    permission_granted_msg: 權限已授予
+    permission_denied_msg: 權限被拒絕，請在系統設置中開啟
+    reminder_section: 提醒設置
+    experiment_reminder: 將物理實驗加入課程提醒
+    experiment_reminder_hint: 將物理實驗的時間安排一併加入課前提醒系統
+    minutes_before: 提前提醒時間
+    minutes_before_hint: 課前提前提醒的時間設置
+    minutes_unit: 分鐘
+    days_to_schedule: 計劃通知天數
+    days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
+    days_unit: 天
+    settings_guide_title: 通知設置提示
+    settings_guide_content_1: '為了確保您能及時收到課前提醒，請確保：
+
+      1. 開啟了應用的通知權限
+
+      2. 開啟了通知的聲音提示
+
+      3. 開啟了懸浮通知（橫幅通知）
+
+      4. 非原生安卓用戶，開啟自啟動和關閉電源優化'
+    settings_guide_content_2: '課前提醒模塊運行機制：
+
+      1. 首次開啟時自動安排未來幾天的課前提醒
+
+      2. 每次打開應用時自動檢查並更新通知日程
+
+      3. 修改設置後自動重新安排所有通知'
+    got_it: 知道了
+    open_settings: 打開系統設置
+    no_classtable_data: 請先獲取課程表數據
+    schedule_success: 已安排 {count} 個課前提醒
+    schedule_failed: '安排通知失敗: {error}'
+    cancel_all_success: 已取消所有課前提醒
+    reschedule_success: 已重新安排 {count} 個課前提醒
+    reschedule_failed: '重新安排通知失敗: {error}'
+  notification_debug_page: 通知服務調試頁面
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面

@@ -1,0 +1,5 @@
+course_reminder:
+  title: "课前提醒：{name}"
+  body: "{time} 分钟后开始上课"
+  location: "地点：{location}"
+  teacher: "教师：{teacher}"
