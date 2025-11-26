@@ -209,7 +209,7 @@ struct Provider: TimelineProvider {
                         type: .exam,
                         name: i.subject,
                         teacher: i.place,
-                        place: String(i.seat),
+                        place: String(i.seat ?? ""),
                         start_time: i.startTime,
                         end_time: i.endTime,
                         colorIndex: examData.subject.firstIndex(where: {$0 === i}) ?? 0
