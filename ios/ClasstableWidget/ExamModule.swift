@@ -24,7 +24,7 @@ class Subject : Codable {
     let endTimeStr : String
     let time : String
     let place : String
-    let seat : String
+    let seat : String?
     
     var startTime : Date {
         get {
