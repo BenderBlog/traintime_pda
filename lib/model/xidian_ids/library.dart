@@ -10,53 +10,60 @@ part 'library.g.dart';
 
 @JsonSerializable()
 class BorrowData {
+  final int lendDay;
+  final int locationId;
+  final int loanId;
+  final int renewTimes;
+  final int recallTimes;
+  final String loanDate;
+  final String? renewDate;
+  final String normReturnDate;
+  final String? returnDate;
+  final String loanType;
+  final String locationName;
+  final String itemLibCode;
+  final String itemLibName;
+  final String loanDeskName;
   final String title;
   final String author;
   final String publisher;
   final String isbn;
-  final int recordId;
-  final int loanId;
-  final int itemId;
-  final String loanDate;
-  final String? renewDate;
-  final String normReturnDate;
-  final String loanType;
+  final String isbn10;
+  final String isbn13;
+  final String publishYear;
+  final String? titles;
   final String barcode;
 
-  const BorrowData({
+  BorrowData({
+    required this.lendDay,
+    required this.locationId,
+    required this.loanId,
+    required this.renewTimes,
+    required this.recallTimes,
+    required this.loanDate,
+    required this.renewDate,
+    required this.normReturnDate,
+    required this.returnDate,
+    required this.loanType,
+    required this.locationName,
+    required this.itemLibCode,
+    required this.itemLibName,
+    required this.loanDeskName,
     required this.title,
     required this.author,
     required this.publisher,
     required this.isbn,
-    required this.recordId,
-    required this.loanId,
-    required this.itemId,
-    required this.loanDate,
-    this.renewDate,
-    required this.normReturnDate,
-    required this.loanType,
+    required this.isbn10,
+    required this.isbn13,
+    required this.publishYear,
+    required this.titles,
     required this.barcode,
   });
 
-  DateTime get loanDateTime {
-    List<String> returnDateArr = loanDate.split("-");
-    return DateTime(
-      int.parse(returnDateArr[0]),
-      int.parse(returnDateArr[1]),
-      int.parse(returnDateArr[2]),
-    );
-  }
+  DateTime get loanDateTime => DateTime.parse(loanDate.replaceAll('/', '-'));
 
-  DateTime get normReturnDateTime {
-    List<String> returnDateArr = normReturnDate.split("-");
-    return DateTime(
-      int.parse(returnDateArr[0]),
-      int.parse(returnDateArr[1]),
-      int.parse(returnDateArr[2]),
-    );
-  }
-
-  int get lendDay => normReturnDateTime.difference(DateTime.now()).inDays;
+  DateTime get normReturnDateTime =>
+      DateTime.parse(normReturnDate.replaceAll('/', '-'));
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);

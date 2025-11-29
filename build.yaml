@@ -1,40 +1,42 @@
 targets:
   $default:
     sources:
-      - $package$              # 包的元数据
-      - lib/$lib$              # lib 目录的元数据
-      - lib/**                 # lib 下的所有文件
-      - tool/**                # tool 下的所有文件（包含生成器）
-      - assets/**              # assets 下的所有文件（包含图片）
-      - pubspec.yaml           # 用作触发器
+      - $package$ # 包的元数据
+      - lib/$lib$ # lib 目录的元数据
+      - lib/** # lib 下的所有文件
+      - tool/** # tool 下的所有文件（包含生成器）
+      - assets/** # assets 下的所有文件（包含图片）
+      - pubspec.yaml # 用作触发器
     builders:
+      json_serializable|json_serializable:
+        enabled: true # 必须是 true 或默认
       watermeter|score_hashes:
         enabled: true
         generate_for:
-          - pubspec.yaml         # 当 pubspec.yaml 改变时触发
+          - pubspec.yaml # 当 pubspec.yaml 改变时触发
       watermeter|non_ui_i18n:
         enabled: true
         generate_for:
-          - assets/non_ui_i18n/README.md  # 使用 README.md 作为触发器，生成单个文件
-        
+          - assets/non_ui_i18n/README.md # 使用 README.md 作为触发器，生成单个文件
+
 builders:
   score_hashes:
     import: "tool/generators/score_hashes_generator.dart"
     builder_factories: ["scoreHashesBuilder"]
     build_extensions:
-      pubspec.yaml:                              # 输入：pubspec.yaml（触发器）
-        - lib/generated/score_hashes.g.dart      # 输出：生成的常量文件
+      pubspec.yaml: # 输入：pubspec.yaml（触发器）
+        - lib/generated/score_hashes.g.dart # 输出：生成的常量文件
     auto_apply: root_package
     build_to: source
-    required_inputs:                             # 声明需要的资源文件
+    required_inputs: # 声明需要的资源文件
       - assets/experiment_score/scores/**
 
   non_ui_i18n:
     import: "tool/generators/non_ui_i18n_generator.dart"
     builder_factories: ["nonUII18nBuilder"]
     build_extensions:
-      README.md:                                    # 输入：README.md
-        - lib/generated/non_ui_i18n.g.dart         # 输出：统一的生成文件
+      README.md: # 输入：README.md
+        - lib/generated/non_ui_i18n.g.dart # 输出：统一的生成文件
     auto_apply: root_package
     build_to: source
     required_inputs:

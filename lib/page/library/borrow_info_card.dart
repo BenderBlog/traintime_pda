@@ -189,7 +189,7 @@ class BorrowInfoCard extends StatelessWidget {
                       pd.show(
                         msg: FlutterI18n.translate(context, "library.renewing"),
                       );
-                      LibrarySession().renew(toUse.loanId).then((value) {
+                      LibrarySession().renew(toUse).then((value) {
                         if (context.mounted) {
                           pd.close();
                           showToast(context: context, msg: value);

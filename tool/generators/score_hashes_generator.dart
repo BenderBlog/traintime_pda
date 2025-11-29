@@ -18,13 +18,13 @@ class _ScoreHashesBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        _triggerFile: [_outputPath],
-      };
+    _triggerFile: [_outputPath],
+  };
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     log.info('Starting score hashes generation...');
-    
+
     final decoded = await _calculateAllFNVHash(buildStep);
 
     if (decoded.isEmpty) {
@@ -67,47 +67,44 @@ class _ScoreHashesBuilder implements Builder {
 
 Future<Map<String, int>> _calculateAllFNVHash(BuildStep buildStep) async {
   final fileHashes = <String, int>{};
-  
+
   try {
     // 使用 buildStep 来访问 assets
     final scoresDir = 'assets/experiment_score/scores';
-    
+
     log.info('Searching for images in $scoresDir');
-    
+
     // 查找所有图片文件
     final imageExtensions = ['.png', '.jpg', '.jpeg', '.bmp', '.gif'];
-    
+
     await for (final input in buildStep.findAssets(Glob('$scoresDir/**'))) {
       final filePath = input.path;
       final ext = path.extension(filePath).toLowerCase();
-      
+
       if (!imageExtensions.contains(ext)) {
         continue;
       }
-      
+
       try {
         log.fine('Processing: $filePath');
-        
+
         // 读取文件内容
         final bytes = await buildStep.readAsBytes(input);
-        
+
         // 计算哈希值
         final hash = _calculatePixelFNV1AFromBytes(Uint8List.fromList(bytes));
-        
+
         // 获取相对路径作为 key（去掉扩展名）
-        final relativePath = path.relative(
-          filePath,
-          from: scoresDir,
-        );
+        final relativePath = path.relative(filePath, from: scoresDir);
         final key = relativePath.substring(0, relativePath.length - ext.length);
-        
+
         fileHashes[key] = hash;
         log.fine('  -> Hash: $hash');
       } catch (e) {
         log.warning('Failed to process $filePath: $e');
       }
     }
-    
+
     log.info('Total images processed: ${fileHashes.length}');
     return fileHashes;
   } catch (e, stackTrace) {
@@ -136,11 +133,7 @@ int _calculatePixelFNV1AFromBytes(Uint8List bytes) {
       final a = pixel.a.toInt();
       if (a == 255) {
         // ignore the transparent pixel to reduce the calculation
-        pixelBytes.addAll([
-          pixel.r.toInt(),
-          pixel.g.toInt(),
-          pixel.b.toInt(),
-        ]);
+        pixelBytes.addAll([pixel.r.toInt(), pixel.g.toInt(), pixel.b.toInt()]);
       }
     }
   }
