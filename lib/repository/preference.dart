@@ -84,7 +84,11 @@ enum Preference {
   courseReminderEnableExperimentNotifications(
     key: "courseReminderEnableExperimentNotifications",
     type: "bool",
-  ); // 是否启用实验提醒
+  ), // 是否启用实验提醒
+  notificationLastLocale(
+    key: "notification_last_locale",
+    type: "String",
+  ); // 上次通知使用的语言
 
   const Preference({required this.key, this.type = "String"});
 
