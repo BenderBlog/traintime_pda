@@ -12,7 +12,6 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -26,7 +25,7 @@ const kDefaultMinutesBeforeOptions = [5, 10, 15, 20, 30];
 const kDefaultDaysToScheduleOptions = [3, 7, 14, 30];
 
 class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
-  final _courseMinder = CourseReminderService();
+  final _courseReminder = CourseReminderService();
 
   bool _isEnabled = false;
   bool _hasNotificationPermission = false;
@@ -40,18 +39,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   void initState() {
     super.initState();
-    // Load settings
-    _isEnabled = preference.getBool(preference.Preference.enableCourseReminder);
-    _enableExperimentNotifications = preference.getBool(
-      preference.Preference.courseReminderEnableExperimentNotifications,
-    );
-
-    _minutesBefore = preference.getInt(
-      preference.Preference.courseReminderMinutesBefore,
-    );
-    _daysToSchedule = preference.getInt(
-      preference.Preference.courseReminderDaysToSchedule,
-    );
+    // Load settings from service
+    _isEnabled = _courseReminder.isEnabled;
+    _enableExperimentNotifications =
+        _courseReminder.enableExperimentNotifications;
+    _minutesBefore = _courseReminder.minutesBefore;
+    _daysToSchedule = _courseReminder.daysToSchedule;
 
     if (kDefaultMinutesBeforeOptions.contains(_minutesBefore) == false) {
       _minutesBefore = 5;
@@ -71,16 +64,24 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
     try {
       // Initiation
-      await _courseMinder.initialize();
+      await _courseReminder.initialize();
 
       // Check permission
-      _hasNotificationPermission = await _courseMinder
+      _hasNotificationPermission = await _courseReminder
           .checkNotificationPermission();
-      _hasExactAlarmPermission = await _courseMinder
+      _hasExactAlarmPermission = await _courseReminder
           .checkExactAlarmPermission();
 
+      if (!_hasExactAlarmPermission || !_hasNotificationPermission) {
+        _courseReminder.setEnabled(false);
+        setState(() {
+          _isEnabled = false;
+        });
+      }
+
       // Get the number of notifications to be sent
-      _pendingCount = await _courseMinder.getPendingCourseNotificationsCount();
+      _pendingCount = await _courseReminder
+          .getPendingCourseNotificationsCount();
     } catch (e) {
       if (mounted) {
         showToast(
@@ -102,9 +103,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _requestPermission() async {
-    final notificationPermissionGranted = await _courseMinder
+    final notificationPermissionGranted = await _courseReminder
         .requestNotificationPermission();
-    final exactAlarmGranted = await _courseMinder.requestExactAlarmPermission();
+    final exactAlarmGranted = await _courseReminder
+        .requestExactAlarmPermission();
     if (mounted) {
       setState(() {
         _hasNotificationPermission = notificationPermissionGranted;
@@ -173,7 +175,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _courseMinder.openNotificationSettings();
+              _courseReminder.openNotificationSettings();
             },
             child: Text(
               FlutterI18n.translate(
@@ -191,7 +193,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     if (value) {
       if (!_hasNotificationPermission) {
         await _requestPermission();
-        return;
       }
 
       _showNotificationSettingsGuide();
@@ -218,16 +219,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           return;
         }
 
-        await _courseMinder.scheduleNotificationsFromCourseData(
-          daysToSchedule: _daysToSchedule,
-          minutesBefore: _minutesBefore,
-        );
+        // Use service method to enable notifications
+        await _courseReminder.setEnabled(true);
 
-        await preference.setBool(
-          preference.Preference.enableCourseReminder,
-          true,
-        );
-        _pendingCount = await _courseMinder
+        _pendingCount = await _courseReminder
             .getPendingCourseNotificationsCount();
 
         if (mounted) {
@@ -262,11 +257,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         }
       }
     } else {
-      await _courseMinder.cancelAllCourseNotifications();
-      await preference.setBool(
-        preference.Preference.enableCourseReminder,
-        false,
-      );
+      // Use service method to disable notifications
+      await _courseReminder.setEnabled(false);
 
       if (mounted) {
         setState(() {
@@ -284,35 +276,65 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
+  /// Helper method to update pending count and show success toast
+  Future<void> _updatePendingCountAndNotify() async {
+    _pendingCount = await _courseReminder.getPendingCourseNotificationsCount();
+    if (mounted) {
+      setState(() {});
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          'setting.notification_page.reschedule_success',
+          translationParams: {'count': _pendingCount.toString()},
+        ),
+      );
+    }
+  }
+
   Future<void> _changeMinutesBefore(int value) async {
     setState(() {
       _minutesBefore = value;
+      _isLoading = true;
     });
 
-    await preference.setInt(
-      preference.Preference.courseReminderMinutesBefore,
-      value,
-    );
+    try {
+      // Use service setter - it will automatically update notifications if enabled
+      await _courseReminder.setMinutesBefore(value);
 
-    // If the notification has been enabled, reschedule
-    if (_isEnabled) {
-      await _rescheduleNotifications();
+      // Update pending count and notify if enabled
+      if (_isEnabled) {
+        await _updatePendingCountAndNotify();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _changeDaysToSchedule(int value) async {
     setState(() {
       _daysToSchedule = value;
+      _isLoading = true;
     });
 
-    await preference.setInt(
-      preference.Preference.courseReminderDaysToSchedule,
-      value,
-    );
+    try {
+      // Use service setter - it will automatically update notifications if enabled
+      await _courseReminder.setDaysToSchedule(value);
 
-    // If the notification has been enabled, reschedule
-    if (_isEnabled) {
-      await _rescheduleNotifications();
+      // Update pending count and notify if enabled
+      if (_isEnabled) {
+        await _updatePendingCountAndNotify();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -322,13 +344,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     });
 
     try {
-      await _courseMinder.cancelAllCourseNotifications();
-      await _courseMinder.scheduleNotificationsFromCourseData(
+      await _courseReminder.cancelAllCourseNotifications();
+      await _courseReminder.scheduleNotificationsFromCourseData(
         daysToSchedule: _daysToSchedule,
         minutesBefore: _minutesBefore,
       );
 
-      _pendingCount = await _courseMinder.getPendingCourseNotificationsCount();
+      _pendingCount = await _courseReminder
+          .getPendingCourseNotificationsCount();
 
       if (mounted) {
         showToast(
@@ -361,7 +384,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _deleteAllSchedules() async {
-    await _courseMinder.cancelAllCourseNotifications();
+    await _courseReminder.cancelAllCourseNotifications();
 
     if (mounted) {
       setState(() {
@@ -529,18 +552,25 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     onChanged: (value) async {
                       setState(() {
                         _enableExperimentNotifications = value;
+                        _isLoading = true;
                       });
-                      
-                      await preference.setBool(
-                        preference
-                            .Preference
-                            .courseReminderEnableExperimentNotifications,
-                        value,
-                      );
-                      
-                      if (_isEnabled) {
-                        // Reschedule notifications to include/exclude experiments
-                        await _rescheduleNotifications();
+
+                      try {
+                        // Use service setter - it will automatically update notifications if enabled
+                        await _courseReminder.setEnableExperimentNotifications(
+                          value,
+                        );
+
+                        // Update pending count and notify if enabled
+                        if (_isEnabled) {
+                          await _updatePendingCountAndNotify();
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
                       }
                     },
                   ),
@@ -708,7 +738,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     ),
                   ),
                   trailing: const Icon(Icons.settings),
-                  onTap: () => _courseMinder.openNotificationSettings(),
+                  onTap: () => _courseReminder.openNotificationSettings(),
                 ),
               ],
             ),

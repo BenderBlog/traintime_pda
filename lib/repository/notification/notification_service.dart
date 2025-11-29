@@ -7,10 +7,10 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/permission_handler/permission_handler_base.dart';
 
 /// Abstract base class for managing notifications.
 ///
@@ -25,16 +25,11 @@ abstract class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  final PermissionHandlerBase notificationPermissionHandler;
-  final PermissionHandlerBase exactAlarmPermissionHandler;
-
   // Platform specific notification details configuration
   final AndroidNotificationDetails? androidNotificationDetails;
   final DarwinNotificationDetails? darwinNotificationDetails;
 
   NotificationService({
-    required this.notificationPermissionHandler,
-    required this.exactAlarmPermissionHandler,
     this.androidNotificationDetails,
     this.darwinNotificationDetails,
   });
@@ -52,57 +47,6 @@ abstract class NotificationService {
     if (initialized) return;
 
     try {
-      // Check and request notification permission before initializing.
-      // We don't abort initialization if permission is denied, but we log
-      // warnings so callers can react accordingly.
-      try {
-        final hasPermission = await checkNotificationPermission();
-        if (!hasPermission) {
-          final granted = await requestNotificationPermission();
-          if (!granted) {
-            log.warning(
-              'Notification permission not granted for ${runtimeType.toString()}',
-            );
-          } else {
-            log.info(
-              'Notification permission granted for ${runtimeType.toString()}',
-            );
-          }
-        }
-      } catch (e, st) {
-        log.error(
-          'Failed to check/request notification permission for ${runtimeType.toString()}',
-          e,
-          st,
-        );
-      }
-
-      // On Android, also check/request the exact alarm permission which may
-      // be required for exact scheduling while idle.
-      if (Platform.isAndroid) {
-        try {
-          final hasExact = await checkExactAlarmPermission();
-          if (!hasExact) {
-            final grantedExact = await requestExactAlarmPermission();
-            if (!grantedExact) {
-              log.warning(
-                'Exact alarm permission not granted for ${runtimeType.toString()}',
-              );
-            } else {
-              log.info(
-                'Exact alarm permission granted for ${runtimeType.toString()}',
-              );
-            }
-          }
-        } catch (e, st) {
-          log.error(
-            'Failed to check/request exact alarm permission for ${runtimeType.toString()}',
-            e,
-            st,
-          );
-        }
-      }
-
       // Initialize time zone data
       tz.initializeTimeZones();
       final effectiveTimeZone = timeZone ?? 'Asia/Shanghai';
@@ -176,26 +120,126 @@ abstract class NotificationService {
     String? payload,
   });
 
+  /// Method to send (show) a notification immediately.
+  ///
+  /// Subclasses can override this to provide platform- and
+  /// channel-specific logic for showing a notification right away.
+  Future<void> sendImmediateNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    if (!initialized) {
+      throw StateError('Notification service not initialized');
+    }
+
+    try {
+      if (Platform.isAndroid) {
+        final notificationDetails = NotificationDetails(
+          android: androidNotificationDetails,
+        );
+
+        await flutterLocalNotificationsPlugin.show(
+          id,
+          title,
+          body,
+          notificationDetails,
+          payload: payload,
+        );
+      } else if (Platform.isIOS) {
+        final notificationDetails = NotificationDetails(
+          iOS: darwinNotificationDetails,
+        );
+
+        await flutterLocalNotificationsPlugin.show(
+          id,
+          title,
+          body,
+          notificationDetails,
+          payload: payload,
+        );
+      }
+
+      log.info('Sent immediate notification $id');
+    } catch (e, stackTrace) {
+      log.error(
+        'Failed to send immediate notification',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Requests notification permissions from the user.
   Future<bool> requestNotificationPermission() async {
-    return await notificationPermissionHandler.requestPermission();
+    bool? result;
+    if (Platform.isAndroid) {
+      result = await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    } else if (Platform.isIOS) {
+      result = await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    } else {
+      return false;
+    }
+    return result ?? false;
   }
 
   /// Checks if notification permissions have been granted.
   Future<bool> checkNotificationPermission() async {
-    return await notificationPermissionHandler.checkPermission();
+    if (Platform.isAndroid) {
+      final result = await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.areNotificationsEnabled();
+      return result ?? false;
+    } else if (Platform.isIOS) {
+      // On iOS, we use requestPermissions to check current status
+      // The plugin will return the current permission status without showing a prompt if already determined
+      final iosPlugin = flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      if (iosPlugin == null) return false;
+      
+      // Request permissions returns true if any permission is granted
+      // This doesn't show a prompt if the user has already responded
+      final result = await iosPlugin.checkPermissions();
+      if (result == null) return false;
+      return result.isEnabled;
+    } else {
+      return false;
+    }
   }
 
   /// Requests schedule exact alarm permission (Android only).
   Future<bool> requestExactAlarmPermission() async {
     if (!Platform.isAndroid) return true; // Not applicable on other platforms
-    return await exactAlarmPermissionHandler.requestPermission();
+    
+    final androidPlugin = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin == null) return false;
+    
+    // Request exact alarm permission by opening settings
+    final result = await androidPlugin.requestExactAlarmsPermission();
+    return result ?? false;
   }
 
   /// Checks if schedule exact alarm permission has been granted (Android only).
   Future<bool> checkExactAlarmPermission() async {
     if (!Platform.isAndroid) return true; // Not applicable on other platforms
-    return await exactAlarmPermissionHandler.checkPermission();
+    
+    final androidPlugin = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin == null) return false;
+    
+    final result = await androidPlugin.canScheduleExactNotifications();
+    return result ?? false;
   }
 
   /// Retrieves a list of all pending (scheduled) notifications.
@@ -257,6 +301,6 @@ abstract class NotificationService {
 
   /// Opens the app's notification settings page.
   Future<void> openNotificationSettings() async {
-    await notificationPermissionHandler.openAppSettings();
+    await openAppSettings();
   }
 }

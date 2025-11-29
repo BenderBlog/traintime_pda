@@ -18,8 +18,6 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
-import 'package:watermeter/repository/permission_handler/exact_alarm_permission_handler.dart';
-import 'package:watermeter/repository/permission_handler/notification_permission_handler.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/generated/non_ui_i18n.g.dart';
@@ -29,8 +27,6 @@ class CourseReminderService extends NotificationService
     with WidgetsBindingObserver {
   static final CourseReminderService _instance =
       CourseReminderService._internal(
-        notificationPermissionHandler: NotificationPermissionHandler(),
-        exactAlarmPermissionHandler: ExactAlarmPermissionHandler(),
         androidNotificationDetails: const AndroidNotificationDetails(
           'course_reminder',
           'Course Reminder',
@@ -51,8 +47,6 @@ class CourseReminderService extends NotificationService
       );
   factory CourseReminderService() => _instance;
   CourseReminderService._internal({
-    required super.notificationPermissionHandler,
-    required super.exactAlarmPermissionHandler,
     super.androidNotificationDetails,
     super.darwinNotificationDetails,
   }) {
@@ -65,6 +59,96 @@ class CourseReminderService extends NotificationService
   static const int _notificationRandomRange = 90;
   final Random _random = Random();
 
+  // Configuration getters - encapsulate preference access
+  bool get isEnabled =>
+      preference.getBool(preference.Preference.enableCourseReminder);
+
+  int get minutesBefore =>
+      preference.getInt(preference.Preference.courseReminderMinutesBefore);
+
+  int get daysToSchedule =>
+      preference.getInt(preference.Preference.courseReminderDaysToSchedule);
+
+  bool get enableExperimentNotifications => preference.getBool(
+    preference.Preference.courseReminderEnableExperimentNotifications,
+  );
+
+  String get lastLocale =>
+      preference.getString(preference.Preference.notificationLastLocale);
+
+  // Configuration setters with automatic notification update
+  Future<void> setEnabled(bool value) async {
+    if (value) { 
+      // Check permissions before enabling
+      final hasNotificationPermission = await checkNotificationPermission();
+      final hasExactAlarmPermission = await checkExactAlarmPermission();
+
+      if (!hasNotificationPermission || !hasExactAlarmPermission) {
+        log.info('[CourseReminderService] Failed to enable due to no permission');
+        throw Exception("[CourseReminderService] Failed to enable due to no permission");
+      }
+    }
+    await preference.setBool(preference.Preference.enableCourseReminder, value);
+    if (value) {
+      log.info('[CourseReminderService] Enabled, scheduling notifications');
+      await scheduleNotificationsFromCourseData(
+        daysToSchedule: daysToSchedule,
+        minutesBefore: minutesBefore,
+      );
+    } else {
+      log.info(
+        '[CourseReminderService] Disabled, cancelling all notifications',
+      );
+      await cancelAllCourseNotifications();
+    }
+  }
+
+  Future<void> setMinutesBefore(int value) async {
+    await preference.setInt(
+      preference.Preference.courseReminderMinutesBefore,
+      value,
+    );
+    if (isEnabled) {
+      log.info(
+        '[CourseReminderService] Minutes before changed to $value, updating notifications',
+      );
+      await validateAndUpdateNotifications();
+    }
+  }
+
+  Future<void> setDaysToSchedule(int value) async {
+    await preference.setInt(
+      preference.Preference.courseReminderDaysToSchedule,
+      value,
+    );
+    if (isEnabled) {
+      log.info(
+        '[CourseReminderService] Days to schedule changed to $value, updating notifications',
+      );
+      await validateAndUpdateNotifications();
+    }
+  }
+
+  Future<void> setEnableExperimentNotifications(bool value) async {
+    await preference.setBool(
+      preference.Preference.courseReminderEnableExperimentNotifications,
+      value,
+    );
+    if (isEnabled) {
+      log.info(
+        '[CourseReminderService] Experiment notifications ${value ? "enabled" : "disabled"}, updating notifications',
+      );
+      await validateAndUpdateNotifications();
+    }
+  }
+
+  Future<void> _setLastLocale(String value) async {
+    await preference.setString(
+      preference.Preference.notificationLastLocale,
+      value,
+    );
+  }
+
   @override
   void didChangeLocales(List<Locale>? locales) {
     super.didChangeLocales(locales);
@@ -76,9 +160,6 @@ class CourseReminderService extends NotificationService
     );
 
     // Check if notifications are enabled
-    final isEnabled = preference.getBool(
-      preference.Preference.enableCourseReminder,
-    );
     if (!isEnabled) {
       log.info(
         '[CourseReminderService] [didChangeLocales] Notifications not enabled, skipping reschedule',
@@ -96,13 +177,6 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [_rescheduleNotificationsOnLocaleChange] Starting locale change reschedule...',
     );
     try {
-      final daysToSchedule = preference.getInt(
-        preference.Preference.courseReminderDaysToSchedule,
-      );
-      final minutesBefore = preference.getInt(
-        preference.Preference.courseReminderMinutesBefore,
-      );
-
       log.info(
         '[CourseReminderService] [_rescheduleNotificationsOnLocaleChange] Config: daysToSchedule=$daysToSchedule, minutesBefore=$minutesBefore',
       );
@@ -134,10 +208,14 @@ class CourseReminderService extends NotificationService
 
   @override
   void handleNotificationTap(NotificationResponse response) {
-    log.info('[CourseReminderService] [handleNotificationTap] Notification tapped');
+    log.info(
+      '[CourseReminderService] [handleNotificationTap] Notification tapped',
+    );
 
     if (response.payload == null || response.payload!.isEmpty) {
-      log.warning('[CourseReminderService] [handleNotificationTap] No payload in notification');
+      log.warning(
+        '[CourseReminderService] [handleNotificationTap] No payload in notification',
+      );
       return;
     }
 
@@ -146,7 +224,9 @@ class CourseReminderService extends NotificationService
       final String? type = payload['type'];
 
       if (type != 'course_reminder') {
-        log.warning('[CourseReminderService] [handleNotificationTap] Unknown notification type: $type');
+        log.warning(
+          '[CourseReminderService] [handleNotificationTap] Unknown notification type: $type',
+        );
         return;
       }
 
@@ -169,7 +249,9 @@ class CourseReminderService extends NotificationService
           '[CourseReminderService] [handleNotificationTap] Navigated to class table, week: $weekIndex',
         );
       } else {
-        log.warning('[CourseReminderService] [handleNotificationTap] Navigator not available');
+        log.warning(
+          '[CourseReminderService] [handleNotificationTap] Navigator not available',
+        );
       }
     } catch (e, stackTrace) {
       log.error(
@@ -191,7 +273,9 @@ class CourseReminderService extends NotificationService
     String? payload,
   }) async {
     if (!initialized) {
-      throw StateError('[CourseReminderService] Notification service not initialized');
+      throw StateError(
+        '[CourseReminderService] Notification service not initialized',
+      );
     }
 
     try {
@@ -217,7 +301,9 @@ class CourseReminderService extends NotificationService
           payload: payload,
         );
       } else if (Platform.isIOS) {
-        final notificationDetails = NotificationDetails(iOS: darwinNotificationDetails);
+        final notificationDetails = NotificationDetails(
+          iOS: darwinNotificationDetails,
+        );
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
           id,
@@ -232,9 +318,15 @@ class CourseReminderService extends NotificationService
         );
       }
 
-      log.info('[CourseReminderService] [scheduleNotification] Scheduled course notification $id at $scheduledTime');
+      log.info(
+        '[CourseReminderService] [scheduleNotification] Scheduled course notification $id at $scheduledTime',
+      );
     } catch (e, stackTrace) {
-      log.error('[CourseReminderService] [scheduleNotification] Failed to schedule course notification', e, stackTrace);
+      log.error(
+        '[CourseReminderService] [scheduleNotification] Failed to schedule course notification',
+        e,
+        stackTrace,
+      );
       rethrow;
     }
   }
@@ -288,24 +380,24 @@ class CourseReminderService extends NotificationService
   /// Returns the class index (1-based), or 1 if no match found
   int _calculateClassPeriodFromTime(DateTime time) {
     final timeInMinutes = time.hour * 60 + time.minute;
-    
+
     // Find the closest matching class start time
     int closestClass = 1;
     int minDifference = 999999;
-    
+
     for (int i = 0; i < timeList.length; i += 2) {
       final classIndex = (i ~/ 2) + 1; // Convert to 1-based class number
       final timeStr = timeList[i];
       final parts = timeStr.split(':');
       final classStartMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
-      
+
       final difference = (timeInMinutes - classStartMinutes).abs();
       if (difference < minDifference) {
         minDifference = difference;
         closestClass = classIndex;
       }
     }
-    
+
     return closestClass;
   }
 
@@ -315,7 +407,9 @@ class CourseReminderService extends NotificationService
     // If localization is not set or empty, get system locale
     if (locale.isEmpty) {
       String systemLocale = Platform.localeName;
-      log.info("[CourseReminderService] [getCurrentLocale] Using system locale: $systemLocale");
+      log.info(
+        "[CourseReminderService] [getCurrentLocale] Using system locale: $systemLocale",
+      );
       if (systemLocale.contains("zh")) {
         if (Platform.isIOS || Platform.isMacOS) {
           if (systemLocale.contains("Hans")) {
@@ -360,7 +454,9 @@ class CourseReminderService extends NotificationService
       final ClassTableData data = controller.classTableData;
 
       if (data.termStartDay.isEmpty) {
-        log.warning('[CourseReminderService] [scheduleNotificationsFromCourseData] Course data not available, cannot schedule notifications');
+        log.warning(
+          '[CourseReminderService] [scheduleNotificationsFromCourseData] Course data not available, cannot schedule notifications',
+        );
         return;
       }
 
@@ -459,7 +555,9 @@ class CourseReminderService extends NotificationService
         }
       }
 
-      log.info('[CourseReminderService] [scheduleNotificationsFromCourseData] Scheduled $scheduledCount course reminder notifications');
+      log.info(
+        '[CourseReminderService] [scheduleNotificationsFromCourseData] Scheduled $scheduledCount course reminder notifications',
+      );
       await _saveScheduleConfig(daysToSchedule, minutesBefore);
     } catch (e, stackTrace) {
       log.error(
@@ -503,7 +601,9 @@ class CourseReminderService extends NotificationService
       final List<ExperimentData> experiments = experimentController.data;
 
       if (experiments.isEmpty) {
-        log.warning('[CourseReminderService] [scheduleNotificationsFromExperimentData] Experiment data not available, cannot schedule notifications');
+        log.warning(
+          '[CourseReminderService] [scheduleNotificationsFromExperimentData] Experiment data not available, cannot schedule notifications',
+        );
         return;
       }
 
@@ -516,15 +616,24 @@ class CourseReminderService extends NotificationService
 
       int scheduledCount = 0;
 
-      for (int experimentIndex = 0; experimentIndex < experiments.length; experimentIndex++) {
+      for (
+        int experimentIndex = 0;
+        experimentIndex < experiments.length;
+        experimentIndex++
+      ) {
         final experiment = experiments[experimentIndex];
 
-        for (int timeRangeIndex = 0; timeRangeIndex < experiment.timeRanges.length; timeRangeIndex++) {
+        for (
+          int timeRangeIndex = 0;
+          timeRangeIndex < experiment.timeRanges.length;
+          timeRangeIndex++
+        ) {
           final timeRange = experiment.timeRanges[timeRangeIndex];
           final experimentStartTime = timeRange.$1;
 
           // Skip if experiment is in the past or beyond the schedule range
-          if (experimentStartTime.isBefore(now) || experimentStartTime.isAfter(endDate)) {
+          if (experimentStartTime.isBefore(now) ||
+              experimentStartTime.isAfter(endDate)) {
             continue;
           }
 
@@ -540,17 +649,23 @@ class CourseReminderService extends NotificationService
           // Calculate week index based on experiment start time
           int weekIndex = 0;
           if (classTableController != null) {
-            weekIndex = classTableController.getCurrentWeek(experimentStartTime);
+            weekIndex = classTableController.getCurrentWeek(
+              experimentStartTime,
+            );
             if (weekIndex < 0) weekIndex = 0;
           }
 
           int weekday = experimentStartTime.weekday; // 1=Mon, 7=Sun
-          
+
           // Calculate which class period this experiment corresponds to
           int startClass = _calculateClassPeriodFromTime(experimentStartTime);
 
           // Use a unique ID based on experiment start time to avoid conflicts
-          int notificationId = _generateNotificationId(weekday, startClass, weekIndex);
+          int notificationId = _generateNotificationId(
+            weekday,
+            startClass,
+            weekIndex,
+          );
 
           String locale = _getCurrentLocale();
 
@@ -594,7 +709,9 @@ class CourseReminderService extends NotificationService
         }
       }
 
-      log.info('[CourseReminderService] [scheduleNotificationsFromExperimentData] Scheduled $scheduledCount experiment reminder notifications');
+      log.info(
+        '[CourseReminderService] [scheduleNotificationsFromExperimentData] Scheduled $scheduledCount experiment reminder notifications',
+      );
     } catch (e, stackTrace) {
       log.error(
         '[CourseReminderService] [scheduleNotificationsFromExperimentData] Failed to schedule experiment reminder notifications',
@@ -617,10 +734,11 @@ class CourseReminderService extends NotificationService
           daysToSchedule: daysToSchedule,
           minutesBefore: minutesBefore,
         ),
-        if (preference.getBool(preference.Preference.courseReminderEnableExperimentNotifications)) _scheduleNotificationFromExperimentData(
-          daysToSchedule: daysToSchedule,
-          minutesBefore: minutesBefore,
-        ),
+        if (enableExperimentNotifications)
+          _scheduleNotificationFromExperimentData(
+            daysToSchedule: daysToSchedule,
+            minutesBefore: minutesBefore,
+          ),
       ]);
     } catch (e, stackTrace) {
       log.error(
@@ -633,12 +751,11 @@ class CourseReminderService extends NotificationService
 
   /// Validate and update the scheduled notification
   Future<void> validateAndUpdateNotifications() async {
-    log.info('[CourseReminderService] [validateAndUpdateNotifications] Validating scheduled notifications...');
+    log.info(
+      '[CourseReminderService] [validateAndUpdateNotifications] Validating scheduled notifications...',
+    );
     try {
       // Check if notifications are enabled first
-      final isEnabled = preference.getBool(
-        preference.Preference.enableCourseReminder,
-      );
       if (!isEnabled) {
         log.info(
           '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
@@ -660,7 +777,9 @@ class CourseReminderService extends NotificationService
       final ClassTableData data = controller.classTableData;
 
       if (data.termStartDay.isEmpty) {
-        log.warning('[CourseReminderService] [validateAndUpdateNotifications] Course data not available, cannot validate notifications');
+        log.warning(
+          '[CourseReminderService] [validateAndUpdateNotifications] Course data not available, cannot validate notifications',
+        );
         return;
       }
 
@@ -668,11 +787,11 @@ class CourseReminderService extends NotificationService
       final config = await _loadScheduleConfig();
       final int daysToSchedule = config?['daysToSchedule'] ?? 7;
       final int minutesBefore = config?['minutesBefore'] ?? 5;
-      
+
       // Check if locale has changed
       final currentLocale = _getCurrentLocale();
       final lastLocale = config?['lastLocale'] as String?;
-      
+
       if (lastLocale != null && lastLocale != currentLocale) {
         log.info(
           '[CourseReminderService] [validateAndUpdateNotifications] Locale changed from $lastLocale to $currentLocale',
@@ -699,7 +818,11 @@ class CourseReminderService extends NotificationService
         '[CourseReminderService] [validateAndUpdateNotifications] Successfully rescheduled $newCount notifications',
       );
     } catch (e, stackTrace) {
-      log.error('[CourseReminderService] [validateAndUpdateNotifications] Failed to validate and update notifications', e, stackTrace);
+      log.error(
+        '[CourseReminderService] [validateAndUpdateNotifications] Failed to validate and update notifications',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -738,30 +861,16 @@ class CourseReminderService extends NotificationService
       minutesBefore,
     );
 
-    String lastLocale = _getCurrentLocale();
-    await preference.prefs.setString(
-      'notification_last_locale',
-      lastLocale,
-    );
+    String currentLocale = _getCurrentLocale();
+    await _setLastLocale(currentLocale);
   }
 
   /// Load the config
   Future<Map<String, dynamic>?> _loadScheduleConfig() async {
-    final daysToSchedule = preference.getInt(
-      preference.Preference.courseReminderDaysToSchedule,
-    );
-    final minutesBefore = preference.getInt(
-      preference.Preference.courseReminderMinutesBefore,
-    );
-
     // Return null only if essential config is missing (0 means not configured yet)
     if (daysToSchedule == 0 || minutesBefore == 0) {
       return null;
     }
-
-    final lastLocale = preference.prefs.getString(
-      'notification_last_locale',
-    );
 
     return {
       'daysToSchedule': daysToSchedule,
@@ -774,9 +883,11 @@ class CourseReminderService extends NotificationService
   Future<int> getPendingCourseNotificationsCount() async {
     try {
       final pendingNotifications = await getPendingNotifications();
-      return pendingNotifications.where(
-        (n) => CourseReminderService.isCourseReminderNotificationId(n.id),
-      ).length;
+      return pendingNotifications
+          .where(
+            (n) => CourseReminderService.isCourseReminderNotificationId(n.id),
+          )
+          .length;
     } catch (e, stackTrace) {
       log.error('Failed to get pending notifications count', e, stackTrace);
       return 0;
