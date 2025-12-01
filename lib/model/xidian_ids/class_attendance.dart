@@ -1,0 +1,47 @@
+// Copyright 2025 BenderBlog Rodriguez and contributors.
+// SPDX-License-Identifier: MPL-2.0
+
+class ClassAttendance {
+  // 课程信息
+  final String courseName; // 课程名称 (课程 名称)
+  final String className; // 教学班名称 (教学班 名称)
+
+  // 考勤数据
+  final String checkInCount; // 签到 次数
+  final String personalLeave; // 事假 次数
+  final String sickLeave; // 病假 次数
+  final String officialLeave; // 公假 次数
+  final String absenceCount; // 旷课 次数
+  final String requiredCheckIn; // 应签 次数
+  final String attendanceRate; // 到课 率
+
+  // 学习进度/活动
+  final String readCount; // 已读 次数
+  final String unreadCount; // 未读 次数
+  final String accessCount; // 访问 次数
+  final String taskProgress; // 任务点 进度 (e.g., "0/4")
+  final String homeworkProgress; // 作业 进度 (e.g., "0/0")
+  final String examProgress; // 考试 进度 (e.g., "0/1")
+  final String discussionCount; // 讨论
+  final String materialCount; // 资料
+
+  const ClassAttendance({
+    required this.courseName,
+    required this.className,
+    required this.checkInCount,
+    required this.personalLeave,
+    required this.sickLeave,
+    required this.officialLeave,
+    required this.absenceCount,
+    required this.requiredCheckIn,
+    required this.attendanceRate,
+    required this.readCount,
+    required this.unreadCount,
+    required this.accessCount,
+    required this.taskProgress,
+    required this.homeworkProgress,
+    required this.examProgress,
+    required this.discussionCount,
+    required this.materialCount,
+  });
+}

@@ -53,3 +53,4 @@ app.*.map.json
 
 # fvm flutter sdk
 .fvm/flutter_sdk
+*.APK

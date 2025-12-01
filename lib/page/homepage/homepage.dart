@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/notice_card/club_card.dart';
+import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -80,6 +81,7 @@ class _MainPageState extends State<MainPage> {
     const ScoreCard(),
     const ExamCard(),
     const EmptyClassroomCard(),
+    const ClassAttendanceCard(),
     if (prefs.getBool(prefs.Preference.role) == false) ...[
       const ExperimentCard(),
       const SportCard(),

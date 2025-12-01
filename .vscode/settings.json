@@ -15,7 +15,7 @@
   "files.associations": {
     "*.arb": "json"
   },
-  "licenser.author": "BenderBlog Rodriguez and contributors",
+  "licenser.author": "Traintime PDA Authours, originally by BenderBlog Rodriguez",
   "licenser.license": "MPLv2",
   "licenser.useSPDXLicenseFormat": true,
 }
