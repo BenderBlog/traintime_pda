@@ -24,6 +24,103 @@ class EmptyClassroomSearchWindow extends StatefulWidget {
       _EmptyClassroomSearchWindowState();
 }
 
+/// Dialog for building selection with auto-scroll to selected item
+class _BuildingSelectionDialog extends StatefulWidget {
+  final List<EmptyClassroomPlace> places;
+  final EmptyClassroomPlace chosen;
+  final ValueChanged<EmptyClassroomPlace> onChanged;
+
+  const _BuildingSelectionDialog({
+    required this.places,
+    required this.chosen,
+    required this.onChanged,
+  });
+
+  @override
+  State<_BuildingSelectionDialog> createState() =>
+      _BuildingSelectionDialogState();
+}
+
+class _BuildingSelectionDialogState extends State<_BuildingSelectionDialog> {
+  final ScrollController _scrollController = ScrollController();
+  
+  @override
+  void initState() {
+    super.initState();
+    // Scroll to selected item after the dialog is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToSelectedItem();
+    });
+  }
+
+  void _scrollToSelectedItem() {
+    // Find the index of the selected item
+    final selectedIndex = widget.places.indexWhere(
+      (place) => place.code == widget.chosen.code,
+    );
+    
+    if (selectedIndex == -1 || !_scrollController.hasClients) return;
+
+    // Estimate item height (RadioListTile typically ~56dp)
+    const double estimatedItemHeight = 56.0;
+    final double targetOffset = selectedIndex * estimatedItemHeight;
+    
+    // Get the viewport height
+    final double viewportHeight = _scrollController.position.viewportDimension;
+    
+    // Calculate offset to center the selected item
+    // Try to position the selected item in the middle of the viewport
+    double scrollOffset = targetOffset - (viewportHeight / 2) + (estimatedItemHeight / 2);
+    
+    // Clamp the offset to valid scroll range
+    final double maxScrollExtent = _scrollController.position.maxScrollExtent;
+    final double minScrollExtent = _scrollController.position.minScrollExtent;
+    scrollOffset = scrollOffset.clamp(minScrollExtent, maxScrollExtent);
+    
+    // Animate to the calculated position with a bouncy curve
+    _scrollController.animateTo(
+      scrollOffset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: SizedBox(
+        width: double.maxFinite,
+        child: RadioGroup<EmptyClassroomPlace>(
+          groupValue: widget.chosen,
+          onChanged: (EmptyClassroomPlace? value) {
+            if (value != null) {
+              widget.onChanged(value);
+              Navigator.pop(context);
+            }
+          },
+          child: ListView.builder(
+            controller: _scrollController,
+            shrinkWrap: true,
+            itemCount: widget.places.length,
+            itemBuilder: (context, index) {
+              return RadioListTile<EmptyClassroomPlace>(
+                title: Text(widget.places[index].name),
+                value: widget.places[index],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _EmptyClassroomSearchWindowState
     extends State<EmptyClassroomSearchWindow> {
   final TextEditingController text = TextEditingController();
@@ -127,33 +224,19 @@ class _EmptyClassroomSearchWindowState
 
   void chooseBuilding() => showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      content: SingleChildScrollView(
-        child: RadioGroup<EmptyClassroomPlace>(
-          groupValue: chosen,
-          onChanged: (EmptyClassroomPlace? value) {
-            if (value != null) {
-              setState(() {
-                chosen = value;
-                preference.setString(
-                  preference.Preference.emptyClassroomLastChoice,
-                  chosen.code,
-                );
-                updateData();
-              });
-            }
-            Navigator.pop(context);
-          },
-          child: Column(
-            children: List.generate(widget.places.length, (index) {
-              return RadioListTile<EmptyClassroomPlace>(
-                title: Text(widget.places[index].name),
-                value: widget.places[index],
-              );
-            }),
-          ),
-        ),
-      ),
+    builder: (context) => _BuildingSelectionDialog(
+      places: widget.places,
+      chosen: chosen,
+      onChanged: (EmptyClassroomPlace value) {
+        setState(() {
+          chosen = value;
+          preference.setString(
+            preference.Preference.emptyClassroomLastChoice,
+            chosen.code,
+          );
+          updateData();
+        });
+      },
     ),
   );
 
