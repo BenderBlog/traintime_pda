@@ -58,27 +58,29 @@ class LearningSession extends IDSSession {
       }
 
       List<String> rowData = cells.map((td) => td.text.trim()).toList();
-      results.add(
-        ClassAttendance(
-          courseName: rowData[0],
-          className: rowData[1],
-          checkInCount: rowData[2],
-          personalLeave: rowData[3],
-          sickLeave: rowData[4],
-          officialLeave: rowData[5],
-          absenceCount: rowData[6],
-          requiredCheckIn: rowData[7],
-          attendanceRate: rowData[8],
-          readCount: rowData[9],
-          unreadCount: rowData[10],
-          accessCount: rowData[11],
-          taskProgress: rowData[12],
-          homeworkProgress: rowData[13],
-          examProgress: rowData[14],
-          discussionCount: rowData[15],
-          materialCount: rowData[16],
-        ),
-      );
+      if (!rowData[8].contains('-')) {
+        results.add(
+          ClassAttendance(
+            courseName: rowData[0],
+            className: rowData[1],
+            checkInCount: rowData[2],
+            personalLeave: rowData[3],
+            sickLeave: rowData[4],
+            officialLeave: rowData[5],
+            absenceCount: rowData[6],
+            requiredCheckIn: rowData[7],
+            attendanceRate: rowData[8],
+            readCount: rowData[9],
+            unreadCount: rowData[10],
+            accessCount: rowData[11],
+            taskProgress: rowData[12],
+            homeworkProgress: rowData[13],
+            examProgress: rowData[14],
+            discussionCount: rowData[15],
+            materialCount: rowData[16],
+          ),
+        );
+      }
     }
 
     return results;

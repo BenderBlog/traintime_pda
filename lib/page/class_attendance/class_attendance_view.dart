@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
+import 'package:watermeter/page/class_attendance/class_attandance_card.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_ids/learning_session.dart';
 
@@ -55,68 +56,18 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
             return LayoutBuilder(
               builder: (context, constraints) => AlignedGridView.count(
                 shrinkWrap: true,
+                itemCount: courses.length,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 crossAxisCount: constraints.maxWidth ~/ 280,
                 mainAxisSpacing: 4,
                 crossAxisSpacing: 4,
                 itemBuilder: (context, index) {
-                  return _CourseCard(course: courses[index]);
+                  return CourseCard(course: courses[index]);
                 },
               ),
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _CourseCard extends StatelessWidget {
-  final ClassAttendance course;
-
-  const _CourseCard({required this.course});
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 70,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(value, style: const TextStyle(color: Colors.black87)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ReXCard(
-      title: Text(course.courseName),
-      remaining: [ReXCardRemaining(course.attendanceRate)],
-      bottomRow: Column(
-        children: [
-          _buildInfoRow('签到', course.checkInCount),
-          if (course.absenceCount != "0")
-            _buildInfoRow('旷课', course.absenceCount),
-          if (course.personalLeave != "0")
-            _buildInfoRow('事假', course.personalLeave),
-          if (course.sickLeave != "0") _buildInfoRow('病假', course.sickLeave),
-          if (course.officialLeave != "0")
-            _buildInfoRow('公假', course.officialLeave),
-        ],
       ),
     );
   }

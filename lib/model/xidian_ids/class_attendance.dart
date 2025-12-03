@@ -44,4 +44,20 @@ class ClassAttendance {
     required this.discussionCount,
     required this.materialCount,
   });
+
+  String get isOkToFinalExam {
+    double? attandanceRatio = double.tryParse(
+      attendanceRate.replaceAll(" %", ""),
+    );
+
+    if (attandanceRatio == null) {
+      return "信息不够";
+    } else if (attandanceRatio < 75.0) {
+      return "取消期末考试资格";
+    } else if (attandanceRatio < 90.0) {
+      return "有取消危险";
+    } else {
+      return "暂时安全";
+    }
+  }
 }
