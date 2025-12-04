@@ -75,6 +75,7 @@ dependencies:
   intl:
   timezone: ^0.9.4
   flutter_local_notifications: ^18.0.1
+  contribution_heatmap: ^0.4.2
 
 dev_dependencies:
   flutter_test:

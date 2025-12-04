@@ -25,6 +25,11 @@ class ClassAttendance {
   final String discussionCount; // 讨论
   final String materialCount; // 资料
 
+  // 采自课程信息网页
+  final String? courseId;
+  final String? clazzId;
+  final String? cpi;
+
   const ClassAttendance({
     required this.courseName,
     required this.className,
@@ -43,6 +48,9 @@ class ClassAttendance {
     required this.examProgress,
     required this.discussionCount,
     required this.materialCount,
+    this.courseId,
+    this.clazzId,
+    this.cpi,
   });
 
   String get isOkToFinalExam {

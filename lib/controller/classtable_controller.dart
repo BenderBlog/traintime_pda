@@ -333,4 +333,18 @@ class ClassTableController extends GetxController {
       error = e.toString();
     }
   }
+
+  Map<String, int> get numberOfClass {
+    Map<String, int> toReturn = {};
+    for (var i in classTableData.timeArrangement) {
+      String nameOfClass = classTableData.getClassDetail(i).name;
+      int numberOfClass = i.weekList.where((ok) => ok).length;
+      if (toReturn[nameOfClass] == null) {
+        toReturn[nameOfClass] = numberOfClass;
+      } else {
+        toReturn[nameOfClass] = toReturn[nameOfClass]! + numberOfClass;
+      }
+    }
+    return toReturn;
+  }
 }

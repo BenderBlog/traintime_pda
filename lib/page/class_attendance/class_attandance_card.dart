@@ -6,8 +6,12 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class CourseCard extends StatelessWidget {
   final ClassAttendance course;
+  final int totalTimes;
+  late final int timeToHaveError;
 
-  const CourseCard({super.key, required this.course});
+  CourseCard({super.key, required this.course, required this.totalTimes}) {
+    timeToHaveError = (totalTimes / 4).floor();
+  }
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
@@ -46,12 +50,20 @@ class CourseCard extends StatelessWidget {
             "${course.checkInCount} 已签 / ${course.absenceCount} 旷课 / ${course.requiredCheckIn} 应签",
           ),
           _buildInfoRow(
+            '复活次数',
+            "${timeToHaveError - (int.tryParse(course.absenceCount) ?? 0)} 次 / $totalTimes 总课程",
+          ),
+          _buildInfoRow(
             "请假次数",
             "事假 ${course.personalLeave}；病假 ${course.sickLeave}；公假 ${course.officialLeave}",
           ),
           _buildInfoRow(
             "学习进度",
             "任务点 ${course.taskProgress}；作业 ${course.homeworkProgress}；考试 ${course.examProgress}",
+          ),
+          _buildInfoRow(
+            "调试信息",
+            "课程代码 ${course.courseId}；班级代码 ${course.clazzId}；CPI ${course.cpi}",
           ),
         ],
       ),

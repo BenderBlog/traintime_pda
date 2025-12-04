@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attandance_card.dart';
-import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_ids/learning_session.dart';
+import 'package:get/get.dart';
 
 class ClassAttendanceView extends StatefulWidget {
   const ClassAttendanceView({super.key});
@@ -16,7 +17,9 @@ class ClassAttendanceView extends StatefulWidget {
 }
 
 class _ClassAttendanceViewState extends State<ClassAttendanceView> {
-  late Future<List<ClassAttendance>> _coursesFuture;
+  late Future<List<ClassAttendance>> coursesFuture;
+  late ClassTableController controller;
+  late Map<String, int> classTimes;
 
   Future<List<ClassAttendance>> loadDataFunction() async =>
       LearningSession().getAttandanceRecord();
@@ -25,13 +28,16 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
   void initState() {
     super.initState();
     // 首次进入页面时开始加载数据
-    _coursesFuture = loadDataFunction();
+    coursesFuture = loadDataFunction();
+    controller = Get.put(ClassTableController());
+    classTimes = controller.numberOfClass;
   }
 
   // 下拉刷新时调用的函数
   Future<void> _refreshData() async {
     setState(() {
-      _coursesFuture = loadDataFunction();
+      coursesFuture = loadDataFunction();
+      classTimes = controller.numberOfClass;
     });
   }
 
@@ -42,7 +48,7 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: FutureBuilder<List<ClassAttendance>>(
-          future: _coursesFuture,
+          future: coursesFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -62,7 +68,8 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
                 mainAxisSpacing: 4,
                 crossAxisSpacing: 4,
                 itemBuilder: (context, index) {
-                  return CourseCard(course: courses[index]);
+                  int times = classTimes[courses[index].courseName] ?? 0;
+                  return CourseCard(course: courses[index], totalTimes: times);
                 },
               ),
             );
