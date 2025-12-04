@@ -6,6 +6,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -88,8 +89,29 @@ class LibrarySession extends IDSSession {
     );
   }
 
-  static String bookCover(String isbn) =>
-      "http://124.90.39.130:18080/xdhyy_book//api/bookCover/getBookCover.html?isbn=$isbn";
+  Future<String> bookCover(
+    String title,
+    String isbn,
+    int docNumber,
+  ) async {
+    return await dio
+        .post(
+          "https://findxidian.libsp.cn/find/unify/getPItemAndOnShelfCountAndDuxiuImageUrl",
+          data: {
+            "title": title,
+            "isbn": isbn,
+            "recordId": docNumber,
+          },
+          options: Options(
+            headers: {
+              HttpHeaders.contentTypeHeader: "application/json",
+              HttpHeaders.refererHeader: "https://findxidian.libsp.cn/",
+              "groupCode": "200755",
+            },
+          ),
+        )
+        .then((value) => value.data["data"]["duxiuImageUrl"]?.toString() ?? "");
+  }
 
   Future<String> renew(BorrowData toUse) async {
     return await dio
