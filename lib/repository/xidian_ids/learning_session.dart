@@ -20,8 +20,39 @@ class LearningSession extends IDSSession {
       "https://fycourse.fanya.chaoxing.com/courselist/study";
   static const COURSE_DATA_URL =
       "https://fycourse.fanya.chaoxing.com/courselist/studyCourseDatashow";
+  static const COURSE_DETAIL_URL =
+      "https://mobilelearn.chaoxing.com/v2/apis/signStat/getActiveList";
 
   static String userId = "";
+
+  Future<List<ClassAttendanceDetail>> getAttendanceRecordDetail(
+    ClassAttendance data,
+  ) async {
+    if (data.courseId == null || data.clazzId == null) {
+      return <ClassAttendanceDetail>[];
+    }
+
+    Map<String, dynamic> jsonData = await dio
+        .get(
+          COURSE_DETAIL_URL,
+          queryParameters: {
+            "classId": data.clazzId,
+            "courseId": data.courseId,
+            "page": 1,
+            "pageSize": 999,
+            "puid": "",
+          },
+        )
+        .then((data) => data.data);
+
+    if (jsonData["result"] != 1) throw Exception(jsonData["msg"]);
+
+    List<ClassAttendanceDetail> toReturn =
+        (jsonData["data"]["list"] as List<dynamic>)
+            .map((data) => ClassAttendanceDetail.fromJson(data))
+            .toList();
+    return toReturn;
+  }
 
   Future<List<ClassAttendance>> getAttandanceRecord() async {
     log.info("[LearningSession][getAttandanceRecord] Finding the record...");

@@ -1,5 +1,9 @@
 // Copyright 2025 BenderBlog Rodriguez and contributors.
+// Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
+
+import 'package:json_annotation/json_annotation.dart';
+part 'class_attendance.g.dart';
 
 class ClassAttendance {
   // 课程信息
@@ -68,4 +72,43 @@ class ClassAttendance {
       return "暂时安全";
     }
   }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ClassAttendanceDetail {
+  final String? submittime;
+  final String createxxuid;
+  final int? userStatus;
+  final String creatorName;
+  final int activeid;
+  final String starttime;
+  final int? attendid;
+  final int activeType;
+  final String name;
+  @JsonKey(name: "other_id")
+  final int otherId;
+  final int updatetime;
+  final String createUid;
+  final int status;
+
+  ClassAttendanceDetail({
+    required this.submittime,
+    required this.createxxuid,
+    required this.userStatus,
+    required this.creatorName,
+    required this.activeid,
+    required this.starttime,
+    required this.attendid,
+    required this.activeType,
+    required this.name,
+    required this.otherId,
+    required this.updatetime,
+    required this.createUid,
+    required this.status,
+  });
+
+  factory ClassAttendanceDetail.fromJson(Map<String, dynamic> json) =>
+      _$ClassAttendanceDetailFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassAttendanceDetailToJson(this);
 }

@@ -1,7 +1,10 @@
 // Copyright 2025 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
+import 'package:watermeter/page/class_attendance/class_attendance_detail.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class CourseCard extends StatelessWidget {
@@ -67,6 +70,9 @@ class CourseCard extends StatelessWidget {
           ),
         ],
       ),
+    ).gestures(
+      onTap: () =>
+          context.push(ClassAttendanceDetailView(classAttendance: course)),
     );
   }
 }
