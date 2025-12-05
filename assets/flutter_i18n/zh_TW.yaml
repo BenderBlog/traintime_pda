@@ -37,6 +37,46 @@ weekday:
   friday: 週五
   saturday: 週六
   sunday: 週日
+class_attendance:
+  title: 考勤查詢
+  detail_title: 簽到信息 - {courseName}
+  no_data: 沒有找到課程數據
+  no_attendance_record: 沒有簽到記錄
+  course_state:
+    unknown: 未知
+    ineligible: 取消
+    eligible: 正常
+    warning: 危險
+  card:
+    time: 簽到次數
+    time_info: '{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤'
+    not_attend: 復活次數
+    not_attend_info: '{timeToHaveError} 次 / {totalTimes} 總課程'
+    leave: 請假次數
+    leave_info: 事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}
+    study: 學習進度
+    study_info: 任務點 {taskProgress} / 作業 {homeworkProgress} / 考試 {examProgress}
+  detail_card:
+    creator_name: 發起人
+    start_time: 開始時間
+    summit_time: 提交時間
+  sign_type:
+    qr_code: 二維碼簽到
+    gesture: 手勢簽到
+    position: 位置簽到
+    default: 普通簽到
+  sign_status:
+    absenceNotParticipating: 缺勤未參與
+    signed: 已籤
+    signedByTeacher: 代簽
+    personalLeave2: 請假
+    absence: 缺勤
+    sickLeave: 病假
+    personalLeave: 事假
+    late: 遲到
+    leaveEarly: 早退
+    signExpiredy: 簽到已過期
+    publicLeave: 公假
 classtable:
   partner_classtable:
     override_dialog: 目前有搭子課表數據，是否要覆蓋？
@@ -313,6 +353,7 @@ homepage:
     no_info: 目前無法獲取信息
     fetching_info: 正在查詢信息中
   toolbox:
+    class_attendance: 考勤查詢
     creative: 雙創競賽
     empty_classroom: 空閒教室
     exam: 考試安排

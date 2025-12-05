@@ -2,10 +2,15 @@
 // Copyright 2025 Traintime PDA Authors
 // SPDX-License-Identifier: MPL-2.0
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attandance_card.dart';
+import 'package:watermeter/page/public_widget/empty_list_view.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
+import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 import 'package:watermeter/repository/xidian_ids/learning_session.dart';
 import 'package:get/get.dart';
 
@@ -27,13 +32,11 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
   @override
   void initState() {
     super.initState();
-    // 首次进入页面时开始加载数据
     coursesFuture = loadDataFunction();
     controller = Get.put(ClassTableController());
     classTimes = controller.numberOfClass;
   }
 
-  // 下拉刷新时调用的函数
   Future<void> _refreshData() async {
     setState(() {
       coursesFuture = loadDataFunction();
@@ -44,7 +47,9 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('课程考勤与进度')),
+      appBar: AppBar(
+        title: Text(FlutterI18n.translate(context, "class_attendance.title")),
+      ),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: FutureBuilder<List<ClassAttendance>>(
@@ -53,25 +58,77 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(child: Text('加载数据失败: ${snapshot.error}'));
+              return ReloadWidget(
+                function: () => _refreshData(),
+                errorStatus: snapshot.error,
+                stackTrace: snapshot.stackTrace,
+              );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('没有找到课程数据。'));
+              return EmptyListView(
+                text: FlutterI18n.translate(context, "class_attndance.no_data"),
+                type: EmptyListViewType.rolling,
+              );
             }
 
-            final courses = snapshot.data!;
-            return LayoutBuilder(
-              builder: (context, constraints) => AlignedGridView.count(
-                shrinkWrap: true,
-                itemCount: courses.length,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                crossAxisCount: constraints.maxWidth ~/ 280,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                itemBuilder: (context, index) {
-                  int times = classTimes[courses[index].courseName] ?? 0;
-                  return CourseCard(course: courses[index], totalTimes: times);
-                },
-              ),
+            final courses = snapshot.data!.map((classAttendance) {
+              int times = classTimes[classAttendance.courseName] ?? 0;
+              return CourseCard(course: classAttendance, totalTimes: times);
+            }).toList();
+
+            final warningCourses = courses.toList()
+              ..retainWhere((e) => e.attendanceStatus.contains("warning"));
+            final ineligibleCourses = courses.toList()
+              ..retainWhere((e) => e.attendanceStatus.contains("ineligible"));
+            final eligibleCourses = courses.toList()
+              ..retainWhere((e) => e.attendanceStatus.contains("eligible"));
+            final unknownCourses = courses.toList()
+              ..retainWhere((e) => e.attendanceStatus.contains("unknown"));
+
+            return TimelineWidget(
+              isTitle: [
+                if (ineligibleCourses.isNotEmpty) ...[true, false],
+                if (warningCourses.isNotEmpty) ...[true, false],
+                if (eligibleCourses.isNotEmpty) ...[true, false],
+                if (unknownCourses.isNotEmpty) ...[true, false],
+              ],
+              children: [
+                if (ineligibleCourses.isNotEmpty) ...[
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "class_attendance.course_state.ineligible",
+                    ),
+                  ),
+                  ineligibleCourses.toColumn(),
+                ],
+                if (warningCourses.isNotEmpty) ...[
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "class_attendance.course_state.warning",
+                    ),
+                  ),
+                  warningCourses.toColumn(),
+                ],
+                if (eligibleCourses.isNotEmpty) ...[
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "class_attendance.course_state.eligible",
+                    ),
+                  ),
+                  eligibleCourses.toColumn(),
+                ],
+                if (unknownCourses.isNotEmpty) ...[
+                  TimelineTitle(
+                    title: FlutterI18n.translate(
+                      context,
+                      "class_attendance.course_state.unknown",
+                    ),
+                  ),
+                  unknownCourses.toColumn(),
+                ],
+              ],
             );
           },
         ),

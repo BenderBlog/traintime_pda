@@ -1,6 +1,7 @@
 // Copyright 2025 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_detail.dart';
@@ -11,9 +12,28 @@ class CourseCard extends StatelessWidget {
   final ClassAttendance course;
   final int totalTimes;
   late final int timeToHaveError;
+  late final int remainAbsenceNum;
+  late final int absenceNum;
+  late final String attendanceStatus;
 
   CourseCard({super.key, required this.course, required this.totalTimes}) {
     timeToHaveError = (totalTimes / 4).floor();
+    absenceNum = int.tryParse(course.absenceCount) ?? 0;
+    remainAbsenceNum = timeToHaveError - absenceNum;
+
+    double? attandanceRatio = double.tryParse(
+      course.attendanceRate.replaceAll(" %", ""),
+    );
+
+    if (attandanceRatio == null) {
+      attendanceStatus = "class_attendance.course_state.unknown";
+    } else if (timeToHaveError < absenceNum) {
+      attendanceStatus = "class_attendance.course_state.ineligible";
+    } else if (attandanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
+      attendanceStatus = "class_attendance.course_state.eligible";
+    } else {
+      attendanceStatus = "class_attendance.course_state.warning";
+    }
   }
 
   Widget _buildInfoRow(String label, String value) {
@@ -45,34 +65,68 @@ class CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReXCard(
       title: Text(course.courseName),
-      remaining: [ReXCardRemaining(course.isOkToFinalExam)],
+      remaining: [
+        ReXCardRemaining(FlutterI18n.translate(context, attendanceStatus)),
+      ],
       bottomRow: Column(
         children: [
           _buildInfoRow(
-            '签到次数',
-            "${course.checkInCount} 已签 / ${course.absenceCount} 旷课 / ${course.requiredCheckIn} 应签",
+            FlutterI18n.translate(context, "class_attendance.card.time"),
+            FlutterI18n.translate(
+              context,
+              "class_attendance.card.time_info",
+              translationParams: {
+                "checkInCount": course.checkInCount,
+                "absenceCount": course.absenceCount,
+                "requiredCheckIn": course.requiredCheckIn,
+              },
+            ),
           ),
           _buildInfoRow(
-            '复活次数',
-            "${timeToHaveError - (int.tryParse(course.absenceCount) ?? 0)} 次 / $totalTimes 总课程",
+            FlutterI18n.translate(context, "class_attendance.card.not_attend"),
+            FlutterI18n.translate(
+              context,
+              "class_attendance.card.not_attend_info",
+              translationParams: {
+                "timeToHaveError": remainAbsenceNum.toString(),
+                "totalTimes": totalTimes.toString(),
+              },
+            ),
           ),
           _buildInfoRow(
-            "请假次数",
-            "事假 ${course.personalLeave}；病假 ${course.sickLeave}；公假 ${course.officialLeave}",
+            FlutterI18n.translate(context, "class_attendance.card.leave"),
+            FlutterI18n.translate(
+              context,
+              "class_attendance.card.leave_info",
+              translationParams: {
+                "personalLeave": course.personalLeave,
+                "sickLeave": course.sickLeave,
+                "officialLeave": course.officialLeave,
+              },
+            ),
           ),
           _buildInfoRow(
-            "学习进度",
-            "任务点 ${course.taskProgress}；作业 ${course.homeworkProgress}；考试 ${course.examProgress}",
-          ),
-          _buildInfoRow(
-            "调试信息",
-            "课程代码 ${course.courseId}；班级代码 ${course.clazzId}；CPI ${course.cpi}",
+            FlutterI18n.translate(context, "class_attendance.card.study"),
+            FlutterI18n.translate(
+              context,
+              "class_attendance.card.study_info",
+              translationParams: {
+                "taskProgress": course.taskProgress,
+                "homeworkProgress": course.homeworkProgress,
+                "examProgress": course.examProgress,
+              },
+            ),
           ),
         ],
       ),
     ).gestures(
-      onTap: () =>
-          context.push(ClassAttendanceDetailView(classAttendance: course)),
+      onTap: () {
+        if (course.cpi != null &&
+            course.clazzId != null &&
+            course.courseId != null) {
+          context.push(ClassAttendanceDetailView(classAttendance: course));
+        }
+      },
     );
   }
 }

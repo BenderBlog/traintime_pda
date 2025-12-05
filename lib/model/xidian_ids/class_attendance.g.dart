@@ -19,7 +19,7 @@ ClassAttendanceDetail _$ClassAttendanceDetailFromJson(
   activeType: (json['activeType'] as num).toInt(),
   name: json['name'] as String,
   otherId: (json['other_id'] as num).toInt(),
-  updatetime: (json['updatetime'] as num).toInt(),
+  updatetime: (json['updatetime'] as num?)?.toInt(),
   createUid: json['createUid'] as String,
   status: (json['status'] as num).toInt(),
 );

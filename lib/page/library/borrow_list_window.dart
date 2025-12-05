@@ -53,11 +53,6 @@ class BorrowListDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> borrowList = List<Widget>.generate(
-      borrow_info.borrowList.length,
-      (index) => BorrowInfoCard(toUse: borrow_info.borrowList[index]),
-    );
-
     return Scaffold(
       body: Builder(
         builder: (context) {
@@ -65,12 +60,13 @@ class BorrowListDetail extends StatelessWidget {
             return LayoutBuilder(
               builder: (context, constraints) => AlignedGridView.count(
                 shrinkWrap: true,
-                itemCount: borrowList.length,
+                itemCount: borrow_info.borrowList.length,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 crossAxisCount: constraints.maxWidth ~/ 360,
                 mainAxisSpacing: 4,
                 crossAxisSpacing: 4,
-                itemBuilder: (context, index) => borrowList[index],
+                itemBuilder: (context, index) =>
+                    BorrowInfoCard(toUse: borrow_info.borrowList[index]),
               ),
             );
           } else {

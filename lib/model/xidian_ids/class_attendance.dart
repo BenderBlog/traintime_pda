@@ -2,8 +2,12 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+// ignore_for_file: constant_identifier_names
+
 import 'package:json_annotation/json_annotation.dart';
 part 'class_attendance.g.dart';
+
+enum AttendanceStatus { unknown, eligible, warning, ineligible }
 
 class ClassAttendance {
   // 课程信息
@@ -56,22 +60,6 @@ class ClassAttendance {
     this.clazzId,
     this.cpi,
   });
-
-  String get isOkToFinalExam {
-    double? attandanceRatio = double.tryParse(
-      attendanceRate.replaceAll(" %", ""),
-    );
-
-    if (attandanceRatio == null) {
-      return "信息不够";
-    } else if (attandanceRatio < 75.0) {
-      return "取消期末考试资格";
-    } else if (attandanceRatio < 90.0) {
-      return "有取消危险";
-    } else {
-      return "暂时安全";
-    }
-  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -84,10 +72,10 @@ class ClassAttendanceDetail {
   final String starttime;
   final int? attendid;
   final int activeType;
-  final String name;
+  final String? name;
   @JsonKey(name: "other_id")
   final int otherId;
-  final int updatetime;
+  final int? updatetime;
   final String createUid;
   final int status;
 
@@ -106,6 +94,52 @@ class ClassAttendanceDetail {
     required this.createUid,
     required this.status,
   });
+
+  String get signStatus {
+    switch (userStatus) {
+      case 0:
+        return "class_attendance.sign_status.absenceNotParticipating";
+      case 1:
+        return "class_attendance.sign_status.signed";
+      case 2:
+        return "class_attendance.sign_status.signedByTeacher";
+      case 4:
+        return "class_attendance.sign_status.personalLeave2";
+      case 5:
+        return "class_attendance.sign_status.absence";
+      case 7:
+        return "class_attendance.sign_status.sickLeave";
+      case 8:
+        return "class_attendance.sign_status.personalLeave";
+      case 9:
+        return "class_attendance.sign_status.late";
+      case 10:
+        return "class_attendance.sign_status.leaveEarly";
+      case 11:
+        return "class_attendance.sign_status.signExpiredy";
+      case 12:
+        return "class_attendance.sign_status.publicLeave";
+      default:
+        return "class_attendance.sign_status.absenceNotParticipating";
+    }
+  }
+
+  String get signName {
+    if (name != null) {
+      return name!;
+    } else {
+      switch (otherId) {
+        case 2:
+          return "class_attendance.sign_type.qr_code";
+        case 3:
+          return "class_attendance.sign_type.gesture";
+        case 4:
+          return "class_attendance.sign_type.position";
+        default:
+          return "class_attendance.sign_type.default";
+      }
+    }
+  }
 
   factory ClassAttendanceDetail.fromJson(Map<String, dynamic> json) =>
       _$ClassAttendanceDetailFromJson(json);

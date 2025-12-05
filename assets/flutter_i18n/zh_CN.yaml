@@ -54,6 +54,48 @@ weekday:
     saturday: "周六"
     sunday: "周日"
 
+# 考勤查询
+class_attendance:
+    title: "考勤查询"
+    detail_title: "签到信息 - {courseName}"
+    no_data: "没有找到课程数据"
+    no_attendance_record: "没有签到记录"
+    course_state:
+        unknown: "未知"
+        ineligible: "取消"
+        eligible: "正常"
+        warning: "危险"
+    card:
+        time: "签到次数"
+        time_info: "{checkInCount} 已签 / {absenceCount} 缺勤 / {requiredCheckIn} 应签"
+        not_attend: "复活次数"
+        not_attend_info: "{timeToHaveError} 次 / {totalTimes} 总课程"
+        leave: "请假次数"
+        leave_info: "事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}"
+        study: "学习进度"
+        study_info: "任务点 {taskProgress} / 作业 {homeworkProgress} / 考试 {examProgress}"
+    detail_card:
+        creator_name: "发起人"
+        start_time: "开始时间"
+        summit_time: "提交时间"
+    sign_type:
+        qr_code: "二维码签到"
+        gesture: "手势签到"
+        position: "位置签到"
+        default: "普通签到"
+    sign_status:
+        absenceNotParticipating: 缺勤未参与
+        signed: 已签
+        signedByTeacher: 代签
+        personalLeave2: 请假
+        absence: 缺勤
+        sickLeave: 病假
+        personalLeave: 事假
+        late: 迟到
+        leaveEarly: 早退
+        signExpiredy: 签到已过期
+        publicLeave: 公假
+
 # 日程表/课程表
 classtable:
     partner_classtable:
@@ -337,6 +379,7 @@ homepage:
         no_info: "目前无法获取信息"
         fetching_info: "正在查询信息中"
     toolbox:
+        class_attendance: "考勤查询"
         creative: "双创竞赛"
         empty_classroom: "空闲教室"
         exam: "考试安排"

@@ -68,7 +68,12 @@ class DataList<T> extends StatelessWidget {
       physics: physics,
       itemCount: list.length,
       itemBuilder: (context, index) {
-        return initFormula(list[index]);
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: sheetMaxWidth),
+            child: initFormula(list[index]),
+          ),
+        );
       },
       separatorBuilder: (BuildContext context, int index) =>
           const SizedBox(height: 4),
@@ -137,34 +142,42 @@ class ReloadWidget extends StatelessWidget {
   final void Function() function;
   // Stands for Exception...
   final Object? errorStatus;
+  final StackTrace? stackTrace;
   final String? buttonName;
   const ReloadWidget({
     super.key,
     required this.function,
     this.buttonName,
     this.errorStatus,
+    this.stackTrace,
   });
 
   @override
   Widget build(BuildContext context) {
     return [
-          Text(
-            "${FlutterI18n.translate(context, "error_detected")}\n"
-            "${errorStatus != null ? errorStatus.toString() : ""}",
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 8),
+          [
+                Text(
+                  FlutterI18n.translate(context, "error_detected"),
+                  style: const TextStyle(fontSize: 16),
+                ).center().padding(bottom: 8),
+                if (errorStatus != null)
+                  Text("Description: $errorStatus").padding(bottom: 8),
+                if (stackTrace != null)
+                  Text("Stacktrace: \n$stackTrace", textAlign: TextAlign.left),
+              ]
+              .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
+              .scrollable()
+              .expanded(),
           FilledButton(
             onPressed: function,
             child: Text(
               buttonName ?? FlutterI18n.translate(context, "click_to_refresh"),
             ),
-          ),
+          ).padding(top: 8),
         ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)
-        .center()
-        .padding(horizontal: 20)
-        .constrained(maxWidth: 600);
+        .padding(horizontal: 20, vertical: 8)
+        .constrained(maxWidth: 600)
+        .center();
   }
 }

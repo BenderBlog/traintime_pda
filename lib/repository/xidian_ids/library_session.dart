@@ -89,19 +89,11 @@ class LibrarySession extends IDSSession {
     );
   }
 
-  Future<String> bookCover(
-    String title,
-    String isbn,
-    int docNumber,
-  ) async {
+  Future<String> bookCover(String title, String isbn, int docNumber) async {
     return await dio
         .post(
           "https://findxidian.libsp.cn/find/unify/getPItemAndOnShelfCountAndDuxiuImageUrl",
-          data: {
-            "title": title,
-            "isbn": isbn,
-            "recordId": docNumber,
-          },
+          data: {"title": title, "isbn": isbn, "recordId": docNumber},
           options: Options(
             headers: {
               HttpHeaders.contentTypeHeader: "application/json",
