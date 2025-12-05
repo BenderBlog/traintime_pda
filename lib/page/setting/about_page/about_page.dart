@@ -36,6 +36,18 @@ class _AboutPageState extends State<AboutPage> {
       "https://space.bilibili.com/284290692",
     ),
     Developer(
+      "A1nair",
+      "https://avatars.githubusercontent.com/u/36269472",
+      FlutterI18n.translate(context, "setting.about_page.alnair"),
+      "https://github.com/A1nair",
+    ),
+    Developer(
+      "Appkad (Kevin)",
+      "https://avatars.githubusercontent.com/u/97880629",
+      FlutterI18n.translate(context, "setting.about_page.aqqkad"),
+      "https://github.com/aqqkad",
+    ),
+    Developer(
       "BellssGit",
       "https://avatars.githubusercontent.com/u/107785251",
       FlutterI18n.translate(context, "setting.about_page.bellssgit"),

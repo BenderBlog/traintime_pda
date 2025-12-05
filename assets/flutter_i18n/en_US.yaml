@@ -753,6 +753,8 @@ setting:
    easter_egg_page: "You found an Easter egg"
    about_page:
       benderblog: "Main developer, iOS widget"
+      alnair: "Development: Library search and cover"
+      aqqkad: "Development: Class attandance history"
       bellssgit: "Support: best and longest feedback source"
       brackrat: "Design: homepage, login page, color scheme, iOS widgets, etc."
       breezeline: "Support: valueless and meaningless product manager (from his own description)"
@@ -760,7 +762,7 @@ setting:
       chitao1234: "Development: fix slider misalignment issue"
       dimole: "Development support: assist in fixing slider issue"
       elitewars: "Design: sports score page"
-      elliot: "Internationalization: English translation / Development guidance: on partner classtable development"
+      elliot: "Internationalization: English translation / Development guidance: on partner classtable development (This function has been removed)"
       godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar"
       hancl777: "Internationalization: Traditional Chinese conversion code"
       hazuki-keatsu: "Development: Physics experiment score query and recognization"
@@ -776,7 +778,7 @@ setting:
       pairman: "Development: score cache and optimize slider algorithm / Internationalization: English correction"
       reverierxu: "Design: REX card for information display / Development support: on postgraduate class schedule"
       rrrilac: "Development support: electricity query"
-      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development / Internationalization: English correction"
+      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development (This function has been removed) / Internationalization: English correction"
       shadowyingyi: "Support: two times of pigeon house official account publicity" # keep this line
       stalomeow: "Design: homepage timeline / Development: asynchronous login and captcha predict"
       xeonds: "Design: settings page / Development: XDU Planet / Development: Payment Code"

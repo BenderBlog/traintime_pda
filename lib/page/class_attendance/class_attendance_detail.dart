@@ -1,3 +1,7 @@
+// Copyright 2025 BenderBlog Rodriguez and contributors.
+// Copyright 2025 Traintime PDA authors.
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/repository/xidian_ids/learning_session.dart';
