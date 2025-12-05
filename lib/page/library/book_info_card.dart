@@ -20,8 +20,15 @@ class BookInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return [
-      CachedNetworkImage(
-        imageUrl: LibrarySession.bookCover(toUse.isbn ?? ""),
+      FutureBuilder<String>(
+        future: LibrarySession().bookCover(
+          toUse.bookName,
+          toUse.isbn ?? "",
+          toUse.docNumber,
+        ),
+        builder: (context, snapshot) {
+          return CachedNetworkImage(
+            imageUrl: snapshot.data ?? "",
         placeholder: (context, url) => Image.asset(
           "assets/art/pda_empty_cover.jpg",
           width: 176 * 0.6,
@@ -44,6 +51,8 @@ class BookInfoCard extends StatelessWidget {
           } else {
             log.info('Image Exception is: ${e.runtimeType}');
           }
+        },
+      );
         },
       ).clipRRect(all: 14),
       const VerticalDivider(color: Colors.transparent),

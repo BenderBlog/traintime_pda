@@ -31,8 +31,15 @@ class _BookDetailCardState extends State<BookDetailCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CachedNetworkImage(
-                  imageUrl: LibrarySession.bookCover(widget.toUse.isbn ?? ""),
+            FutureBuilder<String>(
+              future: LibrarySession().bookCover(
+                widget.toUse.bookName,
+                widget.toUse.isbn ?? "",
+                widget.toUse.docNumber,
+              ),
+              builder: (context, snapshot) {
+                return CachedNetworkImage(
+                  imageUrl: snapshot.data ?? "",
                   placeholder: (context, url) => Image.asset(
                     "assets/art/pda_empty_cover.jpg",
                     width: 120,
@@ -56,7 +63,9 @@ class _BookDetailCardState extends State<BookDetailCard> {
                       log.info('Image Exception is: ${e.runtimeType}');
                     }
                   },
-                )
+                );
+              },
+            )
                 //.clipRect(clipper: BookImageClipper())
                 .clipRRect(all: 14)
                 .padding(all: 2)
