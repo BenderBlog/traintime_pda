@@ -17,11 +17,21 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 import 'package:watermeter/page/library/borrow_info_card.dart';
 
-class BorrowListWindow extends StatelessWidget {
+class BorrowListWindow extends StatefulWidget {
   const BorrowListWindow({super.key});
 
   @override
+  State<BorrowListWindow> createState() => _BorrowListWindowState();
+}
+
+class _BorrowListWindowState extends State<BorrowListWindow>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Obx(() {
       Widget child() {
         switch (borrow_info.state.value) {
