@@ -33,6 +33,7 @@ class BorrowData {
   final String publishYear;
   final String? titles;
   final String barcode;
+  String? imageUrl;
 
   BorrowData({
     required this.lendDay,
@@ -58,6 +59,7 @@ class BorrowData {
     required this.publishYear,
     required this.titles,
     required this.barcode,
+    this.imageUrl,
   });
 
   DateTime get loanDateTime => DateTime.parse(loanDate.replaceAll('/', '-'));
@@ -90,8 +92,9 @@ class BookInfo {
   final List<String?>? barCodes;
   final List<String>? searchCode;
   final List<BookLocation>? items;
+  String? imageUrl;
 
-  const BookInfo({
+  BookInfo({
     this.author,
     this.subject,
     this.isbn,
@@ -109,6 +112,7 @@ class BookInfo {
     this.searchCode,
     required this.barCodes,
     this.items,
+    this.imageUrl,
   });
 
   factory BookInfo.fromJson(Map<String, dynamic> json) =>

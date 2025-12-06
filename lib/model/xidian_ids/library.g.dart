@@ -30,6 +30,7 @@ BorrowData _$BorrowDataFromJson(Map<String, dynamic> json) => BorrowData(
   publishYear: json['publishYear'] as String,
   titles: json['titles'] as String?,
   barcode: json['barcode'] as String,
+  imageUrl: json['imageUrl'] as String?,
 );
 
 Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
@@ -57,6 +58,7 @@ Map<String, dynamic> _$BorrowDataToJson(BorrowData instance) =>
       'publishYear': instance.publishYear,
       'titles': instance.titles,
       'barcode': instance.barcode,
+      'imageUrl': instance.imageUrl,
     };
 
 BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
@@ -87,6 +89,7 @@ BookInfo _$BookInfoFromJson(Map<String, dynamic> json) => BookInfo(
   items: (json['items'] as List<dynamic>?)
       ?.map((e) => BookLocation.fromJson(e as Map<String, dynamic>))
       .toList(),
+  imageUrl: json['imageUrl'] as String?,
 );
 
 Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{
@@ -107,6 +110,7 @@ Map<String, dynamic> _$BookInfoToJson(BookInfo instance) => <String, dynamic>{
   'barCodes': instance.barCodes,
   'searchCode': instance.searchCode,
   'items': instance.items,
+  'imageUrl': instance.imageUrl,
 };
 
 BookLocation _$BookLocationFromJson(Map<String, dynamic> json) => BookLocation(

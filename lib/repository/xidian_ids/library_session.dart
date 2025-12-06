@@ -83,10 +83,21 @@ class LibrarySession extends IDSSession {
           }
         });
 
-    return List<BookInfo>.generate(
-      rawData.length ?? 0,
-      (index) => BookInfo.fromJson(rawData[index]),
-    );
+    List<BookInfo> toReturn = [];
+
+    await Future.wait([
+      ...List<BookInfo>.generate(
+        rawData.length,
+        (index) => BookInfo.fromJson(rawData[index]),
+      ).map(
+        (e) => Future(() async {
+          e.imageUrl = await bookCover(e.bookName, e.isbn ?? "", e.docNumber);
+          toReturn.add(e);
+        }),
+      ),
+    ]);
+
+    return toReturn;
   }
 
   Future<String> bookCover(String title, String isbn, int docNumber) async {
@@ -157,12 +168,26 @@ class LibrarySession extends IDSSession {
           .then((value) => value.data["data"]);
 
       borrowList.clear();
-      borrowList.addAll(
-        List<BorrowData>.generate(
+      await Future.wait([
+        ...List<BorrowData>.generate(
           rawData.length,
           (index) => BorrowData.fromJson(rawData[index]),
+        ).map(
+          (e) => Future(() async {
+            e.imageUrl = await searchBook(e.barcode, 1, searchField: "barcode")
+                .then(
+                  (books) => books.isNotEmpty
+                      ? LibrarySession().bookCover(
+                          books.first.bookName,
+                          books.first.isbn ?? "",
+                          books.first.docNumber,
+                        )
+                      : Future.value(""),
+                );
+            borrowList.add(e);
+          }),
         ),
-      );
+      ]);
       state.value = SessionState.fetched;
     } catch (e) {
       error.value = e.toString();

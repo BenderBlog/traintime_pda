@@ -17,7 +17,7 @@ ClassAttendanceDetail _$ClassAttendanceDetailFromJson(
   starttime: json['starttime'] as String,
   attendid: (json['attendid'] as num?)?.toInt(),
   activeType: (json['activeType'] as num).toInt(),
-  name: json['name'] as String,
+  name: json['name'] as String?,
   otherId: (json['other_id'] as num).toInt(),
   updatetime: (json['updatetime'] as num?)?.toInt(),
   createUid: json['createUid'] as String,
