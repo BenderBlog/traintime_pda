@@ -25,11 +25,14 @@ class LearningSession extends IDSSession {
 
   static String userId = "";
 
+  // Returns a list of ClassAttandanceDetail and Total and PageNum
   Future<List<ClassAttendanceDetail>> getAttendanceRecordDetail(
     ClassAttendance data,
+    int page,
+    int pageSize,
   ) async {
     if (data.courseId == null || data.clazzId == null) {
-      return <ClassAttendanceDetail>[];
+      return [];
     }
 
     Map<String, dynamic> jsonData = await dio
@@ -38,19 +41,19 @@ class LearningSession extends IDSSession {
           queryParameters: {
             "classId": data.clazzId,
             "courseId": data.courseId,
-            "page": 1,
-            "pageSize": 999,
+            "page": page,
+            "pageSize": pageSize,
             "puid": "",
           },
         )
         .then((data) => data.data);
 
-    if (jsonData["result"] != 1) throw Exception(jsonData["msg"]);
-
+    // if (jsonData["result"] != 1) throw Exception(jsonData["msg"]);
     List<ClassAttendanceDetail> toReturn =
-        (jsonData["data"]["list"] as List<dynamic>)
-            .map((data) => ClassAttendanceDetail.fromJson(data))
-            .toList();
+        (jsonData["data"]?["list"] as List<dynamic>?)
+            ?.map((data) => ClassAttendanceDetail.fromJson(data))
+            .toList() ??
+        [];
     return toReturn;
   }
 

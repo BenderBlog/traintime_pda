@@ -121,9 +121,7 @@ class CourseCard extends StatelessWidget {
       ),
     ).gestures(
       onTap: () {
-        if (course.cpi != null &&
-            course.clazzId != null &&
-            course.courseId != null) {
+        if (!attendanceStatus.contains("unknown")) {
           context.push(ClassAttendanceDetailView(classAttendance: course));
         }
       },

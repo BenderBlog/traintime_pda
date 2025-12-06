@@ -1,6 +1,7 @@
 // Copyright 2025 BenderBlog Rodriguez and contributors.
 // Copyright 2025 Traintime PDA Authors
 // SPDX-License-Identifier: MPL-2.0
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -65,7 +66,10 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
               );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return EmptyListView(
-                text: FlutterI18n.translate(context, "class_attndance.no_data"),
+                text: FlutterI18n.translate(
+                  context,
+                  "class_attendance.no_data",
+                ),
                 type: EmptyListViewType.rolling,
               );
             }
