@@ -18,24 +18,28 @@ class SchoolNetPasswordDialog extends StatefulWidget {
 }
 
 class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
-  final TextEditingController _schoolNetPasswordController =
-      TextEditingController.fromValue(
-        TextEditingValue(
-          text: preference.getString(
-            preference.Preference.schoolNetQueryPassword,
-          ),
-          selection: TextSelection.fromPosition(
-            TextPosition(
-              affinity: TextAffinity.downstream,
-              offset: preference
-                  .getString(preference.Preference.electricityPassword)
-                  .length,
-            ),
-          ),
-        ),
-      );
+  late final TextEditingController _schoolNetPasswordController;
 
   bool _couldView = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final pwd =
+        preference.getString(preference.Preference.schoolNetQueryPassword) ?? '';
+    _schoolNetPasswordController = TextEditingController.fromValue(
+      TextEditingValue(
+        text: pwd,
+        selection: TextSelection.collapsed(offset: pwd.length),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _schoolNetPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
