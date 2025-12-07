@@ -25,6 +25,38 @@ class LearningSession extends IDSSession {
 
   static String userId = "";
 
+  Future<bool> isLogin() async {
+    return await dio
+        .get(
+          COURSE_DETAIL_URL,
+          queryParameters: {
+            "classId": 123,
+            "courseId": 1,
+            "page": 1,
+            "pageSize": 999,
+            "puid": "",
+          },
+        )
+        .then((data) => data.data["errorMsg"] != "请登录后再试");
+  }
+
+  Future<void> loginLearningSession() async {
+    log.info("[LearningSession][loginLearningSession] Logging in");
+    String? location = await checkAndLogin(
+      target: LOGIN_URL,
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+    );
+
+    while (location != null) {
+      var response = await dio.get(location);
+      log.info(
+        "[LearningSession][loginLearningSession] Received location: $location.",
+      );
+      location = response.headers[HttpHeaders.locationHeader]?[0];
+    }
+  }
+
   // Returns a list of ClassAttandanceDetail and Total and PageNum
   Future<List<ClassAttendanceDetail>> getAttendanceRecordDetail(
     ClassAttendance data,
@@ -33,6 +65,11 @@ class LearningSession extends IDSSession {
   ) async {
     if (data.courseId == null || data.clazzId == null) {
       return [];
+    }
+
+    if (await isLogin() == false) {
+      log.info("[LearningSession][getAttendanceRecordDetail] Need login");
+      await loginLearningSession();
     }
 
     Map<String, dynamic> jsonData = await dio
@@ -58,19 +95,9 @@ class LearningSession extends IDSSession {
   }
 
   Future<List<ClassAttendance>> getAttandanceRecord() async {
-    log.info("[LearningSession][getAttandanceRecord] Finding the record...");
-    String? location = await checkAndLogin(
-      target: LOGIN_URL,
-      sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
-    );
-
-    while (location != null) {
-      var response = await dio.get(location);
-      log.info(
-        "[LearningSession][getAttandanceRecord] Received location: $location.",
-      );
-      location = response.headers[HttpHeaders.locationHeader]?[0];
+    if (await isLogin() == false) {
+      log.info("[LearningSession][getAttandanceRecord] Need login");
+      await loginLearningSession();
     }
 
     log.info("[LearningSession][getAttandanceRecord] Fetching class list info");

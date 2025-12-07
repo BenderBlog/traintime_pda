@@ -25,8 +25,9 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
   @override
   void initState() {
     super.initState();
-    final pwd =
-        preference.getString(preference.Preference.schoolNetQueryPassword) ?? '';
+    final pwd = preference.getString(
+      preference.Preference.schoolNetQueryPassword,
+    );
     _schoolNetPasswordController = TextEditingController.fromValue(
       TextEditingValue(
         text: pwd,
