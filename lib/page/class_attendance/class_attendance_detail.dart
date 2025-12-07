@@ -114,7 +114,6 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                       ],
                     );
                   },
-                  newPageErrorIndicatorBuilder: (context) => Placeholder(),
                   noItemsFoundIndicatorBuilder: (context) => EmptyListView(
                     text: FlutterI18n.translate(
                       context,

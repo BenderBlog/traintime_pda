@@ -15,6 +15,7 @@ dependencies:
   talker_dio_logger: ^5.0.0
   tflite_flutter: ^0.11.0
   synchronized: ^3.1.0+1
+  pool: ^1.5.2
   # Stroage Cache
   shared_preferences: ^2.5.3
   dio_cookie_manager: ^3.0.0

@@ -4,11 +4,10 @@
 
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
-import 'package:easy_refresh/easy_refresh.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/page/public_widget/empty_list_view.dart';
+// import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as search_book;
@@ -81,52 +80,31 @@ class SearchBookWindow extends StatefulWidget {
 
 class _SearchBookWindowState extends State<SearchBookWindow>
     with AutomaticKeepAliveClientMixin {
-  var searchList = <BookInfo>[].obs;
-  var search = "".obs;
-  var selectedSearchField = SearchField.keyWord.obs;
-  int page = 1;
-  bool noMore = false;
-  var isSearching = false.obs;
+  late final PagingController<int, BookInfo> _pagingController =
+      PagingController<int, BookInfo>(
+        getNextPageKey: (state) =>
+            state.lastPageIsEmpty ? null : state.nextIntPageKey,
+
+        fetchPage: (pageKey) => search_book.LibrarySession().searchBook(
+          search,
+          pageKey,
+          searchField: selectedSearchField.apiValue,
+        ),
+      );
+
+  String search = '';
+  SearchField selectedSearchField = SearchField.keyWord;
 
   @override
   bool get wantKeepAlive => true;
 
-  late EasyRefreshController _controller;
-  late TextEditingController text;
-
-  @override
-  void initState() {
-    _controller = EasyRefreshController(
-      controlFinishRefresh: true,
-      controlFinishLoad: true,
-    );
-    text = TextEditingController.fromValue(
-      TextEditingValue(text: search.value),
-    );
-    super.initState();
-  }
-
-  Future<void> searchBook() async {
-    if (!noMore) {
-      isSearching.value = true;
-      List<BookInfo> get = await search_book.LibrarySession().searchBook(
-        search.value,
-        page,
-        searchField: selectedSearchField.value.apiValue,
-      );
-      if (get.isEmpty) {
-        noMore = true;
-      } else {
-        searchList.addAll(get);
-        page++;
-      }
-      isSearching.value = false;
-    }
-  }
+  late final TextEditingController _textEditingController =
+      TextEditingController.fromValue(TextEditingValue(text: search));
 
   @override
   void dispose() {
-    _controller.dispose();
+    _textEditingController.dispose();
+    _pagingController.dispose();
     super.dispose();
   }
 
@@ -141,7 +119,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextFormField(
-                controller: text,
+                controller: _textEditingController,
                 decoration: InputDecoration(
                   hintText: FlutterI18n.translate(
                     context,
@@ -160,83 +138,109 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                     vertical: 10,
                   ),
                 ),
-                onChanged: (String text) => search.value = text,
-                onFieldSubmitted: (value) => setState(() {
-                  searchList.clear();
-                  page = 1;
-                  noMore = false;
-                  searchBook();
-                }),
+                onChanged: (String textFieldValue) => search = textFieldValue,
+                onFieldSubmitted: (value) {
+                  _pagingController.refresh();
+                },
               ).flexible(flex: 2),
               const SizedBox(width: 8),
-              Obx(
-                () => DropdownButtonHideUnderline(
-                  child: DropdownButton<SearchField>(
-                    value: selectedSearchField.value,
-                    items: SearchField.values
-                        .map(
-                          (SearchField field) => DropdownMenuItem<SearchField>(
-                            value: field,
-                            child: Text(field.getLabel(context)),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (SearchField? newValue) {
-                      if (newValue != null) {
-                        selectedSearchField.value = newValue;
-                      }
-                    },
-                  ),
+              DropdownButtonHideUnderline(
+                child: DropdownButton<SearchField>(
+                  value: selectedSearchField,
+                  items: SearchField.values
+                      .map(
+                        (SearchField field) => DropdownMenuItem<SearchField>(
+                          value: field,
+                          child: Text(field.getLabel(context)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (SearchField? newValue) {
+                    if (newValue != null) {
+                      selectedSearchField = newValue;
+                      _pagingController.refresh();
+                    }
+                  },
                 ),
               ).flexible(),
             ],
           ).padding(vertical: 8).constrained(maxWidth: sheetMaxWidth),
-          EasyRefresh(
-            footer: ClassicFooter(
-              dragText: FlutterI18n.translate(context, "drag_text"),
-              readyText: FlutterI18n.translate(context, "ready_text"),
-              processingText: FlutterI18n.translate(context, "processing_text"),
-              processedText: FlutterI18n.translate(context, "processed_text"),
-              noMoreText: FlutterI18n.translate(context, "no_more_text"),
-              failedText: FlutterI18n.translate(context, "failed_text"),
-              infiniteOffset: null,
-            ),
-            onLoad: () async {
-              await searchBook();
-            },
-            child: Obx(() {
-              if (searchList.isNotEmpty) {
-                List<Widget> bookList = List<Widget>.generate(
-                  searchList.length,
-                  (index) => GestureDetector(
-                    child: BookInfoCard(toUse: searchList[index]),
-                    onTap: () => BothSideSheet.show(
-                      context: context,
-                      title: FlutterI18n.translate(
-                        context,
-                        "library.book_detail",
+          PagingListener(
+            controller: _pagingController,
+            builder: (context, state, fetchNextPage) => LayoutBuilder(
+              builder: (context, constraints) =>
+                  PagedMasonryGridView<int, BookInfo>.count(
+                    state: state,
+                    fetchNextPage: fetchNextPage,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    crossAxisCount: constraints.maxWidth ~/ 360,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    builderDelegate: PagedChildBuilderDelegate<BookInfo>(
+                      itemBuilder: (context, item, index) =>
+                          GestureDetector(
+                                child: BookInfoCard(toUse: item),
+                                onTap: () => BothSideSheet.show(
+                                  context: context,
+                                  title: FlutterI18n.translate(
+                                    context,
+                                    "library.book_detail",
+                                  ),
+                                  child: BookDetailCard(toUse: item),
+                                ),
+                              )
+                              .padding(horizontal: 12, vertical: 2)
+                              .width(double.infinity)
+                              .constrained(width: sheetMaxWidth)
+                              .center(),
+                      firstPageProgressIndicatorBuilder: (context) =>
+                          const Center(child: CircularProgressIndicator()),
+                      firstPageErrorIndicatorBuilder: (context) => ReloadWidget(
+                        function: () async => _pagingController.refresh(),
+                        errorStatus: _pagingController.error,
                       ),
-                      child: BookDetailCard(toUse: searchList[index]),
+                      noItemsFoundIndicatorBuilder: (context) => Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 32,
+                            horizontal: 16,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.search, size: 96.0),
+                              const SizedBox(height: 16),
+                              Text(
+                                FlutterI18n.translate(
+                                  context,
+                                  "library.no_result",
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      noMoreItemsIndicatorBuilder: (context) =>
+                          [
+                                Icon(Icons.sentiment_very_satisfied, size: 32),
+                                SizedBox(width: 8),
+                                Text(
+                                  "That's all folks!",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                              ]
+                              .toRow(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                              )
+                              .padding(vertical: 12)
+                              .center(),
                     ),
                   ),
-                );
-                return ListView.builder(
-                  itemCount: bookList.length,
-                  itemBuilder: (context, index) => bookList[index]
-                      .padding(horizontal: 12, vertical: 2)
-                      .width(double.infinity)
-                      .constrained(width: sheetMaxWidth)
-                      .center(),
-                );
-              } else if (isSearching.value) {
-                return const Center(child: CircularProgressIndicator());
-              } else {
-                return EmptyListView(
-                  type: EmptyListViewType.reading,
-                  text: FlutterI18n.translate(context, "library.no_result"),
-                );
-              }
-            }),
+            ),
           ).expanded(),
         ],
       ),

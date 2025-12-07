@@ -7,6 +7,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:pool/pool.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -84,13 +85,14 @@ class LibrarySession extends IDSSession {
         });
 
     List<BookInfo> toReturn = [];
+    final pool = Pool(5);
 
     await Future.wait([
       ...List<BookInfo>.generate(
         rawData.length,
         (index) => BookInfo.fromJson(rawData[index]),
       ).map(
-        (e) => Future(() async {
+        (e) => pool.withResource(() async {
           e.imageUrl = await bookCover(e.bookName, e.isbn ?? "", e.docNumber);
           toReturn.add(e);
         }),
@@ -168,12 +170,13 @@ class LibrarySession extends IDSSession {
           .then((value) => value.data["data"]);
 
       borrowList.clear();
+      final pool = Pool(5);
       await Future.wait([
         ...List<BorrowData>.generate(
           rawData.length,
           (index) => BorrowData.fromJson(rawData[index]),
         ).map(
-          (e) => Future(() async {
+          (e) => pool.withResource(() async {
             e.imageUrl = await searchBook(e.barcode, 1, searchField: "barcode")
                 .then(
                   (books) => books.isNotEmpty

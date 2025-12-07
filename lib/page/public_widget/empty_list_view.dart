@@ -31,6 +31,7 @@ class EmptyListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(assets, scale: 1.5),
         const Divider(color: Colors.transparent),
