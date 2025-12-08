@@ -10,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:watermeter/model/xidian_sport/score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
@@ -26,116 +25,81 @@ class _SportScoreWindowState extends State<SportScoreWindow>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  late EasyRefreshController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = EasyRefreshController(
-      controlFinishRefresh: true,
-      controlFinishLoad: true,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    if (sportScore.value.situation == null && sportScore.value.detail.isEmpty) {
+      SportSession().getScore();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (sportScore.value.situation == null && sportScore.value.detail.isEmpty) {
-      SportSession().getScore();
-    }
     super.build(context);
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
-        child: EasyRefresh.builder(
-          controller: _controller,
-          clipBehavior: Clip.none,
-          header: const MaterialHeader(
-            clamping: true,
-            showBezierBackground: false,
-            bezierBackgroundAnimation: false,
-            bezierBackgroundBounce: false,
-            springRebound: false,
-          ),
-          onRefresh: () async {
-            await SportSession().getScore();
-            _controller.finishRefresh();
-            _controller.resetFooter();
-          },
-          refreshOnStart: true,
-          childBuilder: (context, physics) => Obx(() {
-            if (sportScore.value.situation == null &&
-                sportScore.value.detail.isNotEmpty) {
-              List<Widget> things = [
-                ReXCard(
-                  title: Text(
-                    FlutterI18n.translate(context, "sport.total_score"),
-                  ),
-                  remaining: [
-                    ReXCardRemaining(
-                      sportScore.value.total,
-                      color: sportScore.value.rank.contains("不")
-                          ? Colors.red
-                          : null,
-                      isBold: true,
-                    ),
-                    ReXCardRemaining(
-                      sportScore.value.rank,
-                      color: sportScore.value.rank.contains("不")
-                          ? Colors.red
-                          : null,
-                      isBold: sportScore.value.rank.contains("不"),
-                    ),
-                  ],
-                  bottomRow: Text(
-                    sportScore.value.detail.substring(
-                      0,
-                      sportScore.value.detail.indexOf("\\"),
-                    ),
-                  ),
-                ),
-              ];
-              things.addAll(
-                List<Widget>.generate(
-                  sportScore.value.list.length,
-                  (index) => ScoreCard(toUse: sportScore.value.list[index]),
-                ).reversed,
-              );
-              return DataList<Widget>(
-                physics: physics,
-                list: things,
-                initFormula: (toUse) => toUse,
-              );
-            } else if (sportScore.value.situation ==
-                "sport.situation_fetching") {
-              return const Center(child: CircularProgressIndicator());
-            } else {
-              return Center(
-                child: ReloadWidget(
-                  function: () => _controller.callRefresh(),
-                  errorStatus: sportClass.value.situation != null
-                      ? FlutterI18n.translate(
-                          context,
-                          "sport.situation_error",
-                          translationParams: {
-                            "situation": FlutterI18n.translate(
-                              context,
-                              sportClass.value.situation ?? "",
-                            ),
-                          },
-                        )
+    return RefreshIndicator(
+      onRefresh: () async {
+        await SportSession().getClass();
+      },
+      child: Obx(() {
+        if (sportScore.value.situation == null &&
+            sportScore.value.detail.isNotEmpty) {
+          List<Widget> things = [
+            ReXCard(
+              title: Text(FlutterI18n.translate(context, "sport.total_score")),
+              remaining: [
+                ReXCardRemaining(
+                  sportScore.value.total,
+                  color: sportScore.value.rank.contains("不")
+                      ? Colors.red
                       : null,
+                  isBold: true,
                 ),
-              );
-            }
-          }),
-        ),
-      ),
+                ReXCardRemaining(
+                  sportScore.value.rank,
+                  color: sportScore.value.rank.contains("不")
+                      ? Colors.red
+                      : null,
+                  isBold: sportScore.value.rank.contains("不"),
+                ),
+              ],
+              bottomRow: Text(
+                sportScore.value.detail.substring(
+                  0,
+                  sportScore.value.detail.indexOf("\\"),
+                ),
+              ),
+            ),
+          ];
+          things.addAll(
+            List<Widget>.generate(
+              sportScore.value.list.length,
+              (index) => ScoreCard(toUse: sportScore.value.list[index]),
+            ).reversed,
+          );
+          return DataList<Widget>(list: things, initFormula: (toUse) => toUse);
+        } else if (sportScore.value.situation == "sport.situation_fetching") {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return Center(
+            child: ReloadWidget(
+              function: () => SportSession().getClass(),
+              errorStatus: sportClass.value.situation != null
+                  ? FlutterI18n.translate(
+                      context,
+                      "sport.situation_error",
+                      translationParams: {
+                        "situation": FlutterI18n.translate(
+                          context,
+                          sportClass.value.situation ?? "",
+                        ),
+                      },
+                    )
+                  : null,
+            ),
+          );
+        }
+      }),
     );
   }
 }

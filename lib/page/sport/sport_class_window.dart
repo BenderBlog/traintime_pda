@@ -2,7 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
@@ -24,88 +23,75 @@ class _SportClassWindowState extends State<SportClassWindow>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  late EasyRefreshController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = EasyRefreshController(
-      controlFinishRefresh: true,
-      controlFinishLoad: true,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    if (sportClass.value.items.isEmpty) {
+      SportSession().getClass();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (sportClass.value.items.isEmpty) {
-      SportSession().getClass();
-    }
-
     super.build(context);
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
-        child: EasyRefresh(
-          controller: _controller,
-          clipBehavior: Clip.none,
-          header: const MaterialHeader(
-            clamping: true,
-            showBezierBackground: false,
-            bezierBackgroundAnimation: false,
-            bezierBackgroundBounce: false,
-            springRebound: false,
-          ),
-          onRefresh: () async {
-            await SportSession().getClass();
-            _controller.finishRefresh();
-          },
-          refreshOnStart: true,
-          child: Obx(() {
-            if (sportClass.value.situation == null) {
-              return sportClass.value.items.isNotEmpty
-                  ? DataList<Widget>(
-                      list: sportClass.value.items
-                          .map((element) => SportClassCard(data: element))
-                          .toList(),
-                      initFormula: (toUse) => toUse,
-                    )
-                  : EmptyListView(
-                      type: EmptyListViewType.singing,
-                      text: FlutterI18n.translate(
+    return RefreshIndicator(
+      onRefresh: () async {
+        await SportSession().getClass();
+      },
+      child: Obx(() {
+        if (sportClass.value.situation == null) {
+          return sportClass.value.items.isNotEmpty
+              ? DataList<Widget>(
+                  list: sportClass.value.items
+                      .map((element) => SportClassCard(data: element))
+                      .toList(),
+                  initFormula: (toUse) => toUse,
+                )
+              : EmptyListView(
+                  type: EmptyListViewType.singing,
+                  text: FlutterI18n.translate(
+                    context,
+                    "sport.empty_class_info",
+                  ),
+                );
+        } else if (sportClass.value.situation == "sport.situation_fetching") {
+          return const CircularProgressIndicator().center();
+        } else {
+          return ReloadWidget(
+            function: () => SportSession().getClass(),
+            errorStatus: sportClass.value.situation != null
+                ? FlutterI18n.translate(
+                    context,
+                    "sport.situation_error",
+                    translationParams: {
+                      "situation": FlutterI18n.translate(
                         context,
-                        "sport.empty_class_info",
+                        sportClass.value.situation ?? "",
                       ),
-                    );
-            } else if (sportClass.value.situation ==
-                "sport.situation_fetching") {
-              return const CircularProgressIndicator().center();
-            } else {
-              return ReloadWidget(
-                function: () => _controller.callRefresh(),
-                errorStatus: sportClass.value.situation != null
-                    ? FlutterI18n.translate(
-                        context,
-                        "sport.situation_error",
-                        translationParams: {
-                          "situation": FlutterI18n.translate(
-                            context,
-                            sportClass.value.situation ?? "",
-                          ),
-                        },
-                      )
-                    : null,
-              ).center();
-            }
-          }),
-        ),
-      ),
+                    },
+                  )
+                : null,
+          ).center();
+        }
+      }),
     );
+
+    // EasyRefresh(
+    //   controller: _controller,
+    //   clipBehavior: Clip.none,
+    //   header: const MaterialHeader(
+    //     clamping: true,
+    //     showBezierBackground: false,
+    //     bezierBackgroundAnimation: false,
+    //     bezierBackgroundBounce: false,
+    //     springRebound: false,
+    //   ),
+    //   onRefresh:
+    //   refreshOnStart: true,
+    //   child: Obx(() {
+    //   }),
+    // );
   }
 }
 
