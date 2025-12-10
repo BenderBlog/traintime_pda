@@ -35,7 +35,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
 
   final double inputFieldVerticalPadding = 4;
   final double horizontalPadding = 10;
-  
+
   late InputDecoration inputDecoration;
 
   Color get color => Theme.of(context).colorScheme.primary;
@@ -81,8 +81,6 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
