@@ -323,18 +323,15 @@ class _SettingWindowState extends State<SettingWindow> {
                   subtitle: Text(
                     FlutterI18n.translate(
                       context,
-                      FlutterI18n.translate(
-                        context,
-                        Localization.values
-                            .firstWhere(
-                              (value) =>
-                                  value.string ==
-                                  preference.getString(
-                                    preference.Preference.localization,
-                                  ),
-                            )
-                            .toShow,
-                      ),
+                      Localization.values
+                          .firstWhere(
+                            (value) =>
+                                value.string ==
+                                preference.getString(
+                                  preference.Preference.localization,
+                                ),
+                          )
+                          .toShow,
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
@@ -784,7 +781,10 @@ class _SettingWindowState extends State<SettingWindow> {
                 if (Platform.isAndroid || Platform.isIOS)
                   ListTile(
                     title: Text(
-                      FlutterI18n.translate(context, "setting.notification_debug_page"),
+                      FlutterI18n.translate(
+                        context,
+                        "setting.notification_debug_page",
+                      ),
                     ),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () => context.push(NotificationDebugPage()),
