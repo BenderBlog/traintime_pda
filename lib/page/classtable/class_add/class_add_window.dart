@@ -7,8 +7,8 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/class_add/wheel_choser.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/class_add/week_selector.dart';
+import 'package:watermeter/page/classtable/class_add/time_selector.dart';
 
 class ClassAddWindow extends StatefulWidget {
   final (ClassDetail, TimeArrangement)? toChange;
@@ -35,6 +35,8 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
 
   final double inputFieldVerticalPadding = 4;
   final double horizontalPadding = 10;
+  
+  late InputDecoration inputDecoration;
 
   Color get color => Theme.of(context).colorScheme.primary;
 
@@ -66,29 +68,21 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
     }
   }
 
-  InputDecoration get inputDecoration => InputDecoration(
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(25),
-      borderSide: BorderSide.none,
-    ),
-    filled: true,
-    fillColor: Theme.of(context).colorScheme.onPrimary,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-  );
-
-  Widget weekDoc({required int index}) {
-    return Text((index + 1).toString())
-        .textColor(color)
-        .center()
-        .decorated(
-          color: chosenWeek[index] ? color.withValues(alpha: 0.2) : null,
-          borderRadius: const BorderRadius.all(Radius.circular(100.0)),
-        )
-        .clipOval()
-        .gestures(
-          onTap: () => setState(() => chosenWeek[index] = !chosenWeek[index]),
-        );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    inputDecoration = InputDecoration(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: BorderSide.none,
+      ),
+      filled: true,
+      fillColor: Theme.of(context).colorScheme.onPrimary,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+    );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -217,162 +211,24 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   context,
                 ).colorScheme.primary.withValues(alpha: 0.1),
               ),
-          Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.calendar_month, color: color, size: 16),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.class_add.input_week_hint",
-                        ),
-                      ).textStyle(TextStyle(color: color)).padding(left: 4),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  GridView.extent(
-                    padding: EdgeInsets.zero,
-                    physics: const ScrollPhysics(),
-                    shrinkWrap: true,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    maxCrossAxisExtent: 30,
-                    children: List.generate(
-                      widget.semesterLength,
-                      (index) => weekDoc(index: index),
-                    ),
-                  ),
-                ],
-              )
-              .padding(all: 12)
-              .card(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                elevation: 0,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-              ),
-          Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.schedule, color: color, size: 16),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.class_add.input_time_hint",
-                        ),
-                      ).textStyle(TextStyle(color: color)).padding(left: 4),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                                FlutterI18n.translate(
-                                  context,
-                                  "classtable.class_add.input_time_weekday_hint",
-                                ),
-                              )
-                              .textStyle(TextStyle(color: color))
-                              .center()
-                              .flexible(),
-                          Text(
-                                FlutterI18n.translate(
-                                  context,
-                                  "classtable.class_add.input_start_time_hint",
-                                ),
-                              )
-                              .textStyle(TextStyle(color: color))
-                              .center()
-                              .flexible(),
-                          Text(
-                                FlutterI18n.translate(
-                                  context,
-                                  "classtable.class_add.input_end_time_hint",
-                                ),
-                              )
-                              .textStyle(TextStyle(color: color))
-                              .center()
-                              .flexible(),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          WheelChoose(
-                            changeBookIdCallBack: (choiceWeek) {
-                              setState(() {
-                                week = choiceWeek + 1;
-                              });
-                            },
-                            defaultPage: week - 1,
-                            options: List.generate(
-                              7,
-                              (index) => WheelChooseOptions(
-                                data: index,
-                                hint: getWeekString(context, index),
-                              ),
-                            ),
-                          ).flexible(),
-                          WheelChoose(
-                            changeBookIdCallBack: (choiceWeek) {
-                              setState(() {
-                                start = choiceWeek;
-                              });
-                            },
-                            defaultPage: start - 1,
-                            options: List.generate(
-                              11,
-                              (index) => WheelChooseOptions(
-                                data: index + 1,
-                                hint: FlutterI18n.translate(
-                                  context,
-                                  "classtable.class_add.wheel_choose_hint",
-                                  translationParams: {
-                                    "index": (index + 1).toString(),
-                                  },
-                                ),
-                              ),
-                            ),
-                          ).flexible(),
-                          WheelChoose(
-                            changeBookIdCallBack: (choiceStop) {
-                              setState(() {
-                                stop = choiceStop;
-                              });
-                            },
-                            defaultPage: stop - 1,
-                            options: List.generate(
-                              11,
-                              (index) => WheelChooseOptions(
-                                data: index + 1,
-                                hint: FlutterI18n.translate(
-                                  context,
-                                  "classtable.class_add.wheel_choose_hint",
-                                  translationParams: {
-                                    "index": (index + 1).toString(),
-                                  },
-                                ),
-                              ),
-                            ),
-                          ).flexible(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              )
-              .padding(all: 12)
-              .card(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                elevation: 0,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-              ),
+          WeekSelector(
+            initialWeeks: chosenWeek,
+            onChanged: (weeks) {
+              chosenWeek = weeks;
+            },
+            color: color,
+          ),
+          TimeSelector(
+            initialWeek: week,
+            initialStart: start,
+            initialStop: stop,
+            onChanged: (time) {
+              week = time.$1;
+              start = time.$2;
+              stop = time.$3;
+            },
+            color: color,
+          ),
         ],
       ),
     );
