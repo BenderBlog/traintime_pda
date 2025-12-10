@@ -108,8 +108,6 @@ abstract class NotificationService {
     }
   }
 
-  /// Abstract method to schedule a notification.
-  ///
   /// Subclasses must implement this to provide specific details for
   /// scheduling, such as channel information and payload structure.
   Future<void> scheduleNotification({
@@ -118,7 +116,65 @@ abstract class NotificationService {
     required String body,
     required DateTime scheduledTime,
     String? payload,
-  });
+  }) async {
+    if (!initialized) {
+      throw StateError(
+        '[CourseReminderService] Notification service not initialized',
+      );
+    }
+
+    try {
+      final tz.TZDateTime tzScheduledTime = tz.TZDateTime.from(
+        scheduledTime,
+        tz.local,
+      );
+
+      if (Platform.isAndroid) {
+        final notificationDetails = NotificationDetails(
+          android: androidNotificationDetails,
+        );
+
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tzScheduledTime,
+          notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          payload: payload,
+        );
+      } else if (Platform.isIOS) {
+        final notificationDetails = NotificationDetails(
+          iOS: darwinNotificationDetails,
+        );
+
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tzScheduledTime,
+          notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          payload: payload,
+        );
+      }
+
+      log.info(
+        '[CourseReminderService] [scheduleNotification] Scheduled course notification $id at $scheduledTime',
+      );
+    } catch (e, stackTrace) {
+      log.error(
+        '[CourseReminderService] [scheduleNotification] Failed to schedule course notification',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
 
   /// Method to send (show) a notification immediately.
   ///

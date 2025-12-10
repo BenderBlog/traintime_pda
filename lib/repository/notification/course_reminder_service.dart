@@ -10,7 +10,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/model/time_list.dart';
@@ -259,75 +258,6 @@ class CourseReminderService extends NotificationService
         e,
         stackTrace,
       );
-    }
-  }
-
-  /// Schedule a course reminder notification.
-  /// This method is an override and provides the specific implementation for course reminders.
-  @override
-  Future<void> scheduleNotification({
-    required int id,
-    required String title,
-    required String body,
-    required DateTime scheduledTime,
-    String? payload,
-  }) async {
-    if (!initialized) {
-      throw StateError(
-        '[CourseReminderService] Notification service not initialized',
-      );
-    }
-
-    try {
-      final tz.TZDateTime tzScheduledTime = tz.TZDateTime.from(
-        scheduledTime,
-        tz.local,
-      );
-
-      if (Platform.isAndroid) {
-        final notificationDetails = NotificationDetails(
-          android: androidNotificationDetails,
-        );
-
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzScheduledTime,
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          payload: payload,
-        );
-      } else if (Platform.isIOS) {
-        final notificationDetails = NotificationDetails(
-          iOS: darwinNotificationDetails,
-        );
-
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzScheduledTime,
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          payload: payload,
-        );
-      }
-
-      log.info(
-        '[CourseReminderService] [scheduleNotification] Scheduled course notification $id at $scheduledTime',
-      );
-    } catch (e, stackTrace) {
-      log.error(
-        '[CourseReminderService] [scheduleNotification] Failed to schedule course notification',
-        e,
-        stackTrace,
-      );
-      rethrow;
     }
   }
 
