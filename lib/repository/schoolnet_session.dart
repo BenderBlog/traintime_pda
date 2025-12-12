@@ -99,9 +99,18 @@ class SchoolnetSession extends NetworkSession {
             ipList.add((tdList[1].innerHtml, tdList[3].innerHtml, usedT));
           }
         } else if (tdList.length == 4) {
-          used = tdList[1].innerHtml;
-          rest = tdList[2].innerHtml;
-          charged = tdList[3].innerHtml;
+          // 改为排除法：当 productName 中不包含运营商关键词（联通/移动/电信）时才保存，
+          // 以保证泛用性并避免把运营商类产品的结算日期写入 charged。
+          final productName = tdList[0].text.trim();
+          final lowerName = productName.toLowerCase();
+          final isOperator = lowerName.contains('联通') ||
+              lowerName.contains('移动') ||
+              lowerName.contains('电信');
+          if (!isOperator) {
+            used = tdList[1].text.trim();
+            rest = tdList[2].text.trim();
+            charged = tdList[3].text.trim();
+          }
         }
       });
       networkInfo.value = NetworkUsage(
