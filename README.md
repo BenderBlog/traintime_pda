@@ -11,9 +11,10 @@ XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息�
 
 [<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
     alt="Get it on App Store"
-    width="180px">](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)[<img src="https://raw.githubusercontent.com/f-droid/artwork/master/badge/get-it-on-zh-cn.svg"
+    height="60px" align="middle">](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
+[<img src="https://raw.githubusercontent.com/f-droid/artwork/master/badge/get-it-on-zh-cn.svg"
     alt="Get it on F-Droid"
-    width="180px">](https://f-droid.org/zh_Hans/packages/io.github.benderblog.traintime_pda/)
+    height="60px" align="middle">](https://f-droid.org/zh_Hans/packages/io.github.benderblog.traintime_pda/)
 
 ## 特性概览
 
