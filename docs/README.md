@@ -1,11 +1,11 @@
 XDYou，代码称为 Traintime PDA，是为西电学生设计的开源信息查询软件。
 
-最新稳定版：v1.5.2+32
-最新测试版：v1.5.3+33
+最新稳定版：v1.5.4+34
+最新测试版：v1.5.5+35 - 滚动更新
 
 ## 软件下载
 
- - [安卓版本下载（提供商：F-Droid 清华镜像站）](https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo/io.github.benderblog.traintime_pda_323.apk)
+ - [安卓版本下载（提供商：F-Droid 清华镜像站）](https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo/io.github.benderblog.traintime_pda_343.apk)
  - [安卓和桌面版本下载（提供商：Github Release）](https://github.com/BenderBlog/traintime_pda/releases)
  - [苹果版本唯一官方版本下载（提供商：App Store）](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
 
