@@ -13,7 +13,6 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
 import 'package:watermeter/repository/logger.dart';

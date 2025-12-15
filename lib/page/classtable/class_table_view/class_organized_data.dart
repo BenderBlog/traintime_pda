@@ -121,6 +121,47 @@ class ClassOrgainzedData {
     this.place,
   });
 
+  static double _transferIndex(DateTime time) {
+    int timeInMin = time.hour * 60 + time.minute;
+    int previous = 0;
+    // Start from the second element.
+    for (var i in _timeInBlock) {
+      int timeChosen =
+          int.parse(i.split(":")[0]) * 60 + int.parse(i.split(":")[1]);
+      if (previous == 0) {
+        // Some exam is started before 8:30
+        if (timeInMin < timeChosen) {
+          return 0;
+        }
+        previous = timeChosen;
+        continue;
+      }
+      if (timeInMin >= previous && timeInMin < timeChosen) {
+        double basic = 0;
+        double blocks = 5;
+        double ratio = (timeInMin - previous) / (timeChosen - previous);
+        if (previous < 12 * 60) {
+          basic = (_timeInBlock.indexOf(i) - 1) * 5;
+        } else if (previous < 14 * 60) {
+          basic = 20;
+          blocks = 3;
+        } else if (previous < 17.5 * 60) {
+          basic = 23 + (_timeInBlock.indexOf(i) - 6) * 5;
+        } else if (previous < 19 * 60) {
+          basic = 43;
+          blocks = 3;
+        } else {
+          basic = 46 + (_timeInBlock.indexOf(i) - 11) * 5;
+        }
+        return basic + blocks * ratio;
+      } else {
+        previous = timeChosen;
+      }
+    }
+
+    return 61;
+  }
+
   ClassOrgainzedData._({
     required this.data,
     required DateTime start,
@@ -129,52 +170,7 @@ class ClassOrgainzedData {
     required this.name,
     this.place,
   }) {
-    double transferIndex(DateTime time) {
-      int timeInMin = time.hour * 60 + time.minute;
-      int previous = 0;
-      // Start from the second element.
-      for (var i in _timeInBlock) {
-        int timeChosen =
-            int.parse(i.split(":")[0]) * 60 + int.parse(i.split(":")[1]);
-        if (previous == 0) {
-          previous = timeChosen;
-          continue;
-        }
-        if (timeInMin >= previous && timeInMin < timeChosen) {
-          double basic = 0;
-          double blocks = 5;
-          double ratio = (timeInMin - previous) / (timeChosen - previous);
-          if (previous < 12 * 60) {
-            basic = (_timeInBlock.indexOf(i) - 1) * 5;
-          } else if (previous < 14 * 60) {
-            basic = 20;
-            blocks = 3;
-          } else if (previous < 17.5 * 60) {
-            basic = 23 + (_timeInBlock.indexOf(i) - 6) * 5;
-          } else if (previous < 19 * 60) {
-            basic = 43;
-            blocks = 3;
-          } else {
-            basic = 46 + (_timeInBlock.indexOf(i) - 11) * 5;
-          }
-          return basic + blocks * ratio;
-        } else {
-          previous = timeChosen;
-        }
-      }
-
-      if (timeInMin >
-          int.parse(_timeInBlock.last.split(":")[0]) * 60 +
-              int.parse(_timeInBlock.last.split(":")[1])) {
-        return 61;
-      }
-
-      throw OutOfIndexException();
-    }
-
-    this.start = transferIndex(start);
-    this.stop = transferIndex(stop);
+    this.start = _transferIndex(start);
+    this.stop = _transferIndex(stop);
   }
 }
-
-class OutOfIndexException implements Exception {}
