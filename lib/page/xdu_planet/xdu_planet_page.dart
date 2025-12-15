@@ -80,16 +80,18 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
                 setState(() => selected = e);
               },
               child: Text(
-                FlutterI18n.translate(
-                  context,
-                  e.replaceAll(
-                    RegExp(
-                      r'(lolicon)|(로리콘)|(Лоликон)|(ロリコン)',
-                      caseSensitive: false,
-                    ),
-                    "Illegal Word Detected",
-                  ),
-                ),
+                e == "xdu_planet.all"
+                    ? FlutterI18n.translate(
+                        context,
+                        e.replaceAll(
+                          RegExp(
+                            r'(lolicon)|(로리콘)|(Лоликон)|(ロリコン)',
+                            caseSensitive: false,
+                          ),
+                          "Illegal Word Detected",
+                        ),
+                      )
+                    : e,
                 style: TextStyle(
                   color: selected == e
                       ? Theme.of(context).colorScheme.onPrimary
