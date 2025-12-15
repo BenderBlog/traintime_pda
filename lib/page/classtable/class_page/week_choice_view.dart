@@ -20,6 +20,8 @@ class WeekChoiceView extends StatefulWidget {
 
 class _WeekChoiceViewState extends State<WeekChoiceView> {
   late ClassTableWidgetState controller;
+  // 缓存 AutoSizeGroup，避免每次 build 创建新实例
+  final AutoSizeGroup _autoSizeGroup = AutoSizeGroup();
 
   @override
   void didChangeDependencies() {
@@ -28,19 +30,23 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
   }
 
   /// The dot of the overview, [isOccupied] is used to identify the opacity of the dot.
-  Widget dot({required bool isOccupied}) {
+  /// [primaryColor] is passed in from outside to avoid calling Theme.of(context) for each dot.
+  Widget dot({required bool isOccupied, required Color primaryColor}) {
     double opacity = isOccupied ? 1 : 0.25;
     return ClipOval(
-      child: Container(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: opacity),
-      ),
+      child: ColoredBox(color: primaryColor.withValues(alpha: opacity)),
     );
   }
 
   /// [buttonInformaion] shows the botton's [index] and the overview.
   ///
   /// A [index] is required to render the botton for the week.
-  Widget buttonInformaion({required int index}) => Column(
+  /// [showOverview] and [primaryColor] are passed in from the outside to avoid every instance listening to MediaQuery and Theme.
+  Widget buttonInformaion({
+    required int index,
+    required bool showOverview,
+    required Color primaryColor,
+  }) => Column(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
       AutoSizeText(
@@ -55,12 +61,12 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
               : FontWeight.normal,
         ),
         maxLines: 1,
-        group: AutoSizeGroup(),
+        group: _autoSizeGroup,
       ),
 
       /// These code are used to render the overview of the week,
       /// as long as the height of the page is over 500.
-      if (MediaQuery.sizeOf(context).height >= 500)
+      if (showOverview)
         Expanded(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(6, 4, 6, 2),
@@ -116,7 +122,7 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
                   if (isOccupied) break;
                 }
 
-                return dot(isOccupied: isOccupied);
+                return dot(isOccupied: isOccupied, primaryColor: primaryColor);
               }),
             ),
           ),
@@ -126,13 +132,21 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(
+    // Retrieve the data once in the build to avoid multiple calls within sub-methods.
+    final showOverview = MediaQuery.sizeOf(context).height >= 500;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
         horizontal: weekButtonHorizontalPadding,
       ),
       child: SizedBox(
         width: weekButtonWidth,
-        child: buttonInformaion(index: widget.index),
+        child: buttonInformaion(
+          index: widget.index,
+          showOverview: showOverview,
+          primaryColor: primaryColor,
+        ),
       ),
     );
   }
