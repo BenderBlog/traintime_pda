@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -17,6 +18,31 @@ class ThemeController extends GetxController {
   late ThemeMode colorState;
   late Locale locale;
   late List<FlexSchemeColor> color;
+
+  /// Cache FlutterI18nDelegate to avoid reload i18n files every time when build
+  FlutterI18nDelegate? _i18nDelegate;
+  Locale? _cachedLocale;
+
+  /// Get the instance of FlutterI18nDelegate when locale change actually
+  FlutterI18nDelegate getI18nDelegate() {
+    if (_i18nDelegate == null || _cachedLocale != locale) {
+      _cachedLocale = locale;
+      _i18nDelegate = FlutterI18nDelegate(
+        translationLoader: FileTranslationLoader(
+          fallbackFile: "zh_CN",
+          useCountryCode: true,
+          forcedLocale: locale,
+        ),
+        missingTranslationHandler: (key, locale) {
+          log.info(
+            "[Locale] Missing Key: $key, "
+            "languageCode: ${locale?.languageCode ?? "unknown"}",
+          );
+        },
+      );
+    }
+    return _i18nDelegate!;
+  }
 
   @override
   void onInit() {

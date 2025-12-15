@@ -134,19 +134,7 @@ class _MyAppState extends State<MyApp> {
     return GetBuilder<ThemeController>(
       builder: (c) => MaterialApp(
         localizationsDelegates: [
-          FlutterI18nDelegate(
-            translationLoader: FileTranslationLoader(
-              fallbackFile: "zh_CN",
-              useCountryCode: true,
-              forcedLocale: c.locale,
-            ),
-            missingTranslationHandler: (key, locale) {
-              log.info(
-                "[Locale] Missing Key: $key, "
-                "languageCode: ${locale?.languageCode ?? "unknown"}",
-              );
-            },
-          ),
+          c.getI18nDelegate(),
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
