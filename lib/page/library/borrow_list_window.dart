@@ -35,12 +35,12 @@ class _BorrowListWindowState extends State<BorrowListWindow>
     return Obx(() {
       Widget child() {
         switch (borrow_info.state.value) {
-          case SessionState.fetched:
-            return const BorrowListDetail();
           case SessionState.fetching:
             return borrow_info.borrowList.isEmpty
                 ? const CircularProgressIndicator().center()
                 : const BorrowListDetail();
+          case SessionState.fetched:
+            return const BorrowListDetail();
           case SessionState.error:
           case SessionState.none:
             return ReloadWidget(
@@ -64,27 +64,38 @@ class BorrowListDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Builder(
-        builder: (context) {
-          if (borrow_info.borrowList.isNotEmpty) {
-            return LayoutBuilder(
-              builder: (context, constraints) => AlignedGridView.count(
-                shrinkWrap: true,
-                itemCount: borrow_info.borrowList.length,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                crossAxisCount: constraints.maxWidth ~/ 360,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                itemBuilder: (context, index) =>
-                    BorrowInfoCard(toUse: borrow_info.borrowList[index]),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: <Widget>[
+              EmptyListView(
+                type: EmptyListViewType.reading,
+                text: FlutterI18n.translate(
+                  context,
+                  "library.empty_borrow_list",
+                ),
               ),
-            );
-          } else {
-            return EmptyListView(
-              type: EmptyListViewType.reading,
-              text: FlutterI18n.translate(context, "library.empty_borrow_list"),
-            );
-          }
+
+              ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  if (borrow_info.borrowList.isNotEmpty)
+                    AlignedGridView.count(
+                      itemCount: borrow_info.borrowList.length,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
+                      crossAxisCount: constraints.maxWidth ~/ 360,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4,
+                      itemBuilder: (context, index) =>
+                          BorrowInfoCard(toUse: borrow_info.borrowList[index]),
+                    ),
+                ],
+              ),
+            ],
+          );
         },
       ),
       bottomNavigationBar: BottomAppBar(
