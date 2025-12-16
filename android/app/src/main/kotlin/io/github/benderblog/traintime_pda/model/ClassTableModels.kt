@@ -180,7 +180,7 @@ data class Subject(
 
 val Subject.startTime: Result<LocalDateTime>
     get() = try {
-        Result.success(LocalDateTime.parse(startTimeStr))
+        Result.success(LocalDateTime.parse(startTimeStr.replace(' ', 'T')))
     } catch (e: Exception) {
         Log.e("[PDA ClassTableWidget][Subject]", "Failed to parse startTimeStr: $startTimeStr", e)
         Result.failure(e)
@@ -188,7 +188,7 @@ val Subject.startTime: Result<LocalDateTime>
 
 val Subject.endTime: Result<LocalDateTime>
     get() = try {
-        Result.success(LocalDateTime.parse(endTimeStr))
+        Result.success(LocalDateTime.parse(endTimeStr.replace(' ', 'T')))
     } catch (e: Exception) {
         Log.e("[PDA ClassTableWidget][Subject]", "Failed to parse endTimeStr: $endTimeStr", e)
         Result.failure(e)
