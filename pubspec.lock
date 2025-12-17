@@ -417,6 +417,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.3.6"
+  file_state_manager:
+    dependency: transitive
+    description:
+      name: file_state_manager
+      sha256: a64f7dfe52e45bb1bb1a0e357ab6d38efddc361f33003c0c0a9b78bf9cf0731d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   fixnum:
     dependency: transitive
     description:
@@ -1101,6 +1109,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.28.0"
+  sakura_blizzard:
+    dependency: "direct main"
+    description:
+      name: sakura_blizzard
+      sha256: ec9113e4d1fb9f3b61a48a74c9c2ec1f2692076834a36d71c1b735033cc36b89
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
   sentry:
     dependency: transitive
     description:
@@ -1197,6 +1213,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  simple_3d:
+    dependency: transitive
+    description:
+      name: simple_3d
+      sha256: f40a14daa88f327ec2807403142aa517aee932fee9d37e98ab71eb42abbf4750
+      url: "https://pub.dev"
+    source: hosted
+    version: "16.0.2"
+  simple_3d_renderer:
+    dependency: transitive
+    description:
+      name: simple_3d_renderer
+      sha256: bf94f7e90c9a601072921aa2f27baae09d9a531e41bf849225bb2029845a2e2e
+      url: "https://pub.dev"
+    source: hosted
+    version: "22.0.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1506,6 +1538,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.4"
+  util_simple_3d:
+    dependency: transitive
+    description:
+      name: util_simple_3d
+      sha256: "2381db1cab8b79e858407a981c3a34016d0514c94bca8f656524d158b970516b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "12.0.2"
   uuid:
     dependency: transitive
     description:
