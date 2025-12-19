@@ -13,7 +13,7 @@ dependencies:
   encrypter_plus: ^5.1.0
   talker_flutter: ^5.0.0
   talker_dio_logger: ^5.0.0
-  tflite_flutter: ^0.11.0
+  tflite_flutter: ^0.12.1
   synchronized: ^3.1.0+1
   pool: ^1.5.2
   # Stroage Cache
@@ -70,13 +70,12 @@ dependencies:
   extended_image: ^10.0.1
   # internationalized
   device_info_plus: ^12.1.0
-  flutter_i18n: ^0.36.2
+  flutter_i18n: ^0.37.1
   flutter_localizations:
     sdk: flutter
   intl:
   timezone: ^0.9.4
   flutter_local_notifications: ^18.0.1
-  contribution_heatmap: ^0.4.2
   sakura_blizzard: ^6.0.2
 
 dev_dependencies:
