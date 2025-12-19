@@ -353,14 +353,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  easy_refresh:
-    dependency: "direct main"
-    description:
-      name: easy_refresh
-      sha256: "486e30abfcaae66c0f2c2798a10de2298eb9dc5e0bb7e1dba9328308968cae0c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.4.0"
   encrypter_plus:
     dependency: "direct main"
     description:

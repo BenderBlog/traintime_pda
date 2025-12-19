@@ -9,8 +9,6 @@ import 'package:watermeter/page/homepage/notice_card/club_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
-import 'package:easy_refresh/easy_refresh.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
@@ -40,18 +38,12 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late EasyRefreshController _controller;
-
   @override
   void initState() {
     super.initState();
     Get.put(ClassTableController());
     Get.put(ExamController());
     Get.put(ExperimentController());
-    _controller = EasyRefreshController(
-      controlFinishRefresh: true,
-      controlFinishLoad: true,
-    );
 
     // Validate and update notifications after controllers are initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -69,12 +61,6 @@ class _MainPageState extends State<MainPage> {
         );
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   final List<Widget> smallFunction = [
@@ -118,13 +104,67 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: EasyRefresh(
-        controller: _controller,
-        header: MaterialHeader(
-          position: IndicatorPosition.locator,
-          safeArea: true,
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxScrolled) => [
+        SliverAppBar(
+          centerTitle: false,
+          expandedHeight: 160,
+          pinned: true,
+          flexibleSpace: FlexibleSpaceBar(
+            centerTitle: false,
+            titlePadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 12,
+            ),
+            title: GetBuilder<ClassTableController>(
+              builder: (c) => Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    FlutterI18n.translate(context, _now),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? null
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  Text(
+                    c.state == ClassTableState.fetched
+                        ? c.getCurrentWeek(updateTime) >= 0 &&
+                                  c.getCurrentWeek(updateTime) <
+                                      c.classTableData.semesterLength
+                              ? FlutterI18n.translate(
+                                  context,
+                                  "homepage.on_weekday",
+                                  translationParams: {
+                                    "current":
+                                        "${c.getCurrentWeek(updateTime) + 1}",
+                                  },
+                                )
+                              : FlutterI18n.translate(
+                                  context,
+                                  "homepage.on_holiday",
+                                )
+                        : c.state == ClassTableState.error
+                        ? FlutterI18n.translate(context, "homepage.load_error")
+                        : FlutterI18n.translate(context, "homepage.loading"),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? null
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
+      ],
+      body: RefreshIndicator(
         onRefresh: () async {
           showToast(
             context: context,
@@ -143,96 +183,27 @@ class _MainPageState extends State<MainPage> {
               context: context,
               msg: FlutterI18n.translate(context, "homepage.loaded"),
             );
-            _controller.finishRefresh();
-            _controller.resetHeader();
           }
         },
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              centerTitle: false,
-              expandedHeight: 160,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: false,
-                titlePadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                title: GetBuilder<ClassTableController>(
-                  builder: (c) => Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        FlutterI18n.translate(context, _now),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? null
-                              : Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      Text(
-                        c.state == ClassTableState.fetched
-                            ? c.getCurrentWeek(updateTime) >= 0 &&
-                                      c.getCurrentWeek(updateTime) <
-                                          c.classTableData.semesterLength
-                                  ? FlutterI18n.translate(
-                                      context,
-                                      "homepage.on_weekday",
-                                      translationParams: {
-                                        "current":
-                                            "${c.getCurrentWeek(updateTime) + 1}",
-                                      },
-                                    )
-                                  : FlutterI18n.translate(
-                                      context,
-                                      "homepage.on_holiday",
-                                    )
-                            : c.state == ClassTableState.error
-                            ? FlutterI18n.translate(
-                                context,
-                                "homepage.load_error",
-                              )
-                            : FlutterI18n.translate(
-                                context,
-                                "homepage.loading",
-                              ),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? null
-                              : Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        child: ListView(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          children: [
+            ClubPromotionCard(onTap: widget.changePage),
+            const ClassTableCard(),
+            ElectricityCard(),
+            SchoolnetCard(),
+            LibraryCard(),
+            //LibraryCapacityCard(),
+            SchoolCardInfoCard(),
+            MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: GridView.extent(
+                maxCrossAxisExtent: 96,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: smallFunction,
               ),
-            ),
-            const HeaderLocator.sliver(),
-            SliverToBoxAdapter(
-              child: <Widget>[
-                ClubPromotionCard(onTap: widget.changePage),
-                const ClassTableCard(),
-                ElectricityCard(),
-                SchoolnetCard(),
-                LibraryCard(),
-                //LibraryCapacityCard(),
-                SchoolCardInfoCard(),
-                MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: GridView.extent(
-                    maxCrossAxisExtent: 96,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: smallFunction,
-                  ),
-                ),
-              ].toColumn().padding(vertical: 8, horizontal: 16),
             ),
           ],
         ),
