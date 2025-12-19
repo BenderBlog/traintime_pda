@@ -68,31 +68,24 @@ class BorrowListDetail extends StatelessWidget {
         builder: (context, constraints) {
           return Stack(
             children: <Widget>[
-              EmptyListView(
-                type: EmptyListViewType.reading,
-                text: FlutterI18n.translate(
-                  context,
-                  "library.empty_borrow_list",
+              if (borrow_info.borrowList.isEmpty)
+                EmptyListView(
+                  type: EmptyListViewType.reading,
+                  text: FlutterI18n.translate(
+                    context,
+                    "library.empty_borrow_list",
+                  ),
                 ),
-              ),
 
-              ListView(
+              AlignedGridView.count(
                 physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  if (borrow_info.borrowList.isNotEmpty)
-                    AlignedGridView.count(
-                      itemCount: borrow_info.borrowList.length,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                      crossAxisCount: constraints.maxWidth ~/ 360,
-                      mainAxisSpacing: 4,
-                      crossAxisSpacing: 4,
-                      itemBuilder: (context, index) =>
-                          BorrowInfoCard(toUse: borrow_info.borrowList[index]),
-                    ),
-                ],
+                itemCount: borrow_info.borrowList.length,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                crossAxisCount: constraints.maxWidth ~/ 360,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                itemBuilder: (context, index) =>
+                    BorrowInfoCard(toUse: borrow_info.borrowList[index]),
               ),
             ],
           );

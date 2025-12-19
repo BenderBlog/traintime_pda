@@ -18,7 +18,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 
 Rx<SessionState> state = SessionState.none.obs;
 RxString error = "".obs;
-List<BorrowData> borrowList = [];
+RxList<BorrowData> borrowList = <BorrowData>[].obs;
 
 Future<void> Function() refreshBorrowList = () =>
     LibrarySession().getBorrowList();
@@ -169,7 +169,7 @@ class LibrarySession extends IDSSession {
           )
           .then((value) => value.data["data"]);
 
-      borrowList.clear();
+      List<BorrowData> toAppend = [];
       final pool = Pool(5);
       await Future.wait([
         ...List<BorrowData>.generate(
@@ -187,10 +187,19 @@ class LibrarySession extends IDSSession {
                         )
                       : Future.value(""),
                 );
-            borrowList.add(e);
+            toAppend.add(e);
           }),
         ),
       ]);
+
+      toAppend.sort(
+        (a, b) =>
+            a.normReturnDateTime.millisecondsSinceEpoch -
+            b.normReturnDateTime.millisecondsSinceEpoch,
+      );
+      borrowList.clear();
+      borrowList.addAll(toAppend);
+
       state.value = SessionState.fetched;
     } catch (e) {
       error.value = e.toString();
