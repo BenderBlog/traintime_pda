@@ -35,7 +35,7 @@ class ToggleDayAction : ActionCallback {
             val newIsShowToday = !currentIsShowToday
             Log.i("[PDA ClassTableWidget][ToggleDayAction]", "New showToday value: $newIsShowToday")
 
-            prefs.preferences.edit {
+            prefs.preferences.edit(true) {
                 putBoolean(ClassTableWidgetKeys.SHOW_TODAY, newIsShowToday)
             }
             Log.i("[PDA ClassTableWidget][ToggleDayAction]", "Set showToday value to: $newIsShowToday")

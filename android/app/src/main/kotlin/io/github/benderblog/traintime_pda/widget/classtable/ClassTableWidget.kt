@@ -214,7 +214,7 @@ class ClassTableWidget : GlanceAppWidget() {
 
                             Text(
                                 "${
-                                    time.plusDays(if (!isShowingToday) 1 else 0).format(formatter)
+                                    time.format(formatter)
                                 } " + if (status != ClassTableWidgetLoadState.FINISHED) ""
                                 else if (weekIndex < 0) context.getString(R.string.widget_classtable_on_holiday)
                                 else context.getString(
