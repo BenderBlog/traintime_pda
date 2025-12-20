@@ -23,10 +23,9 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  final String urlOthers =
-      "https://www.bilibili.com/video/BV1mDKPzxEGj?t=1501.1";
+  final String urlOthers = "https://www.bilibili.com/video/BV1cq4y167ag";
 
-  final String urlApple = "https://www.bilibili.com/video/BV1ACKMeMEUW";
+  final String urlApple = "https://www.bilibili.com/video/BV1Js41167TX?p=32";
 
   List<Developer> getDevelopers() => [
     Developer(
@@ -273,8 +272,8 @@ class _AboutPageState extends State<AboutPage> {
                   TextSpan(text: " v${preference.packageInfo.version}\n"),
                   TextSpan(
                     text:
-                        "${Platform.isIOS || Platform.isMacOS ? "O Grande Amor" : "Para Machucar Meu Coração"}"
-                        " - Tropical Iced Tea Edition",
+                        "${Platform.isIOS || Platform.isMacOS ? "Cheery Flower" : "Affirmation"}"
+                        " - Red and Green Edition",
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],

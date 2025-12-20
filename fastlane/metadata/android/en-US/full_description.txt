@@ -15,7 +15,9 @@ This software is originally called "Traintime PDA".
  - Other tools such as call for repairing, school email, etc.
  - XDU Planet: Look around the blogs of your schoolmates.
  - Schoolnet Query.
+ - Attendance Query.
  - Homepage widget.
  - i18n support with Traditional Chinese and English.
+ - Notice before class.
 
 If you got some idea about it, contact me freely.

@@ -1,0 +1,8 @@
+1. 小部件修复 @BenderBlog
+2. 页面加载优化 @BenderBlog
+3. 签到提醒 @hazuki-keatsu
+4. 图书馆搜索可以选择搜索参数 @A1nair
+5. 空闲教室建筑选择菜单优化 @hazuki-keatsu
+6. 图书馆封面修理 @A1nair
+7. 考勤查询 @BenderBlog; 考勤记录 @aqqkad
+8. 校园网流量显示修复 @ZYar-er

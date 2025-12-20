@@ -61,45 +61,45 @@ weekday:
 
 # 考勤查询
 class_attendance:
-    title: "Attendance Query"
-    detail_title: "Attendance Detail - {courseName}"
-    no_data: "No course info"
-    no_attendance_record: "No attendance record"
-    course_state:
-        unknown: "unknown"
-        ineligible: "ineligible"
-        eligible: "eligible"
-        warning: "warning"
-    card:
-        time: "Attendances"
-        time_info: "{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn} Required"
-        not_attend: "Rebirths"
-        not_attend_info: "{timeToHaveError} Times / {totalTimes} Total"
-        leave: "Leaves"
-        leave_info: "Personal {personalLeave} / Sick {sickLeave} / Official {officialLeave}"
-        study: "Study"
-        study_info: "Task {taskProgress} / Works {homeworkProgress} / Exam {examProgress}"
-    detail_card:
-        creator_name: "Creator"
-        start_time: "Start at"
-        summit_time: "Summit at"
-    sign_type:
-        qr_code: "QR Code Checkin"
-        gesture: "Gesture Checkin"
-        position: "Position Checkin"
-        default: "Normal Checkin"
-    sign_status:
-        absenceNotParticipating: "Absence (Not participating)"
-        signed: Signed
-        signedByTeacher: "Signed by teacher"
-        personalLeave2: "Personal Leave"
-        absence: "Absence"
-        sickLeave: "Sick Leave"
-        personalLeave: "Personal Leave"
-        late: "Late"
-        leaveEarly: "Leave Early"
-        signExpiredy: "Sign Expired"
-        publicLeave: "Public Leave"
+   title: "Attendance Query"
+   detail_title: "Attendance Detail - {courseName}"
+   no_data: "No course info"
+   no_attendance_record: "No attendance record"
+   course_state:
+      unknown: "unknown"
+      ineligible: "ineligible"
+      eligible: "eligible"
+      warning: "warning"
+   card:
+      time: "Attendances"
+      time_info: "{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn} Required"
+      not_attend: "Rebirths"
+      not_attend_info: "{timeToHaveError} Times / {totalTimes} Total"
+      leave: "Leaves"
+      leave_info: "Personal {personalLeave} / Sick {sickLeave} / Official {officialLeave}"
+      study: "Study"
+      study_info: "Task {taskProgress} / Works {homeworkProgress} / Exam {examProgress}"
+   detail_card:
+      creator_name: "Creator"
+      start_time: "Start at"
+      summit_time: "Summit at"
+   sign_type:
+      qr_code: "QR Code Checkin"
+      gesture: "Gesture Checkin"
+      position: "Position Checkin"
+      default: "Normal Checkin"
+   sign_status:
+      absenceNotParticipating: "Absence (Not participating)"
+      signed: Signed
+      signedByTeacher: "Signed by teacher"
+      personalLeave2: "Personal Leave"
+      absence: "Absence"
+      sickLeave: "Sick Leave"
+      personalLeave: "Personal Leave"
+      late: "Late"
+      leaveEarly: "Leave Early"
+      signExpiredy: "Sign Expired"
+      publicLeave: "Public Leave"
 
 # 日程表/课程表
 classtable:
@@ -948,10 +948,24 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-   Enjoy your life, dude!
+   Deaming at the sky
+
+   New horizon will be seen upon
+
+   Merry Xmas, glad to serve you warmly next year!
 
 easter_egg_others: |-
-   Enjoy your life, dude!
+   Our day will come!
+
+   A fair, just world.
+
+   Without prejudice and bullying poor.
+
+   Everyone is open-hearted
+
+   and accept each other.
+
+   Happy Robocon, glad to serve you warmly next year!
 
 # Firefox about:robots.
 easter_egg_robot:

@@ -1,0 +1,8 @@
+1. Widget fix @BenderBlog
+2. Page load optimization @BenderBlog
+3. Sch @hazuki-keatsu
+4. Library search with paramater @A1nair
+5. Scroll to chosen on empty classroom choose dialog @hazuki-keatsu
+6. Library cover fix @A1nair
+7. Attendance fetch @BenderBlog; attendance record @aqqkad
+8. Schoolnet fetch fix @ZYar-er
