@@ -5,7 +5,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_detail.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class CourseCard extends StatelessWidget {
@@ -109,9 +109,22 @@ class CourseCard extends StatelessWidget {
         ],
       ),
     ).gestures(
-      onTap: () {
+      onTap: () async {
         if (!attendanceStatus.contains("unknown")) {
-          context.push(ClassAttendanceDetailView(classAttendance: course));
+          await BothSideSheet.show(
+            context: context,
+            title: FlutterI18n.translate(
+              context,
+              "class_attendance.detail_title",
+              translationParams: {
+                "courseName": course.courseName,
+              },
+            ),
+            child: ClassAttendanceDetailView(
+              classAttendance: course,
+              showAppBar: false,
+            ),
+          );
         }
       },
     );

@@ -65,6 +65,17 @@ class_attendance:
         ineligible: "取消"
         eligible: "正常"
         warning: "危险"
+    table:
+        course_name: "课程名称"
+        status: "状态"
+        attendance_rate: "到课率"
+        check_in: "签到"
+        absence: "缺勤"
+        required: "应签"
+        leave: "请假(事/病/公)"
+        filter: "筛选"
+        filter_all: "全部"
+        showing_count: "显示 {count}/{total} 门课程"
     card:
         time: "签到次数"
         time_info: "{checkInCount} 已签 / {absenceCount} 缺勤 / {requiredCheckIn} 应签"
