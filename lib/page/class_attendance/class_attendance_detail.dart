@@ -199,7 +199,7 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                 ),
                 noMoreItemsIndicatorBuilder: (context) =>
                     [
-                          Icon(Icons.sentiment_very_satisfied, size: 32),
+                          const Icon(Icons.sentiment_very_satisfied, size: 32),
                           SizedBox(width: 8),
                           Text(
                             "That's all folks!",
