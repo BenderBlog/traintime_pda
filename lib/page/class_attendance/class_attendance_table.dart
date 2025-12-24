@@ -42,7 +42,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
     } else {
       filtered = widget.courses.where((course) {
         final totalTimes = widget.classTimes[course.courseName] ?? 0;
-        final status = _getAttendanceStatus(course, totalTimes);
+        final status = course.getAttendanceStatus(totalTimes);
         return status == _selectedFilter;
       }).toList();
     }
@@ -59,8 +59,8 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
             comparison = a.courseName.compareTo(b.courseName);
             break;
           case 1: // 状态
-            final statusA = _getAttendanceStatus(a, totalTimesA);
-            final statusB = _getAttendanceStatus(b, totalTimesB);
+            final statusA = a.getAttendanceStatus(totalTimesA);
+            final statusB = b.getAttendanceStatus(totalTimesB);
             comparison = _getStatusPriority(
               statusA,
             ).compareTo(_getStatusPriority(statusB));
@@ -94,24 +94,6 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
     }
 
     return filtered;
-  }
-
-  String _getAttendanceStatus(ClassAttendance course, int totalTimes) {
-    final timeToHaveError = (totalTimes / 4).floor();
-    final absenceNum = int.tryParse(course.absenceCount) ?? 0;
-    final attendanceRatio = double.tryParse(
-      course.attendanceRate.replaceAll(" %", ""),
-    );
-
-    if (attendanceRatio == null) {
-      return "class_attendance.course_state.unknown";
-    } else if (timeToHaveError < absenceNum) {
-      return "class_attendance.course_state.ineligible";
-    } else if (attendanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
-      return "class_attendance.course_state.eligible";
-    } else {
-      return "class_attendance.course_state.warning";
-    }
   }
 
   Color _getStatusColor(String status) {
@@ -265,6 +247,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
           child: SingleChildScrollView(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
               child: Container(
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -396,7 +379,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                   rows: filteredCourses.map((course) {
                     final totalTimes =
                         widget.classTimes[course.courseName] ?? 0;
-                    final status = _getAttendanceStatus(course, totalTimes);
+                    final status = course.getAttendanceStatus(totalTimes);
                     final statusColor = _getStatusColor(status);
 
                     return DataRow(

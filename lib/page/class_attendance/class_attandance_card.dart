@@ -20,20 +20,7 @@ class CourseCard extends StatelessWidget {
     timeToHaveError = (totalTimes / 4).floor();
     absenceNum = int.tryParse(course.absenceCount) ?? 0;
     remainAbsenceNum = timeToHaveError - absenceNum;
-
-    double? attandanceRatio = double.tryParse(
-      course.attendanceRate.replaceAll(" %", ""),
-    );
-
-    if (attandanceRatio == null) {
-      attendanceStatus = "class_attendance.course_state.unknown";
-    } else if (timeToHaveError < absenceNum) {
-      attendanceStatus = "class_attendance.course_state.ineligible";
-    } else if (attandanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
-      attendanceStatus = "class_attendance.course_state.eligible";
-    } else {
-      attendanceStatus = "class_attendance.course_state.warning";
-    }
+    attendanceStatus = course.getAttendanceStatus(totalTimes);
   }
 
   Widget _buildInfoRow(String label, String value) {

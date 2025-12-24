@@ -60,6 +60,26 @@ class ClassAttendance {
     this.clazzId,
     this.cpi,
   });
+
+  /// Calculate the attendance status based on total class times
+  /// Returns a translation key for the status
+  String getAttendanceStatus(int totalTimes) {
+    final timeToHaveError = (totalTimes / 4).floor();
+    final absenceNum = int.tryParse(absenceCount) ?? 0;
+    final attendanceRatio = double.tryParse(
+      attendanceRate.replaceAll(" %", ""),
+    );
+
+    if (attendanceRatio == null) {
+      return "class_attendance.course_state.unknown";
+    } else if (timeToHaveError < absenceNum) {
+      return "class_attendance.course_state.ineligible";
+    } else if (attendanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
+      return "class_attendance.course_state.eligible";
+    } else {
+      return "class_attendance.course_state.warning";
+    }
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
