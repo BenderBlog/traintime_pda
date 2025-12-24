@@ -97,8 +97,8 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
         newPageProgressIndicatorBuilder: (context) {
           return Row(
             children: [
-              CircularProgressIndicator(),
-              Text("More to come"),
+              const CircularProgressIndicator(),
+              const Text("More to come"),
             ],
           );
         },
@@ -111,8 +111,8 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
         ),
         noMoreItemsIndicatorBuilder: (context) =>
             [
-                  Icon(Icons.sentiment_very_satisfied, size: 32),
-                  SizedBox(width: 8),
+                  const Icon(Icons.sentiment_very_satisfied, size: 32),
+                  const SizedBox(width: 8),
                   Text(
                     "That's all folks!",
                     style: Theme.of(context).textTheme.titleLarge,
@@ -185,8 +185,8 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                 newPageProgressIndicatorBuilder: (context) {
                   return Row(
                     children: [
-                      CircularProgressIndicator(),
-                      Text("More to come"),
+                      const CircularProgressIndicator(),
+                      const Text("More to come"),
                     ],
                   );
                 },
