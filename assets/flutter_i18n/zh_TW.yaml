@@ -47,6 +47,17 @@ class_attendance:
     ineligible: 取消
     eligible: 正常
     warning: 危險
+  table:
+    course_name: 課程名稱
+    status: 狀態
+    attendance_rate: 到課率
+    check_in: 簽到
+    absence: 缺勤
+    required: 應籤
+    leave: 請假(事/病/公)
+    filter: 篩選
+    filter_all: 全部
+    showing_count: 顯示 {count}/{total} 門課程
   card:
     time: 簽到次數
     time_info: '{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤'
