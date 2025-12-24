@@ -99,15 +99,15 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
   String _getAttendanceStatus(ClassAttendance course, int totalTimes) {
     final timeToHaveError = (totalTimes / 4).floor();
     final absenceNum = int.tryParse(course.absenceCount) ?? 0;
-    final attandanceRatio = double.tryParse(
+    final attendanceRatio = double.tryParse(
       course.attendanceRate.replaceAll(" %", ""),
     );
 
-    if (attandanceRatio == null) {
+    if (attendanceRatio == null) {
       return "class_attendance.course_state.unknown";
     } else if (timeToHaveError < absenceNum) {
       return "class_attendance.course_state.ineligible";
-    } else if (attandanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
+    } else if (attendanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
       return "class_attendance.course_state.eligible";
     } else {
       return "class_attendance.course_state.warning";
