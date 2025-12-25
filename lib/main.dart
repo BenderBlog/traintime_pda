@@ -116,7 +116,9 @@ class _MyAppState extends State<MyApp> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      double screenWidth = MediaQuery.of(context).size.width;
+      if (!mounted) return;
+      final screenWidth = PlatformDispatcher.instance.views.first.physicalSize.width /
+          PlatformDispatcher.instance.views.first.devicePixelRatio;
       log.info("Screen width: $screenWidth.");
       if (screenWidth < 480) {
         log.info("Vertical vision mode disabled!");
