@@ -99,13 +99,14 @@ class ClassCard extends StatelessWidget {
                                   ),
                                 ),
                               )
-                              .then(
-                                (value) => controller.editUserDefinedClass(
+                              .then((value) {
+                                if (value == null) return;
+                                controller.editUserDefinedClass(
                                   value.$1,
                                   value.$2,
                                   value.$3,
-                                ),
-                              );
+                                );
+                              });
                         }
                       }
                     },
