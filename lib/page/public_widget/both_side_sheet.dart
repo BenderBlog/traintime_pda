@@ -118,7 +118,15 @@ class _BothSideSheetState extends State<BothSideSheet> {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),
               ),
-              Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+              Expanded(
+                child: Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              const SizedBox(width: 8),
             ],
           ),
         );

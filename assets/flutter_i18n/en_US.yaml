@@ -70,6 +70,17 @@ class_attendance:
       ineligible: "ineligible"
       eligible: "eligible"
       warning: "warning"
+   table:
+      course_name: "Course Name"
+      status: "Status"
+      attendance_rate: "Rate"
+      check_in: "Check-in"
+      absence: "Absence"
+      required: "Required"
+      leave: "Leave(P/S/O)"
+      filter: "Filter"
+      filter_all: "All"
+      showing_count: "Showing {count}/{total} courses"
    card:
       time: "Attendances"
       time_info: "{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn} Required"
