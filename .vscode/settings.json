@@ -18,4 +18,5 @@
   "licenser.author": "Traintime PDA Authours, originally by BenderBlog Rodriguez",
   "licenser.license": "MPLv2",
   "licenser.useSPDXLicenseFormat": true,
+  "cmake.sourceDirectory": "/Volumes/BenderBlog/Development/traintime_pda/linux",
 }

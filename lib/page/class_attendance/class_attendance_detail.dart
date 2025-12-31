@@ -128,7 +128,11 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                         .padding(vertical: 12),
 
                 itemBuilder: (context, item, index) => ReXCard(
-                  title: Text(FlutterI18n.translate(context, item.signName)),
+                  title: Text(
+                    item.signName.contains("class_attendance.sign_type")
+                        ? FlutterI18n.translate(context, item.signName)
+                        : item.signName,
+                  ),
                   remaining: [
                     ReXCardRemaining(
                       FlutterI18n.translate(context, item.signStatus),
@@ -161,15 +165,12 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                         ),
                     ],
                   ),
-                ).constrained(maxWidth: sheetMaxWidth).center(),
+                ),
               ),
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(height: 4);
               },
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12.5,
-                vertical: 9.0,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 9.0),
             ),
       ),
     );
