@@ -46,64 +46,75 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
     });
   }
 
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Text(FlutterI18n.translate(context, "class_attendance.title")),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // 判断是否使用表格视图：宽度大于 800 时使用表格（考虑表格需要更多空间）
     final bool useTableView = MediaQuery.of(context).size.width > 800;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "class_attendance.title")),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: FutureBuilder<List<ClassAttendance>>(
-          future: coursesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return ReloadWidget(
-                function: () => _refreshData(),
-                errorStatus: snapshot.error,
-                stackTrace: snapshot.stackTrace,
-              );
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return EmptyListView(
-                text: FlutterI18n.translate(
-                  context,
-                  "class_attendance.no_data",
-                ),
-                type: EmptyListViewType.rolling,
-              );
-            }
+    return FutureBuilder<List<ClassAttendance>>(
+      future: coursesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: _buildAppBar(context),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            appBar: _buildAppBar(context),
+            body: ReloadWidget(
+              function: () => _refreshData(),
+              errorStatus: snapshot.error,
+              stackTrace: snapshot.stackTrace,
+            ),
+          );
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Scaffold(
+            appBar: _buildAppBar(context),
+            body: EmptyListView(
+              text: FlutterI18n.translate(context, "class_attendance.no_data"),
+              type: EmptyListViewType.rolling,
+            ),
+          );
+        }
 
-            final courses = snapshot.data!;
+        final courses = snapshot.data!;
 
-            // 使用表格视图（平板/电脑端）
-            if (useTableView) {
-              return ClassAttendanceTable(
-                courses: courses,
-                classTimes: classTimes,
-              );
-            }
+        // 使用表格视图（平板/电脑端）
+        if (useTableView) {
+          return ClassAttendanceTable(
+            courses: courses,
+            classTimes: classTimes,
+            onRefresh: _refreshData,
+          );
+        }
 
-            // 使用卡片视图（移动端）
-            final courseCards = courses.map((classAttendance) {
-              int times = classTimes[classAttendance.courseName] ?? 0;
-              return CourseCard(course: classAttendance, totalTimes: times);
-            }).toList();
+        // 使用卡片视图（移动端）
+        final courseCards = courses.map((classAttendance) {
+          int times = classTimes[classAttendance.courseName] ?? 0;
+          return CourseCard(course: classAttendance, totalTimes: times);
+        }).toList();
 
-            final warningCourses = courseCards.toList()
-              ..retainWhere((e) => e.attendanceStatus.contains("warning"));
-            final ineligibleCourses = courseCards.toList()
-              ..retainWhere((e) => e.attendanceStatus.contains("ineligible"));
-            final eligibleCourses = courseCards.toList()
-              ..retainWhere((e) => e.attendanceStatus.contains("eligible"));
-            final unknownCourses = courseCards.toList()
-              ..retainWhere((e) => e.attendanceStatus.contains("unknown"));
+        final warningCourses = courseCards.toList()
+          ..retainWhere((e) => e.attendanceStatus.contains("warning"));
+        final ineligibleCourses = courseCards.toList()
+          ..retainWhere((e) => e.attendanceStatus.contains("ineligible"));
+        final eligibleCourses = courseCards.toList()
+          ..retainWhere((e) => e.attendanceStatus.contains("eligible"));
+        final unknownCourses = courseCards.toList()
+          ..retainWhere((e) => e.attendanceStatus.contains("unknown"));
 
-            return TimelineWidget(
+        return Scaffold(
+          appBar: _buildAppBar(context),
+          body: RefreshIndicator(
+            onRefresh: _refreshData,
+            child: TimelineWidget(
               isTitle: [
                 if (ineligibleCourses.isNotEmpty) ...[true, false],
                 if (warningCourses.isNotEmpty) ...[true, false],
@@ -148,10 +159,10 @@ class _ClassAttendanceViewState extends State<ClassAttendanceView> {
                   unknownCourses.toColumn(),
                 ],
               ],
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
