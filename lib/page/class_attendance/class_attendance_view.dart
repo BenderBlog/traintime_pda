@@ -4,165 +4,155 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attandance_card.dart';
+import 'package:watermeter/page/class_attendance/class_attendance_state.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_table.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
-import 'package:watermeter/repository/xidian_ids/learning_session.dart';
-import 'package:get/get.dart';
 
-class ClassAttendanceView extends StatefulWidget {
+class ClassAttendanceView extends StatelessWidget {
   const ClassAttendanceView({super.key});
 
   @override
-  State<ClassAttendanceView> createState() => _ClassAttendanceViewState();
-}
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => ClassAttendanceState(),
+      child: Consumer<ClassAttendanceState>(
+        builder: (context, state, _) {
+          final bool useTableView = MediaQuery.of(context).size.width > 800;
 
-class _ClassAttendanceViewState extends State<ClassAttendanceView> {
-  late Future<List<ClassAttendance>> coursesFuture;
-  late ClassTableController controller;
-  late Map<String, int> classTimes;
-
-  Future<List<ClassAttendance>> loadDataFunction() async =>
-      LearningSession().getAttandanceRecord();
-
-  @override
-  void initState() {
-    super.initState();
-    coursesFuture = loadDataFunction();
-    controller = Get.put(ClassTableController());
-    classTimes = controller.numberOfClass;
-  }
-
-  Future<void> _refreshData() async {
-    setState(() {
-      coursesFuture = loadDataFunction();
-      classTimes = controller.numberOfClass;
-    });
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text(FlutterI18n.translate(context, "class_attendance.title")),
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                FlutterI18n.translate(context, "class_attendance.title"),
+              ),
+              actions: [
+                if (state.state == ClassAttendanceFetchState.ok ||
+                    state.state == ClassAttendanceFetchState.empty)
+                  IconButton(
+                    icon: const Icon(Icons.replay_outlined),
+                    onPressed: () => state.refreshData(),
+                  ),
+              ],
+            ),
+            body: Builder(
+              builder: (context) {
+                switch (state.state) {
+                  case ClassAttendanceFetchState.fetching:
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 16),
+                          Text(
+                            FlutterI18n.translate(
+                              context,
+                              "class_attendance.long_load",
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  case ClassAttendanceFetchState.error:
+                    return ReloadWidget(
+                      function: () => state.refreshData(),
+                      errorStatus: state.error,
+                      stackTrace: state.stackTrace,
+                    );
+                  case ClassAttendanceFetchState.empty:
+                    return EmptyListView(
+                      text: FlutterI18n.translate(
+                        context,
+                        "class_attendance.no_data",
+                      ),
+                      type: EmptyListViewType.rolling,
+                    );
+                  case ClassAttendanceFetchState.ok:
+                    if (useTableView) {
+                      return ClassAttendanceTable(
+                        courses: state.courses,
+                        classTimes: state.classTimes,
+                        onRefresh: state.refreshData,
+                      );
+                    }
+                    return _buildCardView(context, state);
+                }
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // 判断是否使用表格视图：宽度大于 800 时使用表格（考虑表格需要更多空间）
-    final bool useTableView = MediaQuery.of(context).size.width > 800;
+  Widget _buildCardView(BuildContext context, ClassAttendanceState state) {
+    final courseCards = state.courses.map((classAttendance) {
+      int times = state.classTimes[classAttendance.courseName] ?? 0;
+      return CourseCard(course: classAttendance, totalTimes: times);
+    }).toList();
 
-    return FutureBuilder<List<ClassAttendance>>(
-      future: coursesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: _buildAppBar(context),
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        } else if (snapshot.hasError) {
-          return Scaffold(
-            appBar: _buildAppBar(context),
-            body: ReloadWidget(
-              function: () => _refreshData(),
-              errorStatus: snapshot.error,
-              stackTrace: snapshot.stackTrace,
+    final warningCourses = courseCards.toList()
+      ..retainWhere((e) => e.attendanceStatus.contains("warning"));
+    final ineligibleCourses = courseCards.toList()
+      ..retainWhere((e) => e.attendanceStatus.contains("ineligible"));
+    final eligibleCourses = courseCards.toList()
+      ..retainWhere((e) => e.attendanceStatus.contains("eligible"));
+    final unknownCourses = courseCards.toList()
+      ..retainWhere((e) => e.attendanceStatus.contains("unknown"));
+
+    return RefreshIndicator(
+      onRefresh: state.refreshData,
+      child: TimelineWidget(
+        isTitle: [
+          if (ineligibleCourses.isNotEmpty) ...[true, false],
+          if (warningCourses.isNotEmpty) ...[true, false],
+          if (eligibleCourses.isNotEmpty) ...[true, false],
+          if (unknownCourses.isNotEmpty) ...[true, false],
+        ],
+        children: [
+          if (ineligibleCourses.isNotEmpty) ...[
+            TimelineTitle(
+              title: FlutterI18n.translate(
+                context,
+                "class_attendance.course_state.ineligible",
+              ),
             ),
-          );
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Scaffold(
-            appBar: _buildAppBar(context),
-            body: EmptyListView(
-              text: FlutterI18n.translate(context, "class_attendance.no_data"),
-              type: EmptyListViewType.rolling,
+            ineligibleCourses.toColumn(),
+          ],
+          if (warningCourses.isNotEmpty) ...[
+            TimelineTitle(
+              title: FlutterI18n.translate(
+                context,
+                "class_attendance.course_state.warning",
+              ),
             ),
-          );
-        }
-
-        final courses = snapshot.data!;
-
-        // 使用表格视图（平板/电脑端）
-        if (useTableView) {
-          return ClassAttendanceTable(
-            courses: courses,
-            classTimes: classTimes,
-            onRefresh: _refreshData,
-          );
-        }
-
-        // 使用卡片视图（移动端）
-        final courseCards = courses.map((classAttendance) {
-          int times = classTimes[classAttendance.courseName] ?? 0;
-          return CourseCard(course: classAttendance, totalTimes: times);
-        }).toList();
-
-        final warningCourses = courseCards.toList()
-          ..retainWhere((e) => e.attendanceStatus.contains("warning"));
-        final ineligibleCourses = courseCards.toList()
-          ..retainWhere((e) => e.attendanceStatus.contains("ineligible"));
-        final eligibleCourses = courseCards.toList()
-          ..retainWhere((e) => e.attendanceStatus.contains("eligible"));
-        final unknownCourses = courseCards.toList()
-          ..retainWhere((e) => e.attendanceStatus.contains("unknown"));
-
-        return Scaffold(
-          appBar: _buildAppBar(context),
-          body: RefreshIndicator(
-            onRefresh: _refreshData,
-            child: TimelineWidget(
-              isTitle: [
-                if (ineligibleCourses.isNotEmpty) ...[true, false],
-                if (warningCourses.isNotEmpty) ...[true, false],
-                if (eligibleCourses.isNotEmpty) ...[true, false],
-                if (unknownCourses.isNotEmpty) ...[true, false],
-              ],
-              children: [
-                if (ineligibleCourses.isNotEmpty) ...[
-                  TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "class_attendance.course_state.ineligible",
-                    ),
-                  ),
-                  ineligibleCourses.toColumn(),
-                ],
-                if (warningCourses.isNotEmpty) ...[
-                  TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "class_attendance.course_state.warning",
-                    ),
-                  ),
-                  warningCourses.toColumn(),
-                ],
-                if (eligibleCourses.isNotEmpty) ...[
-                  TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "class_attendance.course_state.eligible",
-                    ),
-                  ),
-                  eligibleCourses.toColumn(),
-                ],
-                if (unknownCourses.isNotEmpty) ...[
-                  TimelineTitle(
-                    title: FlutterI18n.translate(
-                      context,
-                      "class_attendance.course_state.unknown",
-                    ),
-                  ),
-                  unknownCourses.toColumn(),
-                ],
-              ],
+            warningCourses.toColumn(),
+          ],
+          if (eligibleCourses.isNotEmpty) ...[
+            TimelineTitle(
+              title: FlutterI18n.translate(
+                context,
+                "class_attendance.course_state.eligible",
+              ),
             ),
-          ),
-        );
-      },
+            eligibleCourses.toColumn(),
+          ],
+          if (unknownCourses.isNotEmpty) ...[
+            TimelineTitle(
+              title: FlutterI18n.translate(
+                context,
+                "class_attendance.course_state.unknown",
+              ),
+            ),
+            unknownCourses.toColumn(),
+          ],
+        ],
+      ),
     );
   }
 }

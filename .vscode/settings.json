@@ -19,4 +19,7 @@
   "licenser.license": "MPLv2",
   "licenser.useSPDXLicenseFormat": true,
   "cmake.sourceDirectory": "/Volumes/BenderBlog/Development/traintime_pda/linux",
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "python-envs.pythonProjects": [],
 }

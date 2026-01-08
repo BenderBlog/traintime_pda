@@ -65,6 +65,7 @@ class_attendance:
    detail_title: "Attendance Detail - {courseName}"
    no_data: "No course info"
    no_attendance_record: "No attendance record"
+   long_load: "It takes about half minute to load attendance data, pleace wait patiently"
    course_state:
       unknown: "unknown"
       ineligible: "ineligible"

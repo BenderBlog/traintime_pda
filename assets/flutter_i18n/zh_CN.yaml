@@ -60,6 +60,7 @@ class_attendance:
     detail_title: "签到信息 - {courseName}"
     no_data: "没有找到课程数据"
     no_attendance_record: "没有签到记录"
+    long_load: "考勤数据的加载时间约半分钟，请耐心等待"
     course_state:
         unknown: "未知"
         ineligible: "取消"

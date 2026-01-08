@@ -42,6 +42,7 @@ class_attendance:
   detail_title: 簽到信息 - {courseName}
   no_data: 沒有找到課程數據
   no_attendance_record: 沒有簽到記錄
+  long_load: 考勤數據的加載時間約半分鐘，請耐心等待
   course_state:
     unknown: 未知
     ineligible: 取消
