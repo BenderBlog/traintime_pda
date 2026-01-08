@@ -23,17 +23,21 @@ class BothSideSheet extends StatefulWidget {
   }) => showGeneralDialog<T>(
     barrierDismissible: true,
     context: context,
+    barrierColor: Colors.black54,
     useRootNavigator: false,
     pageBuilder: (context, animation1, animation2) {
       return BothSideSheet(title: title, divider: divider, child: child);
     },
     barrierLabel: title,
     transitionBuilder: (context, animation, secondaryAnimation, child) {
+      final isNarrow = MediaQuery.of(context).size.width < divider;
+      final beginOffset = isNarrow
+          ? const Offset(0.0, 1.0)
+          : const Offset(1.0, 0.0);
+
       return SlideTransition(
         position: Tween(
-          begin: MediaQuery.of(context).size.width < divider
-              ? const Offset(0.0, 1.0)
-              : const Offset(1.0, 0.0),
+          begin: beginOffset,
           end: Offset.zero,
         ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation),
         child: child,
@@ -42,133 +46,256 @@ class BothSideSheet extends StatefulWidget {
   );
 
   @override
+  @override
   State<BothSideSheet> createState() => _BothSideSheetState();
 }
 
-class _BothSideSheetState extends State<BothSideSheet> {
-  /// We only change the height, to simulate showModalBottomSheet
-  late double heightForVertical;
+class _BothSideSheetState extends State<BothSideSheet>
+    with SingleTickerProviderStateMixin {
+  double? _initialMobileHeight;
+
+  double? _currentHeight;
+
+  late AnimationController _animationController;
+  late Animation<double> _heightAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _animationController.addListener(() {
+      setState(() {
+        _currentHeight = _heightAnimation.value;
+      });
+    });
+  }
 
   @override
   void didChangeDependencies() {
-    heightForVertical = MediaQuery.of(context).size.height * 0.8;
     super.didChangeDependencies();
+    _initialMobileHeight = MediaQuery.of(context).size.height * 0.8;
+    _currentHeight ??= _initialMobileHeight;
   }
 
-  BorderRadius radius(BuildContext context) => BorderRadius.only(
-    topLeft: const Radius.circular(16),
-    bottomLeft: !(MediaQuery.of(context).size.width < widget.divider)
-        ? const Radius.circular(16)
-        : Radius.zero,
-    topRight: MediaQuery.of(context).size.width < widget.divider
-        ? const Radius.circular(16)
-        : Radius.zero,
-    bottomRight: Radius.zero,
-  );
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
-  double get width => MediaQuery.of(context).size.width < widget.divider
-      ? MediaQuery.of(context).size.width
-      : MediaQuery.of(context).size.width * 0.4 < 360
-      ? 360
-      : MediaQuery.of(context).size.width * 0.4;
+  void _onDragStart() {
+    _animationController.stop();
+  }
 
-  Widget get onTop => MediaQuery.of(context).size.width < widget.divider
-      ? GestureDetector(
-          onVerticalDragUpdate: (DragUpdateDetails details) {
-            setState(() {
-              heightForVertical =
-                  MediaQuery.of(context).size.height -
-                  details.globalPosition.dy;
-              if (heightForVertical <
-                  MediaQuery.of(context).size.height * 0.4) {
-                Navigator.pop(context);
-              }
-            });
-          },
-          child: SizedBox(
-            height: 30,
-            width: double.infinity,
-            child: Stack(
-              alignment: AlignmentDirectional.center,
-              children: [
-                Container(
-                  width: double.infinity,
-                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
-                ),
-                Container(
-                  width: 32,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  ),
-                ),
-              ],
+  void _onDragUpdate(double globalPositionY) {
+    setState(() {
+      double newHeight = MediaQuery.of(context).size.height - globalPositionY;
+      _currentHeight = newHeight.clamp(0.0, _initialMobileHeight!);
+    });
+  }
+
+  void _onDragEnd(double? primaryVelocity) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final dismissThreshold = screenHeight * 0.4;
+
+    final velocity = primaryVelocity ?? 0;
+    if (_currentHeight! < dismissThreshold || velocity > 500) {
+      Navigator.pop(context);
+    } else {
+      _heightAnimation =
+          Tween<double>(
+            begin: _currentHeight,
+            end: _initialMobileHeight,
+          ).animate(
+            CurvedAnimation(
+              parent: _animationController,
+              curve: Curves.easeOutBack,
             ),
-          ),
-        )
-      : SizedBox(
-          height: kToolbarHeight,
-          width: double.infinity,
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back),
-              ),
-              Expanded(
-                child: Text(
-                  widget.title,
-                  style: Theme.of(context).textTheme.titleLarge,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-        );
+          );
+      _animationController.forward(from: 0.0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < widget.divider;
+
+    final desktopWidth = (screenWidth * 0.4).clamp(360.0, double.infinity);
+
+    final borderRadius = BorderRadius.only(
+      topLeft: const Radius.circular(16),
+      bottomLeft: !isNarrow ? const Radius.circular(16) : Radius.zero,
+      topRight: isNarrow ? const Radius.circular(16) : Radius.zero,
+    );
+
     return Align(
-      alignment: MediaQuery.of(context).size.width < widget.divider
-          ? Alignment.bottomCenter
-          : Alignment.centerRight,
-      child: Container(
-        width: width,
-        height: MediaQuery.of(context).size.width < widget.divider
-            ? heightForVertical
-            : double.infinity,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLowest,
-          borderRadius: radius(context),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width < widget.divider
-                ? 15
-                : 10,
-            vertical: MediaQuery.of(context).size.width < widget.divider
-                ? 0
-                : 10,
-          ),
-          child: Scaffold(
-            extendBodyBehindAppBar: true,
-            appBar: MediaQuery.of(context).size.width < widget.divider
-                ? PreferredSize(
-                    preferredSize: const Size.fromHeight(20),
-                    child: onTop,
+      alignment: isNarrow ? Alignment.bottomCenter : Alignment.centerRight,
+      child: Material(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: borderRadius,
+        elevation: 8,
+        child: Container(
+          width: isNarrow ? screenWidth : desktopWidth,
+          height: isNarrow ? _currentHeight : double.infinity,
+          decoration: BoxDecoration(borderRadius: borderRadius),
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: isNarrow
+                ? _MobileLayoutBuilder(
+                    onDragStart: _onDragStart,
+                    onDragUpdate: _onDragUpdate,
+                    onDragEnd: _onDragEnd,
+                    child: widget.child,
                   )
-                : PreferredSize(
-                    preferredSize: const Size.fromHeight(kToolbarHeight),
-                    child: onTop,
+                : _DesktopLayoutBuilder(
+                    title: widget.title,
+                    child: widget.child,
                   ),
-            body: widget.child,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MobileDragHandleBuilder extends StatelessWidget {
+  final VoidCallback onDragStart;
+  final ValueChanged<double> onDragUpdate;
+  final ValueChanged<double?> onDragEnd;
+
+  const _MobileDragHandleBuilder({
+    required this.onDragStart,
+    required this.onDragUpdate,
+    required this.onDragEnd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onVerticalDragStart: (_) => onDragStart(),
+      onVerticalDragUpdate: (details) =>
+          onDragUpdate(details.globalPosition.dy),
+      onVerticalDragEnd: (details) => onDragEnd(details.primaryVelocity),
+      child: SizedBox(
+        height: 30,
+        width: double.infinity,
+        child: Center(
+          child: Container(
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DesktopToolbarBuilder extends StatelessWidget {
+  final String title;
+
+  const _DesktopToolbarBuilder({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          ),
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _MobileLayoutBuilder extends StatelessWidget {
+  final VoidCallback onDragStart;
+  final ValueChanged<double> onDragUpdate;
+  final ValueChanged<double?> onDragEnd;
+  final Widget child;
+
+  const _MobileLayoutBuilder({
+    required this.onDragStart,
+    required this.onDragUpdate,
+    required this.onDragEnd,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _MobileDragHandleBuilder(
+          onDragStart: onDragStart,
+          onDragUpdate: onDragUpdate,
+          onDragEnd: onDragEnd,
+        ),
+        Expanded(
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            removeBottom: true,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 16),
+              child: child,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DesktopLayoutBuilder extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _DesktopLayoutBuilder({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      left: false,
+      child: Column(
+        children: [
+          _DesktopToolbarBuilder(title: title),
+          Expanded(
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              removeBottom: true,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 16),
+                child: child,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
