@@ -8,6 +8,8 @@ XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息�
 
 [临时主页地址](https://legacy.superbart.top/xdyou.html) 
 
+</div>
+
 [<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
     alt="Get it on App Store"
     height="60px" align="middle">](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
