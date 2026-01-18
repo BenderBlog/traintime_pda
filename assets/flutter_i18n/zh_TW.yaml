@@ -835,6 +835,8 @@ sport:
   empty_class_info: 未查詢到課程信息
   test_score: 體測成績
   total_score: 四年總分
+  total_score_label: 總分
+  rank_label: 等級
   semester: '{year} 第{gradeType}'
   subject: 項目
   data: 數據

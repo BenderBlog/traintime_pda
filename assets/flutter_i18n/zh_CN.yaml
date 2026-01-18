@@ -863,6 +863,8 @@ sport:
     test_score: "体测成绩"
     # TODO: change sport score to support i18n
     total_score: "四年总分"
+    total_score_label: "总分"
+    rank_label: "等级"
     semester: "{year} 第{gradeType}"
     subject: "项目"
     data: "数据"
