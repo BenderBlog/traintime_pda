@@ -187,6 +187,14 @@ Win32Window::MessageHandler(HWND hwnd,
       }
       return 0;
 
+    case WM_GETMINMAXINFO: {
+      MINMAXINFO* min_max_info = reinterpret_cast<MINMAXINFO*>(lparam);
+      // Set minimum window size to prevent excessive compression
+      min_max_info->ptMinTrackSize.x = 800;  // Minimum width
+      min_max_info->ptMinTrackSize.y = 600;  // Minimum height
+      return 0;
+    }
+
     case WM_DPICHANGED: {
       auto newRectSize = reinterpret_cast<RECT*>(lparam);
       LONG newWidth = newRectSize->right - newRectSize->left;
