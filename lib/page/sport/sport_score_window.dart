@@ -321,28 +321,6 @@ class ScoreCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text(
-                  "${FlutterI18n.translate(context, "sport.rank_label")}：",
-                  style: const TextStyle(fontSize: _labelFontSize),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: titleBadgeInfo['rankBackgroundColor'],
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    toUse.rank,
-                    style: TextStyle(
-                      color: titleBadgeInfo['rankTextColor'],
-                      fontWeight: FontWeight.bold,
-                      fontSize: _rankFontSize,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
