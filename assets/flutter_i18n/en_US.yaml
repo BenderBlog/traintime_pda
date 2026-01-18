@@ -867,6 +867,8 @@ sport:
    test_score: "Sport test score"
    # TODO: change sport score to support i18n
    total_score: "Four-year total score"
+   total_score_label: "Total Score"
+   rank_label: "Rank"
    semester: "Semester {year} {gradeType}"
    subject: "Subject"
    data: "Data"
