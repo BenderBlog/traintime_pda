@@ -14,6 +14,15 @@ import 'package:watermeter/model/xidian_sport/score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
+// 常量定义
+const double _textBackgroundAlpha = 0.3;
+// const double _textTitleBackgroundAlpha = 0.6;
+const int _primaryColorShade = 900;
+const int _secondaryColorShade = 900;
+const double _scoreFontSize = 13.0;
+const double _rankFontSize = 13.0;
+const double _labelFontSize = 11.0;
+
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({super.key});
 
@@ -26,12 +35,134 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   bool get wantKeepAlive => true;
 
+  /// 根据合格/不合格状态获取颜色方案
+  Map<String, dynamic> _getColorScheme(bool isQualified, bool isUnknown) {
+    if (isUnknown) {
+      return {
+        'scoreBackgroundColor': Colors.grey.withValues(
+          alpha: _textBackgroundAlpha,
+        ),
+        'scoreTextColor': Colors.grey[_primaryColorShade],
+        'rankBackgroundColor': Colors.grey.withValues(
+          alpha: _textBackgroundAlpha,
+        ),
+        'rankTextColor': Colors.grey[_secondaryColorShade],
+      };
+    }
+
+    final baseColor = isQualified ? Colors.green : Colors.red;
+    return {
+      'scoreBackgroundColor': baseColor.withValues(
+        alpha: _textBackgroundAlpha,
+      ),
+      'scoreTextColor': baseColor[_primaryColorShade],
+      'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
+      'rankTextColor': baseColor[_secondaryColorShade],
+    };
+  }
+
   @override
   void initState() {
     super.initState();
     if (sportScore.value.situation == null && sportScore.value.detail.isEmpty) {
       SportSession().getScore();
     }
+  }
+
+  /// 判断四年成绩是否完整
+  bool _isFourYearsComplete() {
+    // 标准的四年应该有4年的成绩记录
+    return sportScore.value.list.length >= 4;
+  }
+
+  /// 获取总分显示值和颜色
+  Map<String, dynamic> _getTotalScoreInfo() {
+    final score = sportScore.value.total;
+    final isUnknown = !_isFourYearsComplete();
+    final isQualified = !sportScore.value.rank.contains("不");
+
+    final colorScheme = _getColorScheme(isQualified, isUnknown);
+
+    return {
+      'score': score,
+      'rank': isUnknown
+          ? FlutterI18n.translate(
+              context,
+              "class_attendance.course_state.unknown",
+            )
+          : sportScore.value.rank,
+      ...colorScheme,
+    };
+  }
+
+  /// 显示分数与等级的行布局
+  Widget _buildScoreRankRow(Map<String, dynamic> displayInfo) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                FlutterI18n.translate(context, "sport.total_score_label"),
+                style: const TextStyle(fontSize: _labelFontSize),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: displayInfo['scoreBackgroundColor'],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  displayInfo['score'],
+                  style: TextStyle(
+                    color: displayInfo['scoreTextColor'],
+                    fontWeight: FontWeight.bold,
+                    fontSize: _scoreFontSize,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                FlutterI18n.translate(context, "sport.rank_label"),
+                style: const TextStyle(fontSize: _labelFontSize),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: displayInfo['rankBackgroundColor'],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  displayInfo['rank'],
+                  style: TextStyle(
+                    color: displayInfo['rankTextColor'],
+                    fontWeight: FontWeight.bold,
+                    fontSize: _rankFontSize,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -44,30 +175,33 @@ class _SportScoreWindowState extends State<SportScoreWindow>
       child: Obx(() {
         if (sportScore.value.situation == null &&
             sportScore.value.detail.isNotEmpty) {
+          final scoreInfo = _getTotalScoreInfo();
           List<Widget> things = [
             ReXCard(
               title: Text(FlutterI18n.translate(context, "sport.total_score")),
-              remaining: [
-                ReXCardRemaining(
-                  sportScore.value.total,
-                  color: sportScore.value.rank.contains("不")
-                      ? Colors.red
-                      : null,
-                  isBold: true,
-                ),
-                ReXCardRemaining(
-                  sportScore.value.rank,
-                  color: sportScore.value.rank.contains("不")
-                      ? Colors.red
-                      : null,
-                  isBold: sportScore.value.rank.contains("不"),
-                ),
-              ],
-              bottomRow: Text(
-                sportScore.value.detail.substring(
-                  0,
-                  sportScore.value.detail.indexOf("\\"),
-                ),
+              remaining: [],
+              bottomRow: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: _buildScoreRankRow(scoreInfo),
+                  ),
+                  const Divider(height: 16, thickness: 0.5),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Center(
+                      child: Text(
+                        sportScore.value.detail.substring(
+                          0,
+                          sportScore.value.detail.indexOf("\\"),
+                        ),
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ];
@@ -112,30 +246,92 @@ class ScoreCard extends StatelessWidget {
   String unitToShow(String eval) =>
       eval.contains(".") ? eval.substring(0, eval.indexOf(".")) : eval;
 
+  Map<String, dynamic> _getScoreDisplayInfo() {
+    final isQualified = !toUse.rank.contains("不");
+    final baseColor = isQualified ? Colors.green : Colors.red;
+    return {
+      'scoreBackgroundColor': baseColor.withValues(
+        alpha: _textBackgroundAlpha,
+      ),
+      'scoreTextColor': baseColor[_primaryColorShade],
+      'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
+      'rankTextColor': baseColor[_secondaryColorShade],
+    };
+  }
+
+  Map<String, dynamic> _getTitleBadgeColorScheme() {
+    final isQualified = !toUse.rank.contains("不");
+    final baseColor = isQualified ? Colors.green : Colors.red;
+    return {
+      'scoreBackgroundColor': baseColor[_primaryColorShade],
+      'scoreTextColor': Colors.white,
+      'rankBackgroundColor': baseColor[_primaryColorShade],
+      'rankTextColor': Colors.white,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayInfo = _getScoreDisplayInfo();
+    final titleBadgeInfo = _getTitleBadgeColorScheme();
+
     return ReXCard(
-      title: Text(
-        FlutterI18n.translate(
-          context,
-          "sport.semester",
-          translationParams: {"year": toUse.year, "gradeType": toUse.gradeType},
-        ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              FlutterI18n.translate(
+                context,
+                "sport.semester",
+                translationParams: {
+                  "year": toUse.year,
+                  "gradeType": toUse.gradeType,
+                },
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                Text(
+                  "${FlutterI18n.translate(context, "sport.total_score_label")}：",
+                  style: const TextStyle(fontSize: _labelFontSize),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: titleBadgeInfo['scoreBackgroundColor'],
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    toUse.totalScore,
+                    style: TextStyle(
+                      color: titleBadgeInfo['scoreTextColor'],
+                      fontWeight: FontWeight.bold,
+                      fontSize: _scoreFontSize,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      remaining: [
-        ReXCardRemaining(
-          toUse.totalScore,
-          color: toUse.rank.contains("不") ? Colors.red : null,
-          isBold: true,
-        ),
-        ReXCardRemaining(
-          toUse.rank,
-          color: toUse.rank.contains("不") ? Colors.red : null,
-          isBold: toUse.rank.contains("不"),
-        ),
-      ],
-      bottomRow: toUse.details.isNotEmpty
-          ? Table(
+      remaining: [],
+      bottomRow: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (toUse.details.isNotEmpty)
+            Table(
               columnWidths: const {
                 0: FlexColumnWidth(1.2),
                 1: FlexColumnWidth(1.4),
@@ -212,7 +408,10 @@ class ScoreCard extends StatelessWidget {
                   ),
               ],
             )
-          : Text(toUse.moreinfo),
+          else
+            Text(toUse.moreinfo),
+        ],
+      ),
     );
   }
 }
