@@ -150,6 +150,7 @@ classtable:
       delete_partner_file: "Delete partner classtable file"
       output_to_system: "Export to system calendar"
       refresh_classtable: "Refresh schedule"
+      switch_semester: "Switch classtable semester"
    class_change_page:
       title: "Schedule Changes"
       empty_message: "Currently there's no class schedule changes"
@@ -223,6 +224,11 @@ classtable:
    refresh_classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
+   semester_switcher:
+      choose_semester: Choose a Semester
+      first_academic_year: Academic year 1
+      second_academic_year: Academic year 2
+      year: "{year}"
 
 # 社团介绍
 club_promotion:

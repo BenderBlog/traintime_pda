@@ -145,6 +145,7 @@ classtable:
         delete_partner_file: "删除共享课表文件"
         output_to_system: "导出到系统日历"
         refresh_classtable: "刷新日程表"
+        switch_semester: "切换课程表学期"
     class_change_page:
         title: "课程调整"
         empty_message: "目前没有调课信息"
@@ -214,6 +215,11 @@ classtable:
     refresh_classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"
+    semester_switcher:
+      choose_semester: 选择学期
+      first_academic_year: 第一学年
+      second_academic_year: 第二学年
+      year: "{year}年"
 
 # 社团介绍
 club_promotion:

@@ -125,6 +125,7 @@ classtable:
     delete_partner_file: 刪除共享課表文件
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
+    switch_semester: 切換課程表學期
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課信息
@@ -198,6 +199,11 @@ classtable:
   refresh_classtable:
     ready: 準備刷新日程信息
     success: 成功刷新日程信息
+  semester_switcher:
+    choose_semester: 選擇學期
+    first_academic_year: 第一學年
+    second_academic_year: 第二學年
+    year: '{year}年'
 club_promotion:
   type:
     tech: 技術
