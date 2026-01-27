@@ -18,7 +18,6 @@ import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
-import 'package:watermeter/page/classtable/semester_switch_popup.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -238,10 +237,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   ),
                 ),
               ),
-              PopupMenuItem<String>(
-                value: "S",
-                child: Text(FlutterI18n.translate(context, "classtable.popup_menu.switch_semester"))
-              )
             ],
             onSelected: (String action) async {
               final box = context.findRenderObject() as RenderBox?;
@@ -488,10 +483,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       }
                     });
                   }
-                case "S":
-                  semesterSwitchDialog(context, (year, semester) => 
-                    showToast(context: context, msg: "年：$year 学期：$semester")
-                  );
               }
             },
           ),

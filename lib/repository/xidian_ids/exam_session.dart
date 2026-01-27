@@ -10,13 +10,14 @@ import 'dart:io';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/semester_info.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 考试安排 4768687067472349
 class ExamSession extends EhallSession {
   Future<ExamData> getExamYjspt() async {
-    String semester = pref.getString(pref.Preference.currentSemester);
+    String semester = getSemester();
 
     String? location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/*default/index.do",
@@ -75,7 +76,7 @@ class ExamSession extends EhallSession {
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
 
-    String semester = pref.getString(pref.Preference.currentSemester);
+    String semester = getSemester();
 
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)

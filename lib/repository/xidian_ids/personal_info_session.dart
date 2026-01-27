@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/semester_info.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 class PersonalInfoSession extends EhallSession {
@@ -44,10 +45,7 @@ class PersonalInfoSession extends EhallSession {
     if (detailed["code"] != "0") {
       throw GetInformationFailedException(detailed["msg"].toString());
     }
-    await preference.setString(
-      preference.Preference.currentSemester,
-      detailed["data"]["xnxqdm"],
-    );
+    await setCurrentSemester(detailed["data"]["xnxqdm"]);
   }
 
   Future<String> getDormInfoEhall() async {
@@ -147,9 +145,6 @@ class PersonalInfoSession extends EhallSession {
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    await preference.setString(
-      preference.Preference.currentSemester,
-      semesterCode,
-    );
+    await setCurrentSemester(semesterCode);
   }
 }

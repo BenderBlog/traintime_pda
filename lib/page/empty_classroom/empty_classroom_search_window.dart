@@ -11,6 +11,7 @@ import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/semester_info.dart';
 import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -43,7 +44,7 @@ class _BuildingSelectionDialog extends StatefulWidget {
 
 class _BuildingSelectionDialogState extends State<_BuildingSelectionDialog> {
   final ScrollController _scrollController = ScrollController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -58,25 +59,26 @@ class _BuildingSelectionDialogState extends State<_BuildingSelectionDialog> {
     final selectedIndex = widget.places.indexWhere(
       (place) => place.code == widget.chosen.code,
     );
-    
+
     if (selectedIndex == -1 || !_scrollController.hasClients) return;
 
     // Estimate item height (RadioListTile typically ~56dp)
     const double estimatedItemHeight = 56.0;
     final double targetOffset = selectedIndex * estimatedItemHeight;
-    
+
     // Get the viewport height
     final double viewportHeight = _scrollController.position.viewportDimension;
-    
+
     // Calculate offset to center the selected item
     // Try to position the selected item in the middle of the viewport
-    double scrollOffset = targetOffset - (viewportHeight / 2) + (estimatedItemHeight / 2);
-    
+    double scrollOffset =
+        targetOffset - (viewportHeight / 2) + (estimatedItemHeight / 2);
+
     // Clamp the offset to valid scroll range
     final double maxScrollExtent = _scrollController.position.maxScrollExtent;
     final double minScrollExtent = _scrollController.position.minScrollExtent;
     scrollOffset = scrollOffset.clamp(minScrollExtent, maxScrollExtent);
-    
+
     // Animate to the calculated position with a bouncy curve
     _scrollController.animateTo(
       scrollOffset,
@@ -131,9 +133,7 @@ class _EmptyClassroomSearchWindowState
   late DateTime time;
 
   SessionState state = SessionState.none;
-  String semesterCode = preference.getString(
-    preference.Preference.currentSemester,
-  );
+  String semesterCode = getSemester();
 
   DateFormat formatter = DateFormat("yyyy-MM-dd");
 

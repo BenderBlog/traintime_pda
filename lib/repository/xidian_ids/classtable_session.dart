@@ -14,6 +14,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/repository/semester_info.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 课程表 4770397878132218
@@ -131,13 +132,14 @@ class ClassTableFile extends EhallSession {
       now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
     );
 
-    if (preference.getString(preference.Preference.currentSemester) !=
-        semesterCode) {
-      preference.setString(preference.Preference.currentSemester, semesterCode);
+    /// TODO: Change to detect current semester and user defined semester
+    semesterCode = getSemester();
+    if (getSemester() != semesterCode) {
+      await setCurrentSemester(semesterCode /*, clearUserSemester: true*/);
 
       /// New semenster, user defined class is useless.
-      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      if (userClassFile.existsSync()) userClassFile.deleteSync();
+      ///var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      ///if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
 
     Map<String, dynamic> data = await dio
@@ -296,13 +298,15 @@ class ClassTableFile extends EhallSession {
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    if (preference.getString(preference.Preference.currentSemester) !=
-        semesterCode) {
-      preference.setString(preference.Preference.currentSemester, semesterCode);
+
+    /// TODO: Change to detect current semester and user defined semester
+    semesterCode = getSemester();
+    if (getSemester() != semesterCode) {
+      await setCurrentSemester(semesterCode /*, clearUserSemester: true*/);
 
       /// New semenster, user defined class is useless.
-      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      if (userClassFile.existsSync()) userClassFile.deleteSync();
+      ///var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      ///if (userClassFile.existsSync()) userClassFile.deleteSync();
     }
 
     log.info(

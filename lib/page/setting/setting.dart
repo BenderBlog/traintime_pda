@@ -21,6 +21,7 @@ import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
 import 'package:watermeter/page/setting/notification_page/notification_page.dart';
@@ -757,6 +758,38 @@ class _SettingWindowState extends State<SettingWindow> {
                       Get.put(ClassTableController()).update();
                       updateCurrentData();
                       setState(() {});
+                    });
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.semester_change"),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.semester_change_description",
+                      // translationParams: {
+                      //   "swift": preference
+                      //       .getInt(preference.Preference.swift)
+                      //       .toString(),
+                      // },
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    showDialog<bool>(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => SemesterSwitchDialog(),
+                    ).then((value) {
+                      if (value == true) {
+                        Get.put(ClassTableController()).update();
+                        // updateCurrentData();
+                        Get.put(ExamController()).update();
+                        // setState(() {});
+                      }
                     });
                   },
                 ),
