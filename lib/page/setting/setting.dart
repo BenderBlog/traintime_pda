@@ -770,11 +770,11 @@ class _SettingWindowState extends State<SettingWindow> {
                     FlutterI18n.translate(
                       context,
                       "setting.semester_change_description",
-                      // translationParams: {
-                      //   "swift": preference
-                      //       .getInt(preference.Preference.swift)
-                      //       .toString(),
-                      // },
+                      translationParams: {
+                        "semester": preference.getString(
+                          preference.Preference.currentSemester,
+                        ),
+                      },
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
@@ -785,10 +785,13 @@ class _SettingWindowState extends State<SettingWindow> {
                       builder: (context) => SemesterSwitchDialog(),
                     ).then((value) {
                       if (value == true) {
-                        Get.put(ClassTableController()).update();
-                        // updateCurrentData();
-                        Get.put(ExamController()).update();
-                        // setState(() {});
+                        if (context.mounted) {
+                          showToast(context: context, msg: "Updating data");
+                        }
+                        Get.put(
+                          ClassTableController(),
+                        ).updateClassTable(isForce: true);
+                        Get.put(ExamController()).get();
                       }
                     });
                   },

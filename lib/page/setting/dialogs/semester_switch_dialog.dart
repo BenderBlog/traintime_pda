@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
+import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:flutter_i18n/flutter_i18n.dart' as i18n;
-import 'package:watermeter/repository/semester_info.dart';
 
 class SemesterSwitchDialog extends StatefulWidget {
   const SemesterSwitchDialog({super.key});
@@ -13,6 +13,9 @@ class SemesterSwitchDialog extends StatefulWidget {
 class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
   late int selectedYear;
   late int selectedSemester;
+  late bool isUserDefinedSemester;
+  late int lastSelectedYear;
+  late int lastSelectedSemester;
   late List<int> years;
   late List<WheelChooseOptions<int>> yearOptions;
   late List<WheelChooseOptions<int>> semesterOptions;
@@ -23,22 +26,30 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
 
     final int currentYear = DateTime.now().year;
     selectedYear = currentYear;
+    lastSelectedYear = selectedYear;
     years = List.generate(currentYear - 2015, (index) => 2016 + index);
 
-    String semesterCode = getSemester();
+    isUserDefinedSemester = pref.getBool(pref.Preference.isUserDefinedSemester);
+    String semesterCode = pref.getString(pref.Preference.currentSemester);
     if (semesterCode.length == 5) {
       selectedYear = int.tryParse(semesterCode.substring(0, 4)) ?? currentYear;
+      lastSelectedYear = selectedYear;
       selectedSemester = int.tryParse(semesterCode.substring(4)) ?? 1;
+      lastSelectedSemester = selectedSemester;
     } else if (semesterCode.length == 11) {
       List<String> splitCode = semesterCode.split("-");
       if (splitCode.length < 3) {
         selectedSemester = 1;
+        lastSelectedSemester = 1;
       } else {
         selectedYear = int.tryParse(splitCode.first) ?? currentYear;
+        lastSelectedYear = selectedYear;
         selectedSemester = int.tryParse(splitCode.last) ?? 1;
+        lastSelectedSemester = selectedSemester;
       }
     } else {
       selectedSemester = 1;
+      lastSelectedSemester = 1;
     }
   }
 
@@ -120,8 +131,18 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
         ),
         TextButton(
           onPressed: () async {
-            /// TODO: Add evaluation, if the setting is unchanged or is the same as current semester, do not set.
-            await setUserSemester(selectedYear, selectedSemester);
+            if (lastSelectedSemester == selectedSemester &&
+                lastSelectedYear == selectedYear) {
+              Navigator.of(context).pop(false);
+              return;
+            }
+            await pref.setBool(pref.Preference.isUserDefinedSemester, true);
+            String semester = selectedYear.toString();
+            if (!pref.getBool(pref.Preference.role)) {
+              semester += "-${selectedYear + 1}-";
+            }
+            semester += selectedSemester.toString();
+            await pref.setString(pref.Preference.currentSemester, semester);
             if (context.mounted) {
               Navigator.of(context).pop(true);
             }

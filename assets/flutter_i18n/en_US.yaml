@@ -810,6 +810,9 @@ setting:
       simplifiedChinese: "Simplified Chinese"
       traditionalChinese: "Traditional Chinese"
       english: "English"
+   semester_change: Change semester
+   semester_change_description: Using semester {semester}
+   semester_update_data: "Applying new semester setting"
    # 关于页面
    easter_egg_page: "You found an Easter egg"
    about_page:

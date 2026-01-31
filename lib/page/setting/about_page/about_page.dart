@@ -244,7 +244,7 @@ class _AboutPageState extends State<AboutPage> {
     Link(
       icon: const Icon(Icons.home),
       name: FlutterI18n.translate(context, "setting.about_page.homepage"),
-      url: "https://legacy.superbart.top/xdyou.html",
+      url: "https://xdyou.superbart.top",
     ),
     Link(
       icon: const Icon(Icons.code),

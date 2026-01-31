@@ -159,11 +159,14 @@ class _LoginWindowState extends State<LoginWindow> {
         );
 
         bool isPostGraduate = await ses.checkWhetherPostgraduate();
-        if (isPostGraduate) {
-          await PersonalInfoSession().getSemesterInfoYjspt();
-        } else {
-          await PersonalInfoSession().getSemesterInfoEhall();
-        }
+        String semesterInfo = isPostGraduate
+            ? await PersonalInfoSession().getSemesterInfoYjspt()
+            : await PersonalInfoSession().getSemesterInfoEhall();
+        preference.setString(
+          preference.Preference.currentSemester,
+          semesterInfo,
+        );
+        preference.setBool(preference.Preference.isUserDefinedSemester, false);
 
         if (mounted) {
           if (pd.isOpen()) pd.close();

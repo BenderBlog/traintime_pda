@@ -216,10 +216,10 @@ classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"
     semester_switcher:
-      choose_semester: 选择学期
-      first_academic_year: 第一学年
-      second_academic_year: 第二学年
-      year: "{year}年"
+        choose_semester: 选择学期
+        first_academic_year: 第一学年
+        second_academic_year: 第二学年
+        year: "{year}年"
 
 # 社团介绍
 club_promotion:
@@ -799,6 +799,9 @@ setting:
         simplifiedChinese: "简体中文"
         traditionalChinese: "繁体中文"
         english: "英语"
+    semester_change: 修改学期
+    semester_change_description: 使用学期 {semester}
+    semester_update_data: "应用新学期设置中"
     # 关于页面
     easter_egg_page: "你找到了彩蛋"
     about_page:

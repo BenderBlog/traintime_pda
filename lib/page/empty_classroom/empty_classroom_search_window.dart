@@ -11,7 +11,6 @@ import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/semester_info.dart';
 import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -133,7 +132,9 @@ class _EmptyClassroomSearchWindowState
   late DateTime time;
 
   SessionState state = SessionState.none;
-  String semesterCode = getSemester();
+  String semesterCode = preference.getString(
+    preference.Preference.currentSemester,
+  );
 
   DateFormat formatter = DateFormat("yyyy-MM-dd");
 

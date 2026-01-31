@@ -14,7 +14,6 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/semester_info.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 /// 课程表 4770397878132218
@@ -132,14 +131,31 @@ class ClassTableFile extends EhallSession {
       now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
     );
 
-    /// TODO: Change to detect current semester and user defined semester
-    semesterCode = getSemester();
-    if (getSemester() != semesterCode) {
-      await setCurrentSemester(semesterCode /*, clearUserSemester: true*/);
+    String currentSemesterCode = preference.getString(
+      preference.Preference.currentSemester,
+    );
+    bool isUserDefinedSemester = preference.getBool(
+      preference.Preference.isUserDefinedSemester,
+    );
+    if (preference.parseSemesterCodeToInt(semesterCode) >
+        preference.parseSemesterCodeToInt(currentSemesterCode)) {
+      await preference.setString(
+        preference.Preference.currentSemester,
+        semesterCode,
+      );
+      await preference.setBool(
+        preference.Preference.isUserDefinedSemester,
+        false,
+      );
 
       /// New semenster, user defined class is useless.
-      ///var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      ///if (userClassFile.existsSync()) userClassFile.deleteSync();
+      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      if (userClassFile.existsSync()) userClassFile.deleteSync();
+    } else if (semesterCode == currentSemesterCode && isUserDefinedSemester) {
+      await preference.setBool(
+        preference.Preference.isUserDefinedSemester,
+        false,
+      );
     }
 
     Map<String, dynamic> data = await dio
@@ -299,14 +315,34 @@ class ClassTableFile extends EhallSession {
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
 
-    /// TODO: Change to detect current semester and user defined semester
-    semesterCode = getSemester();
-    if (getSemester() != semesterCode) {
-      await setCurrentSemester(semesterCode /*, clearUserSemester: true*/);
+    String currentSemesterCode = preference.getString(
+      preference.Preference.currentSemester,
+    );
+    bool isUserDefinedSemester = preference.getBool(
+      preference.Preference.isUserDefinedSemester,
+    );
+    if (preference.parseSemesterCodeToInt(semesterCode) >
+            preference.parseSemesterCodeToInt(currentSemesterCode) &&
+        !isUserDefinedSemester) {
+      await preference.setString(
+        preference.Preference.currentSemester,
+        semesterCode,
+      );
+      await preference.setBool(
+        preference.Preference.isUserDefinedSemester,
+        false,
+      );
 
       /// New semenster, user defined class is useless.
-      ///var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      ///if (userClassFile.existsSync()) userClassFile.deleteSync();
+      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
+      if (userClassFile.existsSync()) userClassFile.deleteSync();
+    } else if (semesterCode == currentSemesterCode && isUserDefinedSemester) {
+      await preference.setBool(
+        preference.Preference.isUserDefinedSemester,
+        false,
+      );
+    } else if (isUserDefinedSemester) {
+      semesterCode = currentSemesterCode;
     }
 
     log.info(

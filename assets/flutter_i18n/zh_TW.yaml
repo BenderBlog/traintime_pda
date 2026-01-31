@@ -769,6 +769,9 @@ setting:
     simplifiedChinese: 簡體中文
     traditionalChinese: 繁體中文
     english: 英語
+  semester_change: 修改學期
+  semester_change_description: 使用學期 {semester}
+  semester_update_data: 應用新學期設置中
   easter_egg_page: 你找到了彩蛋
   about_page:
     benderblog: 主要開發者，iOS 小部件編寫和拼接

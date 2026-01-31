@@ -54,7 +54,7 @@ enum Preference {
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
-  userDefinedSemester(key: "userDefinedSemester", type: "String"), // 用户输入学期编码
+  isUserDefinedSemester(key: "isUserDefinedSemester", type: "bool"), // 是否为用户编辑
   //currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
   role(key: "role", type: "bool"), // 是否为研究生
   simplifiedClassTimeline(
@@ -148,6 +148,15 @@ Future<void> remove(Preference key) async {
 Future<void> prefrenceClear() async {
   await prefs.clear();
   await prefs.reloadCache();
+}
+
+int parseSemesterCodeToInt(String input) {
+  if (input.length < 5) {
+    throw ArgumentError("输入字符串长度不足");
+  }
+  String year = input.substring(0, 4);
+  String semester = input[input.length - 1];
+  return int.parse(year + semester);
 }
 
 class NotRegisteredException implements Exception {}
