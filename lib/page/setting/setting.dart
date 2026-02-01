@@ -785,6 +785,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       builder: (context) => SemesterSwitchDialog(),
                     ).then((value) {
                       if (value == true) {
+                        setState(() {});
                         if (context.mounted) {
                           showToast(context: context, msg: "Updating data");
                         }
