@@ -18,7 +18,7 @@ import 'package:watermeter/repository/preference.dart' as pref;
 Rx<UpdateMessage?> updateMessage = Rx<UpdateMessage?>(null);
 RxList<ClubInfo> clubList = <ClubInfo>[].obs;
 Rx<SessionState> clubState = SessionState.none.obs;
-Rx<Object?> clubError = null.obs;
+Rxn<Object> clubError = Rxn<Object>();
 
 Dio get dio => Dio()..interceptors.add(logDioAdapter);
 
@@ -56,7 +56,7 @@ Future<bool?> checkUpdate() => updateLock.synchronized<bool?>(() async {
 
 Future<void> getClubList() => clubLock.synchronized(() async {
   clubState.value = SessionState.fetching;
-  clubError.value == null;
+  clubError.value = null;
 
   return dio
       .get("$url/club.json")
@@ -75,7 +75,7 @@ Future<void> getClubList() => clubLock.synchronized(() async {
       })
       .onError((e, s) {
         log.error("[getClubList] Error occured!", e, s);
-        clubError.value = e.toString();
+        clubError.value = e;
         clubState.value = SessionState.error;
       });
 });

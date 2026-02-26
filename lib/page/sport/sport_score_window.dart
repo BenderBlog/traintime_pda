@@ -52,9 +52,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
 
     final baseColor = isQualified ? Colors.green : Colors.red;
     return {
-      'scoreBackgroundColor': baseColor.withValues(
-        alpha: _textBackgroundAlpha,
-      ),
+      'scoreBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
       'scoreTextColor': baseColor[_primaryColorShade],
       'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
       'rankTextColor': baseColor[_secondaryColorShade],
@@ -246,18 +244,16 @@ class ScoreCard extends StatelessWidget {
   String unitToShow(String eval) =>
       eval.contains(".") ? eval.substring(0, eval.indexOf(".")) : eval;
 
-  Map<String, dynamic> _getScoreDisplayInfo() {
-    final isQualified = !toUse.rank.contains("不");
-    final baseColor = isQualified ? Colors.green : Colors.red;
-    return {
-      'scoreBackgroundColor': baseColor.withValues(
-        alpha: _textBackgroundAlpha,
-      ),
-      'scoreTextColor': baseColor[_primaryColorShade],
-      'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
-      'rankTextColor': baseColor[_secondaryColorShade],
-    };
-  }
+  //Map<String, dynamic> _getScoreDisplayInfo() {
+  //  final isQualified = !toUse.rank.contains("不");
+  //  final baseColor = isQualified ? Colors.green : Colors.red;
+  //  return {
+  //    'scoreBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
+  //    'scoreTextColor': baseColor[_primaryColorShade],
+  //    'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
+  //    'rankTextColor': baseColor[_secondaryColorShade],
+  //  };
+  //}
 
   Map<String, dynamic> _getTitleBadgeColorScheme() {
     final isQualified = !toUse.rank.contains("不");
@@ -272,7 +268,7 @@ class ScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayInfo = _getScoreDisplayInfo();
+    //final displayInfo = _getScoreDisplayInfo();
     final titleBadgeInfo = _getTitleBadgeColorScheme();
 
     return ReXCard(
