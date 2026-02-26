@@ -13,6 +13,7 @@ import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
@@ -36,10 +37,9 @@ class ElectricityWindow extends StatelessWidget {
 
         if (!electricityInfo.value.remain.contains(RegExp(r'[0-9]'))) {
           return ReloadWidget(
-            errorStatus: FlutterI18n.translate(
-              context,
-              electricityInfo.value.remain,
-            ),
+            errorStatus:
+                "${FlutterI18n.translate(context, electricityInfo.value.remain)} ${errorData.value ?? ""}",
+            stackTrace: stackstrace.value,
             function: () async {
               if (prefs
                   .getString(prefs.Preference.electricityAccount)
@@ -191,6 +191,30 @@ class ElectricityWindow extends StatelessWidget {
                             daily[dayTime] = v;
                           }
 
+                          log.info(
+                            "[ElectricityWindow][RemainGraph] Based on $daily",
+                          );
+
+                          if (daily.isEmpty) {
+                            log.info(
+                              "[ElectricityWindow][RemainGraph] Not enough data, quit!",
+                            );
+
+                            return Text(
+                              FlutterI18n.translate(
+                                context,
+                                "electricity.not_enough_data",
+                              ),
+                              textAlign: TextAlign.center,
+
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                            ).width(double.infinity);
+                          }
+
                           return graphic.Chart<Map<DateTime, double>>(
                             data: daily.entries
                                 .map((entry) => {entry.key: entry.value})
@@ -298,8 +322,16 @@ class ElectricityWindow extends StatelessWidget {
                             }
                           }
 
+                          log.info(
+                            "[ElectricityWindow][AverageDailyUseGraph] Based on daymin data $dayMin",
+                          );
+
                           // If only one day, unable to parse.
                           if (dayMin.keys.length <= 1) {
+                            log.info(
+                              "[ElectricityWindow][AverageDailyUseGraph] Not enough data, quit!",
+                            );
+
                             return Text(
                               FlutterI18n.translate(
                                 context,
@@ -343,9 +375,15 @@ class ElectricityWindow extends StatelessWidget {
                                   diff,
                             });
                           }
+                          log.info(
+                            "[ElectricityWindow][AverageDailyUseGraph] Based on plotdata $dayMin",
+                          );
 
                           // If no record, we cannot render it.
                           if (plotData.isEmpty) {
+                            log.info(
+                              "[ElectricityWindow][AverageDailyUseGraph] Plotdata is empty, quit!",
+                            );
                             return Text(
                               FlutterI18n.translate(
                                 context,

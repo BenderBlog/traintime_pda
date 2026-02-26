@@ -955,7 +955,7 @@ electricity_status:
    remain_other_issue: "Query malfunction"
    owe_fetching: "Obtaining arrearage"
    owe_issue: "Network malfunction of overdue information"
-   owe_not_found: "Cannot query arrearage"
+   owe_not_found: "Cannot query arrearage, check log window for detail"
    owe_no_need: "None"
    owe_need_pay: "Need to pay {due} yuan"
    owe_issue_unable: "Cannot query arrearage"

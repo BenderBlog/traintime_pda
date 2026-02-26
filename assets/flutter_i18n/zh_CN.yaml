@@ -942,7 +942,7 @@ electricity_status:
     remain_other_issue: "查询故障"
     owe_fetching: "正在获取欠费"
     owe_issue: "欠费信息网络故障"
-    owe_not_found: "目前欠款无法查询"
+    owe_not_found: "目前欠款无法查询，请看日志窗口查找报错详情"
     owe_no_need: "目前无需清缴欠费"
     owe_need_pay: "待清缴 {due} 元欠费"
     owe_issue_unable: "目前欠款无法查询"

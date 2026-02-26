@@ -20,6 +20,8 @@ import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 var historyElectricityInfo = RxList<ElectricityInfo>();
 var electricityInfo = ElectricityInfo.empty(DateTime.now()).obs;
+Rxn<Object> errorData = Rxn<Object>();
+Rxn<StackTrace> stackstrace = Rxn<StackTrace>();
 var isCache = false.obs;
 var isLoad = false.obs;
 
@@ -39,6 +41,8 @@ Future<void> update({
   );
   isLoad.value = true;
   isCache.value = false;
+  errorData.value = null;
+  stackstrace.value = null;
   electricityInfo.value.fetchDay = DateTime.now();
 
   late ElectricityInfo cache;
@@ -57,7 +61,12 @@ Future<void> update({
       cache = ElectricityInfo.fromJson(
         jsonDecode(ElectricitySession.fileCache.readAsStringSync()),
       );
-      canUseCache = true;
+      if (double.tryParse(cache.remain) == null) {
+        log.info("[EletricitySession][update] Invalid cache.");
+        canUseCache = false;
+      } else {
+        canUseCache = true;
+      }
     } catch (e, s) {
       log.handle(e, s);
       canUseCache = false;
@@ -85,13 +94,19 @@ Future<void> update({
                   await ElectricitySession().getElectricity(value);
                 } on DioException catch (e, s) {
                   log.handle(e, s);
+                  errorData.value = e;
+                  stackstrace.value = s;
                   electricityInfo.value.remain =
                       "electricity_status.remain_network_issue";
-                } on NotFoundException {
+                } on NotFoundException catch (e, s) {
+                  errorData.value = e;
+                  stackstrace.value = s;
                   electricityInfo.value.remain =
                       "electricity_status.remain_not_found";
                 } catch (e, s) {
                   log.handle(e, s);
+                  errorData.value = e;
+                  stackstrace.value = s;
                   electricityInfo.value.remain =
                       "electricity_status.remain_other_issue";
                 }
@@ -100,13 +115,18 @@ Future<void> update({
                 try {
                   electricityInfo.value.owe = "electricity_status.owe_fetching";
                   await ElectricitySession().getOwe(value);
-                } on DioException {
+                } on DioException catch (e, s) {
                   log.info(
                     "[PaymentSession][update] "
-                    "Network error",
+                    "Network error occurred on getting owe",
                   );
+                  log.handle(e, s);
                   electricityInfo.value.owe = "electricity_status.owe_issue";
                 } catch (e, s) {
+                  log.info(
+                    "[PaymentSession][update] "
+                    "Error occurred on getting owe",
+                  );
                   log.handle(e, s);
                   electricityInfo.value.owe =
                       "electricity_status.owe_not_found";
@@ -132,11 +152,15 @@ Future<void> update({
         log.handle(e, s);
         if (canUseCache) {
           electricityInfo.value = cache;
+          errorData.value = null;
+          stackstrace.value = null;
           isCache.value = true;
           isLoad.value = false;
           return;
         }
 
+        errorData.value = e;
+        stackstrace.value = s;
         if (NeedInfoException().toString().contains(e.toString())) {
           electricityInfo.value.remain = "electricity_status.need_more_info";
         } else if ("NotInitalizedException".contains(e.toString())) {

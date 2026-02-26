@@ -907,7 +907,7 @@ electricity_status:
   remain_other_issue: 查詢故障
   owe_fetching: 正在獲取欠費
   owe_issue: 欠費信息網絡故障
-  owe_not_found: 目前欠款無法查詢
+  owe_not_found: 目前欠款無法查詢，請看日誌窗口查找報錯詳情
   owe_no_need: 目前無需清繳欠費
   owe_need_pay: 待清繳 {due} 元欠費
   owe_issue_unable: 目前欠款無法查詢
