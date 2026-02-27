@@ -26,7 +26,7 @@ class _EasterEggPageState extends State<EasterEggPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isNotApple ? "Merry Xmas" : "Early Sakura",
+          isNotApple ? "Merry Rabbit Day" : "Sakura Soon",
         ), //Text(FlutterI18n.translate(context, "easter_egg_robot.appbar")),
       ),
       body: LayoutBuilder(

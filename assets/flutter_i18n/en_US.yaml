@@ -827,11 +827,13 @@ setting:
       dimole: "Development support: assist in fixing slider issue"
       elitewars: "Design: sports score page"
       elliot: "Internationalization: English translation / Development guidance: on partner classtable development (This function has been removed)"
+      flyingpig: "Development: Fix null pointer exception at user defined class info"
       godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar"
       hancl777: "Internationalization: Traditional Chinese conversion code"
       hazuki-keatsu: "Development: Physics experiment score query and recognization"
       hawa130: "Design: Class info card"
       hhzm: "Development: electricity fee inquiry account calculation"
+      imoscarz: "Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change"
       ka-mate-ka-ora: "Internationalization: English correction"
       lhx-666-cool: "Support: Windows and Linux build scripts"
       lichtyy: "Design: color pattern and blank page picture / Development: HTML reader for the experiment system"
@@ -971,24 +973,38 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-   Deaming at the sky
+   Forgive me lord, for I will acting rudely.
 
-   New horizon will be seen upon
+   Haja o que houver
+   Há sempre um homem, para uma mulher
+   E há de sempre haver para esquecer
+   Um falso amor e uma vontade de morrer
+   Seja como for há de vencer o grande amor
+   Que há de ser no coração
+   Como um perdão
+   Pra quem chorou
 
-   Merry Xmas, glad to serve you warmly next year!
+   God bless us all.
 
 easter_egg_others: |-
-   Our day will come!
+   Konna koto ii na
+   Dekitara ii na
+   Anna yume konna yume ippai aru kedo
 
-   A fair, just world.
+   Minna minna minna
+   Kanaete kureru
+   Fushigina pokke de kanaete kureru
 
-   Without prejudice and bullying poor.
+   Sora wo jiyuu ni tobitai na
+   (Hai! Takekoputaa!)
 
-   Everyone is open-hearted
+   An, an, an
+   Tottemo daisuki
+   Doraemon
 
-   and accept each other.
-
-   Happy Robocon, glad to serve you warmly next year!
+   An, an, an
+   Tottemo daisuki
+   Doraemon
 
 # Firefox about:robots.
 easter_egg_robot:
