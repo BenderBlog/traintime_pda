@@ -705,6 +705,9 @@ class NeedInfoException implements Exception {}
 class NotInitalizedException implements Exception {
   final String msg;
   const NotInitalizedException(this.msg);
+
+  @override
+  String toString() => "[NotInitalizedException] $msg";
 }
 
 class NoAccountInfoException implements Exception {}
