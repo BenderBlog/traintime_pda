@@ -7,12 +7,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -430,6 +431,71 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       throw AccountFailedParseException();
     }
   }
+
+  /// Rewrite the request tool, add a interceptors to avoid illegal cookie.
+  @override
+  Dio get dio =>
+      Dio(
+          BaseOptions(
+            contentType: Headers.formUrlEncodedContentType,
+            headers: {
+              HttpHeaders.userAgentHeader:
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/130.0.0.0 Safari/537.36",
+            },
+          ),
+        )
+        /// Add a interceptor for requst tool to avoid
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onResponse: (Response response, ResponseInterceptorHandler handler) {
+              final originalHeaders = response.headers;
+              final modifiedMap = Map<String, List<String>>.from(
+                originalHeaders.map,
+              );
+
+              final cookie = modifiedMap['set-cookie'];
+              log.info(
+                "[EletricitySession][CookieParseInspector] original $cookie",
+              );
+
+              if (cookie == null) {
+                log.info(
+                  "[EletricitySession][CookieParseInspector] cookie is empty",
+                );
+                handler.next(response);
+                return;
+              }
+              cookie.removeWhere((item) => !item.contains("="));
+              modifiedMap['set-cookie'] = cookie;
+              log.info(
+                "[EletricitySession][CookieParseInspector] modified $cookie",
+              );
+
+              final newHeaders = Headers.fromMap(modifiedMap);
+              final newResponse = Response(
+                requestOptions: response.requestOptions,
+                data: response.data,
+                statusCode: response.statusCode,
+                statusMessage: response.statusMessage,
+                headers: newHeaders,
+                extra: response.extra,
+                redirects: response.redirects,
+                isRedirect: response.isRedirect,
+              );
+
+              handler.next(newResponse);
+            },
+          ),
+        )
+        ..interceptors.add(CookieManager(cookieJar))
+        ..interceptors.add(logDioAdapter)
+        ..options.connectTimeout = const Duration(seconds: 10)
+        ..options.receiveTimeout = const Duration(seconds: 30)
+        ..options.followRedirects = false
+        ..options.validateStatus = (status) =>
+            status != null && status >= 200 && status < 400;
 
   /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
   String rsaEncrypt(String toEnc) {
