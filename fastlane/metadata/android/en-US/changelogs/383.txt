@@ -1,0 +1,5 @@
+1. Fix null pointer exception at user defined class info @FlyingPig278
+2. Sport UI Change @imoscarz
+3. Checkin check UI for Pad @imoscarz
+4. Change semester @BenderBlog @hazuki-keatsu
+5. Electricity query and graph fix @BenderBlog

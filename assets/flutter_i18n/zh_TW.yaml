@@ -978,10 +978,9 @@ easter_egg_others: '每天過的都一樣
 
   （本彩蛋有聲優梗）'
 easter_egg_robot:
-  appbar: 班德，不要傷害肉袋子！
-  title: 歡迎你，人類！
+  appbar: 歡迎你，同學！
+  title: 看看這些要開學的學生們吧！
   contents: '咱孩子零用錢太少了，於是我們來了。
-
 
     1. 機器人不得傷害人類，或袖手旁觀坐視人類受到傷害。
 
@@ -993,8 +992,7 @@ easter_egg_robot:
 
     5. 機器人的閃亮屁股不能隨便咬。
 
-
-    而且他們有個計劃。'
-  button_one: 機器人離我們遠點！
-  button_two: 我是認真的！
-  button_notice: 過河拆橋的人類啊～
+    而且他們有個不可明說的計劃。'
+  button_one: 我們的救世主呢？
+  button_two: 快點來啊！
+  button_notice: \o/\o/\o/\o/\o/\o/\o/\o/

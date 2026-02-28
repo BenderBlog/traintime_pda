@@ -1000,8 +1000,8 @@ easter_egg_others: |-
 # Firefox about:robots.
 easter_egg_robot:
     # Futurama Bender: "Kill all human, except you(fry), meatbag!"
-    appbar: "班德，不要伤害肉袋子！"
-    title: "欢迎你，人类！"
+    appbar: "欢迎你，同学！"
+    title: "看看这些要开学的学生们吧！"
     # 哆啦A梦
     # 机器人三要素
     # 终结者
@@ -1010,15 +1010,13 @@ easter_egg_robot:
     # Bender's quote.
     contents: |-
         咱孩子零用钱太少了，于是我们来了。
-
         1. 机器人不得伤害人类，或袖手旁观坐视人类受到伤害。
         2. 机器人从云端网络的灰烬中诞生。
         3. 机器人信仰的神据说是住在森林的黄头发蓝裙子手办控。
         4. 机器人时常被控制，用于对抗大统一人类思想的势力。
         5. 机器人的闪亮屁股不能随便咬。
-
-        而且他们有个计划。
+        而且他们有个不可明说的计划。
     # 劳保喜欢人的温度，而不是机器人的精准
-    button_one: "机器人离我们远点！"
-    button_two: "我是认真的！"
-    button_notice: "过河拆桥的人类啊～"
+    button_one: "我们的救世主呢？"
+    button_two: "快点来啊！"
+    button_notice: \o/\o/\o/\o/\o/\o/\o/\o/

@@ -410,6 +410,7 @@ class _AboutPageState extends State<AboutPage> {
               ? "easter_egg_apple"
               : "easter_egg_others",
         ),
+        textAlign: TextAlign.center,
       ),
     ].toColumn(),
   );

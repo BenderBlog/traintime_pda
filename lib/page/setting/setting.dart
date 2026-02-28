@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -827,23 +828,27 @@ class _SettingWindowState extends State<SettingWindow> {
                     onTap: () => context.push(NotificationDebugPage()),
                   ),
                 const Divider(),
-                ListTile(
-                  title: Text(
-                    "测试实验系统功能", //FlutterI18n.translate(context, "setting.check_logger"),
+                if (kDebugMode)
+                  ListTile(
+                    title: Text(
+                      "测试实验系统功能", //FlutterI18n.translate(context, "setting.check_logger"),
+                    ),
+                    trailing: const Icon(Icons.navigate_next),
+                    onTap: () => SysjSession().getDataFromSysj().onError((
+                      e,
+                      s,
+                    ) {
+                      if (context.mounted) {
+                        showToast(context: context, msg: "实验系统功能测试失败");
+                        log.error("Failed to test experiment crawlers", e, s);
+                      }
+                      return (
+                        ExperimentFetchStatus.notSchoolNetwork,
+                        <ExperimentData>[],
+                      );
+                    }),
                   ),
-                  trailing: const Icon(Icons.navigate_next),
-                  onTap: () => SysjSession().getDataFromSysj().onError((e, s) {
-                    if (context.mounted) {
-                      showToast(context: context, msg: "实验系统功能测试失败");
-                      log.error("Failed to test experiment crawlers", e, s);
-                    }
-                    return (
-                      ExperimentFetchStatus.notSchoolNetwork,
-                      <ExperimentData>[],
-                    );
-                  }),
-                ),
-                const Divider(),
+                if (kDebugMode) const Divider(),
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(context, "setting.clear_and_restart"),

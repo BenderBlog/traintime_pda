@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.5.7+37
+version: 1.5.8+38
 
 environment:
   sdk: ^3.8.0
@@ -76,7 +76,6 @@ dependencies:
   intl:
   timezone: ^0.9.4
   flutter_local_notifications: ^18.0.1
-  sakura_blizzard: ^6.0.2
 
 dev_dependencies:
   flutter_test:
@@ -106,14 +105,15 @@ flutter:
     - assets/Icon-App-iTunes-Background.png
     - assets/Icon-App-iTunes.png
     - assets/art/aboutRobots-icon.png
+    - assets/art/Doraemon_character.png
     - assets/art/pda_empty_cover.jpg
     - assets/art/pda_classtable_empty.png
     - assets/art/pda_girl_default.png
     #    - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.png
     #    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
-    - assets/art/anan_christmas.png
-    - assets/art/Sakura_and_Tomoyo_Kimono.jpg
+    # - assets/art/anan_christmas.png
+    # - assets/art/Sakura_and_Tomoyo_Kimono.jpg
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/flutter_i18n/en_US.yaml
