@@ -552,6 +552,7 @@ struct ClasstableWidget: Widget {
         .configurationDisplayName(NSLocalizedString("widget_title", comment: "Widget Title"))
         .description(NSLocalizedString("widget_description", comment: "Widget Description"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .privacySensitive(false)
     }
 }
 
