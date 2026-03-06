@@ -230,15 +230,12 @@ class ExperimentSession extends NetworkSession {
 
     final scoreImageRecognitionService = ImageRecognitionService();
 
-    Map<String, RecognitionResult> scoreResults = {};
+    final Map<String, RecognitionResult> scoreResults = {};
 
     try {
-      scoreResults = await scoreImageRecognitionService.recognizeAllScores();
-      for (var entry in scoreResults.entries) {
-        log.debug(
-          '${entry.key}: ${entry.value.label} (found: ${entry.value.found})',
-        );
-      }
+      scoreResults.addAll(
+        await scoreImageRecognitionService.recognizeAllScores(),
+      );
     } catch (e) {
       log.error(
         "[experiment_session][getData]"
