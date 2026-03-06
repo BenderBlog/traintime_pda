@@ -230,10 +230,19 @@ class ExperimentSession extends NetworkSession {
 
     final scoreImageRecognitionService = ImageRecognitionService();
 
-    final scoreResults = await scoreImageRecognitionService.recognizeAllScores();
-    for (var entry in scoreResults.entries) {
-      log.debug(
-        '${entry.key}: ${entry.value.label} (found: ${entry.value.found})',
+    Map<String, RecognitionResult> scoreResults = {};
+
+    try {
+      scoreResults = await scoreImageRecognitionService.recognizeAllScores();
+      for (var entry in scoreResults.entries) {
+        log.debug(
+          '${entry.key}: ${entry.value.label} (found: ${entry.value.found})',
+        );
+      }
+    } catch (e) {
+      log.error(
+        "[experiment_session][getData]"
+        "Failed to recognize scores, skipping score fetch to parse schedule: $e",
       );
     }
 
