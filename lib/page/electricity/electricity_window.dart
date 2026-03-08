@@ -9,6 +9,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/electricity/electricity_usage_graph.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -167,134 +168,33 @@ class ElectricityWindow extends StatelessWidget {
               ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
 
               InfoCard(
-                iconData: Icons.history,
-                title: FlutterI18n.translate(context, "electricity.history"),
-                children: [
-                  Builder(
-                        builder: (context) {
-                          final SplayTreeMap<DateTime, double> daily =
-                              SplayTreeMap();
-                          // Parsing number, store the latest data.
-                          // Notice that the historyElectricityInfo have sorted.
-                          for (final info in historyElectricityInfo) {
-                            final v = double.tryParse(info.remain);
-                            if (v == null) continue;
+                    iconData: Icons.history,
+                    title: FlutterI18n.translate(
+                      context,
+                      "electricity.history",
+                    ),
 
-                            final dayTime = DateTime(
-                              info.fetchDay.year,
-                              info.fetchDay.month,
-                              info.fetchDay.day,
-                            );
-                            // If historyElectricityInfo have not sorted,
-                            // This line should be rewrite to ensure that the
-                            // latest data have been fetched.
-                            daily[dayTime] = v;
-                          }
-
-                          log.info(
-                            "[ElectricityWindow][RemainGraph] Based on $daily",
-                          );
-
-                          if (daily.isEmpty) {
-                            log.info(
-                              "[ElectricityWindow][RemainGraph] Not enough data, quit!",
-                            );
-
-                            return Text(
-                              FlutterI18n.translate(
-                                context,
-                                "electricity.not_enough_data",
-                              ),
-                              textAlign: TextAlign.center,
-
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                            ).width(double.infinity);
-                          }
-
-                          return graphic.Chart<Map<DateTime, double>>(
-                            data: daily.entries
-                                .map((entry) => {entry.key: entry.value})
-                                .toList(),
-                            variables: {
-                              'day': graphic.Variable(
-                                accessor: (Map<DateTime, double> map) =>
-                                    map.keys.first,
-                                scale: graphic.TimeScale(
-                                  formatter: (v) => "${v.month}.${v.day}",
-                                  min: daily.keys.length <= 1
-                                      ? null
-                                      : daily.keys.first,
-                                  max: daily.keys.length <= 1
-                                      ? null
-                                      : daily.keys.last,
+                    children: [
+                      LayoutBuilder(
+                            builder: (context, constraints) =>
+                                ElectricityUsageGraph(
+                                  graphHeight: 300,
+                                  graphWidth: constraints.maxWidth,
+                                  historyElectricityInfo:
+                                      historyElectricityInfo,
                                 ),
-                              ),
-                              'power': graphic.Variable(
-                                accessor: (Map<DateTime, double> map) =>
-                                    map.values.first,
-                                scale: graphic.LinearScale(),
-                              ),
-                            },
-                            axes: [
-                              graphic.Defaults.horizontalAxis,
-                              graphic.Defaults.verticalAxis,
-                            ],
-                            marks: [
-                              graphic.LineMark(
-                                position:
-                                    graphic.Varset('day') *
-                                    graphic.Varset('power'),
-                                shape: graphic.ShapeEncode(
-                                  value: graphic.BasicLineShape(),
-                                ),
-                                color: graphic.ColorEncode(
-                                  value: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              graphic.PointMark(
-                                position:
-                                    graphic.Varset('day') *
-                                    graphic.Varset('power'),
-                                size: graphic.SizeEncode(value: 2),
-                                color: graphic.ColorEncode(
-                                  value: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                            selections: {
-                              'pointMouse': graphic.PointSelection(
-                                on: {graphic.GestureType.hover},
-                                //devices: {PointerDeviceKind.mouse},
-                              ),
-                              'pointTouch': graphic.PointSelection(
-                                on: {
-                                  graphic.GestureType.tapDown,
-                                  graphic.GestureType.tapUp,
-                                },
-                                //devices: {graphic.PointerDeviceKind.touch},
-                              ),
-                            },
-                            tooltip: graphic.TooltipGuide(
-                              selections: {'pointMouse', 'pointTouch'},
-                            ),
-                            coord: graphic.RectCoord(
-                              horizontalRange: [0.1, 0.9],
-                            ),
-                          ).constrained(height: 300);
-                        },
-                      )
-                      .padding(vertical: 12, horizontal: 16)
-                      .decorated(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      .padding(top: 4),
-                ],
-              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+                          )
+                          .padding(vertical: 12, horizontal: 16)
+                          .decorated(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            borderRadius: BorderRadius.circular(12),
+                          )
+                          .padding(top: 4),
+                    ],
+                  )
+                  .padding(vertical: 4)
+                  .constrained(maxWidth: sheetMaxWidth)
+                  .center(),
 
               InfoCard(
                 iconData: Icons.bar_chart,
