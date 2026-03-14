@@ -19,60 +19,55 @@ class ElectricityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => GestureDetector(
-        onTap: () async {
+      () => MainPageCard(
+        isLoad: isLoad.value,
+        icon: MingCuteIcons.mgc_flash_line,
+        text: FlutterI18n.translate(context, "homepage.electricity_card.title"),
+        onPressed: () async {
           context.push(ElectricityWindow());
         },
-        child: MainPageCard(
-          isLoad: isLoad.value,
-          icon: MingCuteIcons.mgc_flash_line,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.electricity_card.title",
-          ),
-          infoText: Text(
-            electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
-                ? FlutterI18n.translate(
-                    context,
-                    "homepage.electricity_card.current_electricity",
-                    translationParams: {"amount": electricityInfo.value.remain},
-                  )
-                : FlutterI18n.translate(context, electricityInfo.value.remain),
-            style: const TextStyle(fontSize: 20),
-          ),
-          bottomText: Builder(
-            builder: (context) {
-              /// I believe it is not from tomorrow, like Bender lol
-              if (!electricityInfo.value.fetchDay.isToday) {
-                return Text(
-                  FlutterI18n.translate(
-                    context,
-                    "homepage.electricity_card.cache_notice",
-                    translationParams: {
-                      "date": DateFormat(
-                        "yyyy-MM-dd HH:mm",
-                      ).format(electricityInfo.value.fetchDay),
-                    },
-                  ).replaceAll("\n", ""),
-                );
-              }
-
-              if (electricityInfo.value.owe.contains(RegExp(r'[0-9]'))) {
-                return Text(
-                  FlutterI18n.translate(
-                    context,
-                    "electricity_status.owe_need_pay",
-                    translationParams: {"due": electricityInfo.value.owe},
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                );
-              }
+        infoText: Text(
+          electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
+              ? FlutterI18n.translate(
+                  context,
+                  "homepage.electricity_card.current_electricity",
+                  translationParams: {"amount": electricityInfo.value.remain},
+                )
+              : FlutterI18n.translate(context, electricityInfo.value.remain),
+          style: const TextStyle(fontSize: 20),
+        ),
+        bottomText: Builder(
+          builder: (context) {
+            /// I believe it is not from tomorrow, like Bender lol
+            if (!electricityInfo.value.fetchDay.isToday) {
               return Text(
-                FlutterI18n.translate(context, electricityInfo.value.owe),
+                FlutterI18n.translate(
+                  context,
+                  "homepage.electricity_card.cache_notice",
+                  translationParams: {
+                    "date": DateFormat(
+                      "yyyy-MM-dd HH:mm",
+                    ).format(electricityInfo.value.fetchDay),
+                  },
+                ).replaceAll("\n", ""),
+              );
+            }
+
+            if (electricityInfo.value.owe.contains(RegExp(r'[0-9]'))) {
+              return Text(
+                FlutterI18n.translate(
+                  context,
+                  "electricity_status.owe_need_pay",
+                  translationParams: {"due": electricityInfo.value.owe},
+                ),
                 overflow: TextOverflow.ellipsis,
               );
-            },
-          ),
+            }
+            return Text(
+              FlutterI18n.translate(context, electricityInfo.value.owe),
+              overflow: TextOverflow.ellipsis,
+            );
+          },
         ),
       ),
     );

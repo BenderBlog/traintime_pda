@@ -23,7 +23,7 @@ class ExamCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<ExamController>(
       builder: (c) => SmallFunctionCard(
-        onTap: () async {
+        onPressed: () async {
           if (c.status == ExamStatus.cache || c.status == ExamStatus.fetched) {
             context.pushReplacement(ExamInfoWindow(time: updateTime));
           } else if (c.status != ExamStatus.error) {

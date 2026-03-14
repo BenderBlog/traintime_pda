@@ -17,7 +17,7 @@ class ScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SmallFunctionCard(
-      onTap: () {
+      onPressed: () {
         if (offline && !ScoreSession.isCacheExist) {
           showToast(
             context: context,

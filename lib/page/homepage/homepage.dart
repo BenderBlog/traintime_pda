@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 //import 'package:watermeter/page/homepage/notice_card/club_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
@@ -71,7 +72,6 @@ class _MainPageState extends State<MainPage> {
       const ExperimentCard(),
       const SportCard(),
     ],
-    //const ToolboxCard(),
   ];
 
   String get _now {
@@ -186,20 +186,22 @@ class _MainPageState extends State<MainPage> {
         },
         child: ListView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
           children: [
             //ClubPromotionCard(onTap: widget.changePage),
-            const ClassTableCard(),
-            ElectricityCard(),
-            SchoolnetCard(),
-            LibraryCard(),
-            //LibraryCapacityCard(),
-            SchoolCardInfoCard(),
+            const ClassTableCard().padding(bottom: 8),
+            ElectricityCard().padding(bottom: 8),
+            SchoolnetCard().padding(bottom: 8),
+            LibraryCard().padding(bottom: 8),
+            SchoolCardInfoCard().padding(bottom: 8),
             MediaQuery.removePadding(
               context: context,
               removeTop: true,
               child: GridView.extent(
                 maxCrossAxisExtent: 96,
                 shrinkWrap: true,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
                 physics: const NeverScrollableScrollPhysics(),
                 children: smallFunction,
               ),

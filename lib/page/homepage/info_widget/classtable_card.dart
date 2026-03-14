@@ -160,22 +160,22 @@ class _ClassTableCardState extends State<ClassTableCard> {
           );
         })
         .paddingDirectional(horizontal: 20, vertical: 14)
-        .withHomeCardStyle(context)
-        .gestures(
-          onTap: () {
+        .withHomeCardStyle(
+          context,
+          onPressed: () {
             final c = Get.find<ClassTableController>();
             switch (c.state) {
               case ClassTableState.fetched:
                 context.pushReplacement(
                   LayoutBuilder(
-                    builder: (context, constraints) => GetBuilder<
-                        ClassTableController>(
-                      builder: (_) => ClassTableWindow(
-                        parentContext: context,
-                        currentWeek: c.getCurrentWeek(updateTime),
-                        constraints: constraints,
-                      ),
-                    ),
+                    builder: (context, constraints) =>
+                        GetBuilder<ClassTableController>(
+                          builder: (_) => ClassTableWindow(
+                            parentContext: context,
+                            currentWeek: c.getCurrentWeek(updateTime),
+                            constraints: constraints,
+                          ),
+                        ),
                   ),
                 );
               case ClassTableState.error:
@@ -192,14 +192,14 @@ class _ClassTableCardState extends State<ClassTableCard> {
                 if (c.classTableFile.existsSync()) {
                   context.pushReplacement(
                     LayoutBuilder(
-                      builder: (context, constraints) => GetBuilder<
-                          ClassTableController>(
-                        builder: (_) => ClassTableWindow(
-                          parentContext: context,
-                          currentWeek: c.getCurrentWeek(updateTime),
-                          constraints: constraints,
-                        ),
-                      ),
+                      builder: (context, constraints) =>
+                          GetBuilder<ClassTableController>(
+                            builder: (_) => ClassTableWindow(
+                              parentContext: context,
+                              currentWeek: c.getCurrentWeek(updateTime),
+                              constraints: constraints,
+                            ),
+                          ),
                     ),
                   );
                 } else {

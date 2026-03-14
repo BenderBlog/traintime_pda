@@ -10,15 +10,13 @@ import 'package:watermeter/page/homepage/home_card_padding.dart';
 class SmallFunctionCard extends StatelessWidget {
   final IconData icon;
   final String nameKey;
-  final void Function()? onTap;
-  final void Function()? onLongPress;
+  final void Function()? onPressed;
 
   const SmallFunctionCard({
     super.key,
     required this.icon,
     required this.nameKey,
-    this.onTap,
-    this.onLongPress,
+    this.onPressed,
   });
 
   @override
@@ -34,7 +32,6 @@ class SmallFunctionCard extends StatelessWidget {
         ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)
         .alignment(Alignment.center)
-        .withHomeCardStyle(context)
-        .gestures(onTap: onTap);
+        .withHomeCardStyle(context, onPressed: onPressed);
   }
 }

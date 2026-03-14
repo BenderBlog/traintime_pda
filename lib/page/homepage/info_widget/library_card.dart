@@ -20,83 +20,81 @@ class LibraryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        if (offline) {
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "homepage.offline_mode"),
-          );
-        } else {
-          context.pushReplacement(const LibraryWindow());
-        }
-      },
-      child: Obx(
-        () => MainPageCard(
-          isLoad: borrow_info.state.value == SessionState.fetching,
-          icon: MingCuteIcons.mgc_book_2_line,
-          text: FlutterI18n.translate(context, "homepage.library_card.title"),
-          infoText: Text.rich(
-            TextSpan(
-              style: const TextStyle(fontSize: 20),
-              children: [
-                if (borrow_info.state.value == SessionState.fetched) ...[
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.current_borrow",
-                      translationParams: {
-                        "count": borrow_info.borrowList.length.toString(),
-                      },
-                    ),
-                  ),
-                ] else if (borrow_info.state.value == SessionState.error)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.error_occured",
-                    ),
-                  )
-                else
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.fetching",
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          bottomText: Obx(() {
-            return DefaultTextStyle.merge(
-              overflow: TextOverflow.ellipsis,
-              child: Text(
-                borrow_info.state.value == SessionState.fetched
-                    ? borrow_info.dued == 0
-                          ? FlutterI18n.translate(
-                              context,
-                              "homepage.library_card.no_return",
-                            )
-                          : FlutterI18n.translate(
-                              context,
-                              "homepage.library_card.need_return",
-                              translationParams: {
-                                "dued": borrow_info.dued.toString(),
-                              },
-                            )
-                    : borrow_info.state.value == SessionState.error
-                    ? FlutterI18n.translate(
-                        context,
-                        "homepage.library_card.no_info",
-                      )
-                    : FlutterI18n.translate(
-                        context,
-                        "homepage.library_card.fetching_info",
-                      ),
-              ),
+    return Obx(
+      () => MainPageCard(
+        onPressed: () async {
+          if (offline) {
+            showToast(
+              context: context,
+              msg: FlutterI18n.translate(context, "homepage.offline_mode"),
             );
-          }),
+          } else {
+            context.pushReplacement(const LibraryWindow());
+          }
+        },
+        isLoad: borrow_info.state.value == SessionState.fetching,
+        icon: MingCuteIcons.mgc_book_2_line,
+        text: FlutterI18n.translate(context, "homepage.library_card.title"),
+        infoText: Text.rich(
+          TextSpan(
+            style: const TextStyle(fontSize: 20),
+            children: [
+              if (borrow_info.state.value == SessionState.fetched) ...[
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.current_borrow",
+                    translationParams: {
+                      "count": borrow_info.borrowList.length.toString(),
+                    },
+                  ),
+                ),
+              ] else if (borrow_info.state.value == SessionState.error)
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.error_occured",
+                  ),
+                )
+              else
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.fetching",
+                  ),
+                ),
+            ],
+          ),
         ),
+        bottomText: Obx(() {
+          return DefaultTextStyle.merge(
+            overflow: TextOverflow.ellipsis,
+            child: Text(
+              borrow_info.state.value == SessionState.fetched
+                  ? borrow_info.dued == 0
+                        ? FlutterI18n.translate(
+                            context,
+                            "homepage.library_card.no_return",
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            "homepage.library_card.need_return",
+                            translationParams: {
+                              "dued": borrow_info.dued.toString(),
+                            },
+                          )
+                  : borrow_info.state.value == SessionState.error
+                  ? FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.no_info",
+                    )
+                  : FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.fetching_info",
+                    ),
+            ),
+          );
+        }),
       ),
     );
   }

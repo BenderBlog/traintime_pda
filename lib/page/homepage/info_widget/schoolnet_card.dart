@@ -19,69 +19,59 @@ class SchoolnetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        context.pushReplacement(const NetworkCardWindow());
-      },
-      child: Obx(
-        () => MainPageCard(
-          isLoad: schoolNetStatus.value == SessionState.fetching,
-          icon: MingCuteIcons.mgc_wifi_fill,
-          text:
-              preference
-                  .getString(preference.Preference.schoolNetQueryPassword)
-                  .isEmpty
+    return Obx(
+      () => MainPageCard(
+        onPressed: () async {
+          context.pushReplacement(const NetworkCardWindow());
+        },
+        isLoad: schoolNetStatus.value == SessionState.fetching,
+        icon: MingCuteIcons.mgc_wifi_fill,
+        text:
+            preference
+                .getString(preference.Preference.schoolNetQueryPassword)
+                .isEmpty
+            ? FlutterI18n.translate(
+                context,
+                "homepage.school_card_info_card.bill",
+              )
+            : FlutterI18n.translate(context, "homepage.school_net.no_password"),
+        infoText: Text.rich(
+          TextSpan(
+            style: const TextStyle(fontSize: 20),
+            children: [
+              if (schoolNetStatus.value == SessionState.fetched) ...[
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.school_net.title",
+                    translationParams: {
+                      "usage": networkInfo.value!.used.replaceAll("G", " GB"),
+                    },
+                  ),
+                ),
+              ] else
+                TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    schoolNetStatus.value == SessionState.error
+                        ? "homepage.school_net.failed"
+                        : "homepage.school_net.fetching",
+                  ),
+                ),
+            ],
+          ),
+        ),
+        bottomText: Text(
+          schoolNetStatus.value == SessionState.fetched
               ? FlutterI18n.translate(
                   context,
-                  "homepage.school_card_info_card.bill",
+                  "homepage.school_net.remaining",
+                  translationParams: {"remaining": networkInfo.value!.charged},
                 )
-              : FlutterI18n.translate(
-                  context,
-                  "homepage.school_net.no_password",
-                ),
-          infoText: Text.rich(
-            TextSpan(
-              style: const TextStyle(fontSize: 20),
-              children: [
-                if (schoolNetStatus.value == SessionState.fetched) ...[
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.school_net.title",
-                      translationParams: {
-                        "usage": networkInfo.value!.used.replaceAll("G", " GB"),
-                      },
-                    ),
-                  ),
-                ] else
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      schoolNetStatus.value == SessionState.error
-                          ? "homepage.school_net.failed"
-                          : "homepage.school_net.fetching",
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          bottomText: Text(
-            schoolNetStatus.value == SessionState.fetched
-                ? FlutterI18n.translate(
-                    context,
-                    "homepage.school_net.remaining",
-                    translationParams: {
-                      "remaining": networkInfo.value!.charged,
-                    },
-                  )
-                : schoolNetStatus.value == SessionState.error
-                ? FlutterI18n.translate(context, isError.value)
-                : FlutterI18n.translate(
-                    context,
-                    "homepage.school_net.fetching",
-                  ),
-            overflow: TextOverflow.ellipsis,
-          ),
+              : schoolNetStatus.value == SessionState.error
+              ? FlutterI18n.translate(context, isError.value)
+              : FlutterI18n.translate(context, "homepage.school_net.fetching"),
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );

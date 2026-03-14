@@ -14,6 +14,7 @@ class MainPageCard extends StatelessWidget {
   final Widget bottomText;
   final Widget? rightButton;
   final bool? isBold;
+  final void Function()? onPressed;
   const MainPageCard({
     super.key,
     required this.icon,
@@ -21,6 +22,7 @@ class MainPageCard extends StatelessWidget {
     required this.infoText,
     required this.bottomText,
     required this.isLoad,
+    this.onPressed,
     this.rightButton,
     this.progress,
     this.isBold,
@@ -55,6 +57,6 @@ class MainPageCard extends StatelessWidget {
         },
       ),
       trailing: rightButton,
-    ).withHomeCardStyle(context);
+    ).withHomeCardStyle(context, onPressed: onPressed);
   }
 }
