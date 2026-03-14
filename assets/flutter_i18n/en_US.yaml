@@ -49,6 +49,9 @@ no_info: "No information"
 catcher_detected: "An error has occurred"
 catcher_description: "Details are shown as follows"
 
+# 新主页提示
+new_homepage_hint: "A new homepage is developing here, the pigimg is a placeholder, have fun"
+
 # 星期
 weekday:
    monday: "Mon."
@@ -341,6 +344,7 @@ homepage:
    homepage: "Homepage"
    club: "Club"
    planet: "Blog"
+   dashboard: "Pighub"
    setting: "Settings"
    input_partner_data:
       route_not_exist: "Import path does not exist:P"

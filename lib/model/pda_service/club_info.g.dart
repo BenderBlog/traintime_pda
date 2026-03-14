@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-
+/*
 part of 'club_info.dart';
 
 // **************************************************************************
@@ -41,3 +41,4 @@ const _$ClubTypeEnumMap = {
   ClubType.unknown: 'unknown',
   ClubType.all: 'all',
 };
+*/

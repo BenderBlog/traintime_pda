@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Content page of XDU Planet.
-
+/*
 import 'dart:async';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
@@ -422,3 +422,4 @@ class CommentModel with ChangeNotifier {
     notifyListeners();
   }
 }
+*/

@@ -13,7 +13,7 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
-import 'package:watermeter/repository/pda_service_session.dart' as message;
+//import 'package:watermeter/repository/pda_service_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/library_session.dart'
     as borrow_info;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
@@ -73,7 +73,7 @@ Future<void> update({
   required Future<void> Function(String) sliderCaptcha,
 }) async {
   // Update data
-  message.getClubList();
+  //message.getClubList();
 
   // Retry Login
   if (forceRetryLogin || loginState == IDSLoginState.fail) {
@@ -114,7 +114,6 @@ Future<void> update({
     await CourseReminderService().initialize();
     CourseReminderService().validateAndUpdateNotifications();
   }
-  
 }
 
 /// Originally updateOnAppResumed

@@ -44,6 +44,9 @@ no_info: "没有信息"
 catcher_detected: "发生错误"
 catcher_description: "详情如下"
 
+# 新主页提示
+new_homepage_hint: "本程序将开发一个新主页，目前先用猪图秀占位，玩得愉快"
+
 # 星期
 weekday:
     monday: "周一"
@@ -331,6 +334,7 @@ homepage:
     # home.dart
     homepage: "主页"
     club: "社团推荐"
+    dashboard: "猪图鉴赏"
     planet: "博客星球"
     setting: "设置"
     input_partner_data:

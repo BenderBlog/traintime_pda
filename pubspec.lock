@@ -361,22 +361,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.0"
-  extended_image:
-    dependency: "direct main"
-    description:
-      name: extended_image
-      sha256: f6cbb1d798f51262ed1a3d93b4f1f2aa0d76128df39af18ecb77fa740f88b2e0
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.0.1"
-  extended_image_library:
-    dependency: transitive
-    description:
-      name: extended_image_library
-      sha256: "1f9a24d3a00c2633891c6a7b5cab2807999eb2d5b597e5133b63f49d113811fe"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.1"
   fake_async:
     dependency: transitive
     description:
@@ -541,14 +525,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_widget_from_html_core:
-    dependency: "direct main"
-    description:
-      name: flutter_widget_from_html_core
-      sha256: "1120ee6ed3509ceff2d55aa6c6cbc7b6b1291434422de2411b5a59364dd6ff03"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.0"
   fluttertoast:
     dependency: "direct main"
     description:
@@ -557,22 +533,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.0.0"
-  fwfh_cached_network_image:
-    dependency: "direct main"
-    description:
-      name: fwfh_cached_network_image
-      sha256: "484cb5f8047f02cfac0654fca5832bfa91bb715fd7fc651c04eb7454187c4af8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.16.1"
-  fwfh_url_launcher:
-    dependency: "direct main"
-    description:
-      name: fwfh_url_launcher
-      sha256: c38aa8fb373fda3a89b951fa260b539f623f6edb45eee7874cb8b492471af881
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.16.1"
   get:
     dependency: "direct main"
     description:
@@ -645,14 +605,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.0"
-  http_client_helper:
-    dependency: transitive
-    description:
-      name: http_client_helper
-      sha256: "8a9127650734da86b5c73760de2b404494c968a3fd55602045ffec789dac3cb1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -701,14 +653,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: "53385261521cc4a0c4658fd0ad07a7d14591cf8fc33abbceae306ddb974888dc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.2"
   json_annotation:
     dependency: "direct main"
     description:
@@ -1101,14 +1045,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
-  result_dart:
-    dependency: "direct main"
-    description:
-      name: result_dart
-      sha256: "0666b21fbdf697b3bdd9986348a380aa204b3ebe7c146d8e4cdaa7ce735e6054"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   rxdart:
     dependency: transitive
     description:

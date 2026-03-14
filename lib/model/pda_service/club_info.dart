@@ -1,5 +1,5 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
-
+/*
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:watermeter/repository/pda_service_session.dart';
@@ -169,3 +169,4 @@ class ClubInfo {
 
   Map<String, dynamic> toJson() => _$ClubInfoToJson(this);
 }
+*/

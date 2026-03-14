@@ -10,10 +10,10 @@ import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
-import 'package:watermeter/page/club_suggestion/club_suggestion.dart';
+import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
-import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
+import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
@@ -230,7 +230,7 @@ class _HomePageMasterState extends State<HomePageMaster>
           }
         },
       );
-      message.getClubList();
+      //message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
         "Current loginstate: $loginState, if none will _loginAsync.",
@@ -270,15 +270,15 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 1,
-        name: FlutterI18n.translate(context, "homepage.club"),
-        icon: Icons.star_outline,
+        name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
+        icon: MingCuteIcons.mgc_tool_line,
         iconChoice: Icons.star,
       ),
       PageInformation(
         index: 2,
-        name: FlutterI18n.translate(context, "homepage.planet"),
-        icon: MingCuteIcons.mgc_planet_line,
-        iconChoice: MingCuteIcons.mgc_planet_fill,
+        name: FlutterI18n.translate(context, "homepage.dashboard"),
+        icon: MingCuteIcons.mgc_pig_line,
+        iconChoice: MingCuteIcons.mgc_pig_fill,
       ),
       PageInformation(
         index: 3,
@@ -300,8 +300,8 @@ class _HomePageMasterState extends State<HomePageMaster>
               _controller.jumpToPage(_selectedIndex);
             },
           ),
-          const ClubSuggestion(),
-          const XDUPlanetPage(),
+          const ToolBoxPage(),
+          const PigPage(),
           const SettingWindow(),
         ],
         onPageChanged: (int index) {

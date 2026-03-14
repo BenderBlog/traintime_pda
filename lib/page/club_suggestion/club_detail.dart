@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+// No more supression for the students who want talking!
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -360,3 +362,4 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
     );
   }
 }
+*/

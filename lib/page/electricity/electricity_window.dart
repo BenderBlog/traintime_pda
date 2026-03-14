@@ -178,7 +178,7 @@ class ElectricityWindow extends StatelessWidget {
                       LayoutBuilder(
                             builder: (context, constraints) =>
                                 ElectricityUsageGraph(
-                                  graphHeight: 300,
+                                  graphHeight: 240,
                                   graphWidth: constraints.maxWidth,
                                   historyElectricityInfo:
                                       historyElectricityInfo,

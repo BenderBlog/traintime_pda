@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
-import 'package:watermeter/page/homepage/notice_card/club_card.dart';
+//import 'package:watermeter/page/homepage/notice_card/club_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -24,7 +24,6 @@ import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
@@ -72,7 +71,7 @@ class _MainPageState extends State<MainPage> {
       const ExperimentCard(),
       const SportCard(),
     ],
-    const ToolboxCard(),
+    //const ToolboxCard(),
   ];
 
   String get _now {
@@ -188,7 +187,7 @@ class _MainPageState extends State<MainPage> {
         child: ListView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           children: [
-            ClubPromotionCard(onTap: widget.changePage),
+            //ClubPromotionCard(onTap: widget.changePage),
             const ClassTableCard(),
             ElectricityCard(),
             SchoolnetCard(),
