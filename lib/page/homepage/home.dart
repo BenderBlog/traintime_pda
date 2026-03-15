@@ -9,10 +9,8 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
-import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -21,7 +19,6 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/pda_service_session.dart' as message;
-import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -179,18 +176,6 @@ class _HomePageMasterState extends State<HomePageMaster>
     }
   }
 
-  void _showUpdateNotice() {
-    if (updateMessage.value != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await showDialog(
-          context: context,
-          builder: (context) =>
-              Obx(() => UpdateDialog(updateMessage: updateMessage.value!)),
-        );
-      });
-    }
-  }
-
   void _showOfflineModeNotice() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await showDialog(
@@ -217,19 +202,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!refreshAtStart) {
-      message.checkUpdate().then(
-        (value) {
-          if (value ?? false) _showUpdateNotice();
-        },
-        onError: (e, s) {
-          if (mounted) {
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(context, "setting.fetch_failed"),
-            );
-          }
-        },
-      );
+      message.checkUpdate();
       //message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
@@ -272,7 +245,7 @@ class _HomePageMasterState extends State<HomePageMaster>
         index: 1,
         name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
         icon: MingCuteIcons.mgc_tool_line,
-        iconChoice: Icons.star,
+        iconChoice: MingCuteIcons.mgc_tool_fill,
       ),
       PageInformation(
         index: 2,

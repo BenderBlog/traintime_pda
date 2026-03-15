@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
-//import 'package:watermeter/page/homepage/notice_card/club_card.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
@@ -186,9 +186,8 @@ class _MainPageState extends State<MainPage> {
         },
         child: ListView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-
           children: [
-            //ClubPromotionCard(onTap: widget.changePage),
+            UpdateCard().padding(bottom: 8),
             const ClassTableCard().padding(bottom: 8),
             ElectricityCard().padding(bottom: 8),
             SchoolnetCard().padding(bottom: 8),

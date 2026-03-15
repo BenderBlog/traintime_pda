@@ -7,13 +7,11 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
-import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -26,7 +24,6 @@ import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
 import 'package:watermeter/page/setting/notification_page/notification_page.dart';
-import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -50,7 +47,6 @@ import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity_session;
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -828,27 +824,6 @@ class _SettingWindowState extends State<SettingWindow> {
                     onTap: () => context.push(NotificationDebugPage()),
                   ),
                 const Divider(),
-                if (kDebugMode)
-                  ListTile(
-                    title: Text(
-                      "测试实验系统功能", //FlutterI18n.translate(context, "setting.check_logger"),
-                    ),
-                    trailing: const Icon(Icons.navigate_next),
-                    onTap: () => SysjSession().getDataFromSysj().onError((
-                      e,
-                      s,
-                    ) {
-                      if (context.mounted) {
-                        showToast(context: context, msg: "实验系统功能测试失败");
-                        log.error("Failed to test experiment crawlers", e, s);
-                      }
-                      return (
-                        ExperimentFetchStatus.notSchoolNetwork,
-                        <ExperimentData>[],
-                      );
-                    }),
-                  ),
-                if (kDebugMode) const Divider(),
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(context, "setting.clear_and_restart"),

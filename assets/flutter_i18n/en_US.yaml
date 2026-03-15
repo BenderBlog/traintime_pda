@@ -622,6 +622,7 @@ setting:
    latest_version: "Latest version: {latest}"
    waiting: "Waiting for obtain"
    fetching_update: "Fetching update information"
+   new_version: "New version released!"
    current_stable: "You are running the latest version"
    current_testing: "You are running the testing version"
    fetch_failed: "Failed to fetch update information"

@@ -29,6 +29,7 @@ login_process:
 no_info: 沒有信息
 catcher_detected: 發生錯誤
 catcher_description: 詳情如下
+new_homepage_hint: 本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快
 weekday:
   monday: 週一
   tuesday: 週二
@@ -301,6 +302,7 @@ homepage:
   linux_notice: Linux 版本正在測試，歡迎反饋！
   homepage: 主頁
   club: 社團推薦
+  dashboard: 豬圖鑑賞
   planet: 博客星球
   setting: 設置
   input_partner_data:
@@ -567,6 +569,7 @@ setting:
   latest_version: '最新版本: {latest}'
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
+  new_version: 有新版本發佈！
   current_stable: 目前您正在運行最新版
   current_testing: 目前您正在運行測試版
   fetch_failed: 獲取更新信息失敗
