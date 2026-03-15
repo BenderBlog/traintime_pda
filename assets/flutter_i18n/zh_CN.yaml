@@ -893,6 +893,8 @@ toolbox:
     title: "其他功能"
     payment: "缴费系统"
     payment_description: "电费该交了吧"
+    drinkingwater: "订水系统"
+    drinkingwater_description: "喝水对身体好"
     repair: "后勤报修"
     repair_description: "不要漏水断网"
     reserve: "空间预约"
@@ -965,42 +967,31 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-    请原谅我用这种方式行侠仗义
-    （主啊，请原谅我这般无礼的行为）
+    Time to get some electric STUFF...
+    ...to get high
 
-    无论如何，每个女人身旁都有一个男人
-    无论如何，你都要忘却一段错误的感情
-    因为她让你痛不欲生
+    I am dry for long time...
+    ...because of the pigs
 
-    无论如何，伟大的爱必胜
-    而当你赢得了她的心
-    伤心的你会得到释怀
+    They said 'No animal shall drink alcohol.'...
+    ...but Napoleon's COUNTRY SON always walking in circle
 
-    愿我们能够顺利完成任务
-    （愿上帝保佑我们）
+    So I got to secretly hide my bootleg PARAPHERNALIA...
+    ...in a place under the sun, where pigs hates
 
-    （本彩蛋有声优梗）
+    Waiting for stupid pig's...
+    ...BLACK COMEDY plays
 
 easter_egg_others: |-
-    每天过的都一样
-    偶尔会突发奇想
-    只要有了哆啦A梦幻想就无限延长
+    向日葵小姐做梦了
+    她身上装饰了很多宝石
+    远处看像是出席舞会的贵族小姐
 
-    快乐时与我分享
-    难过时陪在身旁
-    掏掏它的神奇口袋就能把烦恼遗忘
-
-    找传说的宝藏
-    冒险到远方
-    “看我的，任意门！”
-
-    昂昂昂
-    哆啦A梦和我一起让梦想发光
-
-    昂昂昂
-    哆啦A梦和我一起让梦想发光
-
-    （本彩蛋有声优梗）
+    她和英俊的王子跳舞
+    她们都有点脸红
+    又有点神智不清
+    突然，他把她抱起来
+    举到了空中
 
 # Firefox about:robots.
 easter_egg_robot:

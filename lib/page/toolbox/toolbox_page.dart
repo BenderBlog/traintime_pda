@@ -32,6 +32,15 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
             iconData: MingCuteIcons.mgc_exchange_cny_line,
           ),
           WebViewAddresses(
+            name: FlutterI18n.translate(context, "toolbox.drinkingwater"),
+            url: "https://order.xidian.edu.cn/mobile/thirdoauth/oauth2Xidian/1",
+            description: FlutterI18n.translate(
+              context,
+              "toolbox.drinkingwater_description",
+            ),
+            iconData: MingCuteIcons.mgc_drop_line,
+          ),
+          WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.repair"),
             url:
                 "https://ids.xidian.edu.cn/authserver/login?service="

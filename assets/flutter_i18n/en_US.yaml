@@ -906,6 +906,8 @@ toolbox:
    title: "Other Functions"
    payment: "Payment System"
    payment_description: "Times to pay the electricity fee"
+   drinkingwater: "Drinking Water"
+   drinkingwater_description: "Is good for health"
    repair: "Repair report"
    repair_description: "Don't let the water leak from the top"
    reserve: "Space Reservation"
@@ -978,38 +980,32 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-   Forgive me lord, for I will acting rudely.
+   Time to get some electric STUFF...
+   ...to get high
 
-   Haja o que houver
-   Há sempre um homem, para uma mulher
-   E há de sempre haver para esquecer
-   Um falso amor e uma vontade de morrer
-   Seja como for há de vencer o grande amor
-   Que há de ser no coração
-   Como um perdão
-   Pra quem chorou
+   I am dry for long time...
+   ...because of the pigs
 
-   God bless us all.
+   They said 'No animal shall drink alcohol.'...
+   ...but Napoleon's COUNTRY SON always walking in circle
+
+   So I got to secretly hide my bootleg PARAPHERNALIA...
+   ...in a place under the sun, where pigs hates
+
+   Waiting for stupid pig's...
+   ...BLACK COMEDY plays
 
 easter_egg_others: |-
-   Konna koto ii na
-   Dekitara ii na
-   Anna yume konna yume ippai aru kedo
+   Ms. Himawari have a dream
+   Where she is at a dancing ground
+   Dressed with shiny diamonds
+   Like the dacing queen
 
-   Minna minna minna
-   Kanaete kureru
-   Fushigina pokke de kanaete kureru
-
-   Sora wo jiyuu ni tobitai na
-   (Hai! Takekoputaa!)
-
-   An, an, an
-   Tottemo daisuki
-   Doraemon
-
-   An, an, an
-   Tottemo daisuki
-   Doraemon
+   She dances with handsome prince
+   They are all shy, with red face
+   Also a litting out of mind
+   Suddenly, he raise her
+   Up to the sky...
 
 # Firefox about:robots.
 easter_egg_robot:

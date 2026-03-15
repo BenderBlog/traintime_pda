@@ -861,6 +861,8 @@ toolbox:
   title: 其他功能
   payment: 繳費系統
   payment_description: 電費該交了吧
+  drinkingwater: 訂水系統
+  drinkingwater_description: 喝水對身體好
   repair: 後勤報修
   repair_description: 不要漏水斷網
   reserve: 空間預約
@@ -923,63 +925,45 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: '請原諒我用這種方式行俠仗義
+easter_egg_apple: 'Time to get some electric STUFF...
 
-  （主啊，請原諒我這般無禮的行為）
-
-
-  無論如何，每個女人身旁都有一個男人
-
-  無論如何，你都要忘卻一段錯誤的感情
-
-  因為她讓你痛不欲生
+  ...to get high
 
 
-  無論如何，偉大的愛必勝
+  I am dry for long time...
 
-  而當你贏得了她的心
-
-  傷心的你會得到釋懷
+  ...because of the pigs
 
 
-  願我們能夠順利完成任務
+  They said ''No animal shall drink alcohol.''...
 
-  （願上帝保佑我們）
-
-
-  （本彩蛋有聲優梗）'
-easter_egg_others: '每天過的都一樣
-
-  偶爾會突發奇想
-
-  只要有了哆啦A夢幻想就無限延長
+  ...but Napoleon''s COUNTRY SON always walking in circle
 
 
-  快樂時與我分享
+  So I got to secretly hide my bootleg PARAPHERNALIA...
 
-  難過時陪在身旁
-
-  掏掏它的神奇口袋就能把煩惱遺忘
+  ...in a place under the sun, where pigs hates
 
 
-  找傳說的寶藏
+  Waiting for stupid pig''s...
 
-  冒險到遠方
+  ...BLACK COMEDY plays'
+easter_egg_others: '向日葵小姐做夢了
 
-  “看我的，任意門！”
+  她身上裝飾了很多寶石
 
-
-  昂昂昂
-
-  哆啦A夢和我一起讓夢想發光
+  遠處看像是出席舞會的貴族小姐
 
 
-  昂昂昂
+  她和英俊的王子跳舞
 
-  哆啦A夢和我一起讓夢想發光
+  她們都有點臉紅
 
+  又有點神智不清
 
-  （本彩蛋有聲優梗）'
+  突然，他把她抱起來
+
+  舉到了空中'
 easter_egg_robot:
   appbar: 歡迎你，同學！
   title: 看看這些要開學的學生們吧！
