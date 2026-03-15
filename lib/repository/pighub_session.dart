@@ -5,6 +5,7 @@
 // PigHub API session. https://www.pighub.top
 
 import 'dart:math' as math;
+import 'dart:isolate';
 
 import 'package:dio/dio.dart';
 
@@ -16,6 +17,9 @@ Dio get _dio => Dio(
     receiveTimeout: const Duration(seconds: 30),
   ),
 );
+
+final math.Random _random = math.Random();
+List<PigHubImage>? _cachedImages;
 
 class PigHubImage {
   final String id;
@@ -61,19 +65,41 @@ List<dynamic> _extractImageList(dynamic data) {
   throw const FormatException("Invalid PigHub response format.");
 }
 
-/// Fetches all images and returns one at random.
-Future<PigHubImage> getRandomPig() async {
-  final response = await _dio.get("$_base/api/all-images");
-
-  final List<dynamic> images = _extractImageList(response.data);
+List<PigHubImage> _parsePigImages(dynamic data) {
+  final List<dynamic> images = _extractImageList(data);
   if (images.isEmpty) {
     throw Exception("PigHub returned an empty image list.");
   }
 
-  final index = math.Random().nextInt(images.length);
-  final item = images[index];
-  if (item is! Map<String, dynamic>) {
-    throw const FormatException("Invalid PigHub image item format.");
+  return images
+      .map((item) {
+        if (item is! Map<String, dynamic>) {
+          throw const FormatException("Invalid PigHub image item format.");
+        }
+        return PigHubImage.fromJson(item);
+      })
+      .toList(growable: false);
+}
+
+Future<List<PigHubImage>> _getAllPigs({bool forceRefresh = false}) async {
+  if (!forceRefresh && _cachedImages != null && _cachedImages!.isNotEmpty) {
+    return _cachedImages!;
   }
-  return PigHubImage.fromJson(item);
+
+  final response = await _dio.get("$_base/api/all-images");
+
+  // Parse in a background isolate to avoid UI jank on large payloads.
+  final parsed = await Isolate.run(() => _parsePigImages(response.data));
+  _cachedImages = parsed;
+  return parsed;
+}
+
+/// Fetches one image at random.
+///
+/// It caches PigHub's full image list in memory, then picks randomly from cache
+/// to avoid repeatedly downloading and parsing large responses.
+Future<PigHubImage> getRandomPig({bool forceRefresh = false}) async {
+  final images = await _getAllPigs(forceRefresh: forceRefresh);
+  final index = _random.nextInt(images.length);
+  return images[index];
 }
