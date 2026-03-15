@@ -2,25 +2,22 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/electricity/electricity_average_usage_graph.dart';
 import 'package:watermeter/page/electricity/electricity_usage_graph.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
-import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
     as electricity_session;
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
-import 'package:graphic/graphic.dart' as graphic;
 
 class ElectricityWindow extends StatelessWidget {
   const ElectricityWindow({super.key});
@@ -197,169 +194,31 @@ class ElectricityWindow extends StatelessWidget {
                   .center(),
 
               InfoCard(
-                iconData: Icons.bar_chart,
-                title: FlutterI18n.translate(
-                  context,
-                  "electricity.daily_usage",
-                ),
-                children: [
-                  Builder(
-                        builder: (context) {
-                          // Record the smallest record of the day.
-                          final SplayTreeMap<DateTime, double> dayMin =
-                              SplayTreeMap();
-                          for (final info in historyElectricityInfo) {
-                            final v = double.tryParse(info.remain);
-                            if (v == null) continue;
-                            final dayTime = DateTime(
-                              info.fetchDay.year,
-                              info.fetchDay.month,
-                              info.fetchDay.day,
-                            );
-                            if (!dayMin.containsKey(dayTime) ||
-                                v < dayMin[dayTime]!) {
-                              dayMin[dayTime] = v;
-                            }
-                          }
-
-                          log.info(
-                            "[ElectricityWindow][AverageDailyUseGraph] Based on daymin data $dayMin",
-                          );
-
-                          // If only one day, unable to parse.
-                          if (dayMin.keys.length <= 1) {
-                            log.info(
-                              "[ElectricityWindow][AverageDailyUseGraph] Not enough data, quit!",
-                            );
-
-                            return Text(
-                              FlutterI18n.translate(
-                                context,
-                                "electricity.not_enough_data",
-                              ),
-                              textAlign: TextAlign.center,
-
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                            ).width(double.infinity);
-                          }
-
-                          // Daily usage of the electricity
-                          final keys = dayMin.keys.toList();
-                          final List<Map<String, double>> plotData = [];
-                          double max = 0.0;
-                          double min = double.maxFinite;
-                          for (int i = 1; i < keys.length; i++) {
-                            final dt = keys[i];
-                            final dtPrev = keys[i - 1];
-                            final curr = dayMin[keys[i]]!;
-                            final prev = dayMin[keys[i - 1]]!;
-                            final dayDiff = DateTime(dt.year, dt.month, dt.day)
-                                .difference(
-                                  DateTime(
-                                    dtPrev.year,
-                                    dtPrev.month,
-                                    dtPrev.day,
-                                  ),
-                                )
-                                .inDays;
-                            final diff = (prev - curr) / dayDiff;
-                            if (diff < 0) continue;
-                            if (diff > max) max = diff;
-                            if (diff < min) min = diff;
-                            plotData.add({
-                              "${dtPrev.month}.${dtPrev.day}~${dt.month}.${dt.day} ":
-                                  diff,
-                            });
-                          }
-                          log.info(
-                            "[ElectricityWindow][AverageDailyUseGraph] Based on plotdata $dayMin",
-                          );
-
-                          // If no record, we cannot render it.
-                          if (plotData.isEmpty) {
-                            log.info(
-                              "[ElectricityWindow][AverageDailyUseGraph] Plotdata is empty, quit!",
-                            );
-                            return Text(
-                              FlutterI18n.translate(
-                                context,
-                                "electricity.not_enough_data",
-                              ),
-                              textAlign: TextAlign.center,
-
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                            ).width(double.infinity);
-                          }
-
-                          return graphic.Chart<Map<String, double>>(
-                            data: plotData,
-                            variables: {
-                              'range': graphic.Variable(
-                                accessor: (map) => map.keys.first,
-                              ),
-                              'consPlot': graphic.Variable(
-                                accessor: (map) => map.values.first,
-                                scale: graphic.LinearScale(
-                                  min: min * 0.6,
-                                  max: max * 1.05,
-                                  formatter: (v) => v.toStringAsFixed(2),
+                    iconData: Icons.bar_chart,
+                    title: FlutterI18n.translate(
+                      context,
+                      "electricity.daily_usage",
+                    ),
+                    children: [
+                      LayoutBuilder(
+                            builder: (context, constraints) =>
+                                ElectricityAverageUsageGraph(
+                                  graphWidth: constraints.maxWidth,
+                                  historyElectricityInfo:
+                                      historyElectricityInfo,
                                 ),
-                              ),
-                            },
-                            axes: [
-                              graphic.Defaults.horizontalAxis,
-                              graphic.Defaults.verticalAxis,
-                            ],
-                            marks: [
-                              graphic.IntervalMark(
-                                label: graphic.LabelEncode(
-                                  encoder: (tuple) => graphic.Label(
-                                    (tuple['consPlot'] as double)
-                                        .toStringAsFixed(2),
-                                  ),
-                                ),
-                                position:
-                                    graphic.Varset('range') *
-                                    graphic.Varset('consPlot'),
-                                color: graphic.ColorEncode(
-                                  value: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                            selections: {
-                              'barHover': graphic.PointSelection(
-                                on: {
-                                  graphic.GestureType.hover,
-                                  graphic.GestureType.tapDown,
-                                  graphic.GestureType.tapUp,
-                                  graphic.GestureType.longPressMoveUpdate,
-                                  graphic.GestureType.scaleUpdate,
-                                },
-                              ),
-                            },
-                            tooltip: graphic.TooltipGuide(
-                              selections: {'barHover'},
-                            ),
-                            coord: graphic.RectCoord(transposed: true),
-                          ).constrained(height: 220);
-                        },
-                      )
-                      .padding(vertical: 12, left: 28, right: 20)
-                      .decorated(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      .padding(top: 4),
-                ],
-              ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+                          )
+                          .padding(vertical: 12, horizontal: 16)
+                          .decorated(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            borderRadius: BorderRadius.circular(12),
+                          )
+                          .padding(top: 4),
+                    ],
+                  )
+                  .padding(vertical: 4)
+                  .constrained(maxWidth: sheetMaxWidth)
+                  .center(),
 
               FilledButton(
                     onPressed: () => update(force: true),

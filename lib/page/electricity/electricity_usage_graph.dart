@@ -11,6 +11,32 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/repository/logger.dart';
 
+class _GraphMetrics {
+  static const double chartHorizontalPadding = 30;
+  static const double chartRightReserved = 20;
+  static const double chartTopPadding = 10;
+  static const double chartBottomPadding = 30;
+
+  static const int defaultYAxisLabelCount = 4;
+  static const int defaultYAxisSegmentCount = 5;
+  static const double yAxisPaddingValue = 50;
+  static const double flatDataExtraValue = 1;
+
+  static const double pointHitTestRadius = 8;
+
+  static const double tooltipCardWidth = 90;
+  static const double tooltipCardHeight = 48;
+  static const double tooltipPadding = 4;
+  static const double tooltipFontSize = 9;
+
+  static const double lineStrokeWidth = 2;
+  static const double pointStrokeWidth = 6;
+  static const double axisLabelOffsetY = 16;
+  static const double xAxisBottomOffset = 24;
+
+  static const FontWeight axisLabelFontWeight = FontWeight.w400;
+}
+
 class ElectricityUsageGraph extends StatefulWidget {
   late final SplayTreeMap<DateTime, double> data;
   late final List<Offset> points;
@@ -51,25 +77,36 @@ class ElectricityUsageGraph extends StatefulWidget {
 
     // Horizontal Step
     int step = data.keys.last.difference(data.keys.first).inDays + 2;
-    final horizontalStep = (graphWidth - 50) / step;
+    final horizontalStep =
+        (graphWidth -
+            (_GraphMetrics.chartHorizontalPadding +
+                _GraphMetrics.chartRightReserved)) /
+        step;
     log.info(
       "[SelfGraph] horizontalstep $horizontalStep, from width $graphWidth and step $step",
     );
 
     final keynum = min(data.length, 4);
     final keyStep = data.keys.last.difference(data.keys.first).inDays / keynum;
-    final xstep = (graphWidth - 50) / keynum;
+    final xstep =
+        (graphWidth -
+            (_GraphMetrics.chartHorizontalPadding +
+                _GraphMetrics.chartRightReserved)) /
+        keynum;
     final datekey = List.generate(
       keynum + 1,
       (i) => data.keys.first.add(Duration(days: (i * keyStep).toInt())),
     );
-    final datevalues = List.generate(keynum + 1, (i) => 24 + i * xstep);
+    final datevalues = List.generate(
+      keynum + 1,
+      (i) => _GraphMetrics.xAxisBottomOffset + i * xstep,
+    );
     markAtX = {for (var i = 0; i < keynum + 1; ++i) datekey[i]: datevalues[i]};
 
     // Vertical Step
     // Point's initial point is at the upper left corner
-    double minY = graphHeight - 30;
-    double maxY = 10;
+    final minY = graphHeight - _GraphMetrics.chartBottomPadding;
+    final maxY = _GraphMetrics.chartTopPadding;
     double biggestValue = data.values.reduce((a, b) => a > b ? a : b);
     double smallestValue = data.values.reduce((a, b) => a > b ? b : a);
     double verticalStep = (biggestValue - smallestValue) / (minY - maxY);
@@ -82,31 +119,42 @@ class ElectricityUsageGraph extends StatefulWidget {
     // List of Points based on horizontal and vertical step
     points = data.keys.map<Offset>((k) {
       return Offset(
-        horizontalStep * (k.difference(data.keys.first).inDays + 1) + 30,
+        horizontalStep * (k.difference(data.keys.first).inDays + 1) +
+            _GraphMetrics.chartHorizontalPadding,
         minY - (data[k]! - smallestValue) / verticalStep,
       );
     }).toList();
 
     if (biggestValue == smallestValue) {
-      biggestValue = (biggestValue + 1);
-      smallestValue = max(smallestValue - 1, 0);
-      final lineOffsetBasic = graphHeight / 3;
+      biggestValue = biggestValue + _GraphMetrics.flatDataExtraValue;
+      smallestValue = max(smallestValue - _GraphMetrics.flatDataExtraValue, 0);
+      final lineOffsetBasic =
+          (graphHeight - _GraphMetrics.axisLabelOffsetY) / 3;
       lines = {
         biggestValue.toInt(): lineOffsetBasic,
         smallestValue.toInt(): lineOffsetBasic * 2,
       };
       return;
     }
-    biggestValue = biggestValue + 50;
-    smallestValue = max(smallestValue - 50, 0);
-    final verticalkeyStep = (biggestValue - smallestValue) / 5;
-    final lineOffsetBasic = graphHeight / 5;
+    biggestValue = biggestValue + _GraphMetrics.yAxisPaddingValue;
+    smallestValue = max(smallestValue - _GraphMetrics.yAxisPaddingValue, 0);
+    final verticalkeyStep =
+        (biggestValue - smallestValue) / _GraphMetrics.defaultYAxisSegmentCount;
+    final lineOffsetBasic =
+        (graphHeight - _GraphMetrics.axisLabelOffsetY) /
+        _GraphMetrics.defaultYAxisSegmentCount;
     final keys = List.generate(
-      4,
+      _GraphMetrics.defaultYAxisLabelCount,
       (i) => (biggestValue - (i + 1) * verticalkeyStep).toInt(),
     );
-    final values = List.generate(4, (i) => (i + 1) * lineOffsetBasic);
-    lines = {for (var i = 0; i < 4; ++i) keys[i]: values[i]};
+    final values = List.generate(
+      _GraphMetrics.defaultYAxisLabelCount,
+      (i) => (i + 1) * lineOffsetBasic,
+    );
+    lines = {
+      for (var i = 0; i < _GraphMetrics.defaultYAxisLabelCount; ++i)
+        keys[i]: values[i],
+    };
   }
 
   @override
@@ -125,7 +173,8 @@ class _ElectricityUsageGraphState extends State<ElectricityUsageGraph> {
 
     for (int i = 0; i < widget.points.length; i++) {
       double distance = (widget.points[i] - tapPosition).distance;
-      if (distance < minDistance && distance < 8) {
+      if (distance < minDistance &&
+          distance < _GraphMetrics.pointHitTestRadius) {
         minDistance = distance;
         closestIndex = i;
       }
@@ -166,6 +215,7 @@ class _ElectricityUsageGraphState extends State<ElectricityUsageGraph> {
       },
       child: Stack(
         children: [
+          // Paint the line which passes the dots.
           RepaintBoundary(
             child: CustomPaint(
               painter: LineChartPainter(
@@ -179,6 +229,7 @@ class _ElectricityUsageGraphState extends State<ElectricityUsageGraph> {
             ),
           ),
 
+          // Paint the dots.
           RepaintBoundary(
             child: CustomPaint(
               painter: PoiotPainter(
@@ -194,6 +245,7 @@ class _ElectricityUsageGraphState extends State<ElectricityUsageGraph> {
             ),
           ),
 
+          // Paint the background lines.
           RepaintBoundary(
             child: CustomPaint(
               painter: BackgroundLinePainter(
@@ -212,17 +264,23 @@ class _ElectricityUsageGraphState extends State<ElectricityUsageGraph> {
 
           if (_selected != null)
             Positioned(
-              left: min(_selected!.$1.dx, widget.graphWidth - 90),
-              top: min(_selected!.$1.dy, widget.graphHeight - 48),
+              left: min(
+                _selected!.$1.dx,
+                widget.graphWidth - _GraphMetrics.tooltipCardWidth,
+              ),
+              top: min(
+                _selected!.$1.dy,
+                widget.graphHeight - _GraphMetrics.tooltipCardHeight,
+              ),
               child: Card.outlined(
                 child: Padding(
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(_GraphMetrics.tooltipPadding),
                   child: Text(
                     "Date: ${_selected!.$2.month}.${_selected!.$2.day}\n"
                     "Amount: ${_selected!.$3.toStringAsFixed(2)}",
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelSmall!.copyWith(fontSize: 9),
+                    style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                      fontSize: _GraphMetrics.tooltipFontSize,
+                    ),
                   ),
                 ),
               ),
@@ -240,7 +298,7 @@ class LineChartPainter extends CustomPainter {
 
   LineChartPainter({required this.points, required this.color}) {
     _strokePaint = Paint()
-      ..strokeWidth = 2.0
+      ..strokeWidth = _GraphMetrics.lineStrokeWidth
       ..color = color
       ..style = PaintingStyle.stroke;
   }
@@ -257,13 +315,14 @@ class LineChartPainter extends CustomPainter {
       path.lineTo(points.last.dx, points.last.dy);
     } else {
       // CatmullRomSpline require at least 4 dots, copy the head and tail dots.
-      if (points.length == 3) {
-        points.insert(0, points.first);
-        points.add(points.last);
+      final splineInput = List<Offset>.from(points);
+      if (splineInput.length == 3) {
+        splineInput.insert(0, splineInput.first);
+        splineInput.add(splineInput.last);
       }
 
       // AI-generated how to paint Catmull-Rom splines with Flutter
-      final spline = CatmullRomSpline(points, tension: 0.0);
+      final spline = CatmullRomSpline(splineInput, tension: 0.0);
       final List<Curve2DSample> samples = spline.generateSamples().toList();
       if (samples.isNotEmpty) {
         path.moveTo(samples.first.value.dx, samples.first.value.dy);
@@ -294,7 +353,7 @@ class PoiotPainter extends CustomPainter {
 
   PoiotPainter({super.repaint, required this.points, required this.color}) {
     _dotPaint = Paint()
-      ..strokeWidth = 6.0
+      ..strokeWidth = _GraphMetrics.pointStrokeWidth
       ..color = color
       ..strokeCap = StrokeCap.round;
   }
@@ -335,18 +394,21 @@ class BackgroundLinePainter extends CustomPainter {
         text: TextSpan(
           text: i.toString(),
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-            fontSize: 9,
-            fontWeight: FontWeight.w400,
+            fontSize: _GraphMetrics.tooltipFontSize,
+            fontWeight: _GraphMetrics.axisLabelFontWeight,
           ),
         ),
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
       )..layout();
-      textPainter.paint(canvas, Offset(0, offset[i]! - 16));
+      textPainter.paint(
+        canvas,
+        Offset(0, offset[i]! - _GraphMetrics.axisLabelOffsetY),
+      );
     }
     canvas.drawLine(
-      Offset(0, size.height - 24),
-      Offset(size.width, size.height - 24),
+      Offset(0, size.height - _GraphMetrics.xAxisBottomOffset),
+      Offset(size.width, size.height - _GraphMetrics.xAxisBottomOffset),
       _strokePaint,
     );
 
@@ -355,14 +417,17 @@ class BackgroundLinePainter extends CustomPainter {
         text: TextSpan(
           text: "${i.month}.${i.day}",
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-            fontSize: 9,
-            fontWeight: FontWeight.w400,
+            fontSize: _GraphMetrics.tooltipFontSize,
+            fontWeight: _GraphMetrics.axisLabelFontWeight,
           ),
         ),
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
       )..layout();
-      textPainter.paint(canvas, Offset(markAtX[i]!, size.height - 16));
+      textPainter.paint(
+        canvas,
+        Offset(markAtX[i]!, size.height - _GraphMetrics.axisLabelOffsetY),
+      );
     }
   }
 
