@@ -12,12 +12,14 @@ class DateSelectorFree extends StatefulWidget {
   final List<DateTimeRange> initialDates;
   final ValueChanged<List<DateTimeRange>> onChanged;
   final Color color;
+  final Color deleteColor;
 
   const DateSelectorFree({
     super.key,
     required this.initialDates,
     required this.onChanged,
     required this.color,
+    required this.deleteColor,
   });
 
   @override
@@ -326,6 +328,13 @@ class _DateSelectorFree extends State<DateSelectorFree> {
     widget.onChanged(chosenDatesRanges);
   }
 
+  void _deleteChosenDate(int index) {
+    setState(() {
+      chosenDatesRanges.removeAt(index);
+    });
+    widget.onChanged(chosenDatesRanges);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -422,7 +431,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       margin: const EdgeInsets.only(top: 8),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 10,
+                        vertical: 8,
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
@@ -445,10 +454,13 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.edit_outlined,
-                            color: widget.color,
-                            size: 18,
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: widget.deleteColor,
+                              size: 18,
+                            ),
+                            onPressed: () => _deleteChosenDate(index),
                           ),
                         ],
                       ),

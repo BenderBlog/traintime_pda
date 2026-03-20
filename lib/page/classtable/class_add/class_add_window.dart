@@ -49,6 +49,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   late InputDecoration inputDecoration;
 
   Color get color => Theme.of(context).colorScheme.primary;
+  Color get deleteColor => Theme.of(context).colorScheme.error;
 
   @override
   void initState() {
@@ -364,6 +365,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                 chosenDates = dates;
               },
               color: color,
+              deleteColor: deleteColor,
             ),
         ],
       ),
