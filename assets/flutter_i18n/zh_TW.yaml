@@ -186,6 +186,16 @@ classtable:
     input_start_time_hint: 上課時間
     input_end_time_hint: 下課時間
     wheel_choose_hint: 第 {index} 節
+    choose_at_least_one: 請至少選擇一個上課日期和時間
+    repeat_weekly: 按周重複
+    free_time: 自定義日期
+    date_selector_free:
+      rule: 時間必須在 08:30-21:25 之間
+      rule_2: 下課時間必須晚於上課時間
+      class_start_time: 上課時間
+      class_end_time: 下課時間
+      edit_class_time: 編輯課程時間
+      choose_class_time: 選擇課程時間
   course_detail_card:
     class_number_string: '{number} 班'
     unknown_teacher: 老師未定
@@ -194,7 +204,10 @@ classtable:
     edit: 編輯
     delete: 刪除
     delete_title: 是否刪除課程信息？
+    delete_single: 刪除本次
+    delete_all: 刪除全部
     delete_content: 所有關於這個課的信息都會被刪除，課表上關於這門課的信息將不復存在！
+    delete_content_single: 關於這個課的信息只有這個時間段都會被刪除，其他的時間段會被保留。
   output_to_system:
     success: 成功導出到系統日曆
     failure: 導出到系統日曆過程中發生了問題:P

@@ -224,6 +224,16 @@ classtable:
         input_start_time_hint: "上课时间"
         input_end_time_hint: "下课时间"
         wheel_choose_hint: "第 {index} 节"
+        choose_at_least_one: "请至少选择一个上课日期和时间"
+        repeat_weekly: "按周重复"
+        free_time: "自定义日期"
+        date_selector_free:
+            rule: "时间必须在 08:30-21:25 之间"
+            rule_2: "下课时间必须晚于上课时间"
+            class_start_time: "上课时间"
+            class_end_time: "下课时间"
+            edit_class_time: "编辑课程时间"
+            choose_class_time: "选择课程时间"
     course_detail_card:
         class_number_string: "{number} 班"
         unknown_teacher: "老师未定"
@@ -232,7 +242,10 @@ classtable:
         edit: "编辑"
         delete: "删除"
         delete_title: "是否删除课程信息？"
+        delete_single: "删除本次"
+        delete_all: "删除全部"
         delete_content: "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！"
+        delete_content_single: "关于这个课的信息只有这个时间段都会被删除，其他的时间段会被保留。"
     output_to_system:
         success: "成功导出到系统日历"
         failure: "导出到系统日历过程中发生了问题:P"
