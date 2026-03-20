@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
@@ -371,6 +372,8 @@ class CourseReminderService extends NotificationService
     final classTableData =
         ClassTableController.i.classTableComputedSignal.value;
     final hasClassTableData = classTableData.termStartDay.isNotEmpty;
+    final hasCustomClassData =
+        CustomClassController.i.customClassesSignal.value.isNotEmpty;
 
     final hasExperimentData =
         PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
@@ -380,7 +383,119 @@ class CourseReminderService extends NotificationService
       (subject) => subject.startTime != null,
     );
 
-    return hasClassTableData || hasExperimentData || hasExamData;
+    return hasClassTableData ||
+        hasCustomClassData ||
+        hasExperimentData ||
+        hasExamData;
+  }
+
+  Future<void> _scheduleNotificationFromCustomCourseData({
+    int daysToSchedule = 7,
+    int minutesBefore = 5,
+  }) async {
+    log.info(
+      '[CourseReminderService] [scheduleNotificationsFromCustomCourseData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
+    );
+    try {
+      final controller = CustomClassController.i;
+      final classTableController = ClassTableController.i;
+
+      final now = DateTime.now();
+      final endDate = now.add(Duration(days: daysToSchedule));
+
+      final data = controller.customClasses;
+
+      if (data.isEmpty) {
+        log.warning(
+          '[CourseReminderService] [scheduleNotificationsFromCustomCourseData] CustomClass data is empty.',
+        );
+        return;
+      }
+
+      final String locale = _getCurrentLocale();
+      int scheduledCount = 0;
+
+      for (final customClass in data) {
+        for (final timeRange in customClass.timeRanges) {
+          final DateTime classStartTime = timeRange.startTime;
+
+          if (classStartTime.isBefore(now) || classStartTime.isAfter(endDate)) {
+            continue;
+          }
+
+          final DateTime notificationTime = classStartTime.subtract(
+            Duration(minutes: minutesBefore),
+          );
+
+          if (notificationTime.isBefore(now)) {
+            continue;
+          }
+
+          int weekIndex = 0;
+          weekIndex = classTableController.getCurrentWeek(classStartTime);
+          if (weekIndex < 0) {
+            weekIndex = 0;
+          }
+
+          final int weekday = classStartTime.weekday;
+          final int startClass = _calculateClassPeriodFromTime(classStartTime);
+          final int notificationId = _generateNotificationId(
+            weekday,
+            startClass,
+            weekIndex,
+          );
+
+          String title = NonUII18n.translate(
+            locale,
+            'course_reminder.title',
+            translateParams: {'name': customClass.name},
+          );
+
+          String body = NonUII18n.translate(
+            locale,
+            'course_reminder.body',
+            translateParams: {'time': minutesBefore.toString()},
+          );
+
+          if (customClass.classroom != null &&
+              customClass.classroom!.isNotEmpty) {
+            body +=
+                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": customClass.classroom!})}';
+          }
+          if (customClass.teacher != null && customClass.teacher!.isNotEmpty) {
+            body +=
+                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": customClass.teacher!})}';
+          }
+
+          final Map<String, dynamic> payload = {
+            'type': 'course_reminder',
+            'className': customClass.name,
+            'weekIndex': weekIndex,
+          };
+
+          await scheduleNotification(
+            id: notificationId,
+            title: title,
+            body: body,
+            scheduledTime: notificationTime,
+            payload: jsonEncode(payload),
+          );
+
+          scheduledCount++;
+        }
+      }
+
+      log.info(
+        '[CourseReminderService] [scheduleNotificationsFromCustomCourseData] Scheduled $scheduledCount custom course reminder notifications',
+      );
+    } catch (e, stackTrace) {
+      log.error(
+        '[CourseReminderService] [scheduleNotificationsFromCustomCourseData] Failed to schedule custom course reminder notifications',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
   }
 
   Future<void> _scheduleNotificationFromCourseData({
@@ -748,9 +863,13 @@ class CourseReminderService extends NotificationService
     int minutesBefore = 5,
   }) async {
     try {
-      // Schedule course, experiment and exam notifications in parallel
+    // Schedule course, custom course, experiment, and exam notifications in parallel.
       await Future.wait([
         _scheduleNotificationFromCourseData(
+          daysToSchedule: daysToSchedule,
+          minutesBefore: minutesBefore,
+        ),
+        _scheduleNotificationFromCustomCourseData(
           daysToSchedule: daysToSchedule,
           minutesBefore: minutesBefore,
         ),
