@@ -1,4 +1,5 @@
 // Copyright 2026 Hazuki Keatsu.
+// Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:json_annotation/json_annotation.dart';

@@ -1,4 +1,5 @@
-// Copyright 2025 Traintime PDA authors.
+// Copyright 2026 Hazuki Keatsu.
+// Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
@@ -10,16 +11,22 @@ import 'package:watermeter/page/public_widget/wheel_choser.dart';
 
 class DateSelectorFree extends StatefulWidget {
   final List<DateTimeRange> initialDates;
+  final DateTime semesterStartDay;
+  final int semesterLength;
   final ValueChanged<List<DateTimeRange>> onChanged;
   final Color color;
   final Color deleteColor;
+  final bool enableBorder;
 
   const DateSelectorFree({
     super.key,
     required this.initialDates,
+    required this.semesterStartDay,
+    required this.semesterLength,
     required this.onChanged,
     required this.color,
     required this.deleteColor,
+    this.enableBorder = false,
   });
 
   @override
@@ -32,10 +39,23 @@ class _DateSelectorFree extends State<DateSelectorFree> {
 
   late List<DateTimeRange> chosenDatesRanges;
 
+  DateTime get _semesterFirstDate =>
+      DateUtils.dateOnly(widget.semesterStartDay);
+
+  DateTime get _semesterLastDate =>
+      _semesterFirstDate.add(Duration(days: widget.semesterLength * 7 - 1));
+
+  bool _isWithinSemester(DateTime date) {
+    final day = DateUtils.dateOnly(date);
+    return !day.isBefore(_semesterFirstDate) && !day.isAfter(_semesterLastDate);
+  }
+
   @override
   void initState() {
     super.initState();
-    chosenDatesRanges = List<DateTimeRange>.from(widget.initialDates);
+    chosenDatesRanges = widget.initialDates
+        .where((range) => _isWithinSemester(range.start))
+        .toList();
   }
 
   int _minutesOf(TimeOfDay time) => time.hour * 60 + time.minute;
@@ -354,7 +374,41 @@ class _DateSelectorFree extends State<DateSelectorFree> {
             CalendarDatePicker2(
               config: CalendarDatePicker2Config(
                 calendarType: CalendarDatePicker2Type.multi,
+                hideMonthPickerDividers: true,
+                firstDate: _semesterFirstDate,
+                lastDate: _semesterLastDate,
+                firstDayOfWeek: MaterialLocalizations.of(
+                  context,
+                ).firstDayOfWeekIndex,
                 selectedDayHighlightColor: widget.color,
+                disableModePicker: true,
+                disableMonthPicker: true,
+                selectableYearPredicate: (_) => false,
+                weekdayLabels: [
+                  FlutterI18n.translate(context, 'weekday.sunday'),
+                  FlutterI18n.translate(context, 'weekday.monday'),
+                  FlutterI18n.translate(context, 'weekday.tuesday'),
+                  FlutterI18n.translate(context, 'weekday.wednesday'),
+                  FlutterI18n.translate(context, 'weekday.thursday'),
+                  FlutterI18n.translate(context, 'weekday.friday'),
+                  FlutterI18n.translate(context, 'weekday.saturday'),
+                ],
+                modePickerTextHandler:
+                    ({required DateTime monthDate, bool? isMonthPicker}) {
+                      final monthKey =
+                          'month.${DateFormat('MMMM', "en_US").format(monthDate).toLowerCase()}';
+                      final monthName = FlutterI18n.translate(
+                        context,
+                        monthKey,
+                      );
+                      final year = monthDate.year.toString();
+                      final yearName = FlutterI18n.translate(
+                        context,
+                        "classtable.semester_switcher.year",
+                        translationParams: {"year": year},
+                      );
+                      return "$yearName $monthName";
+                    },
               ),
               value: chosenDatesRanges.map((e) => e.start).toList(),
               onValueChanged: (dates) async {
@@ -422,47 +476,49 @@ class _DateSelectorFree extends State<DateSelectorFree> {
             if (chosenDatesRanges.isNotEmpty)
               ...List.generate(chosenDatesRanges.length, (index) {
                 final d = chosenDatesRanges[index];
-                return Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () => _editChosenDate(index),
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: widget.color.withValues(alpha: 0.08),
-                        border: Border.all(
-                          color: widget.color.withValues(alpha: 0.25),
+                return Padding(
+                  padding: EdgeInsetsGeometry.only(top: 8),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => _editChosenDate(index),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.schedule, color: widget.color, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '${DateFormat('yyyy-MM-dd').format(d.start)}  '
-                              '${DateFormat('HH:mm').format(d.start)}-${DateFormat('HH:mm').format(d.end)}',
-                              style: TextStyle(
-                                color: widget.color,
-                                fontWeight: FontWeight.w600,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: widget.color.withValues(alpha: 0.08),
+                          border: Border.all(
+                            color: widget.color.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.schedule, color: widget.color, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${DateFormat('yyyy-MM-dd').format(d.start)}  '
+                                '${DateFormat('HH:mm').format(d.start)}-${DateFormat('HH:mm').format(d.end)}',
+                                style: TextStyle(
+                                  color: widget.color,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete_outline,
-                              color: widget.deleteColor,
-                              size: 18,
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: widget.deleteColor,
+                                size: 18,
+                              ),
+                              onPressed: () => _deleteChosenDate(index),
                             ),
-                            onPressed: () => _deleteChosenDate(index),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -471,10 +527,14 @@ class _DateSelectorFree extends State<DateSelectorFree> {
           ],
         )
         .padding(all: 12)
-        .card(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          elevation: 0,
+        .decorated(
           color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        );
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: widget.color.withValues(alpha: 0.25),
+            width: widget.enableBorder ? 1.0 : 0.0,
+          ),
+        )
+        .padding(vertical: 6);
   }
 }

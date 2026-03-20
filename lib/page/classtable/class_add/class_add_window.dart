@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -46,10 +47,14 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   final double inputFieldVerticalPadding = 4;
   final double horizontalPadding = 10;
 
-  late InputDecoration inputDecoration;
-
   Color get color => Theme.of(context).colorScheme.primary;
   Color get deleteColor => Theme.of(context).colorScheme.error;
+
+  DateTime get semesterStartDate {
+    final String termStartDay =
+        ClassTableController.i.classTableComputedSignal.value.termStartDay;
+    return DateTime.tryParse(termStartDay) ?? DateUtils.dateOnly(DateTime.now());
+  }
 
   @override
   void initState() {
@@ -221,21 +226,24 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    inputDecoration = InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(25),
-        borderSide: BorderSide.none,
-      ),
-      filled: true,
-      fillColor: Theme.of(context).colorScheme.onPrimary,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final OutlineInputBorder inputEnabledBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: color.withValues(alpha: 0.25)),
+    );
+    final OutlineInputBorder inputFocusedBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: color, width: 1.2),
+    );
+    final ButtonStyle segmentedButtonStyle = ButtonStyle(
+      side: WidgetStatePropertyAll(
+        BorderSide(color: color.withValues(alpha: 0.25)),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -261,15 +269,24 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
           ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        children: [
-          Column(
+      body: Align(
+        alignment: AlignmentGeometry.topCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 600),
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            children: [
+              Column(
                 children: [
                   TextField(
                     controller: classNameController,
-                    decoration: inputDecoration.copyWith(
-                      icon: Icon(Icons.calendar_month, color: color),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.book, color: color),
+                      enabledBorder: inputEnabledBorder,
+                      focusedBorder: inputFocusedBorder,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
                       hintText: FlutterI18n.translate(
                         context,
                         "classtable.class_add.input_classname_hint",
@@ -278,8 +295,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
                     controller: teacherNameController,
-                    decoration: inputDecoration.copyWith(
-                      icon: Icon(Icons.person, color: color),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person, color: color),
+                      enabledBorder: inputEnabledBorder,
+                      focusedBorder: inputFocusedBorder,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
                       hintText: FlutterI18n.translate(
                         context,
                         "classtable.class_add.input_teacher_hint",
@@ -288,8 +310,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
                     controller: classRoomController,
-                    decoration: inputDecoration.copyWith(
-                      icon: Icon(Icons.place, color: color),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.place, color: color),
+                      enabledBorder: inputEnabledBorder,
+                      focusedBorder: inputFocusedBorder,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
                       hintText: FlutterI18n.translate(
                         context,
                         "classtable.class_add.input_classroom_hint",
@@ -297,77 +324,75 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                 ],
-              )
-              .padding(vertical: 8, horizontal: 16)
-              .card(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                elevation: 0,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-              ),
-          if (widget.toChange == null && widget.customToChange == null)
-            SegmentedButton<bool>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment<bool>(
-                  value: false,
-                  icon: Icon(Icons.repeat),
-                  label: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.class_add.repeat_weekly",
+              ).padding(vertical: 8),
+              if (widget.toChange == null && widget.customToChange == null)
+                SegmentedButton<bool>(
+                  style: segmentedButtonStyle,
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment<bool>(
+                      value: false,
+                      icon: Icon(Icons.repeat),
+                      label: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.class_add.repeat_weekly",
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                ButtonSegment<bool>(
-                  value: true,
-                  icon: Icon(Icons.event),
-                  label: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.class_add.free_time",
+                    ButtonSegment<bool>(
+                      value: true,
+                      icon: Icon(Icons.event),
+                      label: Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.class_add.free_time",
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
+                  selected: {useCustomDateFlow},
+                  onSelectionChanged: (selection) {
+                    setState(() {
+                      useCustomDateFlow = selection.first;
+                    });
+                  },
+                ).padding(vertical: 6),
+              if (widget.toChange != null ||
+                  (widget.customToChange == null && !useCustomDateFlow)) ...[
+                WeekSelector(
+                  initialWeeks: chosenWeek,
+                  onChanged: (weeks) {
+                    chosenWeek = weeks;
+                  },
+                  color: color,
                 ),
-              ],
-              selected: {useCustomDateFlow},
-              onSelectionChanged: (selection) {
-                setState(() {
-                  useCustomDateFlow = selection.first;
-                });
-              },
-            ).padding(vertical: 6),
-          if (widget.toChange != null ||
-              (widget.customToChange == null && !useCustomDateFlow)) ...[
-            WeekSelector(
-              initialWeeks: chosenWeek,
-              onChanged: (weeks) {
-                chosenWeek = weeks;
-              },
-              color: color,
-            ),
-            TimeSelector(
-              initialWeek: week,
-              initialStart: start,
-              initialStop: stop,
-              onChanged: (time) {
-                week = time.$1;
-                start = time.$2;
-                stop = time.$3;
-              },
-              color: color,
-            ),
-          ] else
-            DateSelectorFree(
-              initialDates: chosenDates,
-              onChanged: (dates) {
-                chosenDates = dates;
-              },
-              color: color,
-              deleteColor: deleteColor,
-            ),
-        ],
+                TimeSelector(
+                  initialWeek: week,
+                  initialStart: start,
+                  initialStop: stop,
+                  onChanged: (time) {
+                    week = time.$1;
+                    start = time.$2;
+                    stop = time.$3;
+                  },
+                  color: color,
+                ),
+              ] else
+                DateSelectorFree(
+                  initialDates: chosenDates,
+                  semesterStartDay: semesterStartDate,
+                  semesterLength: widget.semesterLength,
+                  onChanged: (dates) {
+                    chosenDates = dates;
+                  },
+                  color: color,
+                  deleteColor: deleteColor,
+                  enableBorder: true,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

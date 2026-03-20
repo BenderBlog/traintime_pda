@@ -41,6 +41,19 @@ weekday:
   friday: 週五
   saturday: 週六
   sunday: 週日
+month:
+  january: 一月
+  february: 二月
+  march: 三月
+  april: 四月
+  may: 五月
+  june: 六月
+  july: 七月
+  august: 八月
+  september: 九月
+  october: 十月
+  november: 十一月
+  december: 十二月
 class_attendance:
   title: 考勤查詢
   detail_title: 簽到信息 - {courseName}
