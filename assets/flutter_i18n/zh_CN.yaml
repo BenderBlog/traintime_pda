@@ -408,6 +408,7 @@ homepage:
         experiment: "实验信息"
         score: "成绩查询"
         sport: "体育信息"
+        dorm_water: "宿舍水机"
         schoolnet: "网络查询"
         toolbox: "其他功能"
         score_cannot_reach: "脱机状态且无缓存成绩数据，无法访问"

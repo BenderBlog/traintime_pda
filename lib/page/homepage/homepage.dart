@@ -23,6 +23,7 @@ import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
 import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
+import 'package:watermeter/page/homepage/toolbox/dorm_water_card.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -71,6 +72,7 @@ class _MainPageState extends State<MainPage> {
     if (prefs.getBool(prefs.Preference.role) == false) ...[
       const ExperimentCard(),
       const SportCard(),
+      const DormWaterCard(),
     ],
   ];
 

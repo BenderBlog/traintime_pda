@@ -380,6 +380,7 @@ homepage:
     experiment: 實驗信息
     score: 成績查詢
     sport: 體育信息
+    dorm_water: 宿舍水機
     schoolnet: 網絡查詢
     toolbox: 其他功能
     score_cannot_reach: 脫機狀態且無緩存成績數據，無法訪問

@@ -417,6 +417,7 @@ homepage:
       experiment: "Experiments"
       score: "Grades"
       sport: "PE Info"
+      dorm_water: "Dorm Water"
       schoolnet: "Schoolnet Usage"
       toolbox: "Others"
       score_cannot_reach: "Offline mode with no cached score data, unable to access"
