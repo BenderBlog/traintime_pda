@@ -826,7 +826,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   onTap: () => context.push(TalkerScreen(talker: log)),
                 ),
                 const Divider(),
-                if (Platform.isAndroid || Platform.isIOS)
+                if (Platform.isAndroid || Platform.isIOS) ...[
                   ListTile(
                     title: Text(
                       FlutterI18n.translate(
@@ -837,7 +837,8 @@ class _SettingWindowState extends State<SettingWindow> {
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () => context.push(NotificationDebugPage()),
                   ),
-                const Divider(),
+                  const Divider(),
+                ],
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(context, "setting.clear_and_restart"),
