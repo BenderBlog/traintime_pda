@@ -45,11 +45,11 @@ class ElectricityAverageUsageGraph extends StatefulWidget {
       }
     }
     log.info("[ElectricityAverageUsageGraph] Based on dayMin $dayMin");
+    plotData = SplayTreeMap((a, b) => a.$1.difference(b.$1).inDays);
     if (dayMin.keys.length <= 1) return;
 
     // Daily usage of the electricity
     final keys = dayMin.keys.toList();
-    plotData = SplayTreeMap((a, b) => a.$1.difference(b.$1).inDays);
     double max = 0.0;
     double min = double.maxFinite;
     for (int i = 1; i < keys.length; i++) {
