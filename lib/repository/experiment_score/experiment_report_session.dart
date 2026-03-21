@@ -287,9 +287,9 @@ class ExperimentReportSession extends NetworkSession {
       List<dynamic> rows = jsonData['rows'] ?? [];
 
       for (var row in rows) {
-        String experimentName = row['1'] ?? '';
+        String experimentName = row['2'] ?? '';
 
-        String imageHtml = row['2'] ?? '';
+        String imageHtml = row['3'] ?? '';
 
         RegExp srcRegex = RegExp(r'src="([^"]+)"');
         Match? match = srcRegex.firstMatch(imageHtml);
