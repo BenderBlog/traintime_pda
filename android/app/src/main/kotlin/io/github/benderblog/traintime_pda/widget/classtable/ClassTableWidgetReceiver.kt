@@ -4,7 +4,7 @@
 
 package io.github.benderblog.traintime_pda.widget.classtable
 
-import HomeWidgetGlanceWidgetReceiver
+import es.antonborri.home_widget.HomeWidgetGlanceWidgetReceiver
 
 class ClassTableWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ClassTableWidget>() {
     override val glanceAppWidget = ClassTableWidget()

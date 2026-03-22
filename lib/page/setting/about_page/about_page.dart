@@ -221,6 +221,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://mxts.jiujiuer.xyz",
     ),
     Developer(
+      "XingShuyu",
+      "https://avatars.githubusercontent.com/u/82715884",
+      FlutterI18n.translate(context, "setting.about_page.xingshuyu"),
+      "https://xingshuyu.github.io",
+    ),
+    Developer(
       "Xiue233",
       "https://avatars.githubusercontent.com/u/30972246",
       FlutterI18n.translate(context, "setting.about_page.xiue233"),

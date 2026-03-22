@@ -10,11 +10,7 @@ PODS:
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
-  - home_widget (0.0.1):
-    - Flutter
   - permission_handler_apple (9.3.0):
-    - Flutter
-  - restart_app (0.0.1):
     - Flutter
   - TensorFlowLiteC (2.12.0):
     - TensorFlowLiteC/Core (= 2.12.0)
@@ -46,9 +42,7 @@ DEPENDENCIES:
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
-  - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - restart_app (from `.symlinks/plugins/restart_app/ios`)
   - tflite_flutter (from `.symlinks/plugins/tflite_flutter/ios`)
 
 SPEC REPOS:
@@ -69,12 +63,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_mailer/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
-  home_widget:
-    :path: ".symlinks/plugins/home_widget/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  restart_app:
-    :path: ".symlinks/plugins/restart_app/ios"
   tflite_flutter:
     :path: ".symlinks/plugins/tflite_flutter/ios"
 
@@ -85,9 +75,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
   flutter_mailer: 3a8cd4f36c960fb04528d5471097270c19fec1c4
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
-  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
-  restart_app: 9cda5378aacc5000e3f66ee76a9201534e7d3ecf
   TensorFlowLiteC: 20785a69299185a379ba9852b6625f00afd7984a
   TensorFlowLiteSwift: 3a4928286e9e35bdd3e17970f48e53c80d25e793
   tflite_flutter: 64b192e11352fe36943ab6656e1d49207f1a5595
