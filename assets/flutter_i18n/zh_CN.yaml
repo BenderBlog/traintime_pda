@@ -435,6 +435,10 @@ dorm_water:
     refresh_captcha: "刷新验证码"
     loading_captcha: "加载中..."
     captcha_error: "验证码加载失败"
+    phone_required: "请输入手机号"
+    image_code_required: "请输入图形验证码"
+    sms_sent: "短信已发送"
+    sms_failed: "发送短信失败"
 
 # 图书馆
 library:

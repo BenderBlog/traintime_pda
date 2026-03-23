@@ -406,6 +406,10 @@ dorm_water:
   refresh_captcha: 刷新驗證碼
   loading_captcha: 加載中...
   captcha_error: 驗證碼加載失敗
+  phone_required: 請輸入手機號
+  image_code_required: 請輸入圖形驗證碼
+  sms_sent: 短信已發送
+  sms_failed: 發送短信失敗
 
 library:
   title: 圖書館信息

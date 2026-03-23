@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'dart:convert' show base64Decode;
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/dorm_water_session.dart';
 
 class DormWaterWindow extends StatefulWidget {
@@ -65,6 +66,37 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     _imageCodeController.clear();
   }
 
+  /// Send SMS code to user's phone
+  Future<void> _sendSmsCode() async {
+    final phone = _phoneController.text.trim();
+    final imageCode = _imageCodeController.text.trim();
+
+    if (phone.isEmpty) {
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.phone_required"));
+      return;
+    }
+
+    if (imageCode.isEmpty) {
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.image_code_required"));
+      return;
+    }
+
+    try {
+      await _session.sendSmsCode(
+        phoneNumber: phone,
+        imageCode: imageCode,
+      );
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.sms_sent"));
+    } catch (e) {
+      if (!mounted) return;
+      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.sms_failed")}: $e");
+      _loadCaptcha();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +144,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             children: [
               Expanded(
                 child: FilledButton.tonal(
-                  onPressed: () {},
+                  onPressed: _sendSmsCode,
                   child: Text(
                     FlutterI18n.translate(context, "dorm_water.send_sms"),
                   ),

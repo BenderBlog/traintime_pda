@@ -21,6 +21,9 @@ class CaptchaData {
 
 class DormWaterSession extends NetworkSession {
   static const String apiBaseUrl = 'https://i.ilife798.com';
+  
+  /// Store current session ID for sending SMS code
+  String? _currentSessionId;
 
   /// Generate a random session ID for captcha
   String _generateSessionId() {
@@ -52,6 +55,8 @@ class DormWaterSession extends NetworkSession {
 
       if (response.statusCode == 200 && response.data != null) {
         final imageBase64 = base64Encode(response.data as List<int>).toString();
+        // Store session ID for later SMS sending
+        _currentSessionId = sessionId;
         return CaptchaData(
           sessionId: sessionId,
           imageBase64: imageBase64,
@@ -65,6 +70,57 @@ class DormWaterSession extends NetworkSession {
       throw Exception('Network error: ${e.message}');
     } catch (e) {
       throw Exception('Failed to get captcha: $e');
+    }
+  }
+
+  /// Send SMS code to user's phone
+  /// 
+  /// Parameters:
+  /// - [phoneNumber]: User's phone number
+  /// - [imageCode]: Image captcha code entered by user
+  /// 
+  /// Returns: Success message if SMS sent successfully
+  Future<String> sendSmsCode({
+    required String phoneNumber,
+    required String imageCode,
+  }) async {
+    if (_currentSessionId == null) {
+      throw Exception('No active session. Please load captcha first.');
+    }
+
+    try {
+      final response = await dio.post(
+        '$apiBaseUrl/api/v1/acc/login/code',
+        data: {
+          's': _currentSessionId,
+          'authCode': imageCode,
+          'un': phoneNumber,
+        },
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          return 'SMS sent successfully';
+        } else {
+          throw Exception(
+            'Failed to send SMS: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to send SMS: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to send SMS: $e');
     }
   }
 }

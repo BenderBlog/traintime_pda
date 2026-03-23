@@ -443,6 +443,10 @@ dorm_water:
    refresh_captcha: "Refresh Captcha"
    loading_captcha: "Loading..."
    captcha_error: "Failed to load captcha"
+   phone_required: "Please enter phone number"
+   image_code_required: "Please enter image code"
+   sms_sent: "SMS sent successfully"
+   sms_failed: "Failed to send SMS"
 
 # 图书馆
 library:
