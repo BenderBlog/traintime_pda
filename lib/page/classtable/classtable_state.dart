@@ -284,13 +284,12 @@ class ClassTableWidgetState with ChangeNotifier {
     }
 
     for (var experiment in experiments) {
-      String description = "实验名称：${experiment.name} - 老师：${experiment.teacher}";
       for (var j in experiment.timeRanges) {
         events.add(
           Event(
             null,
-            title: "${experiment.name}@${experiment.classroom}}",
-            description: description,
+            title: "${experiment.name}@${experiment.classroom}",
+            description: "实验名称：${experiment.name} - 老师：${experiment.teacher}",
             start: TZDateTime.from(j.$1, currentLocation),
             end: TZDateTime.from(j.$2, currentLocation),
             location: experiment.classroom,
