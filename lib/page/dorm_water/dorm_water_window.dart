@@ -6,6 +6,8 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'dart:convert' show base64Decode;
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/dorm_water_session.dart';
+import 'package:watermeter/repository/preference.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 
 class DormWaterWindow extends StatefulWidget {
   const DormWaterWindow({super.key});
@@ -20,16 +22,36 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   final TextEditingController _smsCodeController = TextEditingController();
   
   late DormWaterSession _session;
+  
+  // Login tab states
   String? _captchaImageBase64;
   bool _isCaptchaLoading = false;
   String? _captchaError;
   bool _isLoggingIn = false;
+  bool _isLoggedIn = false;
+
+  // Device list tab states
+  List<DormWaterDevice> _devices = [];
+  bool _isLoadingDevices = false;
+  String? _devicesError;
 
   @override
   void initState() {
     super.initState();
     _session = DormWaterSession();
+    _checkLoginStatus();
     _loadCaptcha();
+  }
+
+  /// Check if user is already logged in (token exists)
+  void _checkLoginStatus() {
+    final token = getString(Preference.dormWaterToken);
+    setState(() {
+      _isLoggedIn = token.isNotEmpty;
+    });
+    if (_isLoggedIn) {
+      _loadDevices();
+    }
   }
 
   @override
@@ -126,6 +148,10 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       );
       if (!mounted) return;
       showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.login_success"));
+      setState(() {
+        _isLoggedIn = true;
+      });
+      _loadDevices();
     } catch (e) {
       if (!mounted) return;
       showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.login_failed")}: $e");
@@ -138,15 +164,91 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     }
   }
 
+  /// Logout and clear token
+  Future<void> _logout() async {
+    await remove(Preference.dormWaterToken);
+    await remove(Preference.dormWaterUid);
+    await remove(Preference.dormWaterEid);
+    
+    if (!mounted) return;
+    setState(() {
+      _isLoggedIn = false;
+      _devices = [];
+      _phoneController.clear();
+      _imageCodeController.clear();
+      _smsCodeController.clear();
+    });
+    _loadCaptcha();
+    
+    if (!mounted) return;
+    showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.logout_success"));
+  }
+
+  /// Load device list
+  Future<void> _loadDevices() async {
+    setState(() {
+      _isLoadingDevices = true;
+      _devicesError = null;
+    });
+
+    try {
+      final devices = await _session.getDeviceList();
+      if (!mounted) return;
+      setState(() {
+        _devices = devices;
+        _isLoadingDevices = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _devicesError = e.toString();
+        _isLoadingDevices = false;
+      });
+      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.fetch_devices_failed")}: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoggedIn) {
+      return _buildDeviceListPage(context);
+    } else {
+      return _buildLoginPage(context);
+    }
+  }
+
+  /// Build login page
+  Widget _buildLoginPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "dorm_water.title")),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: _buildLoginTab(context),
+    );
+  }
+
+  /// Build device list page
+  Widget _buildDeviceListPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(FlutterI18n.translate(context, "dorm_water.title")),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: FlutterI18n.translate(context, "dorm_water.logout"),
+          ),
+        ],
+      ),
+      body: _buildDeviceListTab(context),
+    );
+  }
+
+  /// Build login tab
+  Widget _buildLoginTab(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
           // Phone input
           TextField(
             controller: _phoneController,
@@ -203,11 +305,98 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             ],
           ),
         ],
-      ),
-    );
-  }
+      );
+    }
 
-  /// Build captcha image widget (clickable to refresh)
+    /// Build device list tab
+    Widget _buildDeviceListTab(BuildContext context) {
+      if (_isLoadingDevices) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(FlutterI18n.translate(context, "dorm_water.loading_devices")),
+            ],
+          ),
+        );
+      }
+
+      if (_devicesError != null) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                FlutterI18n.translate(context, "dorm_water.fetch_devices_failed"),
+                style: const TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: _loadDevices,
+                child: Text(FlutterI18n.translate(context, "dorm_water.refresh_captcha")),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (_devices.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(FlutterI18n.translate(context, "dorm_water.no_devices")),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: _loadDevices,
+                child: Text(FlutterI18n.translate(context, "dorm_water.select_device")),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _devices.length,
+        itemBuilder: (context, index) {
+          final device = _devices[index];
+          return Card(
+            child: ListTile(
+              title: Text(device.name),
+              subtitle: Text("ID: ${device.id}"),
+              trailing: SizedBox(
+                width: 100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(MingCuteIcons.mgc_star_fill),
+                      onPressed: () {
+                        // TODO: Placeholder - Star device
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(MingCuteIcons.mgc_play_fill),
+                      onPressed: () {
+                        // TODO: Step 6 - Start water
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              onTap: () {
+                // TODO: Step 6 - Start/End water and polling
+              },
+            ),
+          );
+        },
+      );
+    }
+
+    /// Build captcha image widget (clickable to refresh)
   Widget _buildCaptchaImage(BuildContext context) {
     // Loading state
     if (_isCaptchaLoading) {

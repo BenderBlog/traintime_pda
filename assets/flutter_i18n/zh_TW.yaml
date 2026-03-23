@@ -403,6 +403,7 @@ dorm_water:
   sms_code: 短信驗證碼
   send_sms: 發送短信碼
   login: 登錄
+  logout: 登出
   refresh_captcha: 刷新驗證碼
   loading_captcha: 加載中...
   captcha_error: 驗證碼加載失敗
@@ -413,6 +414,12 @@ dorm_water:
   sms_code_required: 請輸入短信驗證碼
   login_success: 登錄成功
   login_failed: 登錄失敗
+  logout_success: 登出成功
+  devices: 設備列表
+  loading_devices: 加載設備中...
+  no_devices: 暫無設備
+  select_device: 選擇設備
+  fetch_devices_failed: 獲取設備列表失敗
 
 library:
   title: 圖書館信息

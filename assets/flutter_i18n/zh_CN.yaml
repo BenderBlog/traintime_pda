@@ -432,6 +432,7 @@ dorm_water:
     sms_code: "短信验证码"
     send_sms: "发送短信码"
     login: "登录"
+    logout: "退出"
     refresh_captcha: "刷新验证码"
     loading_captcha: "加载中..."
     captcha_error: "验证码加载失败"
@@ -442,6 +443,12 @@ dorm_water:
     sms_code_required: "请输入短信验证码"
     login_success: "登录成功"
     login_failed: "登录失败"
+    logout_success: "退出成功"
+    devices: "设备列表"
+    loading_devices: "加载设备中..."
+    no_devices: "暂无设备"
+    select_device: "选择设备"
+    fetch_devices_failed: "获取设备列表失败"
 
 # 图书馆
 library:

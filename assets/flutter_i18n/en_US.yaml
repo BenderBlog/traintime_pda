@@ -440,6 +440,7 @@ dorm_water:
    sms_code: "SMS code"
    send_sms: "Send SMS"
    login: "Login"
+   logout: "Logout"
    refresh_captcha: "Refresh Captcha"
    loading_captcha: "Loading..."
    captcha_error: "Failed to load captcha"
@@ -450,6 +451,12 @@ dorm_water:
    sms_code_required: "Please enter SMS code"
    login_success: "Login successful"
    login_failed: "Login failed"
+   logout_success: "Logged out successfully"
+   devices: "Device List"
+   loading_devices: "Loading devices..."
+   no_devices: "No devices"
+   select_device: "Select Device"
+   fetch_devices_failed: "Failed to fetch device list"
 
 # 图书馆
 library:

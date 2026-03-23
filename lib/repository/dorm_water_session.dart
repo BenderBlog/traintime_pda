@@ -20,6 +20,24 @@ class CaptchaData {
   });
 }
 
+/// Model class for device
+class DormWaterDevice {
+  final String id;
+  final String name;
+
+  DormWaterDevice({
+    required this.id,
+    required this.name,
+  });
+
+  factory DormWaterDevice.fromJson(Map<String, dynamic> json) {
+    return DormWaterDevice(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+    );
+  }
+}
+
 class DormWaterSession extends NetworkSession {
   static const String apiBaseUrl = 'https://i.ilife798.com';
   
@@ -185,6 +203,61 @@ class DormWaterSession extends NetworkSession {
       throw Exception('Network error: ${e.message}');
     } catch (e) {
       throw Exception('Login failed: $e');
+    }
+  }
+
+  /// Fetch device list from master endpoint
+  /// 
+  /// Requires valid token to be saved in preferences
+  /// Returns list of DormWaterDevice objects
+  Future<List<DormWaterDevice>> getDeviceList() async {
+    try {
+      final token = getString(Preference.dormWaterToken);
+      if (token.isEmpty) {
+        throw Exception('No valid token. Please login first.');
+      }
+
+      final response = await dio.get(
+        '$apiBaseUrl/api/v1/ui/app/master',
+        options: Options(
+          headers: {
+            'Authorization': token,
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          final responseData = data['data'] as Map<String, dynamic>;
+          
+          // Check if login is still valid
+          if (responseData['account'] == null) {
+            throw Exception('Login expired. Please login again.');
+          }
+          
+          // Get favorite devices
+          final List<dynamic> favos = responseData['favos'] as List<dynamic>? ?? [];
+          
+          return favos
+              .map((device) => DormWaterDevice.fromJson(device as Map<String, dynamic>))
+              .toList();
+        } else {
+          throw Exception(
+            'Failed to fetch devices: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to fetch devices: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to fetch devices: $e');
     }
   }
 }
