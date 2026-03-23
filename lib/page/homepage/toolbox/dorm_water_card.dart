@@ -16,7 +16,7 @@ class DormWaterCard extends StatelessWidget {
       onPressed: () async {
         context.pushReplacement(const DormWaterWindow());
       },
-      icon: MingCuteIcons.mgc_drop_line,
+      icon: MingCuteIcons.mgc_teacup_line,
       nameKey: "homepage.toolbox.dorm_water",
     );
   }
