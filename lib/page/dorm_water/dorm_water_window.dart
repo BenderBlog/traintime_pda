@@ -23,6 +23,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   String? _captchaImageBase64;
   bool _isCaptchaLoading = false;
   String? _captchaError;
+  bool _isLoggingIn = false;
 
   @override
   void initState() {
@@ -97,6 +98,46 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     }
   }
 
+  /// Login with SMS code
+  Future<void> _login() async {
+    final phone = _phoneController.text.trim();
+    final smsCode = _smsCodeController.text.trim();
+
+    if (phone.isEmpty) {
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.phone_required"));
+      return;
+    }
+
+    if (smsCode.isEmpty) {
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.sms_code_required"));
+      return;
+    }
+
+    setState(() {
+      _isLoggingIn = true;
+    });
+
+    try {
+      await _session.login(
+        phoneNumber: phone,
+        smsCode: smsCode,
+      );
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.login_success"));
+    } catch (e) {
+      if (!mounted) return;
+      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.login_failed")}: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoggingIn = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,7 +194,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
               const SizedBox(width: 8),
               Expanded(
                 child: FilledButton(
-                  onPressed: () {},
+                  onPressed: _isLoggingIn ? null : _login,
                   child: Text(
                     FlutterI18n.translate(context, "dorm_water.login"),
                   ),

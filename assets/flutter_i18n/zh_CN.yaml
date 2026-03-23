@@ -439,6 +439,9 @@ dorm_water:
     image_code_required: "请输入图形验证码"
     sms_sent: "短信已发送"
     sms_failed: "发送短信失败"
+    sms_code_required: "请输入短信验证码"
+    login_success: "登录成功"
+    login_failed: "登录失败"
 
 # 图书馆
 library:

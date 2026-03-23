@@ -410,6 +410,9 @@ dorm_water:
   image_code_required: 請輸入圖形驗證碼
   sms_sent: 短信已發送
   sms_failed: 發送短信失敗
+  sms_code_required: 請輸入短信驗證碼
+  login_success: 登錄成功
+  login_failed: 登錄失敗
 
 library:
   title: 圖書館信息

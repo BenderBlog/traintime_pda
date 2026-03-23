@@ -5,6 +5,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart';
 import 'dart:math';
 import 'dart:convert' show base64Encode;
 
@@ -121,6 +122,69 @@ class DormWaterSession extends NetworkSession {
       throw Exception('Network error: ${e.message}');
     } catch (e) {
       throw Exception('Failed to send SMS: $e');
+    }
+  }
+
+  /// Login with SMS code
+  /// 
+  /// Parameters:
+  /// - [phoneNumber]: User's phone number
+  /// - [smsCode]: SMS code received by user
+  /// 
+  /// Returns: Login response containing uid, eid, and token
+  Future<Map<String, dynamic>> login({
+    required String phoneNumber,
+    required String smsCode,
+  }) async {
+    try {
+      final response = await dio.post(
+        '$apiBaseUrl/api/v1/acc/login',
+        data: {
+          'cid': '',
+          'authCode': smsCode,
+          'un': phoneNumber,
+        },
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          final responseData = data['data'] as Map<String, dynamic>;
+          final al = responseData['al'] as Map<String, dynamic>;
+          
+          final token = al['token'] as String;
+          final uid = al['uid'] as String;
+          final eid = al['eid'] as String;
+          
+          // Save token and credentials
+          await setString(Preference.dormWaterToken, token);
+          await setString(Preference.dormWaterUid, uid);
+          await setString(Preference.dormWaterEid, eid);
+          
+          return {
+            'token': token,
+            'uid': uid,
+            'eid': eid,
+          };
+        } else {
+          throw Exception(
+            'Login failed: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Login failed: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Login failed: $e');
     }
   }
 }

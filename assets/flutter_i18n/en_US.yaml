@@ -447,6 +447,9 @@ dorm_water:
    image_code_required: "Please enter image code"
    sms_sent: "SMS sent successfully"
    sms_failed: "Failed to send SMS"
+   sms_code_required: "Please enter SMS code"
+   login_success: "Login successful"
+   login_failed: "Login failed"
 
 # 图书馆
 library:
