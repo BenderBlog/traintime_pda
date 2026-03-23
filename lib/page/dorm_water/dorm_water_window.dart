@@ -34,6 +34,11 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   List<DormWaterDevice> _devices = [];
   bool _isLoadingDevices = false;
   String? _devicesError;
+  
+  // Water control states
+  DormWaterDevice? _currentDevice;
+  bool _isWaterRunning = false;
+  int _statusCheckCount = 0; // Counter for consecutive status checks (status == 99)
 
   @override
   void initState() {
@@ -208,6 +213,106 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     }
   }
 
+  /// Start water dispensing
+  Future<void> _startWater(DormWaterDevice device) async {
+    setState(() {
+      _currentDevice = device;
+      _isWaterRunning = true;
+      _statusCheckCount = 0; // Reset counter when starting water
+    });
+
+    try {
+      await _session.startWater(deviceId: device.id);
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.start_water_success"));
+      // Start polling device status
+      _pollDeviceStatus(device.id);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isWaterRunning = false;
+        _currentDevice = null;
+      });
+      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.start_water_failed")}: $e");
+    }
+  }
+
+  /// End water dispensing
+  Future<void> _endWater(String deviceId) async {
+    try {
+      await _session.endWater(deviceId: deviceId);
+      if (!mounted) return;
+      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.end_water_success"));
+      setState(() {
+        _isWaterRunning = false;
+        _currentDevice = null;
+        _statusCheckCount = 0; // Reset counter when ending water
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.end_water_failed")}: $e");
+    }
+  }
+
+  /// Poll device status until it reaches idle state (status == 99)
+  /// Requires consecutive 3 detections of status == 99 to confirm device is truly stopped
+  Future<void> _pollDeviceStatus(String deviceId) async {
+    const maxAttempts = 60; // Max 60 attempts (60 seconds if polling every 1 second)
+    const requiredIdleCount = 3; // Need to detect idle status 3 times consecutively
+    int attempts = 0;
+
+    while (attempts < maxAttempts && _isWaterRunning) {
+      if (!mounted) return;
+
+      try {
+        await Future.delayed(const Duration(seconds: 1));
+        final status = await _session.checkDeviceStatus(deviceId: deviceId);
+        
+        if (!mounted) return;
+
+        // Status 99 means device is ready/idle
+        if (status == 99) {
+          _statusCheckCount++;
+          
+          // If we've detected idle state 3 times consecutively, confirm device is stopped
+          if (_statusCheckCount >= requiredIdleCount) {
+            setState(() {
+              _isWaterRunning = false;
+              _currentDevice = null;
+              _statusCheckCount = 0;
+            });
+            if (mounted) {
+              showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.device_status_ready"));
+            }
+            return;
+          }
+        } else {
+          // If device is not idle, reset counter (network fluctuation or still dispensing)
+          _statusCheckCount = 0;
+        }
+      } catch (e) {
+        if (!mounted) return;
+        // Reset counter on error to avoid false detection
+        _statusCheckCount = 0;
+        // Continue polling even if there's an error
+      }
+
+      attempts++;
+    }
+
+    // Timeout reached
+    if (mounted) {
+      setState(() {
+        _isWaterRunning = false;
+        _currentDevice = null;
+        _statusCheckCount = 0;
+      });
+      showToast(context: context, msg: "Device status check timeout");
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     if (_isLoggedIn) {
@@ -379,17 +484,22 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(MingCuteIcons.mgc_play_fill),
+                      icon: Icon(
+                        (_isWaterRunning && _currentDevice?.id == device.id)
+                            ? MingCuteIcons.mgc_stop_fill
+                            : MingCuteIcons.mgc_play_fill,
+                      ),
                       onPressed: () {
-                        // TODO: Step 6 - Start water
+                        if (_isWaterRunning && _currentDevice?.id == device.id) {
+                          _endWater(device.id);
+                        } else {
+                          _startWater(device);
+                        }
                       },
                     ),
                   ],
                 ),
               ),
-              onTap: () {
-                // TODO: Step 6 - Start/End water and polling
-              },
             ),
           );
         },

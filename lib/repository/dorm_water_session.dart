@@ -260,4 +260,158 @@ class DormWaterSession extends NetworkSession {
       throw Exception('Failed to fetch devices: $e');
     }
   }
+
+  /// Start water dispensing
+  /// 
+  /// Parameters:
+  /// - [deviceId]: Device ID to start water dispensing
+  /// 
+  /// Returns: Success message
+  Future<String> startWater({required String deviceId}) async {
+    try {
+      final token = getString(Preference.dormWaterToken);
+      if (token.isEmpty) {
+        throw Exception('No valid token. Please login first.');
+      }
+
+      final response = await dio.get(
+        '$apiBaseUrl/api/v1/dev/start',
+        queryParameters: {
+          'did': deviceId,
+          'upgrade': 'true',
+          'rcp': 'false',
+          'stype': '5',
+        },
+        options: Options(
+          headers: {
+            'Authorization': token,
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          return 'Water dispensing started';
+        } else {
+          throw Exception(
+            'Failed to start water: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to start water: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to start water: $e');
+    }
+  }
+
+  /// End water dispensing
+  /// 
+  /// Parameters:
+  /// - [deviceId]: Device ID to end water dispensing
+  /// 
+  /// Returns: Success message
+  Future<String> endWater({required String deviceId}) async {
+    try {
+      final token = getString(Preference.dormWaterToken);
+      if (token.isEmpty) {
+        throw Exception('No valid token. Please login first.');
+      }
+
+      final response = await dio.get(
+        '$apiBaseUrl/api/v1/dev/end',
+        queryParameters: {
+          'did': deviceId,
+        },
+        options: Options(
+          headers: {
+            'Authorization': token,
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          return 'Water dispensing ended';
+        } else {
+          throw Exception(
+            'Failed to end water: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to end water: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to end water: $e');
+    }
+  }
+
+  /// Check device status
+  /// 
+  /// Parameters:
+  /// - [deviceId]: Device ID to check status
+  /// 
+  /// Returns: Device status (99 = available/idle)
+  Future<int> checkDeviceStatus({required String deviceId}) async {
+    try {
+      final token = getString(Preference.dormWaterToken);
+      if (token.isEmpty) {
+        throw Exception('No valid token. Please login first.');
+      }
+
+      final response = await dio.get(
+        '$apiBaseUrl/api/v1/ui/app/dev/status',
+        queryParameters: {
+          'did': deviceId,
+          'more': 'true',
+          'promo': 'false',
+        },
+        options: Options(
+          headers: {
+            'Authorization': token,
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          final responseData = data['data'] as Map<String, dynamic>;
+          final device = responseData['device'] as Map<String, dynamic>;
+          final gene = device['gene'] as Map<String, dynamic>;
+          final status = gene['status'] as int;
+          
+          return status;
+        } else {
+          throw Exception(
+            'Failed to check status: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to check status: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to check status: $e');
+    }
+  }
 }

@@ -420,6 +420,16 @@ dorm_water:
   no_devices: 暫無設備
   select_device: 選擇設備
   fetch_devices_failed: 獲取設備列表失敗
+  start_water: 開始接水
+  end_water: 結束接水
+  water_dispensing: 接水中
+  water_status: 接水狀態
+  start_water_success: 開始接水成功
+  end_water_success: 結束接水成功
+  start_water_failed: 開始接水失敗
+  end_water_failed: 結束接水失敗
+  device_status_checking: 検查設備狀態中...
+  device_status_ready: 設備已就緒
 
 library:
   title: 圖書館信息

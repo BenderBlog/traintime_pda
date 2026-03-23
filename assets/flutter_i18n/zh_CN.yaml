@@ -449,6 +449,16 @@ dorm_water:
     no_devices: "暂无设备"
     select_device: "选择设备"
     fetch_devices_failed: "获取设备列表失败"
+    start_water: "开始接水"
+    end_water: "结束接水"
+    water_dispensing: "接水中"
+    water_status: "接水状态"
+    start_water_success: "开始接水成功"
+    end_water_success: "结束接水成功"
+    start_water_failed: "开始接水失败"
+    end_water_failed: "结束接水失败"
+    device_status_checking: "检查设备状态中..."
+    device_status_ready: "设备已就绪"
 
 # 图书馆
 library:

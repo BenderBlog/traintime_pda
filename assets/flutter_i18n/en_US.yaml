@@ -457,6 +457,16 @@ dorm_water:
    no_devices: "No devices"
    select_device: "Select Device"
    fetch_devices_failed: "Failed to fetch device list"
+   start_water: "Start Water"
+   end_water: "End Water"
+   water_dispensing: "Water Dispensing"
+   water_status: "Water Status"
+   start_water_success: "Water dispensing started"
+   end_water_success: "Water dispensing ended"
+   start_water_failed: "Failed to start water"
+   end_water_failed: "Failed to end water"
+   device_status_checking: "Checking device status..."
+   device_status_ready: "Device ready"
 
 # 图书馆
 library:
