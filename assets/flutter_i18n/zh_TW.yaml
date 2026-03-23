@@ -398,12 +398,14 @@ homepage:
 
 dorm_water:
   title: 宿舍水機
-  login_hint: 請先輸入手機號與驗證碼
   phone: 手機號
   image_code: 圖形驗證碼
   sms_code: 短信驗證碼
   send_sms: 發送短信碼
   login: 登錄
+  refresh_captcha: 刷新驗證碼
+  loading_captcha: 加載中...
+  captcha_error: 驗證碼加載失敗
 
 library:
   title: 圖書館信息

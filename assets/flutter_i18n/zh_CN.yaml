@@ -427,12 +427,14 @@ homepage:
 # 宿舍水机
 dorm_water:
     title: "宿舍水机"
-    login_hint: "请先输入手机号与验证码"
     phone: "手机号"
     image_code: "图形验证码"
     sms_code: "短信验证码"
     send_sms: "发送短信码"
     login: "登录"
+    refresh_captcha: "刷新验证码"
+    loading_captcha: "加载中..."
+    captcha_error: "验证码加载失败"
 
 # 图书馆
 library:

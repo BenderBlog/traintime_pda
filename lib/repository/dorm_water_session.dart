@@ -1,0 +1,70 @@
+// Copyright 2025 Traintime PDA authors.
+// SPDX-License-Identifier: MPL-2.0
+
+// Dorm water drink session for Hui798 API.
+
+import 'package:dio/dio.dart';
+import 'package:watermeter/repository/network_session.dart';
+import 'dart:math';
+import 'dart:convert' show base64Encode;
+
+/// Model class for captcha response
+class CaptchaData {
+  final String sessionId;
+  final String imageBase64;
+
+  CaptchaData({
+    required this.sessionId,
+    required this.imageBase64,
+  });
+}
+
+class DormWaterSession extends NetworkSession {
+  static const String apiBaseUrl = 'https://i.ilife798.com';
+
+  /// Generate a random session ID for captcha
+  String _generateSessionId() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random();
+    return List.generate(16, (_) => chars[random.nextInt(chars.length)]).join();
+  }
+
+  /// Fetch captcha image from Hui798 API
+  /// 
+  /// Returns CaptchaData containing:
+  /// - sessionId: Session ID for subsequent API calls (generated randomly)
+  /// - imageBase64: Base64-encoded captcha image
+  Future<CaptchaData> getCaptcha() async {
+    try {
+      final sessionId = _generateSessionId();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+      final response = await dio.get(
+        '$apiBaseUrl/api/v1/captcha/',
+        queryParameters: {
+          's': sessionId,
+          'r': timestamp.toString(),
+        },
+        options: Options(
+          responseType: ResponseType.bytes,
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final imageBase64 = base64Encode(response.data as List<int>).toString();
+        return CaptchaData(
+          sessionId: sessionId,
+          imageBase64: imageBase64,
+        );
+      } else {
+        throw Exception(
+          'Failed to fetch captcha: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to get captcha: $e');
+    }
+  }
+}

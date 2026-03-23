@@ -435,12 +435,14 @@ homepage:
 
 dorm_water:
    title: "Dorm Water"
-   login_hint: "Please enter phone and verification codes first"
    phone: "Phone"
    image_code: "Image code"
    sms_code: "SMS code"
    send_sms: "Send SMS"
    login: "Login"
+   refresh_captcha: "Refresh Captcha"
+   loading_captcha: "Loading..."
+   captcha_error: "Failed to load captcha"
 
 # 图书馆
 library:
