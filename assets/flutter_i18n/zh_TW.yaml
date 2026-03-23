@@ -420,6 +420,7 @@ dorm_water:
   no_devices: 暫無設備
   select_device: 選擇設備
   fetch_devices_failed: 獲取設備列表失敗
+  retry_load_devices: 重試加載
   start_water: 開始接水
   end_water: 結束接水
   water_dispensing: 接水中

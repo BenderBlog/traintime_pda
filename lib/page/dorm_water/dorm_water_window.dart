@@ -440,7 +440,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: _loadDevices,
-                child: Text(FlutterI18n.translate(context, "dorm_water.refresh_captcha")),
+                child: Text(FlutterI18n.translate(context, "dorm_water.retry_load_devices")),
               ),
             ],
           ),

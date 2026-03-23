@@ -449,6 +449,7 @@ dorm_water:
     no_devices: "暂无设备"
     select_device: "选择设备"
     fetch_devices_failed: "获取设备列表失败"
+    retry_load_devices: "重试加载"
     start_water: "开始接水"
     end_water: "结束接水"
     water_dispensing: "接水中"

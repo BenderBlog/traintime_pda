@@ -457,6 +457,7 @@ dorm_water:
    no_devices: "No devices"
    select_device: "Select Device"
    fetch_devices_failed: "Failed to fetch device list"
+   retry_load_devices: "Retry Loading"
    start_water: "Start Water"
    end_water: "End Water"
    water_dispensing: "Water Dispensing"
