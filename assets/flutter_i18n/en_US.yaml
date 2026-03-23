@@ -433,6 +433,15 @@ homepage:
       failed: "Failed to fetch club info"
       fetching: "Fetching club info"
 
+dorm_water:
+   title: "Dorm Water"
+   login_hint: "Please enter phone and verification codes first"
+   phone: "Phone"
+   image_code: "Image code"
+   sms_code: "SMS code"
+   send_sms: "Send SMS"
+   login: "Login"
+
 # 图书馆
 library:
    title: "Library Information"

@@ -395,6 +395,16 @@ homepage:
   club_promotion:
     failed: 社團信息獲取失敗
     fetching: 社團信息清單正在加載
+
+dorm_water:
+  title: 宿舍水機
+  login_hint: 請先輸入手機號與驗證碼
+  phone: 手機號
+  image_code: 圖形驗證碼
+  sms_code: 短信驗證碼
+  send_sms: 發送短信碼
+  login: 登錄
+
 library:
   title: 圖書館信息
   borrow_state_title: 借書狀態

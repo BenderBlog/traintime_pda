@@ -424,6 +424,16 @@ homepage:
         failed: "社团信息获取失败"
         fetching: "社团信息清单正在加载"
 
+# 宿舍水机
+dorm_water:
+    title: "宿舍水机"
+    login_hint: "请先输入手机号与验证码"
+    phone: "手机号"
+    image_code: "图形验证码"
+    sms_code: "短信验证码"
+    send_sms: "发送短信码"
+    login: "登录"
+
 # 图书馆
 library:
     title: "图书馆信息"
