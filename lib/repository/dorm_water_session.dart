@@ -44,9 +44,9 @@ class DormWaterSession extends NetworkSession {
   /// Store current session ID for sending SMS code
   String? _currentSessionId;
 
-  /// Generate a random session ID for captcha
+  /// Generate a random numeric session ID for captcha
   String _generateSessionId() {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const chars = '0123456789';
     final random = Random();
     return List.generate(16, (_) => chars[random.nextInt(chars.length)]).join();
   }
