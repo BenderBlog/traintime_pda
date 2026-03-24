@@ -312,6 +312,65 @@ class DormWaterSession extends NetworkSession {
     }
   }
 
+  /// Toggle device favorite status (favorite or unfavorite)
+  /// 
+  /// Parameters:
+  /// - [deviceId]: Device ID to favorite/unfavorite
+  /// - [remove]: If true, remove from favorites; if false, add to favorites
+  /// 
+  /// Returns: Success message
+  Future<String> toggleDeviceFavorite({
+    required String deviceId,
+    required bool remove,
+  }) async {
+    try {
+      final token = getString(Preference.dormWaterToken);
+      if (token.isEmpty) {
+        throw Exception('No valid token. Please login first.');
+      }
+
+      final response = await dio.get(
+        '$apiBaseUrl/api/v1/dev/favo',
+        queryParameters: {
+          'did': deviceId,
+          'remove': remove.toString(),
+        },
+        options: Options(
+          headers: {
+            'accept': '*/*',
+            'Authorization': token,
+            'accept-encoding': 'gzip, deflate, br',
+            'User-Agent': _getUserAgent(isCaptcha: false),
+            'priority': 'u=3, i',
+            'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final code = data['code'];
+        
+        if (code == 0) {
+          final message = remove ? 'Device removed from favorites' : 'Device added to favorites';
+          return message;
+        } else {
+          throw Exception(
+            'Failed to update favorite: ${data['msg'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to update favorite: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to update favorite: $e');
+    }
+  }
+
   /// Start water dispensing
   /// 
   /// Parameters:
