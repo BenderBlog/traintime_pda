@@ -198,7 +198,12 @@ class DormWaterSession extends NetworkSession {
         options: Options(
           contentType: Headers.jsonContentType,
           headers: {
+            'accept': '*/*',
+            'content-type': 'application/json',
+            'accept-encoding': 'gzip, deflate, br',
             'User-Agent': _getUserAgent(isCaptcha: false),
+            'priority': 'u=3, i',
+            'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
         ),
       );
