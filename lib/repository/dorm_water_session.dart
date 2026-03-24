@@ -93,7 +93,11 @@ class DormWaterSession extends NetworkSession {
         options: Options(
           responseType: ResponseType.bytes,
           headers: {
+            'accept': '*/*',
             'User-Agent': _getUserAgent(isCaptcha: true),
+            'priority': 'u=3, i',
+            'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
+            'accept-encoding': 'gzip, deflate, br',
           },
         ),
       );
