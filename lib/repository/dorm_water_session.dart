@@ -262,8 +262,12 @@ class DormWaterSession extends NetworkSession {
         '$apiBaseUrl/api/v1/ui/app/master',
         options: Options(
           headers: {
+            'accept': '*/*',
             'Authorization': token,
+            'accept-encoding': 'gzip, deflate, br',
             'User-Agent': _getUserAgent(isCaptcha: false),
+            'priority': 'u=3, i',
+            'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
         ),
       );
