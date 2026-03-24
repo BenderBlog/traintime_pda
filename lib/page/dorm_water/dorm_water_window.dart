@@ -524,7 +524,10 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                           );
                           if (!mounted) return;
                           showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.device_removed_from_favorites"));
-                          _loadDevices(); // Refresh device list
+                          // Remove device from list without full refresh
+                          setState(() {
+                            _devices.removeWhere((d) => d.id == device.id);
+                          });
                         } catch (e) {
                           if (!mounted) return;
                           showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.remove_from_favorites_failed")}: $e");
