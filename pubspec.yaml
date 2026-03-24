@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.5.9+39
+version: 1.5.10+40
 
 environment:
   sdk: ^3.8.0
@@ -35,7 +35,7 @@ dependencies:
   url_launcher: ^6.1.6
   time: ^2.1.5
   auto_size_text: ^3.0.0
-  restart_app: ^1.2.1
+  restart_app: ^1.7.3
   calendar_date_picker2: ^2.0.0
   cached_network_image: ^3.2.3
   flutter_native_splash: ^2.3.1
@@ -50,14 +50,14 @@ dependencies:
   file_picker: ^10.1.9
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.7
-  remixicon: ^1.4.1
-  timelines_plus: ^1.0.4
+  remixicon: ^4.9.1
+  timelines_plus: ^2.0.0
   based_split_view: ^1.2.0
   permission_handler: ^12.0.1
   # Output to system calendar
   device_calendar: ^4.3.3
   # Homepage Widget
-  home_widget: ^0.8.0
+  home_widget: ^0.9.0
   image: ^4.2.0
   catcher_2: ^2.0.0
   # XDU Planet

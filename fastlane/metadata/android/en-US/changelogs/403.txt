@@ -1,0 +1,6 @@
+Note: Club suggestion and Planet have removed due to frequency down, a pig page is used as a placeholder before finish designing new homepage.
+
+1. Widgetkit cannot be seen at locked page (only in ios). @BenderBlog
+2. Skip physics experiment score fetch in need. @FlyingPig278
+3. Electricity graph redraw @BenderBlog（@XinShuyu provided a patch）
+4. Physics experiment fetch fix @XinShuyu
