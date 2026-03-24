@@ -291,7 +291,7 @@ class ExperimentReportSession extends NetworkSession {
 
         String imageHtml = row['3'] ?? '';
 
-        RegExp srcRegex = RegExp(r'src="([^"]+)"');
+        RegExp srcRegex = RegExp(r'src=\\?"([^"]+)\\?"');
         Match? match = srcRegex.firstMatch(imageHtml);
 
         if (match != null && experimentName.isNotEmpty) {
