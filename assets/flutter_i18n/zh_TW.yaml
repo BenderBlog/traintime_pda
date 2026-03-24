@@ -434,6 +434,8 @@ dorm_water:
   scan_qr_code: 掃描二維碼
   device_id: 設備 ID
   add_device_failed: 添加設備失敗
+  device_removed_from_favorites: 已從收藏中移除
+  remove_from_favorites_failed: 移除收藏失敗
 
 library:
   title: 圖書館信息

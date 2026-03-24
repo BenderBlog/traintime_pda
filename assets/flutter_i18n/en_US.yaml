@@ -471,6 +471,8 @@ dorm_water:
    scan_qr_code: "Scan QR Code"
    device_id: "Device ID"
    add_device_failed: "Failed to add device"
+   device_removed_from_favorites: "Device removed from favorites"
+   remove_from_favorites_failed: "Failed to remove from favorites"
 
 # 图书馆
 library:

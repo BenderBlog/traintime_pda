@@ -516,8 +516,19 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                   children: [
                     IconButton(
                       icon: const Icon(MingCuteIcons.mgc_star_fill),
-                      onPressed: () {
-                        // TODO: Placeholder - Star device
+                      onPressed: () async {
+                        try {
+                          await _session.toggleDeviceFavorite(
+                            deviceId: device.id,
+                            remove: true,
+                          );
+                          if (!mounted) return;
+                          showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.device_removed_from_favorites"));
+                          _loadDevices(); // Refresh device list
+                        } catch (e) {
+                          if (!mounted) return;
+                          showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.remove_from_favorites_failed")}: $e");
+                        }
                       },
                     ),
                     IconButton(

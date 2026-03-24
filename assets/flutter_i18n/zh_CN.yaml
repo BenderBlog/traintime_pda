@@ -463,6 +463,8 @@ dorm_water:
     scan_qr_code: "扫描二维码"
     device_id: "设备 ID"
     add_device_failed: "添加设备失败"
+    device_removed_from_favorites: "已从收藏中移除"
+    remove_from_favorites_failed: "移除收藏失败"
 
 # 图书馆
 library:
