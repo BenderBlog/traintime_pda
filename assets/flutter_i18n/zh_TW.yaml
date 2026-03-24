@@ -431,6 +431,9 @@ dorm_water:
   end_water_failed: 結束接水失敗
   device_status_checking: 検查設備狀態中...
   device_status_ready: 設備已就緒
+  scan_qr_code: 掃描二維碼
+  device_id: 設備 ID
+  add_device_failed: 添加設備失敗
 
 library:
   title: 圖書館信息

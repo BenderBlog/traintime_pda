@@ -8,6 +8,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/dorm_water_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class DormWaterWindow extends StatefulWidget {
   const DormWaterWindow({super.key});
@@ -332,12 +333,48 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     );
   }
 
+  /// Scan QR code for device ID
+  Future<void> _scanQrCode() async {
+    if (!mounted) return;
+    
+    final result = await Navigator.of(context).push<String?>(
+      MaterialPageRoute(
+        builder: (context) => const _QrCodeScannerPage(),
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      await _addDeviceFromQrCode(result);
+    }
+  }
+
+  /// Add device from QR code scan (add to favorites)
+  Future<void> _addDeviceFromQrCode(String deviceId) async {
+    try {
+      final message = await _session.toggleDeviceFavorite(
+        deviceId: deviceId,
+        remove: false,
+      );
+      if (!mounted) return;
+      showToast(context: context, msg: message);
+      _loadDevices(); // Refresh device list
+    } catch (e) {
+      if (!mounted) return;
+      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.add_device_failed")}: $e");
+    }
+  }
+
   /// Build device list page
   Widget _buildDeviceListPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "dorm_water.title")),
         actions: [
+          IconButton(
+            icon: const Icon(MingCuteIcons.mgc_qrcode_line),
+            onPressed: _scanQrCode,
+            tooltip: FlutterI18n.translate(context, "dorm_water.scan_qr_code"),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,
@@ -578,6 +615,71 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       ),
       child: const Center(
         child: Text("No image", style: TextStyle(fontSize: 10)),
+      ),
+    );
+  }
+}
+
+/// QR Code Scanner Page
+class _QrCodeScannerPage extends StatefulWidget {
+  const _QrCodeScannerPage();
+
+  @override
+  State<_QrCodeScannerPage> createState() => _QrCodeScannerPageState();
+}
+
+class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
+  late MobileScannerController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = MobileScannerController(
+      autoStart: true,
+      torchEnabled: false,
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Scan QR Code"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_off),
+            onPressed: () => controller.toggleTorch(),
+          ),
+        ],
+      ),
+      body: MobileScanner(
+        controller: controller,
+        onDetect: (barcodes) {
+          if (barcodes.barcodes.isNotEmpty) {
+            final barcode = barcodes.barcodes.first;
+            final displayValue = barcode.displayValue;
+            
+            if (displayValue != null && displayValue.isNotEmpty) {
+              // Extract device ID from QR code
+              // Format: https://i.hnkzy.com/q/1/{did}
+              // The device ID is the last path segment
+              String deviceId = displayValue;
+              
+              if (displayValue.contains('/')) {
+                final parts = displayValue.split('/');
+                deviceId = parts.last; // Get the last segment which is the did
+              }
+              
+              Navigator.of(context).pop(deviceId);
+            }
+          }
+        },
       ),
     );
   }

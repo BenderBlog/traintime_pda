@@ -460,6 +460,9 @@ dorm_water:
     end_water_failed: "结束接水失败"
     device_status_checking: "检查设备状态中..."
     device_status_ready: "设备已就绪"
+    scan_qr_code: "扫描二维码"
+    device_id: "设备 ID"
+    add_device_failed: "添加设备失败"
 
 # 图书馆
 library:

@@ -468,6 +468,9 @@ dorm_water:
    end_water_failed: "Failed to end water"
    device_status_checking: "Checking device status..."
    device_status_ready: "Device ready"
+   scan_qr_code: "Scan QR Code"
+   device_id: "Device ID"
+   add_device_failed: "Failed to add device"
 
 # 图书馆
 library:
