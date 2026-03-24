@@ -323,10 +323,12 @@ class DormWaterSession extends NetworkSession {
       final response = await dio.get(
         '$apiBaseUrl/api/v1/dev/start',
         queryParameters: {
+          'args': '',
+          'cnt': '1',
           'did': deviceId,
-          'upgrade': 'true',
-          'rcp': 'false',
-          'stype': '5',
+          'pip': '21',
+          'rcp': '0',
+          'upgrade': '1',
         },
         options: Options(
           headers: {
