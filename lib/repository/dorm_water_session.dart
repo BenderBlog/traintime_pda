@@ -8,6 +8,7 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'dart:math';
 import 'dart:convert' show base64Encode;
+import 'dart:io' show Platform;
 
 /// Model class for captcha response
 class CaptchaData {
@@ -44,6 +45,28 @@ class DormWaterSession extends NetworkSession {
   /// Store current session ID for sending SMS code
   String? _currentSessionId;
 
+  /// Get User-Agent based on platform
+  /// 
+  /// iOS: 
+  ///   - Captcha: iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)
+  ///   - Others: iOS_ilife798_3.1.1
+  /// Android:
+  ///   - All: Android_ilife798_2.0.11
+  /// Other platforms: Same as iOS
+  String _getUserAgent({bool isCaptcha = false}) {
+    if (Platform.isAndroid) {
+      return 'Android_ilife798_2.0.11';
+    } else if (Platform.isIOS || !Platform.isAndroid) {
+      // iOS or other platforms (default to iOS)
+      if (isCaptcha) {
+        return 'iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)';
+      } else {
+        return 'iOS_ilife798_3.1.1';
+      }
+    }
+    return 'iOS_ilife798_3.1.1'; // Fallback
+  }
+
   /// Generate a random numeric session ID for captcha
   String _generateSessionId() {
     const chars = '0123456789';
@@ -69,6 +92,9 @@ class DormWaterSession extends NetworkSession {
         },
         options: Options(
           responseType: ResponseType.bytes,
+          headers: {
+            'User-Agent': _getUserAgent(isCaptcha: true),
+          },
         ),
       );
 
@@ -117,6 +143,9 @@ class DormWaterSession extends NetworkSession {
         },
         options: Options(
           contentType: Headers.jsonContentType,
+          headers: {
+            'User-Agent': _getUserAgent(isCaptcha: false),
+          },
         ),
       );
 
@@ -164,6 +193,9 @@ class DormWaterSession extends NetworkSession {
         },
         options: Options(
           contentType: Headers.jsonContentType,
+          headers: {
+            'User-Agent': _getUserAgent(isCaptcha: false),
+          },
         ),
       );
 
@@ -222,6 +254,7 @@ class DormWaterSession extends NetworkSession {
         options: Options(
           headers: {
             'Authorization': token,
+            'User-Agent': _getUserAgent(isCaptcha: false),
           },
         ),
       );
@@ -285,6 +318,7 @@ class DormWaterSession extends NetworkSession {
         options: Options(
           headers: {
             'Authorization': token,
+            'User-Agent': _getUserAgent(isCaptcha: false),
           },
         ),
       );
@@ -333,6 +367,7 @@ class DormWaterSession extends NetworkSession {
         options: Options(
           headers: {
             'Authorization': token,
+            'User-Agent': _getUserAgent(isCaptcha: false),
           },
         ),
       );
@@ -383,6 +418,7 @@ class DormWaterSession extends NetworkSession {
         options: Options(
           headers: {
             'Authorization': token,
+            'User-Agent': _getUserAgent(isCaptcha: false),
           },
         ),
       );
