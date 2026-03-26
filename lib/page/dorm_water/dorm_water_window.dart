@@ -8,7 +8,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/dorm_water_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 
 class DormWaterWindow extends StatefulWidget {
   const DormWaterWindow({super.key});
@@ -643,15 +643,12 @@ class _QrCodeScannerPage extends StatefulWidget {
 }
 
 class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
-  late MobileScannerController controller;
+  final QRCodeDartScanController controller = QRCodeDartScanController();
+  bool _flashOn = false;
 
   @override
   void initState() {
     super.initState();
-    controller = MobileScannerController(
-      autoStart: true,
-      torchEnabled: false,
-    );
   }
 
   @override
@@ -667,32 +664,35 @@ class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
         title: const Text("Scan QR Code"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.flash_off),
-            onPressed: () => controller.toggleTorch(),
+            icon: Icon(_flashOn ? Icons.flash_on : Icons.flash_off),
+            onPressed: () async {
+              await controller.toggleFlash();
+              if (!mounted) return;
+              setState(() {
+                _flashOn = controller.isFlashOn;
+              });
+            },
           ),
         ],
       ),
-      body: MobileScanner(
+      body: QRCodeDartScanView(
         controller: controller,
-        onDetect: (barcodes) {
-          if (barcodes.barcodes.isNotEmpty) {
-            final barcode = barcodes.barcodes.first;
-            final displayValue = barcode.displayValue;
-            
-            if (displayValue != null && displayValue.isNotEmpty) {
-              // Extract device ID from QR code
-              // Format: https://i.hnkzy.com/q/1/{did}
-              // The device ID is the last path segment
-              String deviceId = displayValue;
-              
-              if (displayValue.contains('/')) {
-                final parts = displayValue.split('/');
-                deviceId = parts.last; // Get the last segment which is the did
-              }
-              
-              Navigator.of(context).pop(deviceId);
+        onCapture: (result) {
+          final text = result.text;
+          if (text.isEmpty) {
+            return;
+          }
+
+          // Format: https://i.hnkzy.com/q/1/{did}
+          String deviceId = text;
+          if (text.contains('/')) {
+            final parts = text.split('/').where((e) => e.isNotEmpty).toList();
+            if (parts.isNotEmpty) {
+              deviceId = parts.last;
             }
           }
+
+          Navigator.of(context).pop(deviceId);
         },
       ),
     );

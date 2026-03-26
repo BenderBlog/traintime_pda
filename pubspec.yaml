@@ -55,7 +55,6 @@ dependencies:
   based_split_view: ^1.2.0
   permission_handler: ^12.0.1
   # QR code scanner
-  mobile_scanner: ^3.5.0
   # Output to system calendar
   device_calendar: ^4.3.3
   # Homepage Widget
@@ -76,6 +75,7 @@ dependencies:
   intl:
   timezone: ^0.9.4
   flutter_local_notifications: ^18.0.1
+  qr_code_dart_scan: ^0.11.5
 
 dev_dependencies:
   flutter_test:
