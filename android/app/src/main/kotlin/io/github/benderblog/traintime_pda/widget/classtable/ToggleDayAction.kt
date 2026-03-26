@@ -4,7 +4,7 @@
 
 package io.github.benderblog.traintime_pda.widget.classtable
 
-import HomeWidgetGlanceStateDefinition
+import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import android.content.Context
 import android.util.Log
 import androidx.core.content.edit

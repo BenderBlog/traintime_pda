@@ -288,7 +288,8 @@ class ClassTableWidgetState with ChangeNotifier {
         events.add(
           Event(
             null,
-            title: "${experiment.name}@${experiment.classroom}}",
+            title: "${experiment.name}@${experiment.classroom}",
+            description: "实验名称：${experiment.name} - 老师：${experiment.teacher}",
             start: TZDateTime.from(j.$1, currentLocation),
             end: TZDateTime.from(j.$2, currentLocation),
             location: experiment.classroom,
