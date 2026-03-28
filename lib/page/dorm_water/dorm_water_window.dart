@@ -46,7 +46,14 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     super.initState();
     _session = DormWaterSession();
     _checkLoginStatus();
-    _loadCaptcha();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_captchaImageBase64 == null && !_isCaptchaLoading) {
+      _loadCaptcha();
+    }
   }
 
   /// Check if user is already logged in (token exists)
@@ -684,6 +691,11 @@ class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
           }
 
           // Format: https://i.hnkzy.com/q/1/{did}
+          if (!text.contains('hnkzy.com')) {
+            showToast(context: context, msg: "Invalid QR Code: Not a hnkzy.com link");
+            return;
+          }
+
           String deviceId = text;
           if (text.contains('/')) {
             final parts = text.split('/').where((e) => e.isNotEmpty).toList();
