@@ -380,6 +380,7 @@ homepage:
     experiment: 實驗信息
     score: 成績查詢
     sport: 體育信息
+    dorm_water: 宿舍水機
     schoolnet: 網絡查詢
     toolbox: 其他功能
     score_cannot_reach: 脫機狀態且無緩存成績數據，無法訪問
@@ -394,6 +395,48 @@ homepage:
   club_promotion:
     failed: 社團信息獲取失敗
     fetching: 社團信息清單正在加載
+
+dorm_water:
+  title: 宿舍水機
+  phone: 手機號
+  image_code: 圖形驗證碼
+  sms_code: 短信驗證碼
+  send_sms: 發送短信碼
+  login: 登錄
+  logout: 登出
+  refresh_captcha: 刷新驗證碼
+  loading_captcha: 加載中...
+  captcha_error: 驗證碼加載失敗
+  phone_required: 請輸入手機號
+  image_code_required: 請輸入圖形驗證碼
+  sms_sent: 短信已發送
+  sms_failed: 發送短信失敗
+  sms_code_required: 請輸入短信驗證碼
+  login_success: 登錄成功
+  login_failed: 登錄失敗
+  logout_success: 登出成功
+  devices: 設備列表
+  loading_devices: 加載設備中...
+  no_devices: 暫無設備
+  select_device: 選擇設備
+  fetch_devices_failed: 獲取設備列表失敗
+  retry_load_devices: 重試加載
+  start_water: 開始接水
+  end_water: 結束接水
+  water_dispensing: 接水中
+  water_status: 接水狀態
+  start_water_success: 開始接水成功
+  end_water_success: 結束接水成功
+  start_water_failed: 開始接水失敗
+  end_water_failed: 結束接水失敗
+  device_status_checking: 検查設備狀態中...
+  device_status_ready: 設備已就緒
+  scan_qr_code: 掃描二維碼
+  device_id: 設備 ID
+  add_device_failed: 添加設備失敗
+  device_removed_from_favorites: 已從收藏中移除
+  remove_from_favorites_failed: 移除收藏失敗
+
 library:
   title: 圖書館信息
   borrow_state_title: 借書狀態
