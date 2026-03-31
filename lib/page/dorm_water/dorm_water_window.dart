@@ -21,9 +21,9 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _imageCodeController = TextEditingController();
   final TextEditingController _smsCodeController = TextEditingController();
-  
+
   late DormWaterSession _session;
-  
+
   // Login tab states
   String? _captchaImageBase64;
   bool _isCaptchaLoading = false;
@@ -35,11 +35,12 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   List<DormWaterDevice> _devices = [];
   bool _isLoadingDevices = false;
   String? _devicesError;
-  
+
   // Water control states
   DormWaterDevice? _currentDevice;
   bool _isWaterRunning = false;
-  int _statusCheckCount = 0; // Counter for consecutive status checks (status == 99)
+  int _statusCheckCount =
+      0; // Counter for consecutive status checks (status == 99)
 
   @override
   void initState() {
@@ -109,26 +110,39 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
 
     if (phone.isEmpty) {
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.phone_required"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.phone_required"),
+      );
       return;
     }
 
     if (imageCode.isEmpty) {
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.image_code_required"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.image_code_required"),
+      );
       return;
     }
 
     try {
-      await _session.sendSmsCode(
-        phoneNumber: phone,
-        imageCode: imageCode,
-      );
+      await _session.sendSmsCode(phoneNumber: phone, imageCode: imageCode);
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.sms_sent"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.sms_sent"),
+      );
+    } on Exception catch (e) {
+      if (!mounted) return;
+      showToast(context: context, msg: e.toString());
+      _loadCaptcha();
     } catch (e) {
       if (!mounted) return;
-      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.sms_failed")}: $e");
+      showToast(
+        context: context,
+        msg: "${FlutterI18n.translate(context, "dorm_water.sms_failed")}: $e",
+      );
       _loadCaptcha();
     }
   }
@@ -140,13 +154,19 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
 
     if (phone.isEmpty) {
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.phone_required"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.phone_required"),
+      );
       return;
     }
 
     if (smsCode.isEmpty) {
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.sms_code_required"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.sms_code_required"),
+      );
       return;
     }
 
@@ -155,19 +175,22 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     });
 
     try {
-      await _session.login(
-        phoneNumber: phone,
-        smsCode: smsCode,
-      );
+      await _session.login(phoneNumber: phone, smsCode: smsCode);
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.login_success"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.login_success"),
+      );
       setState(() {
         _isLoggedIn = true;
       });
       _loadDevices();
     } catch (e) {
       if (!mounted) return;
-      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.login_failed")}: $e");
+      showToast(
+        context: context,
+        msg: "${FlutterI18n.translate(context, "dorm_water.login_failed")}: $e",
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -182,7 +205,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     await remove(Preference.dormWaterToken);
     await remove(Preference.dormWaterUid);
     await remove(Preference.dormWaterEid);
-    
+
     if (!mounted) return;
     setState(() {
       _isLoggedIn = false;
@@ -192,9 +215,12 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       _smsCodeController.clear();
     });
     _loadCaptcha();
-    
+
     if (!mounted) return;
-    showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.logout_success"));
+    showToast(
+      context: context,
+      msg: FlutterI18n.translate(context, "dorm_water.logout_success"),
+    );
   }
 
   /// Load device list
@@ -217,7 +243,11 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
         _devicesError = e.toString();
         _isLoadingDevices = false;
       });
-      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.fetch_devices_failed")}: $e");
+      showToast(
+        context: context,
+        msg:
+            "${FlutterI18n.translate(context, "dorm_water.fetch_devices_failed")}: $e",
+      );
     }
   }
 
@@ -232,7 +262,10 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     try {
       await _session.startWater(deviceId: device.id);
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.start_water_success"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.start_water_success"),
+      );
       // Start polling device status
       _pollDeviceStatus(device.id);
     } catch (e) {
@@ -241,7 +274,11 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
         _isWaterRunning = false;
         _currentDevice = null;
       });
-      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.start_water_failed")}: $e");
+      showToast(
+        context: context,
+        msg:
+            "${FlutterI18n.translate(context, "dorm_water.start_water_failed")}: $e",
+      );
     }
   }
 
@@ -250,7 +287,10 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     try {
       await _session.endWater(deviceId: deviceId);
       if (!mounted) return;
-      showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.end_water_success"));
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "dorm_water.end_water_success"),
+      );
       setState(() {
         _isWaterRunning = false;
         _currentDevice = null;
@@ -258,15 +298,21 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       });
     } catch (e) {
       if (!mounted) return;
-      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.end_water_failed")}: $e");
+      showToast(
+        context: context,
+        msg:
+            "${FlutterI18n.translate(context, "dorm_water.end_water_failed")}: $e",
+      );
     }
   }
 
   /// Poll device status until it reaches idle state (status == 99)
   /// Requires consecutive 3 detections of status == 99 to confirm device is truly stopped
   Future<void> _pollDeviceStatus(String deviceId) async {
-    const maxAttempts = 60; // Max 60 attempts (60 seconds if polling every 1 second)
-    const requiredIdleCount = 3; // Need to detect idle status 3 times consecutively
+    const maxAttempts =
+        60; // Max 60 attempts (60 seconds if polling every 1 second)
+    const requiredIdleCount =
+        3; // Need to detect idle status 3 times consecutively
     int attempts = 0;
 
     while (attempts < maxAttempts && _isWaterRunning) {
@@ -275,13 +321,13 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       try {
         await Future.delayed(const Duration(seconds: 1));
         final status = await _session.checkDeviceStatus(deviceId: deviceId);
-        
+
         if (!mounted) return;
 
         // Status 99 means device is ready/idle
         if (status == 99) {
           _statusCheckCount++;
-          
+
           // If we've detected idle state 3 times consecutively, confirm device is stopped
           if (_statusCheckCount >= requiredIdleCount) {
             setState(() {
@@ -290,7 +336,13 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
               _statusCheckCount = 0;
             });
             if (mounted) {
-              showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.device_status_ready"));
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "dorm_water.device_status_ready",
+                ),
+              );
             }
             return;
           }
@@ -319,8 +371,6 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     if (_isLoggedIn) {
@@ -343,11 +393,9 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   /// Scan QR code for device ID
   Future<void> _scanQrCode() async {
     if (!mounted) return;
-    
+
     final result = await Navigator.of(context).push<String?>(
-      MaterialPageRoute(
-        builder: (context) => const _QrCodeScannerPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const _QrCodeScannerPage()),
     );
 
     if (result != null && result.isNotEmpty) {
@@ -367,7 +415,11 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       _loadDevices(); // Refresh device list
     } catch (e) {
       if (!mounted) return;
-      showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.add_device_failed")}: $e");
+      showToast(
+        context: context,
+        msg:
+            "${FlutterI18n.translate(context, "dorm_water.add_device_failed")}: $e",
+      );
     }
   }
 
@@ -398,173 +450,188 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-          // Phone input
-          TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: FlutterI18n.translate(context, "dorm_water.phone"),
+        // Phone input
+        TextField(
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+          decoration: InputDecoration(
+            labelText: FlutterI18n.translate(context, "dorm_water.phone"),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Image code input with captcha image on the right
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _imageCodeController,
+                decoration: InputDecoration(
+                  labelText: FlutterI18n.translate(
+                    context,
+                    "dorm_water.image_code",
+                  ),
+                ),
+              ),
             ),
+            const SizedBox(width: 12),
+            _buildCaptchaImage(context),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // SMS code input
+        TextField(
+          controller: _smsCodeController,
+          decoration: InputDecoration(
+            labelText: FlutterI18n.translate(context, "dorm_water.sms_code"),
           ),
-          const SizedBox(height: 12),
-          // Image code input with captcha image on the right
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _imageCodeController,
-                  decoration: InputDecoration(
-                    labelText: FlutterI18n.translate(context, "dorm_water.image_code"),
-                  ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: FilledButton.tonal(
+                onPressed: _sendSmsCode,
+                child: Text(
+                  FlutterI18n.translate(context, "dorm_water.send_sms"),
                 ),
               ),
-              const SizedBox(width: 12),
-              _buildCaptchaImage(context),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // SMS code input
-          TextField(
-            controller: _smsCodeController,
-            decoration: InputDecoration(
-              labelText: FlutterI18n.translate(context, "dorm_water.sms_code"),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.tonal(
-                  onPressed: _sendSmsCode,
-                  child: Text(
-                    FlutterI18n.translate(context, "dorm_water.send_sms"),
-                  ),
-                ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: FilledButton(
+                onPressed: _isLoggingIn ? null : _login,
+                child: Text(FlutterI18n.translate(context, "dorm_water.login")),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _isLoggingIn ? null : _login,
-                  child: Text(
-                    FlutterI18n.translate(context, "dorm_water.login"),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Build device list tab
+  Widget _buildDeviceListTab(BuildContext context) {
+    if (_isLoadingDevices) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(FlutterI18n.translate(context, "dorm_water.loading_devices")),
+          ],
+        ),
       );
     }
 
-    /// Build device list tab
-    Widget _buildDeviceListTab(BuildContext context) {
-      if (_isLoadingDevices) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(FlutterI18n.translate(context, "dorm_water.loading_devices")),
-            ],
-          ),
-        );
-      }
-
-      if (_devicesError != null) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                FlutterI18n.translate(context, "dorm_water.fetch_devices_failed"),
-                style: const TextStyle(color: Colors.red),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: _loadDevices,
-                child: Text(FlutterI18n.translate(context, "dorm_water.retry_load_devices")),
-              ),
-            ],
-          ),
-        );
-      }
-
-      if (_devices.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(FlutterI18n.translate(context, "dorm_water.no_devices")),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: _loadDevices,
-                child: Text(FlutterI18n.translate(context, "dorm_water.select_device")),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _devices.length,
-        itemBuilder: (context, index) {
-          final device = _devices[index];
-          return Card(
-            child: ListTile(
-              title: Text(device.name),
-              subtitle: Text("ID: ${device.id}"),
-              trailing: SizedBox(
-                width: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(MingCuteIcons.mgc_star_fill),
-                      onPressed: () async {
-                        try {
-                          await _session.toggleDeviceFavorite(
-                            deviceId: device.id,
-                            remove: true,
-                          );
-                          if (!mounted) return;
-                          showToast(context: context, msg: FlutterI18n.translate(context, "dorm_water.device_removed_from_favorites"));
-                          // Remove device from list without full refresh
-                          setState(() {
-                            _devices.removeWhere((d) => d.id == device.id);
-                          });
-                        } catch (e) {
-                          if (!mounted) return;
-                          showToast(context: context, msg: "${FlutterI18n.translate(context, "dorm_water.remove_from_favorites_failed")}: $e");
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        (_isWaterRunning && _currentDevice?.id == device.id)
-                            ? MingCuteIcons.mgc_stop_fill
-                            : MingCuteIcons.mgc_play_fill,
-                      ),
-                      onPressed: () {
-                        if (_isWaterRunning && _currentDevice?.id == device.id) {
-                          _endWater(device.id);
-                        } else {
-                          _startWater(device);
-                        }
-                      },
-                    ),
-                  ],
-                ),
+    if (_devicesError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              FlutterI18n.translate(context, "dorm_water.fetch_devices_failed"),
+              style: const TextStyle(color: Colors.red),
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _loadDevices,
+              child: Text(
+                FlutterI18n.translate(context, "dorm_water.retry_load_devices"),
               ),
             ),
-          );
-        },
+          ],
+        ),
       );
     }
 
-    /// Build captcha image widget (clickable to refresh)
+    if (_devices.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(FlutterI18n.translate(context, "dorm_water.no_devices")),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _loadDevices,
+              child: Text(
+                FlutterI18n.translate(context, "dorm_water.select_device"),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _devices.length,
+      itemBuilder: (context, index) {
+        final device = _devices[index];
+        return Card(
+          child: ListTile(
+            title: Text(device.name),
+            subtitle: Text("ID: ${device.id}"),
+            trailing: SizedBox(
+              width: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(MingCuteIcons.mgc_star_fill),
+                    onPressed: () async {
+                      try {
+                        await _session.toggleDeviceFavorite(
+                          deviceId: device.id,
+                          remove: true,
+                        );
+                        if (!mounted) return;
+                        showToast(
+                          context: context,
+                          msg: FlutterI18n.translate(
+                            context,
+                            "dorm_water.device_removed_from_favorites",
+                          ),
+                        );
+                        // Remove device from list without full refresh
+                        setState(() {
+                          _devices.removeWhere((d) => d.id == device.id);
+                        });
+                      } catch (e) {
+                        if (!mounted) return;
+                        showToast(
+                          context: context,
+                          msg:
+                              "${FlutterI18n.translate(context, "dorm_water.remove_from_favorites_failed")}: $e",
+                        );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      (_isWaterRunning && _currentDevice?.id == device.id)
+                          ? MingCuteIcons.mgc_stop_fill
+                          : MingCuteIcons.mgc_play_fill,
+                    ),
+                    onPressed: () {
+                      if (_isWaterRunning && _currentDevice?.id == device.id) {
+                        _endWater(device.id);
+                      } else {
+                        _startWater(device);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Build captcha image widget (clickable to refresh)
   Widget _buildCaptchaImage(BuildContext context) {
     // Loading state
     if (_isCaptchaLoading) {
@@ -692,7 +759,10 @@ class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
 
           // Format: https://i.hnkzy.com/q/1/{did}
           if (!text.contains('hnkzy.com')) {
-            showToast(context: context, msg: "Invalid QR Code: Not a hnkzy.com link");
+            showToast(
+              context: context,
+              msg: "Invalid QR Code: Not a hnkzy.com link",
+            );
             return;
           }
 

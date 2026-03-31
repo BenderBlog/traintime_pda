@@ -15,10 +15,7 @@ class CaptchaData {
   final String sessionId;
   final String imageBase64;
 
-  CaptchaData({
-    required this.sessionId,
-    required this.imageBase64,
-  });
+  CaptchaData({required this.sessionId, required this.imageBase64});
 }
 
 /// Model class for device
@@ -26,10 +23,7 @@ class DormWaterDevice {
   final String id;
   final String name;
 
-  DormWaterDevice({
-    required this.id,
-    required this.name,
-  });
+  DormWaterDevice({required this.id, required this.name});
 
   factory DormWaterDevice.fromJson(Map<String, dynamic> json) {
     return DormWaterDevice(
@@ -41,13 +35,13 @@ class DormWaterDevice {
 
 class DormWaterSession extends NetworkSession {
   static const String apiBaseUrl = 'https://i.ilife798.com';
-  
+
   /// Store current session ID for sending SMS code
   String? _currentSessionId;
 
   /// Get User-Agent based on platform
-  /// 
-  /// iOS: 
+  ///
+  /// iOS:
   ///   - Captcha: iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)
   ///   - Others: iOS_ilife798_3.1.1
   /// Android:
@@ -75,7 +69,7 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Fetch captcha image from Hui798 API
-  /// 
+  ///
   /// Returns CaptchaData containing:
   /// - sessionId: Session ID for subsequent API calls (generated randomly)
   /// - imageBase64: Base64-encoded captcha image
@@ -86,10 +80,7 @@ class DormWaterSession extends NetworkSession {
 
       final response = await dio.get(
         '$apiBaseUrl/api/v1/captcha/',
-        queryParameters: {
-          's': sessionId,
-          'r': timestamp.toString(),
-        },
+        queryParameters: {'s': sessionId, 'r': timestamp.toString()},
         options: Options(
           responseType: ResponseType.bytes,
           headers: {
@@ -106,14 +97,9 @@ class DormWaterSession extends NetworkSession {
         final imageBase64 = base64Encode(response.data as List<int>).toString();
         // Store session ID for later SMS sending
         _currentSessionId = sessionId;
-        return CaptchaData(
-          sessionId: sessionId,
-          imageBase64: imageBase64,
-        );
+        return CaptchaData(sessionId: sessionId, imageBase64: imageBase64);
       } else {
-        throw Exception(
-          'Failed to fetch captcha: ${response.statusCode}',
-        );
+        throw Exception('Failed to fetch captcha: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -123,11 +109,11 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Send SMS code to user's phone
-  /// 
+  ///
   /// Parameters:
   /// - [phoneNumber]: User's phone number
   /// - [imageCode]: Image captcha code entered by user
-  /// 
+  ///
   /// Returns: Success message if SMS sent successfully
   Future<String> sendSmsCode({
     required String phoneNumber,
@@ -161,7 +147,7 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
           return 'SMS sent successfully';
         } else {
@@ -170,9 +156,7 @@ class DormWaterSession extends NetworkSession {
           );
         }
       } else {
-        throw Exception(
-          'Failed to send SMS: ${response.statusCode}',
-        );
+        throw Exception('Failed to send SMS: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -182,11 +166,11 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Login with SMS code
-  /// 
+  ///
   /// Parameters:
   /// - [phoneNumber]: User's phone number
   /// - [smsCode]: SMS code received by user
-  /// 
+  ///
   /// Returns: Login response containing uid, eid, and token
   Future<Map<String, dynamic>> login({
     required String phoneNumber,
@@ -195,11 +179,7 @@ class DormWaterSession extends NetworkSession {
     try {
       final response = await dio.post(
         '$apiBaseUrl/api/v1/acc/login',
-        data: {
-          'cid': '',
-          'authCode': smsCode,
-          'un': phoneNumber,
-        },
+        data: {'cid': '', 'authCode': smsCode, 'un': phoneNumber},
         options: Options(
           contentType: Headers.jsonContentType,
           headers: {
@@ -216,34 +196,26 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
           final responseData = data['data'] as Map<String, dynamic>;
           final al = responseData['al'] as Map<String, dynamic>;
-          
+
           final token = al['token'] as String;
           final uid = al['uid'] as String;
           final eid = al['eid'] as String;
-          
+
           // Save token and credentials
           await setString(Preference.dormWaterToken, token);
           await setString(Preference.dormWaterUid, uid);
           await setString(Preference.dormWaterEid, eid);
-          
-          return {
-            'token': token,
-            'uid': uid,
-            'eid': eid,
-          };
+
+          return {'token': token, 'uid': uid, 'eid': eid};
         } else {
-          throw Exception(
-            'Login failed: ${data['msg'] ?? 'Unknown error'}',
-          );
+          throw Exception('Login failed: ${data['msg'] ?? 'Unknown error'}');
         }
       } else {
-        throw Exception(
-          'Login failed: ${response.statusCode}',
-        );
+        throw Exception('Login failed: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -253,7 +225,7 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Fetch device list from master endpoint
-  /// 
+  ///
   /// Requires valid token to be saved in preferences
   /// Returns list of DormWaterDevice objects
   Future<List<DormWaterDevice>> getDeviceList() async {
@@ -280,20 +252,24 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
           final responseData = data['data'] as Map<String, dynamic>;
-          
+
           // Check if login is still valid
           if (responseData['account'] == null) {
             throw Exception('Login expired. Please login again.');
           }
-          
+
           // Get favorite devices
-          final List<dynamic> favos = responseData['favos'] as List<dynamic>? ?? [];
-          
+          final List<dynamic> favos =
+              responseData['favos'] as List<dynamic>? ?? [];
+
           return favos
-              .map((device) => DormWaterDevice.fromJson(device as Map<String, dynamic>))
+              .map(
+                (device) =>
+                    DormWaterDevice.fromJson(device as Map<String, dynamic>),
+              )
               .toList();
         } else {
           throw Exception(
@@ -301,9 +277,7 @@ class DormWaterSession extends NetworkSession {
           );
         }
       } else {
-        throw Exception(
-          'Failed to fetch devices: ${response.statusCode}',
-        );
+        throw Exception('Failed to fetch devices: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -313,11 +287,11 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Toggle device favorite status (favorite or unfavorite)
-  /// 
+  ///
   /// Parameters:
   /// - [deviceId]: Device ID to favorite/unfavorite
   /// - [remove]: If true, remove from favorites; if false, add to favorites
-  /// 
+  ///
   /// Returns: Success message
   Future<String> toggleDeviceFavorite({
     required String deviceId,
@@ -331,10 +305,7 @@ class DormWaterSession extends NetworkSession {
 
       final response = await dio.get(
         '$apiBaseUrl/api/v1/dev/favo',
-        queryParameters: {
-          'did': deviceId,
-          'remove': remove.toString(),
-        },
+        queryParameters: {'did': deviceId, 'remove': remove.toString()},
         options: Options(
           headers: {
             'accept': '*/*',
@@ -350,9 +321,11 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
-          final message = remove ? 'Device removed from favorites' : 'Device added to favorites';
+          final message = remove
+              ? 'Device removed from favorites'
+              : 'Device added to favorites';
           return message;
         } else {
           throw Exception(
@@ -360,9 +333,7 @@ class DormWaterSession extends NetworkSession {
           );
         }
       } else {
-        throw Exception(
-          'Failed to update favorite: ${response.statusCode}',
-        );
+        throw Exception('Failed to update favorite: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -372,10 +343,10 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Start water dispensing
-  /// 
+  ///
   /// Parameters:
   /// - [deviceId]: Device ID to start water dispensing
-  /// 
+  ///
   /// Returns: Success message
   Future<String> startWater({required String deviceId}) async {
     try {
@@ -409,7 +380,7 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
           return 'Water dispensing started';
         } else {
@@ -418,9 +389,7 @@ class DormWaterSession extends NetworkSession {
           );
         }
       } else {
-        throw Exception(
-          'Failed to start water: ${response.statusCode}',
-        );
+        throw Exception('Failed to start water: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -430,10 +399,10 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// End water dispensing
-  /// 
+  ///
   /// Parameters:
   /// - [deviceId]: Device ID to end water dispensing
-  /// 
+  ///
   /// Returns: Success message
   Future<String> endWater({required String deviceId}) async {
     try {
@@ -444,9 +413,7 @@ class DormWaterSession extends NetworkSession {
 
       final response = await dio.get(
         '$apiBaseUrl/api/v1/dev/end',
-        queryParameters: {
-          'did': deviceId,
-        },
+        queryParameters: {'did': deviceId},
         options: Options(
           headers: {
             'accept': '*/*',
@@ -462,7 +429,7 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
           return 'Water dispensing ended';
         } else {
@@ -471,9 +438,7 @@ class DormWaterSession extends NetworkSession {
           );
         }
       } else {
-        throw Exception(
-          'Failed to end water: ${response.statusCode}',
-        );
+        throw Exception('Failed to end water: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -483,10 +448,10 @@ class DormWaterSession extends NetworkSession {
   }
 
   /// Check device status
-  /// 
+  ///
   /// Parameters:
   /// - [deviceId]: Device ID to check status
-  /// 
+  ///
   /// Returns: Device status (99 = available/idle)
   Future<int> checkDeviceStatus({required String deviceId}) async {
     try {
@@ -497,11 +462,7 @@ class DormWaterSession extends NetworkSession {
 
       final response = await dio.get(
         '$apiBaseUrl/api/v1/ui/app/dev/status',
-        queryParameters: {
-          'did': deviceId,
-          'more': 'true',
-          'promo': 'false',
-        },
+        queryParameters: {'did': deviceId, 'more': 'true', 'promo': 'false'},
         options: Options(
           headers: {
             'Authorization': token,
@@ -513,13 +474,13 @@ class DormWaterSession extends NetworkSession {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data as Map<String, dynamic>;
         final code = data['code'];
-        
+
         if (code == 0) {
           final responseData = data['data'] as Map<String, dynamic>;
           final device = responseData['device'] as Map<String, dynamic>;
           final gene = device['gene'] as Map<String, dynamic>;
           final status = gene['status'] as int;
-          
+
           return status;
         } else {
           throw Exception(
@@ -527,9 +488,7 @@ class DormWaterSession extends NetworkSession {
           );
         }
       } else {
-        throw Exception(
-          'Failed to check status: ${response.statusCode}',
-        );
+        throw Exception('Failed to check status: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');

@@ -69,10 +69,10 @@ class _MainPageState extends State<MainPage> {
     const ExamCard(),
     const EmptyClassroomCard(),
     const ClassAttendanceCard(),
+    const DormWaterCard(),
     if (prefs.getBool(prefs.Preference.role) == false) ...[
       const ExperimentCard(),
       const SportCard(),
-      const DormWaterCard(),
     ],
   ];
 
