@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
+import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/model/xidian_ids/network_usage.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -103,7 +104,8 @@ class SchoolnetSession extends NetworkSession {
           // 以保证泛用性并避免把运营商类产品的结算日期写入 charged。
           final productName = tdList[0].text.trim();
           final lowerName = productName.toLowerCase();
-          final isOperator = lowerName.contains('联通') ||
+          final isOperator =
+              lowerName.contains('联通') ||
               lowerName.contains('移动') ||
               lowerName.contains('电信');
           if (!isOperator) {

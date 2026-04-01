@@ -3,14 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart'
-    as borrow_info;
+import 'package:watermeter/repository/xidian_ids/library_session.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -20,8 +18,9 @@ class LibraryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => MainPageCard(
+    return Watch((context) {
+      final state = libraryBorrowSignal.watch(context);
+      return MainPageCard(
         onPressed: () async {
           if (offline) {
             showToast(
@@ -32,70 +31,73 @@ class LibraryCard extends StatelessWidget {
             context.pushReplacement(const LibraryWindow());
           }
         },
-        isLoad: borrow_info.state.value == SessionState.fetching,
+        isLoad: state.isLoading && !state.isRefreshing,
         icon: MingCuteIcons.mgc_book_2_line,
         text: FlutterI18n.translate(context, "homepage.library_card.title"),
         infoText: Text.rich(
           TextSpan(
             style: const TextStyle(fontSize: 20),
             children: [
-              if (borrow_info.state.value == SessionState.fetched) ...[
-                TextSpan(
+              state.map(
+                // 成功状态
+                data: (list) => TextSpan(
                   text: FlutterI18n.translate(
                     context,
                     "homepage.library_card.current_borrow",
-                    translationParams: {
-                      "count": borrow_info.borrowList.length.toString(),
-                    },
+                    translationParams: {"count": list.length.toString()},
                   ),
                 ),
-              ] else if (borrow_info.state.value == SessionState.error)
-                TextSpan(
+                // 错误状态
+                error: (_, __) => TextSpan(
                   text: FlutterI18n.translate(
                     context,
                     "homepage.library_card.error_occured",
                   ),
-                )
-              else
-                TextSpan(
+                ),
+                // 加载状态 (loading, reloading, refreshing)
+                loading: () => TextSpan(
                   text: FlutterI18n.translate(
                     context,
                     "homepage.library_card.fetching",
                   ),
                 ),
+              ),
             ],
           ),
         ),
-        bottomText: Obx(() {
-          return DefaultTextStyle.merge(
-            overflow: TextOverflow.ellipsis,
-            child: Text(
-              borrow_info.state.value == SessionState.fetched
-                  ? borrow_info.dued == 0
-                        ? FlutterI18n.translate(
-                            context,
-                            "homepage.library_card.no_return",
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            "homepage.library_card.need_return",
-                            translationParams: {
-                              "dued": borrow_info.dued.toString(),
-                            },
-                          )
-                  : borrow_info.state.value == SessionState.error
-                  ? FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.no_info",
-                    )
-                  : FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.fetching_info",
-                    ),
+        bottomText: DefaultTextStyle.merge(
+          overflow: TextOverflow.ellipsis,
+          child: state.map(
+            data: (data) {
+              int duedNum = data.where((element) => element.lendDay < 0).length;
+              if (duedNum == 0) {
+                return Text(
+                  FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.no_return",
+                  ),
+                );
+              }
+              return Text(
+                FlutterI18n.translate(
+                  context,
+                  "homepage.library_card.need_return",
+                  translationParams: {"dued": duedNum.toString()},
+                ),
+              );
+            },
+            error: (_, _) => Text(
+              FlutterI18n.translate(context, "homepage.library_card.no_info"),
             ),
-          );
-        }),
-      ),
-    );
+            loading: () => Text(
+              FlutterI18n.translate(
+                context,
+                "homepage.library_card.fetching_info",
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

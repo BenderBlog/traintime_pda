@@ -8,23 +8,21 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:pool/pool.dart';
+import 'package:signals/signals.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-Rx<SessionState> state = SessionState.none.obs;
-RxString error = "".obs;
-RxList<BorrowData> borrowList = <BorrowData>[].obs;
+final libraryBorrowSignal = futureSignal<List<BorrowData>>(() async {
+  return await LibrarySession().getBorrowList();
+}, debugLabel: "LibraryBorrowSignal");
 
-Future<void> Function() refreshBorrowList = () =>
-    LibrarySession().getBorrowList();
-
-int get dued => borrowList.where((element) => element.lendDay < 0).length;
-int get notDued => borrowList.where((element) => element.lendDay >= 0).length;
+void refreshBorrowList() {
+  if (libraryBorrowSignal.value.isLoading) return;
+  libraryBorrowSignal.reload();
+}
 
 class LibrarySession extends IDSSession {
   // static String token = "";
@@ -102,26 +100,50 @@ class LibrarySession extends IDSSession {
     return toReturn;
   }
 
-  Future<String> bookCover(String title, String isbn, int docNumber) async {
-    return await dio
-        .post(
-          "https://findxidian.libsp.cn/find/unify/getPItemAndOnShelfCountAndDuxiuImageUrl",
-          data: {"title": title, "isbn": isbn, "recordId": docNumber},
-          options: Options(
-            headers: {
-              HttpHeaders.contentTypeHeader: "application/json",
-              HttpHeaders.refererHeader: "https://findxidian.libsp.cn/",
-              "groupCode": "200755",
-            },
-          ),
-        )
-        .then((value) => value.data["data"]["duxiuImageUrl"]?.toString() ?? "");
-  }
+  Future<String> bookCover(String title, String isbn, int docNumber) => dio
+      .post(
+        "https://findxidian.libsp.cn/find/unify/getPItemAndOnShelfCountAndDuxiuImageUrl",
+        data: {"title": title, "isbn": isbn, "recordId": docNumber},
+        options: Options(
+          headers: {
+            HttpHeaders.contentTypeHeader: "application/json",
+            HttpHeaders.refererHeader: "https://findxidian.libsp.cn/",
+            "groupCode": "200755",
+          },
+        ),
+      )
+      .then((value) => value.data["data"]["duxiuImageUrl"]?.toString() ?? "");
 
-  Future<String> renew(BorrowData toUse) async {
-    return await dio
+  Future<String> renew(BorrowData toUse) => dio
+      .post(
+        "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/renewBook.html",
+        data: {
+          "libraryId": 5,
+          "userId": userId,
+          "token": token,
+          "cardNumber": preference.getString(preference.Preference.idsAccount),
+          "barNumber": toUse.barcode,
+        },
+      )
+      .then((value) => value.data["msg"]?.toString() ?? "接口返回错误")
+      .onError<Object>((e, s) {
+        log.handle(e, s);
+        return "获取过程遇到错误";
+      });
+
+  Future<List<BorrowData>> getBorrowList() async {
+    log.info(
+      "[LibrarySession][getBorrowList] "
+      "Getting borrow list",
+    );
+
+    if (userId == 0 && token == "") {
+      await initSession();
+    }
+
+    var rawData = await dio
         .post(
-          "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/renewBook.html",
+          "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getBorrowList.html",
           data: {
             "libraryId": 5,
             "userId": userId,
@@ -129,82 +151,41 @@ class LibrarySession extends IDSSession {
             "cardNumber": preference.getString(
               preference.Preference.idsAccount,
             ),
-            "barNumber": toUse.barcode,
+            "page": 0,
           },
         )
-        .then((value) => value.data["msg"]?.toString() ?? "接口返回错误")
-        .onError<Object>((e, s) {
-          log.handle(e, s);
-          return "获取过程遇到错误";
-        });
-  }
+        .then((value) => value.data["data"]);
 
-  Future<void> getBorrowList() async {
-    if (state.value == SessionState.fetching) {
-      return;
-    }
-    log.info(
-      "[LibrarySession][getBorrowList] "
-      "Getting borrow list",
+    List<BorrowData> toAppend = [];
+    final pool = Pool(5);
+    await Future.wait([
+      ...List<BorrowData>.generate(
+        rawData.length,
+        (index) => BorrowData.fromJson(rawData[index]),
+      ).map(
+        (e) => pool.withResource(() async {
+          e.imageUrl = await searchBook(e.barcode, 1, searchField: "barcode")
+              .then(
+                (books) => books.isNotEmpty
+                    ? LibrarySession().bookCover(
+                        books.first.bookName,
+                        books.first.isbn ?? "",
+                        books.first.docNumber,
+                      )
+                    : Future.value(""),
+              );
+          toAppend.add(e);
+        }),
+      ),
+    ]);
+
+    toAppend.sort(
+      (a, b) =>
+          a.normReturnDateTime.millisecondsSinceEpoch -
+          b.normReturnDateTime.millisecondsSinceEpoch,
     );
 
-    try {
-      state.value = SessionState.fetching;
-      if (userId == 0 && token == "") {
-        await initSession();
-      }
-
-      var rawData = await dio
-          .post(
-            "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getBorrowList.html",
-            data: {
-              "libraryId": 5,
-              "userId": userId,
-              "token": token,
-              "cardNumber": preference.getString(
-                preference.Preference.idsAccount,
-              ),
-              "page": 0,
-            },
-          )
-          .then((value) => value.data["data"]);
-
-      List<BorrowData> toAppend = [];
-      final pool = Pool(5);
-      await Future.wait([
-        ...List<BorrowData>.generate(
-          rawData.length,
-          (index) => BorrowData.fromJson(rawData[index]),
-        ).map(
-          (e) => pool.withResource(() async {
-            e.imageUrl = await searchBook(e.barcode, 1, searchField: "barcode")
-                .then(
-                  (books) => books.isNotEmpty
-                      ? LibrarySession().bookCover(
-                          books.first.bookName,
-                          books.first.isbn ?? "",
-                          books.first.docNumber,
-                        )
-                      : Future.value(""),
-                );
-            toAppend.add(e);
-          }),
-        ),
-      ]);
-
-      toAppend.sort(
-        (a, b) =>
-            a.normReturnDateTime.millisecondsSinceEpoch -
-            b.normReturnDateTime.millisecondsSinceEpoch,
-      );
-      borrowList.clear();
-      borrowList.addAll(toAppend);
-
-      state.value = SessionState.fetched;
-    } catch (e) {
-      error.value = e.toString();
-      state.value = SessionState.error;
-    }
+    return toAppend;
   }
 
   @override

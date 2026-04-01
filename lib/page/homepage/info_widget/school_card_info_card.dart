@@ -7,13 +7,13 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/schoolcard/school_card_window.dart';
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
