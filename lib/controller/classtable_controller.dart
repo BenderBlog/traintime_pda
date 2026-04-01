@@ -29,6 +29,7 @@ class ClassTableController extends GetxController {
   late File userDefinedFile;
   late ClassTableData classTableData;
   late UserDefinedClassData userDefinedClassData;
+  bool _isClassTableChangedForSystemCalendarSync = false;
 
   // Get ClassDetail name info
   ClassDetail getClassDetail(TimeArrangement timeArrangementIndex) =>
@@ -213,6 +214,12 @@ class ClassTableController extends GetxController {
     classTableData.termStartDay,
   ).add(Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
+  bool consumeClassTableChangeForSystemCalendarSync() {
+    bool toReturn = _isClassTableChangedForSystemCalendarSync;
+    _isClassTableChangedForSystemCalendarSync = false;
+    return toReturn;
+  }
+
   Future<void> updateClassTable({
     bool isForce = false,
     bool isUserDefinedChanged = false,
@@ -226,7 +233,9 @@ class ClassTableController extends GetxController {
       );
 
       refreshUserDefinedClass();
+      bool isClassTableChangedForSystemCalendarSync = false;
       bool classTableFileIsExist = classTableFile.existsSync();
+      String? originalClassTableStr;
       bool isNotNeedRefreshCache =
           classTableFileIsExist &&
           !isForce &&
@@ -234,8 +243,9 @@ class ClassTableController extends GetxController {
               2;
       bool isEmptyCache = false;
       if (classTableFileIsExist) {
+        originalClassTableStr = classTableFile.readAsStringSync();
         classTableData = ClassTableData.fromJson(
-          jsonDecode(classTableFile.readAsStringSync()),
+          jsonDecode(originalClassTableStr),
         );
         classTableData.userDefinedDetail =
             userDefinedClassData.userDefinedDetail;
@@ -261,7 +271,10 @@ class ClassTableController extends GetxController {
           var toUse = isPostGraduate
               ? await ClassTableFile().getYjspt()
               : await ClassTableFile().getEhall();
-          classTableFile.writeAsStringSync(jsonEncode(toUse.toJson()));
+          String newClassTableStr = jsonEncode(toUse.toJson());
+          isClassTableChangedForSystemCalendarSync =
+              originalClassTableStr != newClassTableStr;
+          classTableFile.writeAsStringSync(newClassTableStr);
           toUse.userDefinedDetail = userDefinedClassData.userDefinedDetail;
           toUse.timeArrangement.addAll(userDefinedClassData.timeArrangement);
           classTableData = toUse;
@@ -324,6 +337,9 @@ class ClassTableController extends GetxController {
         );
       }
 
+      _isClassTableChangedForSystemCalendarSync =
+          _isClassTableChangedForSystemCalendarSync ||
+          isClassTableChangedForSystemCalendarSync;
       state = ClassTableState.fetched;
       error = null;
       update();

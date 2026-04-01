@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
 //import 'package:watermeter/repository/pda_service_session.dart' as message;
@@ -98,7 +99,10 @@ Future<void> update({
       Future(() => school_card_session.SchoolCardSession().initSession()),
       Future(() => electricity.update()),
       Future(() => school_net.update()),
-    ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
+    ]).then((value) async {
+      await maybeAutoSyncSystemCalendar();
+      updateCurrentData();
+    }).onError((error, stackTrace) {
       log.info(
         "[homepage Update]"
         "Update failed with following exception: $error\n"

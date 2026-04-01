@@ -38,6 +38,7 @@ import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart'
 import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
@@ -718,7 +719,9 @@ class _SettingWindowState extends State<SettingWindow> {
                               ).updateClassTable(isForce: true),
                               Get.put(ExamController()).get(),
                               Get.put(ExperimentController()).get(),
-                            ]).then((value) => value.first);
+                            ]).then((_) async {
+                              await maybeAutoSyncSystemCalendar();
+                            });
                             Navigator.pop(context);
                           },
                           child: Text(
@@ -786,10 +789,15 @@ class _SettingWindowState extends State<SettingWindow> {
                         if (context.mounted) {
                           showToast(context: context, msg: "Updating data");
                         }
-                        Get.put(
-                          ClassTableController(),
-                        ).updateClassTable(isForce: true);
-                        Get.put(ExamController()).get();
+                        Future.wait([
+                          Get.put(
+                            ClassTableController(),
+                          ).updateClassTable(isForce: true),
+                          Get.put(ExamController()).get(),
+                          Get.put(ExperimentController()).get(),
+                        ]).then((_) async {
+                          await maybeAutoSyncSystemCalendar();
+                        });
                       }
                     });
                   },
