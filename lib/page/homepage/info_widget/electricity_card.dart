@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/page/electricity/electricity_window.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -18,56 +18,77 @@ class ElectricityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => MainPageCard(
-        isLoad: isLoad.value,
-        icon: MingCuteIcons.mgc_flash_line,
-        text: FlutterI18n.translate(context, "homepage.electricity_card.title"),
-        onPressed: () async {
-          context.push(ElectricityWindow());
-        },
-        infoText: Text(
-          electricityInfo.value.remain.contains(RegExp(r'[0-9]'))
-              ? FlutterI18n.translate(
-                  context,
-                  "homepage.electricity_card.current_electricity",
-                  translationParams: {"amount": electricityInfo.value.remain},
-                )
-              : FlutterI18n.translate(context, electricityInfo.value.remain),
-          style: const TextStyle(fontSize: 20),
+    final state = electricityInfoSignal.watch(context);
+    return MainPageCard(
+      onPressed: () async {
+        context.push(ElectricityWindow());
+      },
+      isLoad: state.isLoading && !state.isRefreshing,
+      icon: MingCuteIcons.mgc_flash_line,
+      text: FlutterI18n.translate(context, "homepage.electricity_card.title"),
+      infoText: DefaultTextStyle(
+        style: const TextStyle(fontSize: 20),
+        child: state.map(
+          data: (value) => Text(
+            value.$2.remain.contains(RegExp(r'[0-9]'))
+                ? FlutterI18n.translate(
+                    context,
+                    "homepage.electricity_card.current_electricity",
+                    translationParams: {"amount": value.$2.remain},
+                  )
+                : FlutterI18n.translate(context, value.$2.remain),
+          ),
+          error: () => Text(
+            FlutterI18n.translate(
+              context,
+              "homepage.electricity_card.current_electricity",
+            ),
+          ),
+          loading: () => Text(
+            FlutterI18n.translate(
+              context,
+              "electricity_status.remain_fetching",
+            ),
+          ),
         ),
-        bottomText: Builder(
-          builder: (context) {
-            /// I believe it is not from tomorrow, like Bender lol
-            if (!electricityInfo.value.fetchDay.isToday) {
-              return Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.electricity_card.cache_notice",
-                  translationParams: {
-                    "date": DateFormat(
-                      "yyyy-MM-dd HH:mm",
-                    ).format(electricityInfo.value.fetchDay),
-                  },
-                ).replaceAll("\n", ""),
-              );
-            }
+      ),
 
-            if (electricityInfo.value.owe.contains(RegExp(r'[0-9]'))) {
-              return Text(
-                FlutterI18n.translate(
-                  context,
-                  "electricity_status.owe_need_pay",
-                  translationParams: {"due": electricityInfo.value.owe},
-                ),
-                overflow: TextOverflow.ellipsis,
-              );
-            }
+      bottomText: state.map(
+        data: (value) {
+          if (!value.$2.fetchDay.isToday) {
             return Text(
-              FlutterI18n.translate(context, electricityInfo.value.owe),
+              FlutterI18n.translate(
+                context,
+                "homepage.electricity_card.cache_notice",
+                translationParams: {
+                  "date": DateFormat(
+                    "yyyy-MM-dd HH:mm",
+                  ).format(value.$2.fetchDay),
+                },
+              ).replaceAll("\n", ""),
+            );
+          }
+
+          if (value.$2.owe.contains(RegExp(r'[0-9]'))) {
+            return Text(
+              FlutterI18n.translate(
+                context,
+                "electricity_status.owe_need_pay",
+                translationParams: {"due": value.$2.owe},
+              ),
               overflow: TextOverflow.ellipsis,
             );
-          },
+          }
+          return Text(
+            FlutterI18n.translate(context, value.$2.owe),
+            overflow: TextOverflow.ellipsis,
+          );
+        },
+        error: () => Text(
+          FlutterI18n.translate(context, "electricity_status.owe_issue"),
+        ),
+        loading: () => Text(
+          FlutterI18n.translate(context, "electricity_status.owe_fetching"),
         ),
       ),
     );

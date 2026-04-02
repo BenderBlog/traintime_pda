@@ -8,21 +8,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:pool/pool.dart';
-import 'package:signals/signals.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-
-final libraryBorrowSignal = futureSignal<List<BorrowData>>(() async {
-  return await LibrarySession().getBorrowList();
-}, debugLabel: "LibraryBorrowSignal");
-
-void refreshBorrowList() {
-  if (libraryBorrowSignal.value.isLoading) return;
-  libraryBorrowSignal.reload();
-}
 
 class LibrarySession extends IDSSession {
   // static String token = "";

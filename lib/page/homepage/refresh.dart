@@ -96,7 +96,7 @@ Future<void> update({
       }),
       Future(() => borrow_info.LibrarySession().getBorrowList()),
       Future(() => school_card_session.SchoolCardSession().initSession()),
-      Future(() => electricity.update()),
+      Future(() => electricity.refreshElectricityInfo()),
       Future(() => school_net.update()),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(

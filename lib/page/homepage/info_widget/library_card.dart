@@ -4,11 +4,11 @@
 
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -19,7 +19,7 @@ class LibraryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      final state = libraryBorrowSignal.watch(context);
+      final state = libraryBorrowSignal.value;
       return MainPageCard(
         onPressed: () async {
           if (offline) {
@@ -48,7 +48,7 @@ class LibraryCard extends StatelessWidget {
                   ),
                 ),
                 // 错误状态
-                error: (_, __) => TextSpan(
+                error: (_, _) => TextSpan(
                   text: FlutterI18n.translate(
                     context,
                     "homepage.library_card.error_occured",

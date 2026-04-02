@@ -43,8 +43,7 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
-    as electricity_session;
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
@@ -412,8 +411,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         onFetchFromNetwork: () async {
                           String dorm = await PersonalInfoSession()
                               .getDormInfoEhall();
-                          return electricity_session
-                              .ElectricitySession.parseElectricityAccountFromIDS(
+                          return ElectricitySession.parseElectricityAccountFromIDS(
                             dorm,
                           );
                         },
@@ -432,8 +430,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         }
                       }
 
-                      electricity_session
-                          .ElectricitySession.clearElectricityHistory();
+                      ElectricitySession.clearElectricityHistory();
 
                       if (context.mounted) {
                         showToast(
@@ -443,7 +440,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             "setting.change_electricity_account.successful_setting",
                           ),
                         );
-                        electricity_session.update(force: true);
+                        refreshElectricityInfo(force: true);
                         return;
                       }
                     });
@@ -991,8 +988,8 @@ void _removeCache() {
     ExperimentController.physicsCacheName,
     ExperimentController.otherCacheName,
     ScoreSession.scoreListCacheName,
-    electricity_session.ElectricitySession.electricityCache,
-    electricity_session.ElectricitySession.electricityHistory,
+    ElectricitySession.electricityCache,
+    ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {
@@ -1010,8 +1007,8 @@ void _removeAll() {
     ExperimentController.physicsCacheName,
     ExperimentController.otherCacheName,
     ScoreSession.scoreListCacheName,
-    electricity_session.ElectricitySession.electricityCache,
-    electricity_session.ElectricitySession.electricityHistory,
+    ElectricitySession.electricityCache,
+    ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {

@@ -9,11 +9,11 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
 
 class BorrowListWindow extends StatefulWidget {
