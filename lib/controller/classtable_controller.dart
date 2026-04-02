@@ -29,6 +29,7 @@ class ClassTableController extends GetxController {
   late File userDefinedFile;
   late ClassTableData classTableData;
   late UserDefinedClassData userDefinedClassData;
+  /// Mark whether the classtable cache changed for system calendar sync.
   bool _isClassTableChangedForSystemCalendarSync = false;
 
   // Get ClassDetail name info
@@ -214,6 +215,7 @@ class ClassTableController extends GetxController {
     classTableData.termStartDay,
   ).add(Duration(days: 7 * preference.getInt(preference.Preference.swift)));
 
+  /// Read and clear the pending change mark for system calendar sync.
   bool consumeClassTableChangeForSystemCalendarSync() {
     bool toReturn = _isClassTableChangedForSystemCalendarSync;
     _isClassTableChangedForSystemCalendarSync = false;

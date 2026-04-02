@@ -18,6 +18,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 
 const String exportedClassTableCalendarPrefix = 'PDA Class Arrangement';
 
+/// Build a stable calendar name for exported classtable events.
 String buildExportedClassTableCalendarName(String semesterCode) =>
     semesterCode.isEmpty
         ? exportedClassTableCalendarPrefix
@@ -278,6 +279,7 @@ class SystemCalendarSyncService {
         name.startsWith(exportedClassTableCalendarPrefix);
   }
 
+  /// Find the exported calendar by saved id, fixed name or legacy name.
   Future<Calendar?> _findExportedCalendar() async {
     final calendarResult = await deviceCalendarPlugin.retrieveCalendars();
     if (!calendarResult.isSuccess || calendarResult.data == null) {
@@ -358,6 +360,7 @@ class SystemCalendarSyncService {
       return null;
     }
 
+    // Recreate the exported calendar to replace the previous exported events.
     Result<bool> deleteResult = await deviceCalendarPlugin.deleteCalendar(
       exportedCalendar.id!,
     );
@@ -425,6 +428,7 @@ class SystemCalendarSyncService {
   }
 }
 
+/// Auto sync only when classtable changed and exported calendar exists.
 Future<void> maybeAutoSyncSystemCalendar() async {
   try {
     final classTableController = Get.find<ClassTableController>();
