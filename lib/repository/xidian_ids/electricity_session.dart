@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:watermeter/model/datetime_is_today_extension.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
@@ -18,32 +18,8 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
-final _isForce = signal(false);
-var historyElectricityInfoSignal = listSignal<ElectricityInfo>([]);
-var electricityInfoSignal = futureSignal<(bool, ElectricityInfo)>(() async {
-  final forceValue = untracked(() => _isForce.value);
-  try {
-    return await _getElectricityInfo(force: forceValue);
-  } finally {
-    _isForce.value = false;
-  }
-}, debugLabel: "ElectricityInfoSignal");
-
-extension IsToday on DateTime {
-  bool get isToday {
-    DateTime now = DateTime.now();
-    return year == now.year && month == now.month && day == now.day;
-  }
-}
-
-void refreshElectricityInfo({bool force = false}) {
-  if (electricityInfoSignal.value.isLoading) return;
-  _isForce.value = force;
-  electricityInfoSignal.reload();
-}
-
 // The bool is a cache flag
-Future<(bool, ElectricityInfo)> _getElectricityInfo({
+Future<(bool, ElectricityInfo)> getElectricityInfo({
   bool force = false,
   Future<String> Function(List<int>)? captchaFunction,
 }) async {
@@ -108,7 +84,7 @@ Future<(bool, ElectricityInfo)> _getElectricityInfo({
     }),
     Future(() async {
       try {
-        remain = await ElectricitySession().getOwe(sessionValue);
+        owe = await ElectricitySession().getOwe(sessionValue);
       } on DioException catch (e, s) {
         log.info(
           "[PaymentSession][update] "
@@ -170,30 +146,45 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     ElectricitySession.fileHistory.createSync();
   }
 
+  // Remove electricity cache
+  static void removeElectricityInfoCache() {
+    if (fileCache.existsSync()) {
+      fileCache.deleteSync();
+    }
+  }
+
+  // Remove electricity history cache
+  static void removeElectricityHistoryCache() {
+    if (fileHistory.existsSync()) {
+      fileHistory.deleteSync();
+    }
+  }
+
   // Read the cached list
   // Input an electricity info will refresh the list
-  static void refreshElectricityHistory(ElectricityInfo? info) {
+  // If not input, just fetch the record cache
+  static List<ElectricityInfo> refreshElectricityHistory(
+    ElectricityInfo? info,
+  ) {
+    var list = <ElectricityInfo>[];
+
+    // Create file if not exist, or read the cache list
     if (!ElectricitySession.fileHistory.existsSync()) {
       ElectricitySession.fileHistory.createSync();
+    } else {
+      try {
+        String rawHistory = ElectricitySession.fileHistory.readAsStringSync();
+        List<ElectricityInfo> toAdd = jsonDecode(rawHistory)
+            .map<ElectricityInfo>((data) => ElectricityInfo.fromJson(data))
+            .toList();
+        list.addAll(toAdd);
+        list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
+      } catch (e, s) {
+        log.handle(e, s);
+      }
     }
 
-    var list = <ElectricityInfo>[];
-    try {
-      List proto = jsonDecode(
-        ElectricitySession.fileHistory.readAsStringSync(),
-      );
-      list.clear();
-      list.addAll(
-        List<ElectricityInfo>.generate(
-          proto.length,
-          (data) => ElectricityInfo.fromJson(proto[data]),
-        ),
-      );
-      list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
-    } catch (e, s) {
-      log.handle(e, s);
-    }
-
+    // Add the record
     if (info != null) {
       if (list.length > 14) {
         list.removeAt(0);
@@ -208,8 +199,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       }
     }
 
-    historyElectricityInfoSignal.clear();
-    historyElectricityInfoSignal.addAll(list);
+    return list;
   }
 
   /// The way to get the electricity number.
@@ -393,7 +383,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
   }
 
   /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
-  String rsaEncrypt(String toEnc) {
+  static String _rsaEncrypt(String toEnc) {
     dynamic publicKey = RSAKeyParser().parse(pubKey);
     return Encrypter(RSA(publicKey: publicKey)).encrypt(toEnc).base64;
   }
@@ -492,9 +482,9 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       var value = await dio.post(
         "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
         data: {
-          "p_Userid": rsaEncrypt(electricityAccount),
-          "p_Password": rsaEncrypt(password),
-          "checkCode": rsaEncrypt(checkCode),
+          "p_Userid": _rsaEncrypt(electricityAccount),
+          "p_Password": _rsaEncrypt(password),
+          "checkCode": _rsaEncrypt(checkCode),
           "factorycode": factorycode,
         },
       );

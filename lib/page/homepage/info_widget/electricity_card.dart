@@ -8,17 +8,18 @@ import 'package:intl/intl.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:watermeter/controller/electricity_controller.dart';
+import 'package:watermeter/model/datetime_is_today_extension.dart';
 import 'package:watermeter/page/electricity/electricity_window.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 
 class ElectricityCard extends StatelessWidget {
   const ElectricityCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final state = electricityInfoSignal.watch(context);
+    final state = ElectricityController.i.electricityInfoSignal.watch(context);
     return MainPageCard(
       onPressed: () async {
         context.push(ElectricityWindow());
@@ -41,7 +42,7 @@ class ElectricityCard extends StatelessWidget {
           error: () => Text(
             FlutterI18n.translate(
               context,
-              "homepage.electricity_card.current_electricity",
+              "electricity_status.remain_not_found",
             ),
           ),
           loading: () => Text(
@@ -55,6 +56,7 @@ class ElectricityCard extends StatelessWidget {
 
       bottomText: state.map(
         data: (value) {
+          // If not today, it must be cache, so show cache date
           if (!value.$2.fetchDay.isToday) {
             return Text(
               FlutterI18n.translate(

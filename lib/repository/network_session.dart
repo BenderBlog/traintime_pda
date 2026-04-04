@@ -40,7 +40,7 @@ class NetworkSession {
             },
           ),
         )
-        ..interceptors.add(CookieManager(cookieJar))
+        ..interceptors.add(CookieManager(cookieJar, ignoreInvalidCookies: true))
         ..interceptors.add(logDioAdapter)
         ..options.connectTimeout = const Duration(seconds: 10)
         ..options.receiveTimeout = const Duration(seconds: 30)

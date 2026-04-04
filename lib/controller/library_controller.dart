@@ -10,7 +10,9 @@ final libraryBorrowSignal = futureSignal<List<BorrowData>>(
   debugLabel: "LibraryBorrowSignal",
 );
 
-void refreshBorrowList() {
+Future<void> refreshBorrowList() async {
   if (libraryBorrowSignal.value.isLoading) return;
-  libraryBorrowSignal.reload();
+  try {
+    await libraryBorrowSignal.reload();
+  } catch (_) {}
 }

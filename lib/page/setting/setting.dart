@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -44,7 +45,6 @@ import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -408,13 +408,8 @@ class _SettingWindowState extends State<SettingWindow> {
                         initialAccountNumber: preference.getString(
                           preference.Preference.electricityAccount,
                         ),
-                        onFetchFromNetwork: () async {
-                          String dorm = await PersonalInfoSession()
-                              .getDormInfoEhall();
-                          return ElectricitySession.parseElectricityAccountFromIDS(
-                            dorm,
-                          );
-                        },
+                        onFetchFromNetwork:
+                            ElectricityController.i.getElectricityAccount,
                       ),
                     ).then((value) async {
                       if (value != true) {
@@ -430,7 +425,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         }
                       }
 
-                      ElectricitySession.clearElectricityHistory();
+                      ElectricityController.i.clearElectricityHistory();
 
                       if (context.mounted) {
                         showToast(
@@ -440,7 +435,9 @@ class _SettingWindowState extends State<SettingWindow> {
                             "setting.change_electricity_account.successful_setting",
                           ),
                         );
-                        refreshElectricityInfo(force: true);
+                        ElectricityController.i.refreshElectricityInfo(
+                          force: true,
+                        );
                         return;
                       }
                     });
@@ -982,14 +979,14 @@ class _SettingWindowState extends State<SettingWindow> {
 }
 
 void _removeCache() {
+  ElectricitySession.removeElectricityHistoryCache();
+  ElectricitySession.removeElectricityInfoCache();
   for (var value in [
     ClassTableFile.schoolClassName,
     ExamController.examDataCacheName,
     ExperimentController.physicsCacheName,
     ExperimentController.otherCacheName,
     ScoreSession.scoreListCacheName,
-    ElectricitySession.electricityCache,
-    ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {
@@ -999,6 +996,8 @@ void _removeCache() {
 }
 
 void _removeAll() {
+  ElectricitySession.removeElectricityHistoryCache();
+  ElectricitySession.removeElectricityInfoCache();
   for (var value in [
     ClassTableFile.schoolClassName,
     ClassTableFile.userDefinedClassName,
@@ -1007,8 +1006,6 @@ void _removeAll() {
     ExperimentController.physicsCacheName,
     ExperimentController.otherCacheName,
     ScoreSession.scoreListCacheName,
-    ElectricitySession.electricityCache,
-    ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {

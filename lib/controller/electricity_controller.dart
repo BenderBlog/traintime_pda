@@ -1,0 +1,69 @@
+// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
+// SPDX-License-Identifier: MPL-2.0
+
+import 'package:signals/signals.dart';
+import 'package:watermeter/model/xidian_ids/electricity.dart';
+import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
+import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+
+class ElectricityController {
+  static final ElectricityController i = ElectricityController._();
+
+  ElectricityController._() {
+    _initEffects();
+  }
+
+  bool _isElectricityForceToLoad = false;
+
+  // bool is a flag about cache info, whether it is today's data
+  late final electricityInfoSignal = futureSignal<(bool, ElectricityInfo)>(
+    () async {
+      final isForce = _isElectricityForceToLoad;
+      _isElectricityForceToLoad = false;
+
+      return await getElectricityInfo(force: isForce);
+    },
+    debugLabel: "ElectricityInfoSignal",
+  );
+
+  final historyElectricitySignal = <ElectricityInfo>[];
+
+  void _initEffects() {
+    effect(() {
+      final state = electricityInfoSignal.value;
+      if (state is AsyncData<(bool, ElectricityInfo)>) {
+        List<ElectricityInfo> newHistoryInfo =
+            ElectricitySession.refreshElectricityHistory(state.value.$2);
+        batch(() {
+          historyElectricitySignal.clear();
+          historyElectricitySignal.addAll(newHistoryInfo);
+        });
+      }
+    }, debugLabel: "HistorySyncEffect");
+  }
+
+  Future<void> refreshElectricityInfo({bool force = false}) async {
+    if (electricityInfoSignal.value.isLoading) return;
+    _isElectricityForceToLoad = force;
+    try {
+      await electricityInfoSignal.refresh();
+    } catch (e, s) {
+      log.error("[refreshElectricityInfo] Refresh with error", e, s);
+      // The UI observes electricityInfoSignal state directly. If this refresh
+      // still ends in an error state, don't surface the internal signal future
+      // exception as an extra crash on top of the visible error UI.
+    }
+  }
+
+  void clearElectricityHistory() {
+    ElectricitySession.clearElectricityHistory();
+    historyElectricitySignal.clear();
+  }
+
+  // Get electricity account
+  Future<String> getElectricityAccount() async {
+    String dorm = await PersonalInfoSession().getDormInfoEhall();
+    return ElectricitySession.parseElectricityAccountFromIDS(dorm);
+  }
+}

@@ -4,7 +4,9 @@
 
 // Refresh formula for homepage.
 
+import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -14,10 +16,6 @@ import 'package:watermeter/repository/notification/course_reminder_service.dart'
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
 //import 'package:watermeter/repository/pda_service_session.dart' as message;
-import 'package:watermeter/repository/xidian_ids/library_session.dart'
-    as borrow_info;
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
-    as electricity;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/schoolnet_session.dart' as school_net;
 
@@ -94,9 +92,9 @@ Future<void> update({
         final c = Get.put(ExperimentController());
         await c.get();
       }),
-      Future(() => borrow_info.LibrarySession().getBorrowList()),
+      Future(() => refreshBorrowList()),
       Future(() => school_card_session.SchoolCardSession().initSession()),
-      Future(() => electricity.refreshElectricityInfo()),
+      Future(() => ElectricityController.i.refreshElectricityInfo()),
       Future(() => school_net.update()),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(

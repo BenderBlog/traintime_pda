@@ -33,26 +33,14 @@ class _BorrowListWindowState extends State<BorrowListWindow>
     super.build(context);
 
     return RefreshIndicator(
-      onRefresh: () async => refreshBorrowList(),
+      onRefresh: refreshBorrowList,
       child: Watch((context) {
         final state = libraryBorrowSignal.watch(context);
         return state.map(
           data: (list) => BorrowListDetail(borrowList: list),
-          loading: () {
-            return const CircularProgressIndicator().center();
-          },
-          refreshing: () {
-            final currentList = state.value;
-            return currentList == null
-                ? const CircularProgressIndicator().center()
-                : BorrowListDetail(borrowList: currentList);
-          },
-          reloading: () {
-            final currentList = state.value;
-            return currentList == null
-                ? const CircularProgressIndicator().center()
-                : BorrowListDetail(borrowList: currentList);
-          },
+          loading: () => const CircularProgressIndicator().center(),
+          refreshing: () => const CircularProgressIndicator().center(),
+          reloading: () => const CircularProgressIndicator().center(),
           error: (err, stack) => ReloadWidget(
             errorStatus: err,
             stackTrace: stack,

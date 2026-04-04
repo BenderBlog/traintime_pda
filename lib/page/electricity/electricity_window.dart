@@ -7,6 +7,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/electricity/electricity_average_usage_graph.dart';
 import 'package:watermeter/page/electricity/electricity_usage_graph.dart';
@@ -28,7 +29,7 @@ class ElectricityWindow extends StatelessWidget {
         title: Text(FlutterI18n.translate(context, "electricity.title")),
       ),
       body: Watch((context) {
-        final state = electricityInfoSignal.value;
+        final state = ElectricityController.i.electricityInfoSignal.value;
         return state.map(
           data: ((bool, ElectricityInfo) value) =>
               [
@@ -119,7 +120,9 @@ class ElectricityWindow extends StatelessWidget {
                                         graphHeight: 240,
                                         graphWidth: constraints.maxWidth,
                                         historyElectricityInfo:
-                                            historyElectricityInfoSignal.value,
+                                            ElectricityController
+                                                .i
+                                                .historyElectricitySignal,
                                       ),
                                 )
                                 .padding(vertical: 12, horizontal: 16)
@@ -148,7 +151,9 @@ class ElectricityWindow extends StatelessWidget {
                                       ElectricityAverageUsageGraph(
                                         graphWidth: constraints.maxWidth,
                                         historyElectricityInfo:
-                                            historyElectricityInfoSignal.value,
+                                            ElectricityController
+                                                .i
+                                                .historyElectricitySignal,
                                       ),
                                 )
                                 .padding(vertical: 12, horizontal: 16)
@@ -166,7 +171,8 @@ class ElectricityWindow extends StatelessWidget {
                         .center(),
 
                     FilledButton(
-                          onPressed: () => refreshElectricityInfo(force: true),
+                          onPressed: () => ElectricityController.i
+                              .refreshElectricityInfo(force: true),
                           child: Text(
                             FlutterI18n.translate(
                               context,
@@ -231,7 +237,7 @@ class ElectricityWindow extends StatelessWidget {
                 }
               }
 
-              ElectricitySession.clearElectricityHistory();
+              ElectricityController.i.clearElectricityHistory();
 
               if (context.mounted) {
                 showToast(
@@ -241,12 +247,14 @@ class ElectricityWindow extends StatelessWidget {
                     "setting.change_electricity_account.successful_setting",
                   ),
                 );
-                refreshElectricityInfo(force: true);
+                ElectricityController.i.refreshElectricityInfo(force: true);
                 return;
               }
             },
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
+          refreshing: () => const CircularProgressIndicator().center(),
+          reloading: () => const CircularProgressIndicator().center(),
         );
       }),
     );
