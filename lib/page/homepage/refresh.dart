@@ -7,6 +7,7 @@
 import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/controller/schoolnet_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:get/get.dart';
@@ -17,7 +18,6 @@ import 'package:watermeter/repository/xidian_ids/school_card_session.dart'
     as school_card_session;
 //import 'package:watermeter/repository/pda_service_session.dart' as message;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/schoolnet_session.dart' as school_net;
 
 DateTime updateTime = DateTime.now();
 
@@ -95,7 +95,7 @@ Future<void> update({
       Future(() => refreshBorrowList()),
       Future(() => school_card_session.SchoolCardSession().initSession()),
       Future(() => ElectricityController.i.refreshElectricityInfo()),
-      Future(() => school_net.update()),
+      Future(() => SchoolnetController.i.reloadSchoolnetInfo()),
     ]).then((value) => updateCurrentData()).onError((error, stackTrace) {
       log.info(
         "[homepage Update]"

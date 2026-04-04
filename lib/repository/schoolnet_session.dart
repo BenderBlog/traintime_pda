@@ -1,38 +1,18 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-import 'dart:async';
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
+import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:html/dom.dart';
-import 'package:watermeter/model/session_state.dart';
+import 'package:html/parser.dart';
+import 'package:pointycastle/asymmetric/api.dart';
 import 'package:watermeter/model/xidian_ids/network_usage.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:html/parser.dart';
-import 'package:encrypter_plus/encrypter_plus.dart';
-import 'package:pointycastle/asymmetric/api.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
-
-Rxn<NetworkUsage?> networkInfo = Rxn();
-Rx<SessionState> schoolNetStatus = SessionState.none.obs;
-var isError = "".obs;
-
-// NetworkInfo is not controlled by schoolNetStatus, do remember
-enum CurrentUserNetInfoState { fetching, fetched, notSchool, error, none }
-
-Rxn<NetworkInfo?> currentUserNetInfo = Rxn();
-Rx<CurrentUserNetInfoState> currentUserNetInfoStatus =
-    CurrentUserNetInfoState.none.obs;
-
-Future<void> update({
-  Future<String> Function(List<int>)? captchaFunction,
-}) async {
-  log.info("[SchoolnetSession] Ready to fetch the schoolnet infos.");
-  await SchoolnetSession().getNetworkUsage(captchaFunction: captchaFunction);
-}
 
 class SchoolnetSession extends NetworkSession {
   Dio get _dio => super.dio
@@ -41,34 +21,26 @@ class SchoolnetSession extends NetworkSession {
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = true;
 
-  static Future<void> getCurrentUserLogin() async {
-    final dio = Dio();
-    currentUserNetInfoStatus.value = CurrentUserNetInfoState.fetching;
+  Future<CurrentUserNetInfo> getCurrentUserNetInfo() async {
     if (await NetworkSession.isInSchool() == false) {
-      currentUserNetInfoStatus.value = CurrentUserNetInfoState.notSchool;
-      return;
+      throw CurrentUserNetInfoState.notSchool;
     }
-    try {
-      final networkInfoResponse = await dio
-          .get(
-            'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
-            queryParameters: {
-              'callback': 'jsonp',
-              '_': DateTime.now().millisecondsSinceEpoch.toString(),
-            },
-            options: Options(responseType: ResponseType.plain),
-          )
-          .then((value) => value.data);
-      final jsonString = networkInfoResponse.substring(
-        6,
-        networkInfoResponse.length - 1,
-      );
-      currentUserNetInfo.value = NetworkInfo.fromJson(jsonDecode(jsonString));
-      currentUserNetInfoStatus.value = CurrentUserNetInfoState.fetched;
-      return;
-    } catch (e) {
-      currentUserNetInfoStatus.value = CurrentUserNetInfoState.error;
-    }
+
+    final networkInfoResponse = await dio
+        .get(
+          'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
+          queryParameters: {
+            'callback': 'jsonp',
+            '_': DateTime.now().millisecondsSinceEpoch.toString(),
+          },
+          options: Options(responseType: ResponseType.plain),
+        )
+        .then((value) => value.data);
+    final jsonString = networkInfoResponse.substring(
+      6,
+      networkInfoResponse.length - 1,
+    );
+    return CurrentUserNetInfo.fromJson(jsonDecode(jsonString));
   }
 
   String _getPostStringBody(Map<String, dynamic> toPost) {
@@ -83,8 +55,7 @@ class SchoolnetSession extends NetworkSession {
     return toPostStr;
   }
 
-  Future<void> _getNetworkUsage() async {
-    // Return data
+  Future<GeneralNetworkUsage> _getNetworkUsage() async {
     try {
       final page = await _dio.get("/home").then((page) => page.data);
 
@@ -115,38 +86,30 @@ class SchoolnetSession extends NetworkSession {
           }
         }
       });
-      networkInfo.value = NetworkUsage(
+      return GeneralNetworkUsage(
         ipList: ipList,
         used: used,
         rest: rest,
         charged: charged,
       );
-      isError.value = "";
-      schoolNetStatus.value = SessionState.fetched;
-    } catch (e) {
-      isError.value = "homepage.school_net.failed";
-      schoolNetStatus.value = SessionState.error;
+    } catch (_) {
+      throw "homepage.school_net.failed";
     }
   }
 
-  Future<void> getNetworkUsage({
+  Future<GeneralNetworkUsage> getGeneralNetworkUsage({
     required Future<String> Function(List<int>)? captchaFunction,
   }) async {
-    schoolNetStatus.value = SessionState.fetching;
-    isError.value = "";
     // Get username and password
     String password = prefs.getString(prefs.Preference.schoolNetQueryPassword);
     if (password.isEmpty) {
-      isError.value = "school_net.empty_password";
-      schoolNetStatus.value = SessionState.error;
-      return;
+      throw "school_net.empty_password";
     }
     String username = prefs.getString(prefs.Preference.idsAccount);
     // Check whether fetch directly
     var page = await _dio.get("/home");
     if (!page.isRedirect) {
-      _getNetworkUsage();
-      return;
+      return await _getNetworkUsage();
     }
     //clearCookieJarSpecific("https://zfw.xidian.edu.cn");
     // Get login page
@@ -167,9 +130,7 @@ class SchoolnetSession extends NetworkSession {
       if (csrf.isNotEmpty && key.isNotEmpty) break;
     }
     if (csrf.isEmpty || key.isEmpty) {
-      isError.value = "school_net.not_initalized";
-      schoolNetStatus.value = SessionState.error;
-      return;
+      throw "school_net.not_initalized";
     }
 
     String lastErrorMessage = "";
@@ -205,9 +166,7 @@ class SchoolnetSession extends NetworkSession {
 
       // If failed too much time, set error state.
       if (verifycode == failedmsg) {
-        isError.value = failedmsg;
-        schoolNetStatus.value = SessionState.error;
-        return;
+        throw failedmsg;
       }
       if (verifycode == null) {
         log.info('[SchoolnetSession] Captcha is impossible to be inferred.');
@@ -279,14 +238,9 @@ class SchoolnetSession extends NetworkSession {
         ),
       );
 
-      await _getNetworkUsage();
-      if (lastErrorMessage.isEmpty) {
-        return;
-      }
+      return await _getNetworkUsage();
     }
 
-    isError.value = lastErrorMessage;
-    schoolNetStatus.value = SessionState.error;
-    return;
+    throw lastErrorMessage;
   }
 }
