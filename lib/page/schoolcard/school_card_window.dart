@@ -25,7 +25,6 @@ class SchoolCardWindow extends StatefulWidget {
 class _SchoolCardWindowState extends State<SchoolCardWindow> {
   List<DateTime?> timeRange = [];
   late Future<List<PaidRecord>> getPaid;
-  late DateTime now;
   DateFormat formatter = DateFormat("yyyy-MM-dd");
 
   String moneySunUp(List<PaidRecord> theRecord) {
@@ -105,7 +104,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
               });
             },
           ).padding(horizontal: 16, vertical: 8),
-          FutureBuilder(
+          FutureBuilder<List<PaidRecord>>(
             future: getPaid,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
