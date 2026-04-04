@@ -5,13 +5,11 @@
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/library_controller.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/library/library_window.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class LibraryCard extends StatelessWidget {
   const LibraryCard({super.key});
@@ -19,19 +17,12 @@ class LibraryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      final state = libraryBorrowSignal.value;
+      final state = LibraryController.i.libraryBorrowSignal.watch(context);
       return MainPageCard(
         onPressed: () async {
-          if (offline) {
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(context, "homepage.offline_mode"),
-            );
-          } else {
-            context.pushReplacement(const LibraryWindow());
-          }
+          context.pushReplacement(const LibraryWindow());
         },
-        isLoad: state.isLoading && !state.isRefreshing,
+        isLoad: state.isLoading,
         icon: MingCuteIcons.mgc_book_2_line,
         text: FlutterI18n.translate(context, "homepage.library_card.title"),
         infoText: Text.rich(
@@ -39,7 +30,6 @@ class LibraryCard extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
             children: [
               state.map(
-                // 成功状态
                 data: (list) => TextSpan(
                   text: FlutterI18n.translate(
                     context,
@@ -47,18 +37,28 @@ class LibraryCard extends StatelessWidget {
                     translationParams: {"count": list.length.toString()},
                   ),
                 ),
-                // 错误状态
-                error: (_, _) => TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "homepage.library_card.error_occured",
-                  ),
-                ),
-                // 加载状态 (loading, reloading, refreshing)
                 loading: () => TextSpan(
                   text: FlutterI18n.translate(
                     context,
                     "homepage.library_card.fetching",
+                  ),
+                ),
+                refreshing: () => TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.fetching",
+                  ),
+                ),
+                reloading: () => TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.fetching",
+                  ),
+                ),
+                error: (_, _) => TextSpan(
+                  text: FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.error_occured",
                   ),
                 ),
               ),
@@ -86,14 +86,26 @@ class LibraryCard extends StatelessWidget {
                 ),
               );
             },
-            error: (_, _) => Text(
-              FlutterI18n.translate(context, "homepage.library_card.no_info"),
-            ),
             loading: () => Text(
               FlutterI18n.translate(
                 context,
                 "homepage.library_card.fetching_info",
               ),
+            ),
+            refreshing: () => Text(
+              FlutterI18n.translate(
+                context,
+                "homepage.library_card.fetching_info",
+              ),
+            ),
+            reloading: () => Text(
+              FlutterI18n.translate(
+                context,
+                "homepage.library_card.fetching_info",
+              ),
+            ),
+            error: (_, _) => Text(
+              FlutterI18n.translate(context, "homepage.library_card.no_info"),
             ),
           ),
         ),

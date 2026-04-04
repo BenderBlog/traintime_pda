@@ -59,7 +59,7 @@ class SchoolnetCard extends StatelessWidget {
                   context,
                   "homepage.school_net.fetching",
                 ),
-                error: (_, stackTrace) => FlutterI18n.translate(
+                error: (_, _) => FlutterI18n.translate(
                   context,
                   "homepage.school_net.failed",
                 ),

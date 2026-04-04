@@ -16,7 +16,7 @@ import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 class SchoolCardSession extends IDSSession {
   static String openid = "";
   static DateTime? _openidFetchedAt;
-  static const Duration _openidValidDuration = Duration(minutes: 10);
+  static const Duration _openidValidDuration = Duration(minutes: 5);
 
   bool get _isOpenIdValid =>
       openid.isNotEmpty &&

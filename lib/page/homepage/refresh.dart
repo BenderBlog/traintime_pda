@@ -91,7 +91,7 @@ Future<void> update({
         final c = Get.put(ExperimentController());
         await c.get();
       }),
-      Future(() => refreshBorrowList()),
+      Future(() => LibraryController.i.reloadBorrowList()),
       Future(() => SchoolCardController.i.reloadOverview()),
       Future(() => ElectricityController.i.refreshElectricityInfo()),
       Future(() => SchoolnetController.i.reloadSchoolnetInfo()),
