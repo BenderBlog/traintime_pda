@@ -122,7 +122,7 @@ class ElectricityWindow extends StatelessWidget {
                                         historyElectricityInfo:
                                             ElectricityController
                                                 .i
-                                                .historyElectricitySignal,
+                                                .historyElectricityInfoList,
                                       ),
                                 )
                                 .padding(vertical: 12, horizontal: 16)
@@ -153,7 +153,7 @@ class ElectricityWindow extends StatelessWidget {
                                         historyElectricityInfo:
                                             ElectricityController
                                                 .i
-                                                .historyElectricitySignal,
+                                                .historyElectricityInfoList,
                                       ),
                                 )
                                 .padding(vertical: 12, horizontal: 16)
@@ -252,7 +252,7 @@ class ElectricityWindow extends StatelessWidget {
               }
             },
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const CircularProgressIndicator().center(),
           refreshing: () => const CircularProgressIndicator().center(),
           reloading: () => const CircularProgressIndicator().center(),
         );

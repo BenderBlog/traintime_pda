@@ -27,7 +27,7 @@ class ElectricityController {
     debugLabel: "ElectricityInfoSignal",
   );
 
-  final historyElectricitySignal = <ElectricityInfo>[];
+  final historyElectricityInfoList = <ElectricityInfo>[];
 
   void _initEffects() {
     effect(() {
@@ -36,8 +36,8 @@ class ElectricityController {
         List<ElectricityInfo> newHistoryInfo =
             ElectricitySession.refreshElectricityHistory(state.value.$2);
         batch(() {
-          historyElectricitySignal.clear();
-          historyElectricitySignal.addAll(newHistoryInfo);
+          historyElectricityInfoList.clear();
+          historyElectricityInfoList.addAll(newHistoryInfo);
         });
       }
     }, debugLabel: "HistorySyncEffect");
@@ -46,19 +46,18 @@ class ElectricityController {
   Future<void> refreshElectricityInfo({bool force = false}) async {
     if (electricityInfoSignal.value.isLoading) return;
     _isElectricityForceToLoad = force;
-    try {
-      await electricityInfoSignal.refresh();
-    } catch (e, s) {
-      log.error("[refreshElectricityInfo] Refresh with error", e, s);
-      // The UI observes electricityInfoSignal state directly. If this refresh
-      // still ends in an error state, don't surface the internal signal future
-      // exception as an extra crash on top of the visible error UI.
-    }
+    await electricityInfoSignal.reload().catchError(
+      (e, s) => log.handle(
+        e,
+        s,
+        "[ElectricityController][refreshElectricityInfo] Have issue",
+      ),
+    );
   }
 
   void clearElectricityHistory() {
     ElectricitySession.clearElectricityHistory();
-    historyElectricitySignal.clear();
+    historyElectricityInfoList.clear();
   }
 
   // Get electricity account

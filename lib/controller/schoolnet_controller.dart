@@ -27,16 +27,12 @@ class SchoolnetController {
     if (schoolNetUsageSignal.value.isLoading) return;
 
     _captchaFunction = captchaFunction;
-    try {
-      await schoolNetUsageSignal.reload();
-    } catch (e, s) {
-      log.error(
-        "[SchoolnetController] Failed to update schoolnet infos.",
+    await schoolNetUsageSignal.reload().catchError(
+      (e, s) => log.handle(
         e,
         s,
-      );
-    } finally {
-      _captchaFunction = null;
-    }
+        "[SchoolnetController][reloadSchoolnetInfo] Have issue",
+      ),
+    );
   }
 }

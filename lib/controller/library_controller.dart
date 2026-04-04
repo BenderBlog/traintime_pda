@@ -18,10 +18,9 @@ class LibraryController {
 
   Future<void> reloadBorrowList() async {
     if (libraryBorrowSignal.value.isLoading) return;
-    return await libraryBorrowSignal.reload().then(
-      (value) {},
-      onError: (e, s) =>
-          log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue."),
+    return await libraryBorrowSignal.reload().catchError(
+      (e, s) =>
+          log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue"),
     );
   }
 }

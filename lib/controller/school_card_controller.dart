@@ -19,14 +19,9 @@ class SchoolCardController {
     log.info("[SchoolCardController] Ready to fetch school card overview.");
     if (moneySignal.value.isLoading) return;
 
-    try {
-      await moneySignal.reload();
-    } catch (e, s) {
-      log.error(
-        "[SchoolCardController] Failed to fetch school card overview.",
-        e,
-        s,
-      );
-    }
+    await moneySignal.reload().catchError(
+      (e, s) =>
+          log.handle(e, s, "[SchoolCardController][reloadOverview] Have issue"),
+    );
   }
 }

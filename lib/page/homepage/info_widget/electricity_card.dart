@@ -24,10 +24,10 @@ class ElectricityCard extends StatelessWidget {
       onPressed: () async {
         context.push(ElectricityWindow());
       },
-      isLoad: state.isLoading && !state.isRefreshing,
+      isLoad: state.isLoading,
       icon: MingCuteIcons.mgc_flash_line,
       text: FlutterI18n.translate(context, "homepage.electricity_card.title"),
-      infoText: DefaultTextStyle(
+      infoText: DefaultTextStyle.merge(
         style: const TextStyle(fontSize: 20),
         child: state.map(
           data: (value) => Text(
@@ -53,7 +53,6 @@ class ElectricityCard extends StatelessWidget {
           ),
         ),
       ),
-
       bottomText: state.map(
         data: (value) {
           // If not today, it must be cache, so show cache date
