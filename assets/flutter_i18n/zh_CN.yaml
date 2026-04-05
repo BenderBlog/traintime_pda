@@ -47,6 +47,10 @@ catcher_description: "详情如下"
 # 新主页提示
 new_homepage_hint: "本程序将开发一个新主页，目前先用猪图秀占位，玩得愉快"
 
+# 页面缓存提示
+local_cache_hint: "本地缓存获取于 {datetime}"
+inapp_cache_hint: "程序内缓存获取于 {datetime}\n缓存退出程序后失效！"
+
 # 星期
 weekday:
     monday: "周一"

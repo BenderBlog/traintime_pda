@@ -13,14 +13,9 @@ import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/model/xidian_sport/score.dart';
-
-var sportClass = SportClass().obs;
-var sportScore = SportScore().obs;
-// var punchData = PunchDataList().obs;
+import 'package:watermeter/model/xidian_sport/sport_score.dart';
 
 class SportSession {
   static final _lock = Lock();
@@ -130,8 +125,13 @@ class SportSession {
   }
   */
 
-  Future<void> getScore() async {
-    sportScore.value.situation = "situation_fetching";
+  static SportScore? _scoreCache;
+  static DateTime _scoreCacheFetchTime = DateTime.now();
+  static SportClass? _classCache;
+  static DateTime _classCacheFetchTime = DateTime.now();
+
+  // First bool stands for cache, second bool stands for fetch time.
+  Future<(bool, DateTime, SportScore)> getScore() async {
     log.info(
       "[SportSession][getScore]"
       "Ready to get sport score.",
@@ -183,34 +183,49 @@ class SportSession {
           toReturn.list.add(toAdd);
         }
       }
-    } on NoPasswordException {
-      toReturn.situation = "sport.situation_nopassword";
-    } on LoginFailedException catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = e.msg == "sport.situation_maintain"
-          ? e.msg
-          : "sport.situation_failed_login";
-    } on SemesterFailedException catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = "sport.situation_query";
-    } on DioException catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = "sport.situation_network";
+      _scoreCache = toReturn;
+      _scoreCacheFetchTime = DateTime.now();
+      log.info(
+        "[SportSession][getScore] Score cache updated at $_scoreCacheFetchTime",
+      );
+      return (false, _scoreCacheFetchTime, toReturn);
     } catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = "sport.situation_unknown\n: $e at\n$s";
-    } finally {
-      sportScore.value = toReturn;
+      log.handle(
+        e,
+        s,
+        "[SportSession][getScore] Error occured, and cache ${_scoreCache != null ? "exist" : "not exist"}",
+      );
+      if (_scoreCache != null) {
+        return (true, _scoreCacheFetchTime, _scoreCache!);
+      } else {
+        rethrow;
+      }
     }
+    // } on NoPasswordException {
+    //   toReturn.situation = "sport.situation_nopassword";
+    // } on LoginFailedException catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = e.msg == "sport.situation_maintain"
+    //       ? e.msg
+    //       : "sport.situation_failed_login";
+    // } on SemesterFailedException catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = "sport.situation_query";
+    // } on DioException catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = "sport.situation_network";
+    // } catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = "sport.situation_unknown\n: $e at\n$s";
+    // }
   }
 
-  Future<void> getClass() async {
-    sportClass.value.situation = "sport.situation_fetching";
+  Future<(bool, DateTime, SportClass)> getClass() async {
     log.info(
       "[SportSession][getClass]"
       "Ready to get latest class.",
     );
-    SportClass toReturn = SportClass();
+    SportClass toReturn = [];
     try {
       await _lock.synchronized(() async {
         if (userId.isEmpty || token.isEmpty) {
@@ -228,7 +243,7 @@ class SportSession {
             subWebsite: "stuTeacherCurriculum/selstuTeacherCurriculum",
             body: {"stuid": userId, "stuTermScoreid": latestId},
           ).then((value) => value["data"][0]);
-          toReturn.items.add(
+          toReturn.add(
             SportClassItem.fromData(
               termName: classData["teacherCurriculumSysTermName"],
               name: classData["teacherCurriculumTeachingCurriculumName"],
@@ -244,31 +259,43 @@ class SportSession {
           continue;
         }
       }
-    } on NoPasswordException {
-      toReturn.situation = "sport.situation_nopassword";
-    } on LoginFailedException catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = e.msg == "sport.situation_maintain"
-          ? e.msg
-          : "sport.situation_failed_login";
-    } on SemesterFailedException catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = "sport.situation_query";
-    } on DioException catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = "sport.situation_network";
-    } catch (e, s) {
-      log.handle(e, s);
-      toReturn.situation = "sport.situation_unknown\n: $e at\n$s";
-    } finally {
-      sportClass.value = toReturn;
-    }
-  }
 
-  /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
-  String rsaEncrypt(String toEnc, String pubKey) {
-    dynamic publicKey = RSAKeyParser().parse(pubKey);
-    return Encrypter(RSA(publicKey: publicKey)).encrypt(toEnc).base64;
+      _classCache = toReturn;
+      _classCacheFetchTime = DateTime.now();
+      log.info(
+        "[SportSession][getScore] Class cache updated at $_classCacheFetchTime",
+      );
+      return (false, _classCacheFetchTime, _classCache!);
+    } catch (e, s) {
+      log.handle(
+        e,
+        s,
+        "[SportSession][getClass] Error occured, and cache ${_classCache != null ? "exist" : "not exist"}",
+      );
+      if (_classCache != null) {
+        log.warning("[SportSession][getClass] Use cache.");
+        return (true, _classCacheFetchTime, _classCache!);
+      } else {
+        rethrow;
+      }
+    }
+    // } on NoPasswordException {
+    //   toReturn.situation = "sport.situation_nopassword";
+    // } on LoginFailedException catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = e.msg == "sport.situation_maintain"
+    //       ? e.msg
+    //       : "sport.situation_failed_login";
+    // } on SemesterFailedException catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = "sport.situation_query";
+    // } on DioException catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = "sport.situation_network";
+    // } catch (e, s) {
+    //   log.handle(e, s);
+    //   toReturn.situation = "sport.situation_unknown\n: $e at\n$s";
+    // }
   }
 
   static var userId = '';
@@ -297,6 +324,12 @@ awb4B45zUwIDAQAB
     'appId': '3685bc028aaf4e64ad6b5d2349d24ba8',
     'appSecret': 'e8167ef026cbc5e456ab837d9d6d9254',
   };
+
+  /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
+  static String _rsaEncrypt(String toEnc, String pubKey) {
+    dynamic publicKey = RSAKeyParser().parse(pubKey);
+    return Encrypter(RSA(publicKey: publicKey)).encrypt(toEnc).base64;
+  }
 
   String _getSign(Map<String, dynamic> params) {
     var toCalculate = '';
@@ -363,7 +396,7 @@ awb4B45zUwIDAQAB
         subWebsite: "/h5/login",
         body: {
           "uname": preference.getString(preference.Preference.idsAccount),
-          "pwd": rsaEncrypt(
+          "pwd": _rsaEncrypt(
             preference.getString(preference.Preference.sportPassword),
             rsaKey,
           ),

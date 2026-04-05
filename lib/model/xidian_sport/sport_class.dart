@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+typedef SportClass = List<SportClassItem>;
+
 class SportClassItem {
   static final RegExp _termDealer = RegExp(
     r'^(?<year_start>\d{4})-(?<year_end>\d{4})(.*)(?<term>\d{1})',
@@ -95,9 +97,4 @@ class SportClassItem {
     required this.week,
     required this.place,
   });
-}
-
-class SportClass {
-  List<SportClassItem> items = [];
-  String? situation;
 }

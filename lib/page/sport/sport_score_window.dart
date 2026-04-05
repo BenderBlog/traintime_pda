@@ -6,12 +6,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/model/xidian_sport/score.dart';
+import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
 
 // 常量定义
@@ -22,6 +23,20 @@ const int _secondaryColorShade = 900;
 const double _scoreFontSize = 13.0;
 const double _rankFontSize = 13.0;
 const double _labelFontSize = 11.0;
+
+class ScoreColorScheme {
+  final Color scoreBackgroundColor;
+  final Color scoreTextColor;
+  final Color rankBackgroundColor;
+  final Color rankTextColor;
+
+  ScoreColorScheme({
+    required this.scoreBackgroundColor,
+    required this.scoreTextColor,
+    required this.rankBackgroundColor,
+    required this.rankTextColor,
+  });
+}
 
 class SportScoreWindow extends StatefulWidget {
   const SportScoreWindow({super.key});
@@ -35,132 +50,36 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   bool get wantKeepAlive => true;
 
+  late Future<(bool, DateTime, SportScore)> _future;
+
   /// 根据合格/不合格状态获取颜色方案
-  Map<String, dynamic> _getColorScheme(bool isQualified, bool isUnknown) {
+  ScoreColorScheme _getColorScheme(bool isQualified, bool isUnknown) {
     if (isUnknown) {
-      return {
-        'scoreBackgroundColor': Colors.grey.withValues(
+      return ScoreColorScheme(
+        scoreBackgroundColor: Colors.grey.withValues(
           alpha: _textBackgroundAlpha,
         ),
-        'scoreTextColor': Colors.grey[_primaryColorShade],
-        'rankBackgroundColor': Colors.grey.withValues(
+        scoreTextColor: Colors.grey[_primaryColorShade]!,
+        rankBackgroundColor: Colors.grey.withValues(
           alpha: _textBackgroundAlpha,
         ),
-        'rankTextColor': Colors.grey[_secondaryColorShade],
-      };
+        rankTextColor: Colors.grey[_secondaryColorShade]!,
+      );
     }
 
     final baseColor = isQualified ? Colors.green : Colors.red;
-    return {
-      'scoreBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
-      'scoreTextColor': baseColor[_primaryColorShade],
-      'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
-      'rankTextColor': baseColor[_secondaryColorShade],
-    };
+    return ScoreColorScheme(
+      scoreBackgroundColor: baseColor.withValues(alpha: _textBackgroundAlpha),
+      scoreTextColor: baseColor[_primaryColorShade]!,
+      rankBackgroundColor: baseColor.withValues(alpha: _textBackgroundAlpha),
+      rankTextColor: baseColor[_secondaryColorShade]!,
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    if (sportScore.value.situation == null && sportScore.value.detail.isEmpty) {
-      SportSession().getScore();
-    }
-  }
-
-  /// 判断四年成绩是否完整
-  bool _isFourYearsComplete() {
-    // 标准的四年应该有4年的成绩记录
-    return sportScore.value.list.length >= 4;
-  }
-
-  /// 获取总分显示值和颜色
-  Map<String, dynamic> _getTotalScoreInfo() {
-    final score = sportScore.value.total;
-    final isUnknown = !_isFourYearsComplete();
-    final isQualified = !sportScore.value.rank.contains("不");
-
-    final colorScheme = _getColorScheme(isQualified, isUnknown);
-
-    return {
-      'score': score,
-      'rank': isUnknown
-          ? FlutterI18n.translate(
-              context,
-              "class_attendance.course_state.unknown",
-            )
-          : sportScore.value.rank,
-      ...colorScheme,
-    };
-  }
-
-  /// 显示分数与等级的行布局
-  Widget _buildScoreRankRow(Map<String, dynamic> displayInfo) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                FlutterI18n.translate(context, "sport.total_score_label"),
-                style: const TextStyle(fontSize: _labelFontSize),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: displayInfo['scoreBackgroundColor'],
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  displayInfo['score'],
-                  style: TextStyle(
-                    color: displayInfo['scoreTextColor'],
-                    fontWeight: FontWeight.bold,
-                    fontSize: _scoreFontSize,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                FlutterI18n.translate(context, "sport.rank_label"),
-                style: const TextStyle(fontSize: _labelFontSize),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: displayInfo['rankBackgroundColor'],
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  displayInfo['rank'],
-                  style: TextStyle(
-                    color: displayInfo['rankTextColor'],
-                    fontWeight: FontWeight.bold,
-                    fontSize: _rankFontSize,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+    SportSession().getScore();
   }
 
   @override
@@ -168,70 +87,179 @@ class _SportScoreWindowState extends State<SportScoreWindow>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        await SportSession().getClass();
+        setState(() {
+          _future = SportSession().getScore();
+        });
       },
-      child: Obx(() {
-        if (sportScore.value.situation == null &&
-            sportScore.value.detail.isNotEmpty) {
-          final scoreInfo = _getTotalScoreInfo();
-          List<Widget> things = [
-            ReXCard(
-              title: Text(FlutterI18n.translate(context, "sport.total_score")),
-              remaining: [],
-              bottomRow: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: _buildScoreRankRow(scoreInfo),
-                  ),
-                  const Divider(height: 16, thickness: 0.5),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Center(
-                      child: Text(
-                        sportScore.value.detail.substring(
-                          0,
-                          sportScore.value.detail.indexOf("\\"),
+      child: FutureBuilder(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            final data = snapshot.data!;
+            final scoreColorScheme = _getColorScheme(
+              data.$3.isQualified,
+              data.$3.isFourYearsComplete,
+            );
+            List<Widget> things = [
+              ReXCard(
+                title: Text(
+                  FlutterI18n.translate(context, "sport.total_score"),
+                ),
+                remaining: [],
+                bottomRow: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    [
+                          [
+                                Text(
+                                  FlutterI18n.translate(
+                                    context,
+                                    "sport.total_score_label",
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: _labelFontSize,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        scoreColorScheme.scoreBackgroundColor,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    data.$3.total,
+                                    style: TextStyle(
+                                      color: scoreColorScheme.scoreTextColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: _scoreFontSize,
+                                    ),
+                                  ),
+                                ),
+                              ]
+                              .toRow(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                              )
+                              .expanded(),
+                          const SizedBox(width: 12),
+                          [
+                                Text(
+                                  FlutterI18n.translate(
+                                    context,
+                                    "sport.rank_label",
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: _labelFontSize,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: scoreColorScheme.rankBackgroundColor,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    FlutterI18n.translate(
+                                      context,
+                                      data.$3.scoreRankI18nStr,
+                                    ),
+                                    style: TextStyle(
+                                      color: scoreColorScheme.rankTextColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: _rankFontSize,
+                                    ),
+                                  ),
+                                ),
+                              ]
+                              .toRow(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                              )
+                              .expanded(),
+                        ]
+                        .toRow(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        )
+                        .padding(vertical: 8.0),
+                    const Divider(height: 16, thickness: 0.5),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Center(
+                        child: Text(
+                          data.$3.detail.substring(
+                            0,
+                            data.$3.detail.indexOf("\\"),
+                          ),
+                          style: Theme.of(context).textTheme.bodySmall,
+                          textAlign: TextAlign.center,
                         ),
-                        style: Theme.of(context).textTheme.bodySmall,
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ];
-          things.addAll(
-            List<Widget>.generate(
-              sportScore.value.list.length,
-              (index) => ScoreCard(toUse: sportScore.value.list[index]),
-            ).reversed,
-          );
-          return DataList<Widget>(list: things, initFormula: (toUse) => toUse);
-        } else if (sportScore.value.situation == "sport.situation_fetching") {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return Center(
-            child: ReloadWidget(
-              function: () => SportSession().getClass(),
-              errorStatus: sportClass.value.situation != null
-                  ? FlutterI18n.translate(
+            ];
+            things.addAll(
+              List<Widget>.generate(
+                data.$3.list.length,
+                (index) => ScoreCard(toUse: data.$3.list[index]),
+              ).reversed,
+            );
+            return Column(
+              children: [
+                if (snapshot.data!.$1)
+                  CacheAlerter(
+                    hint: FlutterI18n.translate(
                       context,
-                      "sport.situation_error",
+                      "inapp_cache_hint",
                       translationParams: {
-                        "situation": FlutterI18n.translate(
-                          context,
-                          sportClass.value.situation ?? "",
-                        ),
+                        "datetime": snapshot.data!.$2.toString(),
                       },
-                    )
-                  : null,
-            ),
-          );
-        }
-      }),
+                    ),
+                  ),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: things.length,
+                    itemBuilder: (context, index) {
+                      return Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: sheetMaxWidth),
+                          child: things[index],
+                        ),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(height: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12.5,
+                      vertical: 9.0,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasError) {
+            return ReloadWidget(
+              function: () => setState(() {
+                _future = SportSession().getScore();
+              }),
+              errorStatus: snapshot.error,
+              stackTrace: snapshot.stackTrace,
+            ).center();
+          } else {
+            return const CircularProgressIndicator().center();
+          }
+        },
+      ),
     );
   }
 }
@@ -243,17 +271,6 @@ class ScoreCard extends StatelessWidget {
 
   String unitToShow(String eval) =>
       eval.contains(".") ? eval.substring(0, eval.indexOf(".")) : eval;
-
-  //Map<String, dynamic> _getScoreDisplayInfo() {
-  //  final isQualified = !toUse.rank.contains("不");
-  //  final baseColor = isQualified ? Colors.green : Colors.red;
-  //  return {
-  //    'scoreBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
-  //    'scoreTextColor': baseColor[_primaryColorShade],
-  //    'rankBackgroundColor': baseColor.withValues(alpha: _textBackgroundAlpha),
-  //    'rankTextColor': baseColor[_secondaryColorShade],
-  //  };
-  //}
 
   Map<String, dynamic> _getTitleBadgeColorScheme() {
     final isQualified = !toUse.rank.contains("不");
