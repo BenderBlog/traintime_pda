@@ -5,83 +5,96 @@
 // The class table window source.
 // Thanks xidian-script and libxdauth!
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:time/time.dart';
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
+Future<(bool, DateTime, ClassTableData)> getClassTable(
+  String semesterCode,
+) async {
+  try {
+    ClassTableData data = pref.getBool(pref.Preference.role)
+        ? await ClassTableSession().getYjspt(semesterCode)
+        : await ClassTableSession().getEhall(semesterCode);
+    DateTime fetchTime = DateTime.now();
+    await ClassTableSession.updateCacheAndGroup(data);
+    return (false, fetchTime, data);
+  } catch (e, s) {
+    log.handle(e, s, "[getClassTable] Have issue");
+    (DateTime, ClassTableData)? cache = ClassTableSession.getCache();
+    if (cache != null) {
+      return (true, cache.$1, cache.$2);
+    }
+    rethrow;
+  }
+}
+
 /// 课程表 4770397878132218
-class ClassTableFile extends EhallSession {
+class ClassTableSession extends EhallSession {
   static const schoolClassName = "ClassTable.json";
-  static const userDefinedClassName = "UserClass.json";
-  static const decorationName = "decoration.jpg";
 
-  ClassTableData simplifyData(Map<String, dynamic> qResult) {
-    ClassTableData toReturn = ClassTableData();
+  static File schoolClassDataCache = File(
+    "${supportPath.path}/$schoolClassName",
+  );
+  static bool get isCacheExist => schoolClassDataCache.existsSync();
 
-    toReturn.semesterCode = qResult["semesterCode"];
-    toReturn.termStartDay = qResult["termStartDay"];
-
-    log.info(
-      "[getClasstable][simplifyData] "
-      "${toReturn.semesterCode} ${toReturn.termStartDay}",
-    );
-
-    for (var i in qResult["rows"]) {
-      var toDeal = ClassDetail(
-        name: i["KCM"],
-        code: i["KCH"],
-        number: i["KXH"],
-      );
-      if (!toReturn.classDetail.contains(toDeal)) {
-        toReturn.classDetail.add(toDeal);
-      }
-      toReturn.timeArrangement.add(
-        TimeArrangement(
-          source: Source.school,
-          index: toReturn.classDetail.indexOf(toDeal),
-          start: int.parse(i["KSJC"]),
-          teacher: i["SKJS"],
-          stop: int.parse(i["JSJC"]),
-          day: int.parse(i["SKXQ"]),
-          weekList: List<bool>.generate(
-            i["SKZC"].toString().length,
-            (index) => i["SKZC"].toString()[index] == "1",
-          ),
-          classroom: i["JASMC"],
-        ),
-      );
-      if (i["SKZC"].toString().length > toReturn.semesterLength) {
-        toReturn.semesterLength = i["SKZC"].toString().length;
-      }
+  static Future<void> deleteCache() async {
+    if (await schoolClassDataCache.exists()) {
+      await schoolClassDataCache.delete();
     }
-
-    // Deal with the not arranged data.
-    for (var i in qResult["notArranged"]) {
-      toReturn.notArranged.add(
-        NotArrangementClassDetail(
-          name: i["KCM"],
-          code: i["KCH"],
-          number: i["KXH"],
-          teacher: i["SKJS"],
-        ),
-      );
-    }
-
-    return toReturn;
   }
 
-  Future<ClassTableData> getYjspt() async {
+  static Future<void> updateCacheAndGroup(ClassTableData data) async {
+    await schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
+
+    /// TODO: Change ios widgitkit code to parse user defined classtable.
+    if (Platform.isIOS) {
+      final api = SaveToGroupIdSwiftApi();
+      try {
+        bool result = await api.saveToGroupId(
+          FileToGroupID(
+            appid: pref.appId,
+            fileName: "ClassTable.json",
+            data: jsonEncode(data.toJson()),
+          ),
+        );
+        log.info(
+          "[ClassTableSession][updateCacheAndGroup] "
+          "ios Save to public place status: $result.",
+        );
+      } catch (e, s) {
+        log.handle(e, s);
+      }
+    }
+  }
+
+  static (DateTime, ClassTableData)? getCache() {
+    try {
+      ClassTableData toReturn = ClassTableData.fromJson(
+        jsonDecode(schoolClassDataCache.readAsStringSync()),
+      );
+      DateTime fetchTime = schoolClassDataCache.lastModifiedSync();
+      return (fetchTime, toReturn);
+    } catch (e, s) {
+      log.handle(e, s);
+      return null;
+    }
+  }
+
+  Future<ClassTableData> getYjspt(String semesterCode) async {
     Map<String, dynamic> qResult = {};
 
-    const semesterCodeURL =
-        "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/kfdxnxqcx.do";
+    //  const semesterCodeURL =
+    //      "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/kfdxnxqcx.do";
     const classInfoURL =
         "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/xspkjgcx.do";
     const notArrangedInfoURL =
@@ -101,11 +114,6 @@ class ClassTableFile extends EhallSession {
       log.info("[getClasstable][getYjspt] Received location: $location.");
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
-
-    /// AKA xnxqdm as [startyear][period] eg 20242 as
-    var semesterCode = await dio
-        .post(semesterCodeURL)
-        .then((value) => value.data["datas"]["kfdxnxqcx"]["rows"][0]["WID"]);
 
     DateTime now = DateTime.now();
     var currentWeek = await dio
@@ -130,33 +138,6 @@ class ClassTableFile extends EhallSession {
     String termStartDay = DateFormat("yyyy-MM-dd HH:mm:ss").format(
       now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
     );
-
-    String currentSemesterCode = preference.getString(
-      preference.Preference.currentSemester,
-    );
-    bool isUserDefinedSemester = preference.getBool(
-      preference.Preference.isUserDefinedSemester,
-    );
-    if (preference.parseSemesterCodeToInt(semesterCode) >
-        preference.parseSemesterCodeToInt(currentSemesterCode)) {
-      await preference.setString(
-        preference.Preference.currentSemester,
-        semesterCode,
-      );
-      await preference.setBool(
-        preference.Preference.isUserDefinedSemester,
-        false,
-      );
-
-      /// New semenster, user defined class is useless.
-      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      if (userClassFile.existsSync()) userClassFile.deleteSync();
-    } else if (semesterCode == currentSemesterCode && isUserDefinedSemester) {
-      await preference.setBool(
-        preference.Preference.isUserDefinedSemester,
-        false,
-      );
-    }
 
     Map<String, dynamic> data = await dio
         .post(classInfoURL, data: {"XNXQDM": semesterCode})
@@ -190,7 +171,7 @@ class ClassTableFile extends EhallSession {
           notArrangedInfoURL,
           data: {
             'XNXQDM': semesterCode,
-            'XH': preference.getString(preference.Preference.idsAccount),
+            'XH': pref.getString(pref.Preference.idsAccount),
           },
         )
         .then((value) => value.data['datas']['xswsckbkc']);
@@ -298,7 +279,7 @@ class ClassTableFile extends EhallSession {
     return toReturn;
   }
 
-  Future<ClassTableData> getEhall() async {
+  Future<ClassTableData> getEhall(String semesterCode) async {
     Map<String, dynamic> qResult = {};
     log.info("[getClasstable][getEhall] Login the system.");
     String get = await useApp("4770397878132218");
@@ -309,41 +290,6 @@ class ClassTableFile extends EhallSession {
       "[getClasstable][getEhall] "
       "Fetch the semester information.",
     );
-    String semesterCode = await dioEhall
-        .post(
-          "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
-        )
-        .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-
-    String currentSemesterCode = preference.getString(
-      preference.Preference.currentSemester,
-    );
-    bool isUserDefinedSemester = preference.getBool(
-      preference.Preference.isUserDefinedSemester,
-    );
-    if (preference.parseSemesterCodeToInt(semesterCode) >
-            preference.parseSemesterCodeToInt(currentSemesterCode) &&
-        !isUserDefinedSemester) {
-      await preference.setString(
-        preference.Preference.currentSemester,
-        semesterCode,
-      );
-      await preference.setBool(
-        preference.Preference.isUserDefinedSemester,
-        false,
-      );
-
-      /// New semenster, user defined class is useless.
-      var userClassFile = File("${supportPath.path}/$userDefinedClassName");
-      if (userClassFile.existsSync()) userClassFile.deleteSync();
-    } else if (semesterCode == currentSemesterCode && isUserDefinedSemester) {
-      await preference.setBool(
-        preference.Preference.isUserDefinedSemester,
-        false,
-      );
-    } else if (isUserDefinedSemester) {
-      semesterCode = currentSemesterCode;
-    }
 
     log.info(
       "[getClasstable][getEhall] "
@@ -368,7 +314,7 @@ class ClassTableFile extends EhallSession {
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
           data: {
             'XNXQDM': semesterCode,
-            'XH': preference.getString(preference.Preference.idsAccount),
+            'XH': pref.getString(pref.Preference.idsAccount),
           },
         )
         .then((value) => value.data['datas']['xskcb']);
@@ -405,7 +351,7 @@ class ClassTableFile extends EhallSession {
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
           data: {
             'XNXQDM': semesterCode,
-            'XH': preference.getString(preference.Preference.idsAccount),
+            'XH': pref.getString(pref.Preference.idsAccount),
           },
         )
         .then((value) => value.data['datas']['cxxsllsywpk']);
@@ -413,7 +359,56 @@ class ClassTableFile extends EhallSession {
     log.info("[getClasstable][getEhall] $notOnTable");
     qResult["notArranged"] = notOnTable["rows"];
 
-    ClassTableData preliminaryData = simplifyData(qResult);
+    ClassTableData preliminaryData = ClassTableData();
+
+    preliminaryData.semesterCode = qResult["semesterCode"];
+    preliminaryData.termStartDay = qResult["termStartDay"];
+
+    log.info(
+      "[getClasstable][getEhall] "
+      "${preliminaryData.semesterCode} ${preliminaryData.termStartDay}",
+    );
+
+    for (var i in qResult["rows"]) {
+      var toDeal = ClassDetail(
+        name: i["KCM"],
+        code: i["KCH"],
+        number: i["KXH"],
+      );
+      if (!preliminaryData.classDetail.contains(toDeal)) {
+        preliminaryData.classDetail.add(toDeal);
+      }
+      preliminaryData.timeArrangement.add(
+        TimeArrangement(
+          source: Source.school,
+          index: preliminaryData.classDetail.indexOf(toDeal),
+          start: int.parse(i["KSJC"]),
+          teacher: i["SKJS"],
+          stop: int.parse(i["JSJC"]),
+          day: int.parse(i["SKXQ"]),
+          weekList: List<bool>.generate(
+            i["SKZC"].toString().length,
+            (index) => i["SKZC"].toString()[index] == "1",
+          ),
+          classroom: i["JASMC"],
+        ),
+      );
+      if (i["SKZC"].toString().length > preliminaryData.semesterLength) {
+        preliminaryData.semesterLength = i["SKZC"].toString().length;
+      }
+    }
+
+    // Deal with the not arranged data.
+    for (var i in qResult["notArranged"]) {
+      preliminaryData.notArranged.add(
+        NotArrangementClassDetail(
+          name: i["KCM"],
+          code: i["KCH"],
+          number: i["KXH"],
+          teacher: i["SKJS"],
+        ),
+      );
+    }
 
     /// Deal with the class change.
     log.info(

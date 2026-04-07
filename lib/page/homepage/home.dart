@@ -64,15 +64,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   int _selectedIndex = 0;
   static bool refreshAtStart = false;
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.resumed) {
-      updateCurrentData();
-    }
-  }
-
   late StreamSubscription _intentSub;
   late PageController _controller;
 
@@ -83,7 +74,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   }
 
   void _loginAsync() async {
-    updateCurrentData(); // load cache data
     showToast(
       context: context,
       msg: FlutterI18n.translate(context, "homepage.login_message"),

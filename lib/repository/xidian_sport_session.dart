@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/model/no_password_exception.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -379,7 +380,7 @@ awb4B45zUwIDAQAB
   Future<void> login() async {
     if (preference.getString(preference.Preference.idsAccount).isEmpty ||
         preference.getString(preference.Preference.sportPassword).isEmpty) {
-      throw NoPasswordException();
+      throw NoPasswordException(type: PasswordType.sport);
     }
     if (userId.isNotEmpty && token.isNotEmpty) {
       log.info(
@@ -429,8 +430,6 @@ awb4B45zUwIDAQAB
     }
   }
 }
-
-class NoPasswordException implements Exception {}
 
 class LoginFailedException implements Exception {
   final String msg;

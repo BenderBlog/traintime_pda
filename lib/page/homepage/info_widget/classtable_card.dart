@@ -5,17 +5,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:get/get.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
-
 import 'package:timelines_plus/timelines_plus.dart';
 import 'package:watermeter/model/home_arrangement.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class _ClassTableCardItemDescriptor {
@@ -26,11 +26,13 @@ class _ClassTableCardItemDescriptor {
   final EdgeInsets padding;
   final bool isTomorrow;
   final bool isMultiArrangementsMode;
+  final String emptyInfoText;
 
   _ClassTableCardItemDescriptor({
     required this.timeLabelPrefix,
     required this.icon,
     required this.padding,
+    required this.emptyInfoText,
     this.isTomorrow = false,
     this.isMultiArrangementsMode = false,
   });
@@ -66,7 +68,132 @@ class ClassTableCard extends StatefulWidget {
 }
 
 class _ClassTableCardState extends State<ClassTableCard> {
-  List<_ClassTableCardItemDescriptor> _getItemDescriptors() {
+  String _getFailedSourceLabel(home.HomepageFailedSource source) {
+    switch (source) {
+      case home.HomepageFailedSource.classInfo:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.failed_source_class_info",
+        );
+      case home.HomepageFailedSource.examInfo:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.failed_source_exam_info",
+        );
+      case home.HomepageFailedSource.physicsExperiment:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.failed_source_physics_experiment",
+        );
+      case home.HomepageFailedSource.otherExperiment:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.failed_source_other_experiment",
+        );
+    }
+  }
+
+  String _getEmptyInfoText(home.ArrangementState state) {
+    switch (state) {
+      case home.ArrangementState.fetching:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.schedule_fetching_infoText",
+        );
+      case home.ArrangementState.error:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.schedule_error_infoText",
+        );
+      case home.ArrangementState.none:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.schedule_none_infoText",
+        );
+      case home.ArrangementState.fetched:
+        return FlutterI18n.translate(
+          context,
+          "homepage.class_table_card.no_arrangement_infoText",
+        );
+    }
+  }
+
+  Widget _buildStateHintChip(
+    BuildContext context, {
+    required String text,
+    required Color backgroundColor,
+    required Color foregroundColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: foregroundColor,
+        ),
+      ),
+    );
+  }
+
+  Widget? _buildStateHints(
+    BuildContext context, {
+    required bool isRefreshing,
+    required List<home.HomepageFailedSource> failedSources,
+  }) {
+    final theme = Theme.of(context).colorScheme;
+    final hints = <Widget>[];
+
+    if (isRefreshing) {
+      hints.add(
+        _buildStateHintChip(
+          context,
+          text: FlutterI18n.translate(
+            context,
+            "homepage.class_table_card.updating_infoText",
+          ),
+          backgroundColor: theme.secondaryContainer,
+          foregroundColor: theme.onSecondaryContainer,
+        ),
+      );
+    }
+
+    for (final source in failedSources) {
+      hints.add(
+        _buildStateHintChip(
+          context,
+          text: FlutterI18n.translate(
+            context,
+            "homepage.class_table_card.failed_chip",
+            translationParams: {"source": _getFailedSourceLabel(source)},
+          ),
+          backgroundColor: theme.errorContainer,
+          foregroundColor: theme.onErrorContainer,
+        ),
+      );
+    }
+
+    if (hints.isEmpty) {
+      return null;
+    }
+
+    return Wrap(spacing: 8, runSpacing: 8, children: hints);
+  }
+
+  List<_ClassTableCardItemDescriptor> _getItemDescriptors({
+    required HomeArrangement? currentArrangement,
+    required HomeArrangement? nextArrangement,
+    required List<HomeArrangement> arrangements,
+    required int remainingCount,
+    required bool isTomorrow,
+    required String emptyInfoText,
+    required bool simplifiedMode,
+  }) {
     var currItem = _ClassTableCardItemDescriptor(
       timeLabelPrefix: FlutterI18n.translate(
         context,
@@ -74,18 +201,20 @@ class _ClassTableCardState extends State<ClassTableCard> {
       ),
       icon: Icons.timelapse_outlined,
       padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
+      emptyInfoText: emptyInfoText,
     );
-    currItem.addArrangementIfNotNull(current.value);
+    currItem.addArrangementIfNotNull(currentArrangement);
 
     var nextItem = _ClassTableCardItemDescriptor(
-      timeLabelPrefix: isTomorrow.isTrue
+      timeLabelPrefix: isTomorrow
           ? FlutterI18n.translate(context, "homepage.class_table_card.tomorrow")
           : FlutterI18n.translate(context, "homepage.class_table_card.later"),
       icon: Icons.schedule_outlined,
       padding: const EdgeInsets.fromLTRB(5, 0.5, 0, 10.0),
-      isTomorrow: isTomorrow.isTrue,
+      emptyInfoText: emptyInfoText,
+      isTomorrow: isTomorrow,
     );
-    nextItem.addArrangementIfNotNull(next.value);
+    nextItem.addArrangementIfNotNull(nextArrangement);
 
     var moreItem = _ClassTableCardItemDescriptor(
       timeLabelPrefix: FlutterI18n.translate(
@@ -94,13 +223,23 @@ class _ClassTableCardState extends State<ClassTableCard> {
       ),
       icon: Icons.more_time_outlined,
       padding: const EdgeInsets.fromLTRB(5, 1.5, 0, 10.0),
+      emptyInfoText: emptyInfoText,
       isMultiArrangementsMode: true,
     );
+    final moreCount = remainingCount < 0
+        ? 0
+        : (remainingCount > arrangements.length
+              ? arrangements.length
+              : remainingCount);
     moreItem.addAllArrangements(
-      arrangement.skip(arrangement.length - remaining.value),
+      arrangements.skip(arrangements.length - moreCount),
     );
 
-    if (ClassTableCard.simplifiedMode.isFalse) {
+    if (arrangements.isEmpty) {
+      return [currItem];
+    }
+
+    if (!simplifiedMode) {
       return [currItem, nextItem, moreItem];
     }
 
@@ -117,100 +256,118 @@ class _ClassTableCardState extends State<ClassTableCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-          List<_ClassTableCardItemDescriptor> itemDesc = _getItemDescriptors();
-          return FixedTimeline.tileBuilder(
-            theme: TimelineThemeData(
-              nodePosition: 0,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            builder: TimelineTileBuilder(
-              itemCount: itemDesc.length,
-              contentsAlign: ContentsAlign.basic,
-              contentsBuilder: (context, index) => Padding(
-                padding: itemDesc[index].padding,
-                child: _ClassTableCardItem(itemDesc[index]),
+    return Watch((context) {
+          final controller = home.HomepageController.i;
+          final arrangementState =
+              controller.homepageArrangementStateComputedSignal.value;
+          final currentArrangement = controller.currentComputedSignal.value;
+          final nextArrangement = controller.nextComputedSignal.value;
+          final remainingCount = controller.remainingComputedSignal.value;
+          final arrangements = controller.arrangementComputedSignal.value;
+          final isTomorrow = controller.isTomorrowComputedSignal.value;
+          final isRefreshing = controller.isRefreshingComputedSignal.value;
+          final failedSources = controller.failedSourcesComputedSignal.value;
+          final itemDesc = _getItemDescriptors(
+            currentArrangement: currentArrangement,
+            nextArrangement: nextArrangement,
+            arrangements: arrangements,
+            remainingCount: remainingCount,
+            isTomorrow: isTomorrow,
+            emptyInfoText: _getEmptyInfoText(arrangementState),
+            simplifiedMode: ClassTableCard.simplifiedMode.value,
+          );
+          final hintWidget = _buildStateHints(
+            context,
+            isRefreshing: isRefreshing,
+            failedSources: failedSources,
+          );
+
+          return [
+            hintWidget,
+            FixedTimeline.tileBuilder(
+              theme: TimelineThemeData(
+                nodePosition: 0,
+                color: Theme.of(context).colorScheme.primary,
               ),
-              indicatorBuilder: (context, index) => Indicator.widget(
-                position: 0,
-                child: Icon(
-                  itemDesc[index].icon,
-                  color: Theme.of(context).colorScheme.primary,
+              builder: TimelineTileBuilder(
+                itemCount: itemDesc.length,
+                contentsAlign: ContentsAlign.basic,
+                contentsBuilder: (context, index) => Padding(
+                  padding: itemDesc[index].padding,
+                  child: _ClassTableCardItem(itemDesc[index]),
                 ),
+                indicatorBuilder: (context, index) => Indicator.widget(
+                  position: 0,
+                  child: Icon(
+                    itemDesc[index].icon,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                startConnectorBuilder: (context, index) {
+                  if (index == 0) {
+                    return null;
+                  }
+                  if (itemDesc[index].isTomorrow) {
+                    return Connector.dashedLine(gap: 4, thickness: 3);
+                  }
+                  return Connector.solidLine(thickness: 3);
+                },
+                endConnectorBuilder: (context, index) {
+                  if (index + 1 < itemDesc.length &&
+                      itemDesc[index + 1].isTomorrow) {
+                    return Connector.dashedLine(gap: 4, thickness: 3);
+                  }
+                  return Connector.solidLine(thickness: 3);
+                },
               ),
-              startConnectorBuilder: (context, index) {
-                if (index == 0) {
-                  return null;
-                }
-                // Use dashedLine between today and tomorrow
-                if (itemDesc[index].isTomorrow) {
-                  return Connector.dashedLine(gap: 4, thickness: 3);
-                }
-                return Connector.solidLine(thickness: 3);
-              },
-              endConnectorBuilder: (context, index) {
-                // Use dashedLine between today and tomorrow
-                if (index + 1 < itemDesc.length &&
-                    itemDesc[index + 1].isTomorrow) {
-                  return Connector.dashedLine(gap: 4, thickness: 3);
-                }
-                return Connector.solidLine(thickness: 3);
-              },
             ),
+          ].whereType<Widget>().toList().toColumn(
+            separator: const SizedBox(height: 10),
           );
         })
         .paddingDirectional(horizontal: 20, vertical: 14)
         .withHomeCardStyle(
           context,
           onPressed: () {
-            final c = Get.find<ClassTableController>();
-            switch (c.state) {
-              case ClassTableState.fetched:
-                context.pushReplacement(
-                  LayoutBuilder(
-                    builder: (context, constraints) =>
-                        GetBuilder<ClassTableController>(
-                          builder: (_) => ClassTableWindow(
-                            parentContext: context,
-                            currentWeek: c.getCurrentWeek(updateTime),
-                            constraints: constraints,
-                          ),
-                        ),
+            final homepageController = home.HomepageController.i;
+            final arrangementState =
+                homepageController.homepageArrangementStateComputedSignal.value;
+            if (homepageController.canOpenArrangementPageComputedSignal.value) {
+              context.pushReplacement(
+                LayoutBuilder(
+                  builder: (context, constraints) => ClassTableWindow(
+                    parentContext: context,
+                    currentWeek:
+                        ClassTableController.i.currentWeekComputedSignal.value,
+                    constraints: constraints,
                   ),
-                );
-              case ClassTableState.error:
+                ),
+              );
+              return;
+            }
+
+            switch (arrangementState) {
+              case home.ArrangementState.fetching:
                 showToast(
                   context: context,
                   msg: FlutterI18n.translate(
                     context,
-                    "homepage.class_table_card.error_message",
-                    translationParams: {"error": c.error.toString()},
+                    "homepage.class_table_card.schedule_fetching_message",
                   ),
                 );
-              case ClassTableState.fetching:
-              case ClassTableState.none:
-                if (c.classTableFile.existsSync()) {
-                  context.pushReplacement(
-                    LayoutBuilder(
-                      builder: (context, constraints) =>
-                          GetBuilder<ClassTableController>(
-                            builder: (_) => ClassTableWindow(
-                              parentContext: context,
-                              currentWeek: c.getCurrentWeek(updateTime),
-                              constraints: constraints,
-                            ),
-                          ),
-                    ),
-                  );
-                } else {
-                  showToast(
-                    context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "homepage.class_table_card.fetching_message",
-                    ),
-                  );
-                }
+                return;
+              case home.ArrangementState.error:
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "homepage.class_table_card.schedule_error_message",
+                  ),
+                );
+                return;
+              case home.ArrangementState.none:
+              case home.ArrangementState.fetched:
+                break;
             }
           },
         );
@@ -257,21 +414,8 @@ class _ClassTableCardItem extends StatelessWidget {
     late String infoText;
     if (arr != null) {
       infoText = arr.name;
-    } else if (arrangementState.value == ArrangementState.error) {
-      infoText = FlutterI18n.translate(
-        context,
-        "homepage.class_table_card.error_infoText",
-      );
-    } else if (arrangementState.value == ArrangementState.fetching) {
-      infoText = FlutterI18n.translate(
-        context,
-        "homepage.class_table_card.fetching_infoText",
-      );
     } else {
-      infoText = FlutterI18n.translate(
-        context,
-        "homepage.class_table_card.no_arrangement_infoText",
-      );
+      infoText = descriptor.emptyInfoText;
     }
 
     List<Widget> columns = [

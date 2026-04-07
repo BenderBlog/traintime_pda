@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
-import 'package:watermeter/model/datetime_is_today_extension.dart';
+import 'package:time/time.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';

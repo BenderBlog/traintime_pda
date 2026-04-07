@@ -684,7 +684,7 @@ setting:
       3. 修改設置後自動重新安排所有通知'
     got_it: 知道了
     open_settings: 打開系統設置
-    no_classtable_data: 請先獲取課程表數據
+    no_classtable_data: 請先獲取課程表、考試或實驗數據
     schedule_success: 已安排 {count} 個課前提醒
     schedule_failed: '安排通知失敗: {error}'
     cancel_all_success: 已取消所有課前提醒

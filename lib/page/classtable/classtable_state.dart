@@ -6,20 +6,20 @@ import 'dart:math' as math;
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/controller/other_experiment_controller.dart';
+import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
@@ -72,18 +72,24 @@ class ClassTableWidgetState with ChangeNotifier {
   /// ***************************///
 
   /// The controller...
-  final ClassTableController classTableController = Get.find();
-  final ExamController examController = Get.find();
-  final ExperimentController experimentController = Get.find();
+  final ClassTableController classTableController = ClassTableController.i;
+  final ExamController examController = ExamController.i;
+  final PhysicsExperimentController physicsExperimentController =
+      PhysicsExperimentController.i;
+  final OtherExperimentController otherExperimentController =
+      OtherExperimentController.i;
+  final WeekSwiftController weekSwiftController = WeekSwiftController.i;
 
   /// The length of the semester, the amount of the class table.
-  int get semesterLength => classTableController.classTableData.semesterLength;
-
-  /// The semester code.
-  String get semesterCode => classTableController.classTableData.semesterCode;
+  int get semesterLength =>
+      classTableController.classTableComputedSignal.value.semesterLength;
 
   /// The offset append to start day of the week.
-  final int offset = preference.getInt(preference.Preference.swift);
+  int get offset => weekSwiftController.weekSwiftSignal.value;
+
+  /// The semester code.
+  String get semesterCode =>
+      classTableController.classTableComputedSignal.value.semesterCode;
 
   ///*****************************///
   /// Following are dynamic data. ///
@@ -107,35 +113,41 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// The class details.
   List<ClassDetail> get classDetail =>
-      classTableController.classTableData.classDetail;
+      classTableController.classTableComputedSignal.value.classDetail;
 
   /// The classes without time arrangements.
   List<NotArrangementClassDetail> get notArranged =>
-      classTableController.classTableData.notArranged;
+      classTableController.classTableComputedSignal.value.notArranged;
 
   /// The time arrangements of the class details, use with [classDetail].
   List<TimeArrangement> get timeArrangement =>
-      classTableController.classTableData.timeArrangement;
+      classTableController.classTableComputedSignal.value.timeArrangement;
 
   /// The class change data.
   List<ClassChange> get classChange =>
-      classTableController.classTableData.classChanges;
+      classTableController.classTableComputedSignal.value.classChanges;
 
   /// The day the semester start, used to calculate the first day of the week.
-  DateTime get startDay =>
-      DateTime.parse(classTableController.classTableData.termStartDay);
+  DateTime get startDay => DateTime.parse(
+    classTableController.classTableComputedSignal.value.termStartDay,
+  );
 
   /// The currentWeek.
   final int currentWeek;
 
   /// The exam list.
-  List<Subject> get subjects => examController.data.subject;
+  List<Subject> get subjects => examController.subjects.value;
 
   /// The experiment list.
-  List<ExperimentData> get experiments => experimentController.data;
+  List<ExperimentData> get experiments => [
+    ...physicsExperimentController.physicsExperiments.value,
+    ...otherExperimentController.otherExperiments.value,
+  ];
 
   /// Get class detail by prividing index of timearrangement
-  ClassDetail getClassDetail(int index) => classTableController.classTableData
+  ClassDetail getClassDetail(int index) => classTableController
+      .classTableComputedSignal
+      .value
       .getClassDetail(timeArrangement[index]);
 
   /// Bridge function to add/del/edit user defined class
@@ -432,9 +444,10 @@ END:VTIMEZONE
   Future<void> updateClasstable(BuildContext context) async {
     log.info("Updating time arrangement data...");
     return await Future.wait([
-      classTableController.updateClassTable(isForce: true),
-      examController.get(),
-      experimentController.get(),
+      classTableController.schoolClassTableSignal.reload(),
+      examController.examInfoSignal.reload(),
+      physicsExperimentController.physicsExperimentSignal.reload(),
+      otherExperimentController.otherExperimentSignal.reload(),
     ]).then((value) {
       notifyListeners();
     });

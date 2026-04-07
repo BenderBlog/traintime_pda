@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
@@ -96,7 +97,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     //}
 
     /// Init the background.
-    File image = File("${supportPath.path}/${ClassTableFile.decorationName}");
+    File image = File(
+      "${supportPath.path}/${ClassTableController.decorationName}",
+    );
     decoration = BoxDecoration(
       image:
           (preference.getBool(preference.Preference.decorated) &&

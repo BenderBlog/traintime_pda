@@ -5,22 +5,22 @@
 // Exam Infomation Interface.
 
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/page/exam/exam_info_card.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
+import 'package:watermeter/page/public_widget/cache_alerter.dart';
+import 'package:watermeter/page/public_widget/loading_alerter.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class ExamInfoWindow extends StatefulWidget {
-  final DateTime time;
-  const ExamInfoWindow({super.key, required this.time});
+  const ExamInfoWindow({super.key});
 
   @override
   State<ExamInfoWindow> createState() => _ExamInfoWindowState();
@@ -29,137 +29,156 @@ class ExamInfoWindow extends StatefulWidget {
 class _ExamInfoWindowState extends State<ExamInfoWindow> {
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ExamController>(
-      builder: (c) {
-        if (offline && c.status == ExamStatus.cache) {
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "exam.cache_hint"),
-          );
-        }
+    final c = ExamController.i;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(FlutterI18n.translate(context, "exam.title")),
-            actions: [
-              if (!offline &&
-                  (c.status == ExamStatus.cache ||
-                      c.status == ExamStatus.fetched))
-                IconButton(
-                  icon: const Icon(Icons.update),
-                  onPressed: () => c.get().then((value) {
-                    c.update();
-                    updateCurrentData();
-                  }),
-                ),
-              if ((c.status == ExamStatus.cache ||
-                  c.status == ExamStatus.fetched))
-                IconButton(
-                  icon: const Icon(Icons.more_time),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          NoArrangedInfo(list: c.data.toBeArranged),
-                    ),
+    return Watch((cache) {
+      final state = c.examInfoSignal.value;
+      final hasValidExamInfo = c.hasValidExamInfo.value;
+      final isFromCache = c.isExamFromCache.value;
+      final fetchTime = c.examFetchTime.value;
+      final subjects = c.subjects.value;
+      final isDisQualified = c.isDisQualified.value;
+      final isFinished = c.isFinished.value;
+      final isNotFinished = c.isNotFinished.value;
+      final toBeArranged = c.toBeArranged.value;
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(FlutterI18n.translate(context, "exam.title")),
+          actions: [
+            if (!offline && hasValidExamInfo)
+              IconButton(
+                icon: const Icon(Icons.update),
+                onPressed: () => c.reloadExamInfo(),
+              ),
+            if (hasValidExamInfo)
+              IconButton(
+                icon: const Icon(Icons.more_time),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NoArrangedInfo(list: toBeArranged),
                   ),
                 ),
-            ],
-          ),
-          body: Builder(
-            builder: (context) {
-              if (c.status == ExamStatus.cache ||
-                  c.status == ExamStatus.fetched) {
-                if (c.data.subject.isNotEmpty) {
-                  return TimelineWidget(
-                    isTitle: [
-                      true,
-                      false,
-                      true,
-                      false,
-                      if (c.isDisQualified.isNotEmpty) ...[true, false],
-                    ],
-                    children: [
+              ),
+          ],
+        ),
+        body: Builder(
+          builder: (context) {
+            if (hasValidExamInfo) {
+              Widget content;
+              if (subjects.isNotEmpty) {
+                content = TimelineWidget(
+                  isTitle: [
+                    true,
+                    false,
+                    true,
+                    false,
+                    if (isDisQualified.isNotEmpty) ...[true, false],
+                  ],
+                  children: [
+                    TimelineTitle(
+                      title: FlutterI18n.translate(
+                        context,
+                        "exam.not_finished",
+                      ),
+                    ),
+                    if (isNotFinished.isNotEmpty)
+                      ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
+                    else
+                      [
+                        ExamInfoCard(
+                          title: FlutterI18n.translate(
+                            context,
+                            "exam.all_finished",
+                          ),
+                        ),
+                      ].toColumn(),
+                    if (isDisQualified.isNotEmpty)
                       TimelineTitle(
                         title: FlutterI18n.translate(
                           context,
-                          "exam.not_finished",
+                          "exam.unable_to_exam",
                         ),
                       ),
-                      Builder(
-                        builder: (context) {
-                          final isNotFinished = c.isNotFinished(widget.time);
-                          if (isNotFinished.isNotEmpty) {
-                            return isNotFinished
-                                .map((e) => ExamInfoCard(toUse: e))
-                                .toList()
-                                .toColumn();
-                          } else {
-                            return ExamInfoCard(
-                              title: FlutterI18n.translate(
-                                context,
-                                "exam.all_finished",
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      if (c.isDisQualified.isNotEmpty)
-                        TimelineTitle(
+                    if (isDisQualified.isNotEmpty)
+                      isDisQualified
+                          .map((e) => ExamInfoCard(toUse: e))
+                          .toList()
+                          .toColumn(),
+                    TimelineTitle(
+                      title: FlutterI18n.translate(context, "exam.finished"),
+                    ),
+                    if (isFinished.isNotEmpty)
+                      ...isFinished.map((e) => ExamInfoCard(toUse: e))
+                    else
+                      [
+                        ExamInfoCard(
                           title: FlutterI18n.translate(
                             context,
-                            "exam.unable_to_exam",
+                            "exam.none_finished",
                           ),
                         ),
-                      if (c.isDisQualified.isNotEmpty)
-                        c.isDisQualified
-                            .map((e) => ExamInfoCard(toUse: e))
-                            .toList()
-                            .toColumn(),
-                      TimelineTitle(
-                        title: FlutterI18n.translate(context, "exam.finished"),
-                      ),
-                      Builder(
-                        builder: (context) {
-                          final isFinished = c.isFinished(widget.time);
-                          if (isFinished.isNotEmpty) {
-                            return isFinished
-                                .map((e) => ExamInfoCard(toUse: e))
-                                .toList()
-                                .toColumn();
-                          } else {
-                            return ExamInfoCard(
-                              title: FlutterI18n.translate(
-                                context,
-                                "exam.none_finished",
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                } else {
-                  return EmptyListView(
-                    type: EmptyListViewType.defaultimg,
-                    text: FlutterI18n.translate(
-                      context,
-                      "exam.no_exam_arrangement",
-                    ),
-                  );
-                }
-              } else if (c.status == ExamStatus.error) {
-                return Center(
-                  child: Text(
-                    FlutterI18n.translate(context, c.error.toString()),
-                  ),
+                      ].toColumn(),
+                  ],
                 );
               } else {
-                return const Center(child: CircularProgressIndicator());
+                content = EmptyListView(
+                  type: EmptyListViewType.defaultimg,
+                  text: FlutterI18n.translate(
+                    context,
+                    "exam.no_exam_arrangement",
+                  ),
+                );
               }
-            },
-          ),
-        );
-      },
-    );
+
+              final body = Column(
+                children: [
+                  if (isFromCache && fetchTime != null)
+                    CacheAlerter(
+                      hint: FlutterI18n.translate(
+                        context,
+                        "inapp_cache_hint",
+                        translationParams: {"datetime": fetchTime.toString()},
+                      ),
+                    ),
+                  Expanded(child: content),
+                ],
+              );
+
+              if (!state.isLoading) return body;
+
+              return Stack(
+                children: [
+                  Column(
+                    children: [
+                      AnimatedContainer(
+                        height: kTextTabBarHeight,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                      Expanded(child: body),
+                    ],
+                  ),
+                  LoadingAlerter(
+                    isLoading: true,
+                    hint: FlutterI18n.translate(context, "exam.fetching_hint"),
+                    opacity: 0.15,
+                    showOverlay: true,
+                  ),
+                ],
+              );
+            } else if (state is AsyncError) {
+              return ReloadWidget(
+                function: () => c.reloadExamInfo(),
+                errorStatus: state.error,
+                stackTrace: state.stackTrace,
+              ).center();
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+      );
+    });
   }
 }

@@ -30,9 +30,7 @@ class EmptyClassTablePage extends StatelessWidget {
           type: EmptyListViewType.rolling,
           text: FlutterI18n.translate(
             context,
-            ClassTableState.of(
-                  context,
-                )!.controllers.examController.data.subject.isEmpty
+            ClassTableState.of(context)!.controllers.subjects.isEmpty
                 ? "classtable.empty_class_message"
                 : "classtable.empty_class_with_exam",
             translationParams: {
