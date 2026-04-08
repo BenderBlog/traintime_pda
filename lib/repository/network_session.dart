@@ -10,15 +10,14 @@ import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
 
-Rx<SessionState> isInit = SessionState.none.obs;
-
 class NetworkSession {
+  static SessionState _isInit = SessionState.none;
+
   //@protected
   final PersistCookieJar cookieJar = PersistCookieJar(
     persistSession: true,
@@ -68,7 +67,7 @@ class NetworkSession {
   }
 
   NetworkSession() {
-    if (isInit.value == SessionState.none) {
+    if (_isInit == SessionState.none) {
       initSession();
     }
   }
@@ -76,33 +75,33 @@ class NetworkSession {
   Future<void> initSession() async {
     log.info(
       "[NetworkSession][initSession] "
-      "Current State: ${isInit.value}",
+      "Current State: $_isInit",
     );
-    if (isInit.value == SessionState.fetching) {
+    if (_isInit == SessionState.fetching) {
       return;
     }
     try {
-      isInit.value = SessionState.fetching;
+      _isInit = SessionState.fetching;
       log.info(
         "[NetworkSession][initSession] "
         "Fetching...",
       );
       var response = await dio.get("http://linux.xidian.edu.cn");
       if (response.statusCode == 200) {
-        isInit.value = SessionState.fetched;
+        _isInit = SessionState.fetched;
         log.info(
           "[NetworkSession][initSession] "
           "Fetched",
         );
       } else {
-        isInit.value = SessionState.error;
+        _isInit = SessionState.error;
         log.error(
           "[NetworkSession][initSession] "
           "Error",
         );
       }
     } catch (e) {
-      isInit.value = SessionState.error;
+      _isInit = SessionState.error;
       log.error(
         "[NetworkSession][initSession] "
         "Error: $e",
