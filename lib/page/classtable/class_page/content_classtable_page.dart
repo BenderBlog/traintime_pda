@@ -23,7 +23,6 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});

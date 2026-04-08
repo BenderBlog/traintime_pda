@@ -5,22 +5,10 @@
 import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
-//import 'package:result_dart/functions.dart';
-//import 'package:result_dart/result_dart.dart';
 import 'package:synchronized/synchronized.dart';
-//import 'package:watermeter/model/pda_service/club_info.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-
-Rxn<UpdateMessage> updateMessage = Rxn<UpdateMessage>(null);
-RxBool updateState = false.obs;
-Rxn<Object> updateError = Rxn<Object>(null);
-
-//RxList<ClubInfo> clubList = <ClubInfo>[].obs;
-//Rx<SessionState> clubState = SessionState.none.obs;
-//Rxn<Object> clubError = Rxn<Object>();
 
 Dio get dio => Dio()..interceptors.add(logDioAdapter);
 
@@ -55,27 +43,11 @@ bool? isNewVersionAvaliable(UpdateMessage updateMessage) {
   return isNewAvaliable;
 }
 
-Future<bool?> checkUpdate() => updateLock.synchronized<bool?>(() async {
-  updateMessage.value = null;
-  updateError.value = null;
-  updateState.value = true;
-  return dio
+Future<UpdateMessage> checkUpdate() => updateLock.synchronized<UpdateMessage>(
+  () => dio
       .get("$url/version.json")
-      .then(
-        (data) {
-          updateMessage.value = UpdateMessage.fromJson(data.data);
-          updateState.value = false;
-          updateError.value = null;
-          return isNewVersionAvaliable(updateMessage.value!);
-        },
-        onError: (e, s) {
-          updateMessage.value = null;
-          updateError.value = e;
-          updateState.value = false;
-          return null;
-        },
-      );
-});
+      .then((data) => UpdateMessage.fromJson(data.data)),
+);
 /*
 Future<void> getClubList() => clubLock.synchronized(() async {
   clubState.value = SessionState.fetching;

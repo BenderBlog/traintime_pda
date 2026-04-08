@@ -9,9 +9,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/electricity_controller.dart';
+import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -39,7 +41,6 @@ import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
-import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
@@ -158,14 +159,19 @@ class _SettingWindowState extends State<SettingWindow> {
                   title: Text(
                     FlutterI18n.translate(context, "setting.check_update"),
                   ),
-                  subtitle: Obx(
-                    () => Text(
+                  subtitle: Watch(
+                    (context) => Text(
                       FlutterI18n.translate(
                         context,
                         "setting.latest_version",
                         translationParams: {
                           "latest":
-                              updateMessage.value?.code ??
+                              UpdateNoticeController
+                                  .i
+                                  .updateMessageSignal
+                                  .value
+                                  .value
+                                  ?.code ??
                               FlutterI18n.translate(context, "setting.waiting"),
                         },
                       ),
@@ -179,33 +185,15 @@ class _SettingWindowState extends State<SettingWindow> {
                         "setting.fetching_update",
                       ),
                     );
-                    checkUpdate().then(
-                      (value) async {
-                        if (context.mounted) {
-                          if ((value ?? false) && updateMessage.value != null) {
-                            await showDialog(
-                              context: context,
-                              builder: (context) => Obx(
-                                () => UpdateDialog(
-                                  updateMessage: updateMessage.value!,
-                                ),
-                              ),
-                            );
-                          } else {
-                            showToast(
-                              context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                value == null
-                                    ? "setting.current_testing"
-                                    : "setting.current_stable",
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      onError: (e, s) {
-                        if (context.mounted) {
+                    UpdateNoticeController.i.reloadUpdateNoticeInfo().then((
+                      value,
+                    ) async {
+                      if (context.mounted) {
+                        if (UpdateNoticeController
+                            .i
+                            .updateMessageSignal
+                            .value
+                            .hasError) {
                           showToast(
                             context: context,
                             msg: FlutterI18n.translate(
@@ -213,9 +201,45 @@ class _SettingWindowState extends State<SettingWindow> {
                               "setting.fetch_failed",
                             ),
                           );
+                          return;
                         }
-                      },
-                    );
+                        switch (UpdateNoticeController
+                            .i
+                            .isNewVersionAvaliableComputed
+                            .value) {
+                          case null:
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+
+                                "setting.current_testing",
+                              ),
+                            );
+                          case true:
+                            await showDialog(
+                              context: context,
+                              builder: (context) => Obx(
+                                () => UpdateDialog(
+                                  updateMessage: UpdateNoticeController
+                                      .i
+                                      .updateMessageSignal
+                                      .value
+                                      .value!,
+                                ),
+                              ),
+                            );
+                          case false:
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                "setting.current_stable",
+                              ),
+                            );
+                        }
+                      }
+                    });
                   },
                   trailing: const Icon(Icons.navigate_next),
                 ),
