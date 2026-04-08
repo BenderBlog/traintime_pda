@@ -5,7 +5,6 @@
 // Course reminder notification service implementation
 
 import 'dart:convert';
-import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -57,9 +56,6 @@ class CourseReminderService extends NotificationService
 
   static const int _notificationIdPrefix = 10;
   static const int _notificationIdBase = 10000000;
-  static const int _notificationRandomMin = 10;
-  static const int _notificationRandomRange = 90;
-  final Random _random = Random();
 
   // Configuration getters - encapsulate preference access
   bool get isEnabled =>
@@ -268,19 +264,23 @@ class CourseReminderService extends NotificationService
     }
   }
 
-  /// Generate the notification ID for course
-  int _generateNotificationId(int weekday, int startClass, int weekIndex) {
-    // return _notificationIdPrefix * 10000 +
-    //     weekday * 10000 +
-    //     startClass * 100 +
-    //     weekIndex;
-    final randomSuffix =
-        _random.nextInt(_notificationRandomRange) + _notificationRandomMin;
-    return _notificationIdPrefix * _notificationIdBase +
-        weekIndex * 100000 +
-        weekday * 10000 +
-        startClass * 100 +
-        randomSuffix;
+  /// Generate a stable notification ID from a unique key.
+  ///
+  /// IDs stay in the same numeric bucket so `isCourseReminderNotificationId`
+  /// continues to work, while removing random collisions from parallel
+  /// scheduling.
+  int _generateNotificationId(String uniqueKey) {
+    const int fnvOffsetBasis = 0x811C9DC5;
+    const int fnvPrime = 0x01000193;
+
+    int hash = fnvOffsetBasis;
+    for (final codeUnit in uniqueKey.codeUnits) {
+      hash ^= codeUnit;
+      hash = (hash * fnvPrime) & 0x7fffffff;
+    }
+
+    final int minId = _notificationIdPrefix * _notificationIdBase;
+    return minId + (hash % _notificationIdBase);
   }
 
   static bool isCourseReminderNotificationId(int id) {
@@ -311,31 +311,6 @@ class CourseReminderService extends NotificationService
       hour,
       minute,
     );
-  }
-
-  /// Calculate which class period the time corresponds to
-  /// Returns the class index (1-based), or 1 if no match found
-  int _calculateClassPeriodFromTime(DateTime time) {
-    final timeInMinutes = time.hour * 60 + time.minute;
-
-    // Find the closest matching class start time
-    int closestClass = 1;
-    int minDifference = 999999;
-
-    for (int i = 0; i < timeList.length; i += 2) {
-      final classIndex = (i ~/ 2) + 1; // Convert to 1-based class number
-      final timeStr = timeList[i];
-      final parts = timeStr.split(':');
-      final classStartMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
-
-      final difference = (timeInMinutes - classStartMinutes).abs();
-      if (difference < minDifference) {
-        minDifference = difference;
-        closestClass = classIndex;
-      }
-    }
-
-    return closestClass;
   }
 
   String _getCurrentLocale() {
@@ -437,12 +412,9 @@ class CourseReminderService extends NotificationService
             weekIndex = 0;
           }
 
-          final int weekday = classStartTime.weekday;
-          final int startClass = _calculateClassPeriodFromTime(classStartTime);
           final int notificationId = _generateNotificationId(
-            weekday,
-            startClass,
-            weekIndex,
+            'custom|${customClass.id}|${timeRange.id}|'
+            '${classStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
           );
 
           String title = NonUII18n.translate(
@@ -563,9 +535,8 @@ class CourseReminderService extends NotificationService
           ClassDetail classDetail = data.getClassDetail(timeArrangement);
 
           int notificationId = _generateNotificationId(
-            timeArrangement.day,
-            timeArrangement.start,
-            weekIndex,
+            'course|${timeArrangement.index}|${classDetail.name}|'
+            '${classStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
           );
 
           String locale = _getCurrentLocale();
@@ -691,16 +662,12 @@ class CourseReminderService extends NotificationService
           );
           if (weekIndex < 0) weekIndex = 0;
 
-          int weekday = experimentStartTime.weekday; // 1=Mon, 7=Sun
-
-          // Calculate which class period this experiment corresponds to
-          int startClass = _calculateClassPeriodFromTime(experimentStartTime);
-
-          // Use a unique ID based on experiment start time to avoid conflicts
+          // Use a stable unique ID to avoid collisions across different
+          // notification sources.
           int notificationId = _generateNotificationId(
-            weekday,
-            startClass,
-            weekIndex,
+            'experiment|$experimentIndex|$timeRangeIndex|'
+            '${experiment.name}|${experimentStartTime.toIso8601String()}|'
+            '$minutesBefore|$weekIndex',
           );
 
           String locale = _getCurrentLocale();
