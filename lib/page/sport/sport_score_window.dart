@@ -78,7 +78,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   void initState() {
     super.initState();
-    SportSession().getScore();
+    _future = SportSession().getScore();
   }
 
   @override
