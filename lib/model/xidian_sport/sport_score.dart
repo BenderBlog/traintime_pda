@@ -45,23 +45,3 @@ class SportScore {
   String get scoreRankI18nStr =>
       list.length < 4 ? "class_attendance.course_state.unknown" : rank;
 }
-
-  /// 获取总分显示值和颜色
-  // Map<String, dynamic> _getTotalScoreInfo() {
-  //   final score = sportScore.value.total;
-  //   final isUnknown = !_isFourYearsComplete();
-  //   final isQualified = !sportScore.value.rank.contains("不");
-// 
-  //   final colorScheme = _getColorScheme(isQualified, isUnknown);
-// 
-  //   return {
-  //     'score': score,
-  //     'rank': isUnknown
-  //         ? FlutterI18n.translate(
-  //             context,
-  //             "class_attendance.course_state.unknown",
-  //           )
-  //         : sportScore.value.rank,
-  //     ...colorScheme,
-  //   };
-  // }

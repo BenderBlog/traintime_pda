@@ -955,6 +955,11 @@ sport:
    situation_unknown: "Unknown malfunction {situation}"
    situation_fetching: "Fetching..."
    situation_error: "Bad thing: {situation}"
+   cache_hint_missing_password: "Showing cached data. Please set your PE password and try again."
+   cache_hint_credential_invalid: "Showing cached data. The PE login has expired. Please update your PE password and try again."
+   error_auth_expired: "The PE login has expired. Please try again."
+   error_missing_password: "PE password is not set"
+   error_credential_invalid: "The PE login has expired. Please update your PE password and try again."
 
 # 其他功能
 toolbox:

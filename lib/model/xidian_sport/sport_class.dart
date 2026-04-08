@@ -72,19 +72,6 @@ class SportClassItem {
     );
   }
 
-  factory SportClassItem.empty() => SportClassItem._(
-    termToShow: "",
-    score: "",
-    term: "",
-    type: "",
-    name: "",
-    teacher: "",
-    start: 0,
-    stop: 0,
-    week: 0,
-    place: "",
-  );
-
   SportClassItem._({
     required this.termToShow,
     required this.term,

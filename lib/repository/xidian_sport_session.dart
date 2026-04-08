@@ -11,15 +11,30 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/no_password_exception.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
+import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/model/xidian_sport/sport_score.dart';
 
 class SportSession {
   static final _lock = Lock();
+  static const _cacheHintMissingPasswordKey =
+      "sport.cache_hint_missing_password";
+  static const _cacheHintCredentialInvalidKey =
+      "sport.cache_hint_credential_invalid";
+  static const _authExpiredMessageKey = "sport.error_auth_expired";
+  static const _credentialInvalidMessageKey = "sport.error_credential_invalid";
+  static const _credentialMissingMessageKey = "sport.error_missing_password";
+  static const _authFailureKeywords = {
+    "未登录",
+    "登录失效",
+    "自动登录失效",
+    "token失效",
+    "重新登录",
+  };
 
   final PersistCookieJar sportCookieJar = PersistCookieJar(
     persistSession: true,
@@ -132,20 +147,16 @@ class SportSession {
   static DateTime _classCacheFetchTime = DateTime.now();
 
   // First bool stands for cache, second bool stands for fetch time.
-  Future<(bool, DateTime, SportScore)> getScore() async {
+  Future<FetchResult<SportScore>> getScore() async {
     log.info(
       "[SportSession][getScore]"
       "Ready to get sport score.",
     );
     SportScore toReturn = SportScore();
     try {
-      await _lock.synchronized(() async {
-        if (userId.isEmpty || token.isEmpty) {
-          await login();
-        }
-      });
+      await _ensureAuthenticated();
 
-      var response = await require(
+      var response = await _authenticatedRequire(
         subWebsite: "measure/getStuTotalScore",
         body: {"userId": userId},
       );
@@ -161,7 +172,7 @@ class SportSession {
             rank: i["rank"],
             gradeType: i["gradeType"],
           );
-          var anotherResponse = await require(
+          var anotherResponse = await _authenticatedRequire(
             subWebsite: "measure/getStuScoreDetail",
             body: {"meaScoreId": i["meaScoreId"]},
           );
@@ -189,7 +200,7 @@ class SportSession {
       log.info(
         "[SportSession][getScore] Score cache updated at $_scoreCacheFetchTime",
       );
-      return (false, _scoreCacheFetchTime, toReturn);
+      return FetchResult.fresh(fetchTime: _scoreCacheFetchTime, data: toReturn);
     } catch (e, s) {
       log.handle(
         e,
@@ -197,7 +208,11 @@ class SportSession {
         "[SportSession][getScore] Error occured, and cache ${_scoreCache != null ? "exist" : "not exist"}",
       );
       if (_scoreCache != null) {
-        return (true, _scoreCacheFetchTime, _scoreCache!);
+        return FetchResult.cache(
+          fetchTime: _scoreCacheFetchTime,
+          data: _scoreCache!,
+          hintKey: _cacheHintFromError(e),
+        );
       } else {
         rethrow;
       }
@@ -221,26 +236,22 @@ class SportSession {
     // }
   }
 
-  Future<(bool, DateTime, SportClass)> getClass() async {
+  Future<FetchResult<SportClass>> getClass() async {
     log.info(
       "[SportSession][getClass]"
       "Ready to get latest class.",
     );
     SportClass toReturn = [];
     try {
-      await _lock.synchronized(() async {
-        if (userId.isEmpty || token.isEmpty) {
-          await login();
-        }
-      });
-      var response = await require(
+      await _ensureAuthenticated();
+      var response = await _authenticatedRequire(
         subWebsite: "stuTermScore/uidSelect",
         body: {"uid": userId, "pageIndex": "1", "pageSize": "100"},
       );
       for (var i in response["data"]) {
         try {
           int latestId = i["id"];
-          var classData = await require(
+          var classData = await _authenticatedRequire(
             subWebsite: "stuTeacherCurriculum/selstuTeacherCurriculum",
             body: {"stuid": userId, "stuTermScoreid": latestId},
           ).then((value) => value["data"][0]);
@@ -266,7 +277,10 @@ class SportSession {
       log.info(
         "[SportSession][getScore] Class cache updated at $_classCacheFetchTime",
       );
-      return (false, _classCacheFetchTime, _classCache!);
+      return FetchResult.fresh(
+        fetchTime: _classCacheFetchTime,
+        data: _classCache!,
+      );
     } catch (e, s) {
       log.handle(
         e,
@@ -275,7 +289,11 @@ class SportSession {
       );
       if (_classCache != null) {
         log.warning("[SportSession][getClass] Use cache.");
-        return (true, _classCacheFetchTime, _classCache!);
+        return FetchResult.cache(
+          fetchTime: _classCacheFetchTime,
+          data: _classCache!,
+          hintKey: _cacheHintFromError(e),
+        );
       } else {
         rethrow;
       }
@@ -325,6 +343,124 @@ awb4B45zUwIDAQAB
     'appId': '3685bc028aaf4e64ad6b5d2349d24ba8',
     'appSecret': 'e8167ef026cbc5e456ab837d9d6d9254',
   };
+
+  Future<void> _ensureAuthenticated({bool force = false}) async {
+    await _lock.synchronized(() async {
+      if (!force && userId.isNotEmpty && token.isNotEmpty) {
+        return;
+      }
+      try {
+        await login(force: force);
+      } on NoPasswordException {
+        throw const SportCredentialMissingException();
+      } on LoginFailedException catch (e) {
+        if (e.msg == "系统维护") {
+          rethrow;
+        }
+        throw const SportCredentialInvalidException();
+      }
+    });
+  }
+
+  bool _isAuthFailureResponse(Map<String, dynamic> response) {
+    final returnCode = response["returnCode"]?.toString();
+    if (returnCode == "401" || returnCode == "402") {
+      return true;
+    }
+    final returnMsg =
+        response["returnMsg"]?.toString() ?? response["msg"]?.toString() ?? "";
+    return _authFailureKeywords.any(returnMsg.contains);
+  }
+
+  bool _isAuthFailureDioException(DioException e) {
+    final statusCode = e.response?.statusCode;
+    if (statusCode == 401 || statusCode == 402) {
+      return true;
+    }
+
+    final responseData = e.response?.data;
+    if (responseData is Map<String, dynamic> &&
+        _isAuthFailureResponse(responseData)) {
+      return true;
+    }
+
+    final rawMessage = [
+      e.message,
+      e.response?.statusMessage,
+      responseData?.toString(),
+    ].whereType<String>().join(" ");
+    return _authFailureKeywords.any(rawMessage.contains);
+  }
+
+  String? _cacheHintFromError(Object error) {
+    if (error is SportCredentialMissingException) {
+      return _cacheHintMissingPasswordKey;
+    }
+    if (error is SportCredentialInvalidException) {
+      return _cacheHintCredentialInvalidKey;
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>> _authenticatedRequire({
+    required String subWebsite,
+    required Map<String, dynamic> body,
+    bool allowRetry = true,
+  }) async {
+    try {
+      final response = await require(
+        subWebsite: subWebsite,
+        body: Map<String, dynamic>.from(body),
+      );
+      if (_isAuthFailureResponse(response)) {
+        throw const SportAuthExpiredException();
+      }
+      return response;
+    } on DioException catch (e) {
+      if (allowRetry && _isAuthFailureDioException(e)) {
+        return _retryAfterReAuth(subWebsite: subWebsite, body: body);
+      }
+      rethrow;
+    } on SportAuthExpiredException {
+      if (allowRetry) {
+        return _retryAfterReAuth(subWebsite: subWebsite, body: body);
+      }
+      throw const SportCredentialInvalidException();
+    }
+  }
+
+  Future<Map<String, dynamic>> _retryAfterReAuth({
+    required String subWebsite,
+    required Map<String, dynamic> body,
+  }) async {
+    log.warning(
+      "[SportSession][_retryAfterReAuth] "
+      "Auth state expired, trying to login again.",
+    );
+
+    /// Clear Auth State
+    userId = '';
+    token = '';
+    await sportCookieJar.deleteAll();
+
+    await _ensureAuthenticated(force: true);
+
+    try {
+      final response = await require(
+        subWebsite: subWebsite,
+        body: Map<String, dynamic>.from(body),
+      );
+      if (_isAuthFailureResponse(response)) {
+        throw const SportCredentialInvalidException();
+      }
+      return response;
+    } on DioException catch (e) {
+      if (_isAuthFailureDioException(e)) {
+        throw const SportCredentialInvalidException();
+      }
+      rethrow;
+    }
+  }
 
   /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
   static String _rsaEncrypt(String toEnc, String pubKey) {
@@ -377,12 +513,12 @@ awb4B45zUwIDAQAB
     return response.data;
   }
 
-  Future<void> login() async {
+  Future<void> login({bool force = false}) async {
     if (preference.getString(preference.Preference.idsAccount).isEmpty ||
         preference.getString(preference.Preference.sportPassword).isEmpty) {
       throw NoPasswordException(type: PasswordType.sport);
     }
-    if (userId.isNotEmpty && token.isNotEmpty) {
+    if (!force && userId.isNotEmpty && token.isNotEmpty) {
       log.info(
         "[SportSession][login]"
         "Already login.",
@@ -445,4 +581,25 @@ class SemesterFailedException implements Exception {
 
   @override
   String toString() => msg;
+}
+
+class SportAuthExpiredException implements Exception {
+  const SportAuthExpiredException();
+
+  @override
+  String toString() => SportSession._authExpiredMessageKey;
+}
+
+class SportCredentialMissingException implements Exception {
+  const SportCredentialMissingException();
+
+  @override
+  String toString() => SportSession._credentialMissingMessageKey;
+}
+
+class SportCredentialInvalidException implements Exception {
+  const SportCredentialInvalidException();
+
+  @override
+  String toString() => SportSession._credentialInvalidMessageKey;
 }

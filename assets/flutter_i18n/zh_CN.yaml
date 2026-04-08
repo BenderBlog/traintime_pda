@@ -947,6 +947,11 @@ sport:
     situation_unknown: "未知故障{situation}"
     situation_fetching: "正在获取"
     situation_error: "坏事: {situation}"
+    cache_hint_missing_password: "当前显示缓存，请先填写体育密码后重试。"
+    cache_hint_credential_invalid: "当前显示缓存，体育登录已失效，请更新体育密码后重试。"
+    error_auth_expired: "体育登录已失效，请重试。"
+    error_missing_password: "未填写体育密码"
+    error_credential_invalid: "体育登录已失效，请更新体育密码后重试。"
 
 # 其他功能
 toolbox:

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
@@ -24,7 +25,18 @@ class _SportClassWindowState extends State<SportClassWindow>
   @override
   bool get wantKeepAlive => true;
 
-  late Future<(bool, DateTime, SportClass)> _future;
+  late Future<FetchResult<SportClass>> _future;
+
+  Object? _translateError(BuildContext context, Object? error) {
+    if (error is SportCredentialMissingException ||
+        error is SportCredentialInvalidException) {
+      return FlutterI18n.translate(context, error.toString());
+    }
+    if (error is String) {
+      return FlutterI18n.translate(context, error);
+    }
+    return error;
+  }
 
   @override
   void initState() {
@@ -46,21 +58,26 @@ class _SportClassWindowState extends State<SportClassWindow>
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
-            List<Widget> toShow = snapshot.data!.$3
+            final result = snapshot.data!;
+            List<Widget> toShow = result.data
                 .map((element) => SportClassCard(data: element))
                 .toList();
 
             return Column(
               children: [
-                if (snapshot.data!.$1)
+                if (result.isCache)
                   CacheAlerter(
-                    hint: FlutterI18n.translate(
-                      context,
-                      "inapp_cache_hint",
-                      translationParams: {
-                        "datetime": snapshot.data!.$2.toString(),
-                      },
-                    ),
+                    hint:
+                        (result.hintKey != null
+                            ? FlutterI18n.translate(context, result.hintKey!)
+                            : null) ??
+                        FlutterI18n.translate(
+                          context,
+                          "inapp_cache_hint",
+                          translationParams: {
+                            "datetime": result.fetchTime.toString(),
+                          },
+                        ),
                   ),
                 if (toShow.isEmpty)
                   EmptyListView(
@@ -100,7 +117,7 @@ class _SportClassWindowState extends State<SportClassWindow>
               function: () => setState(() {
                 _future = SportSession().getClass();
               }),
-              errorStatus: snapshot.error,
+              errorStatus: _translateError(context, snapshot.error),
               stackTrace: snapshot.stackTrace,
             ).center();
           } else {

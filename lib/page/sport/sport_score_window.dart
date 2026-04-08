@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/model/xidian_sport/sport_score.dart';
@@ -49,11 +50,22 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   bool get wantKeepAlive => true;
 
-  late Future<(bool, DateTime, SportScore)> _future;
+  late Future<FetchResult<SportScore>> _future;
+
+  Object? _translateError(BuildContext context, Object? error) {
+    if (error is SportCredentialMissingException ||
+        error is SportCredentialInvalidException) {
+      return FlutterI18n.translate(context, error.toString());
+    }
+    if (error is String) {
+      return FlutterI18n.translate(context, error);
+    }
+    return error;
+  }
 
   /// 根据合格/不合格状态获取颜色方案
-  ScoreColorScheme _getColorScheme(bool isQualified, bool isUnknown) {
-    if (isUnknown) {
+  ScoreColorScheme _getColorScheme(bool isQualified, bool isFourYearsComplete) {
+    if (isFourYearsComplete) {
       return ScoreColorScheme(
         scoreBackgroundColor: Colors.grey.withValues(
           alpha: _textBackgroundAlpha,
@@ -95,10 +107,11 @@ class _SportScoreWindowState extends State<SportScoreWindow>
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
-            final data = snapshot.data!;
+            final result = snapshot.data!;
+            final data = result.data;
             final scoreColorScheme = _getColorScheme(
-              data.$3.isQualified,
-              data.$3.isFourYearsComplete,
+              data.isQualified,
+              data.isFourYearsComplete,
             );
             List<Widget> things = [
               ReXCard(
@@ -132,7 +145,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
-                                    data.$3.total,
+                                    data.total,
                                     style: TextStyle(
                                       color: scoreColorScheme.scoreTextColor,
                                       fontWeight: FontWeight.bold,
@@ -169,7 +182,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                                   child: Text(
                                     FlutterI18n.translate(
                                       context,
-                                      data.$3.scoreRankI18nStr,
+                                      data.scoreRankI18nStr,
                                     ),
                                     style: TextStyle(
                                       color: scoreColorScheme.rankTextColor,
@@ -193,10 +206,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Center(
                         child: Text(
-                          data.$3.detail.substring(
-                            0,
-                            data.$3.detail.indexOf("\\"),
-                          ),
+                          data.detail.substring(0, data.detail.indexOf("\\")),
                           style: Theme.of(context).textTheme.bodySmall,
                           textAlign: TextAlign.center,
                         ),
@@ -208,21 +218,25 @@ class _SportScoreWindowState extends State<SportScoreWindow>
             ];
             things.addAll(
               List<Widget>.generate(
-                data.$3.list.length,
-                (index) => ScoreCard(toUse: data.$3.list[index]),
+                data.list.length,
+                (index) => ScoreCard(toUse: data.list[index]),
               ).reversed,
             );
             return Column(
               children: [
-                if (snapshot.data!.$1)
+                if (result.isCache)
                   CacheAlerter(
-                    hint: FlutterI18n.translate(
-                      context,
-                      "inapp_cache_hint",
-                      translationParams: {
-                        "datetime": snapshot.data!.$2.toString(),
-                      },
-                    ),
+                    hint:
+                        (result.hintKey != null
+                            ? FlutterI18n.translate(context, result.hintKey!)
+                            : null) ??
+                        FlutterI18n.translate(
+                          context,
+                          "inapp_cache_hint",
+                          translationParams: {
+                            "datetime": result.fetchTime.toString(),
+                          },
+                        ),
                   ),
                 Expanded(
                   child: ListView.separated(
@@ -251,7 +265,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
               function: () => setState(() {
                 _future = SportSession().getScore();
               }),
-              errorStatus: snapshot.error,
+              errorStatus: _translateError(context, snapshot.error),
               stackTrace: snapshot.stackTrace,
             ).center();
           } else {
