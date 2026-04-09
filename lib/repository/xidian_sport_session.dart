@@ -12,7 +12,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/model/fetch_result.dart';
-import 'package:watermeter/model/no_password_exception.dart';
+import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -28,6 +28,7 @@ class SportSession {
   static const _authExpiredMessageKey = "sport.error_auth_expired";
   static const _credentialInvalidMessageKey = "sport.error_credential_invalid";
   static const _credentialMissingMessageKey = "sport.error_missing_password";
+  static const _wrongPasswordKeywords = {"用户名", "账号", "密码"};
   static const _authFailureKeywords = {
     "未登录",
     "登录失效",
@@ -353,11 +354,13 @@ awb4B45zUwIDAQAB
         await login(force: force);
       } on NoPasswordException {
         throw const SportCredentialMissingException();
+      } on WrongPasswordException {
+        throw const SportCredentialInvalidException();
       } on LoginFailedException catch (e) {
         if (e.msg == "系统维护") {
           rethrow;
         }
-        throw const SportCredentialInvalidException();
+        rethrow;
       }
     });
   }
@@ -390,6 +393,10 @@ awb4B45zUwIDAQAB
       responseData?.toString(),
     ].whereType<String>().join(" ");
     return _authFailureKeywords.any(rawMessage.contains);
+  }
+
+  bool _isWrongPasswordMessage(String message) {
+    return _wrongPasswordKeywords.any(message.contains);
   }
 
   String? _cacheHintFromError(Object error) {
@@ -541,7 +548,11 @@ awb4B45zUwIDAQAB
         },
       );
       if (response["returnCode"] != "200" && response["returnCode"] != 200) {
-        throw LoginFailedException(msg: response["returnMsg"]);
+        final returnMsg = response["returnMsg"]?.toString() ?? "";
+        if (_isWrongPasswordMessage(returnMsg)) {
+          throw const WrongPasswordException(type: PasswordType.sport);
+        }
+        throw LoginFailedException(msg: returnMsg);
       } else {
         userId = response["data"]["id"].toString();
         token = response["data"]["token"];

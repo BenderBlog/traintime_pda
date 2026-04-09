@@ -10,7 +10,8 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:pool/pool.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
-import 'package:watermeter/model/no_password_exception.dart';
+import 'package:watermeter/model/not_school_network_exception.dart';
+import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/repository/experiment_score/image_recognition.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
@@ -239,7 +240,7 @@ class ExperimentSession extends NetworkSession {
 
   Future<List<ExperimentData>> getData() async {
     if (await NetworkSession.isInSchool() == false) {
-      throw NotSchoolNetworkException;
+      throw NotSchoolNetworkException();
     }
 
     if (prefs.getString(prefs.Preference.experimentPassword).isEmpty) {

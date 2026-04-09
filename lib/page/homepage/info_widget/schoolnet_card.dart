@@ -40,11 +40,11 @@ class SchoolnetCard extends StatelessWidget {
           children: [
             TextSpan(
               text: state.map(
-                data: (usage) => FlutterI18n.translate(
+                data: (result) => FlutterI18n.translate(
                   context,
                   "homepage.school_net.title",
                   translationParams: {
-                    "usage": usage.used.replaceAll("G", " GB"),
+                    "usage": result.data.used.replaceAll("G", " GB"),
                   },
                 ),
                 loading: () => FlutterI18n.translate(
@@ -70,10 +70,10 @@ class SchoolnetCard extends StatelessWidget {
       ),
       bottomText: Text(
         state.map(
-          data: (usage) => FlutterI18n.translate(
+          data: (result) => FlutterI18n.translate(
             context,
             "homepage.school_net.remaining",
-            translationParams: {"remaining": usage.charged},
+            translationParams: {"remaining": result.data.charged},
           ),
           loading: () =>
               FlutterI18n.translate(context, "homepage.school_net.fetching"),

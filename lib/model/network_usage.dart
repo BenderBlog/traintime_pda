@@ -2,8 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-enum CurrentUserNetInfoState { fetching, fetched, notSchool, error, none }
-
 class GeneralNetworkUsage {
   // (ip, online_time, used_t)
   final List<(String, String, String)> ipList;

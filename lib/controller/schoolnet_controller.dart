@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:signals/signals.dart';
-import 'package:watermeter/model/xidian_ids/network_usage.dart';
+import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/schoolnet_session.dart';
 
@@ -13,12 +14,13 @@ class SchoolnetController {
 
   Future<String> Function(List<int>)? _captchaFunction;
 
-  late final schoolNetUsageSignal = futureSignal<GeneralNetworkUsage>(
-    () => SchoolnetSession().getGeneralNetworkUsage(
-      captchaFunction: _captchaFunction,
-    ),
-    debugLabel: "SchoolNetUsageSignal",
-  );
+  late final schoolNetUsageSignal =
+      futureSignal<FetchResult<GeneralNetworkUsage>>(
+        () => SchoolnetSession().getGeneralNetworkUsage(
+          captchaFunction: _captchaFunction,
+        ),
+        debugLabel: "SchoolNetUsageSignal",
+      );
 
   Future<void> reloadSchoolnetInfo({
     Future<String> Function(List<int>)? captchaFunction,
@@ -27,7 +29,7 @@ class SchoolnetController {
     if (schoolNetUsageSignal.value.isLoading) return;
 
     _captchaFunction = captchaFunction;
-    await schoolNetUsageSignal.reload().catchError(
+    await schoolNetUsageSignal.refresh().catchError(
       (e, s) => log.handle(
         e,
         s,

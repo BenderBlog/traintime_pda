@@ -1,5 +1,7 @@
 # FetchResult
 
+相关代码：`lib/model/fetch_result.dart`。
+
 仓库层对 UI 的统一输出是 `FetchResult<T>`：
 
 - `isCache`

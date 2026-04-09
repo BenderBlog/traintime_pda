@@ -536,6 +536,8 @@ school_net:
   empty_password: 您忘記輸入賬號密碼了
   not_initalized: 疑似查詢後端尚未開放查詢
   captcha_failed: 驗證碼識別失敗
+  cache_hint_captcha_failed: 當前顯示緩存，驗證碼識別失敗，請重試。
+  cache_hint_request_failed: 當前顯示緩存，校園網請求失敗，請稍後重試。
   wrong_password: 密碼錯誤
   error_fetch: 獲取失敗
   error_other: 其他錯誤：{msg}

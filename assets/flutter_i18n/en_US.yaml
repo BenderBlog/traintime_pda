@@ -593,6 +593,8 @@ school_net:
    empty_password: "You may forgot to enter the schoolnet password"
    not_initalized: "It seems the backend is not open for query:P"
    captcha_failed: "Failed to idenify captcha"
+   cache_hint_captcha_failed: "Showing cached data because captcha recognition failed. Please try again."
+   cache_hint_request_failed: "Showing cached data because the schoolnet request failed. Please try again later."
    wrong_password: "Wrong schoolnet password"
    error_fetch: "Failed to fetch：{msg}"
    error_other: "Other error：{msg}"

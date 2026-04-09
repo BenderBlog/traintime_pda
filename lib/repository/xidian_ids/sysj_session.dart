@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -123,7 +124,7 @@ class SysjSession extends IDSSession {
   /// These are from sysj.xidian.edu.cn's js file
   Future<List<ExperimentData>> getDataFromSysj() async {
     if (!(await NetworkSession.isInSchool())) {
-      throw NotSchoolNetworkException;
+      throw NotSchoolNetworkException();
     }
 
     Response firstRequest = await dio.get(

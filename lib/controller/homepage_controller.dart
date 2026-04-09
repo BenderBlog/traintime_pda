@@ -7,7 +7,7 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/model/no_password_exception.dart';
+import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 
 enum ArrangementState { fetching, fetched, error, none }

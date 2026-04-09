@@ -109,10 +109,3 @@ class NetworkSession {
     }
   }
 }
-
-class NotSchoolNetworkException implements Exception {
-  final msg = "没有在校园网环境";
-
-  @override
-  String toString() => msg;
-}
