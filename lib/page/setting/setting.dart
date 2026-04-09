@@ -219,8 +219,8 @@ class _SettingWindowState extends State<SettingWindow> {
                           case true:
                             await showDialog(
                               context: context,
-                              builder: (context) => Obx(
-                                () => UpdateDialog(
+                              builder: (context) => Watch(
+                                (context) => UpdateDialog(
                                   updateMessage: UpdateNoticeController
                                       .i
                                       .updateMessageSignal

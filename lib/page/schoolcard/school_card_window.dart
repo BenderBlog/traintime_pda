@@ -4,7 +4,6 @@
 
 // School card log list.
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +31,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
     for (var element in theRecord) {
       sumUp += double.parse(element.money);
     }
-    if (sumUp.isLowerThan(0)) {
+    if (sumUp < 0) {
       return FlutterI18n.translate(
         context,
         "school_card_window.expense",
