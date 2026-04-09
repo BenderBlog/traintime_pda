@@ -135,6 +135,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                 children: [
                   if (isFromCache && fetchTime != null)
                     CacheAlerter(
+                      dataType: FlutterI18n.translate(context, "exam.title"),
                       hint: FlutterI18n.translate(
                         context,
                         "inapp_cache_hint",

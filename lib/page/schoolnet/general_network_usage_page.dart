@@ -38,6 +38,7 @@ class GeneralNetworkUsagePage extends StatelessWidget {
       [
         if (result.isCache)
           CacheAlerter(
+            dataType: FlutterI18n.translate(context, "school_net.title"),
             hint:
                 (result.hintKey != null
                     ? FlutterI18n.translate(context, result.hintKey!)

@@ -5,15 +5,25 @@ import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/experiment_session.dart';
+import 'package:watermeter/repository/physics_experiment_session.dart';
 
 class PhysicsExperimentController {
   static final PhysicsExperimentController i = PhysicsExperimentController._();
 
   PhysicsExperimentController._() {
+    /// Load from cache at the beginning
+    final cache = ExperimentSession.getCache();
+    if (cache != null) {
+      _lastValidPhysicsExperiment.value = FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
+    }
     _initEffects();
   }
 
@@ -22,12 +32,12 @@ class PhysicsExperimentController {
   );
 
   final _lastValidPhysicsExperiment =
-      signal<(bool, DateTime, List<ExperimentData>)?>(null);
+      signal<FetchResult<List<ExperimentData>>?>(null);
 
   void _initEffects() {
     effect(() {
       final state = physicsExperimentSignal.value;
-      if (state is AsyncData<(bool, DateTime, List<ExperimentData>)>) {
+      if (state is AsyncData<FetchResult<List<ExperimentData>>>) {
         _lastValidPhysicsExperiment.value = state.value;
       }
     }, debugLabel: "ExamControllerShadowSyncEffect");
@@ -45,7 +55,7 @@ class PhysicsExperimentController {
   }
 
   late final physicsExperiments = computed(
-    () => _lastValidPhysicsExperiment.value?.$3 ?? <ExperimentData>[],
+    () => _lastValidPhysicsExperiment.value?.data ?? <ExperimentData>[],
   );
 
   late final hasValidPhysicsExperiment = computed(
@@ -53,11 +63,15 @@ class PhysicsExperimentController {
   );
 
   late final isPhysicsExperimentFromCache = computed(
-    () => _lastValidPhysicsExperiment.value?.$1 ?? false,
+    () => _lastValidPhysicsExperiment.value?.isCache ?? false,
   );
 
   late final physicsExperimentFetchTime = computed<DateTime?>(
-    () => _lastValidPhysicsExperiment.value?.$2,
+    () => _lastValidPhysicsExperiment.value?.fetchTime,
+  );
+
+  late final physicsExperimentCacheHintKey = computed<String?>(
+    () => _lastValidPhysicsExperiment.value?.hintKey,
   );
 
   late final physicsExperimentOfTodayComputedSignal = computed(() {

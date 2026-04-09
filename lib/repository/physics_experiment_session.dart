@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:pool/pool.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/repository/experiment_score/image_recognition.dart';
@@ -19,13 +20,12 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-Future<(bool, DateTime, List<ExperimentData>)>
-getPhysicsExperimentData() async {
+Future<FetchResult<List<ExperimentData>>> getPhysicsExperimentData() async {
   try {
     List<ExperimentData> data = await ExperimentSession().getData();
     DateTime fetchTime = DateTime.now();
     await ExperimentSession.writeCache(data);
-    return (false, fetchTime, data);
+    return FetchResult.fresh(fetchTime: fetchTime, data: data);
   } on PasswordWrongException {
     log.error(
       "[ExperimentSession][getExperimentData] "
@@ -37,7 +37,11 @@ getPhysicsExperimentData() async {
     log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
     var cache = ExperimentSession.getCache();
     if (cache != null) {
-      return (true, cache.$1, cache.$2);
+      return FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
     }
     rethrow;
   }

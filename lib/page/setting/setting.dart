@@ -53,7 +53,7 @@ import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
-import 'package:watermeter/repository/experiment_session.dart';
+import 'package:watermeter/repository/physics_experiment_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 class SettingWindow extends StatefulWidget {

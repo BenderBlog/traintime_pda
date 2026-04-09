@@ -226,6 +226,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
               children: [
                 if (result.isCache)
                   CacheAlerter(
+                    dataType: FlutterI18n.translate(context, "sport.title"),
                     hint:
                         (result.hintKey != null
                             ? FlutterI18n.translate(context, result.hintKey!)

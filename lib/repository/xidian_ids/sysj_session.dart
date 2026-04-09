@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/time_list.dart';
@@ -18,12 +19,12 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-Future<(bool, DateTime, List<ExperimentData>)> getOtherExperimentData() async {
+Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
   try {
     List<ExperimentData> data = await SysjSession().getDataFromSysj();
     DateTime fetchTime = DateTime.now();
     await SysjSession.writeCache(data);
-    return (false, fetchTime, data);
+    return FetchResult.fresh(fetchTime: fetchTime, data: data);
   } on PasswordWrongException {
     log.error(
       "[SysjSession][getExperimentData] "
@@ -35,7 +36,11 @@ Future<(bool, DateTime, List<ExperimentData>)> getOtherExperimentData() async {
     log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
     var cache = SysjSession.getCache();
     if (cache != null) {
-      return (true, cache.$1, cache.$2);
+      return FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
     }
     rethrow;
   }

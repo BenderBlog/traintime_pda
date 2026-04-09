@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -14,18 +15,28 @@ class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
 
   OtherExperimentController._() {
+    /// Load from cache at the beginning
+    final cache = SysjSession.getCache();
+    if (cache != null) {
+      _lastValidOtherExperiment.value = FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
+    }
     _initEffects();
   }
 
   final otherExperimentSignal = futureSignal(() => getOtherExperimentData());
 
-  final _lastValidOtherExperiment =
-      signal<(bool, DateTime, List<ExperimentData>)?>(null);
+  final _lastValidOtherExperiment = signal<FetchResult<List<ExperimentData>>?>(
+    null,
+  );
 
   void _initEffects() {
     effect(() {
       final state = otherExperimentSignal.value;
-      if (state is AsyncData<(bool, DateTime, List<ExperimentData>)>) {
+      if (state is AsyncData<FetchResult<List<ExperimentData>>>) {
         _lastValidOtherExperiment.value = state.value;
       }
     }, debugLabel: "ExamControllerShadowSyncEffect");
@@ -43,7 +54,7 @@ class OtherExperimentController {
   }
 
   late final otherExperiments = computed(
-    () => _lastValidOtherExperiment.value?.$3 ?? <ExperimentData>[],
+    () => _lastValidOtherExperiment.value?.data ?? <ExperimentData>[],
   );
 
   late final hasValidOtherExperiment = computed(
@@ -51,11 +62,15 @@ class OtherExperimentController {
   );
 
   late final isOtherExperimentFromCache = computed(
-    () => _lastValidOtherExperiment.value?.$1 ?? false,
+    () => _lastValidOtherExperiment.value?.isCache ?? false,
   );
 
   late final otherExperimentFetchTime = computed<DateTime?>(
-    () => _lastValidOtherExperiment.value?.$2,
+    () => _lastValidOtherExperiment.value?.fetchTime,
+  );
+
+  late final otherExperimentCacheHintKey = computed<String?>(
+    () => _lastValidOtherExperiment.value?.hintKey,
   );
 
   late final otherExperimentOfTodayComputedSignal = computed(() {

@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 
 class CacheAlerter extends StatelessWidget {
   final String hint;
+  final String? dataType;
 
-  const CacheAlerter({super.key, required this.hint});
+  const CacheAlerter({super.key, required this.hint, this.dataType});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class CacheAlerter extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              hint,
+              dataType == null ? hint : "$dataType: $hint",
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.primary,
