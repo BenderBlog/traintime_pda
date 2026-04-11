@@ -25,6 +25,11 @@ class SportSession {
       "sport.cache_hint_missing_password";
   static const _cacheHintCredentialInvalidKey =
       "sport.cache_hint_credential_invalid";
+  static const _cacheHintMaintainKey = "sport.cache_hint_maintain";
+  static const _cacheHintLoginFailedKey = "sport.cache_hint_login_failed";
+  static const _cacheHintQueryFailedKey = "sport.cache_hint_query_failed";
+  static const _cacheHintNetworkKey = "sport.cache_hint_network";
+  static const _cacheHintUnknownKey = "sport.cache_hint_unknown";
   static const _authExpiredMessageKey = "sport.error_auth_expired";
   static const _credentialInvalidMessageKey = "sport.error_credential_invalid";
   static const _credentialMissingMessageKey = "sport.error_missing_password";
@@ -406,7 +411,18 @@ awb4B45zUwIDAQAB
     if (error is SportCredentialInvalidException) {
       return _cacheHintCredentialInvalidKey;
     }
-    return null;
+    if (error is LoginFailedException) {
+      return error.msg == "系统维护"
+          ? _cacheHintMaintainKey
+          : _cacheHintLoginFailedKey;
+    }
+    if (error is SemesterFailedException) {
+      return _cacheHintQueryFailedKey;
+    }
+    if (error is DioException) {
+      return _cacheHintNetworkKey;
+    }
+    return _cacheHintUnknownKey;
   }
 
   Future<Map<String, dynamic>> _authenticatedRequire({

@@ -8,27 +8,47 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-Future<(bool, DateTime, ExamData)> getScoreInfo(String semester) async {
+String _cacheHintFromError(Object error) {
+  if (error is PasswordWrongException) {
+    return "exam.cache_hint_password_wrong";
+  }
+  if (error is LoginFailedException) {
+    return "exam.cache_hint_login_failed";
+  }
+  if (error is DioException) {
+    return "exam.cache_hint_network_failed";
+  }
+  return "exam.cache_hint_unknown_error";
+}
+
+Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
   try {
     ExamData data = pref.getBool(pref.Preference.role)
         ? await ExamSession().getExamYjspt(semester)
         : await ExamSession().getExamEhall(semester);
     DateTime fetchTime = DateTime.now();
     await ExamSession.updateCacheAndGroup(data);
-    return (false, fetchTime, data);
+    return FetchResult.fresh(fetchTime: fetchTime, data: data);
   } catch (e, s) {
     log.handle(e, s, "[getScoreInfo] Have issue");
     (DateTime, ExamData)? cache = ExamSession.getCache();
     if (cache != null) {
-      return (true, cache.$1, cache.$2);
+      return FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: _cacheHintFromError(e),
+      );
     }
     rethrow;
   }

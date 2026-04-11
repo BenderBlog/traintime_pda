@@ -20,6 +20,23 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
+String _cacheHintFromError(Object error) {
+  if (error is NoPasswordException &&
+      error.type == PasswordType.physicsExperiment) {
+    return "experiment.physics_cache_hint_missing_password";
+  }
+  if (error is LoginFailedException) {
+    return "experiment.physics_cache_hint_login_failed";
+  }
+  if (error is NotSchoolNetworkException) {
+    return "experiment.physics_cache_hint_not_school_network";
+  }
+  if (error is DioException) {
+    return "experiment.physics_cache_hint_network_failed";
+  }
+  return "experiment.physics_cache_hint_unknown_error";
+}
+
 Future<FetchResult<List<ExperimentData>>> getPhysicsExperimentData() async {
   try {
     List<ExperimentData> data = await ExperimentSession().getData();
@@ -40,7 +57,7 @@ Future<FetchResult<List<ExperimentData>>> getPhysicsExperimentData() async {
       return FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: "local_cache_hint",
+        hintKey: _cacheHintFromError(e),
       );
     }
     rethrow;

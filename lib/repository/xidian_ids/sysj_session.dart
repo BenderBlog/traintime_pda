@@ -19,6 +19,19 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
+String _cacheHintFromError(Object error) {
+  if (error is LoginFailedException) {
+    return "experiment.other_cache_hint_login_failed";
+  }
+  if (error is NotSchoolNetworkException) {
+    return "experiment.other_cache_hint_not_school_network";
+  }
+  if (error is DioException) {
+    return "experiment.other_cache_hint_network_failed";
+  }
+  return "experiment.other_cache_hint_unknown_error";
+}
+
 Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
   try {
     List<ExperimentData> data = await SysjSession().getDataFromSysj();
@@ -39,7 +52,7 @@ Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
       return FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: "local_cache_hint",
+        hintKey: _cacheHintFromError(e),
       );
     }
     rethrow;

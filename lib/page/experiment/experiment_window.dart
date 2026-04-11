@@ -48,17 +48,13 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
     return "experiment.fetching_hint_other";
   }
 
-  String _resolveCacheHint(
-    BuildContext context, {
-    required String? hintKey,
-    required DateTime fetchTime,
-  }) {
-    return FlutterI18n.translate(
-      context,
-      hintKey ?? "local_cache_hint",
-      translationParams: {"datetime": fetchTime.toString()},
-    );
-  }
+  String _resolveCacheHint(BuildContext context, {required String? hintKey}) =>
+      FlutterI18n.translate(
+        context,
+        hintKey == null || hintKey == "local_cache_hint"
+            ? "cache_reason_default"
+            : hintKey,
+      );
 
   List<ExperimentData> _sortExperiments(Iterable<ExperimentData> data) {
     final result = data.toList();
@@ -156,8 +152,9 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                   .i
                   .physicsExperimentCacheHintKey
                   .value,
-              fetchTime: physicsFetchTime,
             ),
+            placeOfCache: PlaceOfCache.device,
+            fetchTime: physicsFetchTime,
           ),
         if (isOtherFromCache && otherFetchTime != null)
           CacheAlerter(
@@ -169,8 +166,9 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
               context,
               hintKey:
                   OtherExperimentController.i.otherExperimentCacheHintKey.value,
-              fetchTime: otherFetchTime,
             ),
+            placeOfCache: PlaceOfCache.device,
+            fetchTime: otherFetchTime,
           ),
         Expanded(
           child: TimelineWidget(

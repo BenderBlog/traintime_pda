@@ -30,6 +30,9 @@ no_info: 沒有信息
 catcher_detected: 發生錯誤
 catcher_description: 詳情如下
 new_homepage_hint: 本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快
+local_cache_hint: 本地緩存獲取於 {datetime}
+inapp_cache_hint: 程序內緩存獲取於 {datetime}\n緩存退出程序後失效！
+cache_reason_default: 當前顯示緩存數據。
 weekday:
   monday: 週一
   tuesday: 週二
@@ -250,6 +253,11 @@ empty_classroom:
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息
+  cache_hint_password_wrong: 統一認證密碼錯誤或已失效。
+  cache_hint_login_failed: 登錄考試服務失敗。
+  cache_hint_network_failed: 網絡連接失敗。
+  cache_hint_unknown_error: 在線獲取考試安排失敗。詳細錯誤請查看日誌。
+  fetching_hint: 正在獲取最新考試安排...
   not_finished: 未完成考試
   all_finished: 所有考試全部完成
   unable_to_exam: 無法完成考試
@@ -273,6 +281,15 @@ experiment:
   error_physics: 獲取物理實驗信息時發生錯誤：{info}
   error_other: 獲取其他實驗信息時發生錯誤：{info}
   cache_hint: 目前加載緩存狀況：{info}
+  physics_cache_hint_missing_password: 未填寫物理實驗密碼。
+  physics_cache_hint_login_failed: 物理實驗登錄失敗。
+  physics_cache_hint_not_school_network: 當前不在校園網環境。
+  physics_cache_hint_network_failed: 物理實驗網絡請求失敗。
+  physics_cache_hint_unknown_error: 在線獲取物理實驗失敗。詳細錯誤請查看日誌。
+  other_cache_hint_login_failed: 其他實驗登錄失敗。
+  other_cache_hint_not_school_network: 當前不在校園網環境。
+  other_cache_hint_network_failed: 其他實驗網絡請求失敗。
+  other_cache_hint_unknown_error: 在線獲取其他實驗失敗。詳細錯誤請查看日誌。
   physics_experiment: 物理實驗
   other_experiment: 其他實驗
   tap_for_score: 成績未識別出來
@@ -541,8 +558,8 @@ school_net:
   empty_password: 您忘記輸入賬號密碼了
   not_initalized: 疑似查詢後端尚未開放查詢
   captcha_failed: 驗證碼識別失敗
-  cache_hint_captcha_failed: 當前顯示緩存，驗證碼識別失敗，請重試。
-  cache_hint_request_failed: 當前顯示緩存，校園網請求失敗，請稍後重試。
+  cache_hint_captcha_failed: 驗證碼識別失敗，請重試。
+  cache_hint_request_failed: 校園網請求失敗，請稍後重試。
   wrong_password: 密碼錯誤
   error_fetch: 獲取失敗
   error_other: 其他錯誤：{msg}
@@ -908,6 +925,8 @@ sport:
   situation_unknown: 未知故障{situation}
   situation_fetching: 正在獲取
   situation_error: '壞事: {situation}'
+  cache_hint_missing_password: 請先填寫體育密碼後重試。
+  cache_hint_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。
 toolbox:
   title: 其他功能
   payment: 繳費系統

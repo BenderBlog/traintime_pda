@@ -36,6 +36,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
       final hasValidExamInfo = c.hasValidExamInfo.value;
       final isFromCache = c.isExamFromCache.value;
       final fetchTime = c.examFetchTime.value;
+      final cacheHintKey = c.examCacheHintKey.value;
       final subjects = c.subjects.value;
       final isDisQualified = c.isDisQualified.value;
       final isFinished = c.isFinished.value;
@@ -46,7 +47,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
         appBar: AppBar(
           title: Text(FlutterI18n.translate(context, "exam.title")),
           actions: [
-            if (!offline && hasValidExamInfo)
+            if (hasValidExamInfo)
               IconButton(
                 icon: const Icon(Icons.update),
                 onPressed: () => c.reloadExamInfo(),
@@ -138,9 +139,13 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                       dataType: FlutterI18n.translate(context, "exam.title"),
                       hint: FlutterI18n.translate(
                         context,
-                        "inapp_cache_hint",
-                        translationParams: {"datetime": fetchTime.toString()},
+                        cacheHintKey == null ||
+                                cacheHintKey == "local_cache_hint"
+                            ? "cache_reason_default"
+                            : cacheHintKey,
                       ),
+                      placeOfCache: PlaceOfCache.device,
+                      fetchTime: fetchTime,
                     ),
                   Expanded(child: content),
                 ],

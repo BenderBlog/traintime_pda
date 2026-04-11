@@ -39,15 +39,12 @@ class GeneralNetworkUsagePage extends StatelessWidget {
         if (result.isCache)
           CacheAlerter(
             dataType: FlutterI18n.translate(context, "school_net.title"),
-            hint:
-                (result.hintKey != null
-                    ? FlutterI18n.translate(context, result.hintKey!)
-                    : null) ??
-                FlutterI18n.translate(
-                  context,
-                  "inapp_cache_hint",
-                  translationParams: {"datetime": result.fetchTime.toString()},
-                ),
+            hint: FlutterI18n.translate(
+              context,
+              result.hintKey ?? "cache_reason_default",
+            ),
+            placeOfCache: PlaceOfCache.inapp,
+            fetchTime: result.fetchTime,
           ).center(),
         [
               // 注意事项

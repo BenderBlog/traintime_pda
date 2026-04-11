@@ -68,17 +68,12 @@ class _SportClassWindowState extends State<SportClassWindow>
                 if (result.isCache)
                   CacheAlerter(
                     dataType: FlutterI18n.translate(context, "sport.title"),
-                    hint:
-                        (result.hintKey != null
-                            ? FlutterI18n.translate(context, result.hintKey!)
-                            : null) ??
-                        FlutterI18n.translate(
-                          context,
-                          "inapp_cache_hint",
-                          translationParams: {
-                            "datetime": result.fetchTime.toString(),
-                          },
-                        ),
+                    hint: FlutterI18n.translate(
+                      context,
+                      result.hintKey ?? "cache_reason_default",
+                    ),
+                    placeOfCache: PlaceOfCache.inapp,
+                    fetchTime: result.fetchTime,
                   ),
                 if (toShow.isEmpty)
                   EmptyListView(

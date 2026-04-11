@@ -6,6 +6,7 @@ import 'package:signals/signals.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -15,6 +16,14 @@ class ExamController {
   static final ExamController i = ExamController._();
 
   ExamController._() {
+    final cache = ExamSession.getCache();
+    if (cache != null) {
+      _lastValidExamInfo.value = FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
+    }
     _initEffects();
   }
 
@@ -22,12 +31,12 @@ class ExamController {
     () => getScoreInfo(SemesterController.i.semesterSignal.value),
     dependencies: [SemesterController.i.semesterSignal],
   );
-  final _lastValidExamInfo = signal<(bool, DateTime, ExamData)?>(null);
+  final _lastValidExamInfo = signal<FetchResult<ExamData>?>(null);
 
   void _initEffects() {
     effect(() {
       final state = examInfoSignal.value;
-      if (state is AsyncData<(bool, DateTime, ExamData)>) {
+      if (state is AsyncData<FetchResult<ExamData>>) {
         _lastValidExamInfo.value = state.value;
       }
     }, debugLabel: "ExamControllerShadowSyncEffect");
@@ -41,11 +50,11 @@ class ExamController {
   }
 
   late final subjects = computed(
-    () => _lastValidExamInfo.value?.$3.subject ?? <Subject>[],
+    () => _lastValidExamInfo.value?.data.subject ?? <Subject>[],
   );
 
   late final toBeArranged = computed(
-    () => _lastValidExamInfo.value?.$3.toBeArranged ?? <ToBeArranged>[],
+    () => _lastValidExamInfo.value?.data.toBeArranged ?? <ToBeArranged>[],
   );
 
   late final hasValidExamInfo = computed(
@@ -53,11 +62,15 @@ class ExamController {
   );
 
   late final isExamFromCache = computed(
-    () => _lastValidExamInfo.value?.$1 ?? false,
+    () => _lastValidExamInfo.value?.isCache ?? false,
   );
 
   late final examFetchTime = computed<DateTime?>(
-    () => _lastValidExamInfo.value?.$2,
+    () => _lastValidExamInfo.value?.fetchTime,
+  );
+
+  late final examCacheHintKey = computed<String?>(
+    () => _lastValidExamInfo.value?.hintKey,
   );
 
   late final isDisQualified = computed(() {
