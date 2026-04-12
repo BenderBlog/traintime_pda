@@ -36,9 +36,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/pick_file.dart';
@@ -784,7 +782,6 @@ class _SettingWindowState extends State<SettingWindow> {
                       context: context,
                       builder: (context) => ChangeSwiftDialog(),
                     ).then((value) {
-                      WeekSwiftController.i.refresh();
                       setState(() {});
                     });
                   },
@@ -811,21 +808,9 @@ class _SettingWindowState extends State<SettingWindow> {
                       barrierDismissible: false,
                       context: context,
                       builder: (context) => SemesterSwitchDialog(),
-                    ).then((value) async {
+                    ).then((value) {
                       if (value == true) {
-                        SemesterController.i.semesterSignal.value = preference
-                            .getString(preference.Preference.currentSemester);
                         setState(() {});
-                        if (context.mounted) {
-                          showToast(context: context, msg: "Updating data");
-                        }
-                        await Future.wait([
-                          ClassTableController.i.reloadClassTable(),
-                          ExamController.i.reloadExamInfo(),
-                          PhysicsExperimentController.i
-                              .reloadPhysicsExperiment(),
-                          OtherExperimentController.i.reloadOtherExperiment(),
-                        ]);
                       }
                     });
                   },

@@ -1,14 +1,18 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
+import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/physics_experiment_session.dart';
 
 class PhysicsExperimentController {
@@ -33,6 +37,7 @@ class PhysicsExperimentController {
 
   final _lastValidPhysicsExperiment =
       signal<FetchResult<List<ExperimentData>>?>(null);
+  SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
     effect(() {
@@ -41,6 +46,28 @@ class PhysicsExperimentController {
         _lastValidPhysicsExperiment.value = state.value;
       }
     }, debugLabel: "ExamControllerShadowSyncEffect");
+
+    effect(() {
+      final semesterChangeEvent =
+          SemesterController.i.semesterSyncEventSignal.value;
+      if (semesterChangeEvent == null ||
+          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+        return;
+      }
+
+      _lastHandledSemesterSyncEvent = semesterChangeEvent;
+      if (semesterChangeEvent.didChange) {
+        _lastValidPhysicsExperiment.value = null;
+        unawaited(
+          Future(() async {
+            ExperimentSession.deleteCache();
+            await pref.remove(pref.Preference.experimentPassword);
+          }),
+        );
+        return;
+      }
+      unawaited(reloadPhysicsExperiment());
+    }, debugLabel: "PhysicsExperimentSemesterChangeEffect");
   }
 
   Future<void> reloadPhysicsExperiment() async {

@@ -61,9 +61,9 @@ class ExamSession extends EhallSession {
   static File examDataCache = File("${supportPath.path}/$examDataCacheName");
   static bool get isCacheExist => examDataCache.existsSync();
 
-  static Future<void> deleteCache() async {
-    if (await examDataCache.exists()) {
-      await examDataCache.delete();
+  static void deleteCache() {
+    if (examDataCache.existsSync()) {
+      examDataCache.deleteSync();
     }
   }
 

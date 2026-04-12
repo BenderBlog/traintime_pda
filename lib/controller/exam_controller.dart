@@ -1,6 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:signals/signals.dart';
 import 'package:time/time.dart';
@@ -32,6 +34,7 @@ class ExamController {
     dependencies: [SemesterController.i.semesterSignal],
   );
   final _lastValidExamInfo = signal<FetchResult<ExamData>?>(null);
+  SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
     effect(() {
@@ -40,6 +43,22 @@ class ExamController {
         _lastValidExamInfo.value = state.value;
       }
     }, debugLabel: "ExamControllerShadowSyncEffect");
+
+    effect(() {
+      final semesterChangeEvent =
+          SemesterController.i.semesterSyncEventSignal.value;
+      if (semesterChangeEvent == null ||
+          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+        return;
+      }
+
+      _lastHandledSemesterSyncEvent = semesterChangeEvent;
+      if (semesterChangeEvent.didChange) {
+        _lastValidExamInfo.value = null;
+        ExamSession.deleteCache();
+      }
+      unawaited(reloadExamInfo());
+    }, debugLabel: "ExamControllerSemesterChangeEffect");
   }
 
   Future<void> reloadExamInfo() async {

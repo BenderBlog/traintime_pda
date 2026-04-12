@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ChangeSwiftDialog extends StatelessWidget {
@@ -57,14 +58,10 @@ class ChangeSwiftDialog extends StatelessWidget {
         TextButton(
           child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
-            if (_getNumberController.text.isEmpty) {
-              await preference.setInt(preference.Preference.swift, 0);
-            } else {
-              await preference.setInt(
-                preference.Preference.swift,
-                int.parse(_getNumberController.text),
-              );
-            }
+            final value = _getNumberController.text.isEmpty
+                ? 0
+                : int.parse(_getNumberController.text);
+            await WeekSwiftController.i.setWeekSwift(value);
             if (context.mounted) {
               Navigator.of(context).pop();
             }

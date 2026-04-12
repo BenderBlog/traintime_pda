@@ -1,10 +1,13 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
+import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -32,6 +35,7 @@ class OtherExperimentController {
   final _lastValidOtherExperiment = signal<FetchResult<List<ExperimentData>>?>(
     null,
   );
+  SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
     effect(() {
@@ -40,6 +44,22 @@ class OtherExperimentController {
         _lastValidOtherExperiment.value = state.value;
       }
     }, debugLabel: "ExamControllerShadowSyncEffect");
+
+    effect(() {
+      final semesterChangeEvent =
+          SemesterController.i.semesterSyncEventSignal.value;
+      if (semesterChangeEvent == null ||
+          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+        return;
+      }
+
+      _lastHandledSemesterSyncEvent = semesterChangeEvent;
+      if (semesterChangeEvent.didChange) {
+        _lastValidOtherExperiment.value = null;
+        SysjSession.deleteCache();
+      }
+      unawaited(reloadOtherExperiment());
+    }, debugLabel: "OtherExperimentSemesterChangeEffect");
   }
 
   Future<void> reloadOtherExperiment() async {

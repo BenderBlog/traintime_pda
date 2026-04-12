@@ -48,7 +48,7 @@ Future<FetchResult<List<ExperimentData>>> getPhysicsExperimentData() async {
       "[ExperimentSession][getExperimentData] "
       "Password changed, remove cache",
     );
-    await ExperimentSession.deleteCache();
+    ExperimentSession.deleteCache();
     rethrow;
   } catch (e, s) {
     log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
@@ -71,9 +71,9 @@ class ExperimentSession extends NetworkSession {
   );
   static bool get isCacheExist => physicsExperimentCacheFile.existsSync();
 
-  static Future<void> deleteCache() async {
-    if (await physicsExperimentCacheFile.exists()) {
-      await physicsExperimentCacheFile.delete();
+  static void deleteCache() async {
+    if (physicsExperimentCacheFile.existsSync()) {
+      physicsExperimentCacheFile.deleteSync();
     }
   }
 

@@ -1,11 +1,14 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -18,10 +21,18 @@ class ClassTableController {
   static final ClassTableController i = ClassTableController._();
 
   ClassTableController._() {
+    final cache = ClassTableSession.getCache();
+    if (cache != null) {
+      _lastValidSchoolClassTable.value = FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
+    }
     _initEffects();
   }
 
-  SemesterChangeEvent? _lastHandledSemesterChangeEvent;
+  SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   final userDefinedClassSignal = signal<UserDefinedClassData>(
     UserDefinedClassFile.getUserDefinedClass(),
@@ -86,7 +97,7 @@ class ClassTableController {
     userDefinedClassSignal.value = toChange;
   }
 
-  final schoolClassTableSignal = futureSignal<(bool, DateTime, ClassTableData)>(
+  final schoolClassTableSignal = futureSignal<FetchResult<ClassTableData>>(
     () {
       final semesterCode = SemesterController.i.semesterSignal.value;
       return getClassTable(semesterCode);
@@ -95,34 +106,37 @@ class ClassTableController {
     dependencies: [SemesterController.i.semesterSignal],
   );
 
-  final _lastValidSchoolClassTable = signal<(bool, DateTime, ClassTableData)?>(
-    null,
-  );
+  final _lastValidSchoolClassTable = signal<FetchResult<ClassTableData>?>(null);
 
   void _initEffects() {
     effect(() {
       final state = schoolClassTableSignal.value;
-      if (state is AsyncData<(bool, DateTime, ClassTableData)>) {
+      if (state is AsyncData<FetchResult<ClassTableData>>) {
         _lastValidSchoolClassTable.value = state.value;
       }
     }, debugLabel: "ClassTableControllerShadowSyncEffect");
 
     effect(() {
       final semesterChangeEvent =
-          SemesterController.i.semesterChangeEventSignal.value;
+          SemesterController.i.semesterSyncEventSignal.value;
       if (semesterChangeEvent == null ||
-          identical(semesterChangeEvent, _lastHandledSemesterChangeEvent)) {
+          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
         return;
       }
 
-      _lastHandledSemesterChangeEvent = semesterChangeEvent;
-      UserDefinedClassFile.clearUserDefinedClass();
-      userDefinedClassSignal.value = UserDefinedClassData.empty();
+      _lastHandledSemesterSyncEvent = semesterChangeEvent;
+      if (semesterChangeEvent.didChange) {
+        _lastValidSchoolClassTable.value = null;
+        userDefinedClassSignal.value = UserDefinedClassData.empty();
+        ClassTableSession.deleteCache();
+        UserDefinedClassFile.clearUserDefinedClass();
+      }
+      unawaited(reloadClassTable());
       log.info(
         "[ClassTableController][_initEffects] "
-        "Clear user defined classtable because semester changed "
+        "${semesterChangeEvent.didChange ? "Clear user defined classtable because semester changed" : "Reload classtable because semester synced"} "
         "from ${semesterChangeEvent.oldSemester} "
-        "to ${semesterChangeEvent.newSemester}.",
+        "to ${semesterChangeEvent.effectiveSemester}.",
       );
     }, debugLabel: "ClassTableControllerSemesterChangeEffect");
   }
@@ -139,7 +153,7 @@ class ClassTableController {
   }
 
   late final schoolClassTableComputedSignal = computed<ClassTableData>(
-    () => _lastValidSchoolClassTable.value?.$3 ?? ClassTableData(),
+    () => _lastValidSchoolClassTable.value?.data ?? ClassTableData(),
   );
 
   late final classTableComputedSignal = computed<ClassTableData>(() {
@@ -165,11 +179,15 @@ class ClassTableController {
   });
 
   late final isClassTableFromCacheComputedSignal = computed(
-    () => _lastValidSchoolClassTable.value?.$1 ?? false,
+    () => _lastValidSchoolClassTable.value?.isCache ?? false,
   );
 
   late final classTableFetchTimeComputedSignal = computed<DateTime?>(
-    () => _lastValidSchoolClassTable.value?.$2,
+    () => _lastValidSchoolClassTable.value?.fetchTime,
+  );
+
+  late final classTableCacheHintKeyComputedSignal = computed<String?>(
+    () => _lastValidSchoolClassTable.value?.hintKey,
   );
 
   late final startDayComputedSignal = computed<DateTime?>(() {
