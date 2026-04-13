@@ -154,6 +154,24 @@ classtable:
         output_to_system: "导出到系统日历"
         refresh_classtable: "刷新日程表"
         switch_semester: "切换课程表学期"
+    status_source:
+        class_table: "课表"
+        exam: "考试"
+        physics_experiment: "物理实验"
+        other_experiment: "其他实验"
+    error_dialog_title: "错误信息概览"
+    status_banner:
+        loading: "正在更新：{sources}"
+        cache: "当前使用缓存：{sources}"
+        error_summary: "以下信息加载失败：{sources}"
+    empty_state:
+        no_course: "{semester_code} 学期没有课程安排。"
+        with_exam: "{semester_code} 学期没有课程安排，但有考试安排。"
+        with_experiment: "{semester_code} 学期没有课程安排，但有实验安排。"
+        with_exam_and_experiment: "{semester_code} 学期没有课程安排，但有考试和实验安排。"
+    empty_action:
+        view_exam: "查看考试安排"
+        view_experiment: "查看实验安排"
     class_change_page:
         title: "课程调整"
         empty_message: "目前没有调课信息"
@@ -223,6 +241,10 @@ classtable:
     refresh_classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"
+    cache_hint_password_wrong: "统一认证密码错误或已失效。"
+    cache_hint_login_failed: "登录课表服务失败。"
+    cache_hint_network_failed: "课表网络请求失败。"
+    cache_hint_unknown_error: "在线获取课表失败。详细错误请查看日志。"
     semester_switcher:
         choose_semester: 选择学期
         first_academic_year: 第一学年

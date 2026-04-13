@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:signals/signals.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -47,16 +48,27 @@ class ClassTableState extends InheritedWidget {
   }
 }
 
+enum ClassTableStatusSource {
+  classTable,
+  exam,
+  physicsExperiment,
+  otherExperiment,
+}
+
 /// The controllers and shared datas of the class table.
 class ClassTableWidgetState with ChangeNotifier {
   ///*******************************************************************///
   /// Hack on notifyListeners, do not fire when the widget is disposed. ///
   ///*******************************************************************///
   bool _disposed = false;
+  final List<EffectCleanup> _effectCleanup = [];
 
   @override
   void dispose() {
     _disposed = true;
+    for (final cleanup in _effectCleanup) {
+      cleanup();
+    }
     super.dispose();
   }
 
@@ -80,6 +92,31 @@ class ClassTableWidgetState with ChangeNotifier {
       OtherExperimentController.i;
   final WeekSwiftController weekSwiftController = WeekSwiftController.i;
 
+  void _initEffects() {
+    _effectCleanup.add(
+      effect(() {
+        classTableController.schoolClassTableSignal.value;
+        classTableController.classTableComputedSignal.value;
+        classTableController.isClassTableFromCacheComputedSignal.value;
+        classTableController.classTableCacheHintKeyComputedSignal.value;
+        examController.examInfoSignal.value;
+        examController.subjects.value;
+        examController.isExamFromCache.value;
+        examController.examCacheHintKey.value;
+        physicsExperimentController.physicsExperimentSignal.value;
+        physicsExperimentController.physicsExperiments.value;
+        physicsExperimentController.isPhysicsExperimentFromCache.value;
+        physicsExperimentController.physicsExperimentCacheHintKey.value;
+        otherExperimentController.otherExperimentSignal.value;
+        otherExperimentController.otherExperiments.value;
+        otherExperimentController.isOtherExperimentFromCache.value;
+        otherExperimentController.otherExperimentCacheHintKey.value;
+        weekSwiftController.weekSwiftSignal.value;
+        notifyListeners();
+      }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
+    );
+  }
+
   /// The length of the semester, the amount of the class table.
   int get semesterLength =>
       classTableController.classTableComputedSignal.value.semesterLength;
@@ -91,12 +128,106 @@ class ClassTableWidgetState with ChangeNotifier {
   String get semesterCode =>
       classTableController.classTableComputedSignal.value.semesterCode;
 
+  String get decorationName => ClassTableController.decorationName;
+
   ///*****************************///
   /// Following are dynamic data. ///
   /// ****************************///
 
   /// If no class, a special page appears.
   bool get haveClass => timeArrangement.isNotEmpty && classDetail.isNotEmpty;
+
+  bool get isClassTableLoading =>
+      classTableController.schoolClassTableSignal.value.isLoading;
+
+  bool get hasClassTableLoadError =>
+      classTableController.schoolClassTableSignal.value is AsyncError;
+
+  bool get isClassTableFromCache =>
+      classTableController.isClassTableFromCacheComputedSignal.value;
+
+  String? get classTableCacheHintKey =>
+      classTableController.classTableCacheHintKeyComputedSignal.value;
+
+  DateTime? get classTableFetchTime =>
+      classTableController.classTableFetchTimeComputedSignal.value;
+
+  bool get isExamLoading => examController.examInfoSignal.value.isLoading;
+
+  bool get hasExamLoadError =>
+      examController.examInfoSignal.value is AsyncError;
+
+  bool get isExamFromCache => examController.isExamFromCache.value;
+
+  String? get examCacheHintKey => examController.examCacheHintKey.value;
+
+  bool get isPhysicsExperimentLoading =>
+      physicsExperimentController.physicsExperimentSignal.value.isLoading;
+
+  bool get hasPhysicsExperimentLoadError =>
+      physicsExperimentController.physicsExperimentSignal.value is AsyncError;
+
+  bool get isPhysicsExperimentFromCache =>
+      physicsExperimentController.isPhysicsExperimentFromCache.value;
+
+  String? get physicsExperimentCacheHintKey =>
+      physicsExperimentController.physicsExperimentCacheHintKey.value;
+
+  bool get isOtherExperimentLoading =>
+      otherExperimentController.otherExperimentSignal.value.isLoading;
+
+  bool get hasOtherExperimentLoadError =>
+      otherExperimentController.otherExperimentSignal.value is AsyncError;
+
+  bool get isOtherExperimentFromCache =>
+      otherExperimentController.isOtherExperimentFromCache.value;
+
+  String? get otherExperimentCacheHintKey =>
+      otherExperimentController.otherExperimentCacheHintKey.value;
+
+  bool get hasExamArrangement => examController.hasExamArrangement.value;
+
+  bool get hasExperimentArrangement =>
+      physicsExperimentController.hasPhysicsExperimentArrangement.value ||
+      otherExperimentController.hasOtherExperimentArrangement.value;
+
+  List<ClassTableStatusSource> get loadingSources => [
+    if (isClassTableLoading) ClassTableStatusSource.classTable,
+    if (isExamLoading) ClassTableStatusSource.exam,
+    if (isPhysicsExperimentLoading) ClassTableStatusSource.physicsExperiment,
+    if (isOtherExperimentLoading) ClassTableStatusSource.otherExperiment,
+  ];
+
+  List<ClassTableStatusSource> get cacheSources => [
+    if (isClassTableFromCache) ClassTableStatusSource.classTable,
+    if (isExamFromCache) ClassTableStatusSource.exam,
+    if (isPhysicsExperimentFromCache) ClassTableStatusSource.physicsExperiment,
+    if (isOtherExperimentFromCache) ClassTableStatusSource.otherExperiment,
+  ];
+
+  List<ClassTableStatusSource> get errorWithoutCacheSources => [
+    if (hasClassTableLoadError) ClassTableStatusSource.classTable,
+    if (hasExamLoadError) ClassTableStatusSource.exam,
+    if (hasPhysicsExperimentLoadError) ClassTableStatusSource.physicsExperiment,
+    if (hasOtherExperimentLoadError) ClassTableStatusSource.otherExperiment,
+  ];
+
+  List<ClassTableStatusSource> get errorWithCacheSources => [
+    if (!hasClassTableLoadError &&
+        isClassTableFromCache &&
+        classTableCacheHintKey != null)
+      ClassTableStatusSource.classTable,
+    if (!hasExamLoadError && isExamFromCache && examCacheHintKey != null)
+      ClassTableStatusSource.exam,
+    if (!hasPhysicsExperimentLoadError &&
+        isPhysicsExperimentFromCache &&
+        physicsExperimentCacheHintKey != null)
+      ClassTableStatusSource.physicsExperiment,
+    if (!hasOtherExperimentLoadError &&
+        isOtherExperimentFromCache &&
+        otherExperimentCacheHintKey != null)
+      ClassTableStatusSource.otherExperiment,
+  ];
 
   /// Current showing week.
   int _chosenWeek = 0;
@@ -454,6 +585,7 @@ END:VTIMEZONE
   }
 
   ClassTableWidgetState({required this.currentWeek}) {
+    _initEffects();
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {

@@ -25,7 +25,6 @@ class PhysicsExperimentController {
       _lastValidPhysicsExperiment.value = FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: "local_cache_hint",
       );
     }
     _initEffects();
@@ -99,6 +98,10 @@ class PhysicsExperimentController {
 
   late final physicsExperimentCacheHintKey = computed<String?>(
     () => _lastValidPhysicsExperiment.value?.hintKey,
+  );
+
+  late final hasPhysicsExperimentArrangement = computed(
+    () => physicsExperiments.value.isNotEmpty,
   );
 
   late final physicsExperimentOfTodayComputedSignal = computed(() {

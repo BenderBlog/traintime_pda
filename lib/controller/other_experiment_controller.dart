@@ -24,7 +24,6 @@ class OtherExperimentController {
       _lastValidOtherExperiment.value = FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: "local_cache_hint",
       );
     }
     _initEffects();
@@ -91,6 +90,10 @@ class OtherExperimentController {
 
   late final otherExperimentCacheHintKey = computed<String?>(
     () => _lastValidOtherExperiment.value?.hintKey,
+  );
+
+  late final hasOtherExperimentArrangement = computed(
+    () => otherExperiments.value.isNotEmpty,
   );
 
   late final otherExperimentOfTodayComputedSignal = computed(() {

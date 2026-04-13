@@ -92,6 +92,10 @@ class ExamController {
     () => _lastValidExamInfo.value?.hintKey,
   );
 
+  late final hasExamArrangement = computed(
+    () => subjects.value.isNotEmpty || toBeArranged.value.isNotEmpty,
+  );
+
   late final isDisQualified = computed(() {
     return subjects.value
         .where((e) => e.startTime == null || e.stopTime == null)
