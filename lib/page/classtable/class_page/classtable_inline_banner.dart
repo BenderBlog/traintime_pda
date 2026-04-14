@@ -59,7 +59,7 @@ class ClassTableInlineBanner extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer,
+              color: Theme.of(context).colorScheme.surface,
             ),
             child: Row(
               children: [

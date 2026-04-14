@@ -44,75 +44,6 @@ class HomepageController {
     return result;
   }
 
-  bool _hasValidClassTable() {
-    final classTable = ClassTableController.i.classTableComputedSignal.value;
-    return ClassTableController.i.classTableFetchTimeComputedSignal.value !=
-            null ||
-        classTable.classDetail.isNotEmpty ||
-        classTable.timeArrangement.isNotEmpty;
-  }
-
-  HomepageSourceState _resolveClassTableState() {
-    final state = ClassTableController.i.schoolClassTableSignal.value;
-    if (_hasValidClassTable()) {
-      return HomepageSourceState.success;
-    }
-    if (state.isLoading) {
-      return HomepageSourceState.loading;
-    }
-    if (state is AsyncError) {
-      return HomepageSourceState.error;
-    }
-    return HomepageSourceState.none;
-  }
-
-  HomepageSourceState _resolveExamState() {
-    final state = ExamController.i.examInfoSignal.value;
-    if (ExamController.i.hasValidExamInfo.value) {
-      return HomepageSourceState.success;
-    }
-    if (state.isLoading) {
-      return HomepageSourceState.loading;
-    }
-    if (state is AsyncError) {
-      return HomepageSourceState.error;
-    }
-    return HomepageSourceState.none;
-  }
-
-  HomepageSourceState _resolvePhysicsExperimentState() {
-    final state = PhysicsExperimentController.i.physicsExperimentSignal.value;
-    if (PhysicsExperimentController.i.hasValidPhysicsExperiment.value) {
-      return HomepageSourceState.success;
-    }
-    if (state.isLoading) {
-      return HomepageSourceState.loading;
-    }
-    if (state is AsyncError) {
-      final error = state.error;
-      if (error is NoPasswordException &&
-          error.type == PasswordType.physicsExperiment) {
-        return HomepageSourceState.ignored;
-      }
-      return HomepageSourceState.error;
-    }
-    return HomepageSourceState.none;
-  }
-
-  HomepageSourceState _resolveOtherExperimentState() {
-    final state = OtherExperimentController.i.otherExperimentSignal.value;
-    if (OtherExperimentController.i.hasValidOtherExperiment.value) {
-      return HomepageSourceState.success;
-    }
-    if (state.isLoading) {
-      return HomepageSourceState.loading;
-    }
-    if (state is AsyncError) {
-      return HomepageSourceState.error;
-    }
-    return HomepageSourceState.none;
-  }
-
   bool _isEffectiveLoading(HomepageSourceState state) =>
       state == HomepageSourceState.loading;
 
@@ -124,17 +55,78 @@ class HomepageController {
   );
 
   late final classTableSourceStateComputedSignal =
-      computed<HomepageSourceState>(_resolveClassTableState);
+      computed<HomepageSourceState>(() {
+        final state = ClassTableController.i.schoolClassTableSignal.value;
+        if (state.isLoading) {
+          return HomepageSourceState.loading;
+        }
+        if (ClassTableController.i.hasValidClassInfo.value) {
+          return HomepageSourceState.success;
+        }
+        if (state is AsyncError) {
+          return HomepageSourceState.error;
+        }
+        return HomepageSourceState.none;
+      });
 
-  late final examSourceStateComputedSignal = computed<HomepageSourceState>(
-    _resolveExamState,
-  );
+  late final examSourceStateComputedSignal = computed<HomepageSourceState>(() {
+    final state = ExamController.i.examInfoSignal.value;
+    if (state.isLoading) {
+      return HomepageSourceState.loading;
+    }
+    if (ExamController.i.hasValidExamInfo.value) {
+      return HomepageSourceState.success;
+    }
+    if (state is AsyncError) {
+      return HomepageSourceState.error;
+    }
+    return HomepageSourceState.none;
+  });
 
   late final physicsExperimentSourceStateComputedSignal =
-      computed<HomepageSourceState>(_resolvePhysicsExperimentState);
+      computed<HomepageSourceState>(() {
+        final state =
+            PhysicsExperimentController.i.physicsExperimentSignal.value;
+        if (state.isLoading) {
+          return HomepageSourceState.loading;
+        }
+        if (PhysicsExperimentController.i.hasValidPhysicsExperiment.value) {
+          return HomepageSourceState.success;
+        }
+        if (state is AsyncError) {
+          final error = state.error;
+          if (error is NoPasswordException &&
+              error.type == PasswordType.physicsExperiment) {
+            return HomepageSourceState.ignored;
+          }
+          return HomepageSourceState.error;
+        }
+        return HomepageSourceState.none;
+      });
 
   late final otherExperimentSourceStateComputedSignal =
-      computed<HomepageSourceState>(_resolveOtherExperimentState);
+      computed<HomepageSourceState>(() {
+        final state = OtherExperimentController.i.otherExperimentSignal.value;
+        if (state.isLoading) {
+          return HomepageSourceState.loading;
+        }
+        if (OtherExperimentController.i.hasValidOtherExperiment.value) {
+          return HomepageSourceState.success;
+        }
+        if (state is AsyncError) {
+          return HomepageSourceState.error;
+        }
+        return HomepageSourceState.none;
+      });
+
+  late final _sourceStatesComputedSignal = computed<List<HomepageSourceState>>(
+    () => [
+      classTableSourceStateComputedSignal.value,
+      examSourceStateComputedSignal.value,
+      physicsExperimentSourceStateComputedSignal.value,
+      otherExperimentSourceStateComputedSignal.value,
+    ],
+  );
 
   late final isTomorrowComputedSignal = computed<bool>(() {
     final updateTime = GlobalTimerController.i.currentTimeSignal.value;
@@ -250,12 +242,7 @@ class HomepageController {
   );
 
   late final arrangementStateComputedSignal = computed<ArrangementState>(() {
-    final sourceStates = [
-      classTableSourceStateComputedSignal.value,
-      examSourceStateComputedSignal.value,
-      physicsExperimentSourceStateComputedSignal.value,
-      otherExperimentSourceStateComputedSignal.value,
-    ];
+    final sourceStates = _sourceStatesComputedSignal.value;
 
     if (hasArrangementComputedSignal.value) {
       return ArrangementState.fetched;
@@ -275,30 +262,14 @@ class HomepageController {
   late final homepageArrangementStateComputedSignal =
       computed<ArrangementState>(() => arrangementStateComputedSignal.value);
 
-  late final isRefreshingComputedSignal = computed<bool>(() {
-    if (!hasArrangementComputedSignal.value) {
-      return false;
-    }
+  late final isAllSourcesLoadingComputedSignal = computed<bool>(
+    () => _sourceStatesComputedSignal.value.every(_isEffectiveLoading),
+  );
 
-    return [
-      classTableSourceStateComputedSignal.value,
-      examSourceStateComputedSignal.value,
-      physicsExperimentSourceStateComputedSignal.value,
-      otherExperimentSourceStateComputedSignal.value,
-    ].any(_isEffectiveLoading);
-  });
-
-  late final hasPartialErrorComputedSignal = computed<bool>(() {
-    if (!hasArrangementComputedSignal.value) {
-      return false;
-    }
-
-    return [
-      classTableSourceStateComputedSignal.value,
-      examSourceStateComputedSignal.value,
-      physicsExperimentSourceStateComputedSignal.value,
-      otherExperimentSourceStateComputedSignal.value,
-    ].any(_isRealError);
+  late final isPartialSourcesLoadingComputedSignal = computed<bool>(() {
+    final sourceStates = _sourceStatesComputedSignal.value;
+    return sourceStates.any(_isEffectiveLoading) &&
+        !sourceStates.every(_isEffectiveLoading);
   });
 
   late final failedSourcesComputedSignal = computed<List<HomepageFailedSource>>(
@@ -324,9 +295,4 @@ class HomepageController {
       return failedSources;
     },
   );
-
-  late final canOpenArrangementPageComputedSignal = computed<bool>(() {
-    final state = homepageArrangementStateComputedSignal.value;
-    return state == ArrangementState.fetched || state == ArrangementState.none;
-  });
 }

@@ -186,6 +186,13 @@ class ClassTableController {
     () => _lastValidSchoolClassTable.value?.fetchTime,
   );
 
+  late final hasValidClassInfo = computed(
+    () =>
+        classTableFetchTimeComputedSignal.value != null ||
+        classTableComputedSignal.value.classDetail.isNotEmpty ||
+        classTableComputedSignal.value.timeArrangement.isNotEmpty,
+  );
+
   late final classTableCacheHintKeyComputedSignal = computed<String?>(
     () => _lastValidSchoolClassTable.value?.hintKey,
   );

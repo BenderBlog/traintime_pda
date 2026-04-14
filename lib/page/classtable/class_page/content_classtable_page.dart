@@ -581,10 +581,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          ClassTableInlineBanner(
-            loadingSources: state.loadingSources,
-            cacheSources: state.cacheSources,
-          ),
           PreferredSize(
             preferredSize: Size.fromHeight(
               MediaQuery.sizeOf(context).height >= 500
@@ -592,6 +588,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   : topRowHeightSmall,
             ),
             child: _topView(),
+          ),
+          ClassTableInlineBanner(
+            loadingSources: state.loadingSources,
+            cacheSources: state.cacheSources,
           ),
           DecoratedBox(
             decoration: decoration,

@@ -15,7 +15,6 @@ import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class _ClassTableCardItemDescriptor {
@@ -123,42 +122,47 @@ class _ClassTableCardState extends State<ClassTableCard> {
     required String text,
     required Color backgroundColor,
     required Color foregroundColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: foregroundColor,
-        ),
-      ),
-    );
-  }
+  }) => Chip(
+    label: Text(text),
+    labelStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+      color: foregroundColor,
+    ),
+    backgroundColor: backgroundColor,
+  );
 
   Widget? _buildStateHints(
     BuildContext context, {
-    required bool isRefreshing,
+    required bool isAllSourcesLoading,
+    required bool isPartialSourcesLoading,
     required List<home.HomepageFailedSource> failedSources,
   }) {
     final theme = Theme.of(context).colorScheme;
     final hints = <Widget>[];
 
-    if (isRefreshing) {
+    if (isAllSourcesLoading) {
       hints.add(
         _buildStateHintChip(
           context,
           text: FlutterI18n.translate(
             context,
-            "homepage.class_table_card.updating_infoText",
+            "homepage.class_table_card.all_loading_infoText",
           ),
-          backgroundColor: theme.secondaryContainer,
-          foregroundColor: theme.onSecondaryContainer,
+          backgroundColor: theme.primary,
+          foregroundColor: theme.primaryContainer,
+        ),
+      );
+    } else if (isPartialSourcesLoading) {
+      hints.add(
+        _buildStateHintChip(
+          context,
+          text: FlutterI18n.translate(
+            context,
+            "homepage.class_table_card.partial_loading_infoText",
+          ),
+          backgroundColor: theme.primary,
+          foregroundColor: theme.primaryContainer,
         ),
       );
     }
@@ -172,8 +176,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
             "homepage.class_table_card.failed_chip",
             translationParams: {"source": _getFailedSourceLabel(source)},
           ),
-          backgroundColor: theme.errorContainer,
-          foregroundColor: theme.onErrorContainer,
+          backgroundColor: theme.error,
+          foregroundColor: theme.errorContainer,
         ),
       );
     }
@@ -265,7 +269,10 @@ class _ClassTableCardState extends State<ClassTableCard> {
           final remainingCount = controller.remainingComputedSignal.value;
           final arrangements = controller.arrangementComputedSignal.value;
           final isTomorrow = controller.isTomorrowComputedSignal.value;
-          final isRefreshing = controller.isRefreshingComputedSignal.value;
+          final isAllSourcesLoading =
+              controller.isAllSourcesLoadingComputedSignal.value;
+          final isPartialSourcesLoading =
+              controller.isPartialSourcesLoadingComputedSignal.value;
           final failedSources = controller.failedSourcesComputedSignal.value;
           final itemDesc = _getItemDescriptors(
             currentArrangement: currentArrangement,
@@ -278,7 +285,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
           );
           final hintWidget = _buildStateHints(
             context,
-            isRefreshing: isRefreshing,
+            isAllSourcesLoading: isAllSourcesLoading,
+            isPartialSourcesLoading: isPartialSourcesLoading,
             failedSources: failedSources,
           );
 
@@ -329,46 +337,16 @@ class _ClassTableCardState extends State<ClassTableCard> {
         .withHomeCardStyle(
           context,
           onPressed: () {
-            final homepageController = home.HomepageController.i;
-            final arrangementState =
-                homepageController.homepageArrangementStateComputedSignal.value;
-            if (homepageController.canOpenArrangementPageComputedSignal.value) {
-              context.pushReplacement(
-                LayoutBuilder(
-                  builder: (context, constraints) => ClassTableWindow(
-                    parentContext: context,
-                    currentWeek:
-                        ClassTableController.i.currentWeekComputedSignal.value,
-                    constraints: constraints,
-                  ),
+            context.pushReplacement(
+              LayoutBuilder(
+                builder: (context, constraints) => ClassTableWindow(
+                  parentContext: context,
+                  currentWeek:
+                      ClassTableController.i.currentWeekComputedSignal.value,
+                  constraints: constraints,
                 ),
-              );
-              return;
-            }
-
-            switch (arrangementState) {
-              case home.ArrangementState.fetching:
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "homepage.class_table_card.schedule_fetching_message",
-                  ),
-                );
-                return;
-              case home.ArrangementState.error:
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "homepage.class_table_card.schedule_error_message",
-                  ),
-                );
-                return;
-              case home.ArrangementState.none:
-              case home.ArrangementState.fetched:
-                break;
-            }
+              ),
+            );
           },
         );
   }

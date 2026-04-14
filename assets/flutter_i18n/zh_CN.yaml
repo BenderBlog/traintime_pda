@@ -424,6 +424,8 @@ homepage:
         schedule_error_infoText: "日程加载失败"
         schedule_none_infoText: "暂无日程"
         updating_infoText: "正在更新"
+        all_loading_infoText: "全部加载中"
+        partial_loading_infoText: "部分加载中"
         partial_error_infoText: "部分数据加载失败"
         failed_chip: "{source}加载失败"
         failed_source_class_info: "课程信息"

@@ -433,6 +433,8 @@ homepage:
       schedule_error_infoText: "Failed to load schedule"
       schedule_none_infoText: "No schedule available"
       updating_infoText: "Updating"
+      all_loading_infoText: "All sources loading"
+      partial_loading_infoText: "Partially loading"
       partial_error_infoText: "Some data failed to load"
       failed_chip: "{source} failed"
       failed_source_class_info: "Class info"

@@ -17,7 +17,6 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class ExamInfoWindow extends StatefulWidget {
   const ExamInfoWindow({super.key});
