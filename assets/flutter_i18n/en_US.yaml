@@ -316,7 +316,7 @@ exam:
    cache_hint_login_failed: "Failed to log in to the exam service."
    cache_hint_network_failed: "Network request failed."
    cache_hint_unknown_error: "Failed to fetch the latest exam schedule. Check logs for details."
-   fetching_hint: "Fetching the latest exam schedule..."
+   fetching_hint: "Fetching the latest exam schedule."
    not_finished: "Still there are some bad guys here."
    all_finished: "Say goodbye to all the exams."
    unable_to_exam: "Unable to exam"
@@ -669,7 +669,11 @@ score:
       Selected subjects {chosen}  Total credits {credit}
       Average {avg} GPA {gpa}
    all_passed: "All subjects have passed"
-   # TODO：string in eval detected
+   cache_hint_password_wrong: "IDS password is incorrect or expired."
+   cache_hint_login_failed: "Failed to log in to the score service."
+   cache_hint_network_failed: "Network request failed."
+   cache_hint_unknown_error: "Failed to fetch the latest score info. Check logs for details."
+   fetching_hint: "Fetching the latest score info."
    all_semester: "All semesters"
    chosen_semester: "{chosen}"
    all_type: "All types"

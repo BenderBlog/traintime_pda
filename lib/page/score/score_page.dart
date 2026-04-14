@@ -8,9 +8,11 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
+import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
@@ -23,7 +25,7 @@ class ScorePage extends StatefulWidget {
 }
 
 class _ScorePageState extends State<ScorePage> {
-  late TextEditingController text;
+  late final TextEditingController text;
 
   Widget scoreInfoDialog(BuildContext context) => Consumer<ScoreState>(
     builder: (context, state, _) => FloatingActionButton(
@@ -42,11 +44,15 @@ class _ScorePageState extends State<ScorePage> {
   );
 
   @override
-  void didChangeDependencies() {
-    text = TextEditingController.fromValue(
-      TextEditingValue(text: context.watch<ScoreState>().search),
-    );
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+    text = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    text.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,6 +60,31 @@ class _ScorePageState extends State<ScorePage> {
     return Scaffold(
       body: Column(
         children: [
+          Consumer<ScoreState>(
+            builder: (context, state, _) {
+              if (state.state == ScoreFetchState.fetchingWithData) {
+                return LoadingAlerter(
+                  isLoading: true,
+                  showOverlay: false,
+                  showAnimation: false,
+                  hint: FlutterI18n.translate(context, "score.fetching_hint"),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          Consumer<ScoreState>(
+            builder: (context, state, _) {
+              if (state.state == ScoreFetchState.readyCache) {
+                return CacheAlerter(
+                  hint: FlutterI18n.translate(context, state.hintKey ?? ""),
+                  placeOfCache: PlaceOfCache.device,
+                  fetchTime: state.fetchDate,
+                );
+              }
+              return SizedBox.shrink();
+            },
+          ),
           Wrap(
                 alignment: WrapAlignment.start,
                 children: [
@@ -68,6 +99,8 @@ class _ScorePageState extends State<ScorePage> {
                         "score.score_page.search_hint",
                       ),
                     ),
+                    onChanged: (value) =>
+                        context.read<ScoreState>().search = value,
                     onSubmitted: (String text) =>
                         context.read<ScoreState>().search = text,
                   ).padding(bottom: 8),
@@ -155,7 +188,10 @@ class _ScorePageState extends State<ScorePage> {
                     shrinkWrap: true,
                     itemCount: state.toShow.length,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    crossAxisCount: constraints.maxWidth ~/ cardWidth,
+                    crossAxisCount: (constraints.maxWidth ~/ cardWidth).clamp(
+                      1,
+                      1000,
+                    ),
                     mainAxisSpacing: 4,
                     crossAxisSpacing: 4,
                     itemBuilder: (context, index) =>

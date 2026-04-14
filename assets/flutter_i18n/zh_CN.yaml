@@ -303,11 +303,11 @@ empty_classroom:
 exam:
     title: "考试安排"
     cache_hint: "已显示缓存考试安排信息"
-    cache_hint_password_wrong: "统一认证密码错误或已失效。"
-    cache_hint_login_failed: "登录考试服务失败。"
-    cache_hint_network_failed: "网络连接失败。"
-    cache_hint_unknown_error: "在线获取考试安排失败。详细错误请查看日志。"
-    fetching_hint: "正在获取最新考试安排..."
+    cache_hint_password_wrong: "统一认证密码错误或已失效"
+    cache_hint_login_failed: "登录考试服务失败"
+    cache_hint_network_failed: "网络连接失败"
+    cache_hint_unknown_error: "在线获取考试安排失败，详细错误请查看日志"
+    fetching_hint: "正在获取最新考试安排"
     not_finished: "未完成考试"
     all_finished: "所有考试全部完成"
     unable_to_exam: "无法完成考试"
@@ -654,7 +654,11 @@ score:
         目前选中科目 {chosen}  总计学分 {credit}
         均分 {avg} GPA {gpa}
     all_passed: "所有科目均已通过"
-    # TODO：string in eval detected
+    cache_hint_password_wrong: "统一认证密码错误或已失效"
+    cache_hint_login_failed: "登录考试服务失败"
+    cache_hint_network_failed: "网络连接失败"
+    cache_hint_unknown_error: "在线获取成绩安排失败，详细错误请查看日志"
+    fetching_hint: "正在获取最新成绩信息，请不要退出页面"
     all_semester: "所有学期"
     chosen_semester: "学期 {chosen}"
     all_type: "所有类型"

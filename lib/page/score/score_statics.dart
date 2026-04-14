@@ -2,7 +2,13 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-enum ScoreFetchState { ok, error, fetching }
+enum ScoreFetchState {
+  readyFresh,
+  readyCache,
+  fetching,
+  fetchingWithData,
+  error,
+}
 
 const double cardWidth = 280;
 
