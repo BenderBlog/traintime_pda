@@ -76,49 +76,49 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     if (isDisQualified.isNotEmpty) ...[true, false],
                   ],
                   children: [
-                    TimelineTitle(
-                      title: FlutterI18n.translate(
-                        context,
-                        "exam.not_finished",
-                      ),
-                    ),
-                    if (isNotFinished.isNotEmpty)
-                      ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
-                    else
-                      [
-                        ExamInfoCard(
-                          title: FlutterI18n.translate(
-                            context,
-                            "exam.all_finished",
-                          ),
-                        ),
-                      ].toColumn(),
-                    if (isDisQualified.isNotEmpty)
+                    if (isDisQualified.isNotEmpty) ...[
                       TimelineTitle(
                         title: FlutterI18n.translate(
                           context,
                           "exam.unable_to_exam",
                         ),
                       ),
-                    if (isDisQualified.isNotEmpty)
                       isDisQualified
                           .map((e) => ExamInfoCard(toUse: e))
                           .toList()
                           .toColumn(),
+                    ],
+                    TimelineTitle(
+                      title: FlutterI18n.translate(
+                        context,
+                        "exam.not_finished",
+                      ),
+                    ),
+                    [
+                      if (isNotFinished.isNotEmpty)
+                        ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
+                      else
+                        ExamInfoCard(
+                          title: FlutterI18n.translate(
+                            context,
+                            "exam.all_finished",
+                          ),
+                        ),
+                    ].toColumn(),
                     TimelineTitle(
                       title: FlutterI18n.translate(context, "exam.finished"),
                     ),
-                    if (isFinished.isNotEmpty)
-                      ...isFinished.map((e) => ExamInfoCard(toUse: e))
-                    else
-                      [
+                    [
+                      if (isFinished.isNotEmpty)
+                        ...isFinished.map((e) => ExamInfoCard(toUse: e))
+                      else
                         ExamInfoCard(
                           title: FlutterI18n.translate(
                             context,
                             "exam.none_finished",
                           ),
                         ),
-                      ].toColumn(),
+                    ].toColumn(),
                   ],
                 );
               } else {

@@ -14,7 +14,10 @@ class TimelineWidget extends StatelessWidget {
     super.key,
     required this.isTitle,
     required this.children,
-  }) : assert(isTitle.length == children.length);
+  }) : assert(
+         isTitle.length == children.length,
+         "isTitle's length ${isTitle.length} should be same as children's length ${children.length}",
+       );
 
   @override
   Widget build(BuildContext context) {

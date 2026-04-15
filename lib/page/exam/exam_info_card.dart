@@ -17,8 +17,10 @@ class ExamInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return toUse != null
-        ? ReXCard(
+    return Builder(
+      builder: (context) {
+        if (toUse != null) {
+          return ReXCard(
             title: Text(toUse!.subject),
             remaining: [ReXCardRemaining(toUse!.type)],
             bottomRow: Wrap(
@@ -44,8 +46,9 @@ class ExamInfoCard extends StatelessWidget {
                 ),
               ],
             ),
-          )
-        : Text(
+          );
+        } else {
+          return Text(
                 title!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -57,9 +60,14 @@ class ExamInfoCard extends StatelessWidget {
               .card(
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 elevation: 0,
+
                 color: Theme.of(
                   context,
                 ).colorScheme.primary.withValues(alpha: 0.1),
-              );
+              )
+              .constrained(width: double.maxFinite);
+        }
+      },
+    );
   }
 }

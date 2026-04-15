@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
-import 'package:time/time.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
@@ -18,103 +18,112 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
-// The bool is a cache flag
-Future<(bool, ElectricityInfo)> getElectricityInfo({
-  bool force = false,
+String _cacheHintFromError(Object error) {
+  if (error is NoAccountInfoException) {
+    return "electricity.cache_hint_account_missing";
+  }
+  if (error is AccountFailedParseException) {
+    return "electricity.cache_hint_account_parse_failed";
+  }
+  if (error is CaptchaFailedException) {
+    return "electricity.cache_hint_captcha_failed";
+  }
+  if (error is PasswordWrongException) {
+    return "electricity.cache_hint_password_wrong";
+  }
+  if (error is LoginFailedException) {
+    return error.msg == "验证码校验失败"
+        ? "electricity.cache_hint_captcha_failed"
+        : "electricity.cache_hint_login_failed";
+  }
+  if (error is NotInitalizedException) {
+    if (error.msg == "用户名或密码错误") {
+      return "electricity.cache_hint_password_wrong";
+    }
+    if (error.msg.contains("验证码")) {
+      return "electricity.cache_hint_captcha_failed";
+    }
+    return "electricity.cache_hint_login_failed";
+  }
+  if (error is DioException) {
+    return "electricity.cache_hint_network_failed";
+  }
+  return "electricity.cache_hint_unknown_error";
+}
+
+Future<FetchResult<ElectricityInfo>> getElectricityInfo({
   Future<String> Function(List<int>)? captchaFunction,
 }) async {
-  log.info(
-    "[EletricitySession][update] Ready to update electricity info. isForce: $force",
-  );
+  log.info("[EletricitySession][update] Ready to update electricity info. ");
   DateTime fetchDay = DateTime.now();
 
-  // Fetch cache info
-  late ElectricityInfo cache;
-  bool canUseCache = false;
   if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
     if (ElectricitySession.fileCache.existsSync()) {
       ElectricitySession.fileCache.deleteSync();
     }
   }
-  if (ElectricitySession.isCacheExist) {
-    log.info("[EletricitySession][update] Checking out cache.");
-    try {
-      cache = ElectricityInfo.fromJson(
-        jsonDecode(ElectricitySession.fileCache.readAsStringSync()),
+  // Fetch cache info
+  final cache = ElectricitySession.getCache();
+
+  try {
+    log.info("[EletricitySession][update] Fetching from Internet.");
+    (String, String) sessionValue = await ElectricitySession().loginPayment(
+      captchaFunction: captchaFunction,
+    );
+    String remain = "";
+    String owe = "";
+    await Future.wait([
+      Future(() async {
+        try {
+          remain = await ElectricitySession().getElectricity(sessionValue);
+        } on NotFoundException {
+          remain = "electricity_status.remain_not_found";
+        } on DioException catch (e, s) {
+          log.handle(e, s);
+          remain = "electricity_status.remain_network_issue";
+        } catch (e, s) {
+          log.handle(e, s);
+          remain = "electricity_status.remain_other_issue";
+        }
+      }),
+      Future(() async {
+        try {
+          owe = await ElectricitySession().getOwe(sessionValue);
+        } on DioException catch (e, s) {
+          log.info(
+            "[PaymentSession][update] "
+            "Network error occurred on getting owe",
+          );
+          log.handle(e, s);
+          owe = "electricity_status.owe_issue";
+        } catch (e, s) {
+          log.info(
+            "[PaymentSession][update] "
+            "Error occurred on getting owe",
+          );
+          log.handle(e, s);
+          owe = "electricity_status.owe_not_found";
+        }
+      }),
+    ]);
+    ElectricityInfo toReturn = ElectricityInfo(
+      fetchDay: fetchDay,
+      remain: remain,
+      owe: owe,
+    );
+    ElectricitySession.saveCache(toReturn);
+    return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
+  } catch (e, s) {
+    log.handle(e, s, "[getElectricityInfo] Have issue");
+    if (cache != null) {
+      return FetchResult.cache(
+        fetchTime: cache.fetchTime,
+        data: cache.data,
+        hintKey: _cacheHintFromError(e),
       );
-      if (double.tryParse(cache.remain) == null) {
-        log.info("[EletricitySession][update] Invalid cache.");
-        canUseCache = false;
-      } else {
-        canUseCache = true;
-      }
-    } catch (e, s) {
-      log.handle(e, s);
-      canUseCache = false;
     }
+    rethrow;
   }
-
-  // If using cache
-  if (!force && canUseCache && cache.fetchDay.isToday) {
-    log.info("[EletricitySession][update] Using cache.");
-    ElectricitySession.refreshElectricityHistory(cache);
-    return (true, cache);
-  }
-
-  // If not using cache
-  log.info("[EletricitySession][update] Fetching from Internet.");
-  (String, String) sessionValue = await ElectricitySession().loginPayment(
-    captchaFunction: captchaFunction,
-  );
-  String remain = "";
-  String owe = "";
-  await Future.wait([
-    Future(() async {
-      try {
-        remain = await ElectricitySession().getElectricity(sessionValue);
-      } on NotFoundException {
-        remain = "electricity_status.remain_not_found";
-      } on DioException catch (e, s) {
-        log.handle(e, s);
-        remain = "electricity_status.remain_network_issue";
-      } catch (e, s) {
-        log.handle(e, s);
-        remain = "electricity_status.remain_other_issue";
-      }
-    }),
-    Future(() async {
-      try {
-        owe = await ElectricitySession().getOwe(sessionValue);
-      } on DioException catch (e, s) {
-        log.info(
-          "[PaymentSession][update] "
-          "Network error occurred on getting owe",
-        );
-        log.handle(e, s);
-        owe = "electricity_status.owe_issue";
-      } catch (e, s) {
-        log.info(
-          "[PaymentSession][update] "
-          "Error occurred on getting owe",
-        );
-        log.handle(e, s);
-        owe = "electricity_status.owe_not_found";
-      }
-    }),
-  ]);
-  ElectricityInfo toReturn = ElectricityInfo(
-    fetchDay: fetchDay,
-    remain: remain,
-    owe: owe,
-  );
-  if (ElectricitySession.isCacheExist) {
-    ElectricitySession.fileCache.createSync();
-  }
-  ElectricitySession.fileCache.writeAsStringSync(jsonEncode(toReturn.toJson()));
-  if (!remain.contains("electricity_status")) {
-    ElectricitySession.refreshElectricityHistory(toReturn);
-  }
-  return (false, toReturn);
 }
 
 class ElectricitySession extends IDSSession {
@@ -125,6 +134,31 @@ class ElectricitySession extends IDSSession {
   static File fileHistory = File("${supportPath.path}/$electricityHistory");
 
   static bool get isCacheExist => fileCache.existsSync();
+
+  static FetchResult<ElectricityInfo>? getCache() {
+    if (!isCacheExist) return null;
+    log.info("[EletricitySession][cache] Checking out cache.");
+    try {
+      final cache = ElectricityInfo.fromJson(
+        jsonDecode(fileCache.readAsStringSync()),
+      );
+      if (double.tryParse(cache.remain) == null) {
+        log.info("[EletricitySession][cache] Invalid cache.");
+        return null;
+      }
+      return FetchResult.cache(fetchTime: cache.fetchDay, data: cache);
+    } catch (e, s) {
+      log.handle(e, s);
+      return null;
+    }
+  }
+
+  static void saveCache(ElectricityInfo info) {
+    if (!isCacheExist) {
+      fileCache.createSync(recursive: true);
+    }
+    fileCache.writeAsStringSync(jsonEncode(info.toJson()));
+  }
 
   static const pubKey = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCa1ILSkh
@@ -160,46 +194,33 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     }
   }
 
-  // Read the cached list
-  // Input an electricity info will refresh the list
-  // If not input, just fetch the record cache
-  static List<ElectricityInfo> refreshElectricityHistory(
-    ElectricityInfo? info,
-  ) {
+  static List<ElectricityInfo> getHistory() {
     var list = <ElectricityInfo>[];
 
-    // Create file if not exist, or read the cache list
     if (!ElectricitySession.fileHistory.existsSync()) {
-      ElectricitySession.fileHistory.createSync();
-    } else {
-      try {
-        String rawHistory = ElectricitySession.fileHistory.readAsStringSync();
-        List<ElectricityInfo> toAdd = jsonDecode(rawHistory)
-            .map<ElectricityInfo>((data) => ElectricityInfo.fromJson(data))
-            .toList();
-        list.addAll(toAdd);
-        list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
-      } catch (e, s) {
-        log.handle(e, s);
-      }
+      ElectricitySession.fileHistory.createSync(recursive: true);
+      return list;
     }
 
-    // Add the record
-    if (info != null) {
-      if (list.length > 14) {
-        list.removeAt(0);
-      }
-      if (!(list.isNotEmpty &&
-          list.last.fetchDay.year == info.fetchDay.year &&
-          list.last.fetchDay.month == info.fetchDay.month &&
-          list.last.fetchDay.day == info.fetchDay.day &&
-          list.last.remain == info.remain)) {
-        list.add(info);
-        fileHistory.writeAsStringSync(jsonEncode(list));
-      }
+    try {
+      String rawHistory = ElectricitySession.fileHistory.readAsStringSync();
+      List<ElectricityInfo> toAdd = jsonDecode(
+        rawHistory,
+      ).map<ElectricityInfo>((data) => ElectricityInfo.fromJson(data)).toList();
+      list.addAll(toAdd);
+      list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
+    } catch (e, s) {
+      log.handle(e, s);
     }
 
     return list;
+  }
+
+  static void saveHistory(List<ElectricityInfo> history) {
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      ElectricitySession.fileHistory.createSync(recursive: true);
+    }
+    fileHistory.writeAsStringSync(jsonEncode(history));
   }
 
   /// The way to get the electricity number.
