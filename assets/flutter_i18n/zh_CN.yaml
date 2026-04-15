@@ -153,6 +153,8 @@ classtable:
         output_to_system: "导出到系统日历"
         refresh_classtable: "刷新日程表"
         switch_semester: "切换课程表学期"
+        enable_current_time_indicator: "显示当前时间指示条"
+        disable_current_time_indicator: "隐藏当前时间指示条"
     class_change_page:
         title: "课程调整"
         empty_message: "目前没有调课信息"

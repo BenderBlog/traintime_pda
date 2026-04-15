@@ -239,6 +239,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   ),
                 ),
               ),
+              PopupMenuItem<String>(
+                value: 'J',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    preference.getBool(
+                      preference.Preference.enableCurrentTimeIndicator,
+                    )
+                        ? "classtable.popup_menu.disable_current_time_indicator"
+                        : "classtable.popup_menu.enable_current_time_indicator",
+                  ),
+                ),
+              ),
             ],
             onSelected: (String action) async {
               final box = context.findRenderObject() as RenderBox?;
@@ -484,6 +497,17 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         );
                       }
                     });
+                  }
+                case 'J':
+                  bool currentValue = preference.getBool(
+                    preference.Preference.enableCurrentTimeIndicator,
+                  );
+                  await preference.setBool(
+                    preference.Preference.enableCurrentTimeIndicator,
+                    !currentValue,
+                  );
+                  if (context.mounted) {
+                    setState(() {});
                   }
               }
             },

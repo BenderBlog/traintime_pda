@@ -121,7 +121,7 @@ class ClassOrgainzedData {
     this.place,
   });
 
-  static double _transferIndex(DateTime time) {
+  static double transferIndex(DateTime time) {
     int timeInMin = time.hour * 60 + time.minute;
     int previous = 0;
     // Start from the second element.
@@ -170,7 +170,7 @@ class ClassOrgainzedData {
     required this.name,
     this.place,
   }) {
-    this.start = _transferIndex(start);
-    this.stop = _transferIndex(stop);
+    this.start = transferIndex(start);
+    this.stop = transferIndex(stop);
   }
 }

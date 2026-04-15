@@ -89,7 +89,8 @@ enum Preference {
   ), // 上次通知使用的语言
   dormWaterToken(key: "dorm_water_token", type: "String"), // 宿舍水机登录 token
   dormWaterUid(key: "dorm_water_uid", type: "String"), // 宿舍水机用户 uid
-  dormWaterEid(key: "dorm_water_eid", type: "String"); // 宿舍水机用户 eid
+  dormWaterEid(key: "dorm_water_eid", type: "String"), // 宿舍水机用户 eid
+  enableCurrentTimeIndicator(key: "enableCurrentTimeIndicator", type: "bool"); // 是否启用当前时间指示条
 
   const Preference({required this.key, this.type = "String"});
 
