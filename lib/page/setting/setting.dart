@@ -272,7 +272,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   subtitle: Text(
                     FlutterI18n.translate(
                       context,
-                      "setting.change_color_dialog.${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+                      "setting.change_color_dialog."
+                      "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),

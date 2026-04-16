@@ -82,7 +82,10 @@ Future<void> update({
     ),
     _safeReload("Library", LibraryController.i.reloadBorrowList),
     _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
-    _safeReload("Electricity", ElectricityController.i.refreshElectricityInfo),
+    _safeReload(
+      "Electricity",
+      ElectricityController.i.refreshElectricityInfo,
+    ),
     _safeReload("Schoolnet", SchoolnetController.i.reloadSchoolnetInfo),
   ]);
   await maybeAutoSyncSystemCalendar();

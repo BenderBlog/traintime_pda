@@ -201,10 +201,14 @@ END:VTIMEZONE
 
     vevent +=
         'DTSTART;TZID=Asia/Shanghai:'
-        '${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch))}\n';
+        '${DateFormat('yyyyMMddTHHmmss').format(
+          DateTime.fromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch),
+        )}\n';
     vevent +=
         'DTEND;TZID=Asia/Shanghai:'
-        '${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch))}\n';
+        '${DateFormat('yyyyMMddTHHmmss').format(
+          DateTime.fromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch),
+        )}\n';
     if (i.location != null) {
       vevent += 'LOCATION:${i.location}\n';
     }
