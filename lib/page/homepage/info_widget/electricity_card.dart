@@ -19,7 +19,7 @@ class ElectricityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = ElectricityController.i;
-    final state = controller.electricityInfoSignal.watch(context);
+    final state = controller.electricityInfoStateSignal.watch(context);
     final displayInfo = controller.displayElectricityInfo.value;
     final isFromCache = controller.isElectricityFromCache.value;
     final fetchTime = controller.electricityFetchTime.value;

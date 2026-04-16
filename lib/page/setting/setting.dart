@@ -157,24 +157,21 @@ class _SettingWindowState extends State<SettingWindow> {
                   title: Text(
                     FlutterI18n.translate(context, "setting.check_update"),
                   ),
-                  subtitle: Watch(
-                    (context) => Text(
+                  subtitle: Watch((context) {
+                    final updateState =
+                        UpdateNoticeController.i.updateMessageStateSignal.value;
+                    return Text(
                       FlutterI18n.translate(
                         context,
                         "setting.latest_version",
                         translationParams: {
                           "latest":
-                              UpdateNoticeController
-                                  .i
-                                  .updateMessageSignal
-                                  .value
-                                  .value
-                                  ?.code ??
+                              updateState.value?.code ??
                               FlutterI18n.translate(context, "setting.waiting"),
                         },
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                   onTap: () {
                     showToast(
                       context: context,
@@ -189,7 +186,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       if (context.mounted) {
                         if (UpdateNoticeController
                             .i
-                            .updateMessageSignal
+                            .updateMessageStateSignal
                             .value
                             .hasError) {
                           showToast(
@@ -221,7 +218,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                 (context) => UpdateDialog(
                                   updateMessage: UpdateNoticeController
                                       .i
-                                      .updateMessageSignal
+                                      .updateMessageStateSignal
                                       .value
                                       .value!,
                                 ),

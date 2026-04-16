@@ -7,10 +7,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
-import 'package:watermeter/controller/other_experiment_controller.dart';
-import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
@@ -44,11 +41,6 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    home.HomepageController.i;
-    ClassTableController.i;
-    ExamController.i;
-    PhysicsExperimentController.i;
-    OtherExperimentController.i;
 
     // Validate and update notifications after controllers are initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {

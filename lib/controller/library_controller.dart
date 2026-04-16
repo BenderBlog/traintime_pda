@@ -8,19 +8,29 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class LibraryController {
   static final LibraryController i = LibraryController._();
+  bool _isReloading = false;
 
   LibraryController._();
 
-  final libraryBorrowSignal = futureSignal<List<BorrowData>>(
-    () => LibrarySession().getBorrowList(),
-    debugLabel: "LibraryBorrowSignal",
+  final libraryBorrowStateSignal = signal<AsyncState<List<BorrowData>>>(
+    const AsyncLoading(),
   );
 
   Future<void> reloadBorrowList() async {
-    if (libraryBorrowSignal.value.isLoading) return;
-    return await libraryBorrowSignal.reload().catchError(
-      (e, s) =>
-          log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue"),
-    );
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = libraryBorrowStateSignal.peek().value;
+    libraryBorrowStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await LibrarySession().getBorrowList();
+      libraryBorrowStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      libraryBorrowStateSignal.value = AsyncState.error(e, s);
+      log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue");
+    } finally {
+      _isReloading = false;
+    }
   }
 }

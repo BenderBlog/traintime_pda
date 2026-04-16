@@ -16,34 +16,25 @@ import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 
 class ExamController {
   static final ExamController i = ExamController._();
+  bool _isReloading = false;
 
   ExamController._() {
     final cache = ExamSession.getCache();
     if (cache != null) {
-      _lastValidExamInfo.value = FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-        hintKey: "local_cache_hint",
-      );
+      final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
+      _lastValidExamInfo.value = cached;
+      examInfoStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
   }
 
-  final examInfoSignal = futureSignal(
-    () => getScoreInfo(SemesterController.i.semesterSignal.value),
-    dependencies: [SemesterController.i.semesterSignal],
-  );
   final _lastValidExamInfo = signal<FetchResult<ExamData>?>(null);
+  final examInfoStateSignal = signal<AsyncState<FetchResult<ExamData>>>(
+    const AsyncLoading(),
+  );
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final state = examInfoSignal.value;
-      if (state is AsyncData<FetchResult<ExamData>>) {
-        _lastValidExamInfo.value = state.value;
-      }
-    }, debugLabel: "ExamControllerShadowSyncEffect");
-
     effect(() {
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
@@ -62,10 +53,24 @@ class ExamController {
   }
 
   Future<void> reloadExamInfo() async {
-    if (examInfoSignal.value.isLoading) return;
-    return await examInfoSignal.reload().catchError(
-      (e, s) => log.handle(e, s, "[ExamController][reloadExamInfo] Have issue"),
-    );
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = _lastValidExamInfo.value;
+    examInfoStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await getScoreInfo(
+        SemesterController.i.semesterSignal.value,
+      );
+      _lastValidExamInfo.value = result;
+      examInfoStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      examInfoStateSignal.value = AsyncState.error(e, s);
+      log.handle(e, s, "[ExamController][reloadExamInfo] Have issue");
+    } finally {
+      _isReloading = false;
+    }
   }
 
   late final subjects = computed(

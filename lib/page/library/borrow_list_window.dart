@@ -29,7 +29,7 @@ class _BorrowListWindowState extends State<BorrowListWindow>
 
     return RefreshIndicator(
       onRefresh: LibraryController.i.reloadBorrowList,
-      child: LibraryController.i.libraryBorrowSignal
+      child: LibraryController.i.libraryBorrowStateSignal
           .watch(context)
           .map(
             data: (list) => BorrowListView(borrowList: list),

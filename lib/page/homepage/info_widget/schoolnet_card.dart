@@ -18,7 +18,9 @@ class SchoolnetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = SchoolnetController.i.schoolNetUsageSignal.watch(context);
+    final state = SchoolnetController.i.schoolNetUsageStateSignal.watch(
+      context,
+    );
     return MainPageCard(
       onPressed: () async {
         context.pushReplacement(const NetworkCardWindow());

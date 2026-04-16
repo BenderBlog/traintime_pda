@@ -140,14 +140,16 @@ class GeneralNetworkUsagePage extends StatelessWidget {
       LoadingAlerter(
         isLoading: isLoading,
         hint: FlutterI18n.translate(context, "school_net.fetching"),
-        showOverlay: false,
+        showOverlay: true,
       ),
     ],
   );
 
   @override
   Widget build(BuildContext context) => Watch((context) {
-    final state = SchoolnetController.i.schoolNetUsageSignal.watch(context);
+    final state = SchoolnetController.i.schoolNetUsageStateSignal.watch(
+      context,
+    );
     return state.map(
       data: (result) =>
           _buildUsageBody(context, result, isLoading: state.isLoading),

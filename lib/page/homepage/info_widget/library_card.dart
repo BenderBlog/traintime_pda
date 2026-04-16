@@ -16,7 +16,7 @@ class LibraryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = LibraryController.i.libraryBorrowSignal.watch(context);
+    final state = LibraryController.i.libraryBorrowStateSignal.watch(context);
     return MainPageCard(
       onPressed: () async {
         context.pushReplacement(const LibraryWindow());

@@ -19,15 +19,18 @@ import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 class ClassTableController {
   static const decorationName = "decoration.jpg";
   static final ClassTableController i = ClassTableController._();
+  bool _isReloading = false;
 
   ClassTableController._() {
     final cache = ClassTableSession.getCache();
     if (cache != null) {
-      _lastValidSchoolClassTable.value = FetchResult.cache(
+      final cached = FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
         hintKey: "local_cache_hint",
       );
+      _lastValidSchoolClassTable.value = cached;
+      schoolClassTableStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
   }
@@ -97,25 +100,11 @@ class ClassTableController {
     userDefinedClassSignal.value = toChange;
   }
 
-  final schoolClassTableSignal = futureSignal<FetchResult<ClassTableData>>(
-    () {
-      final semesterCode = SemesterController.i.semesterSignal.value;
-      return getClassTable(semesterCode);
-    },
-    debugLabel: "ClassTableSignal",
-    dependencies: [SemesterController.i.semesterSignal],
-  );
-
   final _lastValidSchoolClassTable = signal<FetchResult<ClassTableData>?>(null);
+  final schoolClassTableStateSignal =
+      signal<AsyncState<FetchResult<ClassTableData>>>(const AsyncLoading());
 
   void _initEffects() {
-    effect(() {
-      final state = schoolClassTableSignal.value;
-      if (state is AsyncData<FetchResult<ClassTableData>>) {
-        _lastValidSchoolClassTable.value = state.value;
-      }
-    }, debugLabel: "ClassTableControllerShadowSyncEffect");
-
     effect(() {
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
@@ -142,14 +131,28 @@ class ClassTableController {
   }
 
   Future<void> reloadClassTable() async {
-    if (schoolClassTableSignal.value.isLoading) return;
-    await schoolClassTableSignal.reload().catchError(
-      (e, s) => log.handle(
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = _lastValidSchoolClassTable.value;
+    schoolClassTableStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await getClassTable(
+        SemesterController.i.semesterSignal.value,
+      );
+      _lastValidSchoolClassTable.value = result;
+      schoolClassTableStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      schoolClassTableStateSignal.value = AsyncState.error(e, s);
+      log.handle(
         e,
         s,
         "[ClassTableControllerNew][reloadClassTable] Have issue",
-      ),
-    );
+      );
+    } finally {
+      _isReloading = false;
+    }
   }
 
   late final schoolClassTableComputedSignal = computed<ClassTableData>(

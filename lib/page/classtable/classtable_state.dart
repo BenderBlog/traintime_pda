@@ -95,19 +95,19 @@ class ClassTableWidgetState with ChangeNotifier {
   void _initEffects() {
     _effectCleanup.add(
       effect(() {
-        classTableController.schoolClassTableSignal.value;
+        classTableController.schoolClassTableStateSignal.value;
         classTableController.classTableComputedSignal.value;
         classTableController.isClassTableFromCacheComputedSignal.value;
         classTableController.classTableCacheHintKeyComputedSignal.value;
-        examController.examInfoSignal.value;
+        examController.examInfoStateSignal.value;
         examController.subjects.value;
         examController.isExamFromCache.value;
         examController.examCacheHintKey.value;
-        physicsExperimentController.physicsExperimentSignal.value;
+        physicsExperimentController.physicsExperimentStateSignal.value;
         physicsExperimentController.physicsExperiments.value;
         physicsExperimentController.isPhysicsExperimentFromCache.value;
         physicsExperimentController.physicsExperimentCacheHintKey.value;
-        otherExperimentController.otherExperimentSignal.value;
+        otherExperimentController.otherExperimentStateSignal.value;
         otherExperimentController.otherExperiments.value;
         otherExperimentController.isOtherExperimentFromCache.value;
         otherExperimentController.otherExperimentCacheHintKey.value;
@@ -138,10 +138,10 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get haveClass => timeArrangement.isNotEmpty && classDetail.isNotEmpty;
 
   bool get isClassTableLoading =>
-      classTableController.schoolClassTableSignal.value.isLoading;
+      classTableController.schoolClassTableStateSignal.value.isLoading;
 
   bool get hasClassTableLoadError =>
-      classTableController.schoolClassTableSignal.value is AsyncError;
+      classTableController.schoolClassTableStateSignal.value is AsyncError;
 
   bool get isClassTableFromCache =>
       classTableController.isClassTableFromCacheComputedSignal.value;
@@ -152,20 +152,21 @@ class ClassTableWidgetState with ChangeNotifier {
   DateTime? get classTableFetchTime =>
       classTableController.classTableFetchTimeComputedSignal.value;
 
-  bool get isExamLoading => examController.examInfoSignal.value.isLoading;
+  bool get isExamLoading => examController.examInfoStateSignal.value.isLoading;
 
   bool get hasExamLoadError =>
-      examController.examInfoSignal.value is AsyncError;
+      examController.examInfoStateSignal.value is AsyncError;
 
   bool get isExamFromCache => examController.isExamFromCache.value;
 
   String? get examCacheHintKey => examController.examCacheHintKey.value;
 
   bool get isPhysicsExperimentLoading =>
-      physicsExperimentController.physicsExperimentSignal.value.isLoading;
+      physicsExperimentController.physicsExperimentStateSignal.value.isLoading;
 
   bool get hasPhysicsExperimentLoadError =>
-      physicsExperimentController.physicsExperimentSignal.value is AsyncError;
+      physicsExperimentController.physicsExperimentStateSignal.value
+          is AsyncError;
 
   bool get isPhysicsExperimentFromCache =>
       physicsExperimentController.isPhysicsExperimentFromCache.value;
@@ -174,10 +175,10 @@ class ClassTableWidgetState with ChangeNotifier {
       physicsExperimentController.physicsExperimentCacheHintKey.value;
 
   bool get isOtherExperimentLoading =>
-      otherExperimentController.otherExperimentSignal.value.isLoading;
+      otherExperimentController.otherExperimentStateSignal.value.isLoading;
 
   bool get hasOtherExperimentLoadError =>
-      otherExperimentController.otherExperimentSignal.value is AsyncError;
+      otherExperimentController.otherExperimentStateSignal.value is AsyncError;
 
   bool get isOtherExperimentFromCache =>
       otherExperimentController.isOtherExperimentFromCache.value;
@@ -575,10 +576,10 @@ END:VTIMEZONE
   Future<void> updateClasstable(BuildContext context) async {
     log.info("Updating time arrangement data...");
     return await Future.wait([
-      classTableController.schoolClassTableSignal.reload(),
-      examController.examInfoSignal.reload(),
-      physicsExperimentController.physicsExperimentSignal.reload(),
-      otherExperimentController.otherExperimentSignal.reload(),
+      classTableController.reloadClassTable(),
+      examController.reloadExamInfo(),
+      physicsExperimentController.reloadPhysicsExperiment(),
+      otherExperimentController.reloadOtherExperiment(),
     ]).then((value) {
       notifyListeners();
     });
