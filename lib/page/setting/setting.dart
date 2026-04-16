@@ -29,7 +29,6 @@ import 'package:watermeter/page/setting/notification_page/notification_page.dart
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:get/get.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -291,10 +290,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           .setInt(preference.Preference.brightness, value)
                           .then((value) {
                             setState(() {
-                              ThemeController toChange = Get.put(
-                                ThemeController(),
-                              );
-                              toChange.updateTheme();
+                              ThemeController.i.updateTheme();
                             });
                           });
                     },
@@ -974,10 +970,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             await preference.prefrenceClear();
 
                             /// Theme back to default
-                            ThemeController toChange = Get.put(
-                              ThemeController(),
-                            );
-                            toChange.updateTheme();
+                            ThemeController.i.updateTheme();
 
                             /// Restart app
                             if (mounted) {

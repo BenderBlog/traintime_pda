@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
@@ -42,7 +41,7 @@ class UpdateCard extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) =>
-                          Obx(() => UpdateDialog(updateMessage: state.value!)),
+                          UpdateDialog(updateMessage: state.value!),
                     );
                   },
                 );

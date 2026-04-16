@@ -5,7 +5,6 @@
 // Change app brightness.
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 
 import 'package:watermeter/repository/localization.dart';
@@ -47,10 +46,9 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
                   Localization.values[value].string,
                 )
                 .then((value) {
-                  ThemeController toChange = Get.put(ThemeController());
-                  toChange.updateTheme();
+                  ThemeController.i.updateTheme();
                 });
-            
+
             // To update course reminders according to new localization
             await CourseReminderService().cancelAllCourseNotifications();
             await CourseReminderService().scheduleNotificationsFromCourseData(

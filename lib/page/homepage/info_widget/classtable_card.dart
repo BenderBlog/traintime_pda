@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -52,9 +51,9 @@ class _ClassTableCardItemDescriptor {
 class ClassTableCard extends StatefulWidget {
   const ClassTableCard({super.key});
 
-  static final RxBool simplifiedMode = preference
-      .getBool(preference.Preference.simplifiedClassTimeline)
-      .obs;
+  static final ValueNotifier<bool> simplifiedMode = ValueNotifier<bool>(
+    preference.getBool(preference.Preference.simplifiedClassTimeline),
+  );
 
   static void reloadSettingsFromPref() {
     simplifiedMode.value = preference.getBool(
@@ -248,9 +247,15 @@ class _ClassTableCardState extends State<ClassTableCard> {
     }
 
     List<_ClassTableCardItemDescriptor> results = [];
-    results.addIf(currItem.isNotEmpty, currItem);
-    results.addIf(nextItem.isNotEmpty, nextItem);
-    results.addIf(moreItem.isNotEmpty, moreItem);
+    if (currItem.isNotEmpty) {
+      results.add(currItem);
+    }
+    if (nextItem.isNotEmpty) {
+      results.add(nextItem);
+    }
+    if (moreItem.isNotEmpty) {
+      results.add(moreItem);
+    }
 
     if (results.isEmpty) {
       results.add(currItem);
@@ -409,7 +414,9 @@ class _ClassTableCardItem extends StatelessWidget {
 
     if (arr != null) {
       var detail = _ClassTableCardArrangementDetail(displayArrangement: arr);
-      columns.addIf(!detail.isContentEmpty, detail);
+      if (!detail.isContentEmpty) {
+        columns.add(detail);
+      }
     }
     return columns;
   }
