@@ -319,11 +319,6 @@ class SystemCalendarSyncService {
     await preference.remove(preference.Preference.systemCalendarId);
   }
 
-  bool _isLegacyCalendarName(String name) {
-    return name.startsWith('$calendarName created at ') ||
-        name.startsWith(exportedClassTableCalendarPrefix);
-  }
-
   Future<List<Calendar>?> _retrieveWritableCalendars() async {
     final calendarResult = await deviceCalendarPlugin.retrieveCalendars();
     if (!calendarResult.isSuccess || calendarResult.data == null) {
@@ -357,31 +352,20 @@ class SystemCalendarSyncService {
     return null;
   }
 
-  /// Find the exported calendar by saved id or compatible old naming rules.
-  Future<Calendar?> _findExportedCalendar({
-    required bool allowLegacyLookup,
-  }) async {
+  /// Find the exported calendar by saved id or the current fixed name.
+  Future<Calendar?> _findExportedCalendar() async {
     final calendars = await _retrieveWritableCalendars();
     if (calendars == null) {
       return null;
     }
 
     final boundCalendar = await _findBoundCalendar(calendars);
-    if (boundCalendar != null || !allowLegacyLookup) {
+    if (boundCalendar != null) {
       return boundCalendar;
     }
 
     for (var calendar in calendars) {
       if (calendar.name == calendarName &&
-          calendar.id != null &&
-          calendar.id!.isNotEmpty) {
-        await _saveCalendarBinding(calendar.id!);
-        return calendar;
-      }
-    }
-
-    for (var calendar in calendars) {
-      if (_isLegacyCalendarName(calendar.name ?? '') &&
           calendar.id != null &&
           calendar.id!.isNotEmpty) {
         await _saveCalendarBinding(calendar.id!);
@@ -410,9 +394,7 @@ class SystemCalendarSyncService {
   }
 
   Future<String?> _prepareCalendar({required bool onlyIfCalendarExists}) async {
-    Calendar? exportedCalendar = await _findExportedCalendar(
-      allowLegacyLookup: !onlyIfCalendarExists,
-    );
+    Calendar? exportedCalendar = await _findExportedCalendar();
 
     if (exportedCalendar == null) {
       if (onlyIfCalendarExists) {
