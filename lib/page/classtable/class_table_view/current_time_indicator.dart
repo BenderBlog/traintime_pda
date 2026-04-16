@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 class CurrentTimeIndicatorConfig {
   static bool enabled = true;
   static bool showTimeLabel = true;
+  static bool showCurrentDayColumnBox = true;
   static double lineAlpha = 0.9;
   static double lineThickness = 2;
   static double labelHeight = 14;
   static double labelFontSize = 9;
+  static double dayColumnBorderAlpha = 0.65;
+  static double dayColumnBorderWidth = 2;
 }
 
 class CurrentTimeIndicator {
@@ -82,8 +85,11 @@ class CurrentTimeIndicator {
     }
 
     final today = DateTime(now.year, now.month, now.day);
-    final normalizedWeekStart =
-        DateTime(weekStart.year, weekStart.month, weekStart.day);
+    final normalizedWeekStart = DateTime(
+      weekStart.year,
+      weekStart.month,
+      weekStart.day,
+    );
     final dayOffset = today.difference(normalizedWeekStart).inDays;
     if (dayOffset < 0 || dayOffset > 6) {
       return null;
@@ -91,6 +97,9 @@ class CurrentTimeIndicator {
 
     final lineTop = blockHeight(_transferIndex(now));
     final color = Theme.of(context).colorScheme.primary;
+    final lineHorizontalInset = CurrentTimeIndicatorConfig.showCurrentDayColumnBox
+      ? CurrentTimeIndicatorConfig.dayColumnBorderWidth
+      : 0.0;
     final labelText =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
@@ -121,14 +130,62 @@ class CurrentTimeIndicator {
                 ),
               Positioned(
                 top: lineOffset,
-                left: 0,
-                right: 0,
+                left: lineHorizontalInset / 2,
+                right: lineHorizontalInset / 2,
                 child: Container(
                   height: CurrentTimeIndicatorConfig.lineThickness,
-                  color: color.withValues(alpha: CurrentTimeIndicatorConfig.lineAlpha),
+                  color: color.withValues(
+                    alpha: CurrentTimeIndicatorConfig.lineAlpha,
+                  ),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Positioned? buildDayColumnBox({
+    required BuildContext context,
+    required DateTime now,
+    required DateTime weekStart,
+    required double leftRow,
+    required double blockWidth,
+    required double Function(double) blockHeight,
+  }) {
+    if (!CurrentTimeIndicatorConfig.showCurrentDayColumnBox) {
+      return null;
+    }
+
+    final today = DateTime(now.year, now.month, now.day);
+    final normalizedWeekStart = DateTime(
+      weekStart.year,
+      weekStart.month,
+      weekStart.day,
+    );
+    final dayOffset = today.difference(normalizedWeekStart).inDays;
+    if (dayOffset < 0 || dayOffset > 6) {
+      return null;
+    }
+
+    final color = Theme.of(context).colorScheme.primary.withValues(
+      alpha: CurrentTimeIndicatorConfig.lineAlpha,
+    );
+
+    return Positioned(
+      left: leftRow + blockWidth * dayOffset -
+          CurrentTimeIndicatorConfig.dayColumnBorderWidth / 2,
+      top: 0,
+      width: blockWidth + CurrentTimeIndicatorConfig.dayColumnBorderWidth,
+      height: blockHeight(61),
+      child: IgnorePointer(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: color,
+              width: CurrentTimeIndicatorConfig.dayColumnBorderWidth,
+            ),
           ),
         ),
       ),

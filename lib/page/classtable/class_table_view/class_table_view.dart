@@ -68,6 +68,15 @@ class _ClassTableViewState extends State<ClassTableView> {
     blockHeight: blockheight,
   );
 
+  Positioned? _currentDayColumnBox() => CurrentTimeIndicator.buildDayColumnBox(
+    context: context,
+    now: classTableState.currentTime,
+    weekStart: _visibleWeekStart,
+    leftRow: leftRow,
+    blockWidth: blockwidth,
+    blockHeight: blockheight,
+  );
+
   /// The height of the class card.
   double blockheight(double count) =>
       count *
@@ -101,6 +110,10 @@ class _ClassTableViewState extends State<ClassTableView> {
       }
 
       final timeIndicator = _currentTimeIndicator();
+      final currentDayColumnBox = _currentDayColumnBox();
+      if (currentDayColumnBox != null) {
+        thisRow.add(currentDayColumnBox);
+      }
       if (timeIndicator != null) {
         thisRow.add(timeIndicator);
       }

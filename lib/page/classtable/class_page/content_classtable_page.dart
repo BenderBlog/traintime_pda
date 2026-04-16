@@ -254,6 +254,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   Future<void> _showClassTableVisualSettingsDialog() async {
     var enabled = CurrentTimeIndicatorConfig.enabled;
     var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
+    var showCurrentDayColumnBox =
+        CurrentTimeIndicatorConfig.showCurrentDayColumnBox;
     var completedSaturationFactor =
         CompletedClassStyleConfig.completedSaturationFactor;
     var completedTextSaturationFactor =
@@ -313,6 +315,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                             ? (value) =>
                                   setDialogState(() => showTimeLabel = value)
                             : null,
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.show_current_day_column_box",
+                          ),
+                        ),
+                        value: showCurrentDayColumnBox,
+                        onChanged: (value) => setDialogState(
+                          () => showCurrentDayColumnBox = value,
+                        ),
                       ),
                       const Divider(height: 24),
                       Text(
@@ -419,12 +434,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     CurrentTimeIndicatorConfig.enabled = enabled;
     CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
-  CompletedClassStyleConfig.completedSaturationFactor =
-    completedSaturationFactor;
-  CompletedClassStyleConfig.completedTextSaturationFactor =
-    completedTextSaturationFactor;
-  CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
-  CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
+    CurrentTimeIndicatorConfig.showCurrentDayColumnBox =
+        showCurrentDayColumnBox;
+    CompletedClassStyleConfig.completedSaturationFactor =
+        completedSaturationFactor;
+    CompletedClassStyleConfig.completedTextSaturationFactor =
+        completedTextSaturationFactor;
+    CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
+    CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
     setState(() {});
   }
 

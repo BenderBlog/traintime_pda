@@ -160,6 +160,7 @@ classtable:
         current_time_section: "当前时间标线"
         show_current_time_indicator: "显示当前时间标线"
         show_current_time_label: "显示迷你时间标签"
+        show_current_day_column_box: "显示当前日期列方框"
         completed_section: "已完成课程颜色"
         completed_saturation_factor: "底色饱和度: {value}"
         completed_text_saturation_factor: "文字饱和度: {value}"
