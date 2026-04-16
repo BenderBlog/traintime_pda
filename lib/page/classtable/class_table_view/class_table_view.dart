@@ -4,9 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/model/time_list.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
@@ -166,6 +164,13 @@ class _ClassTableViewState extends State<ClassTableView> {
     }
   }
 
+  /// This function will be triggered every minute to refresh the time indicator.
+  void _reloadTimeIndicator() {
+    if (mounted && classTableState.currentWeek == widget.index) {
+      setState(() {});
+    }
+  }
+
   void updateSize() => size = ClassTableState.of(context)!.constraints;
 
   @override
@@ -173,12 +178,14 @@ class _ClassTableViewState extends State<ClassTableView> {
     super.didChangeDependencies();
     classTableState = ClassTableState.of(context)!.controllers;
     classTableState.addListener(_reload);
+    classTableState.currentTimeNotifier.addListener(_reloadTimeIndicator);
     updateSize();
   }
 
   @override
   void dispose() {
     classTableState.removeListener(_reload);
+    classTableState.currentTimeNotifier.removeListener(_reloadTimeIndicator);
     super.dispose();
   }
 
@@ -186,6 +193,31 @@ class _ClassTableViewState extends State<ClassTableView> {
   void didUpdateWidget(covariant ClassTableView oldWidget) {
     super.didUpdateWidget(oldWidget);
     updateSize();
+  }
+
+  Widget _buildCurrentTimeIndicator() {
+    if (classTableState.currentWeek != widget.index) {
+      return const SizedBox.shrink();
+    }
+    if (!preference.getBool(preference.Preference.enableCurrentTimeIndicator)) {
+      return const SizedBox.shrink();
+    }
+    // transferIndex returns 0 if before 8:30 and 61 if after 21:25.
+    final timeIndex = ClassOrgainzedData.transferIndex(
+      classTableState.currentTimeNotifier.value,
+    );
+    if (timeIndex <= 0 || timeIndex >= 61) {
+      return const SizedBox.shrink();
+    }
+    return Positioned(
+      top: blockheight(timeIndex) - 1,
+      left: leftRow,
+      width: size.maxWidth - leftRow,
+      height: 2,
+      child: Container(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+      ),
+    );
   }
 
   @override
@@ -210,34 +242,7 @@ class _ClassTableViewState extends State<ClassTableView> {
                 .constrained(width: leftRow)
                 .positioned(left: 0),
             ...classSubRow(true),
-            Watch((context) {
-              final now = GlobalTimerController.i.currentTimeSignal.value;
-              if (classTableState.currentWeek != widget.index) {
-                return const SizedBox.shrink();
-              }
-
-              // Check if current time indicator is enabled
-              if (!preference.getBool(preference.Preference.enableCurrentTimeIndicator)) {
-                return const SizedBox.shrink();
-              }
-
-              // Check if it is within the day's class range (approx 8:30 - 21:25)
-              // transferIndex returns 0 if before 8:30 and 61 if after 21:25.
-              final index = ClassOrgainzedData.transferIndex(now);
-              if (index <= 0 || index >= 61) {
-                return const SizedBox.shrink();
-              }
-
-              return Positioned(
-                top: blockheight(index) - 1,
-                left: leftRow,
-                width: size.maxWidth - leftRow,
-                height: 2,
-                child: Container(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                ),
-              );
-            }),
+            _buildCurrentTimeIndicator(),
           ]
           .toStack()
           .constrained(height: blockheight(61), width: size.maxWidth)

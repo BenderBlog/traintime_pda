@@ -2,6 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:device_calendar/device_calendar.dart';
@@ -54,8 +55,15 @@ class ClassTableWidgetState with ChangeNotifier {
   ///*******************************************************************///
   bool _disposed = false;
 
+  /// A notifier that fires every minute with the current time.
+  final ValueNotifier<DateTime> currentTimeNotifier =
+      ValueNotifier(DateTime.now());
+  Timer? _currentTimeTimer;
+
   @override
   void dispose() {
+    _currentTimeTimer?.cancel();
+    currentTimeNotifier.dispose();
     _disposed = true;
     super.dispose();
   }
@@ -461,6 +469,9 @@ END:VTIMEZONE
     } else {
       _chosenWeek = currentWeek;
     }
+    _currentTimeTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      currentTimeNotifier.value = DateTime.now();
+    });
   }
 
   bool _checkIsOverlapping(
