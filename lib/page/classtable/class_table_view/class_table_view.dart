@@ -230,8 +230,8 @@ class _ClassTableViewState extends State<ClassTableView> {
 
               return Positioned(
                 top: blockheight(index) - 1,
-                left: 0,
-                width: size.maxWidth,
+                left: leftRow,
+                width: size.maxWidth - leftRow,
                 height: 2,
                 child: Container(
                   color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),

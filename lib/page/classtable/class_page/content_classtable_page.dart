@@ -498,6 +498,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       }
                     });
                   }
+                  break;
                 case 'J':
                   bool currentValue = preference.getBool(
                     preference.Preference.enableCurrentTimeIndicator,
