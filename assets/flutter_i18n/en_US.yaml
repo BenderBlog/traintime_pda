@@ -159,6 +159,17 @@ classtable:
       output_to_system: "Export to system calendar"
       refresh_classtable: "Refresh schedule"
       switch_semester: "Switch classtable semester"
+      visual_settings: "Schedule visual settings"
+   visual_settings:
+      title: "Schedule visual settings"
+      current_time_section: "Current time indicator"
+      show_current_time_indicator: "Show current time indicator"
+      show_current_time_label: "Show mini time label"
+      completed_section: "Completed class colors"
+      completed_saturation_factor: "Fill saturation: {value}"
+      completed_text_saturation_factor: "Text saturation: {value}"
+      completed_border_alpha: "Border opacity: {value}"
+      completed_inner_alpha: "Fill opacity: {value}"
    status_source:
       class_table: "Class Table"
       exam: "Exams"

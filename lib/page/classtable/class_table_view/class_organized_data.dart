@@ -29,6 +29,7 @@ class ClassOrgainzedData {
 
   final String name;
   final String? place;
+  final DateTime? actualEndTime;
 
   final MaterialColor color;
 
@@ -80,6 +81,7 @@ class ClassOrgainzedData {
       color: color,
       name: name,
       place: timeArrangement.classroom,
+      actualEndTime: null,
     );
   }
 
@@ -96,6 +98,7 @@ class ClassOrgainzedData {
     place:
         "${subject.place} "
         "${subject.seat == null ? "" : "${subject.seat}"}",
+    actualEndTime: subject.stopTime,
   );
 
   factory ClassOrgainzedData.fromExperiment(
@@ -110,6 +113,7 @@ class ClassOrgainzedData {
     color: color,
     name: exp.name,
     place: exp.classroom,
+    actualEndTime: stop,
   );
 
   ClassOrgainzedData({
@@ -119,6 +123,7 @@ class ClassOrgainzedData {
     required this.name,
     required this.color,
     this.place,
+    this.actualEndTime,
   });
 
   static double _transferIndex(DateTime time) {
@@ -169,6 +174,7 @@ class ClassOrgainzedData {
     required this.color,
     required this.name,
     this.place,
+    this.actualEndTime,
   }) {
     this.start = _transferIndex(start);
     this.stop = _transferIndex(stop);

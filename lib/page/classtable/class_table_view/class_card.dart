@@ -10,6 +10,7 @@ import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
@@ -18,18 +19,23 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 /// The card in [classSubRow], metioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
   final ClassOrgainzedData detail;
+  final bool isCompleted;
 
   List<dynamic> get data => detail.data;
   MaterialColor get color => detail.color;
   String get name => detail.name;
   String? get place => detail.place;
-  const ClassCard({super.key, required this.detail});
+  const ClassCard({super.key, required this.detail, required this.isCompleted});
 
   @override
   Widget build(BuildContext context) {
     ClassTableWidgetState classTableState = ClassTableState.of(
       context,
     )!.controllers;
+    final style = CompletedClassStyle.resolve(
+      palette: color,
+      isCompleted: isCompleted,
+    );
 
     /// This is the result of the class info card.
     return Padding(
@@ -39,7 +45,7 @@ class ClassCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Container(
           // Border
-          color: color.shade300.withValues(alpha: 0.8),
+          color: style.borderColor.withValues(alpha: style.borderAlpha),
           padding: const EdgeInsets.all(2),
           child: Stack(
             children: [
@@ -47,7 +53,7 @@ class ClassCard extends StatelessWidget {
                 // Inner
                 borderRadius: BorderRadius.circular(6),
                 child: Container(
-                  color: color.shade100.withValues(alpha: 0.7),
+                  color: style.innerColor.withValues(alpha: style.innerAlpha),
                   child: TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -117,20 +123,14 @@ class ClassCard extends StatelessWidget {
                                 Flexible(
                                   child: Text(
                                     name,
-                                    style: TextStyle(
-                                      color: color.shade900,
-                                      fontSize: isPhone(context) ? 12 : 14,
-                                    ),
+                                    style: TextStyle(color: style.textColor, fontSize: isPhone(context) ? 12 : 14),
                                     maxLines: 3,
                                     overflow: TextOverflow.clip,
                                   ),
                                 ),
                                 Text(
                                   "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
-                                  style: TextStyle(
-                                    color: color.shade900,
-                                    fontSize: isPhone(context) ? 10 : 12,
-                                  ),
+                                  style: TextStyle(color: style.textColor, fontSize: isPhone(context) ? 10 : 12),
                                 ),
                                 if (data.length > 1)
                                   Text(
@@ -142,10 +142,7 @@ class ClassCard extends StatelessWidget {
                                             .toString(),
                                       },
                                     ),
-                                    style: TextStyle(
-                                      color: color.shade900,
-                                      fontSize: isPhone(context) ? 10 : 12,
-                                    ),
+                                      style: TextStyle(color: style.textColor, fontSize: isPhone(context) ? 10 : 12),
                                   ),
                               ],
                             )
@@ -161,7 +158,7 @@ class ClassCard extends StatelessWidget {
                 ClipPath(
                   clipper: Triangle(),
                   child: Container(
-                    color: color.shade300,
+                    color: style.borderColor,
                   ).constrained(width: 8, height: 8),
                 ).alignment(Alignment.topRight),
             ],

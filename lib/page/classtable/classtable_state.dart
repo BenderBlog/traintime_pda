@@ -12,6 +12,7 @@ import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
@@ -112,6 +113,7 @@ class ClassTableWidgetState with ChangeNotifier {
         otherExperimentController.isOtherExperimentFromCache.value;
         otherExperimentController.otherExperimentCacheHintKey.value;
         weekSwiftController.weekSwiftSignal.value;
+        GlobalTimerController.i.currentTimeSignal.value;
         notifyListeners();
       }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
     );
@@ -265,6 +267,8 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// The currentWeek.
   final int currentWeek;
+
+  DateTime get currentTime => GlobalTimerController.i.currentTimeSignal.value;
 
   /// The exam list.
   List<Subject> get subjects => examController.subjects.value;

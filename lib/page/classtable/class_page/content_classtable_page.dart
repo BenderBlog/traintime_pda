@@ -16,6 +16,8 @@ import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
+import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
@@ -249,6 +251,183 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
+  Future<void> _showClassTableVisualSettingsDialog() async {
+    var enabled = CurrentTimeIndicatorConfig.enabled;
+    var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
+    var completedSaturationFactor =
+        CompletedClassStyleConfig.completedSaturationFactor;
+    var completedTextSaturationFactor =
+        CompletedClassStyleConfig.completedTextSaturationFactor;
+    var completedBorderAlpha = CompletedClassStyleConfig.completedBorderAlpha;
+    var completedInnerAlpha = CompletedClassStyleConfig.completedInnerAlpha;
+
+    String formatPercent(double value) => "${(value * 100).round()}%";
+
+    final shouldApply =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: Text(
+                FlutterI18n.translate(
+                  context,
+                  "classtable.visual_settings.title",
+                ),
+              ),
+              content: SizedBox(
+                width: 420,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.current_time_section",
+                        ),
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.show_current_time_indicator",
+                          ),
+                        ),
+                        value: enabled,
+                        onChanged: (value) =>
+                            setDialogState(() => enabled = value),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.show_current_time_label",
+                          ),
+                        ),
+                        value: showTimeLabel,
+                        onChanged: enabled
+                            ? (value) =>
+                                  setDialogState(() => showTimeLabel = value)
+                            : null,
+                      ),
+                      const Divider(height: 24),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.completed_section",
+                        ),
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.completed_saturation_factor",
+                          translationParams: {
+                            "value": formatPercent(completedSaturationFactor),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: completedSaturationFactor,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) => setDialogState(
+                          () => completedSaturationFactor = value,
+                        ),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.completed_text_saturation_factor",
+                          translationParams: {
+                            "value": formatPercent(
+                              completedTextSaturationFactor,
+                            ),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: completedTextSaturationFactor,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) => setDialogState(
+                          () => completedTextSaturationFactor = value,
+                        ),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.completed_border_alpha",
+                          translationParams: {
+                            "value": formatPercent(completedBorderAlpha),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: completedBorderAlpha,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) =>
+                            setDialogState(() => completedBorderAlpha = value),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.completed_inner_alpha",
+                          translationParams: {
+                            "value": formatPercent(completedInnerAlpha),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: completedInnerAlpha,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) =>
+                            setDialogState(() => completedInnerAlpha = value),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(FlutterI18n.translate(context, "cancel")),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(FlutterI18n.translate(context, "confirm")),
+                ),
+              ],
+            ),
+          ),
+        ) ??
+        false;
+
+    if (!shouldApply || !mounted) {
+      return;
+    }
+
+    CurrentTimeIndicatorConfig.enabled = enabled;
+    CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
+  CompletedClassStyleConfig.completedSaturationFactor =
+    completedSaturationFactor;
+  CompletedClassStyleConfig.completedTextSaturationFactor =
+    completedTextSaturationFactor;
+  CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
+  CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
@@ -324,6 +503,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   FlutterI18n.translate(
                     context,
                     "classtable.popup_menu.refresh_classtable",
+                  ),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'J',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.visual_settings",
                   ),
                 ),
               ),
@@ -573,6 +761,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       }
                     });
                   }
+                  break;
+                case 'J':
+                  await _showClassTableVisualSettingsDialog();
+                  break;
               }
             },
           ),

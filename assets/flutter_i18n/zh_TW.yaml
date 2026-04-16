@@ -130,6 +130,17 @@ classtable:
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
     switch_semester: 切換課程表學期
+    visual_settings: 課表視覺設置
+  visual_settings:
+    title: 課表視覺設置
+    current_time_section: 當前時間標線
+    show_current_time_indicator: 顯示當前時間標線
+    show_current_time_label: 顯示迷你時間標籤
+    completed_section: 已完成課程顏色
+    completed_saturation_factor: 底色飽和度: {value}
+    completed_text_saturation_factor: 文字飽和度: {value}
+    completed_border_alpha: 邊框透明度: {value}
+    completed_inner_alpha: 底色透明度: {value}
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課信息
