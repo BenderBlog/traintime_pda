@@ -253,8 +253,17 @@ class SystemCalendarSyncService {
   OtherExperimentController get otherExperimentController =>
       OtherExperimentController.i;
 
+  String get currentSemesterCode =>
+      classTableController.classTableComputedSignal.value.semesterCode;
+
+  String get savedCalendarId =>
+      preference.getString(preference.Preference.systemCalendarId);
+
+  String get savedCalendarSemesterCode =>
+      preference.getString(preference.Preference.systemCalendarSemesterCode);
+
   String get calendarName => buildExportedClassTableCalendarName(
-    classTableController.classTableComputedSignal.value.semesterCode,
+    currentSemesterCode,
   );
 
   List<ExperimentData> get experiments => [
@@ -274,10 +283,22 @@ class SystemCalendarSyncService {
     experiments: experiments,
   );
 
+  bool get hasCalendarBinding => savedCalendarId.isNotEmpty;
+
+  bool get isBoundCalendarForCurrentSemester =>
+      savedCalendarSemesterCode.isNotEmpty &&
+      savedCalendarSemesterCode == currentSemesterCode;
+
+  bool get didSemesterChangeSinceLastBinding =>
+      savedCalendarSemesterCode.isNotEmpty &&
+      currentSemesterCode.isNotEmpty &&
+      savedCalendarSemesterCode != currentSemesterCode;
+
   bool get canAutoSync =>
-      preference.getString(preference.Preference.systemCalendarId).isNotEmpty &&
-      preference.getString(preference.Preference.systemCalendarSnapshot) !=
-          snapshot &&
+      hasCalendarBinding &&
+      (didSemesterChangeSinceLastBinding ||
+          preference.getString(preference.Preference.systemCalendarSnapshot) !=
+              snapshot) &&
       classTableController.hasValidClassInfo.value;
 
   Future<bool> _ensureCalendarPermission({
@@ -305,6 +326,10 @@ class SystemCalendarSyncService {
       preference.Preference.systemCalendarId,
       calendarId,
     );
+    await preference.setString(
+      preference.Preference.systemCalendarSemesterCode,
+      currentSemesterCode,
+    );
   }
 
   Future<void> _saveCalendarSyncState(String calendarId) async {
@@ -317,6 +342,7 @@ class SystemCalendarSyncService {
 
   Future<void> _clearCalendarBinding() async {
     await preference.remove(preference.Preference.systemCalendarId);
+    await preference.remove(preference.Preference.systemCalendarSemesterCode);
   }
 
   Future<List<Calendar>?> _retrieveWritableCalendars() async {
@@ -335,20 +361,40 @@ class SystemCalendarSyncService {
   }
 
   Future<Calendar?> _findBoundCalendar(List<Calendar> calendars) async {
-    String savedCalendarId = preference.getString(
-      preference.Preference.systemCalendarId,
-    );
-    if (savedCalendarId.isEmpty) {
+    if (!hasCalendarBinding) {
       return null;
     }
 
     for (var calendar in calendars) {
-      if (calendar.id == savedCalendarId) {
+      if (calendar.id != savedCalendarId) {
+        continue;
+      }
+
+      if (isBoundCalendarForCurrentSemester) {
         return calendar;
       }
+
+      // Migrate older bindings that do not persist the semester code yet.
+      if (savedCalendarSemesterCode.isEmpty &&
+          calendar.name == calendarName &&
+          calendar.id != null &&
+          calendar.id!.isNotEmpty) {
+        await _saveCalendarBinding(calendar.id!);
+        return calendar;
+      }
+
+      log.info(
+        '[SystemCalendarSyncService][_findBoundCalendar] '
+        'Skip maintaining bound calendar from semester '
+        '$savedCalendarSemesterCode while current semester is '
+        '$currentSemesterCode.',
+      );
+      return null;
     }
 
-    await _clearCalendarBinding();
+    if (isBoundCalendarForCurrentSemester) {
+      await _clearCalendarBinding();
+    }
     return null;
   }
 
@@ -395,9 +441,11 @@ class SystemCalendarSyncService {
 
   Future<String?> _prepareCalendar({required bool onlyIfCalendarExists}) async {
     Calendar? exportedCalendar = await _findExportedCalendar();
+    bool shouldCreateCurrentSemesterCalendar =
+        !onlyIfCalendarExists || didSemesterChangeSinceLastBinding;
 
     if (exportedCalendar == null) {
-      if (onlyIfCalendarExists) {
+      if (!shouldCreateCurrentSemesterCalendar) {
         return null;
       }
       return await _createExportedCalendar();
