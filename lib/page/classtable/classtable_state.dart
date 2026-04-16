@@ -6,17 +6,18 @@ import 'dart:math' as math;
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:signals/signals.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/controller/other_experiment_controller.dart';
+import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -45,16 +46,27 @@ class ClassTableState extends InheritedWidget {
   }
 }
 
+enum ClassTableStatusSource {
+  classTable,
+  exam,
+  physicsExperiment,
+  otherExperiment,
+}
+
 /// The controllers and shared datas of the class table.
 class ClassTableWidgetState with ChangeNotifier {
   ///*******************************************************************///
   /// Hack on notifyListeners, do not fire when the widget is disposed. ///
   ///*******************************************************************///
   bool _disposed = false;
+  final List<EffectCleanup> _effectCleanup = [];
 
   @override
   void dispose() {
     _disposed = true;
+    for (final cleanup in _effectCleanup) {
+      cleanup();
+    }
     super.dispose();
   }
 
@@ -70,18 +82,51 @@ class ClassTableWidgetState with ChangeNotifier {
   /// ***************************///
 
   /// The controller...
-  final ClassTableController classTableController = Get.find();
-  final ExamController examController = Get.find();
-  final ExperimentController experimentController = Get.find();
+  final ClassTableController classTableController = ClassTableController.i;
+  final ExamController examController = ExamController.i;
+  final PhysicsExperimentController physicsExperimentController =
+      PhysicsExperimentController.i;
+  final OtherExperimentController otherExperimentController =
+      OtherExperimentController.i;
+  final WeekSwiftController weekSwiftController = WeekSwiftController.i;
+
+  void _initEffects() {
+    _effectCleanup.add(
+      effect(() {
+        classTableController.schoolClassTableStateSignal.value;
+        classTableController.classTableComputedSignal.value;
+        classTableController.isClassTableFromCacheComputedSignal.value;
+        classTableController.classTableCacheHintKeyComputedSignal.value;
+        examController.examInfoStateSignal.value;
+        examController.subjects.value;
+        examController.isExamFromCache.value;
+        examController.examCacheHintKey.value;
+        physicsExperimentController.physicsExperimentStateSignal.value;
+        physicsExperimentController.physicsExperiments.value;
+        physicsExperimentController.isPhysicsExperimentFromCache.value;
+        physicsExperimentController.physicsExperimentCacheHintKey.value;
+        otherExperimentController.otherExperimentStateSignal.value;
+        otherExperimentController.otherExperiments.value;
+        otherExperimentController.isOtherExperimentFromCache.value;
+        otherExperimentController.otherExperimentCacheHintKey.value;
+        weekSwiftController.weekSwiftSignal.value;
+        notifyListeners();
+      }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
+    );
+  }
 
   /// The length of the semester, the amount of the class table.
-  int get semesterLength => classTableController.classTableData.semesterLength;
-
-  /// The semester code.
-  String get semesterCode => classTableController.classTableData.semesterCode;
+  int get semesterLength =>
+      classTableController.classTableComputedSignal.value.semesterLength;
 
   /// The offset append to start day of the week.
-  final int offset = preference.getInt(preference.Preference.swift);
+  int get offset => weekSwiftController.weekSwiftSignal.value;
+
+  /// The semester code.
+  String get semesterCode =>
+      classTableController.classTableComputedSignal.value.semesterCode;
+
+  String get decorationName => ClassTableController.decorationName;
 
   ///*****************************///
   /// Following are dynamic data. ///
@@ -89,6 +134,99 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// If no class, a special page appears.
   bool get haveClass => timeArrangement.isNotEmpty && classDetail.isNotEmpty;
+
+  bool get isClassTableLoading =>
+      classTableController.schoolClassTableStateSignal.value.isLoading;
+
+  bool get hasClassTableLoadError =>
+      classTableController.schoolClassTableStateSignal.value is AsyncError;
+
+  bool get isClassTableFromCache =>
+      classTableController.isClassTableFromCacheComputedSignal.value;
+
+  String? get classTableCacheHintKey =>
+      classTableController.classTableCacheHintKeyComputedSignal.value;
+
+  DateTime? get classTableFetchTime =>
+      classTableController.classTableFetchTimeComputedSignal.value;
+
+  bool get isExamLoading => examController.examInfoStateSignal.value.isLoading;
+
+  bool get hasExamLoadError =>
+      examController.examInfoStateSignal.value is AsyncError;
+
+  bool get isExamFromCache => examController.isExamFromCache.value;
+
+  String? get examCacheHintKey => examController.examCacheHintKey.value;
+
+  bool get isPhysicsExperimentLoading =>
+      physicsExperimentController.physicsExperimentStateSignal.value.isLoading;
+
+  bool get hasPhysicsExperimentLoadError =>
+      physicsExperimentController.physicsExperimentStateSignal.value
+          is AsyncError;
+
+  bool get isPhysicsExperimentFromCache =>
+      physicsExperimentController.isPhysicsExperimentFromCache.value;
+
+  String? get physicsExperimentCacheHintKey =>
+      physicsExperimentController.physicsExperimentCacheHintKey.value;
+
+  bool get isOtherExperimentLoading =>
+      otherExperimentController.otherExperimentStateSignal.value.isLoading;
+
+  bool get hasOtherExperimentLoadError =>
+      otherExperimentController.otherExperimentStateSignal.value is AsyncError;
+
+  bool get isOtherExperimentFromCache =>
+      otherExperimentController.isOtherExperimentFromCache.value;
+
+  String? get otherExperimentCacheHintKey =>
+      otherExperimentController.otherExperimentCacheHintKey.value;
+
+  bool get hasExamArrangement => examController.hasExamArrangement.value;
+
+  bool get hasExperimentArrangement =>
+      physicsExperimentController.hasPhysicsExperimentArrangement.value ||
+      otherExperimentController.hasOtherExperimentArrangement.value;
+
+  List<ClassTableStatusSource> get loadingSources => [
+    if (isClassTableLoading) ClassTableStatusSource.classTable,
+    if (isExamLoading) ClassTableStatusSource.exam,
+    if (isPhysicsExperimentLoading) ClassTableStatusSource.physicsExperiment,
+    if (isOtherExperimentLoading) ClassTableStatusSource.otherExperiment,
+  ];
+
+  List<ClassTableStatusSource> get cacheSources => [
+    if (isClassTableFromCache) ClassTableStatusSource.classTable,
+    if (isExamFromCache) ClassTableStatusSource.exam,
+    if (isPhysicsExperimentFromCache) ClassTableStatusSource.physicsExperiment,
+    if (isOtherExperimentFromCache) ClassTableStatusSource.otherExperiment,
+  ];
+
+  List<ClassTableStatusSource> get errorWithoutCacheSources => [
+    if (hasClassTableLoadError) ClassTableStatusSource.classTable,
+    if (hasExamLoadError) ClassTableStatusSource.exam,
+    if (hasPhysicsExperimentLoadError) ClassTableStatusSource.physicsExperiment,
+    if (hasOtherExperimentLoadError) ClassTableStatusSource.otherExperiment,
+  ];
+
+  List<ClassTableStatusSource> get errorWithCacheSources => [
+    if (!hasClassTableLoadError &&
+        isClassTableFromCache &&
+        classTableCacheHintKey != null)
+      ClassTableStatusSource.classTable,
+    if (!hasExamLoadError && isExamFromCache && examCacheHintKey != null)
+      ClassTableStatusSource.exam,
+    if (!hasPhysicsExperimentLoadError &&
+        isPhysicsExperimentFromCache &&
+        physicsExperimentCacheHintKey != null)
+      ClassTableStatusSource.physicsExperiment,
+    if (!hasOtherExperimentLoadError &&
+        isOtherExperimentFromCache &&
+        otherExperimentCacheHintKey != null)
+      ClassTableStatusSource.otherExperiment,
+  ];
 
   /// Current showing week.
   int _chosenWeek = 0;
@@ -105,35 +243,41 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// The class details.
   List<ClassDetail> get classDetail =>
-      classTableController.classTableData.classDetail;
+      classTableController.classTableComputedSignal.value.classDetail;
 
   /// The classes without time arrangements.
   List<NotArrangementClassDetail> get notArranged =>
-      classTableController.classTableData.notArranged;
+      classTableController.classTableComputedSignal.value.notArranged;
 
   /// The time arrangements of the class details, use with [classDetail].
   List<TimeArrangement> get timeArrangement =>
-      classTableController.classTableData.timeArrangement;
+      classTableController.classTableComputedSignal.value.timeArrangement;
 
   /// The class change data.
   List<ClassChange> get classChange =>
-      classTableController.classTableData.classChanges;
+      classTableController.classTableComputedSignal.value.classChanges;
 
   /// The day the semester start, used to calculate the first day of the week.
-  DateTime get startDay =>
-      DateTime.parse(classTableController.classTableData.termStartDay);
+  DateTime get startDay => DateTime.parse(
+    classTableController.classTableComputedSignal.value.termStartDay,
+  );
 
   /// The currentWeek.
   final int currentWeek;
 
   /// The exam list.
-  List<Subject> get subjects => examController.data.subject;
+  List<Subject> get subjects => examController.subjects.value;
 
   /// The experiment list.
-  List<ExperimentData> get experiments => experimentController.data;
+  List<ExperimentData> get experiments => [
+    ...physicsExperimentController.physicsExperiments.value,
+    ...otherExperimentController.otherExperiments.value,
+  ];
 
   /// Get class detail by prividing index of timearrangement
-  ClassDetail getClassDetail(int index) => classTableController.classTableData
+  ClassDetail getClassDetail(int index) => classTableController
+      .classTableComputedSignal
+      .value
       .getClassDetail(timeArrangement[index]);
 
   /// Bridge function to add/del/edit user defined class
@@ -159,7 +303,7 @@ class ClassTableWidgetState with ChangeNotifier {
           .then((value) => notifyListeners());
 
   List<Event> get events => buildCalendarEvents(
-    classTableData: classTableController.classTableData,
+    classTableData: classTableController.classTableComputedSignal.value,
     subjects: subjects,
     experiments: experiments,
   );
@@ -179,17 +323,18 @@ class ClassTableWidgetState with ChangeNotifier {
   /// Update classtable infos
   Future<void> updateClasstable(BuildContext context) async {
     log.info("Updating time arrangement data...");
-    return await Future.wait([
-      classTableController.updateClassTable(isForce: true),
-      examController.get(),
-      experimentController.get(),
-    ]).then((value) async {
-      await maybeAutoSyncSystemCalendar();
-      notifyListeners();
-    });
+    await Future.wait([
+      classTableController.reloadClassTable(),
+      examController.reloadExamInfo(),
+      physicsExperimentController.reloadPhysicsExperiment(),
+      otherExperimentController.reloadOtherExperiment(),
+    ]);
+    await maybeAutoSyncSystemCalendar();
+    notifyListeners();
   }
 
   ClassTableWidgetState({required this.currentWeek}) {
+    _initEffects();
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {

@@ -1,159 +1,56 @@
-// Copyright 2023-2025 BenderBlog Rodriguez and contributors
-// Copyright 2025 Traintime PDA authors.
+// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:convert';
-import 'dart:io';
+import 'dart:async';
 
-import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
-import 'package:watermeter/bridge/save_to_groupid.g.dart';
-import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/repository/logger.dart';
-import 'package:get/get.dart';
+import 'package:signals/signals.dart';
+import 'package:watermeter/controller/global_timer_controller.dart';
+import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/controller/week_swift_controller.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
-import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
-enum ClassTableState { fetching, fetched, error, none }
+class ClassTableController {
+  static const decorationName = "decoration.jpg";
+  static final ClassTableController i = ClassTableController._();
+  bool _isReloading = false;
 
-class ClassTableController extends GetxController {
-  // Classtable state
-  String? error;
-  ClassTableState state = ClassTableState.none;
-
-  // Classtable Data
-  late File classTableFile;
-  late File userDefinedFile;
-  late ClassTableData classTableData;
-  late UserDefinedClassData userDefinedClassData;
-  /// Mark whether the classtable cache changed for system calendar sync.
-  bool _isClassTableChangedForSystemCalendarSync = false;
-
-  // Get ClassDetail name info
-  ClassDetail getClassDetail(TimeArrangement timeArrangementIndex) =>
-      classTableData.getClassDetail(timeArrangementIndex);
-
-  bool isTomorrow(DateTime updateTime) =>
-      updateTime.hour * 60 + updateTime.minute > 21 * 60 + 25;
-
-  int getCurrentWeek(DateTime now) {
-    // Get the current index.
-    int delta = now.difference(startDay).inDays;
-    if (delta < 0) delta = -7;
-    return delta ~/ 7;
-  }
-
-  /// Get all of [updateTime]'s arrangement in classtable
-  List<HomeArrangement> getArrangementOfDay(DateTime updateTime) {
-    DateFormat formatter = DateFormat(HomeArrangement.format);
-    int currentWeek = getCurrentWeek(updateTime);
-    Set<HomeArrangement> getArrangement = {};
-    if (currentWeek >= 0 && currentWeek < classTableData.semesterLength) {
-      for (var i in classTableData.timeArrangement) {
-        if (i.weekList.length > currentWeek &&
-            i.weekList[currentWeek] &&
-            i.day == updateTime.weekday) {
-          getArrangement.add(
-            HomeArrangement(
-              name: getClassDetail(i).name,
-              teacher: i.teacher,
-              place: i.classroom,
-              startTimeStr: formatter.format(
-                DateTime(
-                  updateTime.year,
-                  updateTime.month,
-                  updateTime.day,
-                  int.parse(timeList[(i.start - 1) * 2].split(':')[0]),
-                  int.parse(timeList[(i.start - 1) * 2].split(':')[1]),
-                ),
-              ),
-              endTimeStr: formatter.format(
-                DateTime(
-                  updateTime.year,
-                  updateTime.month,
-                  updateTime.day,
-                  int.parse(timeList[(i.stop - 1) * 2 + 1].split(':')[0]),
-                  int.parse(timeList[(i.stop - 1) * 2 + 1].split(':')[1]),
-                ),
-              ),
-            ),
-          );
-        }
-      }
+  ClassTableController._() {
+    final cache = ClassTableSession.getCache();
+    if (cache != null) {
+      final cached = FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: "local_cache_hint",
+      );
+      _lastValidSchoolClassTable.value = cached;
+      schoolClassTableStateSignal.value = AsyncState.data(cached);
     }
-
-    return getArrangement.toList();
+    _initEffects();
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    log.info(
-      "[ClassTableController][onInit] "
-      "Init classtable file.",
-    );
-    classTableFile = File(
-      "${supportPath.path}/${ClassTableFile.schoolClassName}",
-    );
-    bool classTableFileisExist = classTableFile.existsSync();
-    if (classTableFileisExist) {
-      log.info(
-        "[ClassTableController][onInit] "
-        "Init from cache.",
-      );
-      classTableData = ClassTableData.fromJson(
-        jsonDecode(classTableFile.readAsStringSync()),
-      );
-      state = ClassTableState.fetched;
-    } else {
-      log.info(
-        "[ClassTableController][onInit] "
-        "Init from empty.",
-      );
-      classTableData = ClassTableData();
-    }
+  SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
-    log.info(
-      "[ClassTableController][onInit] "
-      "Init user defined file.",
-    );
-    refreshUserDefinedClass();
-  }
-
-  @override
-  void onReady() async {
-    await updateClassTable();
-  }
-
-  void refreshUserDefinedClass() {
-    userDefinedFile = File(
-      "${supportPath.path}/${ClassTableFile.userDefinedClassName}",
-    );
-    bool userDefinedFileIsExist = userDefinedFile.existsSync();
-    if (!userDefinedFileIsExist) {
-      userDefinedFile.writeAsStringSync(
-        jsonEncode(UserDefinedClassData.empty()),
-      );
-    }
-    userDefinedClassData = UserDefinedClassData.fromJson(
-      jsonDecode(userDefinedFile.readAsStringSync()),
-    );
-  }
+  final userDefinedClassSignal = signal<UserDefinedClassData>(
+    UserDefinedClassFile.getUserDefinedClass(),
+  );
 
   Future<void> addUserDefinedClass(
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    userDefinedClassData.userDefinedDetail.add(classDetail);
-    timeArrangement.index = userDefinedClassData.userDefinedDetail.length - 1;
-    userDefinedClassData.timeArrangement.add(timeArrangement);
-    userDefinedFile.writeAsStringSync(
-      jsonEncode(userDefinedClassData.toJson()),
-    );
-    await updateClassTable(isUserDefinedChanged: true);
+    var toChange = userDefinedClassSignal.value;
+    toChange.userDefinedDetail.add(classDetail);
+    timeArrangement.index = toChange.userDefinedDetail.length - 1;
+    toChange.timeArrangement.add(timeArrangement);
+    UserDefinedClassFile.updateUserDefinedClass(toChange);
+    userDefinedClassSignal.value = toChange;
   }
 
   Future<void> editUserDefinedClass(
@@ -165,204 +62,244 @@ class ClassTableController extends GetxController {
         originalTimeArrangement.index != timeArrangement.index) {
       return;
     }
-    int timeArrangementIndex = userDefinedClassData.timeArrangement.indexOf(
+    var toChange = userDefinedClassSignal.value;
+    int timeArrangementIndex = toChange.timeArrangement.indexOf(
       originalTimeArrangement,
     );
-    userDefinedClassData.timeArrangement[timeArrangementIndex].weekList =
+    toChange.timeArrangement[timeArrangementIndex].weekList =
         timeArrangement.weekList;
-    userDefinedClassData.timeArrangement[timeArrangementIndex].teacher =
+    toChange.timeArrangement[timeArrangementIndex].teacher =
         timeArrangement.teacher;
-    userDefinedClassData.timeArrangement[timeArrangementIndex].day =
-        timeArrangement.day;
-    userDefinedClassData.timeArrangement[timeArrangementIndex].start =
+    toChange.timeArrangement[timeArrangementIndex].day = timeArrangement.day;
+    toChange.timeArrangement[timeArrangementIndex].start =
         timeArrangement.start;
-    userDefinedClassData.timeArrangement[timeArrangementIndex].stop =
-        timeArrangement.stop;
-    userDefinedClassData.timeArrangement[timeArrangementIndex].classroom =
+    toChange.timeArrangement[timeArrangementIndex].stop = timeArrangement.stop;
+    toChange.timeArrangement[timeArrangementIndex].classroom =
         timeArrangement.classroom;
 
     /// Update classDetail
     int classDetailIndex = originalTimeArrangement.index;
-    userDefinedClassData.userDefinedDetail[classDetailIndex].name =
-        classDetail.name;
-    userDefinedClassData.userDefinedDetail[classDetailIndex].code =
-        classDetail.code;
-    userDefinedClassData.userDefinedDetail[classDetailIndex].number =
-        classDetail.number;
+    toChange.userDefinedDetail[classDetailIndex].name = classDetail.name;
+    toChange.userDefinedDetail[classDetailIndex].code = classDetail.code;
+    toChange.userDefinedDetail[classDetailIndex].number = classDetail.number;
 
-    userDefinedFile.writeAsStringSync(
-      jsonEncode(userDefinedClassData.toJson()),
-    );
-    await updateClassTable(isUserDefinedChanged: true);
+    UserDefinedClassFile.updateUserDefinedClass(toChange);
+    userDefinedClassSignal.value = toChange;
   }
 
   Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) async {
     if (timeArrangement.source != Source.user) return;
+    var toChange = userDefinedClassSignal.value;
     int tempIndex = timeArrangement.index;
-    userDefinedClassData.timeArrangement.remove(timeArrangement);
-    userDefinedClassData.userDefinedDetail.removeAt(timeArrangement.index);
-    for (var i in userDefinedClassData.timeArrangement) {
+    toChange.timeArrangement.remove(timeArrangement);
+    toChange.userDefinedDetail.removeAt(timeArrangement.index);
+    for (var i in toChange.timeArrangement) {
       if (i.index >= tempIndex) i.index -= 1;
     }
-    userDefinedFile.writeAsStringSync(
-      jsonEncode(userDefinedClassData.toJson()),
-    );
-    await updateClassTable(isUserDefinedChanged: true);
+    UserDefinedClassFile.updateUserDefinedClass(toChange);
+    userDefinedClassSignal.value = toChange;
   }
 
-  /// The start day of the semester.
-  DateTime get startDay => DateTime.parse(
-    classTableData.termStartDay,
-  ).add(Duration(days: 7 * preference.getInt(preference.Preference.swift)));
+  final _lastValidSchoolClassTable = signal<FetchResult<ClassTableData>?>(null);
+  final schoolClassTableStateSignal =
+      signal<AsyncState<FetchResult<ClassTableData>>>(const AsyncLoading());
 
-  /// Read and clear the pending change mark for system calendar sync.
-  bool consumeClassTableChangeForSystemCalendarSync() {
-    bool toReturn = _isClassTableChangedForSystemCalendarSync;
-    _isClassTableChangedForSystemCalendarSync = false;
-    return toReturn;
+  void _initEffects() {
+    effect(() {
+      final semesterChangeEvent =
+          SemesterController.i.semesterSyncEventSignal.value;
+      if (semesterChangeEvent == null ||
+          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+        return;
+      }
+
+      _lastHandledSemesterSyncEvent = semesterChangeEvent;
+      if (semesterChangeEvent.didChange) {
+        _lastValidSchoolClassTable.value = null;
+        userDefinedClassSignal.value = UserDefinedClassData.empty();
+        ClassTableSession.deleteCache();
+        UserDefinedClassFile.clearUserDefinedClass();
+      }
+      unawaited(reloadClassTable());
+      log.info(
+        "[ClassTableController][_initEffects] "
+        "${semesterChangeEvent.didChange ? "Clear user defined classtable because semester changed" : "Reload classtable because semester synced"} "
+        "from ${semesterChangeEvent.oldSemester} "
+        "to ${semesterChangeEvent.effectiveSemester}.",
+      );
+    }, debugLabel: "ClassTableControllerSemesterChangeEffect");
   }
 
-  Future<void> updateClassTable({
-    bool isForce = false,
-    bool isUserDefinedChanged = false,
-  }) async {
-    state = ClassTableState.fetching;
-    error = null;
+  Future<void> reloadClassTable() async {
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = _lastValidSchoolClassTable.value;
+    schoolClassTableStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
     try {
-      log.info(
-        "[ClassTableController][updateClassTable] "
-        "Start fetching the classtable.",
+      final result = await getClassTable(
+        SemesterController.i.semesterSignal.value,
       );
-
-      refreshUserDefinedClass();
-      bool isClassTableChangedForSystemCalendarSync = false;
-      bool classTableFileIsExist = classTableFile.existsSync();
-      String? originalClassTableStr;
-      bool isNotNeedRefreshCache =
-          classTableFileIsExist &&
-          !isForce &&
-          DateTime.now().difference(classTableFile.lastModifiedSync()).inDays <=
-              2;
-      bool isEmptyCache = false;
-      if (classTableFileIsExist) {
-        originalClassTableStr = classTableFile.readAsStringSync();
-        classTableData = ClassTableData.fromJson(
-          jsonDecode(originalClassTableStr),
-        );
-        classTableData.userDefinedDetail =
-            userDefinedClassData.userDefinedDetail;
-        classTableData.timeArrangement.addAll(
-          userDefinedClassData.timeArrangement,
-        );
-        isEmptyCache =
-            classTableData.classDetail.isEmpty ||
-            classTableData.timeArrangement.isEmpty;
-      }
-
-      log.info(
-        "[ClassTableController][updateClassTable]"
-        "Cache file exist: $classTableFileIsExist.\n"
-        "Is not need refresh cache: $isNotNeedRefreshCache\n"
-        "Is user class changed: $isUserDefinedChanged\n"
-        "Is cache empty: $isEmptyCache",
-      );
-
-      if (isEmptyCache || (!isNotNeedRefreshCache && !isUserDefinedChanged)) {
-        try {
-          bool isPostGraduate = preference.getBool(preference.Preference.role);
-          var toUse = isPostGraduate
-              ? await ClassTableFile().getYjspt()
-              : await ClassTableFile().getEhall();
-          String newClassTableStr = jsonEncode(toUse.toJson());
-          isClassTableChangedForSystemCalendarSync =
-              originalClassTableStr != newClassTableStr;
-          classTableFile.writeAsStringSync(newClassTableStr);
-          toUse.userDefinedDetail = userDefinedClassData.userDefinedDetail;
-          toUse.timeArrangement.addAll(userDefinedClassData.timeArrangement);
-          classTableData = toUse;
-        } catch (e, s) {
-          log.handle(e, s);
-          if (classTableFileIsExist) {
-            classTableData = ClassTableData.fromJson(
-              jsonDecode(classTableFile.readAsStringSync()),
-            );
-            classTableData.userDefinedDetail =
-                userDefinedClassData.userDefinedDetail;
-            classTableData.timeArrangement.addAll(
-              userDefinedClassData.timeArrangement,
-            );
-          } else {
-            rethrow;
-          }
-        }
-      }
-
-      /// If ios, store the file to groupid public place
-      /// in order to refresh the widget...
-      if (Platform.isIOS) {
-        final api = SaveToGroupIdSwiftApi();
-        try {
-          bool data = await api.saveToGroupId(
-            FileToGroupID(
-              appid: preference.appId,
-              fileName: "ClassTable.json",
-              data: jsonEncode(classTableData.toJson()),
-            ),
-          );
-          log.info(
-            "[ClassTableController][updateClassTable] "
-            "ios ClassTable.json save to public place status: $data.",
-          );
-        } catch (e, s) {
-          log.handle(e, s);
-        }
-        try {
-          bool data = await api.saveToGroupId(
-            FileToGroupID(
-              appid: preference.appId,
-              fileName: "WeekSwift.txt",
-              data: preference.getInt(preference.Preference.swift).toString(),
-            ),
-          );
-          log.info(
-            "[ClassTableController][updateClassTable] "
-            "ios WeekSwift.txt save to public place status: $data.",
-          );
-        } catch (e, s) {
-          log.handle(e, s);
-        }
-        HomeWidget.updateWidget(
-          iOSName: "ClasstableWidget",
-          qualifiedAndroidName:
-              "io.github.benderblog.traintime_pda."
-              "widget.classtable.ClassTableWidgetProvider",
-        );
-      }
-
-      _isClassTableChangedForSystemCalendarSync =
-          _isClassTableChangedForSystemCalendarSync ||
-          isClassTableChangedForSystemCalendarSync;
-      state = ClassTableState.fetched;
-      error = null;
-      update();
+      _lastValidSchoolClassTable.value = result;
+      schoolClassTableStateSignal.value = AsyncState.data(result);
     } catch (e, s) {
-      log.warning(e, s);
-      state = ClassTableState.error;
-      error = e.toString();
+      schoolClassTableStateSignal.value = AsyncState.error(e, s);
+      log.handle(
+        e,
+        s,
+        "[ClassTableControllerNew][reloadClassTable] Have issue",
+      );
+    } finally {
+      _isReloading = false;
     }
   }
 
-  Map<String, int> get numberOfClass {
-    Map<String, int> toReturn = {};
-    for (var i in classTableData.timeArrangement) {
-      String nameOfClass = classTableData.getClassDetail(i).name;
-      int numberOfClass = i.weekList.where((ok) => ok).length;
-      if (toReturn[nameOfClass] == null) {
-        toReturn[nameOfClass] = numberOfClass;
-      } else {
-        toReturn[nameOfClass] = toReturn[nameOfClass]! + numberOfClass;
-      }
-    }
-    return toReturn;
+  late final schoolClassTableComputedSignal = computed<ClassTableData>(
+    () => _lastValidSchoolClassTable.value?.data ?? ClassTableData(),
+  );
+
+  late final classTableComputedSignal = computed<ClassTableData>(() {
+    final networkClassTable = schoolClassTableComputedSignal.value;
+    final userDefinedClass = userDefinedClassSignal.value;
+
+    return ClassTableData(
+      semesterLength: networkClassTable.semesterLength,
+      semesterCode: networkClassTable.semesterCode,
+      termStartDay: networkClassTable.termStartDay,
+      classDetail: List<ClassDetail>.from(networkClassTable.classDetail),
+      userDefinedDetail: List<ClassDetail>.from(
+        userDefinedClass.userDefinedDetail,
+      ),
+      notArranged: List<NotArrangementClassDetail>.from(
+        networkClassTable.notArranged,
+      ),
+      timeArrangement: List<TimeArrangement>.from(
+        networkClassTable.timeArrangement,
+      )..addAll(userDefinedClass.timeArrangement),
+      classChanges: List<ClassChange>.from(networkClassTable.classChanges),
+    );
+  });
+
+  late final isClassTableFromCacheComputedSignal = computed(
+    () => _lastValidSchoolClassTable.value?.isCache ?? false,
+  );
+
+  late final classTableFetchTimeComputedSignal = computed<DateTime?>(
+    () => _lastValidSchoolClassTable.value?.fetchTime,
+  );
+
+  late final hasValidClassInfo = computed(
+    () =>
+        classTableFetchTimeComputedSignal.value != null ||
+        classTableComputedSignal.value.classDetail.isNotEmpty ||
+        classTableComputedSignal.value.timeArrangement.isNotEmpty,
+  );
+
+  late final classTableCacheHintKeyComputedSignal = computed<String?>(
+    () => _lastValidSchoolClassTable.value?.hintKey,
+  );
+
+  late final startDayComputedSignal = computed<DateTime?>(() {
+    final termStartDay = classTableComputedSignal.value.termStartDay;
+    final weekSwift = WeekSwiftController.i.weekSwiftSignal.value;
+    if (termStartDay.isEmpty) return null;
+
+    return DateTime.parse(termStartDay).add(Duration(days: 7 * weekSwift));
+  });
+
+  int getCurrentWeek(DateTime time) {
+    final startDay = startDayComputedSignal.value;
+    if (startDay == null) return -1;
+
+    int delta = time.difference(startDay).inDays;
+    if (delta < 0) delta = -7;
+    return delta ~/ 7;
   }
+
+  late final currentWeekComputedSignal = computed<int>(() {
+    return getCurrentWeek(GlobalTimerController.i.currentTimeSignal.value);
+  });
+
+  ClassDetail getClassDetail(TimeArrangement timeArrangementIndex) =>
+      classTableComputedSignal.value.getClassDetail(timeArrangementIndex);
+
+  List<HomeArrangement> getArrangementOfDay(DateTime updateTime) {
+    final formatter = DateFormat(HomeArrangement.format);
+    final currentWeek = currentWeekComputedSignal.value;
+    final classTableData = classTableComputedSignal.value;
+    final arrangementSet = <HomeArrangement>{};
+
+    if (currentWeek < 0 || currentWeek >= classTableData.semesterLength) {
+      return const <HomeArrangement>[];
+    }
+
+    for (final arrangement in classTableData.timeArrangement) {
+      if (arrangement.weekList.length <= currentWeek ||
+          !arrangement.weekList[currentWeek] ||
+          arrangement.day != updateTime.weekday) {
+        continue;
+      }
+
+      arrangementSet.add(
+        HomeArrangement(
+          name: getClassDetail(arrangement).name,
+          teacher: arrangement.teacher,
+          place: arrangement.classroom,
+          startTimeStr: formatter.format(
+            DateTime(
+              updateTime.year,
+              updateTime.month,
+              updateTime.day,
+              int.parse(timeList[(arrangement.start - 1) * 2].split(':')[0]),
+              int.parse(timeList[(arrangement.start - 1) * 2].split(':')[1]),
+            ),
+          ),
+          endTimeStr: formatter.format(
+            DateTime(
+              updateTime.year,
+              updateTime.month,
+              updateTime.day,
+              int.parse(timeList[(arrangement.stop - 1) * 2 + 1].split(':')[0]),
+              int.parse(timeList[(arrangement.stop - 1) * 2 + 1].split(':')[1]),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final result = arrangementSet.toList();
+    result.sort((a, b) => a.startTime.compareTo(b.startTime));
+    return result;
+  }
+
+  late final arrangementOfTodayComputedSignal = computed<List<HomeArrangement>>(
+    () => getArrangementOfDay(GlobalTimerController.i.currentTimeSignal.value),
+  );
+
+  late final arrangementOfTomorrowComputedSignal =
+      computed<List<HomeArrangement>>(
+        () => getArrangementOfDay(
+          GlobalTimerController.i.currentTimeSignal.value.add(
+            const Duration(days: 1),
+          ),
+        ),
+      );
+
+  late final numberOfClassComputedSignal = computed<Map<String, int>>(() {
+    final toReturn = <String, int>{};
+    final classTableData = classTableComputedSignal.value;
+
+    for (final arrangement in classTableData.timeArrangement) {
+      final className = classTableData.getClassDetail(arrangement).name;
+      final classCount = arrangement.weekList.where((ok) => ok).length;
+      toReturn.update(
+        className,
+        (value) => value + classCount,
+        ifAbsent: () => classCount,
+      );
+    }
+
+    return toReturn;
+  });
 }

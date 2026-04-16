@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // From https://blog.csdn.net/zl18603543572/article/details/125757856
-
+/*
 import 'dart:async';
 import 'package:flutter/material.dart';
 
@@ -67,3 +67,4 @@ class _MarqueeWidgetState extends State<MarqueeWidget> {
     _timer.cancel();
   }
 }
+*/

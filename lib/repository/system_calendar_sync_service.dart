@@ -2,13 +2,15 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:convert';
+
 import 'package:device_calendar/device_calendar.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/controller/other_experiment_controller.dart';
+import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -23,6 +25,17 @@ String buildExportedClassTableCalendarName(String semesterCode) =>
     semesterCode.isEmpty
         ? exportedClassTableCalendarPrefix
         : '$exportedClassTableCalendarPrefix $semesterCode';
+
+/// Build a stable snapshot used to decide whether auto sync is needed.
+String buildSystemCalendarSnapshot({
+  required ClassTableData classTableData,
+  required List<Subject> subjects,
+  required List<ExperimentData> experiments,
+}) => jsonEncode({
+  'classTableData': classTableData.toJson(),
+  'subjects': subjects.map((item) => item.toJson()).toList(),
+  'experiments': experiments.map((item) => item.toJson()).toList(),
+});
 
 List<Event> buildCalendarEvents({
   required ClassTableData classTableData,
@@ -229,19 +242,39 @@ END:VTIMEZONE
 class SystemCalendarSyncService {
   final DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
 
-  ClassTableController get classTableController => Get.find();
-  ExamController get examController => Get.find();
-  ExperimentController get experimentController => Get.find();
+  ClassTableController get classTableController => ClassTableController.i;
+  ExamController get examController => ExamController.i;
+  PhysicsExperimentController get physicsExperimentController =>
+      PhysicsExperimentController.i;
+  OtherExperimentController get otherExperimentController =>
+      OtherExperimentController.i;
 
   String get calendarName => buildExportedClassTableCalendarName(
-    classTableController.classTableData.semesterCode,
+    classTableController.classTableComputedSignal.value.semesterCode,
   );
 
+  List<ExperimentData> get experiments => [
+    ...physicsExperimentController.physicsExperiments.value,
+    ...otherExperimentController.otherExperiments.value,
+  ];
+
   List<Event> get events => buildCalendarEvents(
-    classTableData: classTableController.classTableData,
-    subjects: examController.data.subject,
-    experiments: experimentController.data,
+    classTableData: classTableController.classTableComputedSignal.value,
+    subjects: examController.subjects.value,
+    experiments: experiments,
   );
+
+  String get snapshot => buildSystemCalendarSnapshot(
+    classTableData: classTableController.classTableComputedSignal.value,
+    subjects: examController.subjects.value,
+    experiments: experiments,
+  );
+
+  bool get canAutoSync =>
+      preference.getString(preference.Preference.systemCalendarId).isNotEmpty &&
+      preference.getString(preference.Preference.systemCalendarSnapshot) !=
+          snapshot &&
+      classTableController.hasValidClassInfo.value;
 
   Future<bool> _ensureCalendarPermission({
     required bool requestPermissionsIfNeeded,
@@ -263,14 +296,22 @@ class SystemCalendarSyncService {
     return hasPermitted.data == true;
   }
 
-  Future<void> _saveCalendarId(String calendarId) async {
+  Future<void> _saveCalendarBinding(String calendarId) async {
     await preference.setString(
       preference.Preference.systemCalendarId,
       calendarId,
     );
   }
 
-  Future<void> _clearCalendarId() async {
+  Future<void> _saveCalendarSyncState(String calendarId) async {
+    await _saveCalendarBinding(calendarId);
+    await preference.setString(
+      preference.Preference.systemCalendarSnapshot,
+      snapshot,
+    );
+  }
+
+  Future<void> _clearCalendarBinding() async {
     await preference.remove(preference.Preference.systemCalendarId);
   }
 
@@ -279,45 +320,68 @@ class SystemCalendarSyncService {
         name.startsWith(exportedClassTableCalendarPrefix);
   }
 
-  /// Find the exported calendar by saved id, fixed name or legacy name.
-  Future<Calendar?> _findExportedCalendar() async {
+  Future<List<Calendar>?> _retrieveWritableCalendars() async {
     final calendarResult = await deviceCalendarPlugin.retrieveCalendars();
     if (!calendarResult.isSuccess || calendarResult.data == null) {
       log.info(
-        '[SystemCalendarSyncService][_findExportedCalendar] '
+        '[SystemCalendarSyncService][_retrieveWritableCalendars] '
         'Retrieve calendars failed.',
       );
       return null;
     }
 
+    return calendarResult.data!
+        .where((calendar) => calendar.isReadOnly != true)
+        .toList();
+  }
+
+  Future<Calendar?> _findBoundCalendar(List<Calendar> calendars) async {
     String savedCalendarId = preference.getString(
       preference.Preference.systemCalendarId,
     );
-
-    if (savedCalendarId.isNotEmpty) {
-      for (var i in calendarResult.data!) {
-        if (i.id == savedCalendarId && i.isReadOnly != true) {
-          return i;
-        }
-      }
-      await _clearCalendarId();
+    if (savedCalendarId.isEmpty) {
+      return null;
     }
 
-    for (var i in calendarResult.data!) {
-      if (i.name == calendarName && i.isReadOnly != true) {
-        if (i.id != null && i.id!.isNotEmpty) {
-          await _saveCalendarId(i.id!);
-        }
-        return i;
+    for (var calendar in calendars) {
+      if (calendar.id == savedCalendarId) {
+        return calendar;
       }
     }
 
-    for (var i in calendarResult.data!) {
-      if (_isLegacyCalendarName(i.name ?? '') && i.isReadOnly != true) {
-        if (i.id != null && i.id!.isNotEmpty) {
-          await _saveCalendarId(i.id!);
-        }
-        return i;
+    await _clearCalendarBinding();
+    return null;
+  }
+
+  /// Find the exported calendar by saved id or compatible old naming rules.
+  Future<Calendar?> _findExportedCalendar({
+    required bool allowLegacyLookup,
+  }) async {
+    final calendars = await _retrieveWritableCalendars();
+    if (calendars == null) {
+      return null;
+    }
+
+    final boundCalendar = await _findBoundCalendar(calendars);
+    if (boundCalendar != null || !allowLegacyLookup) {
+      return boundCalendar;
+    }
+
+    for (var calendar in calendars) {
+      if (calendar.name == calendarName &&
+          calendar.id != null &&
+          calendar.id!.isNotEmpty) {
+        await _saveCalendarBinding(calendar.id!);
+        return calendar;
+      }
+    }
+
+    for (var calendar in calendars) {
+      if (_isLegacyCalendarName(calendar.name ?? '') &&
+          calendar.id != null &&
+          calendar.id!.isNotEmpty) {
+        await _saveCalendarBinding(calendar.id!);
+        return calendar;
       }
     }
 
@@ -338,12 +402,13 @@ class SystemCalendarSyncService {
       return null;
     }
 
-    await _saveCalendarId(calendarIdData.data!);
     return calendarIdData.data!;
   }
 
   Future<String?> _prepareCalendar({required bool onlyIfCalendarExists}) async {
-    Calendar? exportedCalendar = await _findExportedCalendar();
+    Calendar? exportedCalendar = await _findExportedCalendar(
+      allowLegacyLookup: !onlyIfCalendarExists,
+    );
 
     if (exportedCalendar == null) {
       if (onlyIfCalendarExists) {
@@ -360,7 +425,6 @@ class SystemCalendarSyncService {
       return null;
     }
 
-    // Recreate the exported calendar to replace the previous exported events.
     Result<bool> deleteResult = await deviceCalendarPlugin.deleteCalendar(
       exportedCalendar.id!,
     );
@@ -372,7 +436,7 @@ class SystemCalendarSyncService {
       return null;
     }
 
-    await _clearCalendarId();
+    await _clearCalendarBinding();
     return await _createExportedCalendar();
   }
 
@@ -420,7 +484,11 @@ class SystemCalendarSyncService {
         return false;
       }
 
-      return await _writeEventsToCalendar(calendarId);
+      bool didWrite = await _writeEventsToCalendar(calendarId);
+      if (didWrite) {
+        await _saveCalendarSyncState(calendarId);
+      }
+      return didWrite;
     } catch (e, s) {
       log.handle(e, s);
       return false;
@@ -428,15 +496,16 @@ class SystemCalendarSyncService {
   }
 }
 
-/// Auto sync only when classtable changed and exported calendar exists.
+/// Auto sync only when the exported payload changed and the bound calendar
+/// still exists.
 Future<void> maybeAutoSyncSystemCalendar() async {
   try {
-    final classTableController = Get.find<ClassTableController>();
-    if (!classTableController.consumeClassTableChangeForSystemCalendarSync()) {
+    final service = SystemCalendarSyncService();
+    if (!service.canAutoSync) {
       return;
     }
 
-    await SystemCalendarSyncService().syncSystemCalendar(
+    await service.syncSystemCalendar(
       requestPermissionsIfNeeded: false,
       onlyIfCalendarExists: true,
     );

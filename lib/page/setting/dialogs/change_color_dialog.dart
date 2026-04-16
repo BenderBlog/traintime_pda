@@ -6,7 +6,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
@@ -33,7 +32,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                 .setInt(preference.Preference.color, value!)
                 .then(
                   (value) => setState(() {
-                    Get.put(ThemeController()).updateTheme();
+                    ThemeController.i.updateTheme();
                   }),
                 );
           },

@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -25,7 +26,6 @@ import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:home_widget/home_widget.dart';
 
@@ -98,7 +98,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeController appTheme = Get.put(ThemeController());
+  final ThemeController appTheme = ThemeController.i;
 
   @override
   void initState() {
@@ -132,10 +132,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ThemeController>(
-      builder: (c) => MaterialApp(
+    return Watch((context) {
+      final color = appTheme.colorSignal.value;
+      final themeMode = appTheme.colorStateSignal.value;
+      final i18nDelegate = appTheme.i18nDelegateSignal.value;
+
+      return MaterialApp(
         localizationsDelegates: [
-          c.getI18nDelegate(),
+          i18nDelegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -152,7 +156,7 @@ class _MyAppState extends State<MyApp> {
             ? "XDYou"
             : 'Traintime PDA',
         theme: FlexThemeData.light(
-          colors: c.color.first,
+          colors: color.first,
           usedColors: 1,
           surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
           blendLevel: 2,
@@ -229,7 +233,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ).useSystemChineseFont(Brightness.light),
         darkTheme: FlexThemeData.dark(
-          colors: c.color.last,
+          colors: color.last,
           usedColors: 1,
           surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
           blendLevel: 2,
@@ -304,7 +308,7 @@ class _MyAppState extends State<MyApp> {
             applyThemeToAll: true,
           ),
         ).useSystemChineseFont(Brightness.dark),
-        themeMode: c.colorState,
+        themeMode: themeMode,
         home: DefaultTextStyle.merge(
           style: const TextStyle(textBaseline: TextBaseline.ideographic),
           child: widget.isFirst ? const LoginWindow() : const HomePage(),
@@ -319,8 +323,8 @@ class _MyAppState extends State<MyApp> {
           if (widget != null) return widget;
           throw StateError('widget is null');
         },
-      ),
-    );
+      );
+    });
   }
 }
 

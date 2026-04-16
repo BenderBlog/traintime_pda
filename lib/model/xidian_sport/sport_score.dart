@@ -35,9 +35,13 @@ class SportScoreOfYear {
 }
 
 class SportScore {
-  String? situation;
   String total = "0.0";
   String rank = "";
   String detail = "";
   List<SportScoreOfYear> list = [];
+
+  bool get isFourYearsComplete => list.length >= 4;
+  bool get isQualified => !rank.contains("不");
+  String get scoreRankI18nStr =>
+      list.length < 4 ? "class_attendance.course_state.unknown" : rank;
 }

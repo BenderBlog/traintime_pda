@@ -5,19 +5,104 @@
 // The exam source.
 // Thanks xidian-script and libxdauth!
 
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+
+String _cacheHintFromError(Object error) {
+  if (error is PasswordWrongException) {
+    return "exam.cache_hint_password_wrong";
+  }
+  if (error is LoginFailedException) {
+    return "exam.cache_hint_login_failed";
+  }
+  if (error is DioException) {
+    return "exam.cache_hint_network_failed";
+  }
+  return "exam.cache_hint_unknown_error";
+}
+
+Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
+  try {
+    ExamData data = pref.getBool(pref.Preference.role)
+        ? await ExamSession().getExamYjspt(semester)
+        : await ExamSession().getExamEhall(semester);
+    DateTime fetchTime = DateTime.now();
+    await ExamSession.updateCacheAndGroup(data);
+    return FetchResult.fresh(fetchTime: fetchTime, data: data);
+  } catch (e, s) {
+    log.handle(e, s, "[getScoreInfo] Have issue");
+    (DateTime, ExamData)? cache = ExamSession.getCache();
+    if (cache != null) {
+      return FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: _cacheHintFromError(e),
+      );
+    }
+    rethrow;
+  }
+}
 
 /// 考试安排 4768687067472349
 class ExamSession extends EhallSession {
-  Future<ExamData> getExamYjspt() async {
-    String semester = pref.getString(pref.Preference.currentSemester);
+  static const examDataCacheName = "exam.json";
+  static const examDataGroupFileName = "ExamFile.json";
+  static File examDataCache = File("${supportPath.path}/$examDataCacheName");
+  static bool get isCacheExist => examDataCache.existsSync();
 
+  static void deleteCache() {
+    if (examDataCache.existsSync()) {
+      examDataCache.deleteSync();
+    }
+  }
+
+  static Future<void> updateCacheAndGroup(ExamData data) async {
+    await examDataCache.writeAsString(jsonEncode(data.toJson()));
+    if (Platform.isIOS) {
+      final api = SaveToGroupIdSwiftApi();
+      try {
+        bool result = await api.saveToGroupId(
+          FileToGroupID(
+            appid: pref.appId,
+            fileName: "ExamFile.json",
+            data: jsonEncode(data.toJson()),
+          ),
+        );
+        log.info(
+          "[ExamSession][updateCacheAndGroup] "
+          "ios Save to public place status: $result.",
+        );
+      } catch (e, s) {
+        log.handle(e, s);
+      }
+    }
+  }
+
+  static (DateTime, ExamData)? getCache() {
+    try {
+      ExamData toReturn = ExamData.fromJson(
+        jsonDecode(examDataCache.readAsStringSync()),
+      );
+      DateTime fetchTime = examDataCache.lastModifiedSync();
+      return (fetchTime, toReturn);
+    } catch (e, s) {
+      log.handle(e, s);
+      return null;
+    }
+  }
+
+  Future<ExamData> getExamYjspt(String semester) async {
     String? location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/*default/index.do",
       sliderCaptcha: (String cookieStr) =>
@@ -67,15 +152,13 @@ class ExamSession extends EhallSession {
     return ExamData(subject: subject, toBeArranged: []);
   }
 
-  Future<ExamData> getExamEhall() async {
+  Future<ExamData> getExamEhall(String semester) async {
     String? location = await useApp("4768687067472349");
     while (location != null) {
       var response = await dio.get(location);
       log.info("[ExamFile][getExamEhall] Received location: $location.");
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
-
-    String semester = pref.getString(pref.Preference.currentSemester);
 
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)

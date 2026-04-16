@@ -89,24 +89,27 @@ class ScoreComposeCard extends Dialog {
             ),
           );
         }
-        return ReXCard(
-          title: Text(score.name),
-          remaining: [ReXCardRemaining(score.semesterCode)],
-          bottomRow: [
-            [
-              Text(
-                "${FlutterI18n.translate(context, "score.score_compose_card.credit")}: ${score.credit}",
-              ).expanded(flex: 2),
-              Text(
-                "${FlutterI18n.translate(context, "score.score_compose_card.gpa")}: ${score.gpa}",
-              ).expanded(flex: 3),
-              Text(
-                "${FlutterI18n.translate(context, "score.score_compose_card.score")}: ${score.scoreStr}",
-              ).expanded(flex: 3),
-            ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
-            const SizedBox(height: 8),
-            info,
-          ].toColumn(crossAxisAlignment: CrossAxisAlignment.center),
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 400),
+          child: ReXCard(
+            title: Text(score.name),
+            remaining: [ReXCardRemaining(score.semesterCode)],
+            bottomRow: [
+              [
+                Text(
+                  "${FlutterI18n.translate(context, "score.score_compose_card.credit")}: ${score.credit}",
+                ).expanded(flex: 2),
+                Text(
+                  "${FlutterI18n.translate(context, "score.score_compose_card.gpa")}: ${score.gpa}",
+                ).expanded(flex: 3),
+                Text(
+                  "${FlutterI18n.translate(context, "score.score_compose_card.score")}: ${score.scoreStr}",
+                ).expanded(flex: 3),
+              ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
+              const SizedBox(height: 8),
+              info,
+            ].toColumn(crossAxisAlignment: CrossAxisAlignment.center),
+          ),
         );
       },
     );

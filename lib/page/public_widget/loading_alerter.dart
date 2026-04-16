@@ -29,9 +29,13 @@ class LoadingAlerter extends StatefulWidget {
     super.key,
     required this.isLoading,
     required this.hint,
+    this.showAnimation = true,
     this.showOverlay = true,
     this.opacity = 0.3,
-  });
+  }) : assert(
+         !showOverlay || showAnimation,
+         "showAnimation cannot be false when showOverlay is true.",
+       );
 
   /// Whether to display the loading alert banner.
   ///
@@ -58,6 +62,12 @@ class LoadingAlerter extends StatefulWidget {
   /// Ranges from 0.0 (fully transparent) to 1.0 (fully opaque).
   final double opacity;
 
+  /// Whether to show animation.
+  ///
+  /// When true, a slide animation is shown, with [Positioned].
+  /// It cannot be false when [showOverlay] is true.
+  final bool showAnimation;
+
   @override
   State<LoadingAlerter> createState() => _LoadingAlerterState();
 }
@@ -76,21 +86,17 @@ class _LoadingAlerterState extends State<LoadingAlerter>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: widget.opacity,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.0, -1.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut, 
-    ));
-    
+    _opacityAnimation = Tween<double>(begin: 0.0, end: widget.opacity).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0.0, -1.0), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
     _animationController.addStatusListener((status) {
       if (status == AnimationStatus.dismissed) {
         setState(() {
@@ -98,7 +104,7 @@ class _LoadingAlerterState extends State<LoadingAlerter>
         });
       }
     });
-    
+
     if (widget.isLoading) {
       _shouldShow = true;
       _animationController.forward();
@@ -119,13 +125,13 @@ class _LoadingAlerterState extends State<LoadingAlerter>
       }
     }
     if (widget.opacity != oldWidget.opacity) {
-      _opacityAnimation = Tween<double>(
-        begin: 0.0,
-        end: widget.opacity,
-      ).animate(CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ));
+      _opacityAnimation = Tween<double>(begin: 0.0, end: widget.opacity)
+          .animate(
+            CurvedAnimation(
+              parent: _animationController,
+              curve: Curves.easeInOut,
+            ),
+          );
     }
   }
 
@@ -143,45 +149,48 @@ class _LoadingAlerterState extends State<LoadingAlerter>
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-  
+
+    final sizedBox = SizedBox(
+      height: kTextTabBarHeight,
+      child: Container(
+        decoration: DecoratedBox(
+          decoration: BoxDecoration(color: colorScheme.errorContainer),
+        ).decoration,
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.hint,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onErrorContainer,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                color: colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!widget.showAnimation) {
+      return sizedBox;
+    }
+
     final alertBar = Positioned(
       top: 0,
       left: 0,
       right: 0,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: SizedBox(
-          height: kTextTabBarHeight,
-          child: Container(
-            decoration: DecoratedBox(decoration: BoxDecoration(
-              color: colorScheme.errorContainer,
-            )).decoration,
-            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.hint,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onErrorContainer,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: SlideTransition(position: _slideAnimation, child: sizedBox),
     );
 
     if (!widget.showOverlay) {
@@ -198,7 +207,9 @@ class _LoadingAlerterState extends State<LoadingAlerter>
               animation: _opacityAnimation,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withAlpha((_opacityAnimation.value * 255).toInt()),
+                  color: Colors.black.withAlpha(
+                    (_opacityAnimation.value * 255).toInt(),
+                  ),
                 );
               },
             ),

@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/page/schoolnet/current_login_user_net_info.dart';
-import 'package:watermeter/page/schoolnet/ids_account_net_info.dart';
+import 'package:watermeter/page/schoolnet/current_net_info_page.dart';
+import 'package:watermeter/page/schoolnet/general_network_usage_page.dart';
 
 class NetworkCardWindow extends StatefulWidget {
   const NetworkCardWindow({super.key});
@@ -41,7 +41,7 @@ class _NetworkCardWindowState extends State<NetworkCardWindow> {
           ),
         ),
         body: const TabBarView(
-          children: <Widget>[IdsAccountNetInfo(), CurrentLoginUserNetInfo()],
+          children: <Widget>[GeneralNetworkUsagePage(), CurrentNetInfoPage()],
         ),
       ),
     );

@@ -10,154 +10,170 @@ import 'dart:typed_data';
 import 'package:html/parser.dart';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-
-Rx<SessionState> isInit = SessionState.none.obs;
-RxString money = "".obs;
-RxString errorSession = "".obs;
 
 class SchoolCardSession extends IDSSession {
   static String openid = "";
+  static DateTime? _openidFetchedAt;
+  static const Duration _openidValidDuration = Duration(minutes: 5);
+
+  bool get _isOpenIdValid =>
+      openid.isNotEmpty &&
+      _openidFetchedAt != null &&
+      DateTime.now().difference(_openidFetchedAt!) < _openidValidDuration;
+
+  Future<void> _ensureOpenId({bool forceRefresh = false}) async {
+    if (!forceRefresh && _isOpenIdValid) return;
+
+    openid = "";
+    _openidFetchedAt = null;
+
+    var response = await dio.get(
+      "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
+    );
+    while (response.headers[HttpHeaders.locationHeader] != null) {
+      String location = response.headers[HttpHeaders.locationHeader]![0];
+      log.info(
+        "[SchoolCardSession][_ensureOpenId] "
+        "Received location: $location.",
+      );
+      response = await dio.get(location);
+    }
+    var page = parse(response.data);
+
+    var getOpenId = page.getElementsByTagName('input');
+    for (var i in getOpenId) {
+      if (i.id == "openid" && i.attributes["type"] == "hidden") {
+        openid = i.attributes["value"]!;
+        break;
+      }
+    }
+
+    if (openid.isEmpty) {
+      throw Exception("School card openid not found.");
+    }
+    _openidFetchedAt = DateTime.now();
+  }
+
+  Future<T> _withOpenIdRetry<T>(Future<T> Function() action) async {
+    await _ensureOpenId();
+    try {
+      return await action();
+    } catch (e, s) {
+      log.warning(
+        "[SchoolCardSession][_withOpenIdRetry] "
+        "Request failed, retry with refreshed openid.",
+        e,
+        s,
+      );
+      await _ensureOpenId(forceRefresh: true);
+      return await action();
+    }
+  }
+
+  Future<String> _fetchOverview() async {
+    final responseData = await dio
+        .get(
+          "https://v8scan.xidian.edu.cn/myaccount/openMyAccount?openid=$openid",
+        )
+        .then((value) => value.data);
+    return parse(responseData)
+            .getElementsByTagName("li")
+            .firstOrNull
+            ?.children
+            .elementAtOrNull(1)
+            ?.children
+            .elementAtOrNull(1)
+            ?.innerHtml ??
+        "school_card_status.failed_to_query";
+  }
+
+  Future<String> getOverview() async {
+    log.info(
+      "[SchoolCardSession][getOverview] "
+      "Try to fetch school card overview.",
+    );
+    String money = await _withOpenIdRetry(_fetchOverview);
+    if (money == "school_card_status.failed_to_query") {
+      await _ensureOpenId(forceRefresh: true);
+      money = await _fetchOverview();
+    }
+    return money;
+  }
 
   Future<Uint8List> getQRCode() async {
     log.info(
       "[SchoolCardSession][initSession] "
       "Try to get QR Code",
     );
-    final homeUrl =
-        "https://v8scan.xidian.edu.cn/home/openHomePage?openid=$openid";
-    final homeResp = await dio.get(homeUrl);
-    final homeDoc = parse(homeResp.data);
+    return _withOpenIdRetry(() async {
+      final homeUrl =
+          "https://v8scan.xidian.edu.cn/home/openHomePage?openid=$openid";
+      final homeResp = await dio.get(homeUrl);
+      final homeDoc = parse(homeResp.data);
 
-    final aTags = homeDoc.getElementsByTagName('a');
-    String? id;
-    for (var a in aTags) {
-      final href = a.attributes['href'] ?? '';
-      if (href.contains('/virtualcard/openVirtualcard') &&
-          href.contains('id=')) {
-        final uri = Uri.parse(href.replaceAll('&amp;', '&'));
-        id = uri.queryParameters['id'];
-        if (id != null && id.isNotEmpty) break;
+      final aTags = homeDoc.getElementsByTagName('a');
+      String? id;
+      for (var a in aTags) {
+        final href = a.attributes['href'] ?? '';
+        if (href.contains('/virtualcard/openVirtualcard') &&
+            href.contains('id=')) {
+          final uri = Uri.parse(href.replaceAll('&amp;', '&'));
+          id = uri.queryParameters['id'];
+          if (id != null && id.isNotEmpty) break;
+        }
       }
-    }
-    if (id == null) {
-      throw Exception("aTag id not found.");
-    }
+      if (id == null) {
+        throw Exception("aTag id not found.");
+      }
 
-    final qrUrl =
-        "https://v8scan.xidian.edu.cn/virtualcard/openVirtualcard?openid=$openid&displayflag=1&id=$id";
-    final qrResp = await dio.get(qrUrl);
-    final qrDoc = parse(qrResp.data);
-    final img = qrDoc.getElementById("qrcode");
-    if (img == null) {
-      throw Exception("QR image not found.");
-    }
-    var src = img.attributes["src"] ?? "";
-    // 提取 base64 数据
-    var base64Data = src
-        .replaceAll("data:image/png;base64,", "")
-        .replaceAll("\n", "");
-    if (base64Data.isEmpty) {
-      throw Exception("QR data is empty.");
-    }
-    return base64Decode(base64Data);
+      final qrUrl =
+          "https://v8scan.xidian.edu.cn"
+          "/virtualcard/openVirtualcard?"
+          "openid=$openid&"
+          "displayflag=1&"
+          "id=$id";
+      final qrResp = await dio.get(qrUrl);
+      final qrDoc = parse(qrResp.data);
+      final img = qrDoc.getElementById("qrcode");
+      if (img == null) {
+        throw Exception("QR image not found.");
+      }
+      var src = img.attributes["src"] ?? "";
+      // 提取 base64 数据
+      var base64Data = src
+          .replaceAll("data:image/png;base64,", "")
+          .replaceAll("\n", "");
+      if (base64Data.isEmpty) {
+        throw Exception("QR data is empty.");
+      }
+      return base64Decode(base64Data);
+    });
   }
 
   // 获取支付记录
   Future<List<PaidRecord>> getPaidStatus(String begin, String end) async {
-    if (isInit.value == SessionState.error ||
-        isInit.value == SessionState.none) {
-      initSession();
-    }
-    List<PaidRecord> toReturn = [];
-    var response = await dio
-        .post(
-          "https://v8scan.xidian.edu.cn/selftrade/queryCardSelfTradeList?openid=$openid",
-          options: Options(contentType: "application/json; charset=utf-8"),
-          data: {
-            "beginDate": begin,
-            "endDate": end,
-            "tradeType": "-1",
-            "openid": openid,
-          },
-        )
-        .then((value) => jsonDecode(value.data));
-    for (var i in response["resultData"]) {
-      toReturn.add(
-        PaidRecord(place: i["mername"], date: i["txdate"], money: i["txamt"]),
-      );
-    }
-    return toReturn;
-  }
-
-  @override
-  Future<void> initSession() async {
-    log.info(
-      "[SchoolCardSession][initSession] "
-      "Current State: ${isInit.value}",
-    );
-    if (isInit.value == SessionState.fetching) {
-      return;
-    }
-    try {
-      isInit.value = SessionState.fetching;
-      log.info(
-        "[SchoolCardSession][initSession] "
-        "Fetching...",
-      );
-      var response = await dio.get(
-        "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
-      );
-      while (response.headers[HttpHeaders.locationHeader] != null) {
-        String location = response.headers[HttpHeaders.locationHeader]![0];
-        log.info(
-          "[SchoolCardSession][initSession] "
-          "Received location: $location.",
+    return _withOpenIdRetry(() async {
+      List<PaidRecord> toReturn = [];
+      var response = await dio
+          .post(
+            "https://v8scan.xidian.edu.cn/selftrade/queryCardSelfTradeList?openid=$openid",
+            options: Options(contentType: "application/json; charset=utf-8"),
+            data: {
+              "beginDate": begin,
+              "endDate": end,
+              "tradeType": "-1",
+              "openid": openid,
+            },
+          )
+          .then((value) => jsonDecode(value.data));
+      for (var i in response["resultData"]) {
+        toReturn.add(
+          PaidRecord(place: i["mername"], date: i["txdate"], money: i["txamt"]),
         );
-        response = await dio.get(location);
       }
-      var page = parse(response.data);
-
-      var getOpenId = page.getElementsByTagName('input');
-
-      for (var i in getOpenId) {
-        if (i.id == "openid" && i.attributes["type"] == "hidden") {
-          openid = i.attributes["value"]!;
-          break;
-        }
-      }
-
-      /// Post formula: fetch money.
-      response = await dio.get(
-        "https://v8scan.xidian.edu.cn/myaccount/openMyAccount?openid=$openid",
-      );
-      page = parse(response.data);
-
-      money.value =
-          page
-              .getElementsByTagName("li")
-              .firstOrNull
-              ?.children
-              .elementAtOrNull(1)
-              ?.children
-              .elementAtOrNull(1)
-              ?.innerHtml ??
-          "school_card_status.failed_to_query";
-      log.info("[SchoolCardSession][initSession] Money $money");
-
-      isInit.value = SessionState.fetched;
-    } catch (e, s) {
-      log.error(
-        "[SchoolCardSession][initSession] Money failed to fetch.",
-        e,
-        s,
-      );
-      errorSession.value = e.toString();
-      money.value = "school_card_status.failed_to_fetch";
-      isInit.value = SessionState.error;
-    }
+      return toReturn;
+    });
   }
 }

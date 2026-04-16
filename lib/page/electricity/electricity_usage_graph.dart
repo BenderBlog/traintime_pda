@@ -32,7 +32,7 @@ class _GraphMetrics {
   static const double lineStrokeWidth = 2;
   static const double pointStrokeWidth = 6;
   static const double axisLabelOffsetY = 16;
-  static const double xAxisBottomOffset = 24;
+  static const double xAxisBottomOffset = chartBottomPadding;
 
   static const FontWeight axisLabelFontWeight = FontWeight.w400;
 }
@@ -75,85 +75,84 @@ class ElectricityUsageGraph extends StatefulWidget {
       return;
     }
 
+    // All chart elements should use the same plot bounds; otherwise points,
+    // axis lines, and labels will drift apart into different coordinate systems.
+    final dates = data.keys.toList();
+    final plotLeft = _GraphMetrics.chartHorizontalPadding;
+    final plotRight = graphWidth - _GraphMetrics.chartRightReserved;
+    final plotTop = _GraphMetrics.chartTopPadding;
+    final plotBottom = graphHeight - _GraphMetrics.chartBottomPadding;
+    final plotWidth = plotRight - plotLeft;
+    final plotHeight = plotBottom - plotTop;
+
     // Horizontal Step
-    int step = data.keys.last.difference(data.keys.first).inDays + 2;
-    final horizontalStep =
-        (graphWidth -
-            (_GraphMetrics.chartHorizontalPadding +
-                _GraphMetrics.chartRightReserved)) /
-        step;
+    final step = dates.last.difference(dates.first).inDays + 2;
+    final horizontalStep = plotWidth / step;
     log.info(
       "[SelfGraph] horizontalstep $horizontalStep, from width $graphWidth and step $step",
     );
 
-    final keynum = min(data.length, 4);
-    final keyStep = data.keys.last.difference(data.keys.first).inDays / keynum;
-    final xstep =
-        (graphWidth -
-            (_GraphMetrics.chartHorizontalPadding +
-                _GraphMetrics.chartRightReserved)) /
-        keynum;
-    final datekey = List.generate(
-      keynum + 1,
-      (i) => data.keys.first.add(Duration(days: (i * keyStep).toInt())),
-    );
-    final datevalues = List.generate(
-      keynum + 1,
-      (i) => _GraphMetrics.xAxisBottomOffset + i * xstep,
-    );
-    markAtX = {for (var i = 0; i < keynum + 1; ++i) datekey[i]: datevalues[i]};
-
     // Vertical Step
     // Point's initial point is at the upper left corner
-    final minY = graphHeight - _GraphMetrics.chartBottomPadding;
-    final maxY = _GraphMetrics.chartTopPadding;
-    double biggestValue = data.values.reduce((a, b) => a > b ? a : b);
-    double smallestValue = data.values.reduce((a, b) => a > b ? b : a);
-    double verticalStep = (biggestValue - smallestValue) / (minY - maxY);
+    final rawBiggestValue = data.values.reduce((a, b) => a > b ? a : b);
+    final rawSmallestValue = data.values.reduce((a, b) => a > b ? b : a);
+    final isFlatData = rawBiggestValue == rawSmallestValue;
+    // Flat data still needs a non-zero range so the single horizontal line can
+    // be placed around the visual middle instead of collapsing to the bottom.
+    double biggestValue = isFlatData
+        ? rawBiggestValue + _GraphMetrics.flatDataExtraValue
+        : rawBiggestValue + _GraphMetrics.yAxisPaddingValue;
+    double smallestValue = isFlatData
+        ? max(rawSmallestValue - _GraphMetrics.flatDataExtraValue, 0)
+        : max(rawSmallestValue - _GraphMetrics.yAxisPaddingValue, 0);
+    final verticalStep = plotHeight / (biggestValue - smallestValue);
     log.info(
       "[SelfGraph] verticalstep $verticalStep, "
-      "from ($biggestValue - $smallestValue) / (${minY - maxY}), "
+      "from $plotHeight / ($biggestValue - $smallestValue), "
       "height $graphHeight",
     );
 
     // List of Points based on horizontal and vertical step
-    points = data.keys.map<Offset>((k) {
+    points = dates.map<Offset>((k) {
       return Offset(
-        horizontalStep * (k.difference(data.keys.first).inDays + 1) +
-            _GraphMetrics.chartHorizontalPadding,
-        minY - (data[k]! - smallestValue) / verticalStep,
+        horizontalStep * (k.difference(dates.first).inDays + 1) + plotLeft,
+        plotBottom - (data[k]! - smallestValue) * verticalStep,
       );
     }).toList();
 
-    if (biggestValue == smallestValue) {
-      biggestValue = biggestValue + _GraphMetrics.flatDataExtraValue;
-      smallestValue = max(smallestValue - _GraphMetrics.flatDataExtraValue, 0);
-      final lineOffsetBasic =
-          (graphHeight - _GraphMetrics.axisLabelOffsetY) / 3;
-      lines = {
-        biggestValue.toInt(): lineOffsetBasic,
-        smallestValue.toInt(): lineOffsetBasic * 2,
+    final markCount = min(dates.length, 5);
+    if (markCount == 1) {
+      markAtX = {dates.first: points.first.dx};
+    } else {
+      // Sample existing points instead of regenerating dates from fractional
+      // day steps, so short ranges cannot produce duplicate tick dates.
+      final markIndices = List.generate(
+        markCount,
+        (i) => (i * (dates.length - 1) / (markCount - 1)).round(),
+      );
+      markAtX = {
+        for (final index in markIndices) dates[index]: points[index].dx,
       };
+    }
+
+    log.info(
+      "[SelfGraph] Preliminary there are ${points.length} dot(s), "
+      "$points",
+    );
+
+    if (isFlatData) {
+      lines = {rawBiggestValue.toInt(): plotTop + plotHeight / 2};
       return;
     }
-    biggestValue = biggestValue + _GraphMetrics.yAxisPaddingValue;
-    smallestValue = max(smallestValue - _GraphMetrics.yAxisPaddingValue, 0);
     final verticalkeyStep =
         (biggestValue - smallestValue) / _GraphMetrics.defaultYAxisSegmentCount;
-    final lineOffsetBasic =
-        (graphHeight - _GraphMetrics.axisLabelOffsetY) /
-        _GraphMetrics.defaultYAxisSegmentCount;
-    final keys = List.generate(
+    final List<double> keys = List.generate(
       _GraphMetrics.defaultYAxisLabelCount,
-      (i) => (biggestValue - (i + 1) * verticalkeyStep).toInt(),
-    );
-    final values = List.generate(
-      _GraphMetrics.defaultYAxisLabelCount,
-      (i) => (i + 1) * lineOffsetBasic,
+      (i) => biggestValue - (i + 1) * verticalkeyStep,
     );
     lines = {
-      for (var i = 0; i < _GraphMetrics.defaultYAxisLabelCount; ++i)
-        keys[i]: values[i],
+      for (final value in keys)
+        value.toInt(): plotBottom - (value - smallestValue) * verticalStep,
     };
   }
 
@@ -426,7 +425,10 @@ class BackgroundLinePainter extends CustomPainter {
       )..layout();
       textPainter.paint(
         canvas,
-        Offset(markAtX[i]!, size.height - _GraphMetrics.axisLabelOffsetY),
+        Offset(
+          markAtX[i]! - textPainter.width / 2,
+          size.height - _GraphMetrics.axisLabelOffsetY,
+        ),
       );
     }
   }

@@ -4,16 +4,19 @@
 
 // Setting window.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/controller/electricity_controller.dart';
+import 'package:watermeter/controller/update_notice_controller.dart';
+import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
@@ -27,15 +30,15 @@ import 'package:watermeter/page/setting/notification_page/notification_page.dart
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:get/get.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/other_experiment_controller.dart';
+import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
-import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
@@ -43,11 +46,13 @@ import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart'
-    as electricity_session;
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
+import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
+import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
+import 'package:watermeter/repository/physics_experiment_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -78,6 +83,22 @@ class _SettingWindowState extends State<SettingWindow> {
           ),
         ),
       );
+    }
+  }
+
+  bool get _isSemesterAwareControllerLoading =>
+      ClassTableController.i.schoolClassTableStateSignal.value.isLoading ||
+      ExamController.i.examInfoStateSignal.value.isLoading ||
+      PhysicsExperimentController.i.physicsExperimentStateSignal.value
+          .isLoading ||
+      OtherExperimentController.i.otherExperimentStateSignal.value.isLoading;
+
+  Future<void> _waitForSemesterAwareReloads() async {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    final stopwatch = Stopwatch()..start();
+    while (_isSemesterAwareControllerLoading &&
+        stopwatch.elapsed < const Duration(seconds: 30)) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
     }
   }
 
@@ -153,19 +174,21 @@ class _SettingWindowState extends State<SettingWindow> {
                   title: Text(
                     FlutterI18n.translate(context, "setting.check_update"),
                   ),
-                  subtitle: Obx(
-                    () => Text(
+                  subtitle: Watch((context) {
+                    final updateState =
+                        UpdateNoticeController.i.updateMessageStateSignal.value;
+                    return Text(
                       FlutterI18n.translate(
                         context,
                         "setting.latest_version",
                         translationParams: {
                           "latest":
-                              updateMessage.value?.code ??
+                              updateState.value?.code ??
                               FlutterI18n.translate(context, "setting.waiting"),
                         },
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                   onTap: () {
                     showToast(
                       context: context,
@@ -174,33 +197,15 @@ class _SettingWindowState extends State<SettingWindow> {
                         "setting.fetching_update",
                       ),
                     );
-                    checkUpdate().then(
-                      (value) async {
-                        if (context.mounted) {
-                          if ((value ?? false) && updateMessage.value != null) {
-                            await showDialog(
-                              context: context,
-                              builder: (context) => Obx(
-                                () => UpdateDialog(
-                                  updateMessage: updateMessage.value!,
-                                ),
-                              ),
-                            );
-                          } else {
-                            showToast(
-                              context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                value == null
-                                    ? "setting.current_testing"
-                                    : "setting.current_stable",
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      onError: (e, s) {
-                        if (context.mounted) {
+                    UpdateNoticeController.i.reloadUpdateNoticeInfo().then((
+                      value,
+                    ) async {
+                      if (context.mounted) {
+                        if (UpdateNoticeController
+                            .i
+                            .updateMessageStateSignal
+                            .value
+                            .hasError) {
                           showToast(
                             context: context,
                             msg: FlutterI18n.translate(
@@ -208,9 +213,45 @@ class _SettingWindowState extends State<SettingWindow> {
                               "setting.fetch_failed",
                             ),
                           );
+                          return;
                         }
-                      },
-                    );
+                        switch (UpdateNoticeController
+                            .i
+                            .isNewVersionAvaliableComputed
+                            .value) {
+                          case null:
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+
+                                "setting.current_testing",
+                              ),
+                            );
+                          case true:
+                            await showDialog(
+                              context: context,
+                              builder: (context) => Watch(
+                                (context) => UpdateDialog(
+                                  updateMessage: UpdateNoticeController
+                                      .i
+                                      .updateMessageStateSignal
+                                      .value
+                                      .value!,
+                                ),
+                              ),
+                            );
+                          case false:
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                "setting.current_stable",
+                              ),
+                            );
+                        }
+                      }
+                    });
                   },
                   trailing: const Icon(Icons.navigate_next),
                 ),
@@ -267,10 +308,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           .setInt(preference.Preference.brightness, value)
                           .then((value) {
                             setState(() {
-                              ThemeController toChange = Get.put(
-                                ThemeController(),
-                              );
-                              toChange.updateTheme();
+                              ThemeController.i.updateTheme();
                             });
                           });
                     },
@@ -410,14 +448,8 @@ class _SettingWindowState extends State<SettingWindow> {
                         initialAccountNumber: preference.getString(
                           preference.Preference.electricityAccount,
                         ),
-                        onFetchFromNetwork: () async {
-                          String dorm = await PersonalInfoSession()
-                              .getDormInfoEhall();
-                          return electricity_session
-                              .ElectricitySession.parseElectricityAccountFromIDS(
-                            dorm,
-                          );
-                        },
+                        onFetchFromNetwork:
+                            ElectricityController.i.getElectricityAccount,
                       ),
                     ).then((value) async {
                       if (value != true) {
@@ -433,8 +465,7 @@ class _SettingWindowState extends State<SettingWindow> {
                         }
                       }
 
-                      electricity_session
-                          .ElectricitySession.clearElectricityHistory();
+                      ElectricityController.i.clearElectricityHistory();
 
                       if (context.mounted) {
                         showToast(
@@ -444,7 +475,9 @@ class _SettingWindowState extends State<SettingWindow> {
                             "setting.change_electricity_account.successful_setting",
                           ),
                         );
-                        electricity_session.update(force: true);
+                        ElectricityController.i.refreshElectricityInfo(
+                          force: true,
+                        );
                         return;
                       }
                     });
@@ -587,7 +620,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     if (mounted) {
                       if (result != null) {
                         File(result.files.single.path!).copySync(
-                          "${supportPath.path}/${ClassTableFile.decorationName}",
+                          "${supportPath.path}/${ClassTableController.decorationName}",
                         );
                         preference.setBool(
                           preference.Preference.decoration,
@@ -652,14 +685,15 @@ class _SettingWindowState extends State<SettingWindow> {
                         ),
                         TextButton(
                           onPressed: () {
-                            var file = File(
-                              "${supportPath.path}/"
-                              "${ClassTableFile.userDefinedClassName}",
-                            );
-                            if (file.existsSync()) {
-                              file.deleteSync();
+                            UserDefinedClassFile.clearUserDefinedClass();
+                            ClassTableController
+                                    .i
+                                    .userDefinedClassSignal
+                                    .value =
+                                UserDefinedClassData.empty();
+                            if (mounted) {
+                              setState(() {});
                             }
-                            Get.find<ClassTableController>().updateClassTable();
                             showToast(
                               context: context,
                               msg: FlutterI18n.translate(
@@ -712,17 +746,22 @@ class _SettingWindowState extends State<SettingWindow> {
                           child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
-                          onPressed: () {
-                            Future.wait([
-                              Get.put(
-                                ClassTableController(),
-                              ).updateClassTable(isForce: true),
-                              Get.put(ExamController()).get(),
-                              Get.put(ExperimentController()).get(),
-                            ]).then((_) async {
-                              await maybeAutoSyncSystemCalendar();
-                            });
-                            Navigator.pop(context);
+                          onPressed: () async {
+                            await Future.wait([
+                              ClassTableController.i.reloadClassTable(),
+                              ExamController.i.reloadExamInfo(),
+                              PhysicsExperimentController.i
+                                  .reloadPhysicsExperiment(),
+                              OtherExperimentController.i
+                                  .reloadOtherExperiment(),
+                            ]);
+                            await maybeAutoSyncSystemCalendar();
+                            if (mounted) {
+                              setState(() {});
+                            }
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                            }
                           },
                           child: Text(
                             FlutterI18n.translate(context, "confirm"),
@@ -755,8 +794,6 @@ class _SettingWindowState extends State<SettingWindow> {
                       context: context,
                       builder: (context) => ChangeSwiftDialog(),
                     ).then((value) {
-                      Get.put(ClassTableController()).update();
-                      updateCurrentData();
                       setState(() {});
                     });
                   },
@@ -781,23 +818,19 @@ class _SettingWindowState extends State<SettingWindow> {
                   onTap: () {
                     showDialog<bool>(
                       barrierDismissible: false,
-                      context: context,
-                      builder: (context) => SemesterSwitchDialog(),
-                    ).then((value) {
+                    context: context,
+                    builder: (context) => SemesterSwitchDialog(),
+                    ).then((value) async {
                       if (value == true) {
                         setState(() {});
                         if (context.mounted) {
                           showToast(context: context, msg: "Updating data");
                         }
-                        Future.wait([
-                          Get.put(
-                            ClassTableController(),
-                          ).updateClassTable(isForce: true),
-                          Get.put(ExamController()).get(),
-                          Get.put(ExperimentController()).get(),
-                        ]).then((_) async {
-                          await maybeAutoSyncSystemCalendar();
-                        });
+                        await _waitForSemesterAwareReloads();
+                        await maybeAutoSyncSystemCalendar();
+                        if (mounted) {
+                          setState(() {});
+                        }
                       }
                     });
                   },
@@ -964,10 +997,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             await preference.prefrenceClear();
 
                             /// Theme back to default
-                            ThemeController toChange = Get.put(
-                              ThemeController(),
-                            );
-                            toChange.updateTheme();
+                            ThemeController.i.updateTheme();
 
                             /// Restart app
                             if (mounted) {
@@ -993,14 +1023,14 @@ class _SettingWindowState extends State<SettingWindow> {
 }
 
 void _removeCache() {
+  ElectricitySession.removeElectricityHistoryCache();
+  ElectricitySession.removeElectricityInfoCache();
   for (var value in [
-    ClassTableFile.schoolClassName,
-    ExamController.examDataCacheName,
-    ExperimentController.physicsCacheName,
-    ExperimentController.otherCacheName,
+    ClassTableSession.schoolClassName,
+    ExamSession.examDataCacheName,
+    ExperimentSession.physicsExperimentCacheName,
+    SysjSession.otherExperimentCacheName,
     ScoreSession.scoreListCacheName,
-    electricity_session.ElectricitySession.electricityCache,
-    electricity_session.ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {
@@ -1010,16 +1040,16 @@ void _removeCache() {
 }
 
 void _removeAll() {
+  ElectricitySession.removeElectricityHistoryCache();
+  ElectricitySession.removeElectricityInfoCache();
   for (var value in [
-    ClassTableFile.schoolClassName,
-    ClassTableFile.userDefinedClassName,
-    ClassTableFile.decorationName,
-    ExamController.examDataCacheName,
-    ExperimentController.physicsCacheName,
-    ExperimentController.otherCacheName,
+    ClassTableSession.schoolClassName,
+    UserDefinedClassFile.userDefinedClassName,
+    ClassTableController.decorationName,
+    ExamSession.examDataCacheName,
+    ExperimentSession.physicsExperimentCacheName,
+    SysjSession.otherExperimentCacheName,
     ScoreSession.scoreListCacheName,
-    electricity_session.ElectricitySession.electricityCache,
-    electricity_session.ElectricitySession.electricityHistory,
   ]) {
     var file = File("${supportPath.path}/$value");
     if (file.existsSync()) {

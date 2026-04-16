@@ -47,6 +47,11 @@ catcher_description: "详情如下"
 # 新主页提示
 new_homepage_hint: "本程序将开发一个新主页，目前先用猪图秀占位，玩得愉快"
 
+# 页面缓存提示
+local_cache_hint: "本地缓存获取于 {datetime}"
+inapp_cache_hint: "程序内缓存获取于 {datetime}\n缓存退出程序后失效！"
+cache_reason_default: "当前显示缓存数据。"
+
 # 星期
 weekday:
     monday: "周一"
@@ -149,6 +154,24 @@ classtable:
         output_to_system: "导出到系统日历"
         refresh_classtable: "刷新日程表"
         switch_semester: "切换课程表学期"
+    status_source:
+        class_table: "课表"
+        exam: "考试"
+        physics_experiment: "物理实验"
+        other_experiment: "其他实验"
+    error_dialog_title: "错误信息概览"
+    status_banner:
+        loading: "正在更新：{sources}"
+        cache: "当前使用缓存：{sources}"
+        error_summary: "以下信息加载失败：{sources}"
+    empty_state:
+        no_course: "{semester_code} 学期没有课程安排。"
+        with_exam: "{semester_code} 学期没有课程安排，但有考试安排。"
+        with_experiment: "{semester_code} 学期没有课程安排，但有实验安排。"
+        with_exam_and_experiment: "{semester_code} 学期没有课程安排，但有考试和实验安排。"
+    empty_action:
+        view_exam: "查看考试安排"
+        view_experiment: "查看实验安排"
     class_change_page:
         title: "课程调整"
         empty_message: "目前没有调课信息"
@@ -218,6 +241,10 @@ classtable:
     refresh_classtable:
         ready: "准备刷新日程信息"
         success: "成功刷新日程信息"
+    cache_hint_password_wrong: "统一认证密码错误或已失效。"
+    cache_hint_login_failed: "登录课表服务失败。"
+    cache_hint_network_failed: "课表网络请求失败。"
+    cache_hint_unknown_error: "在线获取课表失败。详细错误请查看日志。"
     semester_switcher:
         choose_semester: 选择学期
         first_academic_year: 第一学年
@@ -250,6 +277,13 @@ club_promotion:
 electricity:
     title: "水电信息"
     power_title: "余额信息"
+    cache_hint_account_missing: "未填写电费账号，正在显示缓存数据。"
+    cache_hint_account_parse_failed: "无法根据宿舍信息解析电费账号，正在显示缓存数据。"
+    cache_hint_captcha_failed: "电费平台验证码识别失败，正在显示缓存数据。"
+    cache_hint_password_wrong: "电费密码错误或已失效，正在显示缓存数据。"
+    cache_hint_login_failed: "登录电费服务失败，正在显示缓存数据。"
+    cache_hint_network_failed: "电费服务网络请求失败，正在显示缓存数据。"
+    cache_hint_unknown_error: "在线获取电费失败，正在显示缓存数据。详细错误请查看日志。"
     cache_notice: "获取时间"
     account: "电费账号"
     remain_power: "电量信息"
@@ -258,6 +292,7 @@ electricity:
     daily_usage: "平均每日用量"
     not_enough_data: "数据量不足以用于渲染"
     info: "有欠费一般代表水费，半夜11:20到午夜0:30左右无法获取数据"
+    fetching_hint: "正在获取最新电费信息"
     date: "日期"
     power: "该日0点电量"
     update: "刷新信息"
@@ -276,6 +311,11 @@ empty_classroom:
 exam:
     title: "考试安排"
     cache_hint: "已显示缓存考试安排信息"
+    cache_hint_password_wrong: "统一认证密码错误或已失效"
+    cache_hint_login_failed: "登录考试服务失败"
+    cache_hint_network_failed: "网络连接失败"
+    cache_hint_unknown_error: "在线获取考试安排失败，详细错误请查看日志"
+    fetching_hint: "正在获取最新考试安排"
     not_finished: "未完成考试"
     all_finished: "所有考试全部完成"
     unable_to_exam: "无法完成考试"
@@ -301,6 +341,15 @@ experiment:
     error_physics: "获取物理实验信息时发生错误：{info}"
     error_other: "获取其他实验信息时发生错误：{info}"
     cache_hint: "目前加载缓存状况：{info}"
+    physics_cache_hint_missing_password: "未填写物理实验密码。"
+    physics_cache_hint_login_failed: "物理实验登录失败。"
+    physics_cache_hint_not_school_network: "当前不在校园网环境。"
+    physics_cache_hint_network_failed: "物理实验网络请求失败。"
+    physics_cache_hint_unknown_error: "在线获取物理实验失败。详细错误请查看日志。"
+    other_cache_hint_login_failed: "其他实验登录失败。"
+    other_cache_hint_not_school_network: "当前不在校园网环境。"
+    other_cache_hint_network_failed: "其他实验网络请求失败。"
+    other_cache_hint_unknown_error: "在线获取其他实验失败。详细错误请查看日志。"
     physics_experiment: "物理实验"
     other_experiment: "其他实验"
     tap_for_score: "成绩未识别出来"
@@ -308,6 +357,11 @@ experiment:
     predict_score: "推测分数：{score}"
     send_mail: "发送邮件"
     fetching_hint: "您现在看到的是缓存数据。正在后台获取更新数据中..."
+    fetching_hint_both: "物理实验和其他实验正在加载"
+    fetching_hint_physics: "物理实验正在加载"
+    fetching_hint_other: "其他实验正在加载"
+    fetching_hint_physics_with_other_failed: "物理实验正在加载，其他实验加载失败"
+    fetching_hint_other_with_physics_failed: "其他实验正在加载，物理实验加载失败"
     score_hint_0: "您可点击卡片上的成绩字段来查看原始成绩数据"
     score_hint_1: "您的分数不在 XDYou 分数识别库中，因此它没有被正常识别。"
     score_hint_2: "如果您希望为 XDYou 的发展贡献一份自己的力量，您可以点击发送邮件按钮，我们将您的分数加入识别库！"
@@ -372,6 +426,20 @@ homepage:
         error_infoText: "遇到错误"
         fetching_infoText: "正在加载"
         no_arrangement_infoText: "暂无日程"
+        schedule_fetching_message: "日程正在加载，请稍后查看"
+        schedule_error_message: "日程加载失败，请稍后重试"
+        schedule_fetching_infoText: "正在加载日程"
+        schedule_error_infoText: "日程加载失败"
+        schedule_none_infoText: "暂无日程"
+        updating_infoText: "正在更新"
+        all_loading_infoText: "全部加载中"
+        partial_loading_infoText: "部分加载中"
+        partial_error_infoText: "部分数据加载失败"
+        failed_chip: "{source}加载失败"
+        failed_source_class_info: "课程信息"
+        failed_source_exam_info: "考试信息"
+        failed_source_physics_experiment: "物理实验"
+        failed_source_other_experiment: "其他实验"
     electricity_card:
         title: "水电信息"
         current_electricity: "余额 {amount} 度"
@@ -506,7 +574,7 @@ library:
 # 图书馆入馆状态信息卡
 library_card:
     title: "图书馆当前状况"
-    fetching: "正在获取"
+    fetching: "正在获取图书馆信息"
     northern_library: "北校区状况"
     southern_library: "南校区状况"
     people: "在馆 {people} 人"
@@ -566,6 +634,8 @@ school_net:
     empty_password: "您忘记输入账号密码了"
     not_initalized: "疑似查询后端尚未开放查询"
     captcha_failed: "验证码识别失败"
+    cache_hint_captcha_failed: "验证码识别失败，请重试。"
+    cache_hint_request_failed: "校园网请求失败，请稍后重试。"
     wrong_password: "密码错误"
     error_fetch: "获取失败"
     error_other: "其他错误：{msg}"
@@ -592,7 +662,11 @@ score:
         目前选中科目 {chosen}  总计学分 {credit}
         均分 {avg} GPA {gpa}
     all_passed: "所有科目均已通过"
-    # TODO：string in eval detected
+    cache_hint_password_wrong: "统一认证密码错误或已失效"
+    cache_hint_login_failed: "登录考试服务失败"
+    cache_hint_network_failed: "网络连接失败"
+    cache_hint_unknown_error: "在线获取成绩安排失败，详细错误请查看日志"
+    fetching_hint: "正在获取最新成绩信息，请不要退出页面"
     all_semester: "所有学期"
     chosen_semester: "学期 {chosen}"
     all_type: "所有类型"
@@ -715,7 +789,7 @@ setting:
         got_it: "知道了"
         open_settings: "打开系统设置"
         # 操作消息
-        no_classtable_data: "请先获取课程表数据"
+        no_classtable_data: "请先获取课程表、考试或实验数据"
         schedule_success: "已安排 {count} 个课前提醒"
         schedule_failed: "安排通知失败: {error}"
         cancel_all_success: "已取消所有课前提醒"
@@ -931,6 +1005,16 @@ sport:
     situation_unknown: "未知故障{situation}"
     situation_fetching: "正在获取"
     situation_error: "坏事: {situation}"
+    cache_hint_missing_password: "请先填写体育密码后重试。"
+    cache_hint_credential_invalid: "体育登录已失效，请更新体育密码后重试。"
+    cache_hint_maintain: "体育服务正在维护中，请稍后重试。"
+    cache_hint_login_failed: "体育服务登录失败。"
+    cache_hint_query_failed: "体育信息查询失败。"
+    cache_hint_network: "体育服务网络请求失败。"
+    cache_hint_unknown: "在线获取体育信息失败。详细错误请查看日志。"
+    error_auth_expired: "体育登录已失效，请重试。"
+    error_missing_password: "未填写体育密码"
+    error_credential_invalid: "体育登录已失效，请更新体育密码后重试。"
 
 # 其他功能
 toolbox:
@@ -989,12 +1073,12 @@ xdu_planet:
 # 电费状态
 electricity_status:
     pending: "等待获取"
-    remain_fetching: "正在获取"
-    remain_network_issue: "网络故障"
-    remain_not_found: "查询失败"
-    remain_other_issue: "查询故障"
+    remain_fetching: "正在获取电量"
+    remain_network_issue: "电量查询网络故障"
+    remain_not_found: "电量查询失败"
+    remain_other_issue: "电量查询故障"
     owe_fetching: "正在获取欠费"
-    owe_issue: "欠费信息网络故障"
+    owe_issue: "欠费查询网络故障"
     owe_not_found: "目前欠款无法查询，请看日志窗口查找报错详情"
     owe_no_need: "目前无需清缴欠费"
     owe_need_pay: "待清缴 {due} 元欠费"

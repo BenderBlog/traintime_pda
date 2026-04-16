@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -49,9 +48,8 @@ class ClassAttendanceState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final controller = Get.put(ClassTableController());
       courses = await LearningSession().getAttandanceRecord();
-      classTimes = controller.numberOfClass;
+      classTimes = ClassTableController.i.numberOfClassComputedSignal.value;
 
       if (courses.isEmpty) {
         state = ClassAttendanceFetchState.empty;
@@ -73,18 +71,16 @@ class ClassAttendanceState extends ChangeNotifier {
 
   /// Refresh data without losing current data during loading
   Future<void> refreshData() async {
-    // 如果当前状态不是 ok 或 empty，则直接重新加载
     if (state != ClassAttendanceFetchState.ok &&
         state != ClassAttendanceFetchState.empty) {
       await _loadData();
       return;
     }
 
-    // 保留当前数据，在后台刷新
     try {
-      final controller = Get.put(ClassTableController());
       final newCourses = await LearningSession().getAttandanceRecord();
-      final newClassTimes = controller.numberOfClass;
+      final newClassTimes =
+          ClassTableController.i.numberOfClassComputedSignal.value;
 
       courses = newCourses;
       classTimes = newClassTimes;
@@ -98,8 +94,6 @@ class ClassAttendanceState extends ChangeNotifier {
       stackTrace = null;
     } catch (e, s) {
       log.error("[ClassAttendanceState] Error on refreshing attendance.", e, s);
-      // 刷新失败时保留原有数据，不改变状态
-      // 但如果原来就没有数据，则显示错误
       if (courses.isEmpty) {
         state = ClassAttendanceFetchState.error;
         error = e;
