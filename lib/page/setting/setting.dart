@@ -818,8 +818,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   onTap: () {
                     showDialog<bool>(
                       barrierDismissible: false,
-                    context: context,
-                    builder: (context) => SemesterSwitchDialog(),
+                      context: context,
+                      builder: (context) => SemesterSwitchDialog(),
                     ).then((value) async {
                       if (value == true) {
                         setState(() {});
