@@ -392,9 +392,7 @@ class SystemCalendarSyncService {
       return null;
     }
 
-    if (isBoundCalendarForCurrentSemester) {
-      await _clearCalendarBinding();
-    }
+    await _clearCalendarBinding();
     return null;
   }
 
@@ -405,9 +403,15 @@ class SystemCalendarSyncService {
       return null;
     }
 
+    final hadCalendarBinding = hasCalendarBinding;
     final boundCalendar = await _findBoundCalendar(calendars);
     if (boundCalendar != null) {
       return boundCalendar;
+    }
+    // Treat a missing bound calendar as an explicit user opt-out, so auto sync
+    // does not resurrect the export by falling back to name lookup.
+    if (hadCalendarBinding && !hasCalendarBinding) {
+      return null;
     }
 
     for (var calendar in calendars) {
