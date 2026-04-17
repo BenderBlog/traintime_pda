@@ -579,10 +579,10 @@ END:VTIMEZONE
   Future<void> updateClasstable(BuildContext context) async {
     log.info("Updating time arrangement data...");
     return await Future.wait([
-      classTableController.schoolClassTableSignal.reload(),
-      examController.examInfoSignal.reload(),
-      physicsExperimentController.physicsExperimentSignal.reload(),
-      otherExperimentController.otherExperimentSignal.reload(),
+      classTableController.reloadClassTable(),
+      examController.reloadExamInfo(),
+      physicsExperimentController.reloadPhysicsExperiment(),
+      otherExperimentController.reloadOtherExperiment(),
     ]).then((value) {
       notifyListeners();
     });

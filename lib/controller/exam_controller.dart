@@ -63,6 +63,9 @@ class ExamController {
 
   Future<void> reloadExamInfo() async {
     if (examInfoSignal.value.isLoading) return;
+    if (examInfoSignal.value is AsyncError) {
+      examInfoSignal.reset();
+    }
     return await examInfoSignal.reload().catchError(
       (e, s) => log.handle(e, s, "[ExamController][reloadExamInfo] Have issue"),
     );

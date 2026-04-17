@@ -71,6 +71,9 @@ class PhysicsExperimentController {
 
   Future<void> reloadPhysicsExperiment() async {
     if (physicsExperimentSignal.value.isLoading) return;
+    if (physicsExperimentSignal.value is AsyncError) {
+      physicsExperimentSignal.reset();
+    }
     await physicsExperimentSignal.reload().catchError(
       (e, s) => log.handle(
         e,

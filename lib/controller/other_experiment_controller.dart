@@ -63,6 +63,9 @@ class OtherExperimentController {
 
   Future<void> reloadOtherExperiment() async {
     if (otherExperimentSignal.value.isLoading) return;
+    if (otherExperimentSignal.value is AsyncError) {
+      otherExperimentSignal.reset();
+    }
     await otherExperimentSignal.reload().catchError(
       (e, s) => log.handle(
         e,

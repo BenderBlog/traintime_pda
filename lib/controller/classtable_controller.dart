@@ -143,6 +143,9 @@ class ClassTableController {
 
   Future<void> reloadClassTable() async {
     if (schoolClassTableSignal.value.isLoading) return;
+    if (schoolClassTableSignal.value is AsyncError) {
+      schoolClassTableSignal.reset();
+    }
     await schoolClassTableSignal.reload().catchError(
       (e, s) => log.handle(
         e,
