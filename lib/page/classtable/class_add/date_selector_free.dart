@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
 
 class DateSelectorFree extends StatefulWidget {
@@ -65,24 +66,28 @@ class _DateSelectorFree extends State<DateSelectorFree> {
     return value >= _earliestInMinutes && value <= _latestInMinutes;
   }
 
-  List<int> _allowedMinutes(int hour) {
+  List<int> _allowedMinutes(int hour, {required bool isStart}) {
     if (hour == 8) {
       return List<int>.generate(30, (index) => index + 30);
     }
     if (hour == 21) {
-      return List<int>.generate(26, (index) => index);
+      final int maxMinute = isStart ? 24 : 25;
+      return List<int>.generate(maxMinute + 1, (index) => index);
     }
     return List<int>.generate(60, (index) => index);
   }
 
-  TimeOfDay _sanitizeTime(TimeOfDay source) {
+  TimeOfDay _sanitizeTime(TimeOfDay source, {required bool isStart}) {
     int hour = source.hour.clamp(8, 21);
     int minute = source.minute;
     if (hour == 8 && minute < 30) {
       minute = 30;
     }
-    if (hour == 21 && minute > 25) {
-      minute = 25;
+    if (hour == 21) {
+      final int maxMinute = isStart ? 24 : 25;
+      if (minute > maxMinute) {
+        minute = maxMinute;
+      }
     }
     return TimeOfDay(hour: hour, minute: minute);
   }
@@ -93,8 +98,8 @@ class _DateSelectorFree extends State<DateSelectorFree> {
     required TimeOfDay initialEnd,
     required String helpText,
   }) async {
-    TimeOfDay start = _sanitizeTime(initialStart);
-    TimeOfDay end = _sanitizeTime(initialEnd);
+    TimeOfDay start = _sanitizeTime(initialStart, isStart: true);
+    TimeOfDay end = _sanitizeTime(initialEnd, isStart: false);
     if (_minutesOf(end) <= _minutesOf(start)) {
       final int fixedEnd = (_minutesOf(start) + 60).clamp(
         _earliestInMinutes + 1,
@@ -141,27 +146,21 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       TextButton(
                         onPressed: () {
                           if (!_isInRange(start) || !_isInRange(end)) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    "classtable.class_add.date_selector_free.rule",
-                                  ),
-                                ),
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                "classtable.class_add.date_selector_free.rule",
                               ),
                             );
                             return;
                           }
                           if (_minutesOf(end) <= _minutesOf(start)) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    "classtable.class_add.date_selector_free.rule_2",
-                                  ),
-                                ),
+                            showToast(
+                              context: context,
+                              msg: FlutterI18n.translate(
+                                context,
+                                "classtable.class_add.date_selector_free.rule_2",
                               ),
                             );
                             return;
@@ -186,6 +185,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                     children: [
                       _buildTimeEditor(
                         keyPrefix: 'start',
+                        isStart: true,
                         title: FlutterI18n.translate(
                           context,
                           "classtable.class_add.date_selector_free.class_start_time",
@@ -194,7 +194,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                         current: start,
                         onHourChanged: (hour) {
                           setModalState(() {
-                            final mins = _allowedMinutes(hour);
+                            final mins = _allowedMinutes(hour, isStart: true);
                             int minute = start.minute;
                             if (!mins.contains(minute)) {
                               minute = mins.first;
@@ -211,6 +211,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       const SizedBox(height: 12),
                       _buildTimeEditor(
                         keyPrefix: 'end',
+                        isStart: false,
                         title: FlutterI18n.translate(
                           context,
                           "classtable.class_add.date_selector_free.class_end_time",
@@ -219,7 +220,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                         current: end,
                         onHourChanged: (hour) {
                           setModalState(() {
-                            final mins = _allowedMinutes(hour);
+                            final mins = _allowedMinutes(hour, isStart: false);
                             int minute = end.minute;
                             if (!mins.contains(minute)) {
                               minute = mins.first;
@@ -246,6 +247,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
 
   Widget _buildTimeEditor({
     required String keyPrefix,
+    required bool isStart,
     required String title,
     required Color color,
     required TimeOfDay current,
@@ -253,7 +255,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
     required ValueChanged<int> onMinuteChanged,
   }) {
     final allowedHours = List<int>.generate(14, (index) => index + 8);
-    final allowedMinutes = _allowedMinutes(current.hour);
+    final allowedMinutes = _allowedMinutes(current.hour, isStart: isStart);
     final hourPage = allowedHours.indexOf(current.hour);
     final minutePage = allowedMinutes.indexOf(current.minute);
 
