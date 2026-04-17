@@ -768,12 +768,9 @@ class CourseReminderService extends NotificationService
         int weekIndex = classTableController.getCurrentWeek(examStartTime);
         if (weekIndex < 0) weekIndex = 0;
 
-        final weekday = examStartTime.weekday;
-        final startClass = _calculateClassPeriodFromTime(examStartTime);
         final notificationId = _generateNotificationId(
-          weekday,
-          startClass,
-          weekIndex,
+          'exam|${exam.subject}|${exam.typeStr}|${exam.place}|'
+          '${examStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
         );
         final locale = _getCurrentLocale();
 
