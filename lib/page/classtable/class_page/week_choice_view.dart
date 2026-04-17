@@ -6,6 +6,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -22,6 +24,14 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
   late ClassTableWidgetState controller;
   // 缓存 AutoSizeGroup，避免每次 build 创建新实例
   final AutoSizeGroup _autoSizeGroup = AutoSizeGroup();
+  static const double _occupiedOpacity = 1.0;
+  static const double _completedOpacity = 0.45;
+  static const double _vacantOpacity = 0.25;
+
+  Color _desaturateColor(Color color, {required double factor}) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withSaturation(hsl.saturation * factor).toColor();
+  }
 
   @override
   void didChangeDependencies() {
@@ -31,11 +41,23 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
 
   /// The dot of the overview, [isOccupied] is used to identify the opacity of the dot.
   /// [primaryColor] is passed in from outside to avoid calling Theme.of(context) for each dot.
-  Widget dot({required bool isOccupied, required Color primaryColor}) {
-    double opacity = isOccupied ? 1 : 0.25;
-    return ClipOval(
-      child: ColoredBox(color: primaryColor.withValues(alpha: opacity)),
-    );
+  Widget dot({
+    required bool isOccupied,
+    required bool isCompleted,
+    required Color primaryColor,
+  }) {
+    double opacity = _vacantOpacity;
+    Color dotColor = primaryColor;
+    if (isOccupied) {
+      opacity = isCompleted ? _completedOpacity : _occupiedOpacity;
+      if (isCompleted) {
+        dotColor = _desaturateColor(
+          primaryColor,
+          factor: CompletedClassStyleConfig.completedSaturationFactor,
+        );
+      }
+    }
+    return ClipOval(child: ColoredBox(color: dotColor.withValues(alpha: opacity)));
   }
 
   /// [buttonInformaion] shows the botton's [index] and the overview.
@@ -80,10 +102,19 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
                 int day = i % 5 + 1;
                 int time = i ~/ 5;
                 bool isOccupied = false;
+                bool isCompleted = false;
+                final now = controller.currentTime;
+                final today = DateTime(now.year, now.month, now.day);
+                final weekStart = controller.startDay
+                  .add(Duration(days: 7 * controller.offset))
+                  .add(Duration(days: 7 * widget.index));
+                final blockDate = weekStart.add(Duration(days: day - 1));
+                final currentBlockIndex = CurrentTimeIndicator
+                  .transferTimeToBlockIndex(now);
                 List<ClassOrgainzedData> arrangedEvents = controller
                     .getArrangement(weekIndex: widget.index, dayIndex: day);
 
-                for (var i in arrangedEvents) {
+                for (var event in arrangedEvents) {
                   int start = 0;
                   int stop = 0;
 
@@ -95,17 +126,20 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
                     case 1:
                       start = 10;
                       stop = 20;
-                      isOccupied = i.stop > 10.0 && i.stop <= 20.0;
+                      isOccupied =
+                          event.stop > 10.0 && event.stop <= 20.0;
                       break;
                     case 2:
                       start = 20;
                       stop = 33;
-                      isOccupied = i.stop > 23.0 && i.stop <= 33.0;
+                      isOccupied =
+                          event.stop > 23.0 && event.stop <= 33.0;
                       break;
                     case 3:
                       start = 33;
                       stop = 43;
-                      isOccupied = i.stop > 33.0 && i.stop <= 43.0;
+                      isOccupied =
+                          event.stop > 33.0 && event.stop <= 43.0;
                       break;
                     case 4:
                       start = 46;
@@ -113,16 +147,36 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
                       break;
                   }
 
-                  if ((i.stop != start && i.start != stop) &&
-                      ((start < i.stop && i.start < stop) ||
-                          (stop > i.start && i.stop > start))) {
+                  if ((event.stop != start && event.start != stop) &&
+                      ((start < event.stop && event.start < stop) ||
+                          (stop > event.start && event.stop > start))) {
                     isOccupied = true;
                   }
 
-                  if (isOccupied) break;
+                  if (!isOccupied) {
+                    continue;
+                  }
+
+                  if (blockDate.isBefore(today)) {
+                    isCompleted = true;
+                  } else if (blockDate.isAfter(today)) {
+                    isCompleted = false;
+                  } else {
+                    isCompleted = stop <= currentBlockIndex;
+                  }
+
+                  // Any ongoing/upcoming arrangement in the same cell should keep
+                  // the preview block highlighted as active.
+                  if (!isCompleted) {
+                    break;
+                  }
                 }
 
-                return dot(isOccupied: isOccupied, primaryColor: primaryColor);
+                return dot(
+                  isOccupied: isOccupied,
+                  isCompleted: isCompleted,
+                  primaryColor: primaryColor,
+                );
               }),
             ),
           ),
