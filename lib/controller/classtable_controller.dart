@@ -24,11 +24,7 @@ class ClassTableController {
   ClassTableController._() {
     final cache = ClassTableSession.getCache();
     if (cache != null) {
-      final cached = FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-        hintKey: "local_cache_hint",
-      );
+      final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidSchoolClassTable.value = cached;
       schoolClassTableStateSignal.value = AsyncState.data(cached);
     }
