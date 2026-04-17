@@ -6,6 +6,7 @@
 // Removed left/right, only use stack.
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -32,24 +33,6 @@ class ClassOrgainzedData {
   final DateTime? actualEndTime;
 
   final MaterialColor color;
-
-  /// Following is the begin/end for each blocks...
-  static const _timeInBlock = [
-    "08:30",
-    "09:20",
-    "10:25",
-    "11:15",
-    "12:00",
-    "14:00",
-    "14:50",
-    "15:55",
-    "16:45",
-    "17:30",
-    "19:00",
-    "19:55",
-    "20:35",
-    "21:25",
-  ];
 
   factory ClassOrgainzedData.fromTimeArrangement(
     TimeArrangement timeArrangement,
@@ -127,40 +110,61 @@ class ClassOrgainzedData {
   });
 
   static double _transferIndex(DateTime time) {
-    int timeInMin = time.hour * 60 + time.minute;
-    int previous = 0;
-    // Start from the second element.
-    for (var i in _timeInBlock) {
-      int timeChosen =
-          int.parse(i.split(":")[0]) * 60 + int.parse(i.split(":")[1]);
-      if (previous == 0) {
-        // Some exam is started before 8:30
-        if (timeInMin < timeChosen) {
-          return 0;
+    final timeInMin = time.hour * 60 + time.minute;
+    if (timeList.isEmpty) {
+      return 0;
+    }
+
+    int parseMinute(String hhmm) {
+      final parts = hhmm.split(':');
+      return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    }
+
+    double classStartBlock(int classIndex) {
+      if (classIndex < 4) {
+        return classIndex * 5.0;
+      }
+      if (classIndex < 8) {
+        return 23 + (classIndex - 4) * 5.0;
+      }
+      return 46 + (classIndex - 8) * 5.0;
+    }
+
+    final firstStart = parseMinute(timeList.first);
+    if (timeInMin < firstStart) {
+      return 0;
+    }
+
+    final classCount = timeList.length ~/ 2;
+    for (var classIndex = 0; classIndex < classCount; classIndex++) {
+      final startMinute = parseMinute(timeList[classIndex * 2]);
+      final endMinute = parseMinute(timeList[classIndex * 2 + 1]);
+      final startBlock = classStartBlock(classIndex);
+      final endBlock = startBlock + 5;
+
+      if (timeInMin >= startMinute && timeInMin < endMinute) {
+        final ratio = (timeInMin - startMinute) / (endMinute - startMinute);
+        return startBlock + 5 * ratio;
+      }
+
+      if (classIndex == classCount - 1) {
+        if (timeInMin >= endMinute) {
+          return 61;
         }
-        previous = timeChosen;
         continue;
       }
-      if (timeInMin >= previous && timeInMin < timeChosen) {
-        double basic = 0;
-        double blocks = 5;
-        double ratio = (timeInMin - previous) / (timeChosen - previous);
-        if (previous < 12 * 60) {
-          basic = (_timeInBlock.indexOf(i) - 1) * 5;
-        } else if (previous < 14 * 60) {
-          basic = 20;
-          blocks = 3;
-        } else if (previous < 17.5 * 60) {
-          basic = 23 + (_timeInBlock.indexOf(i) - 6) * 5;
-        } else if (previous < 19 * 60) {
-          basic = 43;
-          blocks = 3;
-        } else {
-          basic = 46 + (_timeInBlock.indexOf(i) - 11) * 5;
+
+      final nextStartMinute = parseMinute(timeList[(classIndex + 1) * 2]);
+      if (timeInMin >= endMinute && timeInMin < nextStartMinute) {
+        final nextStartBlock = classStartBlock(classIndex + 1);
+        final breakMinuteSpan = nextStartMinute - endMinute;
+        final breakBlockSpan = nextStartBlock - endBlock;
+
+        if (breakMinuteSpan > 0 && breakBlockSpan > 0) {
+          final ratio = (timeInMin - endMinute) / breakMinuteSpan;
+          return endBlock + breakBlockSpan * ratio;
         }
-        return basic + blocks * ratio;
-      } else {
-        previous = timeChosen;
+        return endBlock;
       }
     }
 

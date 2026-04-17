@@ -50,8 +50,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   late BoxDecoration decoration;
   late ClassTableWidgetState classTableState;
+  ClassTableWidgetState? _attachedClassTableState;
 
   void _switchPage() {
+    if (!mounted) {
+      return;
+    }
     setState(() => isTopRowLocked = true);
     Future.wait([
       rowControl.animateToPage(
@@ -64,18 +68,30 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         curve: Curves.easeInOutCubic,
         duration: const Duration(milliseconds: changePageTime),
       ),
-    ]).then((value) => isTopRowLocked = false);
+    ]).then((value) {
+      if (mounted) {
+        isTopRowLocked = false;
+      }
+    });
   }
 
   @override
   void dispose() {
-    classTableState.removeListener(_switchPage);
+    _attachedClassTableState?.removeListener(_switchPage);
     super.dispose();
   }
 
   @override
   void didChangeDependencies() {
-    classTableState = ClassTableState.of(context)!.controllers;
+    final nextClassTableState = ClassTableState.of(context)!.controllers;
+
+    if (_attachedClassTableState != nextClassTableState) {
+      _attachedClassTableState?.removeListener(_switchPage);
+      _attachedClassTableState = nextClassTableState;
+      _attachedClassTableState!.addListener(_switchPage);
+    }
+
+    classTableState = nextClassTableState;
 
     pageControl = PageController(
       initialPage: classTableState.chosenWeek,
@@ -93,11 +109,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
 
     /// Let controllers listen to the currentWeek's change.
-    // if (isPushedListener == false) {
-    classTableState.addListener(_switchPage);
-    //  isPushedListener = true;
-    //}
-
     /// Init the background.
     File image = File("${supportPath.path}/${classTableState.decorationName}");
     decoration = BoxDecoration(
@@ -254,8 +265,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   Future<void> _showClassTableVisualSettingsDialog() async {
     var enabled = CurrentTimeIndicatorConfig.enabled;
     var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
-    var showCurrentDayColumnBox =
-        CurrentTimeIndicatorConfig.showCurrentDayColumnBox;
+    var showTodayColumnHighlight =
+        CurrentTimeIndicatorConfig.showTodayColumnHighlight;
+    var activeBorderAlpha = CompletedClassStyleConfig.activeBorderAlpha;
+    var activeInnerAlpha = CompletedClassStyleConfig.activeInnerAlpha;
     var completedSaturationFactor =
         CompletedClassStyleConfig.completedSaturationFactor;
     var completedTextSaturationFactor =
@@ -321,13 +334,55 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         title: Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.show_current_day_column_box",
+                            "classtable.visual_settings.show_today_column_highlight",
                           ),
                         ),
-                        value: showCurrentDayColumnBox,
+                        value: showTodayColumnHighlight,
                         onChanged: (value) => setDialogState(
-                          () => showCurrentDayColumnBox = value,
+                          () => showTodayColumnHighlight = value,
                         ),
+                      ),
+                      const Divider(height: 24),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.unfinished_section",
+                        ),
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.active_border_alpha",
+                          translationParams: {
+                            "value": formatPercent(activeBorderAlpha),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: activeBorderAlpha,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) =>
+                            setDialogState(() => activeBorderAlpha = value),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.active_inner_alpha",
+                          translationParams: {
+                            "value": formatPercent(activeInnerAlpha),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: activeInnerAlpha,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) =>
+                            setDialogState(() => activeInnerAlpha = value),
                       ),
                       const Divider(height: 24),
                       Text(
@@ -434,8 +489,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     CurrentTimeIndicatorConfig.enabled = enabled;
     CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
-    CurrentTimeIndicatorConfig.showCurrentDayColumnBox =
-        showCurrentDayColumnBox;
+    CurrentTimeIndicatorConfig.showTodayColumnHighlight =
+        showTodayColumnHighlight;
+    CompletedClassStyleConfig.activeBorderAlpha = activeBorderAlpha;
+    CompletedClassStyleConfig.activeInnerAlpha = activeInnerAlpha;
     CompletedClassStyleConfig.completedSaturationFactor =
         completedSaturationFactor;
     CompletedClassStyleConfig.completedTextSaturationFactor =

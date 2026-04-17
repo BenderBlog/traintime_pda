@@ -8,7 +8,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
-import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
@@ -44,19 +43,34 @@ class ClassTableView extends StatefulWidget {
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
+  ClassTableWidgetState? _attachedClassTableState;
 
   DateTime get _visibleWeekStart => classTableState.startDay
       .add(Duration(days: 7 * classTableState.offset))
       .add(Duration(days: 7 * widget.index));
 
-  bool _isCompleted(ClassOrgainzedData data, int dayIndex) {
+  double _completedHeight(ClassOrgainzedData data, int dayIndex) {
     final now = classTableState.currentTime;
     final dayStart = _visibleWeekStart.add(Duration(days: dayIndex - 1));
-    return CompletedClassStyle.isCompleted(
-      data: data,
-      now: now,
-      dayStart: dayStart,
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (today.isBefore(dayStart)) {
+      return 0;
+    }
+    if (today.isAfter(dayStart)) {
+      return blockheight(data.stop - data.start);
+    }
+
+    final currentIndex = CurrentTimeIndicator.transferTimeToBlockIndex(now);
+    if (currentIndex <= data.start) {
+      return 0;
+    }
+
+    final completedBlocks = (currentIndex - data.start).clamp(
+      0.0,
+      data.stop - data.start,
     );
+    return blockheight(completedBlocks);
   }
 
   Positioned? _currentTimeIndicator() => CurrentTimeIndicator.build(
@@ -96,14 +110,14 @@ class _ClassTableViewState extends State<ClassTableView> {
         /// Choice the day and render it!
         for (var i in arrangedEvents) {
           /// Generate the row.
-          final isCompleted = _isCompleted(i, index);
+          final completedHeight = _completedHeight(i, index);
           thisRow.add(
             Positioned(
               top: blockheight(i.start),
               height: blockheight(i.stop - i.start),
               left: leftRow + blockwidth * (index - 1),
               width: blockwidth,
-              child: ClassCard(detail: i, isCompleted: isCompleted),
+              child: ClassCard(detail: i, completedHeight: completedHeight),
             ),
           );
         }
@@ -213,14 +227,21 @@ class _ClassTableViewState extends State<ClassTableView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    classTableState = ClassTableState.of(context)!.controllers;
-    classTableState.addListener(_reload);
+    final nextClassTableState = ClassTableState.of(context)!.controllers;
+
+    if (_attachedClassTableState != nextClassTableState) {
+      _attachedClassTableState?.removeListener(_reload);
+      _attachedClassTableState = nextClassTableState;
+      _attachedClassTableState!.addListener(_reload);
+    }
+
+    classTableState = nextClassTableState;
     updateSize();
   }
 
   @override
   void dispose() {
-    classTableState.removeListener(_reload);
+    _attachedClassTableState?.removeListener(_reload);
     super.dispose();
   }
 

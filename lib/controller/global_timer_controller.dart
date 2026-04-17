@@ -9,7 +9,7 @@ import 'package:watermeter/repository/logger.dart';
 class GlobalTimerController {
   static final GlobalTimerController i = GlobalTimerController._();
   GlobalTimerController._() {
-    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
       currentTimeSignal.value = DateTime.now();
       log.debug("Global Timer: Time is ${currentTimeSignal.value}");
     });

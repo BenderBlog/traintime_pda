@@ -19,48 +19,79 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 /// The card in [classSubRow], metioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
   final ClassOrgainzedData detail;
-  final bool isCompleted;
+  final double completedHeight;
 
   List<dynamic> get data => detail.data;
   MaterialColor get color => detail.color;
   String get name => detail.name;
   String? get place => detail.place;
-  const ClassCard({super.key, required this.detail, required this.isCompleted});
+  const ClassCard({
+    super.key,
+    required this.detail,
+    required this.completedHeight,
+  });
 
   @override
   Widget build(BuildContext context) {
     ClassTableWidgetState classTableState = ClassTableState.of(
       context,
     )!.controllers;
-    final style = CompletedClassStyle.resolve(
+    final activeStyle = CompletedClassStyle.resolve(
       palette: color,
-      isCompleted: isCompleted,
+      isCompleted: false,
+    );
+    final completedStyle = CompletedClassStyle.resolve(
+      palette: color,
+      isCompleted: true,
     );
 
     /// This is the result of the class info card.
+    const borderRadius = BorderRadius.all(Radius.circular(8));
     return Padding(
       padding: const EdgeInsets.all(1),
       child: ClipRRect(
-        // Out
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          // Border
-          color: style.borderColor.withValues(alpha: style.borderAlpha),
-          padding: const EdgeInsets.all(2),
-          child: Stack(
-            children: [
-              ClipRRect(
-                // Inner
-                borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  color: style.innerColor.withValues(alpha: style.innerAlpha),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      overlayColor: Colors.transparent,
+        borderRadius: borderRadius,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final splitHeight = completedHeight.clamp(0.0, constraints.maxHeight);
+            final isCompleted = splitHeight >= constraints.maxHeight - 0.5;
+            final textStyle = isCompleted ? completedStyle : activeStyle;
+            final borderStyle = isCompleted ? completedStyle : activeStyle;
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                if (splitHeight > 0)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: splitHeight,
+                    child: Container(
+                      color: completedStyle.innerColor.withValues(
+                        alpha: completedStyle.innerAlpha,
+                      ),
                     ),
-                    onPressed: () async {
-                      var controller = ClassTableState.of(context)!.controllers;
+                  ),
+                if (splitHeight < constraints.maxHeight)
+                  Positioned(
+                    top: splitHeight,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      color: activeStyle.innerColor.withValues(
+                        alpha: activeStyle.innerAlpha,
+                      ),
+                    ),
+                  ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    overlayColor: Colors.transparent,
+                  ),
+                  onPressed: () async {
+                    var controller = ClassTableState.of(context)!.controllers;
 
                       /// The way to show the class info of the period.
                       /// The last one indicate whether to delete this stuff.
@@ -115,54 +146,77 @@ class ClassCard extends StatelessWidget {
                               });
                         }
                       }
-                    },
-                    child:
-                        Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    name,
-                                    style: TextStyle(color: style.textColor, fontSize: isPhone(context) ? 12 : 14),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.clip,
+                  },
+                  child:
+                      Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  name,
+                                  style: TextStyle(
+                                    color: textStyle.textColor,
+                                    fontSize: isPhone(context) ? 12 : 14,
                                   ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.clip,
                                 ),
+                              ),
+                              Text(
+                                "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
+                                style: TextStyle(
+                                  color: textStyle.textColor,
+                                  fontSize: isPhone(context) ? 10 : 12,
+                                ),
+                              ),
+                              if (data.length > 1)
                                 Text(
-                                  "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
-                                  style: TextStyle(color: style.textColor, fontSize: isPhone(context) ? 10 : 12),
-                                ),
-                                if (data.length > 1)
-                                  Text(
-                                    FlutterI18n.translate(
-                                      context,
-                                      "classtable.class_card.remains_hint",
-                                      translationParams: {
-                                        "remain_count": (data.length - 1)
-                                            .toString(),
-                                      },
-                                    ),
-                                      style: TextStyle(color: style.textColor, fontSize: isPhone(context) ? 10 : 12),
+                                  FlutterI18n.translate(
+                                    context,
+                                    "classtable.class_card.remains_hint",
+                                    translationParams: {
+                                      "remain_count":
+                                          (data.length - 1).toString(),
+                                    },
                                   ),
-                              ],
-                            )
-                            .alignment(Alignment.topLeft)
-                            .padding(
-                              horizontal: isPhone(context) ? 2 : 4,
-                              vertical: 4,
-                            ),
+                                  style: TextStyle(
+                                    color: textStyle.textColor,
+                                    fontSize: isPhone(context) ? 10 : 12,
+                                  ),
+                                ),
+                            ],
+                          )
+                          .alignment(Alignment.topLeft)
+                          .padding(
+                            horizontal: isPhone(context) ? 2 : 4,
+                            vertical: 4,
+                          ),
+                ),
+                if (data.length > 1)
+                  ClipPath(
+                    clipper: Triangle(),
+                    child: Container(
+                      color: textStyle.borderColor,
+                    ).constrained(width: 8, height: 8),
+                  ).alignment(Alignment.topRight),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: borderRadius,
+                        border: Border.all(
+                          color: borderStyle.borderColor.withValues(
+                            alpha: borderStyle.borderAlpha,
+                          ),
+                          width: 2,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              if (data.length > 1)
-                ClipPath(
-                  clipper: Triangle(),
-                  child: Container(
-                    color: style.borderColor,
-                  ).constrained(width: 8, height: 8),
-                ).alignment(Alignment.topRight),
-            ],
-          ),
+              ],
+            );
+          },
         ),
       ),
     );

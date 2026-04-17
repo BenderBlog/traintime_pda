@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/time_list.dart';
 
 class CurrentTimeIndicatorConfig {
   static bool enabled = true;
   static bool showTimeLabel = true;
-  static bool showCurrentDayColumnBox = true;
+  static bool showTodayColumnHighlight = true;
   static double lineAlpha = 0.9;
   static double lineThickness = 2;
   static double labelHeight = 14;
@@ -16,61 +17,71 @@ class CurrentTimeIndicatorConfig {
 }
 
 class CurrentTimeIndicator {
-  static const List<String> _timeInBlock = [
-    '08:30',
-    '09:20',
-    '10:25',
-    '11:15',
-    '12:00',
-    '14:00',
-    '14:50',
-    '15:55',
-    '16:45',
-    '17:30',
-    '19:00',
-    '19:55',
-    '20:35',
-    '21:25',
-  ];
-
   static double _transferIndex(DateTime time) {
     final timeInMin = time.hour * 60 + time.minute;
-    var previous = 0;
-    for (final i in _timeInBlock) {
-      final timeChosen =
-          int.parse(i.split(':')[0]) * 60 + int.parse(i.split(':')[1]);
-      if (previous == 0) {
-        if (timeInMin < timeChosen) {
-          return 0;
+    if (timeList.isEmpty) {
+      return 0;
+    }
+
+    int parseMinute(String hhmm) {
+      final parts = hhmm.split(':');
+      return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    }
+
+    double classStartBlock(int classIndex) {
+      if (classIndex < 4) {
+        return classIndex * 5.0;
+      }
+      if (classIndex < 8) {
+        return 23 + (classIndex - 4) * 5.0;
+      }
+      return 46 + (classIndex - 8) * 5.0;
+    }
+
+    final firstStart = parseMinute(timeList.first);
+    if (timeInMin < firstStart) {
+      return 0;
+    }
+
+    final classCount = timeList.length ~/ 2;
+    for (var classIndex = 0; classIndex < classCount; classIndex++) {
+      final startMinute = parseMinute(timeList[classIndex * 2]);
+      final endMinute = parseMinute(timeList[classIndex * 2 + 1]);
+      final startBlock = classStartBlock(classIndex);
+      final endBlock = startBlock + 5;
+
+      if (timeInMin >= startMinute && timeInMin < endMinute) {
+        final ratio = (timeInMin - startMinute) / (endMinute - startMinute);
+        return startBlock + 5 * ratio;
+      }
+
+      if (classIndex == classCount - 1) {
+        if (timeInMin >= endMinute) {
+          return 61;
         }
-        previous = timeChosen;
         continue;
       }
 
-      if (timeInMin >= previous && timeInMin < timeChosen) {
-        var basic = 0.0;
-        var blocks = 5.0;
-        final ratio = (timeInMin - previous) / (timeChosen - previous);
-        if (previous < 12 * 60) {
-          basic = (_timeInBlock.indexOf(i) - 1) * 5;
-        } else if (previous < 14 * 60) {
-          basic = 20;
-          blocks = 3;
-        } else if (previous < 17.5 * 60) {
-          basic = 23 + (_timeInBlock.indexOf(i) - 6) * 5;
-        } else if (previous < 19 * 60) {
-          basic = 43;
-          blocks = 3;
-        } else {
-          basic = 46 + (_timeInBlock.indexOf(i) - 11) * 5;
+      final nextStartMinute = parseMinute(timeList[(classIndex + 1) * 2]);
+      if (timeInMin >= endMinute && timeInMin < nextStartMinute) {
+        final nextStartBlock = classStartBlock(classIndex + 1);
+        final breakMinuteSpan = nextStartMinute - endMinute;
+        final breakBlockSpan = nextStartBlock - endBlock;
+
+        // Move continuously during breaks that have visible rows (e.g. lunch/dinner).
+        // If there is no visual gap between classes, keep the indicator at the boundary.
+        if (breakMinuteSpan > 0 && breakBlockSpan > 0) {
+          final ratio = (timeInMin - endMinute) / breakMinuteSpan;
+          return endBlock + breakBlockSpan * ratio;
         }
-        return basic + blocks * ratio;
+        return endBlock;
       }
-      previous = timeChosen;
     }
 
     return 61;
   }
+
+  static double transferTimeToBlockIndex(DateTime time) => _transferIndex(time);
 
   static Positioned? build({
     required BuildContext context,
@@ -97,9 +108,10 @@ class CurrentTimeIndicator {
 
     final lineTop = blockHeight(_transferIndex(now));
     final color = Theme.of(context).colorScheme.primary;
-    final lineHorizontalInset = CurrentTimeIndicatorConfig.showCurrentDayColumnBox
-      ? CurrentTimeIndicatorConfig.dayColumnBorderWidth
-      : 0.0;
+    final lineHorizontalInset =
+        CurrentTimeIndicatorConfig.showTodayColumnHighlight
+        ? CurrentTimeIndicatorConfig.dayColumnBorderWidth
+        : 0.0;
     final labelText =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
@@ -129,7 +141,7 @@ class CurrentTimeIndicator {
                   ),
                 ),
               Positioned(
-                top: lineOffset,
+                top: lineOffset - CurrentTimeIndicatorConfig.lineThickness / 2,
                 left: lineHorizontalInset / 2,
                 right: lineHorizontalInset / 2,
                 child: Container(
@@ -154,7 +166,7 @@ class CurrentTimeIndicator {
     required double blockWidth,
     required double Function(double) blockHeight,
   }) {
-    if (!CurrentTimeIndicatorConfig.showCurrentDayColumnBox) {
+    if (!CurrentTimeIndicatorConfig.showTodayColumnHighlight) {
       return null;
     }
 
@@ -174,7 +186,9 @@ class CurrentTimeIndicator {
     );
 
     return Positioned(
-      left: leftRow + blockWidth * dayOffset -
+      left:
+          leftRow +
+          blockWidth * dayOffset -
           CurrentTimeIndicatorConfig.dayColumnBorderWidth / 2,
       top: 0,
       width: blockWidth + CurrentTimeIndicatorConfig.dayColumnBorderWidth,

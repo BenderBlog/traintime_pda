@@ -29,7 +29,7 @@ class SchoolnetController {
     if (schoolNetUsageSignal.value.isLoading) return;
 
     _captchaFunction = captchaFunction;
-    await schoolNetUsageSignal.refresh().catchError(
+    await schoolNetUsageSignal.reload().catchError(
       (e, s) => log.handle(
         e,
         s,
