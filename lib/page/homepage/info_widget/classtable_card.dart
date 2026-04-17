@@ -136,6 +136,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
     required bool isAllSourcesLoading,
     required bool isPartialSourcesLoading,
     required List<home.HomepageFailedSource> failedSources,
+    required bool havePhysicsExperiment,
   }) {
     final theme = Theme.of(context).colorScheme;
     final hints = <Widget>[];
@@ -167,6 +168,10 @@ class _ClassTableCardState extends State<ClassTableCard> {
     }
 
     for (final source in failedSources) {
+      if (source == home.HomepageFailedSource.physicsExperiment &&
+          !havePhysicsExperiment) {
+        continue;
+      }
       hints.add(
         _buildStateHintChip(
           context,
@@ -279,6 +284,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
           final isPartialSourcesLoading =
               controller.isPartialSourcesLoadingComputedSignal.value;
           final failedSources = controller.failedSourcesComputedSignal.value;
+          final havePhysicsExperiment =
+              controller.havePhysicsExperimentSignal.value;
           final itemDesc = _getItemDescriptors(
             currentArrangement: currentArrangement,
             nextArrangement: nextArrangement,
@@ -293,6 +300,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
             isAllSourcesLoading: isAllSourcesLoading,
             isPartialSourcesLoading: isPartialSourcesLoading,
             failedSources: failedSources,
+            havePhysicsExperiment: havePhysicsExperiment,
           );
 
           return [
@@ -346,8 +354,6 @@ class _ClassTableCardState extends State<ClassTableCard> {
               LayoutBuilder(
                 builder: (context, constraints) => ClassTableWindow(
                   parentContext: context,
-                  currentWeek:
-                      ClassTableController.i.currentWeekComputedSignal.value,
                   constraints: constraints,
                 ),
               ),

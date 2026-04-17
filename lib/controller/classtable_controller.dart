@@ -298,4 +298,12 @@ class ClassTableController {
 
     return toReturn;
   });
+
+  late final havePhysicsExperimentSignal = computed<bool>(() {
+    var classData = classTableComputedSignal.value;
+    return classData.classDetail.any(
+          (element) => element.name.contains("物理实验"),
+        ) ||
+        classData.notArranged.any((element) => element.name.contains("物理实验"));
+  });
 }

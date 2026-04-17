@@ -115,6 +115,14 @@ class ClassTableWidgetState with ChangeNotifier {
         notifyListeners();
       }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
     );
+    // Init current week info
+    if (currentWeek < 0) {
+      _chosenWeek = 0;
+    } else if (currentWeek >= semesterLength) {
+      _chosenWeek = semesterLength - 1;
+    } else {
+      _chosenWeek = currentWeek;
+    }
   }
 
   /// The length of the semester, the amount of the class table.
@@ -192,6 +200,11 @@ class ClassTableWidgetState with ChangeNotifier {
       physicsExperimentController.hasPhysicsExperimentArrangement.value ||
       otherExperimentController.hasOtherExperimentArrangement.value;
 
+  int get currentWeek => ClassTableController.i.currentWeekComputedSignal.value;
+
+  bool get havePhysicsExperiment =>
+      ClassTableController.i.havePhysicsExperimentSignal.value;
+
   List<ClassTableStatusSource> get loadingSources => [
     if (isClassTableLoading) ClassTableStatusSource.classTable,
     if (isExamLoading) ClassTableStatusSource.exam,
@@ -209,7 +222,8 @@ class ClassTableWidgetState with ChangeNotifier {
   List<ClassTableStatusSource> get errorWithoutCacheSources => [
     if (hasClassTableLoadError) ClassTableStatusSource.classTable,
     if (hasExamLoadError) ClassTableStatusSource.exam,
-    if (hasPhysicsExperimentLoadError) ClassTableStatusSource.physicsExperiment,
+    if (hasPhysicsExperimentLoadError && havePhysicsExperiment)
+      ClassTableStatusSource.physicsExperiment,
     if (hasOtherExperimentLoadError) ClassTableStatusSource.otherExperiment,
   ];
 
@@ -263,9 +277,6 @@ class ClassTableWidgetState with ChangeNotifier {
   DateTime get startDay => DateTime.parse(
     classTableController.classTableComputedSignal.value.termStartDay,
   );
-
-  /// The currentWeek.
-  final int currentWeek;
 
   /// The exam list.
   List<Subject> get subjects => examController.subjects.value;
@@ -585,15 +596,8 @@ END:VTIMEZONE
     });
   }
 
-  ClassTableWidgetState({required this.currentWeek}) {
+  ClassTableWidgetState() {
     _initEffects();
-    if (currentWeek < 0) {
-      _chosenWeek = 0;
-    } else if (currentWeek >= semesterLength) {
-      _chosenWeek = semesterLength - 1;
-    } else {
-      _chosenWeek = currentWeek;
-    }
   }
 
   bool _checkIsOverlapping(
