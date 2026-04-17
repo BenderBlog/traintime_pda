@@ -41,10 +41,27 @@ class ClassTableController {
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    var toChange = userDefinedClassSignal.value;
-    toChange.userDefinedDetail.add(classDetail);
-    timeArrangement.index = toChange.userDefinedDetail.length - 1;
-    toChange.timeArrangement.add(timeArrangement);
+    final current = userDefinedClassSignal.value;
+    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail)
+      ..add(ClassDetail.from(classDetail));
+    final timeArrangements = List<TimeArrangement>.from(
+      current.timeArrangement,
+    );
+    final toAdd = TimeArrangement(
+      source: timeArrangement.source,
+      index: userDefinedDetail.length - 1,
+      weekList: List<bool>.from(timeArrangement.weekList),
+      classroom: timeArrangement.classroom,
+      teacher: timeArrangement.teacher,
+      day: timeArrangement.day,
+      start: timeArrangement.start,
+      stop: timeArrangement.stop,
+    );
+    timeArrangements.add(toAdd);
+    final toChange = UserDefinedClassData(
+      userDefinedDetail: userDefinedDetail,
+      timeArrangement: timeArrangements,
+    );
     UserDefinedClassFile.updateUserDefinedClass(toChange);
     userDefinedClassSignal.value = toChange;
   }
@@ -58,26 +75,34 @@ class ClassTableController {
         originalTimeArrangement.index != timeArrangement.index) {
       return;
     }
-    var toChange = userDefinedClassSignal.value;
-    int timeArrangementIndex = toChange.timeArrangement.indexOf(
+    final current = userDefinedClassSignal.value;
+    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail);
+    final timeArrangements = List<TimeArrangement>.from(
+      current.timeArrangement,
+    );
+    int timeArrangementIndex = timeArrangements.indexOf(
       originalTimeArrangement,
     );
-    toChange.timeArrangement[timeArrangementIndex].weekList =
-        timeArrangement.weekList;
-    toChange.timeArrangement[timeArrangementIndex].teacher =
-        timeArrangement.teacher;
-    toChange.timeArrangement[timeArrangementIndex].day = timeArrangement.day;
-    toChange.timeArrangement[timeArrangementIndex].start =
-        timeArrangement.start;
-    toChange.timeArrangement[timeArrangementIndex].stop = timeArrangement.stop;
-    toChange.timeArrangement[timeArrangementIndex].classroom =
-        timeArrangement.classroom;
+    if (timeArrangementIndex < 0) return;
+    timeArrangements[timeArrangementIndex] = TimeArrangement(
+      source: originalTimeArrangement.source,
+      index: originalTimeArrangement.index,
+      weekList: List<bool>.from(timeArrangement.weekList),
+      classroom: timeArrangement.classroom,
+      teacher: timeArrangement.teacher,
+      day: timeArrangement.day,
+      start: timeArrangement.start,
+      stop: timeArrangement.stop,
+    );
 
     /// Update classDetail
     int classDetailIndex = originalTimeArrangement.index;
-    toChange.userDefinedDetail[classDetailIndex].name = classDetail.name;
-    toChange.userDefinedDetail[classDetailIndex].code = classDetail.code;
-    toChange.userDefinedDetail[classDetailIndex].number = classDetail.number;
+    userDefinedDetail[classDetailIndex] = ClassDetail.from(classDetail);
+
+    final toChange = UserDefinedClassData(
+      userDefinedDetail: userDefinedDetail,
+      timeArrangement: timeArrangements,
+    );
 
     UserDefinedClassFile.updateUserDefinedClass(toChange);
     userDefinedClassSignal.value = toChange;
@@ -85,13 +110,21 @@ class ClassTableController {
 
   Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) async {
     if (timeArrangement.source != Source.user) return;
-    var toChange = userDefinedClassSignal.value;
+    final current = userDefinedClassSignal.value;
+    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail);
+    final timeArrangements = List<TimeArrangement>.from(
+      current.timeArrangement,
+    );
     int tempIndex = timeArrangement.index;
-    toChange.timeArrangement.remove(timeArrangement);
-    toChange.userDefinedDetail.removeAt(timeArrangement.index);
-    for (var i in toChange.timeArrangement) {
+    timeArrangements.remove(timeArrangement);
+    userDefinedDetail.removeAt(timeArrangement.index);
+    for (var i in timeArrangements) {
       if (i.index >= tempIndex) i.index -= 1;
     }
+    final toChange = UserDefinedClassData(
+      userDefinedDetail: userDefinedDetail,
+      timeArrangement: timeArrangements,
+    );
     UserDefinedClassFile.updateUserDefinedClass(toChange);
     userDefinedClassSignal.value = toChange;
   }

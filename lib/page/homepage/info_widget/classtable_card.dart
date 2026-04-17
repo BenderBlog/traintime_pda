@@ -7,7 +7,6 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
