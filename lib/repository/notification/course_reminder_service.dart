@@ -781,6 +781,7 @@ class CourseReminderService extends NotificationService
         log.info(
           '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
         );
+        await cancelAllCourseNotifications();
         return;
       }
 
