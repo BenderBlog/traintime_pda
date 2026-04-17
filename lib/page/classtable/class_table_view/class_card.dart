@@ -16,7 +16,7 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
-/// The card in [classSubRow], metioned in [ClassTableView].
+/// The card in [classSubRow], mentioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
   final ClassOrgainzedData detail;
   final double completedHeight;
@@ -33,9 +33,7 @@ class ClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ClassTableWidgetState classTableState = ClassTableState.of(
-      context,
-    )!.controllers;
+    final classTableState = ClassTableState.of(context)!.controllers;
     final activeStyle = CompletedClassStyle.resolve(
       palette: color,
       isCompleted: false,
@@ -53,7 +51,10 @@ class ClassCard extends StatelessWidget {
         borderRadius: borderRadius,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final splitHeight = completedHeight.clamp(0.0, constraints.maxHeight);
+            final splitHeight = completedHeight.clamp(
+              0.0,
+              constraints.maxHeight,
+            );
             final isCompleted = splitHeight >= constraints.maxHeight - 0.5;
             final textStyle = isCompleted ? completedStyle : activeStyle;
             final borderStyle = isCompleted ? completedStyle : activeStyle;
@@ -91,106 +92,111 @@ class ClassCard extends StatelessWidget {
                     overlayColor: Colors.transparent,
                   ),
                   onPressed: () async {
-                    var controller = ClassTableState.of(context)!.controllers;
+                    final controller = ClassTableState.of(context)!.controllers;
 
-                      /// The way to show the class info of the period.
-                      /// The last one indicate whether to delete this stuff.
-                      (ClassDetail, TimeArrangement, bool)? toUse =
-                          await BothSideSheet.show(
-                            title: FlutterI18n.translate(
-                              context,
-                              "classtable.class_card.title",
-                            ),
-                            child: ArrangementDetail(
-                              information: List.generate(data.length, (index) {
-                                if (data.elementAt(index) is Subject ||
-                                    data.elementAt(index) is ExperimentData) {
-                                  return data.elementAt(index);
-                                } else {
-                                  return (
-                                    classTableState.getClassDetail(
-                                      classTableState.timeArrangement.indexOf(
-                                        data.elementAt(index),
-                                      ),
-                                    ),
-                                    data.elementAt(index),
-                                  );
-                                }
-                              }),
-                              currentWeek: classTableState.currentWeek,
-                            ),
-                            context: context,
-                          );
-                      if (context.mounted && toUse != null) {
-                        if (toUse.$3) {
-                          await ClassTableState.of(
+                    // Show the class info for this card.
+                    // The last value indicates whether to delete it.
+                    final toUse =
+                        await BothSideSheet.show<
+                          (ClassDetail, TimeArrangement, bool)
+                        >(
+                          title: FlutterI18n.translate(
                             context,
-                          )!.controllers.deleteUserDefinedClass(toUse.$2);
-                        } else {
-                          await Navigator.of(context)
-                              .push(
-                                MaterialPageRoute(
-                                  builder: (context) => ClassAddWindow(
-                                    toChange: (toUse.$1, toUse.$2),
-                                    semesterLength: controller.semesterLength,
-                                  ),
-                                ),
-                              )
-                              .then((value) {
-                                if (value == null) return;
-                                controller.editUserDefinedClass(
-                                  value.$1,
-                                  value.$2,
-                                  value.$3,
-                                );
-                              });
-                        }
-                      }
-                  },
-                  child:
-                      Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  name,
-                                  style: TextStyle(
-                                    color: textStyle.textColor,
-                                    fontSize: isPhone(context) ? 12 : 14,
-                                  ),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.clip,
-                                ),
-                              ),
-                              Text(
-                                "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
-                                style: TextStyle(
-                                  color: textStyle.textColor,
-                                  fontSize: isPhone(context) ? 10 : 12,
-                                ),
-                              ),
-                              if (data.length > 1)
-                                Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    "classtable.class_card.remains_hint",
-                                    translationParams: {
-                                      "remain_count":
-                                          (data.length - 1).toString(),
-                                    },
-                                  ),
-                                  style: TextStyle(
-                                    color: textStyle.textColor,
-                                    fontSize: isPhone(context) ? 10 : 12,
-                                  ),
-                                ),
-                            ],
-                          )
-                          .alignment(Alignment.topLeft)
-                          .padding(
-                            horizontal: isPhone(context) ? 2 : 4,
-                            vertical: 4,
+                            "classtable.class_card.title",
                           ),
+                          child: ArrangementDetail(
+                            information: List.generate(data.length, (index) {
+                              if (data.elementAt(index) is Subject ||
+                                  data.elementAt(index) is ExperimentData) {
+                                return data.elementAt(index);
+                              }
+
+                              final arrangement = data.elementAt(index);
+                              return (
+                                classTableState.getClassDetail(
+                                  classTableState.timeArrangement.indexOf(
+                                    arrangement,
+                                  ),
+                                ),
+                                arrangement,
+                              );
+                            }),
+                            currentWeek: classTableState.currentWeek,
+                          ),
+                          context: context,
+                        );
+                    if (context.mounted && toUse != null) {
+                      if (toUse.$3) {
+                        await ClassTableState.of(
+                          context,
+                        )!.controllers.deleteUserDefinedClass(toUse.$2);
+                      } else {
+                        await Navigator.of(context)
+                            .push(
+                              MaterialPageRoute(
+                                builder: (context) => ClassAddWindow(
+                                  toChange: (toUse.$1, toUse.$2),
+                                  semesterLength: controller.semesterLength,
+                                ),
+                              ),
+                            )
+                            .then((value) {
+                              if (value == null) return;
+                              controller.editUserDefinedClass(
+                                value.$1,
+                                value.$2,
+                                value.$3,
+                              );
+                            });
+                      }
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isPhone(context) ? 2 : 4,
+                      vertical: 4,
+                    ),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: TextStyle(
+                                color: textStyle.textColor,
+                                fontSize: isPhone(context) ? 12 : 14,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.clip,
+                            ),
+                          ),
+                          Text(
+                            "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
+                            style: TextStyle(
+                              color: textStyle.textColor,
+                              fontSize: isPhone(context) ? 10 : 12,
+                            ),
+                          ),
+                          if (data.length > 1)
+                            Text(
+                              FlutterI18n.translate(
+                                context,
+                                "classtable.class_card.remains_hint",
+                                translationParams: {
+                                  "remain_count": (data.length - 1).toString(),
+                                },
+                              ),
+                              style: TextStyle(
+                                color: textStyle.textColor,
+                                fontSize: isPhone(context) ? 10 : 12,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 if (data.length > 1)
                   ClipPath(
@@ -226,7 +232,7 @@ class ClassCard extends StatelessWidget {
 class Triangle extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    Path path = Path();
+    final path = Path();
     path.addPolygon([
       const Offset(0, 0),
       Offset(size.width, 0),
