@@ -33,6 +33,47 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
     return hsl.withSaturation(hsl.saturation * factor).toColor();
   }
 
+  ({int start, int stop}) _slotRange(int timeIndex) {
+    switch (timeIndex) {
+      case 0:
+        return (start: 0, stop: 10);
+      case 1:
+        return (start: 10, stop: 20);
+      case 2:
+        return (start: 20, stop: 33);
+      case 3:
+        return (start: 33, stop: 43);
+      default:
+        // 49 is the visible limit of the compact week preview.
+        return (start: 46, stop: 49);
+    }
+  }
+
+  bool _eventOccupiesSlot({
+    required ClassOrgainzedData event,
+    required int slotStart,
+    required int slotStop,
+  }) {
+    return (event.stop != slotStart && event.start != slotStop) &&
+        ((slotStart < event.stop && event.start < slotStop) ||
+            (slotStop > event.start && event.stop > slotStart));
+  }
+
+  bool _slotCompleted({
+    required DateTime slotDate,
+    required DateTime today,
+    required int slotStop,
+    required double currentBlockIndex,
+  }) {
+    if (slotDate.isBefore(today)) {
+      return true;
+    }
+    if (slotDate.isAfter(today)) {
+      return false;
+    }
+    return slotStop <= currentBlockIndex;
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -101,80 +142,54 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
               children: List.generate(25, (i) {
                 int day = i % 5 + 1;
                 int time = i ~/ 5;
-                bool isOccupied = false;
-                bool isCompleted = false;
                 final now = controller.currentTime;
                 final today = DateTime(now.year, now.month, now.day);
                 final weekStart = controller.startDay
-                  .add(Duration(days: 7 * controller.offset))
-                  .add(Duration(days: 7 * widget.index));
+                    .add(Duration(days: 7 * controller.offset))
+                    .add(Duration(days: 7 * widget.index));
                 final blockDate = weekStart.add(Duration(days: day - 1));
                 final currentBlockIndex = CurrentTimeIndicator
-                  .transferTimeToBlockIndex(now);
+                    .transferTimeToBlockIndex(now);
                 List<ClassOrgainzedData> arrangedEvents = controller
                     .getArrangement(weekIndex: widget.index, dayIndex: day);
 
+                final slot = _slotRange(time);
+
+                var hasOccupiedEvent = false;
+                var allOccupiedEventsCompleted = true;
+
                 for (var event in arrangedEvents) {
-                  int start = 0;
-                  int stop = 0;
-
-                  switch (time) {
-                    case 0:
-                      start = 0;
-                      stop = 10;
-                      break;
-                    case 1:
-                      start = 10;
-                      stop = 20;
-                      isOccupied =
-                          event.stop > 10.0 && event.stop <= 20.0;
-                      break;
-                    case 2:
-                      start = 20;
-                      stop = 33;
-                      isOccupied =
-                          event.stop > 23.0 && event.stop <= 33.0;
-                      break;
-                    case 3:
-                      start = 33;
-                      stop = 43;
-                      isOccupied =
-                          event.stop > 33.0 && event.stop <= 43.0;
-                      break;
-                    case 4:
-                      start = 46;
-                      stop = 49; // 49 is the limit of the classtable...
-                      break;
-                  }
-
-                  if ((event.stop != start && event.start != stop) &&
-                      ((start < event.stop && event.start < stop) ||
-                          (stop > event.start && event.stop > start))) {
-                    isOccupied = true;
-                  }
-
-                  if (!isOccupied) {
+                  final eventOccupiesCell = _eventOccupiesSlot(
+                    event: event,
+                    slotStart: slot.start,
+                    slotStop: slot.stop,
+                  );
+                  if (!eventOccupiesCell) {
                     continue;
                   }
 
-                  if (blockDate.isBefore(today)) {
-                    isCompleted = true;
-                  } else if (blockDate.isAfter(today)) {
-                    isCompleted = false;
-                  } else {
-                    isCompleted = stop <= currentBlockIndex;
-                  }
+                  hasOccupiedEvent = true;
+
+                  final eventCompleted = _slotCompleted(
+                    slotDate: blockDate,
+                    today: today,
+                    slotStop: slot.stop,
+                    currentBlockIndex: currentBlockIndex,
+                  );
+
+                  allOccupiedEventsCompleted =
+                      allOccupiedEventsCompleted && eventCompleted;
 
                   // Any ongoing/upcoming arrangement in the same cell should keep
                   // the preview block highlighted as active.
-                  if (!isCompleted) {
+                  if (!eventCompleted) {
                     break;
                   }
                 }
 
                 return dot(
-                  isOccupied: isOccupied,
-                  isCompleted: isCompleted,
+                  isOccupied: hasOccupiedEvent,
+                  isCompleted: hasOccupiedEvent && allOccupiedEventsCompleted,
                   primaryColor: primaryColor,
                 );
               }),

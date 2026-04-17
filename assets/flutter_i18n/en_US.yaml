@@ -166,7 +166,7 @@ classtable:
       show_current_time_indicator: "Show current time indicator"
       show_current_time_label: "Show mini time label"
       show_today_column_highlight: "Highlight today's column"
-      unfinished_section: "Unfinished class style"
+      unfinished_section: "Unstarted class style"
       active_border_alpha: "Border opacity: {value}"
       active_inner_alpha: "Fill opacity: {value}"
       completed_section: "Completed class style"

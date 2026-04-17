@@ -9,14 +9,14 @@ import 'package:watermeter/page/classtable/class_table_view/class_organized_data
 class CompletedClassStyleConfig {
   /// Completed-card color tuning.
   /// Lower values make finished classes look more muted and faded.
-  static double completedSaturationFactor = 0.35;
-  static double completedTextSaturationFactor = 0.55;
-  static double completedBorderAlpha = 0.55;
-  static double completedInnerAlpha = 0.45;
+  static double completedSaturationFactor = 0.5;
+  static double completedTextSaturationFactor = 0.75;
+  static double completedBorderAlpha = 0.75;
+  static double completedInnerAlpha = 0.5;
 
   /// Active-card baseline appearance.
-  static double activeBorderAlpha = 0.8;
-  static double activeInnerAlpha = 0.7;
+  static double activeBorderAlpha = 1.0;
+  static double activeInnerAlpha = 0.9;
 }
 
 class CompletedClassStyleData {

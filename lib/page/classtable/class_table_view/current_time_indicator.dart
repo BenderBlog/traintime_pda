@@ -6,12 +6,16 @@ import 'package:watermeter/model/time_list.dart';
 
 class CurrentTimeIndicatorConfig {
   static bool enabled = true;
-  static bool showTimeLabel = true;
+  static bool showTimeLabel = false;
   static bool showTodayColumnHighlight = true;
   static double lineAlpha = 0.9;
   static double lineThickness = 2;
   static double labelHeight = 14;
   static double labelFontSize = 9;
+  static double labelBackgroundAlpha = 0.45;
+  static double labelHorizontalPadding = 2;
+  static double labelVerticalPadding = 0;
+  static double labelBorderRadius = 4;
   static double dayColumnBorderAlpha = 0.65;
   static double dayColumnBorderWidth = 2;
 }
@@ -107,7 +111,8 @@ class CurrentTimeIndicator {
     }
 
     final lineTop = blockHeight(_transferIndex(now));
-    final color = Theme.of(context).colorScheme.primary;
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = colorScheme.primary;
     final lineHorizontalInset =
         CurrentTimeIndicatorConfig.showTodayColumnHighlight
         ? CurrentTimeIndicatorConfig.dayColumnBorderWidth
@@ -115,13 +120,16 @@ class CurrentTimeIndicator {
     final labelText =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
-    final labelHeight = hasLabel ? CurrentTimeIndicatorConfig.labelHeight : 0.0;
-    final labelTop = lineTop > labelHeight ? lineTop - labelHeight : 0.0;
-    final lineOffset = lineTop - labelTop;
+    final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
+    final indicatorTop = lineTop > labelHeight ? lineTop - labelHeight : 0.0;
+    final lineOffset = lineTop - indicatorTop;
+    final labelBackgroundColor = colorScheme.surface.withValues(
+      alpha: CurrentTimeIndicatorConfig.labelBackgroundAlpha,
+    );
 
     return Positioned(
       left: leftRow + blockWidth * dayOffset,
-      top: labelTop,
+      top: indicatorTop,
       width: blockWidth,
       child: IgnorePointer(
         child: SizedBox(
@@ -131,12 +139,39 @@ class CurrentTimeIndicator {
               if (hasLabel)
                 Align(
                   alignment: Alignment.topCenter,
-                  child: Text(
-                    labelText,
-                    style: TextStyle(
-                      fontSize: CurrentTimeIndicatorConfig.labelFontSize,
-                      color: color,
-                      fontWeight: FontWeight.w600,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: labelBackgroundColor,
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.2),
+                        width: 0.6,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        CurrentTimeIndicatorConfig.labelBorderRadius,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal:
+                            CurrentTimeIndicatorConfig.labelHorizontalPadding,
+                        vertical:
+                            CurrentTimeIndicatorConfig.labelVerticalPadding,
+                      ),
+                      child: Text(
+                        labelText,
+                        style: TextStyle(
+                          fontSize: CurrentTimeIndicatorConfig.labelFontSize,
+                          color: color,
+                          fontWeight: FontWeight.w700,
+                          shadows: const [
+                            Shadow(
+                              offset: Offset(0, 0),
+                              blurRadius: 2,
+                              color: Colors.black26,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
