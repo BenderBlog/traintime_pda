@@ -6,6 +6,7 @@
 // Removed left/right, only use stack.
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -160,6 +161,46 @@ class ClassOrgainzedData {
     }
 
     return 61;
+  }
+
+  static double transferIndexForIndicator(DateTime time) {
+    int minutesOfDay(String value) {
+      final timeParts = value.split(":");
+      return int.parse(timeParts[0]) * 60 + int.parse(timeParts[1]);
+    }
+
+    double indexOfMinute(int value) {
+      return transferIndex(
+        DateTime(time.year, time.month, time.day, value ~/ 60, value % 60),
+      );
+    }
+
+    final timeInMin = time.hour * 60 + time.minute;
+
+    for (int i = 0; i < timeList.length; i += 2) {
+      final start = minutesOfDay(timeList[i]);
+      final stop = minutesOfDay(timeList[i + 1]);
+      final nextStart = i + 2 < timeList.length
+          ? minutesOfDay(timeList[i + 2])
+          : null;
+      final isSmallBreak = nextStart != null && nextStart - stop <= 20;
+      final visualStop = isSmallBreak ? nextStart : stop;
+
+      // During class, map the elapsed class time across the visual block including the following small break.
+      if (timeInMin >= start && timeInMin < stop) {
+        final startIndex = indexOfMinute(start);
+        final stopIndex = indexOfMinute(visualStop);
+        return startIndex +
+            (stopIndex - startIndex) * (timeInMin - start) / (stop - start);
+      }
+
+      // During a small break, show the indicator at the end of the class.
+      if (isSmallBreak && timeInMin >= stop && timeInMin < visualStop) {
+        return indexOfMinute(visualStop);
+      }
+    }
+
+    return transferIndex(time);
   }
 
   ClassOrgainzedData._({

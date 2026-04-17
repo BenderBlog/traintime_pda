@@ -202,8 +202,8 @@ class _ClassTableViewState extends State<ClassTableView> {
     if (!preference.getBool(preference.Preference.enableCurrentTimeIndicator)) {
       return const SizedBox.shrink();
     }
-    // transferIndex returns 0 if before 8:30 and 61 if after 21:25.
-    final timeIndex = ClassOrgainzedData.transferIndex(
+    // Keep the indicator correct during short breaks between classes.
+    final timeIndex = ClassOrgainzedData.transferIndexForIndicator(
       classTableState.currentTimeNotifier.value,
     );
     if (timeIndex <= 0 || timeIndex >= 61) {
