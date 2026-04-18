@@ -9,12 +9,14 @@ import 'package:watermeter/page/classtable/class_table_view/class_organized_data
 class CompletedClassStyleConfig {
   /// Completed-card color tuning.
   /// Lower values make finished classes look more muted and faded.
-  static double completedSaturationFactor = 0.5;
+  static double completedSaturationFactor = 0.25;
+  static double completedBrightnessFactor = 0.75;
   static double completedTextSaturationFactor = 0.75;
   static double completedBorderAlpha = 0.75;
-  static double completedInnerAlpha = 0.5;
+  static double completedInnerAlpha = 0.75;
 
   /// Active-card baseline appearance.
+  static double activeBrightnessFactor = 1.0;
   static double activeBorderAlpha = 1.0;
   static double activeInnerAlpha = 0.9;
 }
@@ -41,28 +43,56 @@ class CompletedClassStyle {
     return hsl.withSaturation(hsl.saturation * factor).toColor();
   }
 
+  static Color _adjustBrightness(Color color, {double factor = 1.0}) {
+    final hsl = HSLColor.fromColor(color);
+    final brightness = (hsl.lightness * factor).clamp(0.0, 1.0).toDouble();
+    return hsl.withLightness(brightness).toColor();
+  }
+
+  static Color _tuneColor(
+    Color color, {
+    required double saturationFactor,
+    required double brightnessFactor,
+  }) {
+    final desaturated = _desaturateColor(color, factor: saturationFactor);
+    return _adjustBrightness(desaturated, factor: brightnessFactor);
+  }
+
   static CompletedClassStyleData resolve({
     required MaterialColor palette,
     required bool isCompleted,
   }) {
+    final saturationFactor = isCompleted
+        ? CompletedClassStyleConfig.completedSaturationFactor
+        : 1.0;
+    final brightnessFactor =
+        (isCompleted
+                ? CompletedClassStyleConfig.completedBrightnessFactor
+                : CompletedClassStyleConfig.activeBrightnessFactor)
+            .clamp(0.5, 1.0)
+            .toDouble();
     final borderColor = isCompleted
-        ? _desaturateColor(
+        ? _tuneColor(
             palette.shade300,
-            factor: CompletedClassStyleConfig.completedSaturationFactor,
+            saturationFactor: saturationFactor,
+            brightnessFactor: brightnessFactor,
           )
-        : palette.shade300;
+        : _adjustBrightness(palette.shade300, factor: brightnessFactor);
     final innerColor = isCompleted
-        ? _desaturateColor(
+        ? _tuneColor(
             palette.shade100,
-            factor: CompletedClassStyleConfig.completedSaturationFactor,
+            saturationFactor: saturationFactor,
+            brightnessFactor: brightnessFactor,
           )
-        : palette.shade100;
+        : _adjustBrightness(palette.shade100, factor: brightnessFactor);
     final textColor = isCompleted
-        ? _desaturateColor(
+        ? _tuneColor(
             palette.shade900,
-            factor: CompletedClassStyleConfig.completedTextSaturationFactor,
+            saturationFactor:
+                CompletedClassStyleConfig.completedTextSaturationFactor,
+            brightnessFactor: brightnessFactor,
           )
-        : palette.shade900;
+        : _adjustBrightness(palette.shade900, factor: brightnessFactor);
 
     return CompletedClassStyleData(
       borderColor: borderColor,

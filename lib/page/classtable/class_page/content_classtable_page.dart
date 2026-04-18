@@ -262,21 +262,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
-  Future<void> _showClassTableVisualSettingsDialog() async {
+  String _formatPercent(double value) => "${(value * 100).round()}%";
+
+  Future<void> _showCurrentTimeSettingsDialog() async {
     var enabled = CurrentTimeIndicatorConfig.enabled;
     var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     var showTodayColumnHighlight =
         CurrentTimeIndicatorConfig.showTodayColumnHighlight;
-    var activeBorderAlpha = CompletedClassStyleConfig.activeBorderAlpha;
-    var activeInnerAlpha = CompletedClassStyleConfig.activeInnerAlpha;
-    var completedSaturationFactor =
-        CompletedClassStyleConfig.completedSaturationFactor;
-    var completedTextSaturationFactor =
-        CompletedClassStyleConfig.completedTextSaturationFactor;
-    var completedBorderAlpha = CompletedClassStyleConfig.completedBorderAlpha;
-    var completedInnerAlpha = CompletedClassStyleConfig.completedInnerAlpha;
-
-    String formatPercent(double value) => "${(value * 100).round()}%";
 
     final shouldApply =
         await showDialog<bool>(
@@ -286,7 +278,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               title: Text(
                 FlutterI18n.translate(
                   context,
-                  "classtable.visual_settings.title",
+                  "classtable.visual_settings.current_time_settings_title",
                 ),
               ),
               content: SizedBox(
@@ -296,13 +288,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.current_time_section",
-                        ),
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
@@ -342,20 +327,103 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           () => showTodayColumnHighlight = value,
                         ),
                       ),
-                      const Divider(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(FlutterI18n.translate(context, "cancel")),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(FlutterI18n.translate(context, "confirm")),
+                ),
+              ],
+            ),
+          ),
+        ) ??
+        false;
+
+    if (!shouldApply || !mounted) {
+      return;
+    }
+
+    CurrentTimeIndicatorConfig.enabled = enabled;
+    CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
+    CurrentTimeIndicatorConfig.showTodayColumnHighlight =
+        showTodayColumnHighlight;
+    setState(() {});
+  }
+
+  Future<void> _showClassColorSettingsDialog() async {
+    var activeBrightnessFactor = CompletedClassStyleConfig
+        .activeBrightnessFactor
+        .clamp(0.5, 1.0)
+        .toDouble();
+    var activeBorderAlpha = CompletedClassStyleConfig.activeBorderAlpha;
+    var activeInnerAlpha = CompletedClassStyleConfig.activeInnerAlpha;
+    var completedSaturationFactor =
+        CompletedClassStyleConfig.completedSaturationFactor;
+    var completedBrightnessFactor = CompletedClassStyleConfig
+        .completedBrightnessFactor
+        .clamp(0.5, 1.0)
+        .toDouble();
+    var completedTextSaturationFactor =
+        CompletedClassStyleConfig.completedTextSaturationFactor;
+    var completedBorderAlpha = CompletedClassStyleConfig.completedBorderAlpha;
+    var completedInnerAlpha = CompletedClassStyleConfig.completedInnerAlpha;
+
+    final shouldApply =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: Text(
+                FlutterI18n.translate(
+                  context,
+                  "classtable.visual_settings.class_color_settings_title",
+                ),
+              ),
+              content: SizedBox(
+                width: 420,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
                         FlutterI18n.translate(
                           context,
                           "classtable.visual_settings.unfinished_section",
                         ),
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.active_brightness_factor",
+                          translationParams: {
+                            "value": _formatPercent(activeBrightnessFactor),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: activeBrightnessFactor,
+                        min: 0.5,
+                        max: 1.0,
+                        divisions: 10,
+                        onChanged: (value) => setDialogState(
+                          () => activeBrightnessFactor = value,
+                        ),
                       ),
                       Text(
                         FlutterI18n.translate(
                           context,
                           "classtable.visual_settings.active_border_alpha",
                           translationParams: {
-                            "value": formatPercent(activeBorderAlpha),
+                            "value": _formatPercent(activeBorderAlpha),
                           },
                         ),
                       ),
@@ -372,7 +440,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           context,
                           "classtable.visual_settings.active_inner_alpha",
                           translationParams: {
-                            "value": formatPercent(activeInnerAlpha),
+                            "value": _formatPercent(activeInnerAlpha),
                           },
                         ),
                       ),
@@ -390,14 +458,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           context,
                           "classtable.visual_settings.completed_section",
                         ),
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       Text(
                         FlutterI18n.translate(
                           context,
                           "classtable.visual_settings.completed_saturation_factor",
                           translationParams: {
-                            "value": formatPercent(completedSaturationFactor),
+                            "value": _formatPercent(completedSaturationFactor),
                           },
                         ),
                       ),
@@ -413,9 +481,27 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
+                          "classtable.visual_settings.completed_brightness_factor",
+                          translationParams: {
+                            "value": _formatPercent(completedBrightnessFactor),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: completedBrightnessFactor,
+                        min: 0.5,
+                        max: 1.0,
+                        divisions: 10,
+                        onChanged: (value) => setDialogState(
+                          () => completedBrightnessFactor = value,
+                        ),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
                           "classtable.visual_settings.completed_text_saturation_factor",
                           translationParams: {
-                            "value": formatPercent(
+                            "value": _formatPercent(
                               completedTextSaturationFactor,
                             ),
                           },
@@ -435,7 +521,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           context,
                           "classtable.visual_settings.completed_border_alpha",
                           translationParams: {
-                            "value": formatPercent(completedBorderAlpha),
+                            "value": _formatPercent(completedBorderAlpha),
                           },
                         ),
                       ),
@@ -452,7 +538,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           context,
                           "classtable.visual_settings.completed_inner_alpha",
                           translationParams: {
-                            "value": formatPercent(completedInnerAlpha),
+                            "value": _formatPercent(completedInnerAlpha),
                           },
                         ),
                       ),
@@ -487,14 +573,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       return;
     }
 
-    CurrentTimeIndicatorConfig.enabled = enabled;
-    CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
-    CurrentTimeIndicatorConfig.showTodayColumnHighlight =
-        showTodayColumnHighlight;
+    CompletedClassStyleConfig.activeBrightnessFactor = activeBrightnessFactor
+        .clamp(0.5, 1.0)
+        .toDouble();
     CompletedClassStyleConfig.activeBorderAlpha = activeBorderAlpha;
     CompletedClassStyleConfig.activeInnerAlpha = activeInnerAlpha;
     CompletedClassStyleConfig.completedSaturationFactor =
         completedSaturationFactor;
+    CompletedClassStyleConfig.completedBrightnessFactor =
+        completedBrightnessFactor.clamp(0.5, 1.0).toDouble();
     CompletedClassStyleConfig.completedTextSaturationFactor =
         completedTextSaturationFactor;
     CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
@@ -585,7 +672,16 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                 child: Text(
                   FlutterI18n.translate(
                     context,
-                    "classtable.popup_menu.visual_settings",
+                    "classtable.popup_menu.current_time_settings",
+                  ),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'K',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.class_color_settings",
                   ),
                 ),
               ),
@@ -837,7 +933,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   }
                   break;
                 case 'J':
-                  await _showClassTableVisualSettingsDialog();
+                  await _showCurrentTimeSettingsDialog();
+                  break;
+                case 'K':
+                  await _showClassColorSettingsDialog();
                   break;
               }
             },

@@ -6,18 +6,18 @@ import 'package:watermeter/model/time_list.dart';
 
 class CurrentTimeIndicatorConfig {
   static bool enabled = true;
-  static bool showTimeLabel = false;
+  static bool showTimeLabel = true;
   static bool showTodayColumnHighlight = true;
   static double lineAlpha = 0.9;
   static double lineThickness = 2;
-  static double labelHeight = 14;
-  static double labelFontSize = 9;
-  static double labelBackgroundAlpha = 0.45;
-  static double labelHorizontalPadding = 2;
-  static double labelVerticalPadding = 0;
+  static double labelHeight = 13;
+  static double labelFontSize = 8;
+  static double labelBackgroundAlpha = 0.75;
+  static double labelHorizontalPadding = 1;
+  static double labelVerticalPadding = 1;
   static double labelBorderRadius = 4;
-  static double dayColumnBorderAlpha = 0.65;
-  static double dayColumnBorderWidth = 2;
+  static double dayColumnHighlightAlpha = 0.25;
+  static double dayColumnHighlightRadius = 8;
 }
 
 class CurrentTimeIndicator {
@@ -113,38 +113,56 @@ class CurrentTimeIndicator {
     final lineTop = blockHeight(_transferIndex(now));
     final colorScheme = Theme.of(context).colorScheme;
     final color = colorScheme.primary;
-    final lineHorizontalInset =
-        CurrentTimeIndicatorConfig.showTodayColumnHighlight
-        ? CurrentTimeIndicatorConfig.dayColumnBorderWidth
-        : 0.0;
     final labelText =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
     final indicatorTop = lineTop > labelHeight ? lineTop - labelHeight : 0.0;
     final lineOffset = lineTop - indicatorTop;
+    final lineTopOffset =
+        lineOffset - CurrentTimeIndicatorConfig.lineThickness / 2;
+    final labelTop = (lineOffset - CurrentTimeIndicatorConfig.labelHeight / 2)
+        .clamp(0.0, double.infinity)
+        .toDouble();
+    final labelBottom = labelTop + CurrentTimeIndicatorConfig.labelHeight;
+    final lineBottom = lineTopOffset + CurrentTimeIndicatorConfig.lineThickness;
+    final indicatorHeight =
+        (hasLabel
+                ? (labelBottom > lineBottom ? labelBottom : lineBottom)
+                : lineBottom)
+            .clamp(0.0, double.infinity)
+            .toDouble();
     final labelBackgroundColor = colorScheme.surface.withValues(
       alpha: CurrentTimeIndicatorConfig.labelBackgroundAlpha,
     );
+    final connectorColor = color.withValues(
+      alpha: CurrentTimeIndicatorConfig.lineAlpha * 0.35,
+    );
+    final lineColor = color.withValues(
+      alpha: CurrentTimeIndicatorConfig.lineAlpha,
+    );
 
     return Positioned(
-      left: leftRow + blockWidth * dayOffset,
+      left: 0,
       top: indicatorTop,
-      width: blockWidth,
+      width: leftRow + blockWidth * (dayOffset + 1),
       child: IgnorePointer(
         child: SizedBox(
-          height: lineOffset + CurrentTimeIndicatorConfig.lineThickness,
+          height: indicatorHeight,
           child: Stack(
             children: [
               if (hasLabel)
-                Align(
-                  alignment: Alignment.topCenter,
+                Positioned(
+                  top: labelTop,
+                  left: 0,
+                  width: leftRow,
+                  height: CurrentTimeIndicatorConfig.labelHeight,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: labelBackgroundColor,
                       border: Border.all(
-                        color: color.withValues(alpha: 0.2),
-                        width: 0.6,
+                        color: color.withValues(alpha: 0.7),
+                        width: 1.4,
                       ),
                       borderRadius: BorderRadius.circular(
                         CurrentTimeIndicatorConfig.labelBorderRadius,
@@ -157,33 +175,44 @@ class CurrentTimeIndicator {
                         vertical:
                             CurrentTimeIndicatorConfig.labelVerticalPadding,
                       ),
-                      child: Text(
-                        labelText,
-                        style: TextStyle(
-                          fontSize: CurrentTimeIndicatorConfig.labelFontSize,
-                          color: color,
-                          fontWeight: FontWeight.w700,
-                          shadows: const [
-                            Shadow(
-                              offset: Offset(0, 0),
-                              blurRadius: 2,
-                              color: Colors.black26,
-                            ),
-                          ],
+                      child: Center(
+                        child: Text(
+                          labelText,
+                          style: TextStyle(
+                            fontSize: CurrentTimeIndicatorConfig.labelFontSize,
+                            color: color,
+                            fontWeight: FontWeight.w700,
+                            height: 1,
+                            shadows: const [
+                              Shadow(
+                                offset: Offset(0, 0),
+                                blurRadius: 2,
+                                color: Colors.black26,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
+              if (dayOffset > 0)
+                Positioned(
+                  top: lineTopOffset,
+                  left: leftRow,
+                  width: blockWidth * dayOffset,
+                  child: Container(
+                    height: CurrentTimeIndicatorConfig.lineThickness,
+                    color: connectorColor,
+                  ),
+                ),
               Positioned(
-                top: lineOffset - CurrentTimeIndicatorConfig.lineThickness / 2,
-                left: lineHorizontalInset / 2,
-                right: lineHorizontalInset / 2,
+                top: lineTopOffset,
+                left: leftRow + blockWidth * dayOffset,
+                width: blockWidth,
                 child: Container(
                   height: CurrentTimeIndicatorConfig.lineThickness,
-                  color: color.withValues(
-                    alpha: CurrentTimeIndicatorConfig.lineAlpha,
-                  ),
+                  color: lineColor,
                 ),
               ),
             ],
@@ -217,23 +246,20 @@ class CurrentTimeIndicator {
     }
 
     final color = Theme.of(context).colorScheme.primary.withValues(
-      alpha: CurrentTimeIndicatorConfig.lineAlpha,
+      alpha: CurrentTimeIndicatorConfig.dayColumnHighlightAlpha,
     );
 
     return Positioned(
-      left:
-          leftRow +
-          blockWidth * dayOffset -
-          CurrentTimeIndicatorConfig.dayColumnBorderWidth / 2,
+      left: leftRow + blockWidth * dayOffset,
       top: 0,
-      width: blockWidth + CurrentTimeIndicatorConfig.dayColumnBorderWidth,
+      width: blockWidth,
       height: blockHeight(61),
       child: IgnorePointer(
         child: DecoratedBox(
           decoration: BoxDecoration(
-            border: Border.all(
-              color: color,
-              width: CurrentTimeIndicatorConfig.dayColumnBorderWidth,
+            color: color,
+            borderRadius: BorderRadius.circular(
+              CurrentTimeIndicatorConfig.dayColumnHighlightRadius,
             ),
           ),
         ),
