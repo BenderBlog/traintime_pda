@@ -5,10 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
@@ -52,9 +50,9 @@ class _ClassTableCardItemDescriptor {
 class ClassTableCard extends StatefulWidget {
   const ClassTableCard({super.key});
 
-  static final RxBool simplifiedMode = preference
-      .getBool(preference.Preference.simplifiedClassTimeline)
-      .obs;
+  static final ValueNotifier<bool> simplifiedMode = ValueNotifier<bool>(
+    preference.getBool(preference.Preference.simplifiedClassTimeline),
+  );
 
   static void reloadSettingsFromPref() {
     simplifiedMode.value = preference.getBool(
@@ -137,6 +135,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
     required bool isAllSourcesLoading,
     required bool isPartialSourcesLoading,
     required List<home.HomepageFailedSource> failedSources,
+    required bool havePhysicsExperiment,
   }) {
     final theme = Theme.of(context).colorScheme;
     final hints = <Widget>[];
@@ -168,6 +167,10 @@ class _ClassTableCardState extends State<ClassTableCard> {
     }
 
     for (final source in failedSources) {
+      if (source == home.HomepageFailedSource.physicsExperiment &&
+          !havePhysicsExperiment) {
+        continue;
+      }
       hints.add(
         _buildStateHintChip(
           context,
@@ -248,9 +251,15 @@ class _ClassTableCardState extends State<ClassTableCard> {
     }
 
     List<_ClassTableCardItemDescriptor> results = [];
-    results.addIf(currItem.isNotEmpty, currItem);
-    results.addIf(nextItem.isNotEmpty, nextItem);
-    results.addIf(moreItem.isNotEmpty, moreItem);
+    if (currItem.isNotEmpty) {
+      results.add(currItem);
+    }
+    if (nextItem.isNotEmpty) {
+      results.add(nextItem);
+    }
+    if (moreItem.isNotEmpty) {
+      results.add(moreItem);
+    }
 
     if (results.isEmpty) {
       results.add(currItem);
@@ -274,6 +283,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
           final isPartialSourcesLoading =
               controller.isPartialSourcesLoadingComputedSignal.value;
           final failedSources = controller.failedSourcesComputedSignal.value;
+          final havePhysicsExperiment =
+              controller.havePhysicsExperimentSignal.value;
           final itemDesc = _getItemDescriptors(
             currentArrangement: currentArrangement,
             nextArrangement: nextArrangement,
@@ -288,6 +299,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
             isAllSourcesLoading: isAllSourcesLoading,
             isPartialSourcesLoading: isPartialSourcesLoading,
             failedSources: failedSources,
+            havePhysicsExperiment: havePhysicsExperiment,
           );
 
           return [
@@ -341,8 +353,6 @@ class _ClassTableCardState extends State<ClassTableCard> {
               LayoutBuilder(
                 builder: (context, constraints) => ClassTableWindow(
                   parentContext: context,
-                  currentWeek:
-                      ClassTableController.i.currentWeekComputedSignal.value,
                   constraints: constraints,
                 ),
               ),
@@ -409,7 +419,9 @@ class _ClassTableCardItem extends StatelessWidget {
 
     if (arr != null) {
       var detail = _ClassTableCardArrangementDetail(displayArrangement: arr);
-      columns.addIf(!detail.isContentEmpty, detail);
+      if (!detail.isContentEmpty) {
+        columns.add(detail);
+      }
     }
     return columns;
   }

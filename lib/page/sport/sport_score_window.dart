@@ -50,7 +50,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   bool get wantKeepAlive => true;
 
-  late Future<FetchResult<SportScore>> _future;
+  Future<FetchResult<SportScore>> _future = SportSession().getScore();
 
   Object? _translateError(BuildContext context, Object? error) {
     if (error is SportCredentialMissingException ||
@@ -85,12 +85,6 @@ class _SportScoreWindowState extends State<SportScoreWindow>
       rankBackgroundColor: baseColor.withValues(alpha: _textBackgroundAlpha),
       rankTextColor: baseColor[_secondaryColorShade]!,
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _future = SportSession().getScore();
   }
 
   @override

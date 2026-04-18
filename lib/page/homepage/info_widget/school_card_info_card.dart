@@ -22,7 +22,7 @@ class SchoolCardInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = SchoolCardController.i.moneySignal.watch(context);
+    final state = SchoolCardController.i.moneyStateSignal.watch(context);
     return MainPageCard(
       onPressed: () async {
         if (offline) {

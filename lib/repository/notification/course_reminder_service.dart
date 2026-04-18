@@ -235,8 +235,6 @@ class CourseReminderService extends NotificationService
         return;
       }
 
-      final int weekIndex = payload['weekIndex'] ?? 0;
-
       final navigator = preference.debuggerKey.currentState;
       if (navigator != null) {
         navigator.push(
@@ -244,14 +242,13 @@ class CourseReminderService extends NotificationService
             builder: (context) => LayoutBuilder(
               builder: (context, constraints) => ClassTableWindow(
                 parentContext: context,
-                currentWeek: weekIndex,
                 constraints: constraints,
               ),
             ),
           ),
         );
         log.info(
-          '[CourseReminderService] [handleNotificationTap] Navigated to class table, week: $weekIndex',
+          '[CourseReminderService] [handleNotificationTap] Navigated to class table',
         );
       } else {
         log.warning(
@@ -784,6 +781,7 @@ class CourseReminderService extends NotificationService
         log.info(
           '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
         );
+        await cancelAllCourseNotifications();
         return;
       }
 

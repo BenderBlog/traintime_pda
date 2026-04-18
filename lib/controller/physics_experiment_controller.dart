@@ -17,35 +17,28 @@ import 'package:watermeter/repository/physics_experiment_session.dart';
 
 class PhysicsExperimentController {
   static final PhysicsExperimentController i = PhysicsExperimentController._();
+  bool _isReloading = false;
 
   PhysicsExperimentController._() {
     /// Load from cache at the beginning
     final cache = ExperimentSession.getCache();
     if (cache != null) {
-      _lastValidPhysicsExperiment.value = FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-      );
+      final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
+      _lastValidPhysicsExperiment.value = cached;
+      physicsExperimentStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
   }
 
-  final physicsExperimentSignal = futureSignal(
-    () => getPhysicsExperimentData(),
-  );
-
   final _lastValidPhysicsExperiment =
       signal<FetchResult<List<ExperimentData>>?>(null);
+  final physicsExperimentStateSignal =
+      signal<AsyncState<FetchResult<List<ExperimentData>>>>(
+        const AsyncLoading(),
+      );
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final state = physicsExperimentSignal.value;
-      if (state is AsyncData<FetchResult<List<ExperimentData>>>) {
-        _lastValidPhysicsExperiment.value = state.value;
-      }
-    }, debugLabel: "ExamControllerShadowSyncEffect");
-
     effect(() {
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
@@ -70,17 +63,26 @@ class PhysicsExperimentController {
   }
 
   Future<void> reloadPhysicsExperiment() async {
-    if (physicsExperimentSignal.value.isLoading) return;
-    if (physicsExperimentSignal.value is AsyncError) {
-      physicsExperimentSignal.reset();
-    }
-    await physicsExperimentSignal.reload().catchError(
-      (e, s) => log.handle(
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = _lastValidPhysicsExperiment.value;
+    physicsExperimentStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await getPhysicsExperimentData();
+      _lastValidPhysicsExperiment.value = result;
+      physicsExperimentStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      physicsExperimentStateSignal.value = AsyncState.error(e, s);
+      log.handle(
         e,
         s,
         "[PhysicsExperimentController][reloadPhysicsExperiment] Have issue",
-      ),
-    );
+      );
+    } finally {
+      _isReloading = false;
+    }
   }
 
   late final physicsExperiments = computed(

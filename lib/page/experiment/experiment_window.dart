@@ -261,8 +261,8 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
       final physicsController = PhysicsExperimentController.i;
       final otherController = OtherExperimentController.i;
 
-      final physicsState = physicsController.physicsExperimentSignal.value;
-      final otherState = otherController.otherExperimentSignal.value;
+      final physicsState = physicsController.physicsExperimentStateSignal.value;
+      final otherState = otherController.otherExperimentStateSignal.value;
 
       final hasValidPhysics = physicsController.hasValidPhysicsExperiment.value;
       final hasValidOther = otherController.hasValidOtherExperiment.value;

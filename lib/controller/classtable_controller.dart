@@ -19,15 +19,14 @@ import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 class ClassTableController {
   static const decorationName = "decoration.jpg";
   static final ClassTableController i = ClassTableController._();
+  bool _isReloading = false;
 
   ClassTableController._() {
     final cache = ClassTableSession.getCache();
     if (cache != null) {
-      _lastValidSchoolClassTable.value = FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-        hintKey: "local_cache_hint",
-      );
+      final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
+      _lastValidSchoolClassTable.value = cached;
+      schoolClassTableStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
   }
@@ -42,10 +41,27 @@ class ClassTableController {
     ClassDetail classDetail,
     TimeArrangement timeArrangement,
   ) async {
-    var toChange = userDefinedClassSignal.value;
-    toChange.userDefinedDetail.add(classDetail);
-    timeArrangement.index = toChange.userDefinedDetail.length - 1;
-    toChange.timeArrangement.add(timeArrangement);
+    final current = userDefinedClassSignal.value;
+    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail)
+      ..add(ClassDetail.from(classDetail));
+    final timeArrangements = List<TimeArrangement>.from(
+      current.timeArrangement,
+    );
+    final toAdd = TimeArrangement(
+      source: timeArrangement.source,
+      index: userDefinedDetail.length - 1,
+      weekList: List<bool>.from(timeArrangement.weekList),
+      classroom: timeArrangement.classroom,
+      teacher: timeArrangement.teacher,
+      day: timeArrangement.day,
+      start: timeArrangement.start,
+      stop: timeArrangement.stop,
+    );
+    timeArrangements.add(toAdd);
+    final toChange = UserDefinedClassData(
+      userDefinedDetail: userDefinedDetail,
+      timeArrangement: timeArrangements,
+    );
     UserDefinedClassFile.updateUserDefinedClass(toChange);
     userDefinedClassSignal.value = toChange;
   }
@@ -59,26 +75,34 @@ class ClassTableController {
         originalTimeArrangement.index != timeArrangement.index) {
       return;
     }
-    var toChange = userDefinedClassSignal.value;
-    int timeArrangementIndex = toChange.timeArrangement.indexOf(
+    final current = userDefinedClassSignal.value;
+    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail);
+    final timeArrangements = List<TimeArrangement>.from(
+      current.timeArrangement,
+    );
+    int timeArrangementIndex = timeArrangements.indexOf(
       originalTimeArrangement,
     );
-    toChange.timeArrangement[timeArrangementIndex].weekList =
-        timeArrangement.weekList;
-    toChange.timeArrangement[timeArrangementIndex].teacher =
-        timeArrangement.teacher;
-    toChange.timeArrangement[timeArrangementIndex].day = timeArrangement.day;
-    toChange.timeArrangement[timeArrangementIndex].start =
-        timeArrangement.start;
-    toChange.timeArrangement[timeArrangementIndex].stop = timeArrangement.stop;
-    toChange.timeArrangement[timeArrangementIndex].classroom =
-        timeArrangement.classroom;
+    if (timeArrangementIndex < 0) return;
+    timeArrangements[timeArrangementIndex] = TimeArrangement(
+      source: originalTimeArrangement.source,
+      index: originalTimeArrangement.index,
+      weekList: List<bool>.from(timeArrangement.weekList),
+      classroom: timeArrangement.classroom,
+      teacher: timeArrangement.teacher,
+      day: timeArrangement.day,
+      start: timeArrangement.start,
+      stop: timeArrangement.stop,
+    );
 
     /// Update classDetail
     int classDetailIndex = originalTimeArrangement.index;
-    toChange.userDefinedDetail[classDetailIndex].name = classDetail.name;
-    toChange.userDefinedDetail[classDetailIndex].code = classDetail.code;
-    toChange.userDefinedDetail[classDetailIndex].number = classDetail.number;
+    userDefinedDetail[classDetailIndex] = ClassDetail.from(classDetail);
+
+    final toChange = UserDefinedClassData(
+      userDefinedDetail: userDefinedDetail,
+      timeArrangement: timeArrangements,
+    );
 
     UserDefinedClassFile.updateUserDefinedClass(toChange);
     userDefinedClassSignal.value = toChange;
@@ -86,36 +110,30 @@ class ClassTableController {
 
   Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) async {
     if (timeArrangement.source != Source.user) return;
-    var toChange = userDefinedClassSignal.value;
+    final current = userDefinedClassSignal.value;
+    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail);
+    final timeArrangements = List<TimeArrangement>.from(
+      current.timeArrangement,
+    );
     int tempIndex = timeArrangement.index;
-    toChange.timeArrangement.remove(timeArrangement);
-    toChange.userDefinedDetail.removeAt(timeArrangement.index);
-    for (var i in toChange.timeArrangement) {
+    timeArrangements.remove(timeArrangement);
+    userDefinedDetail.removeAt(timeArrangement.index);
+    for (var i in timeArrangements) {
       if (i.index >= tempIndex) i.index -= 1;
     }
+    final toChange = UserDefinedClassData(
+      userDefinedDetail: userDefinedDetail,
+      timeArrangement: timeArrangements,
+    );
     UserDefinedClassFile.updateUserDefinedClass(toChange);
     userDefinedClassSignal.value = toChange;
   }
 
-  final schoolClassTableSignal = futureSignal<FetchResult<ClassTableData>>(
-    () {
-      final semesterCode = SemesterController.i.semesterSignal.value;
-      return getClassTable(semesterCode);
-    },
-    debugLabel: "ClassTableSignal",
-    dependencies: [SemesterController.i.semesterSignal],
-  );
-
   final _lastValidSchoolClassTable = signal<FetchResult<ClassTableData>?>(null);
+  final schoolClassTableStateSignal =
+      signal<AsyncState<FetchResult<ClassTableData>>>(const AsyncLoading());
 
   void _initEffects() {
-    effect(() {
-      final state = schoolClassTableSignal.value;
-      if (state is AsyncData<FetchResult<ClassTableData>>) {
-        _lastValidSchoolClassTable.value = state.value;
-      }
-    }, debugLabel: "ClassTableControllerShadowSyncEffect");
-
     effect(() {
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
@@ -142,17 +160,28 @@ class ClassTableController {
   }
 
   Future<void> reloadClassTable() async {
-    if (schoolClassTableSignal.value.isLoading) return;
-    if (schoolClassTableSignal.value is AsyncError) {
-      schoolClassTableSignal.reset();
-    }
-    await schoolClassTableSignal.reload().catchError(
-      (e, s) => log.handle(
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = _lastValidSchoolClassTable.value;
+    schoolClassTableStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await getClassTable(
+        SemesterController.i.semesterSignal.value,
+      );
+      _lastValidSchoolClassTable.value = result;
+      schoolClassTableStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      schoolClassTableStateSignal.value = AsyncState.error(e, s);
+      log.handle(
         e,
         s,
         "[ClassTableControllerNew][reloadClassTable] Have issue",
-      ),
-    );
+      );
+    } finally {
+      _isReloading = false;
+    }
   }
 
   late final schoolClassTableComputedSignal = computed<ClassTableData>(
@@ -301,5 +330,13 @@ class ClassTableController {
     }
 
     return toReturn;
+  });
+
+  late final havePhysicsExperimentSignal = computed<bool>(() {
+    var classData = classTableComputedSignal.value;
+    return classData.classDetail.any(
+          (element) => element.name.contains("物理实验"),
+        ) ||
+        classData.notArranged.any((element) => element.name.contains("物理实验"));
   });
 }

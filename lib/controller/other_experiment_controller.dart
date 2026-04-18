@@ -16,34 +16,29 @@ import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 
 class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
+  bool _isReloading = false;
 
   OtherExperimentController._() {
     /// Load from cache at the beginning
     final cache = SysjSession.getCache();
     if (cache != null) {
-      _lastValidOtherExperiment.value = FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-      );
+      final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
+      _lastValidOtherExperiment.value = cached;
+      otherExperimentStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
   }
 
-  final otherExperimentSignal = futureSignal(() => getOtherExperimentData());
-
   final _lastValidOtherExperiment = signal<FetchResult<List<ExperimentData>>?>(
     null,
   );
+  final otherExperimentStateSignal =
+      signal<AsyncState<FetchResult<List<ExperimentData>>>>(
+        const AsyncLoading(),
+      );
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final state = otherExperimentSignal.value;
-      if (state is AsyncData<FetchResult<List<ExperimentData>>>) {
-        _lastValidOtherExperiment.value = state.value;
-      }
-    }, debugLabel: "ExamControllerShadowSyncEffect");
-
     effect(() {
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
@@ -62,17 +57,26 @@ class OtherExperimentController {
   }
 
   Future<void> reloadOtherExperiment() async {
-    if (otherExperimentSignal.value.isLoading) return;
-    if (otherExperimentSignal.value is AsyncError) {
-      otherExperimentSignal.reset();
-    }
-    await otherExperimentSignal.reload().catchError(
-      (e, s) => log.handle(
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = _lastValidOtherExperiment.value;
+    otherExperimentStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await getOtherExperimentData();
+      _lastValidOtherExperiment.value = result;
+      otherExperimentStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      otherExperimentStateSignal.value = AsyncState.error(e, s);
+      log.handle(
         e,
         s,
         "[OtherExperimentController][reloadOtherExperiment] Have issue",
-      ),
-    );
+      );
+    } finally {
+      _isReloading = false;
+    }
   }
 
   late final otherExperiments = computed(

@@ -4,33 +4,48 @@
 import 'dart:math' as math;
 
 import 'package:signals/signals.dart';
+import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
 class UpdateNoticeController {
   static UpdateNoticeController i = UpdateNoticeController._();
+  bool _isReloading = false;
 
   UpdateNoticeController._();
 
-  final updateMessageSignal = futureSignal(checkUpdate);
+  final updateMessageStateSignal = signal<AsyncState<UpdateMessage>>(
+    const AsyncLoading(),
+  );
 
   Future<void> reloadUpdateNoticeInfo() async {
-    if (updateMessageSignal.value.isLoading) return;
-    return await updateMessageSignal.reload().catchError(
-      (e, s) => log.handle(
+    if (_isReloading) return;
+    _isReloading = true;
+    final previous = updateMessageStateSignal.peek().value;
+    updateMessageStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+    try {
+      final result = await checkUpdate();
+      updateMessageStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      updateMessageStateSignal.value = AsyncState.error(e, s);
+      log.handle(
         e,
         s,
         "[UpdateNoticeController][reloadUpdateNoticeInfo] Have issue",
-      ),
-    );
+      );
+    } finally {
+      _isReloading = false;
+    }
   }
 
   /// true: new version avaliable
   /// false: latest version
   /// null: testing version
   late final isNewVersionAvaliableComputed = computed(() {
-    return updateMessageSignal.value.map(
+    return updateMessageStateSignal.value.map(
       data: (updateMessage) {
         List<int> versionCode = updateMessage.code
             .split('.')

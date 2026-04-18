@@ -28,7 +28,7 @@ class ElectricityWindow extends StatelessWidget {
       ),
       body: Watch((context) {
         final c = ElectricityController.i;
-        final state = c.electricityInfoSignal.value;
+        final state = c.electricityInfoStateSignal.value;
         final displayInfo = c.displayElectricityInfo.value;
         final isFromCache = c.isElectricityFromCache.value;
         final fetchTime = c.electricityFetchTime.value;

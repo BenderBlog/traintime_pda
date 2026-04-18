@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
@@ -16,12 +15,12 @@ class UpdateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      if (UpdateNoticeController.i.updateMessageSignal.value.isLoading ||
-          UpdateNoticeController.i.updateMessageSignal.value.isRefreshing) {
+      final state = UpdateNoticeController.i.updateMessageStateSignal.value;
+      if (state.isLoading || state.isRefreshing) {
         return Text(FlutterI18n.translate(context, "setting.fetching_update"))
             .paddingDirectional(horizontal: 16, vertical: 14)
             .withHomeCardStyle(context);
-      } else if (UpdateNoticeController.i.updateMessageSignal.value.hasError) {
+      } else if (state.hasError) {
         return Text(FlutterI18n.translate(context, "setting.fetch_failed"))
             .paddingDirectional(horizontal: 16, vertical: 14)
             .withHomeCardStyle(context);
@@ -41,15 +40,8 @@ class UpdateCard extends StatelessWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => Obx(
-                        () => UpdateDialog(
-                          updateMessage: UpdateNoticeController
-                              .i
-                              .updateMessageSignal
-                              .value
-                              .value!,
-                        ),
-                      ),
+                      builder: (context) =>
+                          UpdateDialog(updateMessage: state.value!),
                     );
                   },
                 );

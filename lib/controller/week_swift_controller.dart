@@ -1,6 +1,9 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -42,6 +45,24 @@ class WeekSwiftController {
 
   Future<int> setWeekSwift(int value) async {
     await preference.setInt(preference.Preference.swift, value);
+    if (Platform.isIOS) {
+      final api = SaveToGroupIdSwiftApi();
+      try {
+        final result = await api.saveToGroupId(
+          FileToGroupID(
+            appid: preference.appId,
+            fileName: "WeekSwift.txt",
+            data: value.toString(),
+          ),
+        );
+        log.info(
+          "[WeekSwiftController][setWeekSwift] "
+          "ios Save to public place status: $result.",
+        );
+      } catch (e, s) {
+        log.handle(e, s);
+      }
+    }
     weekSwiftSignal.value = value;
     log.info(
       "[WeekSwiftController][setWeekSwift] Update week swift to $value.",

@@ -31,7 +31,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
     final c = ExamController.i;
 
     return Watch((cache) {
-      final state = c.examInfoSignal.value;
+      final state = c.examInfoStateSignal.value;
       final hasValidExamInfo = c.hasValidExamInfo.value;
       final isFromCache = c.isExamFromCache.value;
       final fetchTime = c.examFetchTime.value;

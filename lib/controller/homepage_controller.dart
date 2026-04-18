@@ -56,7 +56,7 @@ class HomepageController {
 
   late final classTableSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
-        final state = ClassTableController.i.schoolClassTableSignal.value;
+        final state = ClassTableController.i.schoolClassTableStateSignal.value;
         if (state.isLoading) {
           return HomepageSourceState.loading;
         }
@@ -70,7 +70,7 @@ class HomepageController {
       });
 
   late final examSourceStateComputedSignal = computed<HomepageSourceState>(() {
-    final state = ExamController.i.examInfoSignal.value;
+    final state = ExamController.i.examInfoStateSignal.value;
     if (state.isLoading) {
       return HomepageSourceState.loading;
     }
@@ -86,7 +86,7 @@ class HomepageController {
   late final physicsExperimentSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
         final state =
-            PhysicsExperimentController.i.physicsExperimentSignal.value;
+            PhysicsExperimentController.i.physicsExperimentStateSignal.value;
         if (state.isLoading) {
           return HomepageSourceState.loading;
         }
@@ -106,7 +106,8 @@ class HomepageController {
 
   late final otherExperimentSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
-        final state = OtherExperimentController.i.otherExperimentSignal.value;
+        final state =
+            OtherExperimentController.i.otherExperimentStateSignal.value;
         if (state.isLoading) {
           return HomepageSourceState.loading;
         }
@@ -294,5 +295,9 @@ class HomepageController {
 
       return failedSources;
     },
+  );
+
+  late final havePhysicsExperimentSignal = computed<bool>(
+    () => ClassTableController.i.havePhysicsExperimentSignal.value,
   );
 }

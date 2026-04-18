@@ -96,22 +96,30 @@ class ClassTableWidgetState with ChangeNotifier {
       OtherExperimentController.i;
   final WeekSwiftController weekSwiftController = WeekSwiftController.i;
 
+  void _initClockTimer() {
+    _clockTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      _currentTime = DateTime.now();
+      notifyListeners();
+    });
+  }
+
   void _initEffects() {
+    _initClockTimer();
     _effectCleanup.add(
       effect(() {
-        classTableController.schoolClassTableSignal.value;
+        classTableController.schoolClassTableStateSignal.value;
         classTableController.classTableComputedSignal.value;
         classTableController.isClassTableFromCacheComputedSignal.value;
         classTableController.classTableCacheHintKeyComputedSignal.value;
-        examController.examInfoSignal.value;
+        examController.examInfoStateSignal.value;
         examController.subjects.value;
         examController.isExamFromCache.value;
         examController.examCacheHintKey.value;
-        physicsExperimentController.physicsExperimentSignal.value;
+        physicsExperimentController.physicsExperimentStateSignal.value;
         physicsExperimentController.physicsExperiments.value;
         physicsExperimentController.isPhysicsExperimentFromCache.value;
         physicsExperimentController.physicsExperimentCacheHintKey.value;
-        otherExperimentController.otherExperimentSignal.value;
+        otherExperimentController.otherExperimentStateSignal.value;
         otherExperimentController.otherExperiments.value;
         otherExperimentController.isOtherExperimentFromCache.value;
         otherExperimentController.otherExperimentCacheHintKey.value;
@@ -119,13 +127,14 @@ class ClassTableWidgetState with ChangeNotifier {
         notifyListeners();
       }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
     );
-  }
-
-  void _initClockTimer() {
-    _clockTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-      _currentTime = DateTime.now();
-      notifyListeners();
-    });
+    // Init current week info
+    if (currentWeek < 0) {
+      _chosenWeek = 0;
+    } else if (currentWeek >= semesterLength) {
+      _chosenWeek = semesterLength - 1;
+    } else {
+      _chosenWeek = currentWeek;
+    }
   }
 
   /// The length of the semester, the amount of the class table.
@@ -141,6 +150,8 @@ class ClassTableWidgetState with ChangeNotifier {
 
   String get decorationName => ClassTableController.decorationName;
 
+  DateTime get currentTime => _currentTime;
+
   ///*****************************///
   /// Following are dynamic data. ///
   /// ****************************///
@@ -149,10 +160,10 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get haveClass => timeArrangement.isNotEmpty && classDetail.isNotEmpty;
 
   bool get isClassTableLoading =>
-      classTableController.schoolClassTableSignal.value.isLoading;
+      classTableController.schoolClassTableStateSignal.value.isLoading;
 
   bool get hasClassTableLoadError =>
-      classTableController.schoolClassTableSignal.value is AsyncError;
+      classTableController.schoolClassTableStateSignal.value is AsyncError;
 
   bool get isClassTableFromCache =>
       classTableController.isClassTableFromCacheComputedSignal.value;
@@ -163,20 +174,21 @@ class ClassTableWidgetState with ChangeNotifier {
   DateTime? get classTableFetchTime =>
       classTableController.classTableFetchTimeComputedSignal.value;
 
-  bool get isExamLoading => examController.examInfoSignal.value.isLoading;
+  bool get isExamLoading => examController.examInfoStateSignal.value.isLoading;
 
   bool get hasExamLoadError =>
-      examController.examInfoSignal.value is AsyncError;
+      examController.examInfoStateSignal.value is AsyncError;
 
   bool get isExamFromCache => examController.isExamFromCache.value;
 
   String? get examCacheHintKey => examController.examCacheHintKey.value;
 
   bool get isPhysicsExperimentLoading =>
-      physicsExperimentController.physicsExperimentSignal.value.isLoading;
+      physicsExperimentController.physicsExperimentStateSignal.value.isLoading;
 
   bool get hasPhysicsExperimentLoadError =>
-      physicsExperimentController.physicsExperimentSignal.value is AsyncError;
+      physicsExperimentController.physicsExperimentStateSignal.value
+          is AsyncError;
 
   bool get isPhysicsExperimentFromCache =>
       physicsExperimentController.isPhysicsExperimentFromCache.value;
@@ -185,10 +197,10 @@ class ClassTableWidgetState with ChangeNotifier {
       physicsExperimentController.physicsExperimentCacheHintKey.value;
 
   bool get isOtherExperimentLoading =>
-      otherExperimentController.otherExperimentSignal.value.isLoading;
+      otherExperimentController.otherExperimentStateSignal.value.isLoading;
 
   bool get hasOtherExperimentLoadError =>
-      otherExperimentController.otherExperimentSignal.value is AsyncError;
+      otherExperimentController.otherExperimentStateSignal.value is AsyncError;
 
   bool get isOtherExperimentFromCache =>
       otherExperimentController.isOtherExperimentFromCache.value;
@@ -201,6 +213,11 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get hasExperimentArrangement =>
       physicsExperimentController.hasPhysicsExperimentArrangement.value ||
       otherExperimentController.hasOtherExperimentArrangement.value;
+
+  int get currentWeek => ClassTableController.i.currentWeekComputedSignal.value;
+
+  bool get havePhysicsExperiment =>
+      ClassTableController.i.havePhysicsExperimentSignal.value;
 
   List<ClassTableStatusSource> get loadingSources => [
     if (isClassTableLoading) ClassTableStatusSource.classTable,
@@ -219,7 +236,8 @@ class ClassTableWidgetState with ChangeNotifier {
   List<ClassTableStatusSource> get errorWithoutCacheSources => [
     if (hasClassTableLoadError) ClassTableStatusSource.classTable,
     if (hasExamLoadError) ClassTableStatusSource.exam,
-    if (hasPhysicsExperimentLoadError) ClassTableStatusSource.physicsExperiment,
+    if (hasPhysicsExperimentLoadError && havePhysicsExperiment)
+      ClassTableStatusSource.physicsExperiment,
     if (hasOtherExperimentLoadError) ClassTableStatusSource.otherExperiment,
   ];
 
@@ -273,11 +291,6 @@ class ClassTableWidgetState with ChangeNotifier {
   DateTime get startDay => DateTime.parse(
     classTableController.classTableComputedSignal.value.termStartDay,
   );
-
-  /// The currentWeek.
-  final int currentWeek;
-
-  DateTime get currentTime => _currentTime;
 
   /// The exam list.
   List<Subject> get subjects => examController.subjects.value;
@@ -597,16 +610,8 @@ END:VTIMEZONE
     });
   }
 
-  ClassTableWidgetState({required this.currentWeek}) {
+  ClassTableWidgetState() {
     _initEffects();
-    _initClockTimer();
-    if (currentWeek < 0) {
-      _chosenWeek = 0;
-    } else if (currentWeek >= semesterLength) {
-      _chosenWeek = semesterLength - 1;
-    } else {
-      _chosenWeek = currentWeek;
-    }
   }
 
   bool _checkIsOverlapping(

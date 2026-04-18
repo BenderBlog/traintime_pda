@@ -15,10 +15,10 @@ import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
-import 'package:watermeter/repository/pda_service_session.dart' as message;
 import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -192,7 +192,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!refreshAtStart) {
-      message.checkUpdate();
+      unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
       //message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"

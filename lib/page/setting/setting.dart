@@ -29,7 +29,6 @@ import 'package:watermeter/page/setting/notification_page/notification_page.dart
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:get/get.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -157,24 +156,21 @@ class _SettingWindowState extends State<SettingWindow> {
                   title: Text(
                     FlutterI18n.translate(context, "setting.check_update"),
                   ),
-                  subtitle: Watch(
-                    (context) => Text(
+                  subtitle: Watch((context) {
+                    final updateState =
+                        UpdateNoticeController.i.updateMessageStateSignal.value;
+                    return Text(
                       FlutterI18n.translate(
                         context,
                         "setting.latest_version",
                         translationParams: {
                           "latest":
-                              UpdateNoticeController
-                                  .i
-                                  .updateMessageSignal
-                                  .value
-                                  .value
-                                  ?.code ??
+                              updateState.value?.code ??
                               FlutterI18n.translate(context, "setting.waiting"),
                         },
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                   onTap: () {
                     showToast(
                       context: context,
@@ -189,7 +185,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       if (context.mounted) {
                         if (UpdateNoticeController
                             .i
-                            .updateMessageSignal
+                            .updateMessageStateSignal
                             .value
                             .hasError) {
                           showToast(
@@ -221,7 +217,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                 (context) => UpdateDialog(
                                   updateMessage: UpdateNoticeController
                                       .i
-                                      .updateMessageSignal
+                                      .updateMessageStateSignal
                                       .value
                                       .value!,
                                 ),
@@ -294,10 +290,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           .setInt(preference.Preference.brightness, value)
                           .then((value) {
                             setState(() {
-                              ThemeController toChange = Get.put(
-                                ThemeController(),
-                              );
-                              toChange.updateTheme();
+                              ThemeController.i.updateTheme();
                             });
                           });
                     },
@@ -977,10 +970,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             await preference.prefrenceClear();
 
                             /// Theme back to default
-                            ThemeController toChange = Get.put(
-                              ThemeController(),
-                            );
-                            toChange.updateTheme();
+                            ThemeController.i.updateTheme();
 
                             /// Restart app
                             if (mounted) {

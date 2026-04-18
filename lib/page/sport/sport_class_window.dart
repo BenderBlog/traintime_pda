@@ -25,7 +25,7 @@ class _SportClassWindowState extends State<SportClassWindow>
   @override
   bool get wantKeepAlive => true;
 
-  late Future<FetchResult<SportClass>> _future;
+  Future<FetchResult<SportClass>> _future = SportSession().getClass();
 
   Object? _translateError(BuildContext context, Object? error) {
     if (error is SportCredentialMissingException ||
@@ -36,12 +36,6 @@ class _SportClassWindowState extends State<SportClassWindow>
       return FlutterI18n.translate(context, error);
     }
     return error;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _future = SportSession().getClass();
   }
 
   @override
