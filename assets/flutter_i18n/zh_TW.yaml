@@ -130,6 +130,25 @@ classtable:
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
     switch_semester: 切換課程表學期
+    current_time_settings: 時間指示設置
+    class_color_settings: 课表样式设置
+  visual_settings:
+    current_time_settings_title: 時間指示設置
+    class_color_settings_title: 课表样式设置
+    current_time_section: 時間指示
+    show_current_time_indicator: 顯示當前時間指示線
+    show_current_time_label: 顯示迷你数字時钟
+    show_today_column_highlight: 強調顯示今天的纵列
+    unfinished_section: 未开始課程樣式
+    active_brightness_factor: 亮度: {value}
+    active_border_alpha: 邊框透明度: {value}
+    active_inner_alpha: 底色透明度: {value}
+    completed_section: 已结束課程樣式
+    completed_saturation_factor: 底色飽和度: {value}
+    completed_brightness_factor: 亮度: {value}
+    completed_text_saturation_factor: 文字飽和度: {value}
+    completed_border_alpha: 邊框透明度: {value}
+    completed_inner_alpha: 底色透明度: {value}
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課信息
