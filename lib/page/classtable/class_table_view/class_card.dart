@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -58,43 +59,59 @@ class ClassCard extends StatelessWidget {
 
                       /// The way to show the class info of the period.
                       /// The last one indicate whether to delete this stuff.
-                      (ClassDetail, TimeArrangement, bool)? toUse =
-                          await BothSideSheet.show(
-                            title: FlutterI18n.translate(
-                              context,
-                              "classtable.class_card.title",
-                            ),
-                            child: ArrangementDetail(
-                              information: List.generate(data.length, (index) {
-                                if (data.elementAt(index) is Subject ||
-                                    data.elementAt(index) is ExperimentData) {
-                                  return data.elementAt(index);
-                                } else {
-                                  return (
-                                    classTableState.getClassDetail(
-                                      classTableState.timeArrangement.indexOf(
-                                        data.elementAt(index),
-                                      ),
-                                    ),
-                                    data.elementAt(index),
-                                  );
-                                }
-                              }),
-                              currentWeek: classTableState.currentWeek,
-                            ),
-                            context: context,
-                          );
-                      if (context.mounted && toUse != null) {
-                        if (toUse.$3) {
+                      final action = await BothSideSheet.show(
+                        title: FlutterI18n.translate(
+                          context,
+                          "classtable.class_card.title",
+                        ),
+                        child: ArrangementDetail(
+                          information: List.generate(data.length, (index) {
+                            if (data.elementAt(index) is Subject ||
+                                data.elementAt(index) is ExperimentData) {
+                              return data.elementAt(index);
+                            } else if (data.elementAt(index)
+                                is (
+                                  CustomClass,
+                                  CustomClassTimeRange,
+                                  MaterialColor,
+                                )) {
+                              return data.elementAt(index);
+                            } else if (data.elementAt(index)
+                                is (CustomClass, CustomClassTimeRange)) {
+                              return data.elementAt(index);
+                            } else if (data.elementAt(index)
+                                is TimeArrangement) {
+                              final TimeArrangement arrangement = data
+                                  .elementAt(index);
+                              return (
+                                classTableState.getClassDetail(
+                                  classTableState.timeArrangement.indexOf(
+                                    arrangement,
+                                  ),
+                                ),
+                                arrangement,
+                              );
+                            } else {
+                              return data.elementAt(index);
+                            }
+                          }),
+                          currentWeek: classTableState.currentWeek,
+                        ),
+                        context: context,
+                      );
+                      if (!context.mounted || action == null) return;
+
+                      if (action is (ClassDetail, TimeArrangement, bool)) {
+                        if (action.$3) {
                           await ClassTableState.of(
                             context,
-                          )!.controllers.deleteUserDefinedClass(toUse.$2);
+                          )!.controllers.deleteUserDefinedClass(action.$2);
                         } else {
                           await Navigator.of(context)
                               .push(
                                 MaterialPageRoute(
                                   builder: (context) => ClassAddWindow(
-                                    toChange: (toUse.$1, toUse.$2),
+                                    toChange: (action.$1, action.$2),
                                     semesterLength: controller.semesterLength,
                                   ),
                                 ),
@@ -106,6 +123,41 @@ class ClassCard extends StatelessWidget {
                                   value.$2,
                                   value.$3,
                                 );
+                              });
+                        }
+                      } else if (action is (String, String?, String)) {
+                        final int customIndex = controller.customClasses
+                            .indexWhere((custom) => custom.id == action.$1);
+                        if (customIndex < 0) return;
+
+                        if (action.$3 == 'delete_all') {
+                          await controller.deleteCustomClassById(action.$1);
+                        } else if (action.$3 == 'delete_one') {
+                          final String? timeRangeId = action.$2;
+                          if (timeRangeId == null) return;
+                          await controller.deleteCustomClassTimeRange(
+                            customClassId: action.$1,
+                            timeRangeId: timeRangeId,
+                          );
+                        } else if (action.$3 == 'edit') {
+                          final CustomClass customClass =
+                              controller.customClasses[customIndex];
+                          await Navigator.of(context)
+                              .push(
+                                MaterialPageRoute(
+                                  builder: (context) => ClassAddWindow(
+                                    customToChange: customClass,
+                                    semesterLength: controller.semesterLength,
+                                  ),
+                                ),
+                              )
+                              .then((value) async {
+                                if (value is CustomClass) {
+                                  await controller.editCustomClassById(
+                                    action.$1,
+                                    value,
+                                  );
+                                }
                               });
                         }
                       }
