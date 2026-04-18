@@ -103,6 +103,11 @@ class _ClassTableViewState extends State<ClassTableView> {
   List<Widget> classSubRow(bool isRest) {
     if (isRest) {
       List<Widget> thisRow = [];
+      final currentDayColumnBox = _currentDayColumnBox();
+      if (currentDayColumnBox != null) {
+        thisRow.add(currentDayColumnBox);
+      }
+
       for (var index = 1; index <= 7; ++index) {
         List<ClassOrgainzedData> arrangedEvents = classTableState
             .getArrangement(weekIndex: widget.index, dayIndex: index);
@@ -124,10 +129,6 @@ class _ClassTableViewState extends State<ClassTableView> {
       }
 
       final timeIndicator = _currentTimeIndicator();
-      final currentDayColumnBox = _currentDayColumnBox();
-      if (currentDayColumnBox != null) {
-        thisRow.add(currentDayColumnBox);
-      }
       if (timeIndicator != null) {
         thisRow.add(timeIndicator);
       }

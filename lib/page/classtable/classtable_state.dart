@@ -2,6 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:device_calendar/device_calendar.dart';
@@ -12,7 +13,6 @@ import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
@@ -63,10 +63,13 @@ class ClassTableWidgetState with ChangeNotifier {
   ///*******************************************************************///
   bool _disposed = false;
   final List<EffectCleanup> _effectCleanup = [];
+  Timer? _clockTimer;
+  DateTime _currentTime = DateTime.now();
 
   @override
   void dispose() {
     _disposed = true;
+    _clockTimer?.cancel();
     for (final cleanup in _effectCleanup) {
       cleanup();
     }
@@ -113,10 +116,16 @@ class ClassTableWidgetState with ChangeNotifier {
         otherExperimentController.isOtherExperimentFromCache.value;
         otherExperimentController.otherExperimentCacheHintKey.value;
         weekSwiftController.weekSwiftSignal.value;
-        GlobalTimerController.i.currentTimeSignal.value;
         notifyListeners();
       }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
     );
+  }
+
+  void _initClockTimer() {
+    _clockTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      _currentTime = DateTime.now();
+      notifyListeners();
+    });
   }
 
   /// The length of the semester, the amount of the class table.
@@ -268,7 +277,7 @@ class ClassTableWidgetState with ChangeNotifier {
   /// The currentWeek.
   final int currentWeek;
 
-  DateTime get currentTime => GlobalTimerController.i.currentTimeSignal.value;
+  DateTime get currentTime => _currentTime;
 
   /// The exam list.
   List<Subject> get subjects => examController.subjects.value;
@@ -590,6 +599,7 @@ END:VTIMEZONE
 
   ClassTableWidgetState({required this.currentWeek}) {
     _initEffects();
+    _initClockTimer();
     if (currentWeek < 0) {
       _chosenWeek = 0;
     } else if (currentWeek >= semesterLength) {
