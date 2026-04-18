@@ -2,6 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:device_calendar/device_calendar.dart';
@@ -62,10 +63,13 @@ class ClassTableWidgetState with ChangeNotifier {
   ///*******************************************************************///
   bool _disposed = false;
   final List<EffectCleanup> _effectCleanup = [];
+  Timer? _clockTimer;
+  DateTime _currentTime = DateTime.now();
 
   @override
   void dispose() {
     _disposed = true;
+    _clockTimer?.cancel();
     for (final cleanup in _effectCleanup) {
       cleanup();
     }
@@ -92,7 +96,15 @@ class ClassTableWidgetState with ChangeNotifier {
       OtherExperimentController.i;
   final WeekSwiftController weekSwiftController = WeekSwiftController.i;
 
+  void _initClockTimer() {
+    _clockTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      _currentTime = DateTime.now();
+      notifyListeners();
+    });
+  }
+
   void _initEffects() {
+    _initClockTimer();
     _effectCleanup.add(
       effect(() {
         classTableController.schoolClassTableStateSignal.value;
@@ -137,6 +149,8 @@ class ClassTableWidgetState with ChangeNotifier {
       classTableController.classTableComputedSignal.value.semesterCode;
 
   String get decorationName => ClassTableController.decorationName;
+
+  DateTime get currentTime => _currentTime;
 
   ///*****************************///
   /// Following are dynamic data. ///
