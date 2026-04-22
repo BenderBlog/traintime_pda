@@ -15,6 +15,7 @@ import 'package:watermeter/controller/schoolnet_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 Future<void> _comboLogin({
@@ -81,9 +82,13 @@ Future<void> update({
     ),
     _safeReload("Library", LibraryController.i.reloadBorrowList),
     _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
-    _safeReload("Electricity", ElectricityController.i.refreshElectricityInfo),
+    _safeReload(
+      "Electricity",
+      ElectricityController.i.refreshElectricityInfo,
+    ),
     _safeReload("Schoolnet", SchoolnetController.i.reloadSchoolnetInfo),
   ]);
+  await maybeAutoSyncSystemCalendar();
 
   if (CourseReminderService().isInitialized) {
     CourseReminderService().validateAndUpdateNotifications();

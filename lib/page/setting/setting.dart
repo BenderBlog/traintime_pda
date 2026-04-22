@@ -4,6 +4,7 @@
 
 // Setting window.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -40,6 +41,7 @@ import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
@@ -81,6 +83,22 @@ class _SettingWindowState extends State<SettingWindow> {
           ),
         ),
       );
+    }
+  }
+
+  bool get _isSemesterAwareControllerLoading =>
+      ClassTableController.i.schoolClassTableStateSignal.value.isLoading ||
+      ExamController.i.examInfoStateSignal.value.isLoading ||
+      PhysicsExperimentController.i.physicsExperimentStateSignal.value
+          .isLoading ||
+      OtherExperimentController.i.otherExperimentStateSignal.value.isLoading;
+
+  Future<void> _waitForSemesterAwareReloads() async {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    final stopwatch = Stopwatch()..start();
+    while (_isSemesterAwareControllerLoading &&
+        stopwatch.elapsed < const Duration(seconds: 30)) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
     }
   }
 
@@ -254,7 +272,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   subtitle: Text(
                     FlutterI18n.translate(
                       context,
-                      "setting.change_color_dialog.${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+                      "setting.change_color_dialog."
+                      "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
@@ -737,6 +756,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               OtherExperimentController.i
                                   .reloadOtherExperiment(),
                             ]);
+                            await maybeAutoSyncSystemCalendar();
                             if (mounted) {
                               setState(() {});
                             }
@@ -801,9 +821,17 @@ class _SettingWindowState extends State<SettingWindow> {
                       barrierDismissible: false,
                       context: context,
                       builder: (context) => SemesterSwitchDialog(),
-                    ).then((value) {
+                    ).then((value) async {
                       if (value == true) {
                         setState(() {});
+                        if (context.mounted) {
+                          showToast(context: context, msg: "Updating data");
+                        }
+                        await _waitForSemesterAwareReloads();
+                        await maybeAutoSyncSystemCalendar();
+                        if (mounted) {
+                          setState(() {});
+                        }
                       }
                     });
                   },
