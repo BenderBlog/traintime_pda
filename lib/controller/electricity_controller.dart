@@ -38,15 +38,13 @@ class ElectricityController {
     if (result.isCache) return;
 
     final info = result.data;
-    if (double.tryParse(info.remain) == null) return;
 
     final newHistoryInfo = List<ElectricityInfo>.from(
       historyElectricityInfoList,
     );
     if (newHistoryInfo.isNotEmpty) {
       final last = newHistoryInfo.last;
-      if (last.fetchDay.isAtSameDayAs(info.fetchDay) &&
-          last.remain == info.remain) {
+      if (last.fetchDay.isAtSameDayAs(info.fetchDay)) {
         return;
       }
     }
@@ -88,12 +86,6 @@ class ElectricityController {
   void clearElectricityHistory() {
     ElectricitySession.clearElectricityHistory();
     historyElectricityInfoList.clear();
-  }
-
-  // Get electricity account
-  Future<String> getElectricityAccount() async {
-    String dorm = await PersonalInfoSession().getDormInfoEhall();
-    return ElectricitySession.parseElectricityAccountFromIDS(dorm);
   }
 
   late final displayElectricityInfo = computed(

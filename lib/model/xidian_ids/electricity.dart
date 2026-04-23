@@ -9,20 +9,14 @@ part 'electricity.g.dart';
 @JsonSerializable()
 class ElectricityInfo {
   DateTime fetchDay;
-  String remain;
-  String owe;
+  String electricityRemain;
+  String waterRemain;
 
   ElectricityInfo({
     required this.fetchDay,
-    required this.remain,
-    required this.owe,
+    required this.electricityRemain,
+    required this.waterRemain,
   });
-
-  factory ElectricityInfo.empty(DateTime time) => ElectricityInfo(
-    fetchDay: time,
-    remain: "electricity_status.pending",
-    owe: "electricity_status.pending",
-  );
 
   factory ElectricityInfo.fromJson(Map<String, dynamic> json) =>
       _$ElectricityInfoFromJson(json);
