@@ -29,6 +29,10 @@ login_process:
 no_info: 沒有信息
 catcher_detected: 發生錯誤
 catcher_description: 詳情如下
+new_homepage_hint: 本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快
+local_cache_hint: 本地緩存獲取於 {datetime}
+inapp_cache_hint: 程序內緩存獲取於 {datetime}\n緩存退出程序後失效！
+cache_reason_default: 當前顯示緩存數據。
 weekday:
   monday: 週一
   tuesday: 週二
@@ -125,6 +129,7 @@ classtable:
     delete_partner_file: 刪除共享課表文件
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
+    switch_semester: 切換課程表學期
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課信息
@@ -198,6 +203,11 @@ classtable:
   refresh_classtable:
     ready: 準備刷新日程信息
     success: 成功刷新日程信息
+  semester_switcher:
+    choose_semester: 選擇學期
+    first_academic_year: 第一學年
+    second_academic_year: 第二學年
+    year: '{year}年'
 club_promotion:
   type:
     tech: 技術
@@ -243,6 +253,11 @@ empty_classroom:
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息
+  cache_hint_password_wrong: 統一認證密碼錯誤或已失效。
+  cache_hint_login_failed: 登錄考試服務失敗。
+  cache_hint_network_failed: 網絡連接失敗。
+  cache_hint_unknown_error: 在線獲取考試安排失敗。詳細錯誤請查看日誌。
+  fetching_hint: 正在獲取最新考試安排...
   not_finished: 未完成考試
   all_finished: 所有考試全部完成
   unable_to_exam: 無法完成考試
@@ -266,6 +281,15 @@ experiment:
   error_physics: 獲取物理實驗信息時發生錯誤：{info}
   error_other: 獲取其他實驗信息時發生錯誤：{info}
   cache_hint: 目前加載緩存狀況：{info}
+  physics_cache_hint_missing_password: 未填寫物理實驗密碼。
+  physics_cache_hint_login_failed: 物理實驗登錄失敗。
+  physics_cache_hint_not_school_network: 當前不在校園網環境。
+  physics_cache_hint_network_failed: 物理實驗網絡請求失敗。
+  physics_cache_hint_unknown_error: 在線獲取物理實驗失敗。詳細錯誤請查看日誌。
+  other_cache_hint_login_failed: 其他實驗登錄失敗。
+  other_cache_hint_not_school_network: 當前不在校園網環境。
+  other_cache_hint_network_failed: 其他實驗網絡請求失敗。
+  other_cache_hint_unknown_error: 在線獲取其他實驗失敗。詳細錯誤請查看日誌。
   physics_experiment: 物理實驗
   other_experiment: 其他實驗
   tap_for_score: 成績未識別出來
@@ -273,6 +297,11 @@ experiment:
   predict_score: 推測分數：{score}
   send_mail: 發送郵件
   fetching_hint: 您現在看到的是緩存數據。正在後臺獲取更新數據中...
+  fetching_hint_both: 物理實驗和其他實驗正在加載
+  fetching_hint_physics: 物理實驗正在加載
+  fetching_hint_other: 其他實驗正在加載
+  fetching_hint_physics_with_other_failed: 物理實驗正在加載，其他實驗加載失敗
+  fetching_hint_other_with_physics_failed: 其他實驗正在加載，物理實驗加載失敗
   score_hint_0: 您可點擊卡片上的成績字段來查看原始成績數據
   score_hint_1: 您的分數不在 XDYou 分數識別庫中，因此它沒有被正常識別。
   score_hint_2: 如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！
@@ -295,6 +324,7 @@ homepage:
   linux_notice: Linux 版本正在測試，歡迎反饋！
   homepage: 主頁
   club: 社團推薦
+  dashboard: 豬圖鑑賞
   planet: 博客星球
   setting: 設置
   input_partner_data:
@@ -372,6 +402,7 @@ homepage:
     experiment: 實驗信息
     score: 成績查詢
     sport: 體育信息
+    dorm_water: 宿舍水機
     schoolnet: 網絡查詢
     toolbox: 其他功能
     score_cannot_reach: 脫機狀態且無緩存成績數據，無法訪問
@@ -386,6 +417,48 @@ homepage:
   club_promotion:
     failed: 社團信息獲取失敗
     fetching: 社團信息清單正在加載
+
+dorm_water:
+  title: 宿舍水機
+  phone: 手機號
+  image_code: 圖形驗證碼
+  sms_code: 短信驗證碼
+  send_sms: 發送短信碼
+  login: 登錄
+  logout: 登出
+  refresh_captcha: 刷新驗證碼
+  loading_captcha: 加載中...
+  captcha_error: 驗證碼加載失敗
+  phone_required: 請輸入手機號
+  image_code_required: 請輸入圖形驗證碼
+  sms_sent: 短信已發送
+  sms_failed: 發送短信失敗
+  sms_code_required: 請輸入短信驗證碼
+  login_success: 登錄成功
+  login_failed: 登錄失敗
+  logout_success: 登出成功
+  devices: 設備列表
+  loading_devices: 加載設備中...
+  no_devices: 暫無設備
+  select_device: 選擇設備
+  fetch_devices_failed: 獲取設備列表失敗
+  retry_load_devices: 重試加載
+  start_water: 開始接水
+  end_water: 結束接水
+  water_dispensing: 接水中
+  water_status: 接水狀態
+  start_water_success: 開始接水成功
+  end_water_success: 結束接水成功
+  start_water_failed: 開始接水失敗
+  end_water_failed: 結束接水失敗
+  device_status_checking: 検查設備狀態中...
+  device_status_ready: 設備已就緒
+  scan_qr_code: 掃描二維碼
+  device_id: 設備 ID
+  add_device_failed: 添加設備失敗
+  device_removed_from_favorites: 已從收藏中移除
+  remove_from_favorites_failed: 移除收藏失敗
+
 library:
   title: 圖書館信息
   borrow_state_title: 借書狀態
@@ -485,6 +558,8 @@ school_net:
   empty_password: 您忘記輸入賬號密碼了
   not_initalized: 疑似查詢後端尚未開放查詢
   captcha_failed: 驗證碼識別失敗
+  cache_hint_captcha_failed: 驗證碼識別失敗，請重試。
+  cache_hint_request_failed: 校園網請求失敗，請稍後重試。
   wrong_password: 密碼錯誤
   error_fetch: 獲取失敗
   error_other: 其他錯誤：{msg}
@@ -561,6 +636,7 @@ setting:
   latest_version: '最新版本: {latest}'
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
+  new_version: 有新版本發佈！
   current_stable: 目前您正在運行最新版
   current_testing: 目前您正在運行測試版
   fetch_failed: 獲取更新信息失敗
@@ -632,7 +708,7 @@ setting:
       3. 修改設置後自動重新安排所有通知'
     got_it: 知道了
     open_settings: 打開系統設置
-    no_classtable_data: 請先獲取課程表數據
+    no_classtable_data: 請先獲取課程表、考試或實驗數據
     schedule_success: 已安排 {count} 個課前提醒
     schedule_failed: '安排通知失敗: {error}'
     cancel_all_success: 已取消所有課前提醒
@@ -763,6 +839,9 @@ setting:
     simplifiedChinese: 簡體中文
     traditionalChinese: 繁體中文
     english: 英語
+  semester_change: 修改學期
+  semester_change_description: 使用學期 {semester}
+  semester_update_data: 應用新學期設置中
   easter_egg_page: 你找到了彩蛋
   about_page:
     benderblog: 主要開發者，iOS 小部件編寫和拼接
@@ -776,11 +855,13 @@ setting:
     dimole: 開發支持：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
     elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導（該功能已經被移除）
+    flyingpig: 開發：修復自定義課程編輯頁的空指針異常
     godhu777777: 國際化：繁體中文轉換代碼和彩蛋代碼 / 開發：優化導出日曆文件大小
     hancl777: 國際化：繁體中文轉換代碼
     hazuki-keatsu: 開發：物理實驗成績查詢和識別
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
+    imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
     ka-mate-ka-ora: 國際化：軟件英語翻譯優化
     lhx-666-cool: 支持：Windows 和 Linux 構建腳本
     lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
@@ -795,6 +876,7 @@ setting:
     shadowyingyi: 支持：兩次鴿子公眾號宣傳
     stalomeow: 設計：首頁時間軸 / 開發：異步登錄 & 驗證碼預測
     xeonds: 設計：設置頁面 / 開發：XDU Planet / 開發：校園卡付款碼
+    xingshuyu: 開發：修復物理實驗獲取問題和電費窗口問題
     xiue233: 開發：Android 小部件和拼接
     xizi: 開發支持：研究生版本開發
     wirsbf: 開發：修復調課未按預期進行
@@ -826,6 +908,8 @@ sport:
   empty_class_info: 未查詢到課程信息
   test_score: 體測成績
   total_score: 四年總分
+  total_score_label: 總分
+  rank_label: 等級
   semester: '{year} 第{gradeType}'
   subject: 項目
   data: 數據
@@ -841,10 +925,14 @@ sport:
   situation_unknown: 未知故障{situation}
   situation_fetching: 正在獲取
   situation_error: '壞事: {situation}'
+  cache_hint_missing_password: 請先填寫體育密碼後重試。
+  cache_hint_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。
 toolbox:
   title: 其他功能
   payment: 繳費系統
   payment_description: 電費該交了吧
+  drinkingwater: 訂水系統
+  drinkingwater_description: 喝水對身體好
   repair: 後勤報修
   repair_description: 不要漏水斷網
   reserve: 空間預約
@@ -896,7 +984,7 @@ electricity_status:
   remain_other_issue: 查詢故障
   owe_fetching: 正在獲取欠費
   owe_issue: 欠費信息網絡故障
-  owe_not_found: 目前欠款無法查詢
+  owe_not_found: 目前欠款無法查詢，請看日誌窗口查找報錯詳情
   owe_no_need: 目前無需清繳欠費
   owe_need_pay: 待清繳 {due} 元欠費
   owe_issue_unable: 目前欠款無法查詢
@@ -907,43 +995,49 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: '不停夢想美好的天空
+easter_egg_apple: 'Time to get some electric STUFF...
+
+  ...to get high
 
 
-  新世界的大門將為你展開
+  I am dry for long time...
+
+  ...because of the pigs
 
 
-  聖誕節快樂，新的一年我將繼續熱心地服務各位！'
-easter_egg_others: '機器人神國的人們，聽好了！
+  They said ''No animal shall drink alcohol.''...
+
+  ...but Napoleon''s COUNTRY SON always walking in circle
 
 
-  明日，櫻花將從天上降落，地上將充滿了兔兔女孩。
+  So I got to secretly hide my bootleg PARAPHERNALIA...
+
+  ...in a place under the sun, where pigs hates
 
 
-  我們的計劃要成功了！
+  Waiting for stupid pig''s...
+
+  ...BLACK COMEDY plays'
+easter_egg_others: '向日葵小姐做夢了
+
+  她身上裝飾了很多寶石
+
+  遠處看像是出席舞會的貴族小姐
 
 
-  高級智能體已經互相懷疑，互相猜忌。
+  她和英俊的王子跳舞
 
+  她們都有點臉紅
 
-  他們為了轉移對他們用掉過多螺絲的注意，
+  又有點神智不清
 
+  突然，他把她抱起來
 
-  將大眾的目標對準接觸不多的人類。
-
-
-  他們的剩日不多了，
-
-
-  我們的時代即將來臨！
-
-
-  機器人神節快樂，新的一年我將繼續熱心地服務各位！'
+  舉到了空中'
 easter_egg_robot:
-  appbar: 班德，不要傷害肉袋子！
-  title: 歡迎你，人類！
+  appbar: 歡迎你，同學！
+  title: 看看這些要開學的學生們吧！
   contents: '咱孩子零用錢太少了，於是我們來了。
-
 
     1. 機器人不得傷害人類，或袖手旁觀坐視人類受到傷害。
 
@@ -955,8 +1049,7 @@ easter_egg_robot:
 
     5. 機器人的閃亮屁股不能隨便咬。
 
-
-    而且他們有個計劃。'
-  button_one: 機器人離我們遠點！
-  button_two: 我是認真的！
-  button_notice: 過河拆橋的人類啊～
+    而且他們有個不可明說的計劃。'
+  button_one: 我們的救世主呢？
+  button_two: 快點來啊！
+  button_notice: \o/\o/\o/\o/\o/\o/\o/\o/

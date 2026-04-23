@@ -2,20 +2,148 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:charset_converter/charset_converter.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
+import 'package:pool/pool.dart';
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/not_school_network_exception.dart';
+import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/repository/experiment_score/image_recognition.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-enum ExperimentFetchStatus { notSchoolNetwork, noPassword, success }
+String _cacheHintFromError(Object error) {
+  if (error is NoPasswordException &&
+      error.type == PasswordType.physicsExperiment) {
+    return "experiment.physics_cache_hint_missing_password";
+  }
+  if (error is LoginFailedException) {
+    return "experiment.physics_cache_hint_login_failed";
+  }
+  if (error is NotSchoolNetworkException) {
+    return "experiment.physics_cache_hint_not_school_network";
+  }
+  if (error is DioException) {
+    return "experiment.physics_cache_hint_network_failed";
+  }
+  return "experiment.physics_cache_hint_unknown_error";
+}
+
+Future<FetchResult<List<ExperimentData>>> getPhysicsExperimentData() async {
+  try {
+    List<ExperimentData> data = await ExperimentSession().getData();
+    DateTime fetchTime = DateTime.now();
+    await ExperimentSession.writeCache(data);
+    return FetchResult.fresh(fetchTime: fetchTime, data: data);
+  } on PasswordWrongException {
+    log.error(
+      "[ExperimentSession][getExperimentData] "
+      "Password changed, remove cache",
+    );
+    ExperimentSession.deleteCache();
+    rethrow;
+  } catch (e, s) {
+    log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
+    var cache = ExperimentSession.getCache();
+    if (cache != null) {
+      return FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: _cacheHintFromError(e),
+      );
+    }
+    rethrow;
+  }
+}
 
 class ExperimentSession extends NetworkSession {
+  static const physicsExperimentCacheName = "PhysicsExperiment.json";
+  static File physicsExperimentCacheFile = File(
+    "${supportPath.path}/$physicsExperimentCacheName",
+  );
+  static bool get isCacheExist => physicsExperimentCacheFile.existsSync();
+
+  static void deleteCache() async {
+    if (physicsExperimentCacheFile.existsSync()) {
+      physicsExperimentCacheFile.deleteSync();
+    }
+  }
+
+  static Future<void> writeCache(List<ExperimentData> data) async {
+    log.info(
+      "[ExperimentSession][writeCache] "
+      "Store to cache.",
+    );
+    physicsExperimentCacheFile.writeAsStringSync(jsonEncode(data));
+    if (Platform.isIOS) {
+      final api = SaveToGroupIdSwiftApi();
+      try {
+        bool result = await api.saveToGroupId(
+          FileToGroupID(
+            appid: prefs.appId,
+            fileName: physicsExperimentCacheName,
+            data: jsonEncode(data),
+          ),
+        );
+        log.info(
+          "[ExperimentController][getPhysicsExperiment] "
+          "ios Save to public place status: $result.",
+        );
+      } catch (e, s) {
+        log.handle(e, s);
+      }
+    }
+  }
+
+  static (DateTime, List<ExperimentData>)? getCache() {
+    if (!isCacheExist) return null;
+    try {
+      List<dynamic> toDecode = jsonDecode(
+        physicsExperimentCacheFile.readAsStringSync(),
+      );
+      List<ExperimentData> physicsData = List<ExperimentData>.generate(
+        toDecode.length,
+        (index) => ExperimentData.fromJson(toDecode[index]),
+      );
+
+      // Check if cache contains old format data (score field was migrated from String)
+      // Old format will have been converted to null by _recognitionResultFromJson
+      var rawJson = toDecode.firstOrNull;
+      bool hasOldFormat =
+          rawJson != null &&
+          rawJson['score'] != null &&
+          rawJson['score'] is String;
+
+      if (hasOldFormat) {
+        log.info(
+          "[ExamController][onInit] "
+          "Detected old String format in physics cache, will trigger refresh.",
+        );
+        // Delete old cache file to force refresh
+        physicsExperimentCacheFile.deleteSync();
+        return null;
+      }
+
+      DateTime lastUpdateTime = physicsExperimentCacheFile.lastModifiedSync();
+      return (lastUpdateTime, physicsData);
+    } catch (e, s) {
+      log.handle(e, s);
+      log.warning(
+        "[ExperimentSession][getCache] "
+        "Failed to parse physics cache, will refresh.",
+      );
+      return null;
+    }
+  }
+
   @override
   Dio get dio => Dio()
     ..interceptors.add(logDioAdapter)
@@ -131,15 +259,13 @@ class ExperimentSession extends NetworkSession {
     throw NotFoundTeacherException;
   }
 
-  Future<(ExperimentFetchStatus, List<ExperimentData>)> getData() async {
+  Future<List<ExperimentData>> getData() async {
     if (await NetworkSession.isInSchool() == false) {
-      return (ExperimentFetchStatus.notSchoolNetwork, <ExperimentData>[]);
+      throw NotSchoolNetworkException();
     }
 
-    if (preference
-        .getString(preference.Preference.experimentPassword)
-        .isEmpty) {
-      return (ExperimentFetchStatus.noPassword, <ExperimentData>[]);
+    if (prefs.getString(prefs.Preference.experimentPassword).isEmpty) {
+      throw NoPasswordException(type: PasswordType.physicsExperiment);
     }
 
     log.debug(
@@ -159,8 +285,8 @@ class ExperimentSession extends NetworkSession {
           '8Vv4WhRVIIhZlyYNJO%2BySrDKOhP%2B%2FYMNbVIh74hA2r'
           'CYnBBSTsX9SjxiYNNk%2B5kglM%2B6pGIq22Oi5mNu6u6eC2W'
           'EBfKAmATKwSpsOL%2FPNcRyi9l8Dnp6JamksyAzjhW4%3D&'
-          'login1%24StuLoginID=${preference.getString(preference.Preference.idsAccount)}&'
-          'login1%24StuPassword=${preference.getString(preference.Preference.experimentPassword)}&'
+          'login1%24StuLoginID=${prefs.getString(prefs.Preference.idsAccount)}&'
+          'login1%24StuPassword=${prefs.getString(prefs.Preference.experimentPassword)}&'
           'login1%24UserRole=Student&'
           'login1%24btnLogin.x=28&'
           'login1%24btnLogin.y=14',
@@ -230,64 +356,79 @@ class ExperimentSession extends NetworkSession {
 
     final scoreImageRecognitionService = ImageRecognitionService();
 
-    final scoreResults = await scoreImageRecognitionService.recognizeAllScores();
-    for (var entry in scoreResults.entries) {
-      log.debug(
-        '${entry.key}: ${entry.value.label} (found: ${entry.value.found})',
+    final Map<String, RecognitionResult> scoreResults = {};
+
+    try {
+      scoreResults.addAll(
+        await scoreImageRecognitionService.recognizeAllScores(),
+      );
+    } catch (e) {
+      log.error(
+        "[experiment_session][getData]"
+        "Failed to recognize scores, skipping score fetch to parse schedule: $e",
       );
     }
 
-    for (var i in expInfo) {
-      var expTds = i.getElementsByTagName('td');
-      if (expTds.isEmpty) continue;
-      log.debug(
-        "[experiment_session][getData] "
-        "expTds have ${expTds.length}.",
-      );
+    Pool pool = Pool(3);
 
-      String date = expTds[4].getElementsByTagName("span").first.innerHtml;
-      List<int> dateNums = List<int>.generate(
-        date.split('/').length,
-        (index) => int.parse(date.split('/')[index]),
-      );
+    await Future.wait([
+      ...expInfo.map(
+        (i) => pool.withResource(() async {
+          var expTds = i.getElementsByTagName('td');
+          if (expTds.isEmpty) return;
+          log.debug(
+            "[experiment_session][getData] "
+            "expTds have ${expTds.length}.",
+          );
 
-      String timeStr = expTds[3].getElementsByTagName("span").first.innerHtml;
-      (DateTime, DateTime) timeRange = timeStr.contains("15")
-          ? (
-              DateTime(dateNums[2], dateNums[0], dateNums[1], 15, 55, 00),
-              DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 10, 00),
-            )
-          : (
-              DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 30, 00),
-              DateTime(dateNums[2], dateNums[0], dateNums[1], 20, 45, 00),
-            ); // Evening 18:30～20:45
+          String date = expTds[4].getElementsByTagName("span").first.innerHtml;
+          List<int> dateNums = List<int>.generate(
+            date.split('/').length,
+            (index) => int.parse(date.split('/')[index]),
+          );
 
-      final name = expTds[1]
-          .getElementsByClassName("linkSmallBold")
-          .first
-          .innerHtml
-          .replaceAll('（3学时）', '');
+          String timeStr = expTds[3]
+              .getElementsByTagName("span")
+              .first
+              .innerHtml;
+          (DateTime, DateTime) timeRange = timeStr.contains("15")
+              ? (
+                  DateTime(dateNums[2], dateNums[0], dateNums[1], 15, 55, 00),
+                  DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 10, 00),
+                )
+              : (
+                  DateTime(dateNums[2], dateNums[0], dateNums[1], 18, 30, 00),
+                  DateTime(dateNums[2], dateNums[0], dateNums[1], 20, 45, 00),
+                ); // Evening 18:30～20:45
 
-      toReturn.add(
-        ExperimentData(
-          type: ExperimentType.physics,
-          name: name,
-          score: scoreResults[name],
-          classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
-          timeRanges: [timeRange],
-          reference: expTds[9].getElementsByTagName("span").first.innerHtml,
-          teacher: await teacher(
-            time: expTds[3].getElementsByTagName("span").first.innerHtml,
-            subject: expTds[1]
-                .getElementsByClassName("linkSmallBold")
-                .first
-                .innerHtml
-                .replaceAll('（3学时）', ''),
-          ),
-        ),
-      );
-    }
-    return (ExperimentFetchStatus.success, toReturn);
+          final name = expTds[1]
+              .getElementsByClassName("linkSmallBold")
+              .first
+              .innerHtml
+              .replaceAll('（3学时）', '');
+
+          toReturn.add(
+            ExperimentData(
+              type: ExperimentType.physics,
+              name: name,
+              score: scoreResults[name],
+              classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
+              timeRanges: [timeRange],
+              reference: expTds[9].getElementsByTagName("span").first.innerHtml,
+              teacher: await teacher(
+                time: expTds[3].getElementsByTagName("span").first.innerHtml,
+                subject: expTds[1]
+                    .getElementsByClassName("linkSmallBold")
+                    .first
+                    .innerHtml
+                    .replaceAll('（3学时）', ''),
+              ),
+            ),
+          );
+        }),
+      ),
+    ]);
+    return toReturn;
   }
 }
 

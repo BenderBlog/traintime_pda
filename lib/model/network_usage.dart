@@ -2,14 +2,14 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-class NetworkUsage {
+class GeneralNetworkUsage {
   // (ip, online_time, used_t)
   final List<(String, String, String)> ipList;
   final String used;
   final String rest;
   final String charged;
 
-  const NetworkUsage({
+  const GeneralNetworkUsage({
     required this.ipList,
     required this.used,
     required this.rest,
@@ -18,7 +18,7 @@ class NetworkUsage {
 }
 
 /// Provide by xenode, "blackbox"...
-class NetworkInfo {
+class CurrentUserNetInfo {
   late int serverFlag;
   late int addTime;
   late int allBytes;
@@ -50,7 +50,7 @@ class NetworkInfo {
   late String userName;
   late int walletBalance;
 
-  NetworkInfo({
+  CurrentUserNetInfo({
     required this.serverFlag,
     required this.addTime,
     required this.allBytes,
@@ -83,7 +83,7 @@ class NetworkInfo {
     required this.walletBalance,
   });
 
-  NetworkInfo.fromJson(Map<String, dynamic> json) {
+  CurrentUserNetInfo.fromJson(Map<String, dynamic> json) {
     serverFlag = json['ServerFlag'];
     addTime = json['add_time'];
     allBytes = json['all_bytes'];

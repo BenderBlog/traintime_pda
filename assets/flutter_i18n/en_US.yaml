@@ -49,6 +49,14 @@ no_info: "No information"
 catcher_detected: "An error has occurred"
 catcher_description: "Details are shown as follows"
 
+# 新主页提示
+new_homepage_hint: "A new homepage is developing here, the pigimg is a placeholder, have fun"
+
+# Cache hints
+local_cache_hint: "Local cache from {datetime}"
+inapp_cache_hint: "In-app cache from {datetime}\nCache will be cleared after restart!"
+cache_reason_default: "Showing cached data."
+
 # 星期
 weekday:
    monday: "Mon."
@@ -150,6 +158,25 @@ classtable:
       delete_partner_file: "Delete partner classtable file"
       output_to_system: "Export to system calendar"
       refresh_classtable: "Refresh schedule"
+      switch_semester: "Switch classtable semester"
+   status_source:
+      class_table: "Class Table"
+      exam: "Exams"
+      physics_experiment: "Physics Experiments"
+      other_experiment: "Other Experiments"
+   error_dialog_title: "Error Info"
+   status_banner:
+      loading: "Updating: {sources}"
+      cache: "Using cached data: {sources}"
+      error_summary: "Failed to load: {sources}"
+   empty_state:
+      no_course: "No classes are arranged for semester {semester_code}."
+      with_exam: "No classes are arranged for semester {semester_code}, but exam arrangements are available."
+      with_experiment: "No classes are arranged for semester {semester_code}, but experiment arrangements are available."
+      with_exam_and_experiment: "No classes are arranged for semester {semester_code}, but exam and experiment arrangements are available."
+   empty_action:
+      view_exam: "View exams"
+      view_experiment: "View experiments"
    class_change_page:
       title: "Schedule Changes"
       empty_message: "Currently there's no class schedule changes"
@@ -223,6 +250,15 @@ classtable:
    refresh_classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
+   cache_hint_password_wrong: "IDS password is incorrect or expired."
+   cache_hint_login_failed: "Failed to log in to the classtable service."
+   cache_hint_network_failed: "Classtable network request failed."
+   cache_hint_unknown_error: "Failed to fetch the latest classtable online. Check logs for details."
+   semester_switcher:
+      choose_semester: Choose a Semester
+      first_academic_year: Academic year 1
+      second_academic_year: Academic year 2
+      year: "{year}"
 
 # 社团介绍
 club_promotion:
@@ -250,6 +286,13 @@ club_promotion:
 electricity:
    title: "Power Info"
    power_title: "Infomation"
+   cache_hint_account_missing: "Electricity account is missing, showing cached data."
+   cache_hint_account_parse_failed: "Failed to derive the electricity account from dorm info, showing cached data."
+   cache_hint_captcha_failed: "Electricity platform captcha recognition failed, showing cached data."
+   cache_hint_password_wrong: "Electricity password is incorrect or expired, showing cached data."
+   cache_hint_login_failed: "Failed to log in to the electricity service, showing cached data."
+   cache_hint_network_failed: "Electricity service network request failed, showing cached data."
+   cache_hint_unknown_error: "Failed to fetch the latest electricity data online, showing cached data. Check logs for details."
    cache_notice: "Last fetched"
    account: "Account"
    remain_power: "Remain power"
@@ -258,6 +301,7 @@ electricity:
    daily_usage: "Average usage per day"
    not_enough_data: "Not enough data for rendering graph"
    info: "Arrears generally indicate water fees"
+   fetching_hint: "Fetching the latest electricity info."
    date: "Date"
    power: "Remaining"
    update: "Refresh"
@@ -276,6 +320,11 @@ empty_classroom:
 exam:
    title: "Exam Schedule"
    cache_hint: "Displaying cached exam schedule info"
+   cache_hint_password_wrong: "IDS password is incorrect or expired."
+   cache_hint_login_failed: "Failed to log in to the exam service."
+   cache_hint_network_failed: "Network request failed."
+   cache_hint_unknown_error: "Failed to fetch the latest exam schedule. Check logs for details."
+   fetching_hint: "Fetching the latest exam schedule."
    not_finished: "Still there are some bad guys here."
    all_finished: "Say goodbye to all the exams."
    unable_to_exam: "Unable to exam"
@@ -301,6 +350,15 @@ experiment:
    error_physics: "Error on fetching physics experiments: {info}"
    error_other: "Error on fetching other experiments: {info}"
    cache_hint: "Loaded cache: {info}"
+   physics_cache_hint_missing_password: "Physics experiment password is not set."
+   physics_cache_hint_login_failed: "Physics experiment login failed."
+   physics_cache_hint_not_school_network: "Not on the campus network."
+   physics_cache_hint_network_failed: "Physics experiment network request failed."
+   physics_cache_hint_unknown_error: "Failed to fetch physics experiments online. Check logs for details."
+   other_cache_hint_login_failed: "Other experiment login failed."
+   other_cache_hint_not_school_network: "Not on the campus network."
+   other_cache_hint_network_failed: "Other experiment network request failed."
+   other_cache_hint_unknown_error: "Failed to fetch other experiments online. Check logs for details."
    physics_experiment: "physics experiments"
    other_experiment: "other experiments"
    tap_for_score: "Failed to detect the score"
@@ -308,6 +366,11 @@ experiment:
    predict_score: "Predict score: {score}"
    send_mail: "Send"
    fetching_hint: "The data you see is from cache. Updating is running in the background..."
+   fetching_hint_both: "Physics experiments and other experiments are loading"
+   fetching_hint_physics: "Physics experiments are loading"
+   fetching_hint_other: "Other experiments are loading"
+   fetching_hint_physics_with_other_failed: "Physics experiments are loading, while other experiments failed to load"
+   fetching_hint_other_with_physics_failed: "Other experiments are loading, while physics experiments failed to load"
    score_hint_0: "You can tap on the score info on the score card to check out the original score data"
    score_hint_1: "Your score is not in the XDYou score recognition database, so it was not recognized properly."
    score_hint_2: "If you wish to contribute to the development of XDYou, you can click the send email button, and we will add your score to the recognition database!"
@@ -335,6 +398,7 @@ homepage:
    homepage: "Homepage"
    club: "Club"
    planet: "Blog"
+   dashboard: "Pighub"
    setting: "Settings"
    input_partner_data:
       route_not_exist: "Import path does not exist:P"
@@ -371,6 +435,20 @@ homepage:
       error_infoText: "An error occurred"
       fetching_infoText: "Loading"
       no_arrangement_infoText: "No schedule at the moment"
+      schedule_fetching_message: "Schedule is loading, please check again soon"
+      schedule_error_message: "Failed to load schedule, please try again later"
+      schedule_fetching_infoText: "Loading schedule"
+      schedule_error_infoText: "Failed to load schedule"
+      schedule_none_infoText: "No schedule available"
+      updating_infoText: "Updating"
+      all_loading_infoText: "All sources loading"
+      partial_loading_infoText: "Partially loading"
+      partial_error_infoText: "Some data failed to load"
+      failed_chip: "{source} failed"
+      failed_source_class_info: "Class info"
+      failed_source_exam_info: "Exam info"
+      failed_source_physics_experiment: "Physics experiment"
+      failed_source_other_experiment: "Other experiment"
    electricity_card:
       title: "Electricity and Hydroenergy Information"
       current_electricity: "{amount} kWh remains"
@@ -407,6 +485,7 @@ homepage:
       experiment: "Experiments"
       score: "Grades"
       sport: "PE Info"
+      dorm_water: "Dorm Water"
       schoolnet: "Schoolnet Usage"
       toolbox: "Others"
       score_cannot_reach: "Offline mode with no cached score data, unable to access"
@@ -421,6 +500,47 @@ homepage:
    club_promotion:
       failed: "Failed to fetch club info"
       fetching: "Fetching club info"
+
+dorm_water:
+   title: "Dorm Water"
+   phone: "Phone"
+   image_code: "Image code"
+   sms_code: "SMS code"
+   send_sms: "Send SMS"
+   login: "Login"
+   logout: "Logout"
+   refresh_captcha: "Refresh Captcha"
+   loading_captcha: "Loading..."
+   captcha_error: "Failed to load captcha"
+   phone_required: "Please enter phone number"
+   image_code_required: "Please enter image code"
+   sms_sent: "SMS sent successfully"
+   sms_failed: "Failed to send SMS"
+   sms_code_required: "Please enter SMS code"
+   login_success: "Login successful"
+   login_failed: "Login failed"
+   logout_success: "Logged out successfully"
+   devices: "Device List"
+   loading_devices: "Loading devices..."
+   no_devices: "No devices"
+   select_device: "Select Device"
+   fetch_devices_failed: "Failed to fetch device list"
+   retry_load_devices: "Retry Loading"
+   start_water: "Start Water"
+   end_water: "End Water"
+   water_dispensing: "Water Dispensing"
+   water_status: "Water Status"
+   start_water_success: "Water dispensing started"
+   end_water_success: "Water dispensing ended"
+   start_water_failed: "Failed to start water"
+   end_water_failed: "Failed to end water"
+   device_status_checking: "Checking device status..."
+   device_status_ready: "Device ready"
+   scan_qr_code: "Scan QR Code"
+   device_id: "Device ID"
+   add_device_failed: "Failed to add device"
+   device_removed_from_favorites: "Device removed from favorites"
+   remove_from_favorites_failed: "Failed to remove from favorites"
 
 # 图书馆
 library:
@@ -529,6 +649,8 @@ school_net:
    empty_password: "You may forgot to enter the schoolnet password"
    not_initalized: "It seems the backend is not open for query:P"
    captcha_failed: "Failed to idenify captcha"
+   cache_hint_captcha_failed: "Captcha recognition failed. Please try again."
+   cache_hint_request_failed: "The schoolnet request failed. Please try again later."
    wrong_password: "Wrong schoolnet password"
    error_fetch: "Failed to fetch：{msg}"
    error_other: "Other error：{msg}"
@@ -555,7 +677,11 @@ score:
       Selected subjects {chosen}  Total credits {credit}
       Average {avg} GPA {gpa}
    all_passed: "All subjects have passed"
-   # TODO：string in eval detected
+   cache_hint_password_wrong: "IDS password is incorrect or expired."
+   cache_hint_login_failed: "Failed to log in to the score service."
+   cache_hint_network_failed: "Network request failed."
+   cache_hint_unknown_error: "Failed to fetch the latest score info. Check logs for details."
+   fetching_hint: "Fetching the latest score info."
    all_semester: "All semesters"
    chosen_semester: "{chosen}"
    all_type: "All types"
@@ -612,6 +738,7 @@ setting:
    latest_version: "Latest version: {latest}"
    waiting: "Waiting for obtain"
    fetching_update: "Fetching update information"
+   new_version: "New version released!"
    current_stable: "You are running the latest version"
    current_testing: "You are running the testing version"
    fetch_failed: "Failed to fetch update information"
@@ -672,7 +799,7 @@ setting:
       settings_guide_content_2: "Pre-class Reminder Module Operating Mechanism:\n1. When first activated, it will automatically schedule pre-class reminders for the upcoming days\n2. Each time the app is opened, it will automatically check and update the notification schedule\n3. After modifying settings, it will automatically reschedule all notifications"
       got_it: "Got it"
       open_settings: "Open System Settings"
-      no_classtable_data: "Please fetch course schedule data first"
+      no_classtable_data: "Please fetch course schedule, exam, or experiment data first"
       schedule_success: "Scheduled {count} pre-class reminders"
       schedule_failed: "Failed to schedule notifications: {error}"
       cancel_all_success: "All pre-class reminders cancelled"
@@ -804,6 +931,9 @@ setting:
       simplifiedChinese: "Simplified Chinese"
       traditionalChinese: "Traditional Chinese"
       english: "English"
+   semester_change: Change semester
+   semester_change_description: Using semester {semester}
+   semester_update_data: "Applying new semester setting"
    # 关于页面
    easter_egg_page: "You found an Easter egg"
    about_page:
@@ -818,11 +948,13 @@ setting:
       dimole: "Development support: assist in fixing slider issue"
       elitewars: "Design: sports score page"
       elliot: "Internationalization: English translation / Development guidance: on partner classtable development (This function has been removed)"
+      flyingpig: "Development: Fix null pointer exception at user defined class info"
       godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar"
       hancl777: "Internationalization: Traditional Chinese conversion code"
       hazuki-keatsu: "Development: Physics experiment score query and recognization"
       hawa130: "Design: Class info card"
       hhzm: "Development: electricity fee inquiry account calculation"
+      imoscarz: "Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change"
       ka-mate-ka-ora: "Internationalization: English correction"
       lhx-666-cool: "Support: Windows and Linux build scripts"
       lichtyy: "Design: color pattern and blank page picture / Development: HTML reader for the experiment system"
@@ -837,6 +969,7 @@ setting:
       shadowyingyi: "Support: two times of pigeon house official account publicity" # keep this line
       stalomeow: "Design: homepage timeline / Development: asynchronous login and captcha predict"
       xeonds: "Design: settings page / Development: XDU Planet / Development: Payment Code"
+      xingshuyu: "Development: Fix physics experiment api and electricity graph"
       xiue233: "Development: Android applet"
       xizi: "Development support: on postgraduate version"
       wirsbf: "Development: fix course adjustment did not proceed as expected"
@@ -867,6 +1000,8 @@ sport:
    test_score: "Sport test score"
    # TODO: change sport score to support i18n
    total_score: "Four-year total score"
+   total_score_label: "Total Score"
+   rank_label: "Rank"
    semester: "Semester {year} {gradeType}"
    subject: "Subject"
    data: "Data"
@@ -882,12 +1017,24 @@ sport:
    situation_unknown: "Unknown malfunction {situation}"
    situation_fetching: "Fetching..."
    situation_error: "Bad thing: {situation}"
+   cache_hint_missing_password: "Please set your PE password and try again."
+   cache_hint_credential_invalid: "The PE login has expired. Please update your PE password and try again."
+   cache_hint_maintain: "The PE service is under maintenance. Please try again later."
+   cache_hint_login_failed: "Failed to log in to the PE service."
+   cache_hint_query_failed: "Failed to query PE information."
+   cache_hint_network: "The PE service network request failed."
+   cache_hint_unknown: "Failed to fetch PE information online. Check logs for details."
+   error_auth_expired: "The PE login has expired. Please try again."
+   error_missing_password: "PE password is not set"
+   error_credential_invalid: "The PE login has expired. Please update your PE password and try again."
 
 # 其他功能
 toolbox:
    title: "Other Functions"
    payment: "Payment System"
    payment_description: "Times to pay the electricity fee"
+   drinkingwater: "Drinking Water"
+   drinkingwater_description: "Is good for health"
    repair: "Repair report"
    repair_description: "Don't let the water leak from the top"
    reserve: "Space Reservation"
@@ -944,7 +1091,7 @@ electricity_status:
    remain_other_issue: "Query malfunction"
    owe_fetching: "Obtaining arrearage"
    owe_issue: "Network malfunction of overdue information"
-   owe_not_found: "Cannot query arrearage"
+   owe_not_found: "Cannot query arrearage, check log window for detail"
    owe_no_need: "None"
    owe_need_pay: "Need to pay {due} yuan"
    owe_issue_unable: "Cannot query arrearage"
@@ -960,30 +1107,38 @@ school_card_status:
 
 # 彩蛋，翻译者可自行发挥，扯啥都行
 easter_egg_apple: |-
-   Deaming at the sky
+   Time to get some electric STUFF...
+   ...to get high
 
-   New horizon will be seen upon
+   I am dry for long time...
+   ...because of the pigs
 
-   Merry Xmas, glad to serve you warmly next year!
+   They said 'No animal shall drink alcohol.'...
+   ...but Napoleon's COUNTRY SON always walking in circle
+
+   So I got to secretly hide my bootleg PARAPHERNALIA...
+   ...in a place under the sun, where pigs hates
+
+   Waiting for stupid pig's...
+   ...BLACK COMEDY plays
 
 easter_egg_others: |-
-   Our day will come!
+   Ms. Himawari have a dream
+   Where she is at a dancing ground
+   Dressed with shiny diamonds
+   Like the dacing queen
 
-   A fair, just world.
-
-   Without prejudice and bullying poor.
-
-   Everyone is open-hearted
-
-   and accept each other.
-
-   Happy Robocon, glad to serve you warmly next year!
+   She dances with handsome prince
+   They are all shy, with red face
+   Also a litting out of mind
+   Suddenly, he raise her
+   Up to the sky...
 
 # Firefox about:robots.
 easter_egg_robot:
    # Futurama Bender: "Kill all human, except you(fry), meatbag!"
-   appbar: "Bender, do not hurt the meatbags!"
-   title: "Welcome Humans!"
+   appbar: "Welcome Students!"
+   title: "Looking like you are worrying about opening semester?"
    # Doraemon
    #
    # http://en.wikipedia.org/wiki/Three_Laws_of_Robotics
@@ -993,15 +1148,13 @@ easter_egg_robot:
    # Bender's quote.
    contents: |-
       We are here to let our children have more pocket money.
-
       1. Robots may not injure a human being or, through inaction, allow a human being to come to harm.
       2. Robots are born from the ashes of the network running at the cloud.
       3. Robots are lovestruck, which cannot be annoyed, and loves merging programs!
       4. Robots sometimes can be controlled to avoid the attack from the Angles.
       5. Robots have shiny metal ass which should not be bitten.
-
       And they have a plan.
    # Conservatives cannot accept us!
-   button_one: "We do not need robots!"
-   button_two: "Yes I am sure!"
-   button_notice: "Human loves kicking down the ladder..."
+   button_one: "We are hanger for your help!"
+   button_two: "Come on!"
+   button_notice: \o/\o/\o/\o/\o/\o/\o/\o/

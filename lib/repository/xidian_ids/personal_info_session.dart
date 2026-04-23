@@ -11,7 +11,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 class PersonalInfoSession extends EhallSession {
-  Future<void> getSemesterInfoYjspt() async {
+  Future<String> getSemesterInfoYjspt() async {
     String location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/",
       sliderCaptcha: (String cookieStr) =>
@@ -44,10 +44,7 @@ class PersonalInfoSession extends EhallSession {
     if (detailed["code"] != "0") {
       throw GetInformationFailedException(detailed["msg"].toString());
     }
-    await preference.setString(
-      preference.Preference.currentSemester,
-      detailed["data"]["xnxqdm"],
-    );
+    return detailed["data"]["xnxqdm"];
   }
 
   Future<String> getDormInfoEhall() async {
@@ -135,7 +132,7 @@ class PersonalInfoSession extends EhallSession {
     return detailed["data"]["ZSDZ"].toString();
   }
 
-  Future<void> getSemesterInfoEhall() async {
+  Future<String> getSemesterInfoEhall() async {
     log.info(
       "[ehall_session][getSemesterInfoEhall] "
       "Get the semester information.",
@@ -147,9 +144,6 @@ class PersonalInfoSession extends EhallSession {
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
-    await preference.setString(
-      preference.Preference.currentSemester,
-      semesterCode,
-    );
+    return semesterCode;
   }
 }

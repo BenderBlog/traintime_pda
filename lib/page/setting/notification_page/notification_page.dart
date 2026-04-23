@@ -6,9 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
@@ -203,10 +201,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       });
 
       try {
-        // Check whether class table data is available
-        final ClassTableController controller =
-            Get.find<ClassTableController>();
-        if (controller.classTableData.termStartDay.isEmpty) {
+        if (!_courseReminder.hasSchedulableReminderSourceData) {
           if (mounted) {
             showToast(
               context: context,

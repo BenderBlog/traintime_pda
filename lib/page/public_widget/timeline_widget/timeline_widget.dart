@@ -14,7 +14,10 @@ class TimelineWidget extends StatelessWidget {
     super.key,
     required this.isTitle,
     required this.children,
-  }) : assert(isTitle.length == children.length);
+  }) : assert(
+         isTitle.length == children.length,
+         "isTitle's length ${isTitle.length} should be same as children's length ${children.length}",
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +26,14 @@ class TimelineWidget extends StatelessWidget {
           fit: StackFit.loose,
           children: <Widget>[
             Positioned(
-              left: isPhone(context) ? 14 : 20,
-              top: 16,
-              bottom: 16,
-              child: const VerticalDivider(width: 2),
+              left: isPhone(context) ? 15 : 19,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 2,
+                height: double.infinity,
+                color: Theme.of(context).dividerColor,
+              ),
             ),
             Column(
               children: List.generate(children.length, (int index) {
@@ -45,22 +52,6 @@ class TimelineWidget extends StatelessWidget {
                 );
               }),
             ),
-            /*
-        ListView.builder(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          itemCount: children.length,
-          itemBuilder: (BuildContext context, int index) {
-            return FlowEventRow(
-              isTitle: isTitle[index],
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: children[index],
-              ),
-            );
-          },
-        ),
-        */
           ],
         )
         .width(double.infinity)

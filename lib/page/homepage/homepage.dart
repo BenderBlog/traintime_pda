@@ -4,14 +4,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
-import 'package:watermeter/page/homepage/notice_card/club_card.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:get/get.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/experiment_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
 import 'package:watermeter/page/homepage/info_widget/library_card.dart';
@@ -22,9 +22,9 @@ import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
 import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
+import 'package:watermeter/page/homepage/toolbox/dorm_water_card.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/page/homepage/toolbox/toolbox_card.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
@@ -41,9 +41,6 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    Get.put(ClassTableController());
-    Get.put(ExamController());
-    Get.put(ExperimentController());
 
     // Validate and update notifications after controllers are initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -68,11 +65,11 @@ class _MainPageState extends State<MainPage> {
     const ExamCard(),
     const EmptyClassroomCard(),
     const ClassAttendanceCard(),
+    const DormWaterCard(),
     if (prefs.getBool(prefs.Preference.role) == false) ...[
       const ExperimentCard(),
       const SportCard(),
     ],
-    const ToolboxCard(),
   ];
 
   String get _now {
@@ -116,8 +113,36 @@ class _MainPageState extends State<MainPage> {
               horizontal: 20,
               vertical: 12,
             ),
-            title: GetBuilder<ClassTableController>(
-              builder: (c) => Column(
+            title: Watch((context) {
+              final homepageController = home.HomepageController.i;
+              final classTableController = ClassTableController.i;
+              homepageController.updateTimeComputedSignal.value;
+              final currentWeek =
+                  classTableController.currentWeekComputedSignal.value;
+              final semesterLength = classTableController
+                  .classTableComputedSignal
+                  .value
+                  .semesterLength;
+              final arrangementState =
+                  homepageController.arrangementStateComputedSignal.value;
+
+              final subtitle = switch (arrangementState) {
+                home.ArrangementState.fetched =>
+                  currentWeek >= 0 && currentWeek < semesterLength
+                      ? FlutterI18n.translate(
+                          context,
+                          "homepage.on_weekday",
+                          translationParams: {"current": "${currentWeek + 1}"},
+                        )
+                      : FlutterI18n.translate(context, "homepage.on_holiday"),
+                home.ArrangementState.error => FlutterI18n.translate(
+                  context,
+                  "homepage.load_error",
+                ),
+                _ => FlutterI18n.translate(context, "homepage.loading"),
+              };
+
+              return Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -132,25 +157,7 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                   Text(
-                    c.state == ClassTableState.fetched
-                        ? c.getCurrentWeek(updateTime) >= 0 &&
-                                  c.getCurrentWeek(updateTime) <
-                                      c.classTableData.semesterLength
-                              ? FlutterI18n.translate(
-                                  context,
-                                  "homepage.on_weekday",
-                                  translationParams: {
-                                    "current":
-                                        "${c.getCurrentWeek(updateTime) + 1}",
-                                  },
-                                )
-                              : FlutterI18n.translate(
-                                  context,
-                                  "homepage.on_holiday",
-                                )
-                        : c.state == ClassTableState.error
-                        ? FlutterI18n.translate(context, "homepage.load_error")
-                        : FlutterI18n.translate(context, "homepage.loading"),
+                    subtitle,
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).brightness == Brightness.dark
@@ -159,8 +166,8 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                 ],
-              ),
-            ),
+              );
+            }),
           ),
         ),
       ],
@@ -188,19 +195,20 @@ class _MainPageState extends State<MainPage> {
         child: ListView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           children: [
-            ClubPromotionCard(onTap: widget.changePage),
-            const ClassTableCard(),
-            ElectricityCard(),
-            SchoolnetCard(),
-            LibraryCard(),
-            //LibraryCapacityCard(),
-            SchoolCardInfoCard(),
+            UpdateCard().padding(bottom: 8),
+            const ClassTableCard().padding(bottom: 8),
+            ElectricityCard().padding(bottom: 8),
+            SchoolnetCard().padding(bottom: 8),
+            LibraryCard().padding(bottom: 8),
+            SchoolCardInfoCard().padding(bottom: 8),
             MediaQuery.removePadding(
               context: context,
               removeTop: true,
               child: GridView.extent(
                 maxCrossAxisExtent: 96,
                 shrinkWrap: true,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
                 physics: const NeverScrollableScrollPhysics(),
                 children: smallFunction,
               ),

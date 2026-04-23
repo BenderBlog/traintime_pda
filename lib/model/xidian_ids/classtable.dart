@@ -163,7 +163,13 @@ class ClassTableData {
        userDefinedDetail = userDefinedDetail ?? [],
        notArranged = notArranged ?? [],
        timeArrangement = timeArrangement ?? [],
-       classChanges = classChanges ?? [];
+       classChanges = classChanges ?? [],
+       assert(
+         timeArrangement == null ||
+             timeArrangement.isEmpty ||
+             termStartDay.isNotEmpty,
+         "termStartDay is required when timeArrangement is not empty.",
+       );
 
   factory ClassTableData.fromJson(Map<String, dynamic> json) =>
       _$ClassTableDataFromJson(json);

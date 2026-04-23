@@ -2,13 +2,10 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/toolbox/webview_list_tile.dart';
 
 class ToolBoxPage extends StatefulWidget {
@@ -22,17 +19,7 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: I18nText("toolbox.title"),
-        leading: IconButton(
-          icon: Icon(
-            Platform.isIOS || Platform.isMacOS
-                ? Icons.arrow_back_ios
-                : Icons.arrow_back,
-          ),
-          onPressed: () => context.pop(),
-        ),
-      ),
+      appBar: AppBar(title: I18nText("toolbox.title")),
       body: ListView(
         children: [
           WebViewAddresses(
@@ -43,6 +30,15 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
               "toolbox.payment_description",
             ),
             iconData: MingCuteIcons.mgc_exchange_cny_line,
+          ),
+          WebViewAddresses(
+            name: FlutterI18n.translate(context, "toolbox.drinkingwater"),
+            url: "https://order.xidian.edu.cn/mobile/thirdoauth/oauth2Xidian/1",
+            description: FlutterI18n.translate(
+              context,
+              "toolbox.drinkingwater_description",
+            ),
+            iconData: MingCuteIcons.mgc_drop_line,
           ),
           WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.repair"),

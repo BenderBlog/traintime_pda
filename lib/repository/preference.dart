@@ -54,6 +54,7 @@ enum Preference {
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
   currentSemester(key: "currentSemester", type: "String"), // 当前学期编码
+  isUserDefinedSemester(key: "isUserDefinedSemester", type: "bool"), // 是否为用户编辑
   //currentStartDay(key: "currentStartDay", type: "String"), // 当前学期编码
   role(key: "role", type: "bool"), // 是否为研究生
   simplifiedClassTimeline(
@@ -69,10 +70,7 @@ enum Preference {
     key: "emptyClassroomLastChoice",
     type: "String",
   ), // 空闲教室最后一次选择
-  enableCourseReminder(
-    key: "enableCourseReminder",
-    type: "bool",
-  ), // 课程提醒开关
+  enableCourseReminder(key: "enableCourseReminder", type: "bool"), // 课程提醒开关
   courseReminderMinutesBefore(
     key: "courseReminderMinutesBefore",
     type: "int",
@@ -88,7 +86,19 @@ enum Preference {
   notificationLastLocale(
     key: "notification_last_locale",
     type: "String",
-  ); // 上次通知使用的语言
+  ), // 上次通知使用的语言
+  dormWaterToken(key: "dorm_water_token", type: "String"), // 宿舍水机登录 token
+  dormWaterUid(key: "dorm_water_uid", type: "String"), // 宿舍水机用户 uid
+  dormWaterEid(key: "dorm_water_eid", type: "String"), // 宿舍水机用户 eid
+  systemCalendarId(key: "system_calendar_id", type: "String"), // 导出的系统日历 id
+  systemCalendarSemesterCode(
+    key: "system_calendar_semester_code",
+    type: "String",
+  ), // 导出的系统日历绑定学期
+  systemCalendarSnapshot(
+    key: "system_calendar_snapshot",
+    type: "String",
+  ); // 上次同步到系统日历的数据快照
 
   const Preference({required this.key, this.type = "String"});
 
@@ -150,6 +160,15 @@ Future<void> remove(Preference key) async {
 Future<void> prefrenceClear() async {
   await prefs.clear();
   await prefs.reloadCache();
+}
+
+int parseSemesterCodeToInt(String input) {
+  if (input.length < 5) {
+    throw ArgumentError("输入字符串长度不足");
+  }
+  String year = input.substring(0, 4);
+  String semester = input[input.length - 1];
+  return int.parse(year + semester);
 }
 
 class NotRegisteredException implements Exception {}

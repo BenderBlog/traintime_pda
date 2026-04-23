@@ -9,11 +9,13 @@ import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/experiment_controller.dart';
+import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/other_experiment_controller.dart';
+import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
@@ -77,14 +79,18 @@ class CourseReminderService extends NotificationService
 
   // Configuration setters with automatic notification update
   Future<void> setEnabled(bool value) async {
-    if (value) { 
+    if (value) {
       // Check permissions before enabling
       final hasNotificationPermission = await checkNotificationPermission();
       final hasExactAlarmPermission = await checkExactAlarmPermission();
 
       if (!hasNotificationPermission || !hasExactAlarmPermission) {
-        log.info('[CourseReminderService] Failed to enable due to no permission');
-        throw Exception("[CourseReminderService] Failed to enable due to no permission");
+        log.info(
+          '[CourseReminderService] Failed to enable due to no permission',
+        );
+        throw Exception(
+          "[CourseReminderService] Failed to enable due to no permission",
+        );
       }
     }
     await preference.setBool(preference.Preference.enableCourseReminder, value);
@@ -229,8 +235,6 @@ class CourseReminderService extends NotificationService
         return;
       }
 
-      final int weekIndex = payload['weekIndex'] ?? 0;
-
       final navigator = preference.debuggerKey.currentState;
       if (navigator != null) {
         navigator.push(
@@ -238,14 +242,13 @@ class CourseReminderService extends NotificationService
             builder: (context) => LayoutBuilder(
               builder: (context, constraints) => ClassTableWindow(
                 parentContext: context,
-                currentWeek: weekIndex,
                 constraints: constraints,
               ),
             ),
           ),
         );
         log.info(
-          '[CourseReminderService] [handleNotificationTap] Navigated to class table, week: $weekIndex',
+          '[CourseReminderService] [handleNotificationTap] Navigated to class table',
         );
       } else {
         log.warning(
@@ -361,6 +364,22 @@ class CourseReminderService extends NotificationService
     return locale;
   }
 
+  bool get hasSchedulableReminderSourceData {
+    final classTableData =
+        ClassTableController.i.classTableComputedSignal.value;
+    final hasClassTableData = classTableData.termStartDay.isNotEmpty;
+
+    final hasExperimentData =
+        PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
+        OtherExperimentController.i.otherExperiments.value.isNotEmpty;
+
+    final hasExamData = ExamController.i.subjects.value.any(
+      (subject) => subject.startTime != null,
+    );
+
+    return hasClassTableData || hasExperimentData || hasExamData;
+  }
+
   Future<void> _scheduleNotificationFromCourseData({
     int daysToSchedule = 7,
     int minutesBefore = 5,
@@ -369,19 +388,8 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [scheduleNotificationsFromCourseData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
     try {
-      // Try to get ClassTableController with better error handling
-      ClassTableController controller;
-      try {
-        controller = Get.find<ClassTableController>();
-      } catch (e) {
-        log.error(
-          '[CourseReminderService] [scheduleNotificationsFromCourseData] ClassTableController not found',
-          e,
-        );
-        return;
-      }
-
-      final ClassTableData data = controller.classTableData;
+      final controller = ClassTableController.i;
+      final ClassTableData data = controller.classTableComputedSignal.value;
 
       if (data.termStartDay.isEmpty) {
         log.warning(
@@ -507,28 +515,11 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [scheduleNotificationsFromExperimentData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
     try {
-      ExperimentController experimentController;
-      try {
-        experimentController = Get.find<ExperimentController>();
-      } catch (e) {
-        log.error(
-          '[CourseReminderService] [scheduleNotificationsFromExperimentData] ExperimentController not found',
-          e,
-        );
-        return;
-      }
-
-      // Get ClassTableController to calculate week index
-      ClassTableController? classTableController;
-      try {
-        classTableController = Get.find<ClassTableController>();
-      } catch (e) {
-        log.warning(
-          '[CourseReminderService] [scheduleNotificationsFromExperimentData] ClassTableController not found, week index will not be calculated',
-        );
-      }
-
-      final List<ExperimentData> experiments = experimentController.data;
+      final classTableController = ClassTableController.i;
+      final List<ExperimentData> experiments = [
+        ...PhysicsExperimentController.i.physicsExperiments.value,
+        ...OtherExperimentController.i.otherExperiments.value,
+      ];
 
       if (experiments.isEmpty) {
         log.warning(
@@ -577,13 +568,10 @@ class CourseReminderService extends NotificationService
           }
 
           // Calculate week index based on experiment start time
-          int weekIndex = 0;
-          if (classTableController != null) {
-            weekIndex = classTableController.getCurrentWeek(
-              experimentStartTime,
-            );
-            if (weekIndex < 0) weekIndex = 0;
-          }
+          int weekIndex = classTableController.getCurrentWeek(
+            experimentStartTime,
+          );
+          if (weekIndex < 0) weekIndex = 0;
 
           int weekday = experimentStartTime.weekday; // 1=Mon, 7=Sun
 
@@ -652,13 +640,112 @@ class CourseReminderService extends NotificationService
     }
   }
 
-  /// Schedule notification by the course data (includes experiments)
+  Future<void> _scheduleNotificationFromExamData({
+    int daysToSchedule = 7,
+    int minutesBefore = 5,
+  }) async {
+    log.info(
+      '[CourseReminderService] [scheduleNotificationsFromExamData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
+    );
+    try {
+      final classTableController = ClassTableController.i;
+      final List<Subject> exams = ExamController.i.subjects.value
+          .where((subject) => subject.startTime != null)
+          .toList();
+
+      if (exams.isEmpty) {
+        log.warning(
+          '[CourseReminderService] [scheduleNotificationsFromExamData] Exam data not available, cannot schedule notifications',
+        );
+        return;
+      }
+
+      final now = DateTime.now();
+      final endDate = now.add(Duration(days: daysToSchedule));
+      int scheduledCount = 0;
+
+      for (final exam in exams) {
+        final examStartTime = exam.startTime;
+        if (examStartTime == null ||
+            examStartTime.isBefore(now) ||
+            examStartTime.isAfter(endDate)) {
+          continue;
+        }
+
+        final notificationTime = examStartTime.subtract(
+          Duration(minutes: minutesBefore),
+        );
+
+        if (notificationTime.isBefore(now)) {
+          continue;
+        }
+
+        int weekIndex = classTableController.getCurrentWeek(examStartTime);
+        if (weekIndex < 0) weekIndex = 0;
+
+        final weekday = examStartTime.weekday;
+        final startClass = _calculateClassPeriodFromTime(examStartTime);
+        final notificationId = _generateNotificationId(
+          weekday,
+          startClass,
+          weekIndex,
+        );
+        final locale = _getCurrentLocale();
+
+        String title = NonUII18n.translate(
+          locale,
+          'course_reminder.title',
+          translateParams: {'name': '${exam.subject}考试'},
+        );
+
+        String body = NonUII18n.translate(
+          locale,
+          'course_reminder.body',
+          translateParams: {'time': minutesBefore.toString()},
+        );
+
+        if (exam.place.isNotEmpty) {
+          body +=
+              '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": exam.place})}';
+        }
+
+        final payload = <String, dynamic>{
+          'type': 'course_reminder',
+          'className': exam.subject,
+          'weekIndex': weekIndex,
+        };
+
+        await scheduleNotification(
+          id: notificationId,
+          title: title,
+          body: body,
+          scheduledTime: notificationTime,
+          payload: jsonEncode(payload),
+        );
+
+        scheduledCount++;
+      }
+
+      log.info(
+        '[CourseReminderService] [scheduleNotificationsFromExamData] Scheduled $scheduledCount exam reminder notifications',
+      );
+    } catch (e, stackTrace) {
+      log.error(
+        '[CourseReminderService] [scheduleNotificationsFromExamData] Failed to schedule exam reminder notifications',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Schedule notification by the course data (includes experiments and exams)
   Future<void> scheduleNotificationsFromCourseData({
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
     try {
-      // Schedule course and experiment notifications in parallel
+      // Schedule course, experiment and exam notifications in parallel
       await Future.wait([
         _scheduleNotificationFromCourseData(
           daysToSchedule: daysToSchedule,
@@ -669,6 +756,10 @@ class CourseReminderService extends NotificationService
             daysToSchedule: daysToSchedule,
             minutesBefore: minutesBefore,
           ),
+        _scheduleNotificationFromExamData(
+          daysToSchedule: daysToSchedule,
+          minutesBefore: minutesBefore,
+        ),
       ]);
     } catch (e, stackTrace) {
       log.error(
@@ -690,25 +781,13 @@ class CourseReminderService extends NotificationService
         log.info(
           '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
         );
+        await cancelAllCourseNotifications();
         return;
       }
 
-      // Try to get ClassTableController, return if not available
-      ClassTableController controller;
-      try {
-        controller = Get.find<ClassTableController>();
-      } catch (e) {
+      if (!hasSchedulableReminderSourceData) {
         log.warning(
-          '[CourseReminderService] [validateAndUpdateNotifications] ClassTableController not initialized yet',
-        );
-        return;
-      }
-
-      final ClassTableData data = controller.classTableData;
-
-      if (data.termStartDay.isEmpty) {
-        log.warning(
-          '[CourseReminderService] [validateAndUpdateNotifications] Course data not available, cannot validate notifications',
+          '[CourseReminderService] [validateAndUpdateNotifications] No schedulable reminder source data available, cannot validate notifications',
         );
         return;
       }

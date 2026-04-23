@@ -2,27 +2,147 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/experiment_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
+String _cacheHintFromError(Object error) {
+  if (error is LoginFailedException) {
+    return "experiment.other_cache_hint_login_failed";
+  }
+  if (error is NotSchoolNetworkException) {
+    return "experiment.other_cache_hint_not_school_network";
+  }
+  if (error is DioException) {
+    return "experiment.other_cache_hint_network_failed";
+  }
+  return "experiment.other_cache_hint_unknown_error";
+}
+
+Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
+  try {
+    List<ExperimentData> data = await SysjSession().getDataFromSysj();
+    DateTime fetchTime = DateTime.now();
+    await SysjSession.writeCache(data);
+    return FetchResult.fresh(fetchTime: fetchTime, data: data);
+  } on PasswordWrongException {
+    log.error(
+      "[SysjSession][getExperimentData] "
+      "Password changed, remove cache",
+    );
+    await SysjSession.deleteCache();
+    rethrow;
+  } catch (e, s) {
+    log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
+    var cache = SysjSession.getCache();
+    if (cache != null) {
+      return FetchResult.cache(
+        fetchTime: cache.$1,
+        data: cache.$2,
+        hintKey: _cacheHintFromError(e),
+      );
+    }
+    rethrow;
+  }
+}
+
 class SysjSession extends IDSSession {
+  static const otherExperimentCacheName = "OtherExperiment.json";
+  static File otherExperimentCacheFile = File(
+    "${supportPath.path}/$otherExperimentCacheName",
+  );
+  static bool get isCacheExist => otherExperimentCacheFile.existsSync();
+
+  static Future<void> deleteCache() async {
+    if (await otherExperimentCacheFile.exists()) {
+      await otherExperimentCacheFile.delete();
+    }
+  }
+
+  static Future<void> writeCache(List<ExperimentData> data) async {
+    log.info(
+      "[ExperimentSession][writeCache] "
+      "Store to cache.",
+    );
+    otherExperimentCacheFile.writeAsStringSync(jsonEncode(data));
+    if (Platform.isIOS) {
+      final api = SaveToGroupIdSwiftApi();
+      try {
+        bool result = await api.saveToGroupId(
+          FileToGroupID(
+            appid: prefs.appId,
+            fileName: otherExperimentCacheName,
+            data: jsonEncode(data),
+          ),
+        );
+        log.info(
+          "[ExperimentController][getPhysicsExperiment] "
+          "ios Save to public place status: $result.",
+        );
+      } catch (e, s) {
+        log.handle(e, s);
+      }
+    }
+  }
+
+  static (DateTime, List<ExperimentData>)? getCache() {
+    if (!isCacheExist) return null;
+    try {
+      List<dynamic> toDecode = jsonDecode(
+        otherExperimentCacheFile.readAsStringSync(),
+      );
+      List<ExperimentData> physicsData = List<ExperimentData>.generate(
+        toDecode.length,
+        (index) => ExperimentData.fromJson(toDecode[index]),
+      );
+
+      // Check if cache contains old format data (score field was migrated from String)
+      // Old format will have been converted to null by _recognitionResultFromJson
+      var rawJson = toDecode.firstOrNull;
+      bool hasOldFormat =
+          rawJson != null &&
+          rawJson['score'] != null &&
+          rawJson['score'] is String;
+
+      if (hasOldFormat) {
+        log.info(
+          "[ExamController][onInit] "
+          "Detected old String format in physics cache, will trigger refresh.",
+        );
+        // Delete old cache file to force refresh
+        otherExperimentCacheFile.deleteSync();
+        return null;
+      }
+
+      DateTime lastUpdateTime = otherExperimentCacheFile.lastModifiedSync();
+      return (lastUpdateTime, physicsData);
+    } catch (e, s) {
+      log.handle(e, s);
+      log.warning(
+        "[ExperimentSession][getCache] "
+        "Failed to parse physics cache, will refresh.",
+      );
+      return null;
+    }
+  }
+
   /// These are from sysj.xidian.edu.cn's js file
-  Future<(ExperimentFetchStatus, List<ExperimentData>)>
-  getDataFromSysj() async {
+  Future<List<ExperimentData>> getDataFromSysj() async {
     if (!(await NetworkSession.isInSchool())) {
-      log.info("[SysjSession][getDataFromSysj] Not in schoolnet.");
-      return (ExperimentFetchStatus.notSchoolNetwork, <ExperimentData>[]);
+      throw NotSchoolNetworkException();
     }
 
     Response firstRequest = await dio.get(
@@ -302,8 +422,6 @@ class SysjSession extends IDSSession {
       }
     }
 
-    log.debug(experimentData);
-
-    return (ExperimentFetchStatus.success, experimentData);
+    return experimentData;
   }
 }

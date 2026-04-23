@@ -23,9 +23,9 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  final String urlOthers = "https://www.bilibili.com/video/BV1cq4y167ag";
+  final String urlOthers = "https://www.bilibili.com/video/BV1S24y1K7vn/";
 
-  final String urlApple = "https://www.bilibili.com/video/BV1Js41167TX?p=32";
+  final String urlApple = "https://www.bilibili.com/video/BV1W6LhznEzn/";
 
   List<Developer> getDevelopers() => [
     Developer(
@@ -95,6 +95,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://mp.weixin.qq.com/s/_egmj3rjwOTAB-KHzKsYGw",
     ),
     Developer(
+      "FlyingPig278",
+      "https://avatars.githubusercontent.com/u/88129602",
+      FlutterI18n.translate(context, "setting.about_page.flyingpig"),
+      "https://github.com/FlyingPig278",
+    ),
+    Developer(
       "GodHu777777",
       "https://avatars.githubusercontent.com/u/111997394",
       FlutterI18n.translate(context, "setting.about_page.godhu777777"),
@@ -123,6 +129,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://avatars.githubusercontent.com/u/19224718",
       FlutterI18n.translate(context, "setting.about_page.hhzm"),
       "https://hhzm.win/",
+    ),
+    Developer(
+      "imoscarz",
+      "https://avatars.githubusercontent.com/u/52318095",
+      FlutterI18n.translate(context, "setting.about_page.imoscarz"),
+      "https://imoscarz.me/",
     ),
     Developer(
       "Ka-mate-ka-ora",
@@ -174,7 +186,7 @@ class _AboutPageState extends State<AboutPage> {
     ),
     Developer(
       "ReverierXu",
-      "https://blog.woooo.tech/img/avatar.png",
+      "https://avatars.githubusercontent.com/u/41937333",
       FlutterI18n.translate(context, "setting.about_page.reverierxu"),
       "https://blog.woooo.tech/",
     ),
@@ -207,6 +219,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://avatars.githubusercontent.com/u/68117734",
       FlutterI18n.translate(context, "setting.about_page.xeonds"),
       "https://mxts.jiujiuer.xyz",
+    ),
+    Developer(
+      "XingShuyu",
+      "https://avatars.githubusercontent.com/u/82715884",
+      FlutterI18n.translate(context, "setting.about_page.xingshuyu"),
+      "https://xingshuyu.github.io",
     ),
     Developer(
       "Xiue233",
@@ -244,7 +262,7 @@ class _AboutPageState extends State<AboutPage> {
     Link(
       icon: const Icon(Icons.home),
       name: FlutterI18n.translate(context, "setting.about_page.homepage"),
-      url: "https://legacy.superbart.top/xdyou.html",
+      url: "https://xdyou.superbart.top",
     ),
     Link(
       icon: const Icon(Icons.code),
@@ -272,8 +290,8 @@ class _AboutPageState extends State<AboutPage> {
                   TextSpan(text: " v${preference.packageInfo.version}\n"),
                   TextSpan(
                     text:
-                        "${Platform.isIOS || Platform.isMacOS ? "Cheery Flower" : "Affirmation"}"
-                        " - Red and Green Edition",
+                        "${Platform.isIOS || Platform.isMacOS ? "" : ""}"
+                        "Himawari in the Sky Edition",
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -398,6 +416,7 @@ class _AboutPageState extends State<AboutPage> {
               ? "easter_egg_apple"
               : "easter_egg_others",
         ),
+        textAlign: TextAlign.center,
       ),
     ].toColumn(),
   );

@@ -8,152 +8,122 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:get/get.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
-var historyElectricityInfo = RxList<ElectricityInfo>();
-var electricityInfo = ElectricityInfo.empty(DateTime.now()).obs;
-var isCache = false.obs;
-var isLoad = false.obs;
-
-extension IsToday on DateTime {
-  bool get isToday {
-    DateTime now = DateTime.now();
-    return year == now.year && month == now.month && day == now.day;
+String _cacheHintFromError(Object error) {
+  if (error is NoAccountInfoException) {
+    return "electricity.cache_hint_account_missing";
   }
+  if (error is AccountFailedParseException) {
+    return "electricity.cache_hint_account_parse_failed";
+  }
+  if (error is CaptchaFailedException) {
+    return "electricity.cache_hint_captcha_failed";
+  }
+  if (error is PasswordWrongException) {
+    return "electricity.cache_hint_password_wrong";
+  }
+  if (error is LoginFailedException) {
+    return error.msg == "验证码校验失败"
+        ? "electricity.cache_hint_captcha_failed"
+        : "electricity.cache_hint_login_failed";
+  }
+  if (error is NotInitalizedException) {
+    if (error.msg == "用户名或密码错误") {
+      return "electricity.cache_hint_password_wrong";
+    }
+    if (error.msg.contains("验证码")) {
+      return "electricity.cache_hint_captcha_failed";
+    }
+    return "electricity.cache_hint_login_failed";
+  }
+  if (error is DioException) {
+    return "electricity.cache_hint_network_failed";
+  }
+  return "electricity.cache_hint_unknown_error";
 }
 
-Future<void> update({
-  bool force = false,
+Future<FetchResult<ElectricityInfo>> getElectricityInfo({
   Future<String> Function(List<int>)? captchaFunction,
 }) async {
-  log.info(
-    "[EletricitySession][update] Ready to update electricity info. isForce: $force",
-  );
-  isLoad.value = true;
-  isCache.value = false;
-  electricityInfo.value.fetchDay = DateTime.now();
-
-  late ElectricityInfo cache;
-  bool canUseCache = false;
+  log.info("[EletricitySession][update] Ready to update electricity info. ");
+  DateTime fetchDay = DateTime.now();
 
   if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
     if (ElectricitySession.fileCache.existsSync()) {
       ElectricitySession.fileCache.deleteSync();
     }
   }
+  // Fetch cache info
+  final cache = ElectricitySession.getCache();
 
-  if (ElectricitySession.isCacheExist) {
-    log.info("[EletricitySession][update] Checking out cache.");
-
-    try {
-      cache = ElectricityInfo.fromJson(
-        jsonDecode(ElectricitySession.fileCache.readAsStringSync()),
+  try {
+    log.info("[EletricitySession][update] Fetching from Internet.");
+    (String, String) sessionValue = await ElectricitySession().loginPayment(
+      captchaFunction: captchaFunction,
+    );
+    String remain = "";
+    String owe = "";
+    await Future.wait([
+      Future(() async {
+        try {
+          remain = await ElectricitySession().getElectricity(sessionValue);
+        } on NotFoundException {
+          remain = "electricity_status.remain_not_found";
+        } on DioException catch (e, s) {
+          log.handle(e, s);
+          remain = "electricity_status.remain_network_issue";
+        } catch (e, s) {
+          log.handle(e, s);
+          remain = "electricity_status.remain_other_issue";
+        }
+      }),
+      Future(() async {
+        try {
+          owe = await ElectricitySession().getOwe(sessionValue);
+        } on DioException catch (e, s) {
+          log.info(
+            "[PaymentSession][update] "
+            "Network error occurred on getting owe",
+          );
+          log.handle(e, s);
+          owe = "electricity_status.owe_issue";
+        } catch (e, s) {
+          log.info(
+            "[PaymentSession][update] "
+            "Error occurred on getting owe",
+          );
+          log.handle(e, s);
+          owe = "electricity_status.owe_not_found";
+        }
+      }),
+    ]);
+    ElectricityInfo toReturn = ElectricityInfo(
+      fetchDay: fetchDay,
+      remain: remain,
+      owe: owe,
+    );
+    ElectricitySession.saveCache(toReturn);
+    return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
+  } catch (e, s) {
+    log.handle(e, s, "[getElectricityInfo] Have issue");
+    if (cache != null) {
+      return FetchResult.cache(
+        fetchTime: cache.fetchTime,
+        data: cache.data,
+        hintKey: _cacheHintFromError(e),
       );
-      canUseCache = true;
-    } catch (e, s) {
-      log.handle(e, s);
-      canUseCache = false;
     }
+    rethrow;
   }
-
-  if (!force && canUseCache && cache.fetchDay.isToday) {
-    log.info("[EletricitySession][update] Using cache.");
-    ElectricitySession.refreshElectricityHistory(cache);
-    electricityInfo.value = cache;
-    isCache.value = true;
-    isLoad.value = false;
-    return;
-  }
-  log.info("[EletricitySession][update] Fetching from Internet.");
-  await ElectricitySession()
-      .loginPayment(captchaFunction: captchaFunction)
-      .then(
-        (value) =>
-            Future.wait([
-              Future(() async {
-                try {
-                  electricityInfo.value.remain =
-                      "electricity_status.remain_fetching";
-                  await ElectricitySession().getElectricity(value);
-                } on DioException catch (e, s) {
-                  log.handle(e, s);
-                  electricityInfo.value.remain =
-                      "electricity_status.remain_network_issue";
-                } on NotFoundException {
-                  electricityInfo.value.remain =
-                      "electricity_status.remain_not_found";
-                } catch (e, s) {
-                  log.handle(e, s);
-                  electricityInfo.value.remain =
-                      "electricity_status.remain_other_issue";
-                }
-              }),
-              Future(() async {
-                try {
-                  electricityInfo.value.owe = "electricity_status.owe_fetching";
-                  await ElectricitySession().getOwe(value);
-                } on DioException {
-                  log.info(
-                    "[PaymentSession][update] "
-                    "Network error",
-                  );
-                  electricityInfo.value.owe = "electricity_status.owe_issue";
-                } catch (e, s) {
-                  log.handle(e, s);
-                  electricityInfo.value.owe =
-                      "electricity_status.owe_not_found";
-                }
-              }),
-            ]).then((value) async {
-              if (ElectricitySession.isCacheExist) {
-                await ElectricitySession.fileCache.create();
-              }
-              ElectricitySession.fileCache.writeAsStringSync(
-                jsonEncode(electricityInfo.value.toJson()),
-              );
-              if (!electricityInfo.value.remain.contains(
-                "electricity_status",
-              )) {
-                ElectricitySession.refreshElectricityHistory(
-                  electricityInfo.value,
-                );
-              }
-            }),
-      )
-      .catchError((e, s) {
-        log.handle(e, s);
-        if (canUseCache) {
-          electricityInfo.value = cache;
-          isCache.value = true;
-          isLoad.value = false;
-          return;
-        }
-
-        if (NeedInfoException().toString().contains(e.toString())) {
-          electricityInfo.value.remain = "electricity_status.need_more_info";
-        } else if ("NotInitalizedException".contains(e.toString())) {
-          electricityInfo.value.remain = e.msg;
-        } else if (NoAccountInfoException().toString().contains(e.toString())) {
-          electricityInfo.value.remain = "electricity_status.need_account";
-        } else if (CaptchaFailedException().toString().contains(e.toString())) {
-          electricityInfo.value.remain = "electricity_status.captcha_failed";
-        } else {
-          electricityInfo.value.remain = "electricity_status.other_issue";
-        }
-        if (electricityInfo.value.owe == "electricity_status.owe_fetching" ||
-            electricityInfo.value.owe == "electricity_status.pending") {
-          electricityInfo.value.owe = "electricity_status.owe_issue_unable";
-        }
-      });
-  isLoad.value = false;
 }
 
 class ElectricitySession extends IDSSession {
@@ -164,6 +134,31 @@ class ElectricitySession extends IDSSession {
   static File fileHistory = File("${supportPath.path}/$electricityHistory");
 
   static bool get isCacheExist => fileCache.existsSync();
+
+  static FetchResult<ElectricityInfo>? getCache() {
+    if (!isCacheExist) return null;
+    log.info("[EletricitySession][cache] Checking out cache.");
+    try {
+      final cache = ElectricityInfo.fromJson(
+        jsonDecode(fileCache.readAsStringSync()),
+      );
+      if (double.tryParse(cache.remain) == null) {
+        log.info("[EletricitySession][cache] Invalid cache.");
+        return null;
+      }
+      return FetchResult.cache(fetchTime: cache.fetchDay, data: cache);
+    } catch (e, s) {
+      log.handle(e, s);
+      return null;
+    }
+  }
+
+  static void saveCache(ElectricityInfo info) {
+    if (!isCacheExist) {
+      fileCache.createSync(recursive: true);
+    }
+    fileCache.writeAsStringSync(jsonEncode(info.toJson()));
+  }
 
   static const pubKey = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCa1ILSkh
@@ -185,46 +180,47 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     ElectricitySession.fileHistory.createSync();
   }
 
-  // Read the cached list
-  // Input an electricity info will refresh the list
-  static void refreshElectricityHistory(ElectricityInfo? info) {
+  // Remove electricity cache
+  static void removeElectricityInfoCache() {
+    if (fileCache.existsSync()) {
+      fileCache.deleteSync();
+    }
+  }
+
+  // Remove electricity history cache
+  static void removeElectricityHistoryCache() {
+    if (fileHistory.existsSync()) {
+      fileHistory.deleteSync();
+    }
+  }
+
+  static List<ElectricityInfo> getHistory() {
+    var list = <ElectricityInfo>[];
+
     if (!ElectricitySession.fileHistory.existsSync()) {
-      ElectricitySession.fileHistory.createSync();
+      ElectricitySession.fileHistory.createSync(recursive: true);
+      return list;
     }
 
-    var list = <ElectricityInfo>[];
     try {
-      List proto = jsonDecode(
-        ElectricitySession.fileHistory.readAsStringSync(),
-      );
-      list.clear();
-      list.addAll(
-        List<ElectricityInfo>.generate(
-          proto.length,
-          (data) => ElectricityInfo.fromJson(proto[data]),
-        ),
-      );
+      String rawHistory = ElectricitySession.fileHistory.readAsStringSync();
+      List<ElectricityInfo> toAdd = jsonDecode(
+        rawHistory,
+      ).map<ElectricityInfo>((data) => ElectricityInfo.fromJson(data)).toList();
+      list.addAll(toAdd);
       list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
     } catch (e, s) {
       log.handle(e, s);
     }
 
-    if (info != null) {
-      if (list.length > 14) {
-        list.removeAt(0);
-      }
-      if (!(list.isNotEmpty &&
-          list.last.fetchDay.year == info.fetchDay.year &&
-          list.last.fetchDay.month == info.fetchDay.month &&
-          list.last.fetchDay.day == info.fetchDay.day &&
-          list.last.remain == info.remain)) {
-        list.add(info);
-        fileHistory.writeAsStringSync(jsonEncode(list));
-      }
-    }
+    return list;
+  }
 
-    historyElectricityInfo.clear();
-    historyElectricityInfo.addAll(list);
+  static void saveHistory(List<ElectricityInfo> history) {
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      ElectricitySession.fileHistory.createSync(recursive: true);
+    }
+    fileHistory.writeAsStringSync(jsonEncode(history));
   }
 
   /// The way to get the electricity number.
@@ -408,7 +404,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
   }
 
   /// Get base64 encoded data. Which is rsa encrypted [toEnc] using [pubKey].
-  String rsaEncrypt(String toEnc) {
+  static String _rsaEncrypt(String toEnc) {
     dynamic publicKey = RSAKeyParser().parse(pubKey);
     return Encrypter(RSA(publicKey: publicKey)).encrypt(toEnc).base64;
   }
@@ -442,8 +438,6 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
         throw NoAccountInfoException();
       }
     }
-
-    electricityInfo.value.remain = "electricity_status.remain_fetching";
 
     /// Get electricity password
     String password = preference.getString(
@@ -509,9 +503,9 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
       var value = await dio.post(
         "https://payment.xidian.edu.cn/NetWorkUI/checkUserInfo",
         data: {
-          "p_Userid": rsaEncrypt(electricityAccount),
-          "p_Password": rsaEncrypt(password),
-          "checkCode": rsaEncrypt(checkCode),
+          "p_Userid": _rsaEncrypt(electricityAccount),
+          "p_Password": _rsaEncrypt(password),
+          "checkCode": _rsaEncrypt(checkCode),
           "factorycode": factorycode,
         },
       );
@@ -564,7 +558,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
     throw NotInitalizedException(lastErrorMessage);
   }
 
-  Future<void> getElectricity((String, String) fetched) => dio
+  Future<String> getElectricity((String, String) fetched) => dio
       .post(
         "https://payment.xidian.edu.cn/NetWorkUI/checkPayelec",
         data: {
@@ -580,13 +574,13 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
           double balance = double.parse(
             decodeData["rtmeterInfo"]["Result"]["Meter"]["RemainQty"],
           );
-          electricityInfo.value.remain = balance.toString();
+          return balance.toString();
         } else {
           throw NotFoundException();
         }
       });
 
-  Future<void> getOwe((String, String) fetched) => dio
+  Future<String> getOwe((String, String) fetched) => dio
       .post(
         "https://payment.xidian.edu.cn/NetWorkUI/getOwefeeInfo",
         data: {
@@ -599,11 +593,11 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
         var decodeData = jsonDecode(value.data);
         if (decodeData["returncode"] == "ERROR" &&
             decodeData["returnmsg"] == "电费厂家返回xml消息体异常") {
-          electricityInfo.value.owe = "electricity_status.owe_no_need";
+          return "electricity_status.owe_no_need";
         } else if (double.parse(decodeData["dueTotal"]) > 0.0) {
-          electricityInfo.value.owe = decodeData["dueTotal"].toString();
+          return decodeData["dueTotal"].toString();
         } else {
-          electricityInfo.value.owe = "electricity_status.owe_issue_unable";
+          return "electricity_status.owe_issue_unable";
         }
       });
 }
@@ -615,6 +609,9 @@ class NeedInfoException implements Exception {}
 class NotInitalizedException implements Exception {
   final String msg;
   const NotInitalizedException(this.msg);
+
+  @override
+  String toString() => "[NotInitalizedException] $msg";
 }
 
 class NoAccountInfoException implements Exception {}

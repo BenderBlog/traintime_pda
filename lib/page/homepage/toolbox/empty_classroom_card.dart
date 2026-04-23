@@ -17,7 +17,7 @@ class EmptyClassroomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SmallFunctionCard(
-      onTap: () async {
+      onPressed: () async {
         if (offline) {
           showToast(
             context: context,

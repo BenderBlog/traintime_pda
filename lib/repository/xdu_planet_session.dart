@@ -4,7 +4,7 @@
 
 // XDU Planet API.
 // I will put my xduplanet.php to my github, which thanks to old computers.
-
+/*
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
@@ -51,3 +51,4 @@ class PlanetSession extends NetworkSession {
       .get("$base/index.json")
       .then((value) => XDUPlanetDatabase.fromJson(value.data));
 }
+*/

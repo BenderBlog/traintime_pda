@@ -14,6 +14,7 @@ import OSLog
 
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
+private let userClassFile = "UserClass.json"
 private let examFile = "ExamFile.json"
 private let physicsExperimentFile = "PhysicsExperiment.json"
 private let otherExperimentFile = "OtherExperiment.json"
@@ -104,7 +105,17 @@ struct Provider: TimelineProvider {
             logger.info("Getting courses data...")
             let fileURL = containerURL.appendingPathComponent(classTableFile)
             let jsonData = try Data(contentsOf: fileURL)
-            let classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
+            var classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
+
+            let userClassURL = containerURL.appendingPathComponent(userClassFile)
+            if let userClassJsonData = try? Data(contentsOf: userClassURL) {
+                let userDefinedClassData: UserDefinedClassData = try decoder.decode(
+                    UserDefinedClassData.self,
+                    from: userClassJsonData
+                )
+                classData.userDefinedDetail = userDefinedClassData.userDefinedDetail
+                classData.timeArrangement.append(contentsOf: userDefinedClassData.timeArrangement)
+            }
             
             // Fetch start day
             guard var startDay = dateFormatter.date(from: classData.termStartDay) else {

@@ -10,7 +10,6 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/score/score_compose_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
 class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class
@@ -70,10 +69,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                 backgroundColor: Colors.transparent,
                 child: ScoreComposeCard(
                   score: c.scoreData[widget.mark],
-                  detail: ScoreSession().getDetail(
-                    c.scoreData[widget.mark].classID,
-                    c.scoreData[widget.mark].semesterCode,
-                  ),
+                  detail: c.getScoreComposeInfo(c.scoreData[widget.mark]),
                 ),
               );
             },

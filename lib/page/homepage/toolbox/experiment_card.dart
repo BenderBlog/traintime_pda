@@ -14,7 +14,7 @@ class ExperimentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SmallFunctionCard(
-      onTap: () async {
+      onPressed: () async {
         // bool isGood = true;
         //  if (preference
         //      .getString(preference.Preference.experimentPassword)

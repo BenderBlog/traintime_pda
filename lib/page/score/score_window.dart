@@ -27,7 +27,8 @@ class ScoreWindow extends StatelessWidget {
                 FlutterI18n.translate(context, "score.score_page.title"),
               ),
               actions: [
-                if (state.state == ScoreFetchState.ok)
+                if (state.state == ScoreFetchState.readyCache ||
+                    state.state == ScoreFetchState.readyFresh)
                   IconButton(
                     icon: const Icon(Icons.replay_outlined),
                     onPressed: () =>
@@ -38,11 +39,14 @@ class ScoreWindow extends StatelessWidget {
             body: Builder(
               builder: (context) {
                 switch (state.state) {
-                  case ScoreFetchState.ok:
+                  case ScoreFetchState.readyFresh:
+                  case ScoreFetchState.readyCache:
+                  case ScoreFetchState.fetchingWithData:
                     return const ScorePage();
                   case ScoreFetchState.error:
                     return ReloadWidget(
                       errorStatus: state.error,
+                      stackTrace: state.stackTrace,
                       function: () => state.refreshingState(context),
                     );
                   case ScoreFetchState.fetching:

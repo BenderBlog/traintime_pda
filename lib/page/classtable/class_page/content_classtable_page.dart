@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -13,6 +14,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -22,7 +24,6 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:share_plus/share_plus.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -96,7 +97,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     //}
 
     /// Init the background.
-    File image = File("${supportPath.path}/${ClassTableFile.decorationName}");
+    File image = File("${supportPath.path}/${classTableState.decorationName}");
     decoration = BoxDecoration(
       image:
           (preference.getBool(preference.Preference.decorated) &&
@@ -170,8 +171,91 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
+  Future<void> _showLoadErrorDialog() async {
+    final state = ClassTableState.of(context)!.controllers;
+    final errorWithoutCacheSources = state.errorWithoutCacheSources;
+    final errorWithCacheSources = state.errorWithCacheSources;
+
+    String sourceLabel(ClassTableStatusSource source) =>
+        FlutterI18n.translate(context, switch (source) {
+          ClassTableStatusSource.classTable =>
+            "classtable.status_source.class_table",
+          ClassTableStatusSource.exam => "classtable.status_source.exam",
+          ClassTableStatusSource.physicsExperiment =>
+            "classtable.status_source.physics_experiment",
+          ClassTableStatusSource.otherExperiment =>
+            "classtable.status_source.other_experiment",
+        });
+
+    String? sourceHintKey(ClassTableStatusSource source) => switch (source) {
+      ClassTableStatusSource.classTable => state.classTableCacheHintKey,
+      ClassTableStatusSource.exam => state.examCacheHintKey,
+      ClassTableStatusSource.physicsExperiment =>
+        state.physicsExperimentCacheHintKey,
+      ClassTableStatusSource.otherExperiment =>
+        state.otherExperimentCacheHintKey,
+    };
+
+    final content = <String>[
+      if (errorWithoutCacheSources.isNotEmpty)
+        FlutterI18n.translate(
+          context,
+          "classtable.status_banner.error_summary",
+          translationParams: {
+            "sources": errorWithoutCacheSources.map(sourceLabel).join("、"),
+          },
+        ),
+      ...errorWithoutCacheSources.map((source) {
+        final hintKey = sourceHintKey(source);
+        final detail = hintKey != null
+            ? FlutterI18n.translate(context, hintKey)
+            : FlutterI18n.translate(context, "network_error");
+        return "${sourceLabel(source)}: $detail";
+      }),
+      if (errorWithoutCacheSources.isNotEmpty &&
+          errorWithCacheSources.isNotEmpty)
+        "",
+      if (errorWithCacheSources.isNotEmpty)
+        FlutterI18n.translate(
+          context,
+          "classtable.status_banner.cache",
+          translationParams: {
+            "sources": errorWithCacheSources.map(sourceLabel).join("、"),
+          },
+        ),
+      ...errorWithCacheSources.map((source) {
+        final hintKey = sourceHintKey(source);
+        final detail = hintKey != null
+            ? FlutterI18n.translate(context, hintKey)
+            : FlutterI18n.translate(context, "network_error");
+        return "${sourceLabel(source)}: $detail";
+      }),
+    ].join("\n");
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          FlutterI18n.translate(context, "classtable.error_dialog_title"),
+        ),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(FlutterI18n.translate(context, "confirm")),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final state = ClassTableState.of(context)!.controllers;
+    final hasError =
+        state.errorWithoutCacheSources.isNotEmpty ||
+        state.errorWithCacheSources.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "classtable.page_title")),
@@ -180,6 +264,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
         ),
         actions: [
+          if (hasError)
+            IconButton(
+              onPressed: _showLoadErrorDialog,
+              icon: const Icon(Icons.error_outline),
+              tooltip: FlutterI18n.translate(context, "load_error"),
+            ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -498,6 +588,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   : topRowHeightSmall,
             ),
             child: _topView(),
+          ),
+          ClassTableInlineBanner(
+            loadingSources: state.loadingSources,
+            cacheSources: state.cacheSources,
           ),
           DecoratedBox(
             decoration: decoration,

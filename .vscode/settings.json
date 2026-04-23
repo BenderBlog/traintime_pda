@@ -1,7 +1,7 @@
 {
   "mesonbuild.configureOnOpen": false,
   "dart.flutterSdkPaths": [
-    ".fvm/flutter_sdk",
+    ".fvm/flutter_sdk"
   ],
   "dart.analysisExcludedFolders": [
     ".flutter"

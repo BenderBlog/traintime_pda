@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.5.6+36
+version: 1.5.11+41
 
 environment:
   sdk: ^3.8.0
@@ -35,11 +35,11 @@ dependencies:
   url_launcher: ^6.1.6
   time: ^2.1.5
   auto_size_text: ^3.0.0
-  restart_app: ^1.2.1
+  restart_app: ^1.7.3
   calendar_date_picker2: ^2.0.0
   cached_network_image: ^3.2.3
   flutter_native_splash: ^2.3.1
-  get:
+  signals: ^6.3.0
   provider: ^6.1.5
   flutter:
     sdk: flutter
@@ -50,24 +50,23 @@ dependencies:
   file_picker: ^10.1.9
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.7
-  remixicon: ^1.4.1
-  timelines_plus: ^1.0.4
+  remixicon: ^4.9.1
+  timelines_plus: ^2.0.0
   based_split_view: ^1.2.0
   permission_handler: ^12.0.1
-  result_dart: ^2.1.1
-  graphic: ^2.6.0
+  # QR code scanner
   # Output to system calendar
   device_calendar: ^4.3.3
   # Homepage Widget
-  home_widget: ^0.8.0
+  home_widget: ^0.9.0
   image: ^4.2.0
   catcher_2: ^2.0.0
   # XDU Planet
-  flutter_widget_from_html_core: any
-  fwfh_cached_network_image: ^0.16.0
-  fwfh_url_launcher: ^0.16.0
+  #flutter_widget_from_html_core: any
+  #fwfh_cached_network_image: ^0.16.0
+  #fwfh_url_launcher: ^0.16.0
   # PDA Club Promotion
-  extended_image: ^10.0.1
+  #extended_image: ^10.0.1
   # internationalized
   device_info_plus: ^12.1.0
   flutter_i18n: ^0.37.1
@@ -76,7 +75,7 @@ dependencies:
   intl:
   timezone: ^0.9.4
   flutter_local_notifications: ^18.0.1
-  sakura_blizzard: ^6.0.2
+  qr_code_dart_scan: ^0.11.5
 
 dev_dependencies:
   flutter_test:
@@ -106,14 +105,15 @@ flutter:
     - assets/Icon-App-iTunes-Background.png
     - assets/Icon-App-iTunes.png
     - assets/art/aboutRobots-icon.png
+    - assets/art/Doraemon_character.png
     - assets/art/pda_empty_cover.jpg
     - assets/art/pda_classtable_empty.png
     - assets/art/pda_girl_default.png
     #    - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.png
     #    - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
-    - assets/art/anan_christmas.png
-    - assets/art/Sakura_and_Tomoyo_Kimono.jpg
+    # - assets/art/anan_christmas.png
+    # - assets/art/Sakura_and_Tomoyo_Kimono.jpg
     - assets/flutter_i18n/zh_CN.yaml
     - assets/flutter_i18n/zh_TW.yaml
     - assets/flutter_i18n/en_US.yaml

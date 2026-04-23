@@ -9,19 +9,16 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:get/get.dart';
-import 'package:watermeter/page/club_suggestion/club_suggestion.dart';
+import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
-import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
-import 'package:watermeter/page/xdu_planet/xdu_planet_page.dart';
+import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
-import 'package:watermeter/repository/pda_service_session.dart' as message;
-import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -67,15 +64,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   int _selectedIndex = 0;
   static bool refreshAtStart = false;
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.resumed) {
-      updateCurrentData();
-    }
-  }
-
   late StreamSubscription _intentSub;
   late PageController _controller;
 
@@ -86,7 +74,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   }
 
   void _loginAsync() async {
-    updateCurrentData(); // load cache data
     showToast(
       context: context,
       msg: FlutterI18n.translate(context, "homepage.login_message"),
@@ -132,28 +119,28 @@ class _HomePageMasterState extends State<HomePageMaster>
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    if (Platform.isAndroid || Platform.isIOS) {
-                      Restart.restartApp();
-                    } else {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "setting.need_close_dialog.title",
-                            ),
-                          ),
-                          content: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "setting.need_close_dialog.content",
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+                    //if (Platform.isAndroid || Platform.isIOS) {
+                    Restart.restartApp();
+                    //} else {
+                    //  showDialog(
+                    //    barrierDismissible: false,
+                    //    context: context,
+                    //    builder: (context) => AlertDialog(
+                    //      title: Text(
+                    //        FlutterI18n.translate(
+                    //          context,
+                    //          "setting.need_close_dialog.title",
+                    //        ),
+                    //      ),
+                    //      content: Text(
+                    //        FlutterI18n.translate(
+                    //          context,
+                    //          "setting.need_close_dialog.content",
+                    //        ),
+                    //      ),
+                    //    ),
+                    //  );
+                    //}
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),
@@ -176,18 +163,6 @@ class _HomePageMasterState extends State<HomePageMaster>
       } else {
         _showOfflineModeNotice();
       }
-    }
-  }
-
-  void _showUpdateNotice() {
-    if (updateMessage.value != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await showDialog(
-          context: context,
-          builder: (context) =>
-              Obx(() => UpdateDialog(updateMessage: updateMessage.value!)),
-        );
-      });
     }
   }
 
@@ -217,20 +192,8 @@ class _HomePageMasterState extends State<HomePageMaster>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!refreshAtStart) {
-      message.checkUpdate().then(
-        (value) {
-          if (value ?? false) _showUpdateNotice();
-        },
-        onError: (e, s) {
-          if (mounted) {
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(context, "setting.fetch_failed"),
-            );
-          }
-        },
-      );
-      message.getClubList();
+      unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
+      //message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
         "Current loginstate: $loginState, if none will _loginAsync.",
@@ -270,15 +233,15 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 1,
-        name: FlutterI18n.translate(context, "homepage.club"),
-        icon: Icons.star_outline,
-        iconChoice: Icons.star,
+        name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
+        icon: MingCuteIcons.mgc_tool_line,
+        iconChoice: MingCuteIcons.mgc_tool_fill,
       ),
       PageInformation(
         index: 2,
-        name: FlutterI18n.translate(context, "homepage.planet"),
-        icon: MingCuteIcons.mgc_planet_line,
-        iconChoice: MingCuteIcons.mgc_planet_fill,
+        name: FlutterI18n.translate(context, "homepage.dashboard"),
+        icon: MingCuteIcons.mgc_pig_line,
+        iconChoice: MingCuteIcons.mgc_pig_fill,
       ),
       PageInformation(
         index: 3,
@@ -300,8 +263,8 @@ class _HomePageMasterState extends State<HomePageMaster>
               _controller.jumpToPage(_selectedIndex);
             },
           ),
-          const ClubSuggestion(),
-          const XDUPlanetPage(),
+          const ToolBoxPage(),
+          const PigPage(),
           const SettingWindow(),
         ],
         onPageChanged: (int index) {

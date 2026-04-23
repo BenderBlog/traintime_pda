@@ -1,0 +1,5 @@
+1. 修复自定义课程编辑页的空指针异常 @FlyingPig278
+2. 平板考勤查询页面 @imoscarz
+3. 优化体育查询界面的UI @imoscarz
+4. 切换学期功能 @BenderBlog @hazuki-keatsu
+5. 电费查询和电费绘图修复 @BenderBlog

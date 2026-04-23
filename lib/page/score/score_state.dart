@@ -4,6 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/score/score_statics.dart';
@@ -31,13 +32,19 @@ class ScoreState extends ChangeNotifier {
   ScoreFetchState state = ScoreFetchState.fetching;
 
   /// Score data
+  bool isCache = false;
+  DateTime fetchDate = DateTime.now();
   List<Score> scoreData = [];
   Set<String> semester = {};
   Set<String> statuses = {};
   Set<String> unPassedSet = {};
 
-  /// Error string
-  String? error;
+  /// Error and stacktrace for fatal error
+  Object? error;
+  StackTrace? stackTrace;
+
+  /// Hintkey for cache result
+  String? hintKey;
 
   /// Is score is selected to count.
   List<bool> isSelected = [];
@@ -54,8 +61,12 @@ class ScoreState extends ChangeNotifier {
   /// Search parameter
   String _search = "";
 
+  /// A Score Session
+  late final ScoreSession session;
+
   /// Init
   ScoreState(BuildContext context) {
+    session = ScoreSession();
     refreshingState(context);
   }
 
@@ -65,29 +76,38 @@ class ScoreState extends ChangeNotifier {
     bool isForce = false,
   }) async {
     /// Set to fetching mode.
-    state = ScoreFetchState.fetching;
+    if (scoreData.isNotEmpty) {
+      state = ScoreFetchState.fetchingWithData;
+    } else {
+      state = ScoreFetchState.fetching;
+    }
     notifyListeners();
 
-    /// Reset data.
-    scoreData.clear();
-    semester.clear();
-    statuses.clear();
-    unPassedSet.clear();
-
-    /// Error status changed.
-    error = null;
-
-    /// State reset in here.
-    isSelected.clear();
-    _isSelectMod = false;
-    _chosenSemester = "";
-    _chosenStatus = "";
-    _search = "";
     try {
-      ScoreSession session = ScoreSession();
-
       /// Fetch the data.
-      scoreData = await session.getScore(force: isForce);
+      FetchResult<List<Score>> scoreDataFetchResult = await session.getScore();
+
+      /// Reset data.
+      isCache = false;
+      scoreData.clear();
+      semester.clear();
+      statuses.clear();
+      unPassedSet.clear();
+
+      /// Error status changed.
+      error = null;
+      stackTrace = null;
+      hintKey = null;
+
+      /// State reset in here.
+      isSelected.clear();
+      _isSelectMod = false;
+      _chosenSemester = "";
+      _chosenStatus = "";
+      _search = "";
+
+      fetchDate = scoreDataFetchResult.fetchTime;
+      scoreData.addAll(scoreDataFetchResult.data);
       semester = {for (var i in scoreData) i.semesterCode};
       statuses = {for (var i in scoreData) i.classStatus};
       unPassedSet = {
@@ -105,15 +125,24 @@ class ScoreState extends ChangeNotifier {
         }
         return true;
       });
-      state = ScoreFetchState.ok;
+
+      if (scoreDataFetchResult.isCache) {
+        hintKey = scoreDataFetchResult.hintKey;
+        isCache = true;
+        state = ScoreFetchState.readyCache;
+        return;
+      }
+
+      state = ScoreFetchState.readyFresh;
     } catch (e, s) {
       log.error("[ScorePageState] Error on fetching score info.", e, s);
       state = ScoreFetchState.error;
-      error = e.toString();
+      error = e;
+      stackTrace = s;
     } finally {
       log.info("[ScorePageState] Finish fetching. state: $state");
       if (context.mounted) {
-        if (ScoreSession.isScoreListCacheUsed) {
+        if (isCache) {
           showToast(
             context: context,
             msg: FlutterI18n.translate(context, "score.cache_message"),
@@ -123,6 +152,14 @@ class ScoreState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Fetch score detail info
+  Future<List<ComposeDetail>> getScoreComposeInfo(Score scoreData) =>
+      session.getDetail(
+        scoreData.classID,
+        scoreData.semesterCode,
+        needRelogin: isCache,
+      );
 
   /// Exclude these from counting avgs
   /// 1. CET-4 and CET-6
