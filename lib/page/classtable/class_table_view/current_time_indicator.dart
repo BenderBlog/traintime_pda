@@ -159,13 +159,11 @@ class CurrentTimeIndicator {
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
-    final indicatorTop = lineTop > labelHeight ? lineTop - labelHeight : 0.0;
+    final indicatorTop = lineTop - labelHeight;
     final lineOffset = lineTop - indicatorTop;
     final lineTopOffset =
         lineOffset - CurrentTimeIndicatorConfig.lineThickness / 2;
-    final labelTop = (lineOffset - CurrentTimeIndicatorConfig.labelHeight / 2)
-        .clamp(0.0, double.infinity)
-        .toDouble();
+    final labelTop = lineOffset - CurrentTimeIndicatorConfig.labelHeight / 2;
     final labelBottom = labelTop + CurrentTimeIndicatorConfig.labelHeight;
     final lineBottom = lineTopOffset + CurrentTimeIndicatorConfig.lineThickness;
     final indicatorHeight =
