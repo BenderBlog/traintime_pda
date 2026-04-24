@@ -9,13 +9,13 @@ part of 'electricity.dart';
 ElectricityInfo _$ElectricityInfoFromJson(Map<String, dynamic> json) =>
     ElectricityInfo(
       fetchDay: DateTime.parse(json['fetchDay'] as String),
-      remain: json['remain'] as String,
-      owe: json['owe'] as String,
+      electricityRemain: json['electricityRemain'] as String,
+      waterRemain: json['waterRemain'] as String,
     );
 
 Map<String, dynamic> _$ElectricityInfoToJson(ElectricityInfo instance) =>
     <String, dynamic>{
       'fetchDay': instance.fetchDay.toIso8601String(),
-      'remain': instance.remain,
-      'owe': instance.owe,
+      'electricityRemain': instance.electricityRemain,
+      'waterRemain': instance.waterRemain,
     };

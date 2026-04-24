@@ -7,21 +7,19 @@ import 'dart:math' as math;
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:signals/signals.dart';
-import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
+import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
-import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// Use a inheritedWidget to share the ClassTableWidgetState
@@ -329,285 +327,35 @@ class ClassTableWidgetState with ChangeNotifier {
           .deleteUserDefinedClass(timeArrangement)
           .then((value) => notifyListeners());
 
-  List<Event> get events {
-    List<Event> events = [];
-
-    // UTC+8 timezone defination, hard-coded since our school is in here...
-    tz.initializeTimeZones();
-    Location currentLocation = getLocation("Asia/Shanghai");
-
-    // @hgh: i here means each single course assignment
-    for (var i in timeArrangement) {
-      // @hgh: j here means each week for a single course assignment
-      // @hgh: find the first week that has class
-      int j = i.weekList.indexWhere((element) => element);
-
-      // @benderblog: basically not happens, but if not arranged, just skip it.
-      if (j == -1) continue;
-
-      // @benderblog: rewrite, using ai generated algorithm to get the ranges of "true".
-      List<(int, int)> ranges = [];
-      int start = -1;
-
-      for (j; j < i.weekList.length; j++) {
-        if (i.weekList[j] && start == -1) {
-          start = j;
-        } else if (!i.weekList[j] && start != -1) {
-          ranges.add((start, j - 1));
-          start = -1;
-        }
-      }
-
-      // @ai: Handle the case where the array ends with a sequence of true values.
-      if (start != -1) {
-        ranges.add((start, j - 1));
-      }
-
-      String title =
-          "${getClassDetail(timeArrangement.indexOf(i)).name}@${i.classroom ?? "待定"}";
-      String description =
-          "课程名称：${getClassDetail(timeArrangement.indexOf(i)).name} - 老师：${i.teacher ?? "未知"}";
-      String? location = i.classroom ?? "待定";
-
-      List<String> startTime = timeList[(i.start - 1) * 2].split(":");
-      List<String> stopTime = timeList[(i.stop - 1) * 2 + 1].split(":");
-
-      DayOfWeek getDayOfWeek(int day) {
-        switch (day) {
-          case 1:
-            return DayOfWeek.Monday;
-          case 2:
-            return DayOfWeek.Tuesday;
-          case 3:
-            return DayOfWeek.Wednesday;
-          case 4:
-            return DayOfWeek.Thursday;
-          case 5:
-            return DayOfWeek.Friday;
-          case 6:
-            return DayOfWeek.Saturday;
-          case 7:
-            return DayOfWeek.Sunday;
-          default:
-            return DayOfWeek.Sunday;
-        }
-      }
-
-      // @benderblog: start dealing with
-      for (var range in ranges) {
-        // @hgh: initialize the first day(or, first recurrence) of the class
-        DateTime firstDay = startDay.add(
-          Duration(days: range.$1 * 7 + i.day - 1),
-        );
-
-        DateTime startTimeToUse = firstDay.add(
-          Duration(
-            hours: int.parse(startTime[0]),
-            minutes: int.parse(startTime[1]),
-          ),
-        );
-        DateTime stopTimeToUse = firstDay.add(
-          Duration(
-            hours: int.parse(stopTime[0]),
-            minutes: int.parse(stopTime[1]),
-          ),
-        );
-
-        RecurrenceRule rrule = RecurrenceRule(
-          RecurrenceFrequency.Weekly,
-          daysOfWeek: [getDayOfWeek(i.day)],
-          endDate: firstDay.add(Duration(days: (range.$2 - range.$1) * 7 + 1)),
-        );
-
-        events.add(
-          Event(
-            null,
-            title: title,
-            description: description,
-            recurrenceRule: rrule,
-            start: TZDateTime.from(startTimeToUse, currentLocation),
-            end: TZDateTime.from(stopTimeToUse, currentLocation),
-            location: location,
-          ),
-        );
-      }
-    }
-
-    // Add exam data and experiment data here.
-    for (var i in subjects) {
-      String title =
-          "${i.subject} ${i.typeStr}@${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
-      String description = "考试信息：${i.subject} - ${i.typeStr}";
-      String location = "${i.place} ${i.seat != null ? "-${i.seat}" : ""}";
-
-      events.add(
-        Event(
-          null,
-          title: title,
-          description: description,
-          start: TZDateTime.from(i.startTime!, currentLocation),
-          end: TZDateTime.from(i.stopTime!, currentLocation),
-          location: location,
-        ),
-      );
-    }
-
-    for (var experiment in experiments) {
-      for (var j in experiment.timeRanges) {
-        events.add(
-          Event(
-            null,
-            title: "${experiment.name}@${experiment.classroom}",
-            description: "实验名称：${experiment.name} - 老师：${experiment.teacher}",
-            start: TZDateTime.from(j.$1, currentLocation),
-            end: TZDateTime.from(j.$2, currentLocation),
-            location: experiment.classroom,
-          ),
-        );
-      }
-    }
-    return events;
-  }
+  List<Event> get events => buildCalendarEvents(
+    classTableData: classTableController.classTableComputedSignal.value,
+    subjects: subjects,
+    experiments: experiments,
+  );
 
   /// Generate icalendar file string.
-  String get iCalenderStr {
-    String toReturn = '''BEGIN:VCALENDAR
-CALSCALE:GREGORIAN
-BEGIN:VTIMEZONE
-TZID:Asia/Shanghai
-X-LIC-LOCATION:Asia/Shanghai
-BEGIN:STANDARD
-TZOFFSETFROM:+0800
-TZOFFSETTO:+0800
-TZNAME:CST
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-''';
-
-    for (var i in events) {
-      String vevent = "BEGIN:VEVENT\n";
-
-      vevent +=
-          "DTSTAMP:"
-          "${DateFormat('yyyyMMddTHHmmssZ').format(DateTime.now())}\n";
-      vevent += "SUMMARY:${i.title ?? "待定"}\n";
-      vevent += "DESCRIPTION:${i.description ?? "待定"}\n";
-
-      /// Minus 8 hours to match the "UTC time"
-      vevent +=
-          "DTSTART;TZID=Asia/Shanghai:"
-          "${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch))}\n";
-      vevent +=
-          "DTEND;TZID=Asia/Shanghai:"
-          "${DateFormat('yyyyMMddTHHmmss').format(DateTime.fromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch))}\n";
-      if (i.location != null) {
-        vevent += "LOCATION:${i.location}\n";
-      }
-
-      if (i.recurrenceRule != null) {
-        String getWeekStr(DayOfWeek day) {
-          switch (day) {
-            case DayOfWeek.Monday:
-              return "MO";
-            case DayOfWeek.Tuesday:
-              return "TU";
-            case DayOfWeek.Wednesday:
-              return "WE";
-            case DayOfWeek.Thursday:
-              return "TH";
-            case DayOfWeek.Friday:
-              return "FR";
-            case DayOfWeek.Saturday:
-              return "SA";
-            case DayOfWeek.Sunday:
-              return "SU";
-          }
-        }
-
-        vevent +=
-            "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=${getWeekStr(i.recurrenceRule!.daysOfWeek!.first)};"
-            "UNTIL=${DateFormat('yyyyMMdd').format(i.recurrenceRule!.endDate!)}\n";
-      }
-      toReturn += "${vevent}END:VEVENT\n";
-    }
-
-    return "${toReturn}END:VCALENDAR";
-  }
+  String get iCalenderStr => buildICalendarString(events);
 
   /// Output to System Calendar
   Future<bool> outputToCalendar(Future<void> Function() showDialog) async {
-    // Fetch calendar permission
-    final DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
-    Result<bool> hasPermitted = await deviceCalendarPlugin.hasPermissions();
-    if (hasPermitted.data != true) {
-      await showDialog();
-      hasPermitted = await deviceCalendarPlugin.requestPermissions();
-      if (hasPermitted.data != true) {
-        log.info(
-          "[Classtable][outputToCalendar] "
-          "Gain permission failed: "
-          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
-        );
-        return false;
-      }
-    }
-
-    // Generate a new calendar
-    (bool, String) calendarIdData = await DeviceCalendarPlugin()
-        .createCalendar(
-          "PDA Class Arrangement $semesterCode "
-          "created at ${DateTime.now().millisecondsSinceEpoch}",
-        )
-        .then((data) {
-          if (!data.isSuccess) {
-            log.info(
-              "[Classtable][outputToCalendar] "
-              "Generate new calendar failed: "
-              "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
-            );
-            return (false, "");
-          } else {
-            return (true, data.data!);
-          }
-        });
-
-    if (!calendarIdData.$1) {
-      return false;
-    }
-    String calendarId = calendarIdData.$2;
-
-    for (var i in events) {
-      var toPush = i..calendarId = calendarId;
-      Result<String>? addEventResult = await deviceCalendarPlugin
-          .createOrUpdateEvent(toPush);
-      // If got error, return with false.
-      if (addEventResult == null ||
-          addEventResult.data == null ||
-          addEventResult.data!.isEmpty) {
-        log.info(
-          "[Classtable][outputToCalendar] "
-          "Add failed: "
-          "${hasPermitted.errors.map((e) => e.errorMessage).join(",")}",
-        );
-        return false;
-      }
-    }
-
-    return true;
+    return await SystemCalendarSyncService().syncSystemCalendar(
+      requestPermissionsIfNeeded: true,
+      onlyIfCalendarExists: false,
+      showDialog: showDialog,
+    );
   }
 
   /// Update classtable infos
   Future<void> updateClasstable(BuildContext context) async {
     log.info("Updating time arrangement data...");
-    return await Future.wait([
+    await Future.wait([
       classTableController.reloadClassTable(),
       examController.reloadExamInfo(),
       physicsExperimentController.reloadPhysicsExperiment(),
       otherExperimentController.reloadOtherExperiment(),
-    ]).then((value) {
-      notifyListeners();
-    });
+    ]);
+    await maybeAutoSyncSystemCalendar();
+    notifyListeners();
   }
 
   ClassTableWidgetState() {

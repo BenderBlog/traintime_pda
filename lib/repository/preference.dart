@@ -98,6 +98,7 @@ enum Preference {
   systemCalendarSnapshot(
     key: "system_calendar_snapshot",
     type: "String",
+<<<<<<< feat-classtable-visual-improve
   ), // 上次同步到系统日历的数据快照
   currentTimeIndicatorEnabled(
     key: "currentTimeIndicatorEnabled",
@@ -143,6 +144,9 @@ enum Preference {
     key: "classStyleCompletedInnerAlpha",
     type: "double",
   ); // 已完成课程底色透明度
+=======
+  ); // 上次同步到系统日历的数据快照
+>>>>>>> main
 
   const Preference({required this.key, this.type = "String"});
 
