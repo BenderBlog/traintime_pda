@@ -51,6 +51,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   late BoxDecoration decoration;
   late ClassTableWidgetState classTableState;
   ClassTableWidgetState? _attachedClassTableState;
+  bool _didLoadVisualSettings = false;
 
   void _switchPage() {
     if (!mounted) {
@@ -84,6 +85,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   @override
   void didChangeDependencies() {
     final nextClassTableState = ClassTableState.of(context)!.controllers;
+
+    if (!_didLoadVisualSettings) {
+      CurrentTimeIndicatorConfig.loadFromPreference();
+      CompletedClassStyleConfig.loadFromPreference();
+      _didLoadVisualSettings = true;
+    }
 
     if (_attachedClassTableState != nextClassTableState) {
       _attachedClassTableState?.removeListener(_switchPage);
@@ -354,6 +361,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
     CurrentTimeIndicatorConfig.showTodayColumnHighlight =
         showTodayColumnHighlight;
+    await CurrentTimeIndicatorConfig.saveToPreference();
     setState(() {});
   }
 
@@ -586,6 +594,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         completedTextSaturationFactor;
     CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
     CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
+    await CompletedClassStyleConfig.saveToPreference();
     setState(() {});
   }
 

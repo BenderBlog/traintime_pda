@@ -89,7 +89,51 @@ enum Preference {
   ), // 上次通知使用的语言
   dormWaterToken(key: "dorm_water_token", type: "String"), // 宿舍水机登录 token
   dormWaterUid(key: "dorm_water_uid", type: "String"), // 宿舍水机用户 uid
-  dormWaterEid(key: "dorm_water_eid", type: "String"); // 宿舍水机用户 eid
+  dormWaterEid(key: "dorm_water_eid", type: "String"), // 宿舍水机用户 eid
+  currentTimeIndicatorEnabled(
+    key: "currentTimeIndicatorEnabled",
+    type: "bool",
+  ), // 当前时间标线开关
+  currentTimeIndicatorShowTimeLabel(
+    key: "currentTimeIndicatorShowTimeLabel",
+    type: "bool",
+  ), // 时间标线标签开关
+  currentTimeIndicatorShowTodayColumnHighlight(
+    key: "currentTimeIndicatorShowTodayColumnHighlight",
+    type: "bool",
+  ), // 高亮当日列开关
+  classStyleActiveBrightnessFactor(
+    key: "classStyleActiveBrightnessFactor",
+    type: "double",
+  ), // 未开始课程亮度
+  classStyleActiveBorderAlpha(
+    key: "classStyleActiveBorderAlpha",
+    type: "double",
+  ), // 未开始课程边框透明度
+  classStyleActiveInnerAlpha(
+    key: "classStyleActiveInnerAlpha",
+    type: "double",
+  ), // 未开始课程底色透明度
+  classStyleCompletedSaturationFactor(
+    key: "classStyleCompletedSaturationFactor",
+    type: "double",
+  ), // 已完成课程饱和度
+  classStyleCompletedBrightnessFactor(
+    key: "classStyleCompletedBrightnessFactor",
+    type: "double",
+  ), // 已完成课程亮度
+  classStyleCompletedTextSaturationFactor(
+    key: "classStyleCompletedTextSaturationFactor",
+    type: "double",
+  ), // 已完成课程文本饱和度
+  classStyleCompletedBorderAlpha(
+    key: "classStyleCompletedBorderAlpha",
+    type: "double",
+  ), // 已完成课程边框透明度
+  classStyleCompletedInnerAlpha(
+    key: "classStyleCompletedInnerAlpha",
+    type: "double",
+  ); // 已完成课程底色透明度
 
   const Preference({required this.key, this.type = "String"});
 
@@ -119,6 +163,17 @@ int getInt(Preference key) {
   return prefs.getInt(key.key) ?? 0;
 }
 
+double getDouble(Preference key) {
+  if (key.type != 'double') {
+    throw WrongTypeException;
+  }
+  return prefs.getDouble(key.key) ?? 0.0;
+}
+
+bool contains(Preference key) {
+  return prefs.containsKey(key.key);
+}
+
 Future<void> setString(Preference key, String value) async {
   if (key.type != 'String') {
     throw WrongTypeException;
@@ -140,6 +195,14 @@ Future<void> setInt(Preference key, int value) async {
     throw WrongTypeException;
   }
   await prefs.setInt(key.key, value);
+  await prefs.reloadCache();
+}
+
+Future<void> setDouble(Preference key, double value) async {
+  if (key.type != 'double') {
+    throw WrongTypeException;
+  }
+  await prefs.setDouble(key.key, value);
   await prefs.reloadCache();
 }
 

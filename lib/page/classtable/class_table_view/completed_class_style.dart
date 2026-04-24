@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class CompletedClassStyleConfig {
+  /// Default tuning parameters for completed classes.
   /// Completed-card color tuning.
   /// Lower values make finished classes look more muted and faded.
   static double completedSaturationFactor = 0.25;
@@ -14,11 +16,112 @@ class CompletedClassStyleConfig {
   static double completedTextSaturationFactor = 0.75;
   static double completedBorderAlpha = 0.75;
   static double completedInnerAlpha = 0.75;
-
   /// Active-card baseline appearance.
   static double activeBrightnessFactor = 1.0;
   static double activeBorderAlpha = 1.0;
   static double activeInnerAlpha = 0.9;
+
+  static void loadFromPreference() {
+    if (preference.contains(
+      preference.Preference.classStyleActiveBrightnessFactor,
+    )) {
+      activeBrightnessFactor = preference
+          .getDouble(preference.Preference.classStyleActiveBrightnessFactor)
+          .clamp(0.5, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(
+      preference.Preference.classStyleActiveBorderAlpha,
+    )) {
+      activeBorderAlpha = preference
+          .getDouble(preference.Preference.classStyleActiveBorderAlpha)
+          .clamp(0.1, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(preference.Preference.classStyleActiveInnerAlpha)) {
+      activeInnerAlpha = preference
+          .getDouble(preference.Preference.classStyleActiveInnerAlpha)
+          .clamp(0.1, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(
+      preference.Preference.classStyleCompletedSaturationFactor,
+    )) {
+      completedSaturationFactor = preference
+          .getDouble(preference.Preference.classStyleCompletedSaturationFactor)
+          .clamp(0.1, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(
+      preference.Preference.classStyleCompletedBrightnessFactor,
+    )) {
+      completedBrightnessFactor = preference
+          .getDouble(preference.Preference.classStyleCompletedBrightnessFactor)
+          .clamp(0.5, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(
+      preference.Preference.classStyleCompletedTextSaturationFactor,
+    )) {
+      completedTextSaturationFactor = preference
+          .getDouble(
+            preference.Preference.classStyleCompletedTextSaturationFactor,
+          )
+          .clamp(0.1, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(
+      preference.Preference.classStyleCompletedBorderAlpha,
+    )) {
+      completedBorderAlpha = preference
+          .getDouble(preference.Preference.classStyleCompletedBorderAlpha)
+          .clamp(0.1, 1.0)
+          .toDouble();
+    }
+    if (preference.contains(
+      preference.Preference.classStyleCompletedInnerAlpha,
+    )) {
+      completedInnerAlpha = preference
+          .getDouble(preference.Preference.classStyleCompletedInnerAlpha)
+          .clamp(0.1, 1.0)
+          .toDouble();
+    }
+  }
+
+  static Future<void> saveToPreference() async {
+    await preference.setDouble(
+      preference.Preference.classStyleActiveBrightnessFactor,
+      activeBrightnessFactor.clamp(0.5, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleActiveBorderAlpha,
+      activeBorderAlpha.clamp(0.1, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleActiveInnerAlpha,
+      activeInnerAlpha.clamp(0.1, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleCompletedSaturationFactor,
+      completedSaturationFactor.clamp(0.1, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleCompletedBrightnessFactor,
+      completedBrightnessFactor.clamp(0.5, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleCompletedTextSaturationFactor,
+      completedTextSaturationFactor.clamp(0.1, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleCompletedBorderAlpha,
+      completedBorderAlpha.clamp(0.1, 1.0).toDouble(),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleCompletedInnerAlpha,
+      completedInnerAlpha.clamp(0.1, 1.0).toDouble(),
+    );
+  }
 }
 
 class CompletedClassStyleData {

@@ -3,8 +3,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/model/time_list.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 class CurrentTimeIndicatorConfig {
+  /// Default tuning parameters for the current time indicator.
+  /// Configuration for the current time indicator in the class table view.
   static bool enabled = true;
   static bool showTimeLabel = true;
   static bool showTodayColumnHighlight = true;
@@ -18,6 +21,45 @@ class CurrentTimeIndicatorConfig {
   static double labelBorderRadius = 4;
   static double dayColumnHighlightAlpha = 0.25;
   static double dayColumnHighlightRadius = 8;
+
+  static void loadFromPreference() {
+    if (preference.contains(
+      preference.Preference.currentTimeIndicatorEnabled,
+    )) {
+      enabled = preference.getBool(
+        preference.Preference.currentTimeIndicatorEnabled,
+      );
+    }
+    if (preference.contains(
+      preference.Preference.currentTimeIndicatorShowTimeLabel,
+    )) {
+      showTimeLabel = preference.getBool(
+        preference.Preference.currentTimeIndicatorShowTimeLabel,
+      );
+    }
+    if (preference.contains(
+      preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
+    )) {
+      showTodayColumnHighlight = preference.getBool(
+        preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
+      );
+    }
+  }
+
+  static Future<void> saveToPreference() async {
+    await preference.setBool(
+      preference.Preference.currentTimeIndicatorEnabled,
+      enabled,
+    );
+    await preference.setBool(
+      preference.Preference.currentTimeIndicatorShowTimeLabel,
+      showTimeLabel,
+    );
+    await preference.setBool(
+      preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
+      showTodayColumnHighlight,
+    );
+  }
 }
 
 class CurrentTimeIndicator {
