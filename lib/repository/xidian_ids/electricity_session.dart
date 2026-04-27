@@ -7,18 +7,20 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:encrypter_plus/encrypter_plus.dart';
+import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 String _cacheHintFromError(Object error) {
+  if (error is NotSchoolNetworkException) {
+    return "electricity.not_school_network";
+  }
   if (error is NoAccountInfoException) {
     return "electricity.cache_hint_account_missing";
   }
@@ -32,9 +34,7 @@ String _cacheHintFromError(Object error) {
     return "electricity.cache_hint_password_wrong";
   }
   if (error is LoginFailedException) {
-    return error.msg == "验证码校验失败"
-        ? "electricity.cache_hint_captcha_failed"
-        : "electricity.cache_hint_login_failed";
+    return "electricity.cache_hint_login_failed";
   }
   if (error is NotInitalizedException) {
     if (error.msg == "用户名或密码错误") {
@@ -67,49 +67,8 @@ Future<FetchResult<ElectricityInfo>> getElectricityInfo({
 
   try {
     log.info("[EletricitySession][update] Fetching from Internet.");
-    (String, String) sessionValue = await ElectricitySession().loginPayment(
+    var toReturn = await ElectricitySession().requestNewEnergyInfo(
       captchaFunction: captchaFunction,
-    );
-    String remain = "";
-    String owe = "";
-    await Future.wait([
-      Future(() async {
-        try {
-          remain = await ElectricitySession().getElectricity(sessionValue);
-        } on NotFoundException {
-          remain = "electricity_status.remain_not_found";
-        } on DioException catch (e, s) {
-          log.handle(e, s);
-          remain = "electricity_status.remain_network_issue";
-        } catch (e, s) {
-          log.handle(e, s);
-          remain = "electricity_status.remain_other_issue";
-        }
-      }),
-      Future(() async {
-        try {
-          owe = await ElectricitySession().getOwe(sessionValue);
-        } on DioException catch (e, s) {
-          log.info(
-            "[PaymentSession][update] "
-            "Network error occurred on getting owe",
-          );
-          log.handle(e, s);
-          owe = "electricity_status.owe_issue";
-        } catch (e, s) {
-          log.info(
-            "[PaymentSession][update] "
-            "Error occurred on getting owe",
-          );
-          log.handle(e, s);
-          owe = "electricity_status.owe_not_found";
-        }
-      }),
-    ]);
-    ElectricityInfo toReturn = ElectricityInfo(
-      fetchDay: fetchDay,
-      remain: remain,
-      owe: owe,
     );
     ElectricitySession.saveCache(toReturn);
     return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
@@ -126,7 +85,235 @@ Future<FetchResult<ElectricityInfo>> getElectricityInfo({
   }
 }
 
+/// New energy management system
+/// Online since 2026-4-22
+/// Can be only be accessed through school net
 class ElectricitySession extends IDSSession {
+  static const electricityCache = "Electricity.json";
+  static const electricityHistory = "ElectricityHistory.json";
+  static File fileCache = File("${supportPath.path}/$electricityCache");
+  static File fileHistory = File("${supportPath.path}/$electricityHistory");
+
+  static bool get isCacheExist => fileCache.existsSync();
+
+  static FetchResult<ElectricityInfo>? getCache() {
+    if (!isCacheExist) return null;
+    log.info("[EletricitySession][cache] Checking out cache.");
+    try {
+      final cache = ElectricityInfo.fromJson(
+        jsonDecode(fileCache.readAsStringSync()),
+      );
+      return FetchResult.cache(fetchTime: cache.fetchDay, data: cache);
+    } catch (e, s) {
+      log.handle(e, s);
+      return null;
+    }
+  }
+
+  static void saveCache(ElectricityInfo info) {
+    if (!isCacheExist) {
+      fileCache.createSync(recursive: true);
+    }
+    fileCache.writeAsStringSync(jsonEncode(info.toJson()));
+  }
+
+  static void clearElectricityHistory() {
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      return;
+    }
+
+    ElectricitySession.fileHistory.deleteSync();
+    ElectricitySession.fileHistory.createSync();
+  }
+
+  // Remove electricity cache
+  static void removeElectricityInfoCache() {
+    if (fileCache.existsSync()) {
+      fileCache.deleteSync();
+    }
+  }
+
+  // Remove electricity history cache
+  static void removeElectricityHistoryCache() {
+    if (fileHistory.existsSync()) {
+      fileHistory.deleteSync();
+    }
+  }
+
+  static List<ElectricityInfo> getHistory() {
+    var list = <ElectricityInfo>[];
+
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      ElectricitySession.fileHistory.createSync(recursive: true);
+      return list;
+    }
+
+    try {
+      String rawHistory = ElectricitySession.fileHistory.readAsStringSync();
+      List<ElectricityInfo> toAdd = jsonDecode(
+        rawHistory,
+      ).map<ElectricityInfo>((data) => ElectricityInfo.fromJson(data)).toList();
+      list.addAll(toAdd);
+      list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
+    } catch (e, s) {
+      log.handle(e, s);
+    }
+
+    return list;
+  }
+
+  static void saveHistory(List<ElectricityInfo> history) {
+    if (!ElectricitySession.fileHistory.existsSync()) {
+      ElectricitySession.fileHistory.createSync(recursive: true);
+    }
+    fileHistory.writeAsStringSync(jsonEncode(history));
+  }
+
+  static const _aesKey = "1234567812345678";
+  // padding iv is also 1234567812345678
+
+  /// Request for ElectricitySession, true by default
+  Future<dynamic> _request(
+    String url, {
+    required Map<String, dynamic> data,
+    bool isGetMethod = false,
+  }) async {
+    /// First stands for timestamp, Second stands for signature.
+    /// Just post it in this way.
+    (String, String) sign = await dio
+        .post(
+          "https://ignypt.xidian.edu.cn/baseNew/api/User/GetSignature",
+          data: {
+            "data": "",
+            "access_token": "",
+            "OpCode": "MPAY",
+            "RequestID": "",
+          },
+        )
+        .then(
+          (data) => (
+            data.data["data"]["timestamp"].toString(),
+            data.data["data"]["signature"].toString(),
+          ),
+        );
+
+    var enc = encrypt.Encrypter(
+      encrypt.AES(encrypt.Key.fromUtf8(_aesKey), mode: encrypt.AESMode.cbc),
+    );
+    var iv = encrypt.IV.fromUtf8('1234567812345678');
+    log.info("[ElectricitySession][_request] $data ${jsonEncode(data)}");
+    if (isGetMethod) {
+      return dio.get(
+        url,
+        queryParameters: {
+          "content": Uri.encodeComponent(
+            enc.encrypt(jsonEncode(data), iv: iv).base64,
+          ),
+        },
+        options: Options(
+          headers: {
+            "timestamp": sign.$1,
+            "signature": sign.$2,
+            "OpCode": "MPAY",
+            "OrgId": "",
+            "RequestID": "",
+          },
+        ),
+      );
+    }
+    return dio.post(
+      url,
+      data: {"content": enc.encrypt(jsonEncode(data), iv: iv).base64},
+      options: Options(
+        headers: {
+          "timestamp": sign.$1,
+          "signature": sign.$2,
+          "OpCode": "MPAY",
+          "OrgId": "",
+          "RequestID": "",
+        },
+        contentType: "application/json",
+      ),
+    );
+  }
+
+  Future<ElectricityInfo> requestNewEnergyInfo({
+    required Future<String> Function(List<int>)? captchaFunction,
+  }) async {
+    if (!await NetworkSession.isInSchool()) {
+      throw NotSchoolNetworkException();
+    }
+
+    String location = await checkAndLogin(
+      target:
+          "https://xxcapp.xidian.edu.cn/uc/api/oauth/index?"
+          "redirect=https://ignypt.xidian.edu.cn/revenueH5/login?"
+          "opcode=MPAY&appid=200260318155520600&state=12312312312312&qrcode=0",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+    );
+
+    var response = await dio.get(location);
+    while (response.headers[HttpHeaders.locationHeader] != null) {
+      location = response.headers[HttpHeaders.locationHeader]![0];
+      log.info(
+        "[PaymentSession][getOwe] "
+        "Received location: $location.",
+      );
+      response = await dio.get(location);
+    }
+    String code = Uri.parse(location).queryParameters["code"]!;
+    log.info(
+      "[ElectricitySession][loginEnergy] "
+      "Received location: $location, code is $code",
+    );
+    response = await dio.get(location);
+
+    response = await _request(
+      "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/OauthGetUserInfo",
+      data: {"CODE": code},
+      isGetMethod: true,
+    );
+
+    response = await _request(
+      "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/H5UserIDLogIn",
+      data: {
+        "UserID": preference.getString(preference.Preference.idsAccount),
+        "Pwd": "",
+        "IsCehckPwd": 1,
+        "NodeID": "",
+      },
+    );
+
+    String nodeID = response.data["ResData"][0]["NodeID"];
+
+    response = await _request(
+      "https://ignypt.xidian.edu.cn/estManage/api/wechat/v2/H5QueryMeterList",
+      data: {"NodeID": nodeID},
+      isGetMethod: true,
+    );
+
+    Map<String, dynamic> electricityInfo = response.data["ResData"]["rows"][0];
+    Map<String, dynamic> waterInfo = response.data["ResData"]["rows"][1];
+
+    List<int> fetchDate = electricityInfo["LastReadDate"]
+        .toString()
+        .split("-")
+        .map((e) => int.parse(e))
+        .toList();
+
+    return ElectricityInfo(
+      fetchDay: DateTime(fetchDate[0], fetchDate[1], fetchDate[2]),
+      electricityRemain: electricityInfo["LastNum"].toString(),
+      waterRemain: waterInfo["LastRawNum"].toString(),
+    );
+  }
+}
+
+/// Deprecated API, payment service does exists,
+/// but it has removed electricity support about 2026-4-19
+/*
+class PaymentSession extends IDSSession {
   static const factorycode = "E003";
   static const electricityCache = "Electricity.json";
   static const electricityHistory = "ElectricityHistory.json";
@@ -601,6 +788,7 @@ xh5zeF9usFgtdabgACU/cQIDAQAB
         }
       });
 }
+*/
 
 class NotFoundException implements Exception {}
 

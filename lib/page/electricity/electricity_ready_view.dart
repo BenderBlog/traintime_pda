@@ -47,100 +47,93 @@ class ElectricityReadyView extends StatelessWidget {
               .center(),
 
           InfoCard(
-                iconData: Icons.info,
-                title: FlutterI18n.translate(context, "electricity.power_title"),
-                children: [
-                  InfoItem(
-                    icon: Icons.account_balance,
-                    label: FlutterI18n.translate(context, "electricity.account"),
-                    value: prefs.getString(prefs.Preference.electricityAccount),
-                  ),
-                  InfoItem(
-                    icon: Icons.cached,
-                    label: FlutterI18n.translate(
-                      context,
-                      "electricity.cache_notice",
-                    ),
-                    value: DateFormat(
-                      "yyyy-MM-dd HH:mm",
-                    ).format(displayInfo.fetchDay),
-                  ),
-                  InfoItem(
-                    icon: Icons.electric_meter,
-                    label: FlutterI18n.translate(
-                      context,
-                      "electricity.remain_power",
-                    ),
-                    value:
-                        "${FlutterI18n.translate(context, displayInfo.remain)}"
-                        "${displayInfo.remain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
-                  ),
-                  InfoItem(
-                    icon: Icons.wallet,
-                    label: FlutterI18n.translate(context, "electricity.owe_info"),
-                    value: displayInfo.owe.contains(RegExp(r'[0-9]'))
-                        ? FlutterI18n.translate(
-                            context,
-                            "electricity_status.owe_need_pay",
-                            translationParams: {"due": displayInfo.owe},
-                          )
-                        : FlutterI18n.translate(context, displayInfo.owe),
-                  ),
-                ],
-              )
-              .padding(vertical: 4)
-              .constrained(maxWidth: sheetMaxWidth)
-              .center(),
+            iconData: Icons.info,
+            title: FlutterI18n.translate(context, "electricity.power_title"),
+            children: [
+              InfoItem(
+                icon: Icons.account_balance,
+                label: FlutterI18n.translate(context, "electricity.account"),
+                value: prefs.getString(prefs.Preference.electricityAccount),
+              ),
+              InfoItem(
+                icon: Icons.cached,
+                label: FlutterI18n.translate(
+                  context,
+                  "electricity.cache_notice",
+                ),
+                value: DateFormat(
+                  "yyyy-MM-dd HH:mm",
+                ).format(displayInfo.fetchDay),
+              ),
+              InfoItem(
+                icon: Icons.electric_meter,
+                label: FlutterI18n.translate(
+                  context,
+                  "electricity.remain_power",
+                ),
+                value:
+                    "${FlutterI18n.translate(context, displayInfo.electricityRemain)}"
+                    "${displayInfo.electricityRemain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
+              ),
+              InfoItem(
+                icon: Icons.wallet,
+                label: FlutterI18n.translate(context, "electricity.owe_info"),
+                value: displayInfo.waterRemain.contains(RegExp(r'[0-9]'))
+                    ? FlutterI18n.translate(
+                        context,
+                        "electricity_status.owe_need_pay",
+                        translationParams: {"due": displayInfo.waterRemain},
+                      )
+                    : FlutterI18n.translate(context, displayInfo.waterRemain),
+              ),
+            ],
+          ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
 
           InfoCard(
-                iconData: Icons.history,
-                title: FlutterI18n.translate(context, "electricity.history"),
-                children: [
-                  LayoutBuilder(
-                        builder: (context, constraints) => ElectricityUsageGraph(
-                          graphHeight: 240,
+            iconData: Icons.history,
+            title: FlutterI18n.translate(context, "electricity.history"),
+            children: [
+              LayoutBuilder(
+                    builder: (context, constraints) => ElectricityUsageGraph(
+                      graphHeight: 240,
+                      graphWidth: constraints.maxWidth,
+                      historyElectricityInfo: historyElectricityInfo,
+                    ),
+                  )
+                  .padding(vertical: 12, horizontal: 16)
+                  .decorated(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    borderRadius: BorderRadius.circular(12),
+                  )
+                  .padding(top: 4),
+            ],
+          ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+
+          InfoCard(
+            iconData: Icons.bar_chart,
+            title: FlutterI18n.translate(context, "electricity.daily_usage"),
+            children: [
+              LayoutBuilder(
+                    builder: (context, constraints) =>
+                        ElectricityAverageUsageGraph(
                           graphWidth: constraints.maxWidth,
                           historyElectricityInfo: historyElectricityInfo,
                         ),
-                      )
-                      .padding(vertical: 12, horizontal: 16)
-                      .decorated(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      .padding(top: 4),
-                ],
-              )
-              .padding(vertical: 4)
-              .constrained(maxWidth: sheetMaxWidth)
-              .center(),
-
-          InfoCard(
-                iconData: Icons.bar_chart,
-                title: FlutterI18n.translate(context, "electricity.daily_usage"),
-                children: [
-                  LayoutBuilder(
-                        builder: (context, constraints) =>
-                            ElectricityAverageUsageGraph(
-                              graphWidth: constraints.maxWidth,
-                              historyElectricityInfo: historyElectricityInfo,
-                            ),
-                      )
-                      .padding(vertical: 12, horizontal: 16)
-                      .decorated(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      .padding(top: 4),
-                ],
-              )
-              .padding(vertical: 4)
-              .constrained(maxWidth: sheetMaxWidth)
-              .center(),
+                  )
+                  .padding(vertical: 12, horizontal: 16)
+                  .decorated(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    borderRadius: BorderRadius.circular(12),
+                  )
+                  .padding(top: 4),
+            ],
+          ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
 
           FilledButton(
                 onPressed: onRefresh,
-                child: Text(FlutterI18n.translate(context, "electricity.update")),
+                child: Text(
+                  FlutterI18n.translate(context, "electricity.update"),
+                ),
               )
               .padding(horizontal: 4, vertical: 8)
               .width(double.infinity)
