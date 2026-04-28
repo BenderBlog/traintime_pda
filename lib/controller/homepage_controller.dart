@@ -296,4 +296,8 @@ class HomepageController {
       return failedSources;
     },
   );
+
+  late final havePhysicsExperimentSignal = computed<bool>(
+    () => ClassTableController.i.havePhysicsExperimentSignal.value,
+  );
 }

@@ -54,7 +54,7 @@ class ElectricityUsageGraph extends StatefulWidget {
     // Parsing number, store the latest data.
     // Notice that the historyElectricityInfo have sorted.
     for (final info in historyElectricityInfo) {
-      final v = double.tryParse(info.remain);
+      final v = double.tryParse(info.electricityRemain);
       if (v == null) continue;
 
       final dayTime = DateTime(

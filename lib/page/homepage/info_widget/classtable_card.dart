@@ -7,7 +7,6 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
@@ -136,6 +135,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
     required bool isAllSourcesLoading,
     required bool isPartialSourcesLoading,
     required List<home.HomepageFailedSource> failedSources,
+    required bool havePhysicsExperiment,
   }) {
     final theme = Theme.of(context).colorScheme;
     final hints = <Widget>[];
@@ -167,6 +167,10 @@ class _ClassTableCardState extends State<ClassTableCard> {
     }
 
     for (final source in failedSources) {
+      if (source == home.HomepageFailedSource.physicsExperiment &&
+          !havePhysicsExperiment) {
+        continue;
+      }
       hints.add(
         _buildStateHintChip(
           context,
@@ -279,6 +283,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
           final isPartialSourcesLoading =
               controller.isPartialSourcesLoadingComputedSignal.value;
           final failedSources = controller.failedSourcesComputedSignal.value;
+          final havePhysicsExperiment =
+              controller.havePhysicsExperimentSignal.value;
           final itemDesc = _getItemDescriptors(
             currentArrangement: currentArrangement,
             nextArrangement: nextArrangement,
@@ -293,6 +299,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
             isAllSourcesLoading: isAllSourcesLoading,
             isPartialSourcesLoading: isPartialSourcesLoading,
             failedSources: failedSources,
+            havePhysicsExperiment: havePhysicsExperiment,
           );
 
           return [
@@ -346,8 +353,6 @@ class _ClassTableCardState extends State<ClassTableCard> {
               LayoutBuilder(
                 builder: (context, constraints) => ClassTableWindow(
                   parentContext: context,
-                  currentWeek:
-                      ClassTableController.i.currentWeekComputedSignal.value,
                   constraints: constraints,
                 ),
               ),

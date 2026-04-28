@@ -24,7 +24,7 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
         children: [
           WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.payment"),
-            url: "https://payment.xidian.edu.cn/MNetWorkUI/showPublic",
+            url: "https://xxcapp.xidian.edu.cn/uc/api/oauth/index?redirect=https://ignypt.xidian.edu.cn/revenueH5/login?opcode=MPAY&appid=200260318155520600&state=1231231231",
             description: FlutterI18n.translate(
               context,
               "toolbox.payment_description",

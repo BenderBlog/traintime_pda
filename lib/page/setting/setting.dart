@@ -4,6 +4,7 @@
 
 // Setting window.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:watermeter/controller/electricity_controller.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
@@ -20,7 +20,6 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -40,7 +39,7 @@ import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/setting/dialogs/electricity_password_dialog.dart';
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/repository/network_session.dart';
@@ -81,6 +80,25 @@ class _SettingWindowState extends State<SettingWindow> {
           ),
         ),
       );
+    }
+  }
+
+  bool get _isSemesterAwareControllerLoading =>
+      ClassTableController.i.schoolClassTableStateSignal.value.isLoading ||
+      ExamController.i.examInfoStateSignal.value.isLoading ||
+      PhysicsExperimentController
+          .i
+          .physicsExperimentStateSignal
+          .value
+          .isLoading ||
+      OtherExperimentController.i.otherExperimentStateSignal.value.isLoading;
+
+  Future<void> _waitForSemesterAwareReloads() async {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    final stopwatch = Stopwatch()..start();
+    while (_isSemesterAwareControllerLoading &&
+        stopwatch.elapsed < const Duration(seconds: 30)) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
     }
   }
 
@@ -254,7 +272,8 @@ class _SettingWindowState extends State<SettingWindow> {
                   subtitle: Text(
                     FlutterI18n.translate(
                       context,
-                      "setting.change_color_dialog.${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+                      "setting.change_color_dialog."
+                      "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
@@ -408,87 +427,6 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                 ],
-                ListTile(
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.electricity_account_setting",
-                    ),
-                  ),
-                  trailing: const Icon(Icons.navigate_next),
-                  onTap: () {
-                    showDialog<bool>(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (context) => ElectricityAccountDialog(
-                        onSaveAccount: (accountNumber) async {
-                          await preference.setString(
-                            preference.Preference.electricityAccount,
-                            accountNumber,
-                          );
-                        },
-                        initialAccountNumber: preference.getString(
-                          preference.Preference.electricityAccount,
-                        ),
-                        onFetchFromNetwork:
-                            ElectricityController.i.getElectricityAccount,
-                      ),
-                    ).then((value) async {
-                      if (value != true) {
-                        if (context.mounted) {
-                          showToast(
-                            context: context,
-                            msg: FlutterI18n.translate(
-                              context,
-                              "setting.change_electricity_account.no_setting",
-                            ),
-                          );
-                          return;
-                        }
-                      }
-
-                      ElectricityController.i.clearElectricityHistory();
-
-                      if (context.mounted) {
-                        showToast(
-                          context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "setting.change_electricity_account.successful_setting",
-                          ),
-                        );
-                        ElectricityController.i.refreshElectricityInfo(
-                          force: true,
-                        );
-                        return;
-                      }
-                    });
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.electricity_password_setting",
-                    ),
-                  ),
-                  subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.electricity_password_description",
-                    ),
-                  ),
-                  trailing: const Icon(Icons.navigate_next),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) => const ElectricityPasswordDialog(),
-                    );
-                  },
-                ),
-                const Divider(),
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(
@@ -737,6 +675,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               OtherExperimentController.i
                                   .reloadOtherExperiment(),
                             ]);
+                            await maybeAutoSyncSystemCalendar();
                             if (mounted) {
                               setState(() {});
                             }
@@ -801,9 +740,17 @@ class _SettingWindowState extends State<SettingWindow> {
                       barrierDismissible: false,
                       context: context,
                       builder: (context) => SemesterSwitchDialog(),
-                    ).then((value) {
+                    ).then((value) async {
                       if (value == true) {
                         setState(() {});
+                        if (context.mounted) {
+                          showToast(context: context, msg: "Updating data");
+                        }
+                        await _waitForSemesterAwareReloads();
+                        await maybeAutoSyncSystemCalendar();
+                        if (mounted) {
+                          setState(() {});
+                        }
                       }
                     });
                   },

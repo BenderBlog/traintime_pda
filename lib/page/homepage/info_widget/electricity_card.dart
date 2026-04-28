@@ -35,13 +35,18 @@ class ElectricityCard extends StatelessWidget {
         style: const TextStyle(fontSize: 20),
         child: displayInfo != null
             ? Text(
-                displayInfo.remain.contains(RegExp(r'[0-9]'))
+                displayInfo.electricityRemain.contains(RegExp(r'[0-9]'))
                     ? FlutterI18n.translate(
                         context,
                         "homepage.electricity_card.current_electricity",
-                        translationParams: {"amount": displayInfo.remain},
+                        translationParams: {
+                          "amount": displayInfo.electricityRemain,
+                        },
                       )
-                    : FlutterI18n.translate(context, displayInfo.remain),
+                    : FlutterI18n.translate(
+                        context,
+                        displayInfo.electricityRemain,
+                      ),
               )
             : state.map(
                 data: (_) => const Text(""),
@@ -73,18 +78,18 @@ class ElectricityCard extends StatelessWidget {
                 );
               }
 
-              if (displayInfo.owe.contains(RegExp(r'[0-9]'))) {
+              if (displayInfo.waterRemain.contains(RegExp(r'[0-9]'))) {
                 return Text(
                   FlutterI18n.translate(
                     context,
                     "electricity_status.owe_need_pay",
-                    translationParams: {"due": displayInfo.owe},
+                    translationParams: {"due": displayInfo.waterRemain},
                   ),
                   overflow: TextOverflow.ellipsis,
                 );
               }
               return Text(
-                FlutterI18n.translate(context, displayInfo.owe),
+                FlutterI18n.translate(context, displayInfo.waterRemain),
                 overflow: TextOverflow.ellipsis,
               );
             })()

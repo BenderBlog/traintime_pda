@@ -12,10 +12,6 @@ import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/setting/dialogs/electricity_account_dialog.dart';
-import 'package:watermeter/repository/preference.dart' as prefs;
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 class ElectricityWindow extends StatelessWidget {
   const ElectricityWindow({super.key});
@@ -94,47 +90,6 @@ class ElectricityWindow extends StatelessWidget {
             errorStatus: errorState.error,
             stackTrace: errorState.stackTrace,
             function: () async {
-              if (prefs
-                  .getString(prefs.Preference.electricityAccount)
-                  .isEmpty) {
-                bool? isSaved = await showDialog<bool?>(
-                  context: context,
-                  builder: (context) => ElectricityAccountDialog(
-                    onSaveAccount: (accountNumber) async {
-                      await prefs.setString(
-                        prefs.Preference.electricityAccount,
-                        accountNumber,
-                      );
-                    },
-                    initialAccountNumber: prefs.getString(
-                      prefs.Preference.electricityAccount,
-                    ),
-                    onFetchFromNetwork: () async {
-                      String dorm = await PersonalInfoSession()
-                          .getDormInfoEhall();
-                      return ElectricitySession.parseElectricityAccountFromIDS(
-                        dorm,
-                      );
-                    },
-                  ),
-                );
-
-                if (isSaved != true) {
-                  if (context.mounted) {
-                    showToast(
-                      context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.change_electricity_account.no_setting",
-                      ),
-                    );
-                    return;
-                  }
-                }
-
-                c.clearElectricityHistory();
-              }
-
               if (context.mounted) {
                 showToast(
                   context: context,

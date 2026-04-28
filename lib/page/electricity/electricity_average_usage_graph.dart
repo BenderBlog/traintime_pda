@@ -33,7 +33,7 @@ class ElectricityAverageUsageGraph extends StatefulWidget {
   }) {
     SplayTreeMap<DateTime, double> dayMin = SplayTreeMap();
     for (final info in historyElectricityInfo) {
-      final v = double.tryParse(info.remain);
+      final v = double.tryParse(info.electricityRemain);
       if (v == null) continue;
       final dayTime = DateTime(
         info.fetchDay.year,
