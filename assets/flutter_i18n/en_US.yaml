@@ -26,7 +26,8 @@ cancel: "Cancel"
 confirm: "Okay"
 
 # controller/model 里面可能需要给用户展示的
-network_error: "Network error, maybe you are not connected to the Internet, or the school server is down :P"
+network_error: "Network error, maybe you are not connected to the Internet, or
+   the school server is down :P"
 error_detect: "An error has occurred,"
 query_failed: "Query failed"
 not_school_network: "Not on the Campus Network"
@@ -54,7 +55,9 @@ new_homepage_hint: "A new homepage is developing here, the pigimg is a placehold
 
 # Cache hints
 local_cache_hint: "Local cache from {datetime}"
-inapp_cache_hint: "In-app cache from {datetime}\nCache will be cleared after restart!"
+inapp_cache_hint: "In-app cache from {datetime}
+
+   Cache will be cleared once restart!"
 cache_reason_default: "Showing cached data."
 
 # 星期
@@ -92,7 +95,8 @@ class_attendance:
       showing_count: "Showing {count}/{total} courses"
    card:
       time: "Attendances"
-      time_info: "{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn} Required"
+      time_info: "{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn}
+         Required"
       not_attend: "Rebirths"
       not_attend_info: "{timeToHaveError} Times / {totalTimes} Total"
       leave: "Leaves"
@@ -124,14 +128,16 @@ class_attendance:
 # 日程表/课程表
 classtable:
    partner_classtable:
-      override_dialog: "Currently there is a partner classtable data, do you want to overwrite?"
+      override_dialog: "Currently there is a partner classtable data, do you want to
+         overwrite?"
       no_file: "Import file not found"
       no_permission: "Storage permission denied , cannot read file"
       problem: "Maybe there's a problem with the import file :P"
       success: "Successfully imported"
       share_dialog:
          title: "Caution!"
-         content: "The exported file may include your personal information, please DO NOT share casually"
+         content: "The exported file may include your personal information, please DO NOT
+            share casually"
       save_dialog:
          title: "Save calendar file to..."
          success_message: "Should be saved"
@@ -141,7 +147,8 @@ classtable:
          message: "Are you sure to delete the partner classtable?"
          success_message: "Done"
       name_dialog:
-         title: "Input the name of the partner classtable to be shown on your partner's screen"
+         title: "Input the name of the partner classtable to be shown on your partner's
+            screen"
          hint: "Input here, otherwise it will be shown as 'Sweetie'"
          cancel: "There's nobody other than my sweetie"
          accept: "Submit"
@@ -171,9 +178,12 @@ classtable:
       error_summary: "Failed to load: {sources}"
    empty_state:
       no_course: "No classes are arranged for semester {semester_code}."
-      with_exam: "No classes are arranged for semester {semester_code}, but exam arrangements are available."
-      with_experiment: "No classes are arranged for semester {semester_code}, but experiment arrangements are available."
-      with_exam_and_experiment: "No classes are arranged for semester {semester_code}, but exam and experiment arrangements are available."
+      with_exam: "No classes are arranged for semester {semester_code}, but exam
+         arrangements are available."
+      with_experiment: "No classes are arranged for semester {semester_code}, but
+         experiment arrangements are available."
+      with_exam_and_experiment: "No classes are arranged for semester {semester_code},
+         but exam and experiment arrangements are available."
    empty_action:
       view_exam: "View exams"
       view_experiment: "View experiments"
@@ -190,24 +200,37 @@ classtable:
       "6": "Six"
       "7": "Seven"
       # TODO: Need English specific code at the native platform
-      change_class_message:
-         This is a course adjustment info，Originally scheduled on period {originalClassRangeStart}
-         to period {originalClassRangeEnd} at the {weekChar_originalWeek}th day of the {originalAffectedWeeks}th week(s),
-         now it is at the {newClassroom} classroom, arranged at the period {newClassRangeStart} to period {newClassRangeStop}
-         at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
-      patch_class_message:
-         This is a course reschedule info，The course have been rescheduled at the {newClassroom}, on the period
-         {newClassRangeStart} to period {newClassRangeStop} at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
-      stop_class_message:
-         This is a course suspension info. The class will be suspended at the period {originalClassRangeStart} to
-         period {originalClassRangeEnd} at the {weekChar_originalWeek} day of the {originalAffectedWeeks} week(s).
-      class_info: "Code: {classCode} | Class {classNumber}\nSchedule change: {classChange}\n{teacherChange}"
+      change_class_message: This is a course adjustment info，Originally scheduled on
+         period {originalClassRangeStart} to period {originalClassRangeEnd} at
+         the {weekChar_originalWeek}th day of the {originalAffectedWeeks}th
+         week(s), now it is at the {newClassroom} classroom, arranged at the
+         period {newClassRangeStart} to period {newClassRangeStop} at the
+         {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
+      patch_class_message: This is a course reschedule info，The course have been
+         rescheduled at the {newClassroom}, on the period {newClassRangeStart}
+         to period {newClassRangeStop} at the {weekChar_newWeek}th day of the
+         {newAffectedWeeksListStr} week(s).
+      stop_class_message: This is a course suspension info. The class will be
+         suspended at the period {originalClassRangeStart} to period
+         {originalClassRangeEnd} at the {weekChar_originalWeek} day of the
+         {originalAffectedWeeks} week(s).
+      class_info: "Code: {classCode} | Class {classNumber}
+
+         Schedule change: {classChange}
+
+         {teacherChange}"
    not_arranged_page:
       title: "Unscheduled Classes"
       empty_message: "All courses have been scheduled"
-      content: "Code {classCode} | Class {classNumber}\nTeacher: {teacher}"
+      content: "Code {classCode} | Class {classNumber}
+
+         Teacher: {teacher}"
    empty_class_message: "Semester {semester_code} has no class arranged"
-   empty_class_with_exam: "Semester {semester_code} has no class arranged\nbut we have exam info now!\nGo back to mainpage and goto the exam info page."
+   empty_class_with_exam: "Semester {semester_code} has no class arranged
+
+      but we have exam info now!
+
+      Go back to mainpage and goto the exam info page."
    week_title: "Week {week}"
    noon_break: "Noon"
    supper_break: "Supper"
@@ -246,7 +269,9 @@ classtable:
       success: Successfully output to the system calendar.
       failure: Problem occurred while outputing to the system calendar.
       request_all_title: Information on requesting permission
-      request_all: Due to technical difficulties, users must grant both read calendar and write calendar permissions to this software in order to export schedules properly. However, this software will not read the calendar.
+      request_all: Due to technical difficulties, users must grant both read calendar
+         and write calendar permissions to this software in order to export
+         schedules properly. However, this software will not read the calendar.
    refresh_classtable:
       ready: Ready to refresh the schedule
       success: Successfully refresh the schedule
@@ -286,13 +311,10 @@ club_promotion:
 electricity:
    title: "Power Info"
    power_title: "Infomation"
-   cache_hint_account_missing: "Electricity account is missing, showing cached data."
-   cache_hint_account_parse_failed: "Failed to derive the electricity account from dorm info, showing cached data."
-   cache_hint_captcha_failed: "Electricity platform captcha recognition failed, showing cached data."
-   cache_hint_password_wrong: "Electricity password is incorrect or expired, showing cached data."
    cache_hint_login_failed: "Failed to log in to the electricity service, showing cached data."
    cache_hint_network_failed: "Electricity service network request failed, showing cached data."
-   cache_hint_unknown_error: "Failed to fetch the latest electricity data online, showing cached data. Check logs for details."
+   cache_hint_unknown_error: "Failed to fetch the latest electricity data online,
+      showing cached data. Check logs for details."
    cache_notice: "Last fetched"
    account: "Account"
    remain_power: "Remain power"
@@ -300,11 +322,19 @@ electricity:
    history: "Billing History"
    daily_usage: "Average usage per day"
    not_enough_data: "Not enough data for rendering graph"
-   info: "Arrears generally indicate water fees"
+   info: "Energy system can be only be accessed at schoolnet, do contact developers
+      if have issue.
+
+      History will be recorded locally while average usage is based on the
+      electric meter's record."
    fetching_hint: "Fetching the latest electricity info."
    date: "Date"
    power: "Remaining"
    update: "Refresh"
+   water_usage_fetch_date: "Fetch time"
+   water_usage_read_before: "Last time"
+   water_usage_read_now: "This time"
+   water_usage: "Bath water usage"
 
 # 空闲教室
 empty_classroom:
@@ -371,10 +401,15 @@ experiment:
    fetching_hint_other: "Other experiments are loading"
    fetching_hint_physics_with_other_failed: "Physics experiments are loading, while other experiments failed to load"
    fetching_hint_other_with_physics_failed: "Other experiments are loading, while physics experiments failed to load"
-   score_hint_0: "You can tap on the score info on the score card to check out the original score data"
-   score_hint_1: "Your score is not in the XDYou score recognition database, so it was not recognized properly."
-   score_hint_2: "If you wish to contribute to the development of XDYou, you can click the send email button, and we will add your score to the recognition database!"
-   score_hint_3: "Due to the lack of data for recognization, it is necessary to check twice."
+   score_hint_0: "You can tap on the score info on the score card to check out the
+      original score data"
+   score_hint_1: "Your score is not in the XDYou score recognition database, so it
+      was not recognized properly."
+   score_hint_2: "If you wish to contribute to the development of XDYou, you can
+      click the send email button, and we will add your score to the recognition
+      database!"
+   score_hint_3: "Due to the lack of data for recognization, it is necessary to
+      check twice."
 
 # 主页
 homepage:
@@ -404,9 +439,11 @@ homepage:
       route_not_exist: "Import path does not exist:P"
       failed_get_file: "Failed to import file"
       failed_import: "Maybe there is a problem with the import file:P"
-      success_message: "Import successful, if the class schedule page is open, please reopen it"
+      success_message: "Import successful, if the class schedule page is open, please
+         reopen it"
       not_loaded: "Class schedule has not been loaded yet, please try again later..."
-      confirm_content: "There is currently partner class schedule data, do you want to overwrite?"
+      confirm_content: "There is currently partner class schedule data, do you want to
+         overwrite?"
    login_message: "Logging in, currently displaying cached data"
    successful_login_message: "Login successful"
    password_wrong_title: "Wrong username or password"
@@ -452,12 +489,7 @@ homepage:
    electricity_card:
       title: "Electricity and Hydroenergy Information"
       current_electricity: "{amount} kWh remains"
-      cache_notice: "Currently loading cache, retrieved on {date}\n"
-      dialog_content: |
-         Electricity account：{account}
-         Electricity information：{electricityInfo}
-         Arrears：{owe}
-         Long press to reload, arrears generally indicate water fees
+      cache_notice: "Last fetch date: {date}"
    library_card:
       title: "Library Info"
       current_borrow: "Borrowing {count} book(s)"
@@ -593,7 +625,8 @@ login:
    identity_number: "Student ID"
    password: "IDS Login password"
    login: "Login"
-   incorrect_password_pattern: "Username or password does not meet requirements, student ID must be 11 digits and password cannot be empty"
+   incorrect_password_pattern: "Username or password does not meet requirements,
+      student ID must be 11 digits and password cannot be empty"
    on_login_progress: "Logging in..."
    complete_login: "Login successful"
    failed_login_cannot_connect_to_server: "Cannot connect to server"
@@ -771,10 +804,12 @@ setting:
       update_schedule: "Update Notification Schedule"
       update_schedule_hint: "Reschedule notifications based on the latest course data"
       delete_all_schedule: "Delete All Scheduled Reminder"
-      delete_all_schedule_hint: "This action will delete all scheduled events, but you can click 'Update Notification Schedule' again to re-add them."
+      delete_all_schedule_hint: "This action will delete all scheduled events, but you
+         can click 'Update Notification Schedule' again to re-add them."
       delete_all_success: "Delete successfully"
       view_the_instructions: "View the instructions"
-      view_the_instructions_hint: "Check more instructions to ensure that you can see the notifications sent by the program"
+      view_the_instructions_hint: "Check more instructions to ensure that you can see
+         the notifications sent by the program"
       permission_section: "Permission Status"
       notification_permission: "Notification Permission"
       exact_alarm_permission: "Exact Alarm Permission"
@@ -787,16 +822,38 @@ setting:
       permission_denied_msg: "Permission denied, please enable it in system settings"
       reminder_section: "Reminder Settings"
       experiment_reminder: "Include the physics experiments"
-      experiment_reminder_hint: "Enable this option to add the physics experiment to the Pre-class Reminder"
+      experiment_reminder_hint: "Enable this option to add the physics experiment to
+         the Pre-class Reminder"
       minutes_before: "Advance Reminder Time"
       minutes_before_hint: "The time setting for pre-class reminders"
       minutes_unit: "minutes"
       days_to_schedule: "Schedule Duration"
-      days_to_schedule_hint: "This program writes course information into the planned schedule in advance. This setting can adjust the number of days for writing into the planned schedule"
+      days_to_schedule_hint: "This program writes course information into the planned
+         schedule in advance. This setting can adjust the number of days for
+         writing into the planned schedule"
       days_unit: "days"
       settings_guide_title: "Notification Settings Guide"
-      settings_guide_content_1: "To ensure you receive pre-class reminders in time, please make sure:\n1. App notification permission is enabled\n2. Notification sound is enabled\n3. Banner notifications are enabled\n4. Non-native Android users, enable auto-start and disable power optimization"
-      settings_guide_content_2: "Pre-class Reminder Module Operating Mechanism:\n1. When first activated, it will automatically schedule pre-class reminders for the upcoming days\n2. Each time the app is opened, it will automatically check and update the notification schedule\n3. After modifying settings, it will automatically reschedule all notifications"
+      settings_guide_content_1: "To ensure you receive pre-class reminders in time,
+         please make sure:
+
+         1. App notification permission is enabled
+
+         2. Notification sound is enabled
+
+         3. Banner notifications are enabled
+
+         4. Non-native Android users, enable auto-start and disable power
+         optimization"
+      settings_guide_content_2: "Pre-class Reminder Module Operating Mechanism:
+
+         1. When first activated, it will automatically schedule pre-class
+         reminders for the upcoming days
+
+         2. Each time the app is opened, it will automatically check and update
+         the notification schedule
+
+         3. After modifying settings, it will automatically reschedule all
+         notifications"
       got_it: "Got it"
       open_settings: "Open System Settings"
       no_classtable_data: "Please fetch course schedule, exam, or experiment data first"
@@ -816,11 +873,14 @@ setting:
    failure_setting: "You did not select an image"
    clear_user_class: "Clear all customized courses"
    clear_user_class_title: "Clear Confirmation"
-   clear_user_class_content: "Do you want to clear all user-added courses? This function does not affect the schedule obtained from the school."
+   clear_user_class_content: "Do you want to clear all user-added courses? This
+      function does not affect the schedule obtained from the school."
    clear_user_class_clear: "Already cleared"
    class_refresh: "Force refresh class schedule"
    class_refresh_title: "Refresh Confirmation"
-   class_refresh_content: "Do you want to force refreshing the class schedule? If you agree, we will fetch the schedule from the school, which may takes a long time."
+   class_refresh_content: "Do you want to force refreshing the class schedule? If
+      you agree, we will fetch the schedule from the school, which may takes a
+      long time."
    class_swift: "Class schedule offset setting"
    class_swift_description: |
       Positive number delays the start date, negative number advances the start date
@@ -841,7 +901,8 @@ setting:
       logging_out: "Logging out..."
    need_close_dialog:
       title: "Crashed"
-      content: "Due to technical limitations, you need to close the window manually and then reopen the app."
+      content: "Due to technical limitations, you need to close the window manually
+         and then reopen the app."
    # 剩下乱七八糟的窗口
    change_color_dialog:
       title: "Color setting"
@@ -942,38 +1003,53 @@ setting:
       aqqkad: "Development: Class attandance history"
       bellssgit: "Support: best and longest feedback source"
       brackrat: "Design: homepage, login page, color scheme, iOS widgets, etc."
-      breezeline: "Support: valueless and meaningless product manager (from his own description)"
+      breezeline: "Support: valueless and meaningless product manager (from his own
+         description)"
       cafebabe: "Support: provide Easter egg code"
       chitao1234: "Development: fix slider misalignment issue"
       dimole: "Development support: assist in fixing slider issue"
       elitewars: "Design: sports score page"
-      elliot: "Internationalization: English translation / Development guidance: on partner classtable development (This function has been removed)"
+      elliot: "Internationalization: English translation / Development guidance: on
+         partner classtable development (This function has been removed)"
       flyingpig: "Development: Fix null pointer exception at user defined class info"
-      godhu777777: "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar"
+      godhu777777: "Internationalization: Traditional Chinese conversion code & Easter
+         egg code / Development: Optimize outputing arrangements to the
+         calendar"
       hancl777: "Internationalization: Traditional Chinese conversion code"
       hazuki-keatsu: "Development: Physics experiment score query and recognization"
       hawa130: "Design: Class info card"
       hhzm: "Development: electricity fee inquiry account calculation"
-      imoscarz: "Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change"
+      imoscarz: "Development: Homepage for software / Development: Checkin check for
+         pad / Development: Sport UI Change"
       ka-mate-ka-ora: "Internationalization: English correction"
       lhx-666-cool: "Support: Windows and Linux build scripts"
-      lichtyy: "Design: color pattern and blank page picture / Development: HTML reader for the experiment system"
+      lichtyy: "Design: color pattern and blank page picture / Development: HTML
+         reader for the experiment system"
       lqsy-h: "Support: Promotion Picture"
       lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
-      mrbrilliant2046: "Support: Provided the school net user guide / Internationalization: English correction"
-      nancunchild: "Development: library search function / Internationalization: English correction"
-      pairman: "Development: score cache and optimize slider algorithm / Internationalization: English correction"
-      reverierxu: "Design: REX card for information display / Development support: on postgraduate class schedule"
+      mrbrilliant2046: "Support: Provided the school net user guide /
+         Internationalization: English correction"
+      nancunchild: "Development: library search function / Internationalization:
+         English correction"
+      pairman: "Development: score cache and optimize slider algorithm /
+         Internationalization: English correction"
+      reverierxu: "Design: REX card for information display / Development support: on
+         postgraduate class schedule"
       rrrilac: "Development support: electricity query"
-      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development (This function has been removed) / Internationalization: English correction"
+      ray: "Design: splash screen / Support: iOS publisher / Development guidance: on
+         partner classtable development (This function has been removed) /
+         Internationalization: English correction"
       shadowyingyi: "Support: two times of pigeon house official account publicity" # keep this line
-      stalomeow: "Design: homepage timeline / Development: asynchronous login and captcha predict"
-      xeonds: "Design: settings page / Development: XDU Planet / Development: Payment Code"
+      stalomeow: "Design: homepage timeline / Development: asynchronous login and
+         captcha predict"
+      xeonds: "Design: settings page / Development: XDU Planet / Development: Payment
+         Code"
       xingshuyu: "Development: Fix physics experiment api and electricity graph"
       xiue233: "Development: Android applet"
       xizi: "Development support: on postgraduate version"
       wirsbf: "Development: fix course adjustment did not proceed as expected"
-      zcwzy: "Development: fix Dingxiang apartment electricity fee / development support: on postgraduate version / design: blank page picture"
+      zcwzy: "Development: fix Dingxiang apartment electricity fee / development
+         support: on postgraduate version / design: blank page picture"
       zyar-er: "Development support: fix shortcut url"
       # TODO: PDA Girl inspriation
       homepage: "Homepage"
@@ -1055,7 +1131,8 @@ xdu_planet:
    loading: "Loading, please wait <(=ω=)>"
    unknown_author: "Unknown author"
    load_failed_title: "Failed to load"
-   load_failed_bottom: "Failed to load the article, you can click the button on the top right of the screen to open it in the browser."
+   load_failed_bottom: "Failed to load the article, you can click the button on the
+      top right of the screen to open it in the browser."
    no_comment: "No comments yet"
    reply_audit: "Reply comment #{reply_to} has been reported or deleted"
    reply: "Reply to #{reply_to}: {content}"
@@ -1063,7 +1140,8 @@ xdu_planet:
    audit: "Report"
    confirm_audit_dialog:
       title: "Confirm reporting"
-      content: "Think twice. Reporting will tag the comment, but it may not be deleted."
+      content: "Think twice. Reporting will tag the comment, but it may not be
+         deleted."
       cancel: "Forget it"
       ongoing: "Reporting..."
       failed: "Failed to report"

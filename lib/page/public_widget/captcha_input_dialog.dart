@@ -13,7 +13,10 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 
-enum DigitCaptchaType { payment, zfw }
+enum DigitCaptchaType {
+  // payment,
+  zfw,
+}
 
 class DigitCaptchaClientProvider {
   // Ref: https://github.com/stalomeow/captcha-solver
@@ -126,16 +129,16 @@ class DigitCaptchaClientProvider {
   }
 
   static int _getClassCount(DigitCaptchaType type) {
-    if (type == DigitCaptchaType.payment) {
-      return 9; // The payment captcha only contains number 1-9
-    }
+    // if (type == DigitCaptchaType.payment) {
+    //   return 9; // The payment captcha only contains number 1-9
+    // }
     return 10;
   }
 
   static int _getClassLabel(DigitCaptchaType type, int klass) {
-    if (type == DigitCaptchaType.payment) {
-      return klass + 1; // The payment captcha only contains number 1-9
-    }
+    // if (type == DigitCaptchaType.payment) {
+    //   return klass + 1; // The payment captcha only contains number 1-9
+    // }
     return klass;
   }
 
