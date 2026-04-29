@@ -5,7 +5,7 @@
 // Refresh formula for homepage.
 
 import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/electricity_controller.dart';
+import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
@@ -82,10 +82,7 @@ Future<void> update({
     ),
     _safeReload("Library", LibraryController.i.reloadBorrowList),
     _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
-    _safeReload(
-      "Electricity",
-      ElectricityController.i.refreshElectricityInfo,
-    ),
+    _safeReload("Electricity", EnergyController.i.refreshElectricityInfo),
     _safeReload("Schoolnet", SchoolnetController.i.reloadSchoolnetInfo),
   ]);
   await maybeAutoSyncSystemCalendar();

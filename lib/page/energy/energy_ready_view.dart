@@ -5,23 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/electricity.dart';
-import 'package:watermeter/page/electricity/electricity_average_usage_graph.dart';
-import 'package:watermeter/page/electricity/electricity_usage_graph.dart';
+import 'package:watermeter/model/xidian_ids/energy.dart';
+import 'package:watermeter/page/energy/electricity_average_usage_graph.dart';
+import 'package:watermeter/page/energy/electricity_usage_graph.dart';
+import 'package:watermeter/page/energy/water_usage_list.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/repository/preference.dart' as prefs;
 
 class ElectricityReadyView extends StatelessWidget {
-  final ElectricityInfo displayInfo;
-  final List<ElectricityInfo> historyElectricityInfo;
+  final EnergyInfo displayInfo;
+  final List<ElectricityHistoryInfo> historyElectricityInfoList;
   final VoidCallback onRefresh;
 
   const ElectricityReadyView({
     super.key,
     required this.displayInfo,
-    required this.historyElectricityInfo,
     required this.onRefresh,
+    required this.historyElectricityInfoList,
   });
 
   @override
@@ -51,19 +51,14 @@ class ElectricityReadyView extends StatelessWidget {
             title: FlutterI18n.translate(context, "electricity.power_title"),
             children: [
               InfoItem(
-                icon: Icons.account_balance,
-                label: FlutterI18n.translate(context, "electricity.account"),
-                value: prefs.getString(prefs.Preference.electricityAccount),
-              ),
-              InfoItem(
                 icon: Icons.cached,
                 label: FlutterI18n.translate(
                   context,
                   "electricity.cache_notice",
                 ),
                 value: DateFormat(
-                  "yyyy-MM-dd HH:mm",
-                ).format(displayInfo.fetchDay),
+                  "yyyy-MM-dd",
+                ).format(displayInfo.electricityMeterList.first.ReadTime),
               ),
               InfoItem(
                 icon: Icons.electric_meter,
@@ -71,20 +66,7 @@ class ElectricityReadyView extends StatelessWidget {
                   context,
                   "electricity.remain_power",
                 ),
-                value:
-                    "${FlutterI18n.translate(context, displayInfo.electricityRemain)}"
-                    "${displayInfo.electricityRemain.contains(RegExp(r'[0-9]')) ? " kWh" : ""}",
-              ),
-              InfoItem(
-                icon: Icons.wallet,
-                label: FlutterI18n.translate(context, "electricity.owe_info"),
-                value: displayInfo.waterRemain.contains(RegExp(r'[0-9]'))
-                    ? FlutterI18n.translate(
-                        context,
-                        "electricity_status.owe_need_pay",
-                        translationParams: {"due": displayInfo.waterRemain},
-                      )
-                    : FlutterI18n.translate(context, displayInfo.waterRemain),
+                value: "${displayInfo.electricityRemain} kWh",
               ),
             ],
           ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
@@ -97,7 +79,7 @@ class ElectricityReadyView extends StatelessWidget {
                     builder: (context, constraints) => ElectricityUsageGraph(
                       graphHeight: 240,
                       graphWidth: constraints.maxWidth,
-                      historyElectricityInfo: historyElectricityInfo,
+                      historyElectricityInfo: historyElectricityInfoList,
                     ),
                   )
                   .padding(vertical: 12, horizontal: 16)
@@ -117,7 +99,8 @@ class ElectricityReadyView extends StatelessWidget {
                     builder: (context, constraints) =>
                         ElectricityAverageUsageGraph(
                           graphWidth: constraints.maxWidth,
-                          historyElectricityInfo: historyElectricityInfo,
+                          historyElectricityInfo:
+                              displayInfo.electricityMeterList,
                         ),
                   )
                   .padding(vertical: 12, horizontal: 16)
@@ -127,6 +110,10 @@ class ElectricityReadyView extends StatelessWidget {
                   )
                   .padding(top: 4),
             ],
+          ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+
+          WaterUsageList(
+            usages: displayInfo.waterMeterList,
           ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
 
           FilledButton(

@@ -192,13 +192,19 @@ classtable:
             {newClassroom}补课
         stop_class_message: 停课信息，第{originalAffectedWeeks}周
             星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节停课
-        class_info: "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}{teacherChange}"
+        class_info: "编号: {classCode} | {classNumber} 班
+
+            安排变更：{classChange}{teacherChange}"
     not_arranged_page:
         title: "没有时间安排的科目"
         empty_message: "目前全部课程均有时间安排"
-        content: "编号: {classCode} | {classNumber} 班\n老师: {teacher}"
+        content: "编号: {classCode} | {classNumber} 班
+
+            老师: {teacher}"
     empty_class_message: "{semester_code} 学期没有课程"
-    empty_class_with_exam: "{semester_code} 学期没有课程但是有考试安排！\n请回到主页后下滑点击”考试安排“按钮进入考试安排页面"
+    empty_class_with_exam: "{semester_code} 学期没有课程但是有考试安排！
+
+        请回到主页后下滑点击”考试安排“按钮进入考试安排页面"
     week_title: "第{week}周"
     noon_break: "午休"
     supper_break: "晚休"
@@ -277,10 +283,6 @@ club_promotion:
 electricity:
     title: "水电信息"
     power_title: "余额信息"
-    cache_hint_account_missing: "未填写电费账号，正在显示缓存数据。"
-    cache_hint_account_parse_failed: "无法根据宿舍信息解析电费账号，正在显示缓存数据。"
-    cache_hint_captcha_failed: "电费平台验证码识别失败，正在显示缓存数据。"
-    cache_hint_password_wrong: "电费密码错误或已失效，正在显示缓存数据。"
     cache_hint_login_failed: "登录电费服务失败，正在显示缓存数据。"
     cache_hint_network_failed: "电费服务网络请求失败，正在显示缓存数据。"
     cache_hint_unknown_error: "在线获取电费失败，正在显示缓存数据。详细错误请查看日志。"
@@ -291,11 +293,17 @@ electricity:
     history: "历史记录"
     daily_usage: "平均每日用量"
     not_enough_data: "数据量不足以用于渲染"
-    info: "有欠费一般代表水费，半夜11:20到午夜0:30左右无法获取数据"
+    info: "新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。
+
+        历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
     fetching_hint: "正在获取最新电费信息"
     date: "日期"
     power: "该日0点电量"
     update: "刷新信息"
+    water_usage_fetch_date: "获取时间"
+    water_usage_read_before: "上次读数"
+    water_usage_read_now: "本次读数"
+    water_usage: "洗澡水用量"
 
 # 空闲教室
 empty_classroom:
@@ -443,12 +451,7 @@ homepage:
     electricity_card:
         title: "水电信息"
         current_electricity: "余额 {amount} 度"
-        cache_notice: "缓存获取于 {date}\n"
-        dialog_content: |-
-            电费帐号：{account}
-            电量信息：{electricityInfo}
-            欠费信息：{owe}
-            长按可以重新加载，有欠费一般代表水费
+        cache_notice: "最后一次读表：{date}"
     library_card:
         title: "图书借阅"
         current_borrow: "借书 {count} 本"
@@ -606,7 +609,9 @@ school_net:
     title: "校园网使用详情"
     ids_account_net:
         title: "当前用户"
-        notice: "这是登录到 PDA 账户的校园网信息\n注意: 流量计费采用GB单位（1000进制）"
+        notice: "这是登录到 PDA 账户的校园网信息
+
+            注意: 流量计费采用GB单位（1000进制）"
         overview: "账户概览"
         account: "账号"
         used: "已使用流量"
@@ -615,7 +620,9 @@ school_net:
         no_device_online: "当前没有在线设备"
     current_login_net:
         title: "正在使用"
-        notice: "这是您正在使用中校园网的信息，可能和您登录 PDA 的信息不一致\n注意: 流量计费采用GB单位（1000进制）"
+        notice: "这是您正在使用中校园网的信息，可能和您登录 PDA 的信息不一致
+
+            注意: 流量计费采用GB单位（1000进制）"
         overview: "账户概览"
         account: "账号"
         plan_type: "套餐类型"
@@ -784,8 +791,22 @@ setting:
         days_unit: "天"
         # 提示对话框
         settings_guide_title: "通知设置提示"
-        settings_guide_content_1: "为了确保您能及时收到课前提醒，请确保：\n1. 开启了应用的通知权限\n2. 开启了通知的声音提示\n3. 开启了悬浮通知（横幅通知）\n4. 非原生安卓用户，开启自启动和关闭电源优化"
-        settings_guide_content_2: "课前提醒模块运行机制：\n1. 首次开启时自动安排未来几天的课前提醒\n2. 每次打开应用时自动检查并更新通知日程\n3. 修改设置后自动重新安排所有通知"
+        settings_guide_content_1: "为了确保您能及时收到课前提醒，请确保：
+
+            1. 开启了应用的通知权限
+
+            2. 开启了通知的声音提示
+
+            3. 开启了悬浮通知（横幅通知）
+
+            4. 非原生安卓用户，开启自启动和关闭电源优化"
+        settings_guide_content_2: "课前提醒模块运行机制：
+
+            1. 首次开启时自动安排未来几天的课前提醒
+
+            2. 每次打开应用时自动检查并更新通知日程
+
+            3. 修改设置后自动重新安排所有通知"
         got_it: "知道了"
         open_settings: "打开系统设置"
         # 操作消息
