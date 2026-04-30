@@ -59,11 +59,11 @@ Future<FetchResult<EnergyInfo>> getElectricityInfo({
   log.info("[EletricitySession][update] Ready to update electricity info. ");
   DateTime fetchDay = DateTime.now();
 
-  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
-    if (EnergySession.fileCache.existsSync()) {
-      EnergySession.fileCache.deleteSync();
-    }
-  }
+  //  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
+  //   if (EnergySession.fileCache.existsSync()) {
+  //     EnergySession.fileCache.deleteSync();
+  //   }
+  // }
   // Fetch cache info
   final cache = EnergySession.getCache();
 

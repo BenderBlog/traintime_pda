@@ -13,6 +13,7 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
@@ -339,4 +340,9 @@ class ClassTableController {
         ) ||
         classData.notArranged.any((element) => element.name.contains("物理实验"));
   });
+
+  // Other experiment exists only if not postgraduate
+  late final haveOtherExperimentSignal = !preference.getBool(
+    preference.Preference.role,
+  );
 }

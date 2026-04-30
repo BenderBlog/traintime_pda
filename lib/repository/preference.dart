@@ -42,12 +42,12 @@ enum Preference {
   //execution(key: "execution", type: "String"), // 书院
   //institutes(key: "institutes", type: "String"), // 学院
   //subject(key: "subject", type: "String"), // 专业
-  electricityAccount(key: "electricityAccount", type: "String"), // 电费账号
+  //electricityAccount(key: "electricityAccount", type: "String"), // 电费账号
   idsAccount(key: "idsAccount", type: "String"), // 一站式帐号
   idsPassword(key: "idsPassword", type: "String"), // 一站式密码
   sportPassword(key: "sportPassword", type: "String"), // 体育系统密码
   experimentPassword(key: "experimentPassword", type: "String"), // 物理实验密码
-  electricityPassword(key: "electricityPassword", type: "String"), // 电费密码
+  //electricityPassword(key: "electricityPassword", type: "String"), // 电费密码
   decorated(key: "decorated", type: "bool"), // 课表是否开启背景
   decoration(key: "decoration", type: "bool"), // 背景图是否设置
   swift(key: "swift", type: "int"), // 周次偏移

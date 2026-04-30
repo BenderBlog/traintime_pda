@@ -203,6 +203,9 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get havePhysicsExperiment =>
       ClassTableController.i.havePhysicsExperimentSignal.value;
 
+  bool get haveOtherExperiment =>
+      ClassTableController.i.haveOtherExperimentSignal;
+
   List<ClassTableStatusSource> get loadingSources => [
     if (isClassTableLoading) ClassTableStatusSource.classTable,
     if (isExamLoading) ClassTableStatusSource.exam,
@@ -222,7 +225,8 @@ class ClassTableWidgetState with ChangeNotifier {
     if (hasExamLoadError) ClassTableStatusSource.exam,
     if (hasPhysicsExperimentLoadError && havePhysicsExperiment)
       ClassTableStatusSource.physicsExperiment,
-    if (hasOtherExperimentLoadError) ClassTableStatusSource.otherExperiment,
+    if (hasOtherExperimentLoadError && haveOtherExperiment)
+      ClassTableStatusSource.otherExperiment,
   ];
 
   List<ClassTableStatusSource> get errorWithCacheSources => [
