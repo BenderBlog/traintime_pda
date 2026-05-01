@@ -463,7 +463,6 @@ class CourseReminderService extends NotificationService
         e,
         stackTrace,
       );
-      rethrow;
     }
   }
 

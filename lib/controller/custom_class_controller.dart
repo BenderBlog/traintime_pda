@@ -232,7 +232,7 @@ class CustomClassController {
         FileToGroupID(appid: pref.appId, fileName: fileName, data: data),
       );
       log.info(
-        "[UserDefinedClassFile][syncToWidget] "
+        "[CustomClassController][_syncToWidget] "
         "ios sync $fileName status: $result.",
       );
     } catch (e, s) {
