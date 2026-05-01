@@ -101,31 +101,7 @@ class ClassCard extends StatelessWidget {
                       );
                       if (!context.mounted || action == null) return;
 
-                      if (action is (ClassDetail, TimeArrangement, bool)) {
-                        if (action.$3) {
-                          await ClassTableState.of(
-                            context,
-                          )!.controllers.deleteUserDefinedClass(action.$2);
-                        } else {
-                          await Navigator.of(context)
-                              .push(
-                                MaterialPageRoute(
-                                  builder: (context) => ClassAddWindow(
-                                    toChange: (action.$1, action.$2),
-                                    semesterLength: controller.semesterLength,
-                                  ),
-                                ),
-                              )
-                              .then((value) {
-                                if (value == null) return;
-                                controller.editUserDefinedClass(
-                                  value.$1,
-                                  value.$2,
-                                  value.$3,
-                                );
-                              });
-                        }
-                      } else if (action is (String, String?, String)) {
+                      if (action is (String, String?, String)) {
                         final int customIndex = controller.customClasses
                             .indexWhere((custom) => custom.id == action.$1);
                         if (customIndex < 0) return;

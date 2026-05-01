@@ -7,7 +7,6 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/electricity.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
 class ElectricityController {
   static final ElectricityController i = ElectricityController._();

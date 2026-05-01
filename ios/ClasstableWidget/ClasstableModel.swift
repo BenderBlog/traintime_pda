@@ -151,11 +151,6 @@ struct ClassChange : Codable {
     }
 }
 
-struct UserDefinedClassData : Codable {
-    var userDefinedDetail : [ClassDetail];
-    var timeArrangement : [TimeArrangement];
-}
-
 struct ClassTableData : Codable {
     var semesterLength : Int
     var semesterCode : String
@@ -165,14 +160,32 @@ struct ClassTableData : Codable {
     var notArranged : [NotArrangedClassDetail]
     var timeArrangement : [TimeArrangement]
     var classChanges : [ClassChange]
-    
+
+    enum CodingKeys: String, CodingKey {
+        case semesterLength, semesterCode, termStartDay
+        case classDetail, userDefinedDetail, notArranged
+        case timeArrangement, classChanges
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        semesterLength = try container.decode(Int.self, forKey: .semesterLength)
+        semesterCode = try container.decode(String.self, forKey: .semesterCode)
+        termStartDay = try container.decode(String.self, forKey: .termStartDay)
+        classDetail = try container.decode([ClassDetail].self, forKey: .classDetail)
+        userDefinedDetail = try container.decodeIfPresent([ClassDetail].self, forKey: .userDefinedDetail) ?? []
+        notArranged = try container.decodeIfPresent([NotArrangedClassDetail].self, forKey: .notArranged) ?? []
+        timeArrangement = try container.decode([TimeArrangement].self, forKey: .timeArrangement)
+        classChanges = try container.decodeIfPresent([ClassChange].self, forKey: .classChanges) ?? []
+    }
+
     /// Only allowed to be used with classDetail
     func getClassName(t : TimeArrangement) -> String {
         switch (t.source) {
             case .school:
                 return classDetail[t.index].name;
             case .user:
-                return userDefinedDetail[t.index].name;
+                return "Unknown Custom Class"
             case .exam:
                 return "Unknown Exam"
             case .experiment:

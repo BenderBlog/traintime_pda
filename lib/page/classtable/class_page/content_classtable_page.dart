@@ -12,7 +12,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
@@ -368,11 +367,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     ),
                   );
                   if (context.mounted && data != null) {
-                    if (data is (ClassDetail, TimeArrangement)) {
-                      await ClassTableState.of(
-                        context,
-                      )!.controllers.addUserDefinedClass(data.$1, data.$2);
-                    } else if (data is CustomClass) {
+                    if (data is CustomClass) {
                       await ClassTableState.of(
                         context,
                       )!.controllers.addCustomClass(data);

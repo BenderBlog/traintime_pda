@@ -21,10 +21,6 @@ object ClassTableDataHolder {
         @Synchronized set
 
     @JvmStatic
-    var userDefinedClassJsonData: Result<String?> = Result.success(null)
-        @Synchronized set
-
-    @JvmStatic
     var examJsonData: Result<String> = Result.success("")
         @Synchronized set
 
@@ -34,6 +30,10 @@ object ClassTableDataHolder {
 
     @JvmStatic
     var otherExperimentJsonData: Result<String?> = Result.success(null)
+        @Synchronized set
+
+    @JvmStatic
+    var customClassJsonData: Result<String?> = Result.success(null)
         @Synchronized set
 
     @JvmStatic
@@ -62,20 +62,6 @@ object ClassTableDataHolder {
                 "Exam JSON loaded, isSuccess: ${examJsonData.isSuccess}, " + "length: ${examJsonData.getOrNull()?.length ?: 0}"
             )
 
-            userDefinedClassJsonData = loadFileContent(
-                context, ClassTableConstants.USER_CLASS_FILE_NAME
-            ).fold(onSuccess = { Result.success(it) }, onFailure = {
-                if (it is FileNotFoundException) {
-                    Result.success(null)
-                } else {
-                    Result.failure(it)
-                }
-            })
-            Log.i(
-                TAG,
-                "User Class JSON loaded, isSuccess: ${userDefinedClassJsonData.isSuccess} " + "length: ${userDefinedClassJsonData.getOrNull()?.length ?: 0}"
-            )
-
             physicsExperimentJsonData = loadFileContent(
                 context, ClassTableConstants.PHYSICS_EXPERIMENT_FILE_NAME
             ).fold(onSuccess = { Result.success(it) }, onFailure = {
@@ -102,6 +88,20 @@ object ClassTableDataHolder {
             Log.i(
                 TAG,
                 "Other Experiment JSON loaded, isSuccess: ${otherExperimentJsonData.isSuccess} " + "length: ${otherExperimentJsonData.getOrNull()?.length ?: 0}"
+            )
+
+            customClassJsonData = loadFileContent(
+                context, ClassTableConstants.CUSTOM_CLASS_FILE_NAME
+            ).fold(onSuccess = { Result.success(it) }, onFailure = {
+                if (it is FileNotFoundException) {
+                    Result.success(null)
+                } else {
+                    Result.failure(it)
+                }
+            })
+            Log.i(
+                TAG,
+                "Custom Class JSON loaded, isSuccess: ${customClassJsonData.isSuccess} " + "length: ${customClassJsonData.getOrNull()?.length ?: 0}"
             )
 
             Log.i(TAG, "Finished loading data from files.")

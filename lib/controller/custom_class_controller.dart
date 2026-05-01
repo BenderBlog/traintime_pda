@@ -2,12 +2,16 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:signals/signals.dart';
+import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/preference.dart' as pref;
 
 enum CustomClassState { fetching, fetched, error, none }
 
@@ -24,14 +28,14 @@ class CustomClassOccurrence {
 class CustomClassController {
   static final CustomClassController i = CustomClassController._();
 
-  static const String _customClassFileName = 'CustomClassesV2.json';
+  static const String customClassFileName = 'CustomClassesV2.json';
   static const String _customClassIdPrefix = 'cc';
   static const String _timeRangeIdPrefix = 'tr';
 
   late File customClassFile;
 
   CustomClassController._() {
-    customClassFile = File('${supportPath.path}/$_customClassFileName');
+    customClassFile = File('${supportPath.path}/$customClassFileName');
     _load();
   }
 
@@ -68,9 +72,19 @@ class CustomClassController {
         customClassFile.writeAsStringSync('[]');
       }
       final dynamic decoded = jsonDecode(customClassFile.readAsStringSync());
-      customClassesSignal.value = (decoded as List<dynamic>)
+      final List<CustomClass> loaded = (decoded as List<dynamic>)
           .map((e) => CustomClass.fromJson(e as Map<String, dynamic>))
           .toList();
+      // 过滤掉因数据损坏而可能产生的非法条目
+      customClassesSignal.value = loaded.where((cc) {
+        if (cc.name.trim().isEmpty || cc.timeRanges.isEmpty) {
+          log.warning(
+            "[CustomClassController][_load] Skipping invalid entry: id=${cc.id}",
+          );
+          return false;
+        }
+        return true;
+      }).toList();
       stateSignal.value = CustomClassState.fetched;
     } catch (e) {
       stateSignal.value = CustomClassState.error;
@@ -87,6 +101,13 @@ class CustomClassController {
       customClassesSignal.value = nextClasses;
       errorSignal.value = null;
       stateSignal.value = CustomClassState.fetched;
+
+      unawaited(
+        _syncToWidget(
+          customClassFileName,
+          jsonEncode(nextClasses.map((e) => e.toJson()).toList()),
+        ),
+      );
       return true;
     } catch (e) {
       stateSignal.value = CustomClassState.error;
@@ -164,6 +185,11 @@ class CustomClassController {
     _save(updated);
   }
 
+  /// 清除所有自定义课程数据
+  Future<void> clearAll() async {
+    _save([]);
+  }
+
   /// 通过周索引、日索引和学期开始日期来找到有日程的那天
   List<CustomClassOccurrence> getOccurrenceOfDay({
     required int weekIndex,
@@ -194,5 +220,23 @@ class CustomClassController {
     }
 
     return occurrences;
+  }
+
+  /// Sync a data file to the iOS app group container so the widget can read it.
+  /// Android widget reads directly from [supportPath], so no extra sync needed.
+  Future<void> _syncToWidget(String fileName, String data) async {
+    if (!Platform.isIOS) return;
+    final api = SaveToGroupIdSwiftApi();
+    try {
+      final result = await api.saveToGroupId(
+        FileToGroupID(appid: pref.appId, fileName: fileName, data: data),
+      );
+      log.info(
+        "[UserDefinedClassFile][syncToWidget] "
+        "ios sync $fileName status: $result.",
+      );
+    } catch (e, s) {
+      log.handle(e, s);
+    }
   }
 }

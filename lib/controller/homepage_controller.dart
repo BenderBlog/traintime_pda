@@ -1,14 +1,16 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/home_arrangement.dart';
+import 'package:watermeter/model/password_exceptions.dart';
 
 enum ArrangementState { fetching, fetched, error, none }
 
@@ -49,6 +51,29 @@ class HomepageController {
 
   bool _isRealError(HomepageSourceState state) =>
       state == HomepageSourceState.error;
+
+  List<HomeArrangement> _getCustomClassOfDay(DateTime day) {
+    final formatter = DateFormat(HomeArrangement.format);
+    final result = <HomeArrangement>[];
+    for (final cc in CustomClassController.i.customClassesSignal.value) {
+      for (final tr in cc.timeRanges) {
+        if (tr.startTime.year == day.year &&
+            tr.startTime.month == day.month &&
+            tr.startTime.day == day.day) {
+          result.add(
+            HomeArrangement(
+              name: cc.name,
+              teacher: cc.teacher,
+              place: cc.classroom,
+              startTimeStr: formatter.format(tr.startTime),
+              endTimeStr: formatter.format(tr.endTime),
+            ),
+          );
+        }
+      }
+    }
+    return result;
+  }
 
   late final updateTimeComputedSignal = computed<DateTime>(
     () => GlobalTimerController.i.currentTimeSignal.value,
@@ -137,6 +162,7 @@ class HomepageController {
   late final todayArrangementComputedSignal = computed<List<HomeArrangement>>(
     () => _sortArrangements([
       ...ClassTableController.i.arrangementOfTodayComputedSignal.value,
+      ..._getCustomClassOfDay(GlobalTimerController.i.currentTimeSignal.value),
       ...ExamController.i.todayExams.value,
       ...PhysicsExperimentController
           .i
@@ -150,6 +176,11 @@ class HomepageController {
       computed<List<HomeArrangement>>(
         () => _sortArrangements([
           ...ClassTableController.i.arrangementOfTomorrowComputedSignal.value,
+          ..._getCustomClassOfDay(
+            GlobalTimerController.i.currentTimeSignal.value.add(
+              const Duration(days: 1),
+            ),
+          ),
           ...ExamController.i.tomorrowExams.value,
           ...PhysicsExperimentController
               .i

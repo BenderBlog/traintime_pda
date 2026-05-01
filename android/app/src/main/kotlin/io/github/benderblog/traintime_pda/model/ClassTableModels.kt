@@ -15,10 +15,10 @@ import java.time.LocalDateTime
 
 object ClassTableConstants {
     const val CLASS_FILE_NAME = "ClassTable.json"
-    const val USER_CLASS_FILE_NAME = "UserClass.json"
     const val EXAM_FILE_NAME = "exam.json"
     const val PHYSICS_EXPERIMENT_FILE_NAME = "PhysicsExperiment.json"
     const val OTHER_EXPERIMENT_FILE_NAME = "OtherExperiment.json"
+    const val CUSTOM_CLASS_FILE_NAME = "CustomClassesV2.json"
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
     // Be attention to the changes of SharedPreferencesPlugin.SHARED_PREFERENCES_NAME.
@@ -80,18 +80,6 @@ data class TimeLineItem(
     }
 }
 
-@Serializable
-data class UserDefinedClassData(
-    val userDefinedDetail: List<ClassDetail>,
-    val timeArrangement: List<TimeArrangement>,
-) {
-    companion object {
-        val EMPTY = UserDefinedClassData(
-            emptyList(), emptyList()
-        )
-    }
-}
-
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonIgnoreUnknownKeys
@@ -100,7 +88,7 @@ data class ClassTableData(
     val semesterCode: String,
     val termStartDay: String,
     val classDetail: List<ClassDetail>,
-    val userDefinedDetail: List<ClassDetail>,
+    val userDefinedDetail: List<ClassDetail> = emptyList(),
     val timeArrangement: List<TimeArrangement>,
     // ClassChanges has been omitted here since calculated in time main app.
     // NotArrangedClassDetail has been omitted here since useless.
@@ -115,10 +103,10 @@ data class ClassTableData(
     // Should never go wrong.
     fun getClassName(arrangement: TimeArrangement): String = when (arrangement.source) {
         Source.SCHOOL -> classDetail[arrangement.index].name
-        Source.USER -> userDefinedDetail[arrangement.index].name
         Source.EXAM -> "Unknown Exam"
         Source.EXPERIMENT -> "Unknown Experiment"
         Source.EMPTY -> "Unknown Empty"
+        Source.USER -> "Unknown Custom Class"
     }
 }
 
@@ -211,4 +199,25 @@ val ExperimentData.timeRanges: List<Pair<LocalDateTime, LocalDateTime>>
             it -> Pair(it["$1"]!!, it["$2"]!!)
         }
     }
+
+@Serializable
+data class CustomClassTimeRange(
+    val id: String,
+    @SerialName("start_time")
+    @Serializable(with = LocalDateTimeSerializer::class)
+    val startTime: LocalDateTime,
+    @SerialName("end_time")
+    @Serializable(with = LocalDateTimeSerializer::class)
+    val endTime: LocalDateTime,
+)
+
+@Serializable
+data class CustomClass(
+    val id: String,
+    val name: String,
+    val teacher: String? = null,
+    val classroom: String? = null,
+    @SerialName("time_ranges")
+    val timeRanges: List<CustomClassTimeRange>,
+)
 

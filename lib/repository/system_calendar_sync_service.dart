@@ -8,9 +8,11 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -31,16 +33,19 @@ String buildSystemCalendarSnapshot({
   required ClassTableData classTableData,
   required List<Subject> subjects,
   required List<ExperimentData> experiments,
+  required List<CustomClass> customClasses,
 }) => jsonEncode({
   'classTableData': classTableData.toJson(),
   'subjects': subjects.map((item) => item.toJson()).toList(),
   'experiments': experiments.map((item) => item.toJson()).toList(),
+  'customClasses': customClasses.map((item) => item.toJson()).toList(),
 });
 
 List<Event> buildCalendarEvents({
   required ClassTableData classTableData,
   required List<Subject> subjects,
   required List<ExperimentData> experiments,
+  required List<CustomClass> customClasses,
 }) {
   List<Event> events = [];
 
@@ -173,6 +178,22 @@ List<Event> buildCalendarEvents({
     }
   }
 
+  for (final cc in customClasses) {
+    for (final tr in cc.timeRanges) {
+      events.add(
+        Event(
+          null,
+          title: '${cc.name}@${cc.classroom ?? "待定"}',
+          description:
+              '自定义课程：${cc.name} - 老师：${cc.teacher ?? "未知"}',
+          start: TZDateTime.from(tr.startTime, currentLocation),
+          end: TZDateTime.from(tr.endTime, currentLocation),
+          location: cc.classroom,
+        ),
+      );
+    }
+  }
+
   return events;
 }
 
@@ -271,16 +292,21 @@ class SystemCalendarSyncService {
     ...otherExperimentController.otherExperiments.value,
   ];
 
+  List<CustomClass> get customClasses =>
+      CustomClassController.i.customClassesSignal.value;
+
   List<Event> get events => buildCalendarEvents(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: examController.subjects.value,
     experiments: experiments,
+    customClasses: customClasses,
   );
 
   String get snapshot => buildSystemCalendarSnapshot(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: examController.subjects.value,
     experiments: experiments,
+    customClasses: customClasses,
   );
 
   bool get hasCalendarBinding => savedCalendarId.isNotEmpty;

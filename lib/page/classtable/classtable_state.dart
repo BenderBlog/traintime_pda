@@ -7,9 +7,6 @@ import 'dart:math' as math;
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart';
-
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -300,28 +297,6 @@ class ClassTableWidgetState with ChangeNotifier {
       .value
       .getClassDetail(timeArrangement[index]);
 
-  /// Bridge function to add/del/edit user defined class
-  /// Only main classtable support it!
-  Future<void> addUserDefinedClass(
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) => classTableController
-      .addUserDefinedClass(classDetail, timeArrangement)
-      .then((value) => notifyListeners());
-
-  Future<void> editUserDefinedClass(
-    TimeArrangement oldTimeArrangment,
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) => classTableController
-      .editUserDefinedClass(oldTimeArrangment, classDetail, timeArrangement)
-      .then((value) => notifyListeners());
-
-  Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) =>
-      classTableController
-          .deleteUserDefinedClass(timeArrangement)
-          .then((value) => notifyListeners());
-
   Future<void> addCustomClass(CustomClass customClass) =>
       customClassController.addCustomClass(customClass).then((_) {
         notifyListeners();
@@ -353,39 +328,12 @@ class ClassTableWidgetState with ChangeNotifier {
         notifyListeners();
       });
 
-  List<Event> get events {
-    final events = buildCalendarEvents(
-      classTableData: classTableController.classTableComputedSignal.value,
-      subjects: subjects,
-      experiments: experiments,
-    );
-
-    if (customClasses.isEmpty) {
-      return events;
-    }
-
-    // UTC+8 timezone defination, hard-coded since our school is in here...
-    tz.initializeTimeZones();
-    final currentLocation = getLocation('Asia/Shanghai');
-
-    for (final customClass in customClasses) {
-      for (final timeRange in customClass.timeRanges) {
-        events.add(
-          Event(
-            null,
-            title: '${customClass.name}@${customClass.classroom ?? "待定"}',
-            description:
-                '自定义课程：${customClass.name} - 老师：${customClass.teacher ?? "未知"}',
-            start: TZDateTime.from(timeRange.startTime, currentLocation),
-            end: TZDateTime.from(timeRange.endTime, currentLocation),
-            location: customClass.classroom,
-          ),
-        );
-      }
-    }
-
-    return events;
-  }
+  List<Event> get events => buildCalendarEvents(
+    classTableData: classTableController.classTableComputedSignal.value,
+    subjects: subjects,
+    experiments: experiments,
+    customClasses: customClasses,
+  );
 
   /// Generate icalendar file string.
   String get iCalenderStr => buildICalendarString(events);
