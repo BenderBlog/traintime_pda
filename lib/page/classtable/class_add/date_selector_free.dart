@@ -363,7 +363,8 @@ class _DateSelectorFree extends State<DateSelectorFree> {
           children: [
             Row(
               children: [
-                Icon(Icons.calendar_month, color: widget.color, size: 16),
+                Icon(Icons.calendar_month, color: widget.color),
+                SizedBox(width: 10,),
                 Text(
                   FlutterI18n.translate(
                     context,
@@ -528,7 +529,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
               }),
           ],
         )
-        .padding(all: 12)
+        .padding(all: 10)
         .decorated(
           color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
