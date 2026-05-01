@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/electricity_controller.dart';
-import 'package:watermeter/page/electricity/electricity_ready_view.dart';
+import 'package:watermeter/controller/energy_controller.dart';
+import 'package:watermeter/page/energy/energy_ready_view.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -23,19 +23,20 @@ class ElectricityWindow extends StatelessWidget {
         title: Text(FlutterI18n.translate(context, "electricity.title")),
       ),
       body: Watch((context) {
-        final c = ElectricityController.i;
-        final state = c.electricityInfoStateSignal.value;
-        final displayInfo = c.displayElectricityInfo.value;
-        final isFromCache = c.isElectricityFromCache.value;
-        final fetchTime = c.electricityFetchTime.value;
-        final cacheHintKey = c.electricityCacheHintKey.value;
+        final c = EnergyController.i;
+        final state = c.energyInfoStateSignal.value;
+        final displayInfo = c.displayEnergyInfo.value;
+        final isFromCache = c.isEnergyInfoFromCache.value;
+        final fetchTime = c.energyInfoFetchTime.value;
+        final cacheHintKey = c.energyInfoCacheHintKey.value;
+        final historyElectricityInfoList = c.historyElectricityInfoList;
         final hasValidData = displayInfo != null;
         final isFatalError = state is AsyncError && !hasValidData;
 
         if (hasValidData) {
           final content = ElectricityReadyView(
             displayInfo: displayInfo,
-            historyElectricityInfo: c.historyElectricityInfoList,
+            historyElectricityInfoList: historyElectricityInfoList,
             onRefresh: () => c.refreshElectricityInfo(force: true),
           );
 

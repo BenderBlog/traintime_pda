@@ -136,6 +136,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
     required bool isPartialSourcesLoading,
     required List<home.HomepageFailedSource> failedSources,
     required bool havePhysicsExperiment,
+    required bool isPostGraduate,
   }) {
     final theme = Theme.of(context).colorScheme;
     final hints = <Widget>[];
@@ -167,8 +168,15 @@ class _ClassTableCardState extends State<ClassTableCard> {
     }
 
     for (final source in failedSources) {
+      // If there's no physics experiment needed, skip any error, skip any error related to it
       if (source == home.HomepageFailedSource.physicsExperiment &&
           !havePhysicsExperiment) {
+        continue;
+      }
+
+      // If post graduate, no other experiment needed, skip any error related to it
+      if (source == home.HomepageFailedSource.otherExperiment &&
+          isPostGraduate) {
         continue;
       }
       hints.add(
@@ -285,6 +293,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
           final failedSources = controller.failedSourcesComputedSignal.value;
           final havePhysicsExperiment =
               controller.havePhysicsExperimentSignal.value;
+          final isPostGraduate = controller.isPostGraduate;
           final itemDesc = _getItemDescriptors(
             currentArrangement: currentArrangement,
             nextArrangement: nextArrangement,
@@ -300,6 +309,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
             isPartialSourcesLoading: isPartialSourcesLoading,
             failedSources: failedSources,
             havePhysicsExperiment: havePhysicsExperiment,
+            isPostGraduate: isPostGraduate,
           );
 
           return [

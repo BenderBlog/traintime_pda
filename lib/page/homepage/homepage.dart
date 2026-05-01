@@ -13,7 +13,7 @@ import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/info_widget/electricity_card.dart';
+import 'package:watermeter/page/homepage/info_widget/energy_card.dart';
 import 'package:watermeter/page/homepage/info_widget/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -197,7 +197,7 @@ class _MainPageState extends State<MainPage> {
           children: [
             UpdateCard().padding(bottom: 8),
             const ClassTableCard().padding(bottom: 8),
-            ElectricityCard().padding(bottom: 8),
+            EnergyCard().padding(bottom: 8),
             SchoolnetCard().padding(bottom: 8),
             LibraryCard().padding(bottom: 8),
             SchoolCardInfoCard().padding(bottom: 8),

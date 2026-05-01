@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -11,6 +12,7 @@ import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/password_exceptions.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 
 enum ArrangementState { fetching, fetched, error, none }
 
@@ -276,7 +278,8 @@ class HomepageController {
   late final arrangementStateComputedSignal = computed<ArrangementState>(() {
     final sourceStates = _sourceStatesComputedSignal.value;
 
-    if (hasArrangementComputedSignal.value) {
+    if (classTableSourceStateComputedSignal.value ==
+        HomepageSourceState.success) {
       return ArrangementState.fetched;
     }
 
@@ -331,4 +334,6 @@ class HomepageController {
   late final havePhysicsExperimentSignal = computed<bool>(
     () => ClassTableController.i.havePhysicsExperimentSignal.value,
   );
+
+  final isPostGraduate = preference.getBool(preference.Preference.role);
 }

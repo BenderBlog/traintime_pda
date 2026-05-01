@@ -44,7 +44,7 @@ import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/electricity_session.dart';
+import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
@@ -938,8 +938,8 @@ class _SettingWindowState extends State<SettingWindow> {
 }
 
 void _removeCache() {
-  ElectricitySession.removeElectricityHistoryCache();
-  ElectricitySession.removeElectricityInfoCache();
+  EnergySession.clearCache();
+  EnergySession.clearElectricityHistory();
   for (var value in [
     ClassTableSession.schoolClassName,
     ExamSession.examDataCacheName,
@@ -955,8 +955,8 @@ void _removeCache() {
 }
 
 void _removeAll() {
-  ElectricitySession.removeElectricityHistoryCache();
-  ElectricitySession.removeElectricityInfoCache();
+  EnergySession.clearCache();
+  EnergySession.clearElectricityHistory();
   for (var value in [
     ClassTableSession.schoolClassName,
     CustomClassController.customClassFileName,

@@ -19,7 +19,7 @@
     - Ray.jpg：贡献者 Ray（Elliot Edition）自画像，最终产物没有使用。版权所有，作者保留一切权利
     - xdyou_girl：Ray（Elliot Edition），XDYou 娘，仅 iOS 版本使用。版权所有，作者保留一切权利
     - ZCWzy-MPL-License：ZCWzy 授权文书
- - captcha-solver-payment.tflite：stalomeow，缴费系统验证码模型，MIT 授权
+ - captcha-solver-payment.tflite：stalomeow，缴费系统验证码模型，MIT 授权（现在不再使用）
  - captcha-solver-zfw.tflite：stalomeow，网络计费查询系统验证码模型，MIT 授权
  - Icon-App-iTunes-Background：lsy223622，XDYou 图标，仅 iOS 版本使用。版权所有，作者保留一切权利
  - Icon-App-iTunes：lsy223622，XDYou 图标，仅 iOS 版本使用。版权所有，作者保留一切权利
