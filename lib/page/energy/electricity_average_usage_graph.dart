@@ -7,7 +7,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/electricity.dart';
+import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
 
 class _GraphMetrics {
@@ -21,53 +21,38 @@ class _GraphMetrics {
 }
 
 class ElectricityAverageUsageGraph extends StatefulWidget {
-  late final SplayTreeMap<(DateTime, DateTime), double> plotData;
+  late final SplayTreeMap<(DateTime, DateTime), num> plotData;
   final double graphWidth;
   final double? preferredRowHeight;
 
   ElectricityAverageUsageGraph({
     super.key,
-    required List<ElectricityInfo> historyElectricityInfo,
+    required List<MeterInfo> historyElectricityInfo,
     required this.graphWidth,
     this.preferredRowHeight,
   }) {
-    SplayTreeMap<DateTime, double> dayMin = SplayTreeMap();
-    for (final info in historyElectricityInfo) {
-      final v = double.tryParse(info.electricityRemain);
-      if (v == null) continue;
-      final dayTime = DateTime(
-        info.fetchDay.year,
-        info.fetchDay.month,
-        info.fetchDay.day,
-      );
-      if (!dayMin.containsKey(dayTime) || v < dayMin[dayTime]!) {
-        dayMin[dayTime] = v;
+    SplayTreeMap<DateTime, num> mergedData = SplayTreeMap();
+    for (var data in historyElectricityInfo) {
+      mergedData[data.ReadTime] =
+          (mergedData[data.ReadTime] ?? 0) + data.ReadNum;
+    }
+
+    plotData = SplayTreeMap((a, b) => a.$1.difference(b.$1).inDays);
+
+    // The history electricity info list is ordered descending by fetching date.
+    if (mergedData.length >= 2) {
+      List<DateTime> timeKeys = mergedData.keys.toList();
+
+      for (var i = 1; i < timeKeys.length; i++) {
+        DateTime startTime = timeKeys[i - 1];
+        DateTime endTime = timeKeys[i];
+        num usage = mergedData[endTime]!;
+        plotData[(startTime, endTime)] =
+            usage / endTime.difference(startTime).inDays;
       }
     }
-    log.info("[ElectricityAverageUsageGraph] Based on dayMin $dayMin");
-    plotData = SplayTreeMap((a, b) => a.$1.difference(b.$1).inDays);
-    if (dayMin.keys.length <= 1) return;
 
-    // Daily usage of the electricity
-    final keys = dayMin.keys.toList();
-    double max = 0.0;
-    double min = double.maxFinite;
-    for (int i = 1; i < keys.length; i++) {
-      final dt = keys[i];
-      final dtPrev = keys[i - 1];
-      final curr = dayMin[keys[i]]!;
-      final prev = dayMin[keys[i - 1]]!;
-      final dayDiff = DateTime(
-        dt.year,
-        dt.month,
-        dt.day,
-      ).difference(DateTime(dtPrev.year, dtPrev.month, dtPrev.day)).inDays;
-      final diff = (prev - curr) / dayDiff;
-      if (diff < 0) continue;
-      if (diff > max) max = diff;
-      if (diff < min) min = diff;
-      plotData[(dtPrev, dt)] = diff;
-    }
+    log.info("[ElectricityWindow][ElectricityUsageGraph] Based on $plotData");
   }
 
   @override
@@ -78,7 +63,6 @@ class ElectricityAverageUsageGraph extends StatefulWidget {
 class _ElectricityAverageUsageGraphState
     extends State<ElectricityAverageUsageGraph> {
   double _estimateRowHeight(BuildContext context) {
-    // 用一个假的 TextPainter 来估算最长可能的标签高度
     final testTitle = TextPainter(
       text: const TextSpan(
         text: "12.31~01.15",
@@ -150,7 +134,7 @@ class _ElectricityAverageUsageGraphState
 }
 
 class HistogramPainter extends CustomPainter {
-  final SplayTreeMap<(DateTime, DateTime), double> plotData;
+  final SplayTreeMap<(DateTime, DateTime), num> plotData;
   final BuildContext context;
   final Color color;
   final double rowHeight;
@@ -240,11 +224,11 @@ class HistogramPainter extends CustomPainter {
         longestTitleWidth -
         longestValueWidth -
         _GraphMetrics.lineWidth;
-    double maxNum = plotData.values.fold(
+    num maxNum = plotData.values.fold(
       0.0,
       (previous, current) => current > previous ? current : previous,
     );
-    double minNum = plotData.values.fold(
+    num minNum = plotData.values.fold(
       0.0,
       (previous, current) => current < previous ? current : previous,
     );

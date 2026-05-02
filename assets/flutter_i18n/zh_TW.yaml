@@ -31,7 +31,7 @@ catcher_detected: 發生錯誤
 catcher_description: 詳情如下
 new_homepage_hint: 本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快
 local_cache_hint: 本地緩存獲取於 {datetime}
-inapp_cache_hint: 程序內緩存獲取於 {datetime}\n緩存退出程序後失效！
+inapp_cache_hint: "程序內緩存獲取於 {datetime}\n緩存退出程序後失效！"
 cache_reason_default: 當前顯示緩存數據。
 weekday:
   monday: 週一
@@ -65,9 +65,9 @@ class_attendance:
     showing_count: 顯示 {count}/{total} 門課程
   card:
     time: 簽到次數
-    time_info: '{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤'
+    time_info: "{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤"
     not_attend: 復活次數
-    not_attend_info: '{timeToHaveError} 次 / {totalTimes} 總課程'
+    not_attend_info: "{timeToHaveError} 次 / {totalTimes} 總課程"
     leave: 請假次數
     leave_info: 事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}
     study: 學習進度
@@ -118,7 +118,7 @@ classtable:
       accept: 提交
       blank_input: 輸入空白!
   page_title: 我的日程表
-  partner_page_title: '{partner_name}的日程表'
+  partner_page_title: "{partner_name}的日程表"
   popup_menu:
     not_arranged: 查看未安排課程信息
     class_changed: 查看課程安排調整信息
@@ -130,42 +130,61 @@ classtable:
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
     switch_semester: 切換課程表學期
+  status_source:
+    class_table: 課表
+    exam: 考試
+    physics_experiment: 物理實驗
+    other_experiment: 其他實驗
+  error_dialog_title: 錯誤信息概覽
+  status_banner:
+    loading: 正在更新：{sources}
+    cache: 當前使用緩存：{sources}
+    error_summary: 以下信息加載失敗：{sources}
+  empty_state:
+    no_course: "{semester_code} 學期沒有課程安排。"
+    with_exam: "{semester_code} 學期沒有課程安排，但有考試安排。"
+    with_experiment: "{semester_code} 學期沒有課程安排，但有實驗安排。"
+    with_exam_and_experiment: "{semester_code} 學期沒有課程安排，但有考試和實驗安排。"
+  empty_action:
+    view_exam: 查看考試安排
+    view_experiment: 查看實驗安排
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課信息
     teacher_change: 教師變更：從{previous_teacher}變為{new_teacher}
     no_teacher_change: 教師信息沒有改變
-    '1': 一
-    '2': 二
-    '3': 三
-    '4': 四
-    '5': 五
-    '6': 六
-    '7': 日
-    change_class_message: 調課信息，從第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
+    "1": 一
+    "2": 二
+    "3": 三
+    "4": 四
+    "5": 五
+    "6": 六
+    "7": 日
+    change_class_message: 調課信息，從第{originalAffectedWeeks}周
+      星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
       調整為第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，{newClassroom}教室上課
-    patch_class_message: 補課信息，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，
+    patch_class_message: 補課信息，第{newAffectedWeeksListStr}周
+      星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，
       {newClassroom}補課
-    stop_class_message: 停課信息，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課
-    class_info: '編號: {classCode} | {classNumber} 班
+    stop_class_message: 停課信息，第{originalAffectedWeeks}周
+      星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課
+    class_info: "編號: {classCode} | {classNumber} 班
 
-      安排變更：{classChange}{teacherChange}'
+      安排變更：{classChange}{teacherChange}"
   not_arranged_page:
     title: 沒有時間安排的科目
     empty_message: 目前全部課程均有時間安排
-    content: '編號: {classCode} | {classNumber} 班
+    content: "編號: {classCode} | {classNumber} 班
 
-      老師: {teacher}'
-  empty_class_message: '{semester_code} 學期沒有課程'
-  empty_class_with_exam: '{semester_code} 學期沒有課程但是有考試安排！
+      老師: {teacher}"
+  empty_class_message: "{semester_code} 學期沒有課程"
+  empty_class_with_exam: "{semester_code} 學期沒有課程但是有考試安排！
 
-    請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面'
+    請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面"
   week_title: 第{week}周
   noon_break: 午休
   supper_break: 晚休
-  month: '{month}
-
-    月'
+  month: "{month}\n月"
   no_class: 本週暫無安排，請不要在床上過於慵懶
   class_card:
     title: 日程信息
@@ -187,10 +206,10 @@ classtable:
     input_end_time_hint: 下課時間
     wheel_choose_hint: 第 {index} 節
   course_detail_card:
-    class_number_string: '{number} 班'
+    class_number_string: "{number} 班"
     unknown_teacher: 老師未定
     unknown_place: 地點未定
-    class_period: '{start}-{stop}節'
+    class_period: "{start}-{stop}節"
     edit: 編輯
     delete: 刪除
     delete_title: 是否刪除課程信息？
@@ -203,11 +222,15 @@ classtable:
   refresh_classtable:
     ready: 準備刷新日程信息
     success: 成功刷新日程信息
+  cache_hint_password_wrong: 統一認證密碼錯誤或已失效。
+  cache_hint_login_failed: 登錄課表服務失敗。
+  cache_hint_network_failed: 課表網絡請求失敗。
+  cache_hint_unknown_error: 在線獲取課表失敗。詳細錯誤請查看日誌。
   semester_switcher:
     choose_semester: 選擇學期
     first_academic_year: 第一學年
     second_academic_year: 第二學年
-    year: '{year}年'
+    year: "{year}年"
 club_promotion:
   type:
     tech: 技術
@@ -231,6 +254,9 @@ club_promotion:
 electricity:
   title: 水電信息
   power_title: 餘額信息
+  cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
+  cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
+  cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
   cache_notice: 獲取時間
   account: 電費賬號
   remain_power: 電量信息
@@ -238,10 +264,17 @@ electricity:
   history: 歷史記錄
   daily_usage: 平均每日用量
   not_enough_data: 數據量不足以用於渲染
-  info: 有欠費一般代表水費，半夜11:20到午夜0:30左右無法獲取數據
+  info: "新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
+
+    歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。"
+  fetching_hint: 正在獲取最新電費信息
   date: 日期
   power: 該日0點電量
   update: 刷新信息
+  water_usage_fetch_date: 獲取時間
+  water_usage_read_before: 上次讀數
+  water_usage_read_now: 本次讀數
+  water_usage: 洗澡水用量
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
@@ -253,11 +286,11 @@ empty_classroom:
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息
-  cache_hint_password_wrong: 統一認證密碼錯誤或已失效。
-  cache_hint_login_failed: 登錄考試服務失敗。
-  cache_hint_network_failed: 網絡連接失敗。
-  cache_hint_unknown_error: 在線獲取考試安排失敗。詳細錯誤請查看日誌。
-  fetching_hint: 正在獲取最新考試安排...
+  cache_hint_password_wrong: 統一認證密碼錯誤或已失效
+  cache_hint_login_failed: 登錄考試服務失敗
+  cache_hint_network_failed: 網絡連接失敗
+  cache_hint_unknown_error: 在線獲取考試安排失敗，詳細錯誤請查看日誌
+  fetching_hint: 正在獲取最新考試安排
   not_finished: 未完成考試
   all_finished: 所有考試全部完成
   unable_to_exam: 無法完成考試
@@ -267,14 +300,14 @@ exam:
   no_arrangement:
     title: 目前無安排考試的科目
     all_arranged: 目前所有科目均已安排考試
-    subtitle: '編號: {id}'
+    subtitle: "編號: {id}"
 experiment:
   title: 實驗信息
   ongoing: 正在進行實驗
   not_finished: 未完成實驗
   all_finished: 所有實驗全部完成
   finished: 已完成實驗
-  score_info: '{score} (推測)'
+  score_info: "{score} (推測)"
   score_sum: 目前分數總和：{sum}
   none_finished: 目前沒有已經完成的實驗
   not_provided: 未提供
@@ -340,11 +373,11 @@ homepage:
   password_wrong_content: 是否重啟應用後手動登錄？
   password_wrong_denial: 否，進入離線模式
   offline_mode_title: 統一認證服務離線模式開啟
-  offline_mode_content: '無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
+  offline_mode_content: "無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
 
     成績查詢，考試信息查詢，欠費查詢，校園卡查詢關閉。課表顯示緩存數據。其他功能暫不受影響。
 
-    如有不便，敬請諒解。'
+    如有不便，敬請諒解。"
   offline_mode: 脫機模式下，一站式相關功能全部禁止使用
   notice_card:
     empty_notice: 目前沒有獲取應用公告，請刷新
@@ -362,19 +395,24 @@ homepage:
     error_infoText: 遇到錯誤
     fetching_infoText: 正在加載
     no_arrangement_infoText: 暫無日程
+    schedule_fetching_message: 日程正在加載，請稍後查看
+    schedule_error_message: 日程加載失敗，請稍後重試
+    schedule_fetching_infoText: 正在加載日程
+    schedule_error_infoText: 日程加載失敗
+    schedule_none_infoText: 暫無日程
+    updating_infoText: 正在更新
+    all_loading_infoText: 全部加載中
+    partial_loading_infoText: 部分加載中
+    partial_error_infoText: 部分數據加載失敗
+    failed_chip: "{source}加載失敗"
+    failed_source_class_info: 課程信息
+    failed_source_exam_info: 考試信息
+    failed_source_physics_experiment: 物理實驗
+    failed_source_other_experiment: 其他實驗
   electricity_card:
     title: 水電信息
     current_electricity: 餘額 {amount} 度
-    cache_notice: '緩存獲取於 {date}
-
-      '
-    dialog_content: '電費帳號：{account}
-
-      電量信息：{electricityInfo}
-
-      欠費信息：{owe}
-
-      長按可以重新加載，有欠費一般代表水費'
+    cache_notice: 最後一次讀表：{date}
   library_card:
     title: 圖書借閱
     current_borrow: 借書 {count} 本
@@ -417,7 +455,6 @@ homepage:
   club_promotion:
     failed: 社團信息獲取失敗
     fetching: 社團信息清單正在加載
-
 dorm_water:
   title: 宿舍水機
   phone: 手機號
@@ -425,7 +462,7 @@ dorm_water:
   sms_code: 短信驗證碼
   send_sms: 發送短信碼
   login: 登錄
-  logout: 登出
+  logout: 退出
   refresh_captcha: 刷新驗證碼
   loading_captcha: 加載中...
   captcha_error: 驗證碼加載失敗
@@ -436,7 +473,7 @@ dorm_water:
   sms_code_required: 請輸入短信驗證碼
   login_success: 登錄成功
   login_failed: 登錄失敗
-  logout_success: 登出成功
+  logout_success: 退出成功
   devices: 設備列表
   loading_devices: 加載設備中...
   no_devices: 暫無設備
@@ -451,14 +488,13 @@ dorm_water:
   end_water_success: 結束接水成功
   start_water_failed: 開始接水失敗
   end_water_failed: 結束接水失敗
-  device_status_checking: 検查設備狀態中...
+  device_status_checking: 檢查設備狀態中...
   device_status_ready: 設備已就緒
   scan_qr_code: 掃描二維碼
   device_id: 設備 ID
   add_device_failed: 添加設備失敗
   device_removed_from_favorites: 已從收藏中移除
   remove_from_favorites_failed: 移除收藏失敗
-
 library:
   title: 圖書館信息
   borrow_state_title: 借書狀態
@@ -471,26 +507,24 @@ library:
   search_field_barcode_option: 條碼號
   search_field_callno_option: 索書號
   not_provided: 未提供相關信息
-  author: '作者 '
-  publish_house: '出版社 '
-  call_number: '索書號 '
-  publish_date: '發行時間 '
+  author: "作者 "
+  publish_house: "出版社 "
+  call_number: "索書號 "
+  publish_date: "發行時間 "
   isbn: ISBN
-  arrangement_code: '編排號碼 '
+  arrangement_code: "編排號碼 "
   avaliable_borrow: 可借
   storage: 館藏
   on_shelve: 在架
   book_code: 書籍編號：{barCode}
-  due_date: ' 到期'
-  borrow_str: ' 借閱'
-  after_due_date: ' 天前到期'
-  before_due_date: ' 天后'
+  due_date: " 到期"
+  borrow_str: " 借閱"
+  after_due_date: " 天前到期"
+  before_due_date: " 天后"
   can_be_renewable: 續借
   cannot_be_renewable: 不可續借
   renewing: 正在續借
-  empty_borrow_list: '目前沒有查詢到在借圖書
-
-    不借書就要變成上面的小呆瓜咯'
+  empty_borrow_list: "目前沒有查詢到在借圖書\n不借書就要變成上面的小呆瓜咯"
   borrow_list_info: 在借 {borrow} 本，其中已過期 {dued} 本
   search_book_window: null
   search_here: 在此搜索
@@ -498,7 +532,7 @@ library:
   no_result: 沒有結果，請修改搜索參數或者開始你的搜索
 library_card:
   title: 圖書館當前狀況
-  fetching: 正在獲取
+  fetching: 正在獲取圖書館信息
   northern_library: 北校區狀況
   southern_library: 南校區狀況
   people: 在館 {people} 人
@@ -526,9 +560,9 @@ school_net:
   title: 校園網使用詳情
   ids_account_net:
     title: 當前用戶
-    notice: '這是登錄到 PDA 賬戶的校園網信息
+    notice: "這是登錄到 PDA 賬戶的校園網信息
 
-      注意: 流量計費採用GB單位（1000進制）'
+      注意: 流量計費採用GB單位（1000進制）"
     overview: 賬戶概覽
     account: 賬號
     used: 已使用流量
@@ -537,9 +571,9 @@ school_net:
     no_device_online: 當前沒有在線設備
   current_login_net:
     title: 正在使用
-    notice: '這是您正在使用中校園網的信息，可能和您登錄 PDA 的信息不一致
+    notice: "這是您正在使用中校園網的信息，可能和您登錄 PDA 的信息不一致
 
-      注意: 流量計費採用GB單位（1000進制）'
+      注意: 流量計費採用GB單位（1000進制）"
     overview: 賬戶概覽
     account: 賬號
     plan_type: 套餐類型
@@ -578,10 +612,15 @@ school_card_window:
   reload: 重新加載
 score:
   cache_message: 已顯示緩存成績信息
-  summary: '目前選中科目 {chosen}  總計學分 {credit}
+  summary: "目前選中科目 {chosen}  總計學分 {credit}
 
-    均分 {avg} GPA {gpa}'
+    均分 {avg} GPA {gpa}"
   all_passed: 所有科目均已通過
+  cache_hint_password_wrong: 統一認證密碼錯誤或已失效
+  cache_hint_login_failed: 登錄考試服務失敗
+  cache_hint_network_failed: 網絡連接失敗
+  cache_hint_unknown_error: 在線獲取成績安排失敗，詳細錯誤請查看日誌
+  fetching_hint: 正在獲取最新成績信息，請不要退出頁面
   all_semester: 所有學期
   chosen_semester: 學期 {chosen}
   all_type: 所有類型
@@ -592,7 +631,7 @@ score:
     search_hint: 搜索成績記錄
     empty_list: 沒有選擇該學期的課程計入均分計算
     sum_dialog_title: 小總結
-    sum_dialog_content: '所有科目的GPA：{gpa_all}
+    sum_dialog_content: "所有科目的GPA：{gpa_all}
 
       所有科目的均分：{avg_all}
 
@@ -602,7 +641,7 @@ score:
 
       公共選修課：{not_core_type}
 
-      本程序提供的數據僅供參考，開發者對其準確性不負責'
+      本程序提供的數據僅供參考，開發者對其準確性不負責"
   score_compose_card:
     no_detail: 未提供詳情信息
     fetching: 正在獲取
@@ -612,7 +651,7 @@ score:
   score_info_card:
     title: 成績詳情
     original_course: 初修
-    failed: '[掛] '
+    failed: "[掛] "
     credit: 學分 {credit}
     gpa: GPA {gpa}
     score: 成績 {score}
@@ -633,7 +672,7 @@ setting:
   version: 版本號：{version}
   user_info: 用戶信息
   check_update: 檢查軟件更新
-  latest_version: '最新版本: {latest}'
+  latest_version: "最新版本: {latest}"
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
   new_version: 有新版本發佈！
@@ -658,7 +697,7 @@ setting:
   course_reminder_description: 設置課前提醒通知
   notification_page:
     title: 課前通知設置
-    load_failed: '加載設置失敗: {error}'
+    load_failed: "加載設置失敗: {error}"
     function_section: 通知功能
     enable_notification: 啟用課前通知
     notification_scheduled: 已安排 {count} 個通知
@@ -690,7 +729,7 @@ setting:
     days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
     days_unit: 天
     settings_guide_title: 通知設置提示
-    settings_guide_content_1: '為了確保您能及時收到課前提醒，請確保：
+    settings_guide_content_1: "為了確保您能及時收到課前提醒，請確保：
 
       1. 開啟了應用的通知權限
 
@@ -698,22 +737,22 @@ setting:
 
       3. 開啟了懸浮通知（橫幅通知）
 
-      4. 非原生安卓用戶，開啟自啟動和關閉電源優化'
-    settings_guide_content_2: '課前提醒模塊運行機制：
+      4. 非原生安卓用戶，開啟自啟動和關閉電源優化"
+    settings_guide_content_2: "課前提醒模塊運行機制：
 
       1. 首次開啟時自動安排未來幾天的課前提醒
 
       2. 每次打開應用時自動檢查並更新通知日程
 
-      3. 修改設置後自動重新安排所有通知'
+      3. 修改設置後自動重新安排所有通知"
     got_it: 知道了
     open_settings: 打開系統設置
     no_classtable_data: 請先獲取課程表、考試或實驗數據
     schedule_success: 已安排 {count} 個課前提醒
-    schedule_failed: '安排通知失敗: {error}'
+    schedule_failed: "安排通知失敗: {error}"
     cancel_all_success: 已取消所有課前提醒
     reschedule_success: 已重新安排 {count} 個課前提醒
-    reschedule_failed: '重新安排通知失敗: {error}'
+    reschedule_failed: "重新安排通知失敗: {error}"
   notification_debug_page: 通知服務調試頁面
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
@@ -730,9 +769,7 @@ setting:
   class_refresh_title: 確認對話框
   class_refresh_content: 是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
   class_swift: 課程偏移設置
-  class_swift_description: '正數錯後開學日期 負數提前開學日期
-
-    目前為 {swift}'
+  class_swift_description: "正數錯後開學日期 負數提前開學日期\n目前為 {swift}"
   core_setting: 緩存登錄設置
   check_logger: 查看網絡攔截器和日誌
   clear_and_restart: 清除緩存後重啟
@@ -785,7 +822,7 @@ setting:
     southern_building: 南棟
     failed_generate: 生成失敗：{e}
     building_number: 樓號
-    building_number_hint: '例如: 16, 7, 55'
+    building_number_hint: "例如: 16, 7, 55"
     building_number_query: 請輸入樓號
     yard: 院區
     yard_hint: 選擇院區
@@ -800,7 +837,7 @@ setting:
     levelCode: 層號
     levelCode_query: 請輸入層號
     roomCode: 房間號
-    roomCode_hint: '例如: 304, 508'
+    roomCode_hint: "例如: 304, 508"
     roomCode_query: 請輸入房間號
     account: 電費賬號
     account_hint: 請輸入或從網絡獲取
@@ -830,9 +867,7 @@ setting:
     app_store: App Store 更新
     download_apk: 下載安裝包
     github_release: 去 Git Release
-    new_content: '版本號 {code} 新增內容：
-
-      '
+    new_content: "版本號 {code} 新增內容：\n"
   localization_dialog:
     title: 修改語言
     undefined: 追隨系統設置
@@ -885,7 +920,7 @@ setting:
     homepage: 主頁
     code: 開源代碼
     know_more: 知道更多
-    copyright_notice: '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
+    copyright_notice: "本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
       Public License, v. 2.0 授權。
 
       本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
@@ -896,9 +931,9 @@ setting:
       Copyright 2025 Traintime PDA authors.
 
 
-      The Source Code Form is subject to the terms of the Mozilla Public License,
-      v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
-      one at https://mozilla.org/MPL/2.0/.'
+      The Source Code Form is subject to the terms of the Mozilla Public
+      License, v. 2.0. If a copy of the MPL was not distributed with this file,
+      you can obtain one at https://mozilla.org/MPL/2.0/."
     beian: 備案號
     sign_android: 安卓簽名
     title: 關於本軟件
@@ -910,13 +945,13 @@ sport:
   total_score: 四年總分
   total_score_label: 總分
   rank_label: 等級
-  semester: '{year} 第{gradeType}'
+  semester: "{year} 第{gradeType}"
   subject: 項目
   data: 數據
   score: 分數
   passed: 及格
   from_to: 第{start}節到第{stop}節
-  score_string: '{score}分'
+  score_string: "{score}分"
   situation_nopassword: 沒密碼
   situation_maintain: 系統維護
   situation_failed_login: 登錄失敗
@@ -924,9 +959,17 @@ sport:
   situation_network: 網絡故障
   situation_unknown: 未知故障{situation}
   situation_fetching: 正在獲取
-  situation_error: '壞事: {situation}'
+  situation_error: "壞事: {situation}"
   cache_hint_missing_password: 請先填寫體育密碼後重試。
   cache_hint_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。
+  cache_hint_maintain: 體育服務正在維護中，請稍後重試。
+  cache_hint_login_failed: 體育服務登錄失敗。
+  cache_hint_query_failed: 體育信息查詢失敗。
+  cache_hint_network: 體育服務網絡請求失敗。
+  cache_hint_unknown: 在線獲取體育信息失敗。詳細錯誤請查看日誌。
+  error_auth_expired: 體育登錄已失效，請重試。
+  error_missing_password: 未填寫體育密碼
+  error_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。
 toolbox:
   title: 其他功能
   payment: 繳費系統
@@ -952,8 +995,8 @@ xdu_planet:
   load_failed_title: 加載失敗
   load_failed_bottom: 文章加載失敗，如有需要可以點擊右上方的按鈕在瀏覽器裡打開。
   no_comment: 暫無評論
-  reply_audit: '回覆評論 #{reply_to} 已被舉報或刪除'
-  reply: '回覆評論 #{reply_to}：{content}'
+  reply_audit: "回覆評論 #{reply_to} 已被舉報或刪除"
+  reply: "回覆評論 #{reply_to}：{content}"
   have_been_audit: 本評論已經被舉報
   audit: 舉報
   confirm_audit_dialog:
@@ -978,12 +1021,12 @@ xdu_planet:
   audio: 被刪除
 electricity_status:
   pending: 等待獲取
-  remain_fetching: 正在獲取
-  remain_network_issue: 網絡故障
-  remain_not_found: 查詢失敗
-  remain_other_issue: 查詢故障
+  remain_fetching: 正在獲取電量
+  remain_network_issue: 電量查詢網絡故障
+  remain_not_found: 電量查詢失敗
+  remain_other_issue: 電量查詢故障
   owe_fetching: 正在獲取欠費
-  owe_issue: 欠費信息網絡故障
+  owe_issue: 欠費查詢網絡故障
   owe_not_found: 目前欠款無法查詢，請看日誌窗口查找報錯詳情
   owe_no_need: 目前無需清繳欠費
   owe_need_pay: 待清繳 {due} 元欠費
@@ -995,7 +1038,7 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: 'Time to get some electric STUFF...
+easter_egg_apple: "Time to get some electric STUFF...
 
   ...to get high
 
@@ -1005,9 +1048,9 @@ easter_egg_apple: 'Time to get some electric STUFF...
   ...because of the pigs
 
 
-  They said ''No animal shall drink alcohol.''...
+  They said 'No animal shall drink alcohol.'...
 
-  ...but Napoleon''s COUNTRY SON always walking in circle
+  ...but Napoleon's COUNTRY SON always walking in circle
 
 
   So I got to secretly hide my bootleg PARAPHERNALIA...
@@ -1015,10 +1058,10 @@ easter_egg_apple: 'Time to get some electric STUFF...
   ...in a place under the sun, where pigs hates
 
 
-  Waiting for stupid pig''s...
+  Waiting for stupid pig's...
 
-  ...BLACK COMEDY plays'
-easter_egg_others: '向日葵小姐做夢了
+  ...BLACK COMEDY plays"
+easter_egg_others: "向日葵小姐做夢了
 
   她身上裝飾了很多寶石
 
@@ -1033,11 +1076,11 @@ easter_egg_others: '向日葵小姐做夢了
 
   突然，他把她抱起來
 
-  舉到了空中'
+  舉到了空中"
 easter_egg_robot:
   appbar: 歡迎你，同學！
   title: 看看這些要開學的學生們吧！
-  contents: '咱孩子零用錢太少了，於是我們來了。
+  contents: "咱孩子零用錢太少了，於是我們來了。
 
     1. 機器人不得傷害人類，或袖手旁觀坐視人類受到傷害。
 
@@ -1049,7 +1092,7 @@ easter_egg_robot:
 
     5. 機器人的閃亮屁股不能隨便咬。
 
-    而且他們有個不可明說的計劃。'
+    而且他們有個不可明說的計劃。"
   button_one: 我們的救世主呢？
   button_two: 快點來啊！
   button_notice: \o/\o/\o/\o/\o/\o/\o/\o/

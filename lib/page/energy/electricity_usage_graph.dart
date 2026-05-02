@@ -8,7 +8,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/electricity.dart';
+import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
 
 class _GraphMetrics {
@@ -46,7 +46,7 @@ class ElectricityUsageGraph extends StatefulWidget {
   final double graphWidth;
   ElectricityUsageGraph({
     super.key,
-    required List<ElectricityInfo> historyElectricityInfo,
+    required List<ElectricityHistoryInfo> historyElectricityInfo,
     required this.graphHeight,
     required this.graphWidth,
   }) {
@@ -54,7 +54,7 @@ class ElectricityUsageGraph extends StatefulWidget {
     // Parsing number, store the latest data.
     // Notice that the historyElectricityInfo have sorted.
     for (final info in historyElectricityInfo) {
-      final v = double.tryParse(info.electricityRemain);
+      final v = double.tryParse(info.remain);
       if (v == null) continue;
 
       final dayTime = DateTime(
