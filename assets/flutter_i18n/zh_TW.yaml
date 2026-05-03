@@ -143,24 +143,25 @@ classtable:
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
     switch_semester: 切換課程表學期
-  status_source:
-    class_table: 課表
-    exam: 考試
-    physics_experiment: 物理實驗
-    other_experiment: 其他實驗
-  error_dialog_title: 錯誤信息概覽
-  status_banner:
-    loading: 正在更新：{sources}
-    cache: 當前使用緩存：{sources}
-    error_summary: 以下信息加載失敗：{sources}
-  empty_state:
-    no_course: "{semester_code} 學期沒有課程安排。"
-    with_exam: "{semester_code} 學期沒有課程安排，但有考試安排。"
-    with_experiment: "{semester_code} 學期沒有課程安排，但有實驗安排。"
-    with_exam_and_experiment: "{semester_code} 學期沒有課程安排，但有考試和實驗安排。"
-  empty_action:
-    view_exam: 查看考試安排
-    view_experiment: 查看實驗安排
+    current_time_settings: 時間指示設置
+    class_color_settings: 课表样式设置
+  visual_settings:
+    current_time_settings_title: 時間指示設置
+    class_color_settings_title: 课表样式设置
+    current_time_section: 時間指示
+    show_current_time_indicator: 顯示當前時間指示線
+    show_current_time_label: 顯示迷你数字時钟
+    show_today_column_highlight: 強調顯示今天的纵列
+    unfinished_section: 未开始課程樣式
+    active_brightness_factor: 亮度: {value}
+    active_border_alpha: 邊框透明度: {value}
+    active_inner_alpha: 底色透明度: {value}
+    completed_section: 已结束課程樣式
+    completed_saturation_factor: 底色飽和度: {value}
+    completed_brightness_factor: 亮度: {value}
+    completed_text_saturation_factor: 文字飽和度: {value}
+    completed_border_alpha: 邊框透明度: {value}
+    completed_inner_alpha: 底色透明度: {value}
   class_change_page:
     title: 課程調整
     empty_message: 目前沒有調課信息
