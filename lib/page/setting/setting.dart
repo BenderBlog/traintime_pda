@@ -42,6 +42,7 @@ import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
+import 'package:watermeter/repository/custom_class_service.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
@@ -959,7 +960,7 @@ void _removeAll() {
   EnergySession.clearElectricityHistory();
   for (var value in [
     ClassTableSession.schoolClassName,
-    CustomClassController.customClassFileName,
+    CustomClassRepository.fileName,
     ClassTableController.decorationName,
     ExamSession.examDataCacheName,
     ExperimentSession.physicsExperimentCacheName,

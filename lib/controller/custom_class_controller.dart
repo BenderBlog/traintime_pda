@@ -3,15 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:signals/signals.dart';
-import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
+import 'package:watermeter/repository/custom_class_service.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/preference.dart' as pref;
 
 enum CustomClassState { fetching, fetched, error, none }
 
@@ -28,14 +24,12 @@ class CustomClassOccurrence {
 class CustomClassController {
   static final CustomClassController i = CustomClassController._();
 
-  static const String customClassFileName = 'CustomClassesV2.json';
   static const String _customClassIdPrefix = 'cc';
   static const String _timeRangeIdPrefix = 'tr';
 
-  late File customClassFile;
+  final CustomClassRepository _repository = CustomClassRepository();
 
   CustomClassController._() {
-    customClassFile = File('${supportPath.path}/$customClassFileName');
     _load();
   }
 
@@ -68,13 +62,7 @@ class CustomClassController {
     stateSignal.value = CustomClassState.fetching;
     errorSignal.value = null;
     try {
-      if (!customClassFile.existsSync()) {
-        customClassFile.writeAsStringSync('[]');
-      }
-      final dynamic decoded = jsonDecode(customClassFile.readAsStringSync());
-      final List<CustomClass> loaded = (decoded as List<dynamic>)
-          .map((e) => CustomClass.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final List<CustomClass> loaded = _repository.load();
       // 过滤掉因数据损坏而可能产生的非法条目
       customClassesSignal.value = loaded.where((cc) {
         if (cc.name.trim().isEmpty || cc.timeRanges.isEmpty) {
@@ -95,19 +83,10 @@ class CustomClassController {
 
   bool _save(List<CustomClass> nextClasses) {
     try {
-      customClassFile.writeAsStringSync(
-        jsonEncode(nextClasses.map((e) => e.toJson()).toList()),
-      );
+      _repository.save(nextClasses);
       customClassesSignal.value = nextClasses;
       errorSignal.value = null;
       stateSignal.value = CustomClassState.fetched;
-
-      unawaited(
-        _syncToWidget(
-          customClassFileName,
-          jsonEncode(nextClasses.map((e) => e.toJson()).toList()),
-        ),
-      );
       return true;
     } catch (e) {
       stateSignal.value = CustomClassState.error;
@@ -220,23 +199,5 @@ class CustomClassController {
     }
 
     return occurrences;
-  }
-
-  /// Sync a data file to the iOS app group container so the widget can read it.
-  /// Android widget reads directly from [supportPath], so no extra sync needed.
-  Future<void> _syncToWidget(String fileName, String data) async {
-    if (!Platform.isIOS) return;
-    final api = SaveToGroupIdSwiftApi();
-    try {
-      final result = await api.saveToGroupId(
-        FileToGroupID(appid: pref.appId, fileName: fileName, data: data),
-      );
-      log.info(
-        "[CustomClassController][_syncToWidget] "
-        "ios sync $fileName status: $result.",
-      );
-    } catch (e, s) {
-      log.handle(e, s);
-    }
   }
 }
