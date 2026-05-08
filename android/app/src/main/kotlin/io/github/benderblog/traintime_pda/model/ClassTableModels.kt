@@ -88,7 +88,6 @@ data class ClassTableData(
     val semesterCode: String,
     val termStartDay: String,
     val classDetail: List<ClassDetail>,
-    val userDefinedDetail: List<ClassDetail> = emptyList(),
     val timeArrangement: List<TimeArrangement>,
     // ClassChanges has been omitted here since calculated in time main app.
     // NotArrangedClassDetail has been omitted here since useless.
@@ -96,7 +95,7 @@ data class ClassTableData(
     companion object {
         val EMPTY = ClassTableData(
             0, "", "2024-01-01",
-            emptyList(), emptyList(), emptyList(),
+            emptyList(), emptyList(),
         )
     }
 

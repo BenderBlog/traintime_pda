@@ -213,7 +213,7 @@ struct Provider: TimelineProvider {
                            thisDay.month == monthComp &&
                            thisDay.day == dayComp {
                             arrangement.append(TimeLineStructItems(
-                                type: .course,
+                                type: .user,
                                 name: cc.name,
                                 teacher: cc.teacher ?? "未知老师",
                                 place: cc.classroom ?? "未安排教室",

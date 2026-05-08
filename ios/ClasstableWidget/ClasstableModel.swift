@@ -156,14 +156,13 @@ struct ClassTableData : Codable {
     var semesterCode : String
     var termStartDay : String
     var classDetail : [ClassDetail]
-    var userDefinedDetail : [ClassDetail]
     var notArranged : [NotArrangedClassDetail]
     var timeArrangement : [TimeArrangement]
     var classChanges : [ClassChange]
 
     enum CodingKeys: String, CodingKey {
         case semesterLength, semesterCode, termStartDay
-        case classDetail, userDefinedDetail, notArranged
+        case classDetail, notArranged
         case timeArrangement, classChanges
     }
 
@@ -173,7 +172,6 @@ struct ClassTableData : Codable {
         semesterCode = try container.decode(String.self, forKey: .semesterCode)
         termStartDay = try container.decode(String.self, forKey: .termStartDay)
         classDetail = try container.decode([ClassDetail].self, forKey: .classDetail)
-        userDefinedDetail = try container.decodeIfPresent([ClassDetail].self, forKey: .userDefinedDetail) ?? []
         notArranged = try container.decodeIfPresent([NotArrangedClassDetail].self, forKey: .notArranged) ?? []
         timeArrangement = try container.decode([TimeArrangement].self, forKey: .timeArrangement)
         classChanges = try container.decodeIfPresent([ClassChange].self, forKey: .classChanges) ?? []
