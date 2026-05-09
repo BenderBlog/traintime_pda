@@ -363,14 +363,15 @@ class _DateSelectorFree extends State<DateSelectorFree> {
           children: [
             Row(
               children: [
+                SizedBox(width: 2,),
                 Icon(Icons.calendar_month, color: widget.color),
-                SizedBox(width: 10,),
+                SizedBox(width: 16,),
                 Text(
                   FlutterI18n.translate(
                     context,
                     "classtable.class_add.input_week_hint",
                   ),
-                ).textStyle(TextStyle(color: widget.color)).padding(left: 4),
+                ).textStyle(TextStyle(color: widget.color)),
               ],
             ),
             const SizedBox(height: 8),
