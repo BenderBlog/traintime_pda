@@ -20,14 +20,14 @@ class CustomClassDetailCard extends StatelessWidget {
     required this.infoColor,
   });
 
+  String _dateText(CustomClassTimeRange range) =>
+      DateFormat('yyyy-MM-dd').format(range.startTime);
+
+  String _timeText(CustomClassTimeRange range) =>
+      '${DateFormat('HH:mm').format(range.startTime)}-${DateFormat('HH:mm').format(range.endTime)}';
+
   @override
   Widget build(BuildContext context) {
-    final String dateText = DateFormat(
-      'yyyy-MM-dd EEE',
-    ).format(timeRange.startTime);
-    final String timeText =
-        '${DateFormat('HH:mm').format(timeRange.startTime)}-${DateFormat('HH:mm').format(timeRange.endTime)}';
-
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
@@ -68,10 +68,37 @@ class CustomClassDetailCard extends StatelessWidget {
                     ),
                 infoColor: infoColor,
               ),
-              CustomListTile(
-                icon: Icons.access_time_filled_outlined,
-                str: '$dateText $timeText',
-                infoColor: infoColor,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.access_time_filled_outlined,
+                      color: infoColor.shade900,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: customClass.timeRanges
+                            .map(
+                              (range) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 1),
+                                child: _TimeRangeRow(
+                                  dateText: _dateText(range),
+                                  timeText: _timeText(range),
+                                  isBold: range.id == timeRange.id,
+                                  infoColor: infoColor,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -206,6 +233,35 @@ class CustomClassDetailCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TimeRangeRow extends StatelessWidget {
+  final String dateText;
+  final String timeText;
+  final bool isBold;
+  final MaterialColor infoColor;
+
+  const _TimeRangeRow({
+    required this.dateText,
+    required this.timeText,
+    required this.isBold,
+    required this.infoColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = TextStyle(
+      color: infoColor.shade900,
+      fontSize: 16,
+      fontWeight: isBold ? FontWeight.bold : null,
+    );
+    return Row(
+      children: [
+        SizedBox(width: 100, child: Text(dateText, style: textStyle)),
+        Text(timeText, style: textStyle),
+      ],
     );
   }
 }
