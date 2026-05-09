@@ -43,7 +43,7 @@ class ClassTableView extends StatefulWidget {
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
-  ClassTableWidgetState? _attachedClassTableState;
+  bool _isListening = false;
 
   DateTime get _visibleWeekStart => classTableState.startDay
       .add(Duration(days: 7 * classTableState.offset))
@@ -228,21 +228,17 @@ class _ClassTableViewState extends State<ClassTableView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final nextClassTableState = ClassTableState.of(context)!.controllers;
-
-    if (_attachedClassTableState != nextClassTableState) {
-      _attachedClassTableState?.removeListener(_reload);
-      _attachedClassTableState = nextClassTableState;
-      _attachedClassTableState!.addListener(_reload);
+    if (!_isListening) {
+      classTableState = ClassTableState.of(context)!.controllers;
+      classTableState.addListener(_reload);
+      _isListening = true;
     }
-
-    classTableState = nextClassTableState;
     updateSize();
   }
 
   @override
   void dispose() {
-    _attachedClassTableState?.removeListener(_reload);
+    classTableState.removeListener(_reload);
     super.dispose();
   }
 

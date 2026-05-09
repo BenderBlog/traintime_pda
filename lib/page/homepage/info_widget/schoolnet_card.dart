@@ -2,6 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+/*
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/schoolnet_controller.dart';
 import 'package:watermeter/page/schoolnet/network_card_window.dart';
@@ -92,3 +93,4 @@ class SchoolnetCard extends StatelessWidget {
     );
   }
 }
+*/

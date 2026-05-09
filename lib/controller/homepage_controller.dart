@@ -1,7 +1,6 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/classtable_controller.dart';

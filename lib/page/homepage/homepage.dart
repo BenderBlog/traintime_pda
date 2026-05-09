@@ -8,7 +8,6 @@ import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
-import 'package:watermeter/page/homepage/info_widget/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -198,7 +197,7 @@ class _MainPageState extends State<MainPage> {
             UpdateCard().padding(bottom: 8),
             const ClassTableCard().padding(bottom: 8),
             EnergyCard().padding(bottom: 8),
-            SchoolnetCard().padding(bottom: 8),
+            // SchoolnetCard().padding(bottom: 8),
             LibraryCard().padding(bottom: 8),
             SchoolCardInfoCard().padding(bottom: 8),
             MediaQuery.removePadding(

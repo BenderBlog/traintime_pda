@@ -11,7 +11,6 @@ import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
-import 'package:watermeter/controller/schoolnet_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
@@ -83,7 +82,6 @@ Future<void> update({
     _safeReload("Library", LibraryController.i.reloadBorrowList),
     _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
     _safeReload("Electricity", EnergyController.i.refreshElectricityInfo),
-    _safeReload("Schoolnet", SchoolnetController.i.reloadSchoolnetInfo),
   ]);
   await maybeAutoSyncSystemCalendar();
 

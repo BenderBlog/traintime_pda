@@ -185,7 +185,8 @@ class ImageRecognitionService {
         final pixel = image.getPixel(x, y);
 
         final a = pixel.a.toInt();
-        if (a == 255) {  // ignore the transparent pixel to reduce the calculation
+        if (a == 255) {
+          // ignore the transparent pixel to reduce the calculation
           pixelBytes.addAll([
             pixel.r.toInt(),
             pixel.g.toInt(),
@@ -195,12 +196,12 @@ class ImageRecognitionService {
       }
     }
 
-    var _hash = 0x811C9DC5;
+    var hash = 0x811C9DC5;
     for (var p in pixelBytes) {
-      _hash ^= p;
-      _hash = (_hash * 0x01000193) & 0xFFFFFFFF;
+      hash ^= p;
+      hash = (hash * 0x01000193) & 0xFFFFFFFF;
     }
 
-    return _hash;
+    return hash;
   }
 }
