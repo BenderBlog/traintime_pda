@@ -23,7 +23,7 @@ login_process:
   ready_page: 準備獲取登錄網頁
   get_encrypt: 獲取密碼加密密鑰
   ready_login: 準備登錄
-  slider: 滑塊驗證
+  captcha: 驗證碼驗證
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
 no_info: 沒有信息

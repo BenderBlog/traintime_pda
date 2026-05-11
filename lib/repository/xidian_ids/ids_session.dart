@@ -247,7 +247,7 @@ class IDSSession extends NetworkSession {
     }
 
     if (onResponse != null) {
-      onResponse(45, "login_process.slider");
+      onResponse(45, "login_process.captcha");
     }
 
     await dioNoOfflineCheck.get(

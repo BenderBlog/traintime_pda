@@ -39,7 +39,7 @@ login_process:
    ready_page: "Prepare to obtain login environment"
    get_encrypt: "Obtain password encryption key"
    ready_login: "Prepare to login"
-   slider: "Solving slider captcha"
+   captcha: "Solving captcha"
    after_process: "Post-login processing"
    failed: "Login failed, response status code: {statusCode}"
 # TODO: ehall_exam_session data
