@@ -257,6 +257,8 @@ class IDSSession extends NetworkSession {
       throw const LoginFailedException(msg: "验证码校验失败");
     }
 
+    head['captcha'] = SliderCaptchaClientProvider.lastResult;
+
     /// Post login request.
     if (onResponse != null) {
       onResponse(50, "login_process.ready_login");

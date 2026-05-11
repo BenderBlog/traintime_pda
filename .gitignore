@@ -54,3 +54,4 @@ app.*.map.json
 # fvm flutter sdk
 .fvm/
 *.APK
+log.txt
