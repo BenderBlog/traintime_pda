@@ -7,7 +7,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 
 class SliderCaptchaClientProvider {
@@ -65,10 +64,11 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "login.captcha_window.title")),
+        title: Text(
+          FlutterI18n.translate(context, "login.captcha_window.title"),
+        ),
       ),
       body: Center(
         child: Card(
@@ -95,10 +95,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                       child: TextField(
                         controller: _controller,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          letterSpacing: 6,
-                        ),
+                        style: const TextStyle(fontSize: 18, letterSpacing: 6),
                         decoration: InputDecoration(
                           hintText: FlutterI18n.translate(
                             context,
@@ -127,7 +124,8 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
                   child: FilledButton(
                     onPressed: () {
                       if (_controller.text.isNotEmpty) {
-                        SliderCaptchaClientProvider.lastResult = _controller.text;
+                        SliderCaptchaClientProvider.lastResult =
+                            _controller.text;
                         Navigator.of(context).pop();
                       }
                     },

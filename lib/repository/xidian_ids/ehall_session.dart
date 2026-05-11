@@ -51,7 +51,7 @@ class EhallSession extends IDSSession {
   }) async {
     String location = await super.login(
       target:
-          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+          "https://ehall.xidian.edu.cn:443/login?service=https://ehall.xidian.edu.cn/new/index.html",
       username: username,
       password: password,
       sliderCaptcha: sliderCaptcha,
@@ -78,7 +78,7 @@ class EhallSession extends IDSSession {
       if (!await isLoggedIn()) {
         String location = await super.checkAndLogin(
           target:
-              "https://ehall.xidian.edu.cn/login?"
+              "https://ehall.xidian.edu.cn:443/login?"
               "service=https://ehall.xidian.edu.cn/new/index.html",
           sliderCaptcha: (String cookieStr) =>
               SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
