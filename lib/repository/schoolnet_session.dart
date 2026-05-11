@@ -1,6 +1,8 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
+
+/*
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -12,7 +14,6 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/password_exceptions.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
@@ -231,7 +232,8 @@ class SchoolnetSession extends NetworkSession {
           options: Options(
             headers: {
               "X-CSRF-Token": csrf,
-              "Accept": "*/*",
+              todo: recover
+              "Accept": "*//*",
               "Accept-Encoding": "gzip, deflate, br, zstd",
               "X-Requested-With": "XMLHttpRequest",
             },
@@ -268,7 +270,8 @@ class SchoolnetSession extends NetworkSession {
           options: Options(
             headers: {
               "X-CSRF-Token": csrf,
-              "Accept": "*/*",
+              todo: recover
+              "Accept": "*//*",
               "Accept-Encoding": "gzip, deflate, br, zstd",
               "X-Requested-With": "XMLHttpRequest",
             },
@@ -298,3 +301,4 @@ class SchoolnetSession extends NetworkSession {
     }
   }
 }
+*/

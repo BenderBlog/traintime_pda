@@ -77,6 +77,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://github.com/chitao1234",
     ),
     Developer(
+      "CopperKoi",
+      "https://avatars.githubusercontent.com/u/91732947",
+      FlutterI18n.translate(context, "setting.about_page.copperkoi"),
+      "https://copperkoi.cn/about",
+    ),
+    Developer(
       "Dimole",
       "https://avatars.githubusercontent.com/u/24828354",
       FlutterI18n.translate(context, "setting.about_page.dimole"),
@@ -143,6 +149,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://github.com/Ka-mate-ka-ora/",
     ),
     Developer(
+      "Lagrange-X",
+      "https://avatars.githubusercontent.com/u/110022915",
+      FlutterI18n.translate(context, "setting.about_page.lagrange-x"),
+      "https://github.com/Lagrange-X/",
+    ),
+    Developer(
       "lhx-666-cool",
       "https://avatars.githubusercontent.com/u/63273792",
       FlutterI18n.translate(context, "setting.about_page.lhx-666-cool"),
@@ -177,6 +189,12 @@ class _AboutPageState extends State<AboutPage> {
       "https://avatars.githubusercontent.com/u/85873278?v=4",
       FlutterI18n.translate(context, "setting.about_page.nancunchild"),
       "https://github.com/NanCunChild",
+    ),
+    Developer(
+      "nkAnF",
+      "https://avatars.githubusercontent.com/u/172456830",
+      FlutterI18n.translate(context, "setting.about_page.nkanf"),
+      "https://github.com/nkanf-dev",
     ),
     Developer(
       "Pairman",

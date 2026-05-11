@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // SchoolNet password dialog.
-
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -107,3 +107,4 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
     );
   }
 }
+*/

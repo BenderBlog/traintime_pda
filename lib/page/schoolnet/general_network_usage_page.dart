@@ -1,16 +1,14 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/schoolnet_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/network_usage.dart';
-import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -288,3 +286,4 @@ class _DeviceListLite extends StatelessWidget {
     ].toColumn().card(elevation: 0);
   }
 }
+*/

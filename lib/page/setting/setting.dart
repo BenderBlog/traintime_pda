@@ -20,7 +20,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
+// import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
@@ -427,6 +427,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                 ],
+                /*
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(
@@ -448,6 +449,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   },
                 ),
+                */
               ],
             ),
           ),

@@ -12,28 +12,6 @@ PODS:
     - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
-  - TensorFlowLiteC (2.12.0):
-    - TensorFlowLiteC/Core (= 2.12.0)
-  - TensorFlowLiteC/Core (2.12.0)
-  - TensorFlowLiteC/CoreML (2.12.0):
-    - TensorFlowLiteC/Core
-  - TensorFlowLiteC/Metal (2.12.0):
-    - TensorFlowLiteC/Core
-  - TensorFlowLiteSwift (2.12.0):
-    - TensorFlowLiteSwift/Core (= 2.12.0)
-  - TensorFlowLiteSwift/Core (2.12.0):
-    - TensorFlowLiteC (= 2.12.0)
-  - TensorFlowLiteSwift/CoreML (2.12.0):
-    - TensorFlowLiteC/CoreML (= 2.12.0)
-    - TensorFlowLiteSwift/Core (= 2.12.0)
-  - TensorFlowLiteSwift/Metal (2.12.0):
-    - TensorFlowLiteC/Metal (= 2.12.0)
-    - TensorFlowLiteSwift/Core (= 2.12.0)
-  - tflite_flutter (0.0.1):
-    - Flutter
-    - TensorFlowLiteSwift (= 2.12.0)
-    - TensorFlowLiteSwift/CoreML (= 2.12.0)
-    - TensorFlowLiteSwift/Metal (= 2.12.0)
 
 DEPENDENCIES:
   - charset_converter (from `.symlinks/plugins/charset_converter/ios`)
@@ -43,12 +21,6 @@ DEPENDENCIES:
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - tflite_flutter (from `.symlinks/plugins/tflite_flutter/ios`)
-
-SPEC REPOS:
-  trunk:
-    - TensorFlowLiteC
-    - TensorFlowLiteSwift
 
 EXTERNAL SOURCES:
   charset_converter:
@@ -65,8 +37,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/fluttertoast/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  tflite_flutter:
-    :path: ".symlinks/plugins/tflite_flutter/ios"
 
 SPEC CHECKSUMS:
   charset_converter: 82bc1d2e3c70dcb51bf769e9772e3ae5b2571695
@@ -76,9 +46,6 @@ SPEC CHECKSUMS:
   flutter_mailer: 3a8cd4f36c960fb04528d5471097270c19fec1c4
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
-  TensorFlowLiteC: 20785a69299185a379ba9852b6625f00afd7984a
-  TensorFlowLiteSwift: 3a4928286e9e35bdd3e17970f48e53c80d25e793
-  tflite_flutter: 64b192e11352fe36943ab6656e1d49207f1a5595
 
 PODFILE CHECKSUM: 33ee58e3b6ad46b815d23ed7bf392f2a93d23dc3
 

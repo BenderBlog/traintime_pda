@@ -24,7 +24,7 @@ Future<FilePickerResult?> pickFile({FileType type = FileType.any}) async {
   }
   // Ref. https://github.com/miguelpruivo/flutter_file_picker/issues/1584
   // Disable compression:P
-  return await FilePicker.platform.pickFiles(
+  return await FilePicker.pickFiles(
     type: type,
     compressionQuality: 0,
     allowMultiple: false,

@@ -240,10 +240,8 @@ class CourseReminderService extends NotificationService
         navigator.push(
           MaterialPageRoute(
             builder: (context) => LayoutBuilder(
-              builder: (context, constraints) => ClassTableWindow(
-                parentContext: context,
-                constraints: constraints,
-              ),
+              builder: (context, constraints) =>
+                  ClassTableWindow(constraints: constraints),
             ),
           ),
         );

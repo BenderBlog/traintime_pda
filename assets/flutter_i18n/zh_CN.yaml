@@ -323,6 +323,7 @@ electricity:
     water_usage_read_before: "上次读数"
     water_usage_read_now: "本次读数"
     water_usage: "洗澡水用量"
+    not_school_network: "非校园网访问"
 
 # 空闲教室
 empty_classroom:
@@ -975,6 +976,7 @@ setting:
         breezeline: "支持：无价值无意义的产品经理(他自己的描述)"
         cafebabe: "支持：提供彩蛋代码"
         chitao1234: "开发：修复滑块不对齐问题"
+        copperkoi: "开发：系统日历最新课表同步"
         dimole: "开发支持：辅助修复滑块问题"
         elitewars: "设计：体育成绩页面"
         elliot: "国际化：软件英语翻译 / 开发指导：情侣课表功能开发指导（该功能已经被移除）"
@@ -986,12 +988,14 @@ setting:
         hhzm: "开发：电费查询账号计算"
         imoscarz: "开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI"
         ka-mate-ka-ora: "国际化：软件英语翻译优化"
+        lagrange-x: "开发：课程表时间进度展示（终版方案） / 开发：课程表上过课程灰度化"
         lhx-666-cool: "支持：Windows 和 Linux 构建脚本"
         lichtyy: "设计：配色，空白页面贴图 / 开发：实验系统页面读取代码"
         lqsy-h: "支持：推文宣传图片制作"
         lsy223622: "设计：iOS 和 Android 图标 / 支持：冠名 XDYou"
         mrbrilliant2046: "支持：提供网络服务使用说明文档 / 国际化：优化英语翻译"
         nancunchild: "开发：图书馆搜索功能 / 国际化：优化英语翻译"
+        nkanf: "开发：课程表时间进度展示（初版方案）"
         pairman: "开发：成绩缓存功能和优化滑块算法 / 国际化：优化英语翻译"
         reverierxu: "设计：用于信息展示的 ReX 卡片 / 开发支持：研究生课表"
         rrrilac: "开发支持：电费查询"
