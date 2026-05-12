@@ -26,6 +26,17 @@ class Lazy<T> {
   T get value => _value ??= _initializer();
 }
 
+/// 轨迹点模型
+class TrackPoint {
+  final int a; // x 轴位移
+  final int b; // y 轴位移
+  final int c; // 时间戳 (毫秒)
+
+  TrackPoint(this.a, this.b, this.c);
+
+  Map<String, dynamic> toJson() => {'a': a, 'b': b, 'c': c};
+}
+
 class SliderCaptchaClientProvider {
   static const int _blockSize = 16;
   static const int _captchaKeySize = 16;
@@ -36,12 +47,126 @@ class SliderCaptchaClientProvider {
   final String cookie;
   Dio dio = Dio()..interceptors.add(logDioAdapter);
 
+  static const int blockSize = 16;
+  static const int keySize = 16;
+  static const String aesChars =
+      "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+
+  /// 生成指定长度的随机字符串
+  static String randomString(int n) {
+    final random = Random();
+    return List.generate(
+      n,
+      (index) => aesChars[random.nextInt(aesChars.length)],
+    ).join();
+  }
+
+  /// 加密逻辑
+  static String encryptData(String plainText, Uint8List keyBytes) {
+    final ivStr = randomString(blockSize);
+    final nonce = randomString(blockSize * 4);
+    final plain = nonce + plainText;
+
+    final key = encrypt.Key(keyBytes);
+    final iv = encrypt.IV.fromUtf8(ivStr);
+
+    final encrypter = encrypt.Encrypter(
+      encrypt.AES(key, mode: encrypt.AESMode.cbc),
+    );
+
+    // encrypt.AES 默认使用 PKCS7 填充，等同于 Python 的 pad(..., 16)
+    final encrypted = encrypter.encrypt(plain, iv: iv);
+
+    return encrypted.base64;
+  }
+
+  /// 解密逻辑
+  static String decryptData(String cipherText, Uint8List keyBytes) {
+    final Uint8List fullCipher = base64.decode(cipherText);
+
+    if (fullCipher.length < blockSize * 4) {
+      throw Exception("Cipher text is too short to contain nonce.");
+    }
+
+    // 根据 Python 逻辑：IV 是密文的第 48-64 字节 (Block 4)
+    // 实际密文从第 64 字节开始
+    final ivBytes = fullCipher.sublist(blockSize * 3, blockSize * 4);
+    final encryptedPayload = fullCipher.sublist(blockSize * 4);
+
+    final key = encrypt.Key(keyBytes);
+    final iv = encrypt.IV(ivBytes);
+
+    final encrypter = encrypt.Encrypter(
+      encrypt.AES(key, mode: encrypt.AESMode.cbc),
+    );
+
+    // 解密并自动去除 PKCS7 填充
+    final decrypted = encrypter.decrypt(
+      encrypt.Encrypted(encryptedPayload),
+      iv: iv,
+    );
+
+    return decrypted;
+  }
+
+  /// 从图片字节数组末尾提取 AES Key
+  static Uint8List extractAesKeyFromImage(Uint8List imageBytes) {
+    if (imageBytes.length < keySize) {
+      throw Exception("Image is too short to contain AES key.");
+    }
+    return imageBytes.sublist(imageBytes.length - keySize);
+  }
+
+  /// 优化后的轨迹生成函数
+  List<TrackPoint> generateTracks(int targetX) {
+    List<TrackPoint> tracks = [];
+    Random random = Random();
+
+    int currentX = 0;
+    int currentY = 0;
+
+    // 1. 起始点 [cite: 89, 90]
+    tracks.add(TrackPoint(0, 0, 0));
+
+    // 调整后的参数：更大的步长，更紧凑的时间
+    // 参考你提供的样本：位移 32 像素仅用了 9 个点
+    while (currentX < targetX) {
+      int remaining = targetX - currentX;
+
+      // 增大步长随机区间 (5-9 像素)，这样点数会明显减少
+      int stepX = remaining > 20
+          ? random.nextInt(5) + 5
+          : random.nextInt(3) + 1;
+
+      currentX += stepX;
+      if (currentX > targetX) currentX = targetX;
+
+      // 减小垂直抖动频率，使其看起来更平滑 [cite: 120]
+      if (random.nextDouble() > 0.7) {
+        currentY += random.nextBool() ? 1 : -1;
+      }
+
+      // 将时间间隔 c 锁定在 20-25ms 之间，匹配你提供的样本
+      int stepTime = 20 + random.nextInt(6);
+
+      tracks.add(TrackPoint(currentX, currentY, stepTime));
+
+      if (currentX == targetX) break;
+    }
+
+    // 2. 结束点：最后的停留点 [cite: 106, 107]
+    tracks.add(TrackPoint(targetX, currentY, 20 + random.nextInt(10)));
+
+    return tracks;
+  }
+
   SliderCaptchaClientProvider({required this.cookie});
 
   Uint8List? puzzleData;
   Uint8List? pieceData;
   Lazy<Image>? puzzleImage;
   Lazy<Image>? pieceImage;
+  Uint8List? extractedKey;
 
   final double puzzleWidth = 280;
   final double puzzleHeight = 155;
@@ -63,6 +188,8 @@ class SliderCaptchaClientProvider {
 
     puzzleData = const Base64Decoder().convert(puzzleBase64);
     pieceData = const Base64Decoder().convert(pieceBase64);
+
+    extractedKey = extractAesKeyFromImage(pieceData!);
 
     puzzleImage = Lazy(
       () => Image.memory(
