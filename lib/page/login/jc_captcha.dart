@@ -6,12 +6,13 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:image/image.dart' as img;
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 
@@ -25,9 +26,135 @@ class Lazy<T> {
   T get value => _value ??= _initializer();
 }
 
+/// 轨迹点模型
+class TrackPoint {
+  final int a; // x 轴位移
+  final int b; // y 轴位移
+  final int c; // 时间戳 (毫秒)
+
+  TrackPoint(this.a, this.b, this.c);
+
+  Map<String, dynamic> toJson() => {'a': a, 'b': b, 'c': c};
+}
+
 class SliderCaptchaClientProvider {
+  static const int _blockSize = 16;
+  static const int _captchaKeySize = 16;
+  static const int _keySize = 16;
+  static const String _aesChars =
+      "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+  static final Random _random = Random.secure();
+
   final String cookie;
   Dio dio = Dio()..interceptors.add(logDioAdapter);
+
+  /// 生成指定长度的随机字符串
+  static String randomString(int n) {
+    final random = Random();
+    return List.generate(
+      n,
+      (index) => _aesChars[random.nextInt(_aesChars.length)],
+    ).join();
+  }
+
+  /// 加密逻辑
+  static String encryptData(String plainText, Uint8List keyBytes) {
+    final ivStr = randomString(_blockSize);
+    final nonce = randomString(_blockSize * 4);
+    final plain = nonce + plainText;
+
+    final key = encrypt.Key(keyBytes);
+    final iv = encrypt.IV.fromUtf8(ivStr);
+
+    final encrypter = encrypt.Encrypter(
+      encrypt.AES(key, mode: encrypt.AESMode.cbc),
+    );
+
+    // encrypt.AES 默认使用 PKCS7 填充，等同于 Python 的 pad(..., 16)
+    final encrypted = encrypter.encrypt(plain, iv: iv);
+
+    return encrypted.base64;
+  }
+
+  /// 解密逻辑
+  static String decryptData(String cipherText, Uint8List keyBytes) {
+    final Uint8List fullCipher = base64.decode(cipherText);
+
+    if (fullCipher.length < _blockSize * 4) {
+      throw Exception("Cipher text is too short to contain nonce.");
+    }
+
+    // 根据 Python 逻辑：IV 是密文的第 48-64 字节 (Block 4)
+    // 实际密文从第 64 字节开始
+    final ivBytes = fullCipher.sublist(_blockSize * 3, _blockSize * 4);
+    final encryptedPayload = fullCipher.sublist(_blockSize * 4);
+
+    final key = encrypt.Key(keyBytes);
+    final iv = encrypt.IV(ivBytes);
+
+    final encrypter = encrypt.Encrypter(
+      encrypt.AES(key, mode: encrypt.AESMode.cbc),
+    );
+
+    // 解密并自动去除 PKCS7 填充
+    final decrypted = encrypter.decrypt(
+      encrypt.Encrypted(encryptedPayload),
+      iv: iv,
+    );
+
+    return decrypted;
+  }
+
+  /// 从图片字节数组末尾提取 AES Key
+  static Uint8List extractAesKeyFromImage(Uint8List imageBytes) {
+    if (imageBytes.length < _keySize) {
+      throw Exception("Image is too short to contain AES key.");
+    }
+    return imageBytes.sublist(imageBytes.length - _keySize);
+  }
+
+  /// 优化后的轨迹生成函数
+  List<TrackPoint> generateTracks(int targetX) {
+    List<TrackPoint> tracks = [];
+    Random random = Random();
+
+    int currentX = 0;
+    int currentY = 0;
+
+    // 1. 起始点 [cite: 89, 90]
+    tracks.add(TrackPoint(0, 0, 0));
+
+    // 调整后的参数：更大的步长，更紧凑的时间
+    // 参考你提供的样本：位移 32 像素仅用了 9 个点
+    while (currentX < targetX) {
+      int remaining = targetX - currentX;
+
+      // 增大步长随机区间 (5-9 像素)，这样点数会明显减少
+      int stepX = remaining > 20
+          ? random.nextInt(5) + 5
+          : random.nextInt(3) + 1;
+
+      currentX += stepX;
+      if (currentX > targetX) currentX = targetX;
+
+      // 减小垂直抖动频率，使其看起来更平滑 [cite: 120]
+      if (random.nextDouble() > 0.7) {
+        currentY += random.nextBool() ? 1 : -1;
+      }
+
+      // 将时间间隔 c 锁定在 20-25ms 之间，匹配你提供的样本
+      int stepTime = 20 + random.nextInt(6);
+
+      tracks.add(TrackPoint(currentX, currentY, stepTime));
+
+      if (currentX == targetX) break;
+    }
+
+    // 2. 结束点：最后的停留点 [cite: 106, 107]
+    tracks.add(TrackPoint(targetX, currentY, 20 + random.nextInt(10)));
+
+    return tracks;
+  }
 
   SliderCaptchaClientProvider({required this.cookie});
 
@@ -35,6 +162,7 @@ class SliderCaptchaClientProvider {
   Uint8List? pieceData;
   Lazy<Image>? puzzleImage;
   Lazy<Image>? pieceImage;
+  Uint8List? extractedKey;
 
   final double puzzleWidth = 280;
   final double puzzleHeight = 155;
@@ -42,11 +170,13 @@ class SliderCaptchaClientProvider {
   final double pieceHeight = 155;
 
   Future<void> updatePuzzle() async {
+    log.info("Fetching slider captcha...");
     var rsp = await dio.get(
       "https://ids.xidian.edu.cn/authserver/common/openSliderCaptcha.htl",
       queryParameters: {'_': DateTime.now().millisecondsSinceEpoch.toString()},
       options: Options(headers: {"Cookie": cookie}),
     );
+    log.info("Captcha fetched, decoding images.");
 
     String puzzleBase64 = rsp.data["bigImage"];
     String pieceBase64 = rsp.data["smallImage"];
@@ -54,6 +184,8 @@ class SliderCaptchaClientProvider {
 
     puzzleData = const Base64Decoder().convert(puzzleBase64);
     pieceData = const Base64Decoder().convert(pieceBase64);
+
+    extractedKey = extractAesKeyFromImage(pieceData!);
 
     puzzleImage = Lazy(
       () => Image.memory(
@@ -73,188 +205,78 @@ class SliderCaptchaClientProvider {
     );
   }
 
-  Future<void> solve(BuildContext? context, {int retryCount = 20}) async {
-    for (int i = 0; i < retryCount; i++) {
-      await updatePuzzle();
-      double? answer = _trySolve(puzzleData!, pieceData!);
-      if (answer != null && await verify(answer)) {
-        log.info("Parse captcha $i time(s), success.");
-        return;
-      }
-      log.info("Parse captcha $i time(s), failure.");
-    }
-
-    log.info("$retryCount failures, fallback to user input.");
-    // fallback
+  Future<void> solve(BuildContext? context) async {
+    // 自动解码滑块偏移量已停用。这里始终进入手动滑块，提交用户真实拖动轨迹。
+    log.info("Skipping auto-solve, entering manual slider.");
     if (context != null && context.mounted) {
-      await Navigator.of(context).push(
+      final verified = await Navigator.of(context).push<bool>(
         MaterialPageRoute(builder: (context) => CaptchaWidget(provider: this)),
       );
+      if (verified == true) return;
     }
     throw CaptchaSolveFailedException();
   }
 
-  Future<bool> verify(double answer) async {
+  Future<bool> verifyWithTracks(List<TrackPoint> tracks) async {
+    final moveLength = tracks.isNotEmpty ? tracks.last.a : 0;
+    final payload = jsonEncode({
+      "canvasLength": puzzleWidth.toInt(),
+      "moveLength": moveLength,
+      "tracks": tracks,
+    });
+    log.info(
+      "Verify captcha with ${tracks.length} track points "
+      "(moveLength=$moveLength).",
+    );
+    final sign = _encryptPayload(payload);
+
     dynamic result = await dio.post(
       "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
-      data:
-          "canvasLength=${(puzzleWidth)}&moveLength=${(answer * puzzleWidth).toInt()}",
+      data: "sign=${Uri.encodeQueryComponent(sign)}",
       options: Options(
         headers: {
+          HttpHeaders.acceptHeader:
+              "application/json, text/javascript, */*; q=0.01",
           "Cookie": cookie,
           HttpHeaders.contentTypeHeader:
-              "application/x-www-form-urlencoded;charset=utf-8",
+              "application/x-www-form-urlencoded;charset=UTF-8",
+          "Origin": "https://ids.xidian.edu.cn",
           HttpHeaders.accessControlAllowOriginHeader:
               "https://ids.xidian.edu.cn",
+          "X-Requested-With": "XMLHttpRequest",
         },
       ),
     );
+    log.info("Verify response: ${result.data}");
     return result.data["errorCode"] == 1;
   }
 
-  static double? _trySolve(
-    Uint8List puzzleData,
-    Uint8List pieceData, {
-    int border = 24,
-  }) {
-    img.Image? puzzle = img.decodeImage(puzzleData);
-    if (puzzle == null) {
-      return null;
-    }
-    img.Image? piece = img.decodeImage(pieceData);
-    if (piece == null) {
-      return null;
+  String _encryptPayload(String payload) {
+    if (pieceData == null || pieceData!.length < _captchaKeySize) {
+      throw StateError("Captcha image is too short to contain AES key.");
     }
 
-    var bbox = _findAlphaBoundingBox(piece);
-    var xL = bbox[0] + border,
-        yT = bbox[1] + border,
-        xR = bbox[2] - border,
-        yB = bbox[3] - border;
+    final keyBytes = pieceData!.sublist(pieceData!.length - _captchaKeySize);
+    final key = encrypt.Key(Uint8List.fromList(keyBytes));
+    final iv = encrypt.IV.fromUtf8(_randomString(_blockSize));
+    final nonce = _randomString(_blockSize * 4);
+    final aes = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
 
-    var widthW = xR - xL, heightW = yB - yT, lenW = widthW * heightW;
-    var widthG = puzzle.width - piece.width + widthW - 1;
-
-    var meanT = _calculateMean(piece, xL, yT, widthW, heightW);
-    var templateN = _normalizeImage(piece, xL, yT, widthW, heightW, meanT);
-    var colsW = [
-      for (var x = xL + 1; x < widthG + 1; ++x)
-        _calculateSum(puzzle, x, yT, 1, heightW),
-    ];
-    var colsWL = colsW.iterator, colsWR = colsW.iterator;
-    double sumW = 0;
-    for (var i = 0; i < widthW; ++i) {
-      colsWR.moveNext();
-      sumW += colsWR.current;
-    }
-    double nccMax = 0;
-    int xMax = 0;
-    for (var x = xL + 1; x < widthG - widthW; x += 2) {
-      colsWL.moveNext();
-      colsWR.moveNext();
-      sumW = sumW - colsWL.current + colsWR.current;
-      colsWL.moveNext();
-      colsWR.moveNext();
-      sumW = sumW - colsWL.current + colsWR.current;
-      var ncc = _calculateNCC(
-        puzzle,
-        x,
-        yT,
-        widthW,
-        heightW,
-        templateN,
-        sumW / lenW,
-      );
-      if (ncc > nccMax) {
-        nccMax = ncc;
-        xMax = x;
-      }
-    }
-
-    return (xMax - xL - 1) / puzzle.width;
+    final plain = "$nonce$payload";
+    return aes.encrypt(plain, iv: iv).base64;
   }
 
-  static List<int> _findAlphaBoundingBox(img.Image image) {
-    var xL = image.width, yT = image.height, xR = 0, yB = 0;
-    for (var y = 0; y < image.height; y++) {
-      for (var x = 0; x < image.width; x++) {
-        if (image.getPixel(x, y).a != 255) continue;
-        if (x < xL) xL = x;
-        if (y < yT) yT = y;
-        if (x > xR) xR = x;
-        if (y > yB) yB = y;
-      }
-    }
-    return [xL, yT, xR, yB];
-  }
-
-  static double _calculateSum(
-    img.Image image,
-    int x,
-    int y,
-    int width,
-    int height,
-  ) {
-    double sum = 0;
-    for (var yy = y; yy < y + height; yy++) {
-      for (var xx = x; xx < x + width; xx++) {
-        sum += image.getPixel(xx, yy).luminance;
-      }
-    }
-    return sum;
-  }
-
-  static double _calculateMean(
-    img.Image image,
-    int x,
-    int y,
-    int width,
-    int height,
-  ) {
-    return _calculateSum(image, x, y, width, height) / width / height;
-  }
-
-  static List<double> _normalizeImage(
-    img.Image image,
-    int x,
-    int y,
-    int width,
-    int height,
-    double mean,
-  ) {
-    return [
-      for (var yy = 0; yy < height; yy++)
-        for (var xx = 0; xx < width; xx++)
-          image.getPixel(xx + x, yy + y).luminance - mean,
-    ];
-  }
-
-  static double _calculateNCC(
-    img.Image window,
-    int x,
-    int y,
-    int width,
-    int height,
-    List<double> template,
-    double meanW,
-  ) {
-    double sumWt = 0, sumWw = 0.000001;
-    var iT = template.iterator;
-    for (var yy = y; yy < y + height; yy++) {
-      for (var xx = x; xx < x + width; xx++) {
-        iT.moveNext();
-        var w = window.getPixel(xx, yy).luminance - meanW;
-        sumWt += w * iT.current;
-        sumWw += w * w;
-      }
-    }
-    return sumWt / sumWw;
+  static String _randomString(int length) {
+    return String.fromCharCodes(
+      List.generate(
+        length,
+        (_) => _aesChars.codeUnitAt(_random.nextInt(_aesChars.length)),
+      ),
+    );
   }
 }
 
 class CaptchaWidget extends StatefulWidget {
-  static double deviation = 5;
-
   final SliderCaptchaClientProvider provider;
 
   const CaptchaWidget({super.key, required this.provider});
@@ -264,23 +286,268 @@ class CaptchaWidget extends StatefulWidget {
 }
 
 class _CaptchaWidgetState extends State<CaptchaWidget> {
-  late Future<SliderCaptchaClientProvider> provider;
+  static const double _sliderHandleSize = 42;
+  static const double _jsSliderRightPadding = 40;
+  static const int _recordIntervalMs = 20;
+  static const double _recordDistancePx = 2;
 
-  /// 滑块的当前位置。
-  double _sliderValue = 0.0;
+  late Future<SliderCaptchaClientProvider> _providerFuture;
 
-  /// 滑到哪里了
-  final _offsetValue = 0;
+  final List<TrackPoint> _tracks = [];
+  DateTime? _lastRecordTime;
+  Offset? _dragStartGlobal;
+  int? _activePointer;
+  int? _lastTrackA;
+  int? _lastTrackB;
+
+  double _sliderLeftPx = 0;
+  bool _isSubmitting = false;
+  String? _statusText;
 
   @override
   void initState() {
-    updateProvider();
     super.initState();
+    updateProvider();
   }
 
-  Future<void> updateProvider() async {
-    _sliderValue = 0;
-    provider = widget.provider.updatePuzzle().then((value) => widget.provider);
+  void updateProvider({String? statusText}) {
+    _sliderLeftPx = 0;
+    _tracks.clear();
+    _lastRecordTime = null;
+    _dragStartGlobal = null;
+    _activePointer = null;
+    _lastTrackA = null;
+    _lastTrackB = null;
+    _isSubmitting = false;
+    _statusText = statusText;
+    _providerFuture = widget.provider.updatePuzzle().then((value) {
+      return widget.provider;
+    });
+  }
+
+  double _dragLimit(double puzzleWidth) {
+    return max(0, puzzleWidth - _jsSliderRightPadding).toDouble();
+  }
+
+  double _thumbLeft(double puzzleWidth) {
+    return (_sliderLeftPx - 1)
+        .clamp(0.0, max(0, puzzleWidth - _sliderHandleSize))
+        .toDouble();
+  }
+
+  bool _isInsideThumb(Offset localPosition, double puzzleWidth) {
+    final left = _thumbLeft(puzzleWidth);
+    return localPosition.dx >= left &&
+        localPosition.dx <= left + _sliderHandleSize &&
+        localPosition.dy >= 0 &&
+        localPosition.dy <= _sliderHandleSize;
+  }
+
+  void _onPointerDown(PointerDownEvent event, double puzzleWidth) {
+    if (_isSubmitting || _activePointer != null) return;
+    if (!_isInsideThumb(event.localPosition, puzzleWidth)) return;
+
+    _activePointer = event.pointer;
+    _dragStartGlobal = event.position;
+    _lastRecordTime = DateTime.now();
+    _lastTrackA = null;
+    _lastTrackB = null;
+    _tracks.clear();
+    _tracks.add(TrackPoint(0, 0, 0));
+    if (_statusText != null) {
+      setState(() => _statusText = null);
+    }
+  }
+
+  void _onPointerMove(PointerMoveEvent event, double puzzleWidth) {
+    if (event.pointer != _activePointer) return;
+    final start = _dragStartGlobal;
+    final lastTime = _lastRecordTime;
+    if (start == null || lastTime == null) return;
+
+    final dx = event.position.dx - start.dx;
+    if (dx < 0 || dx + _jsSliderRightPadding > puzzleWidth) return;
+
+    final now = DateTime.now();
+    final dy = event.position.dy - start.dy;
+    final elapsed = now.difference(lastTime).inMilliseconds;
+
+    setState(() => _sliderLeftPx = dx.clamp(0.0, _dragLimit(puzzleWidth)));
+
+    if (elapsed < _recordIntervalMs) return;
+
+    final a = dx.round();
+    final b = dy.round();
+    final lastA = _lastTrackA;
+    final lastB = _lastTrackB;
+    if (lastA != null && lastB != null) {
+      final distanceSquared =
+          (a - lastA) * (a - lastA) + (b - lastB) * (b - lastB);
+      if (distanceSquared < _recordDistancePx * _recordDistancePx) return;
+    }
+
+    _tracks.add(TrackPoint(a, b, elapsed));
+    _lastTrackA = a;
+    _lastTrackB = b;
+    _lastRecordTime = now;
+  }
+
+  Future<void> _onPointerUp(PointerUpEvent event, double puzzleWidth) async {
+    if (event.pointer != _activePointer) return;
+    await _finishDrag(event.position, puzzleWidth);
+  }
+
+  void _onPointerCancel(PointerCancelEvent event) {
+    if (event.pointer != _activePointer) return;
+    _activePointer = null;
+    _dragStartGlobal = null;
+    _lastRecordTime = null;
+    _lastTrackA = null;
+    _lastTrackB = null;
+  }
+
+  Future<void> _finishDrag(Offset globalPosition, double puzzleWidth) async {
+    final start = _dragStartGlobal;
+    final lastTime = _lastRecordTime;
+    _activePointer = null;
+    _dragStartGlobal = null;
+
+    if (start == null || lastTime == null) return;
+
+    final dx = globalPosition.dx - start.dx;
+    if (dx == 0) return;
+
+    final dy = globalPosition.dy - start.dy;
+    final elapsed = DateTime.now().difference(lastTime).inMilliseconds;
+    _tracks.add(TrackPoint(dx.round(), dy.round(), elapsed));
+    log.info("Recorded ${_tracks.length} real slider track points.");
+
+    setState(() {
+      _sliderLeftPx = dx.clamp(0.0, _dragLimit(puzzleWidth));
+      _isSubmitting = true;
+    });
+
+    try {
+      final verified = await widget.provider.verifyWithTracks(_tracks);
+      if (!mounted) return;
+      if (verified) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+
+      setState(() {
+        updateProvider(statusText: "再试一次");
+      });
+    } catch (e, s) {
+      log.warning("Slider captcha verify failed: $e\n$s");
+      if (!mounted) return;
+      setState(() {
+        updateProvider(statusText: "再试一次");
+      });
+    }
+  }
+
+  Widget _buildSlider(double puzzleWidth) {
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerDown: (event) => _onPointerDown(event, puzzleWidth),
+      onPointerMove: (event) => _onPointerMove(event, puzzleWidth),
+      onPointerUp: (event) => _onPointerUp(event, puzzleWidth),
+      onPointerCancel: _onPointerCancel,
+      child: SizedBox(
+        width: puzzleWidth,
+        height: 44,
+        child: Stack(
+          children: [
+            Positioned(
+              top: 17,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Colors.green[900],
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 17,
+              left: 0,
+              width: (_sliderLeftPx + 4).clamp(0.0, puzzleWidth).toDouble(),
+              child: Container(
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Colors.green[700],
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+            Positioned(
+              left: _thumbLeft(puzzleWidth),
+              top: 1,
+              child: Container(
+                width: _sliderHandleSize,
+                height: _sliderHandleSize,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: _isSubmitting
+                    ? const Padding(
+                        padding: EdgeInsets.all(11),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Icon(
+                        Icons.arrow_forward,
+                        size: 20,
+                        color: Colors.green[900],
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCaptcha(SliderCaptchaClientProvider provider) {
+    final pw = provider.puzzleWidth;
+    final ph = provider.puzzleHeight;
+    return Column(
+      children: [
+        SizedBox(
+          width: pw,
+          height: ph,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              provider.puzzleImage!.value,
+              Positioned(
+                left: _sliderLeftPx,
+                child: provider.pieceImage!.value,
+              ),
+            ],
+          ),
+        ),
+        _buildSlider(pw),
+        if (_statusText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              _statusText!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+      ],
+    ).center();
   }
 
   @override
@@ -290,69 +557,26 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
         title: Text(FlutterI18n.translate(context, "login.slider_title")),
       ),
       body: FutureBuilder<SliderCaptchaClientProvider>(
-        future: provider,
+        future: _providerFuture,
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    updateProvider(statusText: "Try Again");
+                  });
+                },
+                icon: const Icon(Icons.refresh),
+              ),
+            );
+          }
+
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
-          } else {
-            return Column(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 堆叠三层，背景图、裁剪的拼图
-                SizedBox(
-                  width: snapshot.data!.puzzleWidth,
-                  height: snapshot.data!.puzzleHeight,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // 背景图层
-                      snapshot.data!.puzzleImage!.value,
-                      // 拼图层
-                      Positioned(
-                        left:
-                            _sliderValue * snapshot.data!.puzzleWidth -
-                            _offsetValue,
-                        child: snapshot.data!.pieceImage!.value,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: snapshot.data!.puzzleWidth,
-                  child: SliderTheme(
-                    data: SliderThemeData(
-                      thumbColor: Colors.white, // 滑块颜色为白色
-                      activeTrackColor: Colors.green[900], // 激活轨道颜色为深绿色
-                      inactiveTrackColor: Colors.green[900], // 非激活轨道颜色为深绿色
-                      trackHeight: 10.0, // 轨道高度
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 10.0,
-                      ), // 滑块形状为圆形
-                    ),
-                    child: Slider(
-                      value: _sliderValue,
-                      onChanged: (value) {
-                        setState(() {
-                          _sliderValue = value;
-                          //print(_sliderValue * snapshot.data!.puzzleWidth);
-                        });
-                      },
-                      onChangeEnd: (value) async {
-                        bool result = await snapshot.data!.verify(_sliderValue);
-                        if (context.mounted) {
-                          result
-                              ? Navigator.of(context).pop()
-                              : setState(() {
-                                  updateProvider();
-                                });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ).center();
           }
+
+          return _buildCaptcha(snapshot.data!);
         },
       ),
     );
