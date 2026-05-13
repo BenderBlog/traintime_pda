@@ -137,12 +137,12 @@ classtable:
   visual_settings:
     current_time_settings_title: 時間指示設置
     class_color_settings_title: 課表樣式設置
-    completed_style_enabled: 啟用課程樣式配置
+    completed_style_enabled: 啟用已完成課程樣式區分
     current_time_section: 時間指示
     show_current_time_indicator: 顯示當前時間指示線
     show_current_time_label: 顯示迷你數字時鐘
     show_today_column_highlight: 強調顯示今天的縱列
-    unfinished_section: 未開始課程樣式
+    unfinished_section: 課程樣式
     active_brightness_factor: '亮度: {value}'
     active_border_alpha: '邊框透明度: {value}'
     active_inner_alpha: '底色透明度: {value}'

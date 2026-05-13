@@ -470,104 +470,111 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         onChanged: (value) =>
                             setDialogState(() => activeInnerAlpha = value),
                       ),
-                      const Divider(height: 24),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.completed_section",
+                      if (completedEnabled) ...[
+                        const Divider(height: 24),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_section",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.completed_saturation_factor",
-                          translationParams: {
-                            "value": _formatPercent(completedSaturationFactor),
-                          },
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_saturation_factor",
+                            translationParams: {
+                              "value": _formatPercent(
+                                completedSaturationFactor,
+                              ),
+                            },
+                          ),
                         ),
-                      ),
-                      Slider(
-                        value: completedSaturationFactor,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) => setDialogState(
-                          () => completedSaturationFactor = value,
+                        Slider(
+                          value: completedSaturationFactor,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) => setDialogState(
+                            () => completedSaturationFactor = value,
+                          ),
                         ),
-                      ),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.completed_brightness_factor",
-                          translationParams: {
-                            "value": _formatPercent(completedBrightnessFactor),
-                          },
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_brightness_factor",
+                            translationParams: {
+                              "value": _formatPercent(
+                                completedBrightnessFactor,
+                              ),
+                            },
+                          ),
                         ),
-                      ),
-                      Slider(
-                        value: completedBrightnessFactor,
-                        min: 0.5,
-                        max: 1.0,
-                        divisions: 10,
-                        onChanged: (value) => setDialogState(
-                          () => completedBrightnessFactor = value,
+                        Slider(
+                          value: completedBrightnessFactor,
+                          min: 0.5,
+                          max: 1.0,
+                          divisions: 10,
+                          onChanged: (value) => setDialogState(
+                            () => completedBrightnessFactor = value,
+                          ),
                         ),
-                      ),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.completed_text_saturation_factor",
-                          translationParams: {
-                            "value": _formatPercent(
-                              completedTextSaturationFactor,
-                            ),
-                          },
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_text_saturation_factor",
+                            translationParams: {
+                              "value": _formatPercent(
+                                completedTextSaturationFactor,
+                              ),
+                            },
+                          ),
                         ),
-                      ),
-                      Slider(
-                        value: completedTextSaturationFactor,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) => setDialogState(
-                          () => completedTextSaturationFactor = value,
+                        Slider(
+                          value: completedTextSaturationFactor,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) => setDialogState(
+                            () => completedTextSaturationFactor = value,
+                          ),
                         ),
-                      ),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.completed_border_alpha",
-                          translationParams: {
-                            "value": _formatPercent(completedBorderAlpha),
-                          },
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_border_alpha",
+                            translationParams: {
+                              "value": _formatPercent(completedBorderAlpha),
+                            },
+                          ),
                         ),
-                      ),
-                      Slider(
-                        value: completedBorderAlpha,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) =>
-                            setDialogState(() => completedBorderAlpha = value),
-                      ),
-                      Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.visual_settings.completed_inner_alpha",
-                          translationParams: {
-                            "value": _formatPercent(completedInnerAlpha),
-                          },
+                        Slider(
+                          value: completedBorderAlpha,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) => setDialogState(
+                            () => completedBorderAlpha = value,
+                          ),
                         ),
-                      ),
-                      Slider(
-                        value: completedInnerAlpha,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) =>
-                            setDialogState(() => completedInnerAlpha = value),
-                      ),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_inner_alpha",
+                            translationParams: {
+                              "value": _formatPercent(completedInnerAlpha),
+                            },
+                          ),
+                        ),
+                        Slider(
+                          value: completedInnerAlpha,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) =>
+                              setDialogState(() => completedInnerAlpha = value),
+                        ),
+                      ],
                     ],
                   ),
                 ),
