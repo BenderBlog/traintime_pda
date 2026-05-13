@@ -171,7 +171,7 @@ classtable:
    visual_settings:
       current_time_settings_title: "Time indicator settings"
       class_color_settings_title: "Class color settings"
-      completed_style_enabled: "Show completed class styling"
+      completed_style_enabled: "Enable class styling configuration"
       current_time_section: "Time indicators"
       show_current_time_indicator: "Show current time indicator"
       show_current_time_label: "Show mini time label"
