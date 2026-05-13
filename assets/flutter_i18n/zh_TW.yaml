@@ -135,6 +135,7 @@ classtable:
   visual_settings:
     current_time_settings_title: 時間指示設置
     class_color_settings_title: 课表样式设置
+    completed_style_enabled: 顯示已结束課程樣式
     current_time_section: 時間指示
     show_current_time_indicator: 顯示當前時間指示線
     show_current_time_label: 顯示迷你数字時钟

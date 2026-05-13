@@ -366,6 +366,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   }
 
   Future<void> _showClassColorSettingsDialog() async {
+    var completedEnabled = CompletedClassStyleConfig.completedEnabled;
     var activeBrightnessFactor = CompletedClassStyleConfig
         .activeBrightnessFactor
         .clamp(0.5, 1.0)
@@ -401,6 +402,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_style_enabled",
+                          ),
+                        ),
+                        value: completedEnabled,
+                        onChanged: (value) =>
+                            setDialogState(() => completedEnabled = value),
+                      ),
+                      const Divider(height: 24),
                       Text(
                         FlutterI18n.translate(
                           context,
@@ -581,6 +595,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       return;
     }
 
+    CompletedClassStyleConfig.completedEnabled = completedEnabled;
     CompletedClassStyleConfig.activeBrightnessFactor = activeBrightnessFactor
         .clamp(0.5, 1.0)
         .toDouble();
