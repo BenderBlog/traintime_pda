@@ -11,7 +11,7 @@ class CompletedClassStyleConfig {
   /// Default tuning parameters for completed classes.
   /// Completed-card color tuning.
   /// Lower values make finished classes look more muted and faded.
-  static bool completedEnabled = true;
+  static bool completedEnabled = false;
   static double completedSaturationFactor = 0.25;
   static double completedBrightnessFactor = 0.75;
   static double completedTextSaturationFactor = 0.75;
