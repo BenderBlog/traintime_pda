@@ -361,10 +361,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
           onPressed: () {
             context.pushReplacement(
               LayoutBuilder(
-                builder: (context, constraints) => ClassTableWindow(
-                  parentContext: context,
-                  constraints: constraints,
-                ),
+                builder: (context, constraints) =>
+                    ClassTableWindow(constraints: constraints),
               ),
             );
           },

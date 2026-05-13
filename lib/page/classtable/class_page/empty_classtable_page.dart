@@ -114,8 +114,7 @@ class EmptyClassTablePage extends StatelessWidget {
                 ? Icons.arrow_back_ios
                 : Icons.arrow_back,
           ),
-          onPressed: () =>
-              Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           if (hasError)

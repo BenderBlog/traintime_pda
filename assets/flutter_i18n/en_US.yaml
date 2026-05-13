@@ -355,6 +355,7 @@ electricity:
    water_usage_read_before: "Last time"
    water_usage_read_now: "This time"
    water_usage: "Bath water usage"
+   not_school_network: "Not school network"
 
 # 空闲教室
 empty_classroom:
@@ -1027,6 +1028,7 @@ setting:
          description)"
       cafebabe: "Support: provide Easter egg code"
       chitao1234: "Development: fix slider misalignment issue"
+      copperkoi: "Development: latest time arrangement sync to calendar"
       dimole: "Development support: assist in fixing slider issue"
       elitewars: "Design: sports score page"
       elliot: "Internationalization: English translation / Development guidance: on
@@ -1042,6 +1044,8 @@ setting:
       imoscarz: "Development: Homepage for software / Development: Checkin check for
          pad / Development: Sport UI Change"
       ka-mate-ka-ora: "Internationalization: English correction"
+      lagrange-x: "Development: Class progress indicator (adopted) / Development: Gray
+         cover on attended class"
       lhx-666-cool: "Support: Windows and Linux build scripts"
       lichtyy: "Design: color pattern and blank page picture / Development: HTML
          reader for the experiment system"
@@ -1051,6 +1055,7 @@ setting:
          Internationalization: English correction"
       nancunchild: "Development: library search function / Internationalization:
          English correction"
+      nkanf: "Development: Class progress indicator (original)"
       pairman: "Development: score cache and optimize slider algorithm /
          Internationalization: English correction"
       reverierxu: "Design: REX card for information display / Development support: on

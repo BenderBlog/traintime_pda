@@ -110,7 +110,6 @@ class _ContentPageState extends State<ContentPage> {
           },
         ),
         const Divider(),
-        // TODO: REFACTOR THESE CODE
         ListenableBuilder(
           listenable: _comments,
           builder: (BuildContext context, Widget? child) => FutureBuilder<List<XDUPlanetComment>>(
