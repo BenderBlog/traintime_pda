@@ -159,7 +159,7 @@ classtable:
     visual_settings:
         current_time_settings_title: "时间指示设置"
         class_color_settings_title: "课表样式设置"
-        completed_style_enabled: "启用已完成课程样式区分"
+        completed_style_enabled: "启用已结束课程样式区分"
         current_time_section: "时间指示"
         show_current_time_indicator: "显示当前时间指示线"
         show_current_time_label: "显示迷你数字时钟"
