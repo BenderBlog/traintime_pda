@@ -131,6 +131,10 @@ enum Preference {
     key: "classStyleCompletedBrightnessFactor",
     type: "double",
   ), // 已完成课程亮度
+  classStyleCompletedEnabled(
+    key: "classStyleCompletedEnabled",
+    type: "bool",
+  ), // 是否启用已完成课程样式
   classStyleCompletedTextSaturationFactor(
     key: "classStyleCompletedTextSaturationFactor",
     type: "double",

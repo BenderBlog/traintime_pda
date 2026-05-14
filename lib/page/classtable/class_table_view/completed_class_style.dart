@@ -11,17 +11,24 @@ class CompletedClassStyleConfig {
   /// Default tuning parameters for completed classes.
   /// Completed-card color tuning.
   /// Lower values make finished classes look more muted and faded.
+  static bool completedEnabled = false;
   static double completedSaturationFactor = 0.25;
   static double completedBrightnessFactor = 0.75;
   static double completedTextSaturationFactor = 0.75;
   static double completedBorderAlpha = 0.75;
   static double completedInnerAlpha = 0.75;
+
   /// Active-card baseline appearance.
   static double activeBrightnessFactor = 1.0;
   static double activeBorderAlpha = 1.0;
   static double activeInnerAlpha = 0.9;
 
   static void loadFromPreference() {
+    if (preference.contains(preference.Preference.classStyleCompletedEnabled)) {
+      completedEnabled = preference.getBool(
+        preference.Preference.classStyleCompletedEnabled,
+      );
+    }
     if (preference.contains(
       preference.Preference.classStyleActiveBrightnessFactor,
     )) {
@@ -89,6 +96,10 @@ class CompletedClassStyleConfig {
   }
 
   static Future<void> saveToPreference() async {
+    await preference.setBool(
+      preference.Preference.classStyleCompletedEnabled,
+      completedEnabled,
+    );
     await preference.setDouble(
       preference.Preference.classStyleActiveBrightnessFactor,
       activeBrightnessFactor.clamp(0.5, 1.0).toDouble(),
@@ -165,30 +176,32 @@ class CompletedClassStyle {
     required MaterialColor palette,
     required bool isCompleted,
   }) {
+    final useCompletedStyle =
+        isCompleted && CompletedClassStyleConfig.completedEnabled;
     final saturationFactor = isCompleted
         ? CompletedClassStyleConfig.completedSaturationFactor
         : 1.0;
     final brightnessFactor =
-        (isCompleted
+        (useCompletedStyle
                 ? CompletedClassStyleConfig.completedBrightnessFactor
                 : CompletedClassStyleConfig.activeBrightnessFactor)
             .clamp(0.5, 1.0)
             .toDouble();
-    final borderColor = isCompleted
+    final borderColor = useCompletedStyle
         ? _tuneColor(
             palette.shade300,
             saturationFactor: saturationFactor,
             brightnessFactor: brightnessFactor,
           )
         : _adjustBrightness(palette.shade300, factor: brightnessFactor);
-    final innerColor = isCompleted
+    final innerColor = useCompletedStyle
         ? _tuneColor(
             palette.shade100,
             saturationFactor: saturationFactor,
             brightnessFactor: brightnessFactor,
           )
         : _adjustBrightness(palette.shade100, factor: brightnessFactor);
-    final textColor = isCompleted
+    final textColor = useCompletedStyle
         ? _tuneColor(
             palette.shade900,
             saturationFactor:
@@ -201,10 +214,10 @@ class CompletedClassStyle {
       borderColor: borderColor,
       innerColor: innerColor,
       textColor: textColor,
-      borderAlpha: isCompleted
+      borderAlpha: useCompletedStyle
           ? CompletedClassStyleConfig.completedBorderAlpha
           : CompletedClassStyleConfig.activeBorderAlpha,
-      innerAlpha: isCompleted
+      innerAlpha: useCompletedStyle
           ? CompletedClassStyleConfig.completedInnerAlpha
           : CompletedClassStyleConfig.activeInnerAlpha,
     );
