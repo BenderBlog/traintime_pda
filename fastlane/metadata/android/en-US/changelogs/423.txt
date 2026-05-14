@@ -1,0 +1,13 @@
+Note: Due to development constraints, the "Network Query" feature was not fully completed and has been temporarily removed.
+
+1. Physics Lab Data Export Optimization – @CopperKoi
+2. Physics Lab Data Retrieval Fix – @XingShuyu
+3. Dormitory Water Dispenser Implementation (Hui Shenghuo 789) – @A1nair
+4. Architecture & Cache Display Optimization – @BenderBlog
+5. System Notification Fixes – @hazuki-keatsu
+6. System Calendar Export: Added support for sync updates – @CopperKoi
+7. New Electricity Fee System Adaptation – @BenderBlog
+8. Schedule Visual Enhancements & Current Time Indicator – @Lagrange-X
+   Initial Time Indicator Implementation – @nkanf-dev
+9. New Version Slider Captcha Implementation – @lhx-666-cool @Steesha
+10. macOS Build Adaptation – @nkanf-dev

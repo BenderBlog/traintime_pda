@@ -5,7 +5,7 @@ This software is originally called "Traintime PDA".
  - Both undergraduates and postgraduates are supported.
  - View classtable with exam arrangement and experiment arrangement, also set your idol as the background, or exchange the classtable with your sweetie.
  - View sport related data: sport class detail and test score. (Punch machine will be sorely missed)
- - Check your dorm's electricity balance, (maybe) pay your electricty fee and check your historical electricity usage. (Postgraduates shall enter the electricity account manually)
+ - Check your dorm's electricity balance and check your historical electricity usage.
  - View your grade, easily calculate GPA and average score by choosing the subjects.
  - View the exam schedule.
  - View the due time of the borrowed books and query the details of the books in the library.
@@ -14,10 +14,11 @@ This software is originally called "Traintime PDA".
  - Physics experiment schedule check and output it to iCalendar.
  - Other tools such as call for repairing, school email, etc.
  - XDU Planet: Look around the blogs of your schoolmates.
- - Schoolnet Query.
+ - Schoolnet Query. (temporarily removed, will be returned very soon)
  - Attendance Query.
  - Homepage widget.
  - i18n support with Traditional Chinese and English.
+ - iLife789 support
  - Notice before class.
 
 If you got some idea about it, contact me freely.

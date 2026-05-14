@@ -1,0 +1,13 @@
+注：开发精力问题，网费没有彻底写完，暂时移除。
+
+1. 物理实验导出信息优化 @CopperKoi
+2. 物理实验获取修复 @XingShuyu
+3. 宿舍水机（慧生活789）的实现 @A1nair
+4. 架构优化和缓存显示优化 @BenderBlog
+5. 系统通知修复 @hazuki-keatsu
+6. 系统日历导出支持同步更新 @CopperKoi
+7. 新电费系统适配 @BenderBlog
+8. 课表视觉改进和当前时间指示器 @Lagrange-X
+   最开始的时间指示器实现 @nkanf-dev
+9. 新版滑块验证码实现 @lhx-666-cool @Steesha
+10. MacOS 构建适配 @nkanf-dev

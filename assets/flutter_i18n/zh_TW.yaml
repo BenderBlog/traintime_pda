@@ -137,7 +137,7 @@ classtable:
   visual_settings:
     current_time_settings_title: 時間指示設置
     class_color_settings_title: 課表樣式設置
-    completed_style_enabled: 已结束課程樣式區分
+    completed_style_enabled: 已結束課程樣式區分
     current_time_section: 時間指示
     show_current_time_indicator: 顯示當前時間指示線
     show_current_time_label: 顯示迷你數字時鐘
@@ -913,7 +913,7 @@ setting:
     bellssgit: 支持：最佳&最久故障反饋者
     brackrat: 設計：主頁，登錄頁，配色，iOS 小部件等
     breezeline: 支持：無價值無意義的產品經理(他自己的描述)
-    cafebabe: 支持：提供彩蛋代碼
+    cafebabe: 支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配
     chitao1234: 開發：修復滑塊不對齊問題
     copperkoi: 開發：系統日曆最新課表同步
     dimole: 開發支持：輔助修復滑塊問題
@@ -927,14 +927,14 @@ setting:
     hhzm: 開發：電費查詢賬號計算
     imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
     ka-mate-ka-ora: 國際化：軟件英語翻譯優化
-    lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化
-    lhx-666-cool: 支持：Windows 和 Linux 構建腳本
+    lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性
+    lhx-666-cool: 支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配
     lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
     lqsy-h: 支持：推文宣傳圖片製作
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
     nancunchild: 開發：圖書館搜索功能 / 國際化：優化英語翻譯
-    nkanf: 開發：課程表時間進度展示（初版方案）
+    nkanf: 開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持
     pairman: 開發：成績緩存功能和優化滑塊算法 / 國際化：優化英語翻譯
     reverierxu: 設計：用於信息展示的 ReX 卡片 / 開發支持：研究生課表
     rrrilac: 開發支持：電費查詢
@@ -1069,45 +1069,70 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: 'Time to get some electric STUFF...
-
-  ...to get high
+easter_egg_apple: '向日葵繼續躲著大豬尾草的影子，繼續走到了友枝縣城。
 
 
-  I am dry for long time...
+  小櫻：快變回你本來的樣子吧！唔誒，咋沒有啥反應啊？
 
-  ...because of the pigs
+  知世：啊，怎麼辦啊？
 
+  小明：我的羅盤告訴我這個地方有兩個魔法來源。
 
-  They said ''No animal shall drink alcohol.''...
-
-  ...but Napoleon''s COUNTRY SON always walking in circle
-
-
-  So I got to secretly hide my bootleg PARAPHERNALIA...
-
-  ...in a place under the sun, where pigs hates
+  小可：嗯嗯，小鬼也有靠譜的時候啊。小櫻，你在感受一下吧。
 
 
-  Waiting for stupid pig''s...
+  小櫻閉上了眼睛，仔細感覺世界八方的信息。突然，他朝向了黑水河公園。
 
-  ...BLACK COMEDY plays'
-easter_egg_others: '向日葵小姐做夢了
-
-  她身上裝飾了很多寶石
-
-  遠處看像是出席舞會的貴族小姐
+  小櫻：我們快去公園，那裡很多人呢！姐姐，你跟我們走吧。
 
 
-  她和英俊的王子跳舞
+  向日葵坐著小可飛向了黑水河公園，不出所料。豬尾草大軍的紙條團團包圍了整個公園，公園西南角的山上一堆人焦急且無助的看著。
 
-  她們都有點臉紅
 
-  又有點神智不清
+  小可：這是樹的魔法牌，樹和水是好朋友，他們立下契約，永不分離。水的魔法牌在這個公園裡，她們互相感應到了，於是互相靠近。
 
-  突然，他把她抱起來
+  向日葵：先別管我為啥跟你們來，我也不知道這些是啥，能解決嗎？
 
-  舉到了空中'
+  小櫻和知世：看我的！
+
+
+  小櫻和知世降落到了公園，知世唱起了歌，甜美的歌聲傳遍了公園，安頓了人民，豬尾草也不在狂怒地搖擺。
+
+  小櫻：樹啊、水啊，我在此立正，你們倆再也不會分開啦。我將好好地保護你們遠離世間的喧囂，請你們變回你們的樣子吧。
+
+
+  豬尾草的藤條和黑水河公園中心的珍珠飛向了天空，互相纏繞，然後向四周散去，這是人們看到的。
+
+  實際上，這也是小櫻的魔法，他讓這些魔法陣四處散去後在她的背後匯聚成了一張牌。
+
+
+  小櫻：謝謝小明提醒我有兩個魔法的氣息。
+
+  小明臉紅了。'
+easter_egg_others: '向日葵是一個生物學家
+
+  她發現了大豬尾草無處不在
+
+
+  村民A：快掉頭跑吧，姑娘！它們無處不在，臺階、馬路、甚至我家水缸裡都是！
+
+  村民B：你看我手裡的傢伙，扽掉這玩意咋粘貼得死啦死啦的。我的天，牆皮都掉了。
+
+  村民C：還牆皮呢，它又長回去啦！
+
+
+  村民A：你看了吧，姑娘。當年我這八里不著的村裡來個幻想鄉的，她們玩過來，撒了這個種子。
+
+  村民D：本來吧，我們都稀罕。這玩意也不長葉子，也不結花，反倒長個燈籠樣的小水壺。
+
+  村民B：我也不知道腦力抽了哪根筋，我把這玩意摘回家，當我水桶的舀子。這玩意比拼多多買的塑料玩意還結實，那玩意用了四五次把手準得掉。
+
+  村民C：（打了一小下村民B）你還有心思說？就你捎回來這玩意，過不了幾天，整個水桶都要被這玩意裝滿了！咱們家可就被你這玩意毀啦。
+
+
+  村長：你們四個還掙扎啥啊，鄉里讓你們趕緊撤了。政府在友知縣體育館和友知北山搞了避難所，快去吧！
+
+  村長轉向向日葵：同志啊，您看這大豬尾草，也就那倆地方它還長不上去，也不知道這玩意對我們有啥仇啊:P'
 easter_egg_robot:
   appbar: 歡迎你，同學！
   title: 看看這些要開學的學生們吧！
