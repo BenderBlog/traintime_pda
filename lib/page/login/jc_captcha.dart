@@ -8,30 +8,12 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
-import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:image/image.dart' as img;
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
-
-// AES-CBC encryption with Pkcs7 padding
-final _rng = Random();
-const int _blockSize = 16;
-const String _aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
-
-String aesEncrypt(String text, Uint8List keyBytes) {
-  final randstr = [
-    for (int i = 0; i < _blockSize * 5; i++)
-      _aesChars[_rng.nextInt(_aesChars.length)],
-  ].join();
-  final plain = randstr.substring(0, 63) + text; // prepend 64B nonce
-  final key = encrypt.Key(keyBytes);
-  final iv = encrypt.IV.fromUtf8(randstr.substring(64, 79)); // 16B iv
-  return encrypt.Encrypter(
-    encrypt.AES(key, mode: encrypt.AESMode.cbc),
-  ).encrypt(plain, iv: iv).base64;
-}
+import 'package:watermeter/repository/network_session.dart';
 
 class Lazy<T> {
   final T Function() _initializer;
@@ -308,6 +290,7 @@ class SliderCaptchaClientProvider {
   /// Finger move track generation
   ///
 
+  static final _rng = Random();
   static final _genTracksNorm = 1.0 / (1.0 + exp(-7.0 * (1.0 - 0.42)));
 
   // generate track along an skewed sigmoid curve

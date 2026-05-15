@@ -5,15 +5,35 @@
 // General network class.
 
 import 'dart:io';
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/widgets.dart';
+import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
+
+/// AES-CBC encryption with Pkcs7 padding
+/// used for IDS CAPTCHA payload & password encryption
+final _rng = Random();
+const int _blockSize = 16;
+const String _aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+
+String aesEncrypt(String text, Uint8List keyBytes) {
+  final randstr = [
+    for (int i = 0; i < _blockSize * 5; i++)
+      _aesChars[_rng.nextInt(_aesChars.length)],
+  ].join();
+  final plain = randstr.substring(0, 63) + text; // prepend 64B nonce
+  final key = encrypt.Key(keyBytes);
+  final iv = encrypt.IV.fromUtf8(randstr.substring(64, 79)); // 16B iv
+  return encrypt.Encrypter(
+    encrypt.AES(key, mode: encrypt.AESMode.cbc),
+  ).encrypt(plain, iv: iv).base64;
+}
 
 class NetworkSession {
   static SessionState _isInit = SessionState.none;
