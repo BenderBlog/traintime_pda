@@ -507,6 +507,7 @@ class ClassTableSession extends EhallSession {
     );
 
     while (toDeal.isNotEmpty) {
+      int previousLength = toDeal.length;
       List<int> toBeRemovedIndex = [];
       for (var e in toDeal) {
         /// First, search for the classes.
@@ -523,6 +524,44 @@ class ClassTableSession extends EhallSession {
           "Class change related to class index $indexClassDetailList.",
         );
 
+        /// If the class is not in the main schedule, create a new entry.
+        if (indexClassDetailList.isEmpty) {
+          if (e.type == ChangeType.patch) {
+            log.info(
+              "[getClasstable][getEhall] "
+              "Class ${e.className} (${e.classCode}) not in main schedule, "
+              "creating new ClassDetail for patch.",
+            );
+            var newDetail = ClassDetail(
+              name: e.className,
+              code: e.classCode,
+              number: e.classNumber,
+            );
+            preliminaryData.classDetail.add(newDetail);
+            int newIndex = preliminaryData.classDetail.length - 1;
+            preliminaryData.timeArrangement.add(
+              TimeArrangement(
+                source: Source.school,
+                index: newIndex,
+                weekList: e.newAffectedWeeks ?? e.originalAffectedWeeks ?? [],
+                day: e.newWeek ?? e.originalWeek ?? 0,
+                start: e.newClassRange[0],
+                stop: e.newClassRange[1],
+                classroom: e.newClassroom ?? e.originalClassroom,
+                teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
+              ),
+            );
+          } else {
+            log.warning(
+              "[getClasstable][getEhall] "
+              "Class ${e.className} (${e.classCode}) not found in main schedule, "
+              "skipping class change entry (type: ${e.type}).",
+            );
+          }
+          toBeRemovedIndex.add(toDeal.indexOf(e));
+          continue;
+        }
+
         /// Then, if patch, find the class and add one
         if (e.type == ChangeType.patch) {
           log.info(
@@ -535,15 +574,14 @@ class ClassTableSession extends EhallSession {
             TimeArrangement(
               source: Source.school,
               index: indexClassDetailList.first,
-              weekList: e.newAffectedWeeks!,
-              day: e.newWeek!,
+              weekList: e.newAffectedWeeks ?? e.originalAffectedWeeks ?? [],
+              day: e.newWeek ?? e.originalWeek ?? 0,
               start: e.newClassRange[0],
               stop: e.newClassRange[1],
               classroom: e.newClassroom ?? e.originalClassroom,
               teacher: e.isTeacherChanged ? e.newTeacher : e.originalTeacher,
             ),
           );
-          toBeRemovedIndex.add(toDeal.indexOf(e));
           continue;
         }
 
@@ -572,8 +610,11 @@ class ClassTableSession extends EhallSession {
           "Class change related to time arrangement index $indexOriginalTimeArrangementList.",
         );
 
-        /// If empty, wait for the next turn...
-        if (indexOriginalTimeArrangementList.isEmpty) continue;
+        /// If empty, remove from toDeal to avoid infinite loop.
+        if (indexOriginalTimeArrangementList.isEmpty) {
+          toBeRemovedIndex.add(toDeal.indexOf(e));
+          continue;
+        }
 
         if (e.type == ChangeType.change) {
           int timeArrangementIndex = indexOriginalTimeArrangementList.first;
@@ -591,6 +632,16 @@ class ClassTableSession extends EhallSession {
               "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
             );
             for (int i in e.originalAffectedWeeksList) {
+              var weekList = preliminaryData
+                  .timeArrangement[indexOriginalTimeArrangement]
+                  .weekList;
+              if (i >= weekList.length) {
+                int oldLength = weekList.length;
+                weekList.addAll(List.filled(i + 1 - oldLength, false));
+                if (weekList.length > preliminaryData.semesterLength) {
+                  preliminaryData.semesterLength = weekList.length;
+                }
+              }
               log.info(
                 "[getClasstable][getEhall] "
                 "Week $i, status ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}.",
@@ -674,8 +725,8 @@ class ClassTableSession extends EhallSession {
             TimeArrangement(
               source: Source.school,
               index: timeArrangementIndex,
-              weekList: e.newAffectedWeeks!,
-              day: e.newWeek!,
+              weekList: e.newAffectedWeeks ?? e.originalAffectedWeeks ?? [],
+              day: e.newWeek ?? e.originalWeek ?? 0,
               start: e.newClassRange[0],
               stop: e.newClassRange[1],
               classroom: e.newClassroom ?? e.originalClassroom,
@@ -697,6 +748,16 @@ class ClassTableSession extends EhallSession {
               "with originalAffectedWeeksList ${e.originalAffectedWeeksList}.",
             );
             for (int i in e.originalAffectedWeeksList) {
+              var weekList = preliminaryData
+                  .timeArrangement[indexOriginalTimeArrangement]
+                  .weekList;
+              if (i >= weekList.length) {
+                int oldLength = weekList.length;
+                weekList.addAll(List.filled(i + 1 - oldLength, false));
+                if (weekList.length > preliminaryData.semesterLength) {
+                  preliminaryData.semesterLength = weekList.length;
+                }
+              }
               log.info(
                 "[getClasstable][getEhall] "
                 "$i ${preliminaryData.timeArrangement[indexOriginalTimeArrangement].weekList[i]}",
@@ -727,6 +788,17 @@ class ClassTableSession extends EhallSession {
         "[getClasstable][getEhall] "
         "After this turn, ${toDeal.length} left, removed $toBeRemovedIndex.",
       );
+
+      /// Safety: if no progress was made in this pass, break to avoid infinite loop.
+      if (toDeal.length == previousLength) {
+        log.warning(
+          "[getClasstable][getEhall] "
+          "No progress made in class change processing. "
+          "Remaining ${toDeal.length} change(s) could not be resolved. "
+          "Breaking to avoid infinite loop.",
+        );
+        break;
+      }
     }
 
     return preliminaryData;
