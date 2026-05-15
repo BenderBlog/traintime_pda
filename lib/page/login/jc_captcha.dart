@@ -92,6 +92,8 @@ class SliderCaptchaClientProvider {
     log.info("Solving slider captcha automatically");
     // multiple tries
     for (int i = 0; i < 6; ++i) {
+      // refresh captcha
+      await updatePuzzle();
       final offset = solveOffset(_puzzleData!, _pieceData!);
       if (offset == null) throw CaptchaSolveFailedException();
       final int baseMove = (offset * _puzzleWidth).round();
