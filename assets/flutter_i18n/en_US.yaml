@@ -42,6 +42,17 @@ login_process:
    slider: "Solving slider captcha"
    after_process: "Post-login processing"
    failed: "Login failed, response status code: {statusCode}"
+   image_captcha:
+      title: "Enter Captcha"
+      refresh_hint: "Tap image to refresh"
+      hint: "Enter captcha"
+      confirm: "Confirm"
+fido_process:
+   prepare: "Preparing FIDO login"
+   start_assertion: "Requesting assertion"
+   signing: "Signing"
+   submitting: "Submitting"
+   done: "Login complete"
 # TODO: ehall_exam_session data
 
 no_info: "No information"
@@ -677,6 +688,10 @@ login:
       hint: "Input captcha"
       message_on_empty: "Please enter captcha"
    slider_title: "Server authentication service"
+   fido_quick_login: "FIDO Quick Login"
+   fido_login_progress: "Logging in with FIDO..."
+   fido_login_failed: "FIDO login failed: {message}"
+   fido_login_fallback: "FIDO login failed, please use password login"
 
 # 校园网信息
 school_net:
@@ -826,6 +841,29 @@ setting:
    electricity_account_setting: "Electricity account setting"
    schoolnet_password_setting: "Campus net password"
    schoolnet_password_description: "If you have not setted it, you cannot query it."
+   # FIDO Quick Login
+   fido_setting: "FIDO Quick Login"
+   fido_registered: "Registered"
+   fido_not_registered: "Not registered"
+   fido_login_required: "Please log in first"
+   fido_register_success: "FIDO registration successful"
+   fido_register_failed: "FIDO registration failed: {error}"
+   fido_delete_title: "Delete FIDO Credential"
+   fido_delete_content: "Are you sure you want to delete the FIDO credential? You will need to re-register to use FIDO login."
+   fido_delete_success: "FIDO credential deleted"
+   fido_delete_failed: "FIDO deletion failed: {error}"
+   fido_prompt_title: "Enable FIDO Quick Login?"
+   fido_prompt_content: |-
+      FIDO is an alternative login method for when password login has issues.
+
+      · No captcha needed: bypasses slider and image captcha verification
+      · Backup login: works normally when password login encounters problems
+      · Device-based authentication: uses device key pair instead of password
+   fido_prompt_register: "Register Now"
+   fido_prompt_skip: "Maybe Later"
+   fido_prompt_registering: "Registering FIDO..."
+   fido_prompt_success: "FIDO registered! You can use quick login next time"
+   fido_prompt_failed: "FIDO registration failed: {error}"
    # 通知设置
    notification_setting: "Notification Settings"
    course_reminder_setting: "Pre-class Reminder Settings"
@@ -1037,6 +1075,7 @@ setting:
       english: "English"
    semester_change: Change semester
    semester_change_description: Using semester {semester}
+   updating_data: "Updating data"
    semester_update_data: "Applying new semester setting"
    # 关于页面
    easter_egg_page: "You found an Easter egg"

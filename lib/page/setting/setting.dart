@@ -46,6 +46,9 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
+import 'package:watermeter/repository/xidian_ids/fido_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_recheck.dart';
+import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
@@ -99,6 +102,153 @@ class _SettingWindowState extends State<SettingWindow> {
     while (_isSemesterAwareControllerLoading &&
         stopwatch.elapsed < const Duration(seconds: 30)) {
       await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
+  Future<void> _registerFido() async {
+    if (offline) {
+      if (!context.mounted) return;
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "setting.fido_login_required"),
+      );
+      return;
+    }
+
+    try {
+      final recheck = IdsRecheck();
+
+      // Ensure authenticated session for /personalInfo service
+      await recheck.ensurePersonalInfoSession();
+
+      final necessary = await recheck.isNecessary();
+
+      if (necessary) {
+        if (!context.mounted) return;
+        await recheck.recheckByPassword(
+          context: context,
+          password: preference.getString(preference.Preference.idsPassword),
+        );
+      }
+
+      if (!context.mounted) return;
+
+      final fido = FidoSession();
+      await fido.register(context: context);
+
+      if (!context.mounted) return;
+      setState(() {});
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "setting.fido_register_success"),
+      );
+    } catch (e) {
+      log.warning("[setting] FIDO registration failed: $e");
+      if (!context.mounted) return;
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "setting.fido_register_failed",
+          translationParams: {"error": e.toString()},
+        ),
+      );
+    }
+  }
+
+  Future<void> _deleteFido() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(FlutterI18n.translate(context, "setting.fido_delete_title")),
+        content: Text(FlutterI18n.translate(context, "setting.fido_delete_content")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(FlutterI18n.translate(context, "cancel")),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(FlutterI18n.translate(context, "confirm")),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      // 1. Ensure authenticated session + recheck
+      final recheck = IdsRecheck();
+      await recheck.ensurePersonalInfoSession();
+      final necessary = await recheck.isNecessary();
+
+      if (necessary) {
+        if (!context.mounted) return;
+        await recheck.recheckByPassword(
+          context: context,
+          password: preference.getString(preference.Preference.idsPassword),
+        );
+      }
+
+      // 2. Server-side delete
+      // The deleteDevice endpoint expects the student ID (username) as 'response',
+      // not the userHandle.
+      final credentialId =
+          preference.getString(preference.Preference.fidoCredentialId);
+      final username =
+          preference.getString(preference.Preference.idsAccount);
+
+      await recheck.deleteDevice(
+        credentialId: credentialId,
+        username: username,
+      );
+
+      // 3. Clear local credentials
+      await preference.remove(preference.Preference.fidoCredentialId);
+      await preference.remove(preference.Preference.fidoPrivateKeyPem);
+      await preference.remove(preference.Preference.fidoUserHandle);
+      await preference.remove(preference.Preference.fidoAnonbiometricsd);
+      await preference.setBool(preference.Preference.fidoEnabled, false);
+
+      if (!context.mounted) return;
+      setState(() {});
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "setting.fido_delete_success"),
+      );
+    } catch (e) {
+      log.warning("[setting] FIDO deletion failed: $e");
+      if (!context.mounted) return;
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "setting.fido_delete_failed",
+          translationParams: {"error": e.toString()},
+        ),
+      );
+    }
+  }
+
+  /// Try to delete FIDO credential from server before clearing local data.
+  /// Silently ignores errors since we're clearing data anyway.
+  Future<void> _tryDeleteFido() async {
+    if (!preference.getBool(preference.Preference.fidoEnabled)) return;
+    try {
+      final recheck = IdsRecheck();
+      await recheck.ensurePersonalInfoSession();
+      final credentialId =
+          preference.getString(preference.Preference.fidoCredentialId);
+      final username =
+          preference.getString(preference.Preference.idsAccount);
+      await recheck.deleteDevice(
+        credentialId: credentialId,
+        username: username,
+      );
+      log.info("[setting] FIDO credential deleted from server before logout.");
+    } catch (e) {
+      log.warning("[setting] Failed to delete FIDO from server (continuing): $e");
     }
   }
 
@@ -427,6 +577,23 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                 ],
+                ListTile(
+                  title: Text(FlutterI18n.translate(context, "setting.fido_setting")),
+                  subtitle: Text(
+                    preference.getBool(preference.Preference.fidoEnabled)
+                        ? FlutterI18n.translate(context, "setting.fido_registered")
+                        : FlutterI18n.translate(context, "setting.fido_not_registered"),
+                  ),
+                  trailing: preference.getBool(preference.Preference.fidoEnabled)
+                      ? IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => _deleteFido(),
+                        )
+                      : const Icon(Icons.navigate_next),
+                  onTap: preference.getBool(preference.Preference.fidoEnabled)
+                      ? null
+                      : () => _registerFido(),
+                ),
                 /*
                 ListTile(
                   title: Text(
@@ -746,7 +913,10 @@ class _SettingWindowState extends State<SettingWindow> {
                       if (value == true) {
                         setState(() {});
                         if (context.mounted) {
-                          showToast(context: context, msg: "Updating data");
+                          showToast(
+                            context: context,
+                            msg: FlutterI18n.translate(context, "setting.updating_data"),
+                          );
                         }
                         await _waitForSemesterAwareReloads();
                         await maybeAutoSyncSystemCalendar();
@@ -831,6 +1001,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                 "setting.clear_and_restart_dialog.cleaning",
                               ),
                             );
+                            await _tryDeleteFido();
                             try {
                               await NetworkSession().clearCookieJar();
                             } on PathNotFoundException {
@@ -904,6 +1075,9 @@ class _SettingWindowState extends State<SettingWindow> {
                                 "setting.logout_dialog.logging_out",
                               ),
                             );
+
+                            /// Delete FIDO from server before clearing cookies
+                            await _tryDeleteFido();
 
                             /// Clean Cookie
                             try {

@@ -146,7 +146,12 @@ enum Preference {
   classStyleCompletedInnerAlpha(
     key: "classStyleCompletedInnerAlpha",
     type: "double",
-  ); // 已完成课程底色透明度
+  ), // 已完成课程底色透明度
+  fidoCredentialId(key: "fidoCredentialId", type: "String"),
+  fidoPrivateKeyPem(key: "fidoPrivateKeyPem", type: "String"),
+  fidoUserHandle(key: "fidoUserHandle", type: "String"),
+  fidoAnonbiometricsd(key: "fidoAnonbiometricsd", type: "String"),
+  fidoEnabled(key: "fidoEnabled", type: "bool");
 
   const Preference({required this.key, this.type = "String"});
 

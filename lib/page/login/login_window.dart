@@ -4,6 +4,7 @@
 
 // Login window of the program.
 
+import 'dart:io';
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,8 @@ import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/xidian_ids/fido_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_recheck.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
 
@@ -104,6 +107,18 @@ class _LoginWindowState extends State<LoginWindow> {
           }
         },
       ),
+      if (preference.getBool(preference.Preference.fidoEnabled)) ...[
+        const SizedBox(height: 8.0),
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+          ),
+          child: Text(FlutterI18n.translate(context, "login.fido_quick_login")),
+          onPressed: () async {
+            await _fidoLogin();
+          },
+        ),
+      ],
       const SizedBox(height: 8.0),
       const ButtomButtons(),
     ],
@@ -170,9 +185,17 @@ class _LoginWindowState extends State<LoginWindow> {
 
         if (mounted) {
           if (pd.isOpen()) pd.close();
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+
+          // Prompt FIDO registration if not yet enabled
+          if (!preference.getBool(preference.Preference.fidoEnabled)) {
+            await _promptFidoRegister();
+          }
+
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }
         }
       }
     } catch (e, s) {
@@ -232,6 +255,160 @@ class _LoginWindowState extends State<LoginWindow> {
             msg: FlutterI18n.translate(context, "login.failed_login_other"),
           );
         }
+      }
+    }
+  }
+
+  Future<void> _fidoLogin() async {
+    ProgressDialog pd = ProgressDialog(context: context);
+    pd.show(
+      msg: FlutterI18n.translate(context, "login.fido_login_progress"),
+      max: 100,
+      hideValue: true,
+      completed: Completed(
+        completedMsg: FlutterI18n.translate(context, "login.complete_login"),
+      ),
+    );
+
+    try {
+      EhallSession ses = EhallSession();
+      await ses.clearCookieJar();
+
+      FidoSession fido = FidoSession();
+      String location = await fido.fidoLogin(
+        target:
+            "https://ehall.xidian.edu.cn:443/login?service=https://ehall.xidian.edu.cn/new/index.html",
+        onResponse: (int number, String status) => pd.update(
+          msg: FlutterI18n.translate(context, status),
+          value: number,
+        ),
+      );
+
+      // Follow redirects
+      var response = await fido.dioNoOfflineCheck.get(location);
+      while (response.headers[HttpHeaders.locationHeader] != null) {
+        location = response.headers[HttpHeaders.locationHeader]![0];
+        response = await ses.dioEhall.get(location);
+      }
+
+      loginState = IDSLoginState.success;
+
+      if (!mounted) return;
+      bool isPostGraduate = await ses.checkWhetherPostgraduate();
+      String semesterInfo = isPostGraduate
+          ? await PersonalInfoSession().getSemesterInfoYjspt()
+          : await PersonalInfoSession().getSemesterInfoEhall();
+      preference.setString(
+        preference.Preference.currentSemester,
+        semesterInfo,
+      );
+      preference.setBool(preference.Preference.isUserDefinedSemester, false);
+
+      if (mounted) {
+        if (pd.isOpen()) pd.close();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
+    } catch (e, s) {
+      if (pd.isOpen()) pd.close();
+      log.warning(
+        "[login_window][fidoLogin] "
+        "FIDO login failed: \n$e\nStacktrace is:\n$s",
+      );
+      if (mounted) {
+        if (e is FidoException) {
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              "login.fido_login_failed",
+              translationParams: {"message": e.msg},
+            ),
+          );
+        } else if (e is LoginFailedException) {
+          showToast(context: context, msg: e.msg);
+        } else {
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(context, "login.fido_login_fallback"),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _promptFidoRegister() async {
+    if (!context.mounted) return;
+    final agree = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          FlutterI18n.translate(context, "setting.fido_prompt_title"),
+        ),
+        content: Text(
+          FlutterI18n.translate(context, "setting.fido_prompt_content"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              FlutterI18n.translate(context, "setting.fido_prompt_skip"),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              FlutterI18n.translate(context, "setting.fido_prompt_register"),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (agree != true || !context.mounted) return;
+
+    ProgressDialog pd = ProgressDialog(context: context);
+    pd.show(
+      msg: FlutterI18n.translate(context, "setting.fido_prompt_registering"),
+      hideValue: true,
+    );
+
+    try {
+      final recheck = IdsRecheck();
+      await recheck.ensurePersonalInfoSession();
+
+      final necessary = await recheck.isNecessary();
+      if (necessary && context.mounted) {
+        await recheck.recheckByPassword(
+          context: context,
+          password: _idsPasswordController.text,
+        );
+      }
+
+      if (!context.mounted) return;
+      final fido = FidoSession();
+      await fido.register(context: context);
+
+      if (pd.isOpen()) pd.close();
+      if (context.mounted) {
+        showToast(
+          context: context,
+          msg: FlutterI18n.translate(context, "setting.fido_prompt_success"),
+        );
+      }
+    } catch (e) {
+      if (pd.isOpen()) pd.close();
+      log.warning("[login_window] FIDO prompt registration failed: $e");
+      if (context.mounted) {
+        showToast(
+          context: context,
+          msg: FlutterI18n.translate(
+            context,
+            "setting.fido_prompt_failed",
+            translationParams: {"error": e.toString()},
+          ),
+        );
       }
     }
   }

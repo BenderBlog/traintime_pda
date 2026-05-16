@@ -11,6 +11,7 @@ dependencies:
   crypto: ^3.0.6
   pointycastle: ^4.0.0
   encrypter_plus: ^5.1.0
+  cbor: ^6.0.0
   talker_flutter: ^5.0.0
   talker_dio_logger: ^5.0.0
   synchronized: ^3.1.0+1

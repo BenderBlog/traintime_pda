@@ -36,6 +36,17 @@ login_process:
     slider: "滑块验证"
     after_process: "登录后处理"
     failed: "登录失败，响应状态码：{statusCode}"
+    image_captcha:
+        title: "输入验证码"
+        refresh_hint: "点击图片刷新"
+        hint: "输入验证码"
+        confirm: "确认"
+fido_process:
+    prepare: "准备 FIDO 登录"
+    start_assertion: "获取认证请求"
+    signing: "签名中"
+    submitting: "提交认证"
+    done: "登录完成"
 # TODO: ehall_exam_session data
 
 no_info: "没有信息"
@@ -624,6 +635,10 @@ login:
         hint: "输入验证码"
         message_on_empty: "请输入验证码"
     slider_title: "服务器认证服务"
+    fido_quick_login: "FIDO 快速登录"
+    fido_login_progress: "FIDO 登录中..."
+    fido_login_failed: "FIDO 登录失败: {message}"
+    fido_login_fallback: "FIDO 登录失败，请使用密码登录"
 
 # 校园网信息
 school_net:
@@ -770,6 +785,29 @@ setting:
     electricity_account_setting: "电费账号设置"
     schoolnet_password_setting: "校园网帐号密码设置"
     schoolnet_password_description: "不设置查看不了网费"
+    # FIDO 快速登录
+    fido_setting: "FIDO 快速登录"
+    fido_registered: "已注册"
+    fido_not_registered: "未注册"
+    fido_login_required: "请先登录"
+    fido_register_success: "FIDO 注册成功"
+    fido_register_failed: "FIDO 注册失败: {error}"
+    fido_delete_title: "删除 FIDO 凭据"
+    fido_delete_content: "确定要删除 FIDO 凭据吗？删除后需重新注册才能使用 FIDO 登录。"
+    fido_delete_success: "FIDO 凭据已删除"
+    fido_delete_failed: "FIDO 删除失败: {error}"
+    fido_prompt_title: "启用 FIDO 快速登录？"
+    fido_prompt_content: |-
+        FIDO 是一种备用登录方式，在密码登录遇到问题时可以使用。
+
+        · 不受验证码影响：无需处理滑块验证和图片验证码
+        · 备用登录方式：当密码登录异常时仍可正常登录
+        · 基于设备认证：使用设备密钥对验证身份，不依赖密码
+    fido_prompt_register: "立即注册"
+    fido_prompt_skip: "以后再说"
+    fido_prompt_registering: "正在注册 FIDO..."
+    fido_prompt_success: "FIDO 注册成功！下次可使用快速登录"
+    fido_prompt_failed: "FIDO 注册失败: {error}"
     # 通知设置
     notification_setting: "通知设置"
     course_reminder_setting: "课前通知设置"
@@ -965,6 +1003,7 @@ setting:
         english: "英语"
     semester_change: 修改学期
     semester_change_description: 使用学期 {semester}
+    updating_data: "正在更新数据"
     semester_update_data: "应用新学期设置中"
     # 关于页面
     easter_egg_page: "你找到了彩蛋"

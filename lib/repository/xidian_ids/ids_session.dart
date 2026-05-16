@@ -15,6 +15,7 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/fido_session.dart';
 
 enum IDSLoginState {
   none,
@@ -118,6 +119,22 @@ class IDSSession extends NetworkSession {
         "[IDSSession][checkAndLogin] "
         "Ready to get $target.",
       );
+
+      // Try FIDO login first if enabled
+      if (preference.getBool(preference.Preference.fidoEnabled)) {
+        try {
+          log.info("[IDSSession][checkAndLogin] Trying FIDO login first.");
+          final fido = FidoSession();
+          final location = await fido.fidoLogin(target: target);
+          loginState = IDSLoginState.success;
+          log.info("[IDSSession][checkAndLogin] FIDO login success.");
+          return location;
+        } catch (e) {
+          log.warning("[IDSSession][checkAndLogin] FIDO login failed, falling back: $e");
+          // FIDO failed, continue with password login
+        }
+      }
+
       var data = await dioNoOfflineCheck.get(
         "https://ids.xidian.edu.cn/authserver/login",
         queryParameters: {'service': target},

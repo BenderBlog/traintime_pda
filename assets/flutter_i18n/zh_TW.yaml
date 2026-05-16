@@ -26,6 +26,17 @@ login_process:
   slider: 滑塊驗證
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
+  image_captcha:
+    title: 輸入驗證碼
+    refresh_hint: 點擊圖片刷新
+    hint: 輸入驗證碼
+    confirm: 確認
+fido_process:
+  prepare: 準備 FIDO 登錄
+  start_assertion: 獲取認證請求
+  signing: 簽名中
+  submitting: 提交認證
+  done: 登錄完成
 no_info: 沒有信息
 catcher_detected: 發生錯誤
 catcher_description: 詳情如下
@@ -580,6 +591,10 @@ login:
     hint: 輸入驗證碼
     message_on_empty: 請輸入驗證碼
   slider_title: 服務器認證服務
+  fido_quick_login: FIDO 快速登錄
+  fido_login_progress: FIDO 登錄中...
+  fido_login_failed: 'FIDO 登錄失敗: {message}'
+  fido_login_fallback: FIDO 登錄失敗，請使用密碼登錄
 school_net:
   title: 校園網使用詳情
   ids_account_net:
@@ -716,6 +731,29 @@ setting:
   electricity_account_setting: 電費賬號設置
   schoolnet_password_setting: 校園網帳號密碼設置
   schoolnet_password_description: 不設置查看不了網費
+  # FIDO 快速登錄
+  fido_setting: FIDO 快速登錄
+  fido_registered: 已註冊
+  fido_not_registered: 未註冊
+  fido_login_required: 請先登錄
+  fido_register_success: FIDO 註冊成功
+  fido_register_failed: 'FIDO 註冊失敗: {error}'
+  fido_delete_title: 刪除 FIDO 憑據
+  fido_delete_content: 確定要刪除 FIDO 憑據嗎？刪除後需重新註冊才能使用 FIDO 登錄。
+  fido_delete_success: FIDO 憑據已刪除
+  fido_delete_failed: 'FIDO 刪除失敗: {error}'
+  fido_prompt_title: 啟用 FIDO 快速登錄？
+  fido_prompt_content: |-
+    FIDO 是一種備用登錄方式，在密碼登錄遇到問題時可以使用。
+
+    · 不受驗證碼影響：無需處理滑塊驗證和圖片驗證碼
+    · 備用登錄方式：當密碼登錄異常時仍可正常登錄
+    · 基於設備認證：使用設備密鑰對驗證身份，不依賴密碼
+  fido_prompt_register: 立即註冊
+  fido_prompt_skip: 以後再說
+  fido_prompt_registering: 正在註冊 FIDO...
+  fido_prompt_success: FIDO 註冊成功！下次可使用快速登錄
+  fido_prompt_failed: 'FIDO 註冊失敗: {error}'
   notification_setting: 通知設置
   course_reminder_setting: 課前通知設置
   course_reminder_description: 設置課前提醒通知
@@ -904,6 +942,7 @@ setting:
     english: 英語
   semester_change: 修改學期
   semester_change_description: 使用學期 {semester}
+  updating_data: 正在更新數據
   semester_update_data: 應用新學期設置中
   easter_egg_page: 你找到了彩蛋
   about_page:
