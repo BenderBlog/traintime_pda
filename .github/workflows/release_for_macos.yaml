@@ -29,7 +29,7 @@ jobs:
       - name: Create DMG
         run: |
           # Extract app name from the build output
-          APP_NAME="watermeter"
+          APP_NAME="XDYou"
           APP_PATH="build/macos/Build/Products/Release/${APP_NAME}.app"
           DMG_NAME="watermeter-macos-release.dmg"
           DMG_PATH="build/app/${DMG_NAME}"
