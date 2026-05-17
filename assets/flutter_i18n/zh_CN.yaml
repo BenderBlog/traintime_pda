@@ -632,7 +632,9 @@ school_net:
         title: "当前用户"
         notice: "这是登录到 PDA 账户的校园网信息
 
-            注意: 流量计费采用GB单位（1000进制）"
+            注意: 流量计费采用GB单位（1000进制）
+
+            如果没有看到信息，请访问 zfw.xidian.edu.cn 重置网络密码"
         overview: "账户概览"
         account: "账号"
         used: "已使用流量"
@@ -662,6 +664,7 @@ school_net:
     empty_password: "您忘记输入账号密码了"
     not_initalized: "疑似查询后端尚未开放查询"
     captcha_failed: "验证码识别失败"
+    captcha_empty: "验证码为空"
     cache_hint_captcha_failed: "验证码识别失败，请重试。"
     cache_hint_request_failed: "校园网请求失败，请稍后重试。"
     wrong_password: "密码错误"

@@ -10,6 +10,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
+import 'package:watermeter/page/homepage/toolbox/schoolnet_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/info_widget/energy_card.dart';
@@ -64,6 +65,7 @@ class _MainPageState extends State<MainPage> {
     const ExamCard(),
     const EmptyClassroomCard(),
     const ClassAttendanceCard(),
+    const SchoolnetCard(),
     const DormWaterCard(),
     if (prefs.getBool(prefs.Preference.role) == false) ...[
       const ExperimentCard(),

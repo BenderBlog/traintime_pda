@@ -20,6 +20,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 // import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -427,7 +428,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                 ],
-                /*
+
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(
@@ -449,7 +450,6 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   },
                 ),
-                */
               ],
             ),
           ),
@@ -775,7 +775,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   onTap: () => context.push(TalkerScreen(talker: log)),
                 ),
                 const Divider(),
-                if (Platform.isAndroid || Platform.isIOS)
+                if (Platform.isAndroid || Platform.isIOS) ...[
                   ListTile(
                     title: Text(
                       FlutterI18n.translate(
@@ -786,7 +786,8 @@ class _SettingWindowState extends State<SettingWindow> {
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () => context.push(NotificationDebugPage()),
                   ),
-                const Divider(),
+                  const Divider(),
+                ],
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(context, "setting.clear_and_restart"),

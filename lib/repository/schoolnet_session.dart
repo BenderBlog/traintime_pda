@@ -1,8 +1,6 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-
-/*
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -52,6 +50,7 @@ class SchoolnetSession extends NetworkSession {
       6,
       networkInfoResponse.length - 1,
     );
+    print(jsonString);
     return CurrentUserNetInfo.fromJson(jsonDecode(jsonString));
   }
 
@@ -128,10 +127,13 @@ class SchoolnetSession extends NetworkSession {
   }
 
   Future<FetchResult<GeneralNetworkUsage>> getGeneralNetworkUsage({
-    required Future<String> Function(List<int>)? captchaFunction,
+    required Future<String> Function(List<int>) captchaFunction,
   }) async {
     try {
       // Get username and password
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] Get Username and Password",
+      );
       String password = prefs.getString(
         prefs.Preference.schoolNetQueryPassword,
       );
@@ -139,7 +141,11 @@ class SchoolnetSession extends NetworkSession {
         throw const NoPasswordException(type: PasswordType.schoolnet);
       }
       String username = prefs.getString(prefs.Preference.idsAccount);
+
       // Check whether fetch directly
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] Check whether fetch directly",
+      );
       var page = await _dio.get("/home");
       if (!page.isRedirect) {
         final usage = await _getNetworkUsage();
@@ -150,10 +156,13 @@ class SchoolnetSession extends NetworkSession {
           data: usage,
         );
       }
-      //clearCookieJarSpecific("https://zfw.xidian.edu.cn");
+
       // Get login page
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Get login page");
       page = await _dio.get("/login");
+
       // Get csrf and key
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Get cerf and key");
       List<Element> inputs = parse(
         page.data.toString(),
       ).getElementsByTagName("input");
@@ -173,121 +182,113 @@ class SchoolnetSession extends NetworkSession {
       }
 
       String lastErrorMessage = "";
-      for (int retry = 10; retry > 0; retry--) {
-        // Clear it everytime new try.
-        lastErrorMessage = "";
 
-        // Refresh captcha
-        await _dio.get(
-          'https://zfw.xidian.edu.cn/site/captcha',
-          queryParameters: {
-            'refresh': 1,
-            '_': DateTime.now().millisecondsSinceEpoch,
-          },
+      // Refresh captcha
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Refresh captcha");
+      await _dio.get(
+        'https://zfw.xidian.edu.cn/site/captcha',
+        queryParameters: {
+          'refresh': 1,
+          '_': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
+
+      // Get verifycode
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Get verifycode");
+      var picture = await _dio
+          .get(
+            "https://zfw.xidian.edu.cn/site/captcha",
+            options: Options(responseType: ResponseType.bytes),
+          )
+          .then((data) => data.data);
+      String failedmsg = "school_net.captcha_failed";
+      String? verifycode = await captchaFunction(picture);
+
+      // If failed too much time, set error state.
+      if (verifycode == failedmsg || verifycode == "") {
+        log.info(
+          "[SchoolnetSession][getGeneralNetworkUsage] Failed with msg $failedmsg",
         );
-
-        // Get verifycode
-        var picture = await _dio
-            .get(
-              "https://zfw.xidian.edu.cn/site/captcha",
-              options: Options(responseType: ResponseType.bytes),
-            )
-            .then((data) => data.data);
-        String failedmsg = "school_net.captcha_failed";
-        String? verifycode = retry == 1
-            ? captchaFunction != null
-                  ? await captchaFunction(picture)
-                  : failedmsg // The last try
-            : await DigitCaptchaClientProvider.infer(
-                DigitCaptchaType.zfw,
-                picture,
-              );
-
-        // If failed too much time, set error state.
-        if (verifycode == failedmsg) {
-          throw failedmsg;
-        }
-        if (verifycode == null) {
-          log.info('[SchoolnetSession] Captcha is impossible to be inferred.');
-          retry++; // Do not count this try
-          continue;
-        }
-
-        log.info("[SchoolnetSession] verifycode is $verifycode");
-
-        // Encrypt the password
-        var rsaKey = RSAKeyParser().parse(key);
-        String encryptedPassword = Encrypter(
-          RSA(publicKey: RSAPublicKey(rsaKey.modulus!, rsaKey.exponent!)),
-        ).encrypt(password).base64;
-
-        // Pre-login post
-        page = await _dio.post(
-          "/site/validate-user",
-          data: _getPostStringBody({
-            "LoginForm[username]": username, //prefs.getString("idsAccount"),
-            "LoginForm[password]": encryptedPassword,
-            "LoginForm[verifyCode]": verifycode,
-          }),
-          options: Options(
-            headers: {
-              "X-CSRF-Token": csrf,
-              todo: recover
-              "Accept": "*//*",
-              "Accept-Encoding": "gzip, deflate, br, zstd",
-              "X-Requested-With": "XMLHttpRequest",
-            },
-          ),
-        );
-
-        // Check success or not?
-        if (!jsonDecode(page.data)["success"]) {
-          lastErrorMessage = jsonDecode(page.data)["message"] ?? "unknown";
-          log.info(
-            "[SchoolNetSession] Attempt ${11 - retry} "
-            "failed: $lastErrorMessage",
-          );
-
-          // No need to retry if the error is about username or password
-          if (lastErrorMessage.contains("用户名") ||
-              lastErrorMessage.contains("密码")) {
-            throw const WrongPasswordException(type: PasswordType.schoolnet);
-          }
-
-          continue;
-        }
-
-        // Login post
-        page = await _dio.post(
-          "/",
-          data: _getPostStringBody({
-            "_csrf-8800": csrf,
-            "LoginForm[username]": username, //prefs.getString("idsAccount"),
-            "LoginForm[password]": encryptedPassword,
-            "LoginForm[smsCode]": "",
-            "LoginForm[verifyCode]": verifycode,
-          }),
-          options: Options(
-            headers: {
-              "X-CSRF-Token": csrf,
-              todo: recover
-              "Accept": "*//*",
-              "Accept-Encoding": "gzip, deflate, br, zstd",
-              "X-Requested-With": "XMLHttpRequest",
-            },
-          ),
-        );
-
-        final usage = await _getNetworkUsage();
-        _generalUsageCache = usage;
-        _generalUsageCacheFetchTime = DateTime.now();
-        return FetchResult.fresh(
-          fetchTime: _generalUsageCacheFetchTime,
-          data: usage,
-        );
+        throw failedmsg;
       }
 
-      throw lastErrorMessage;
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] verifycode is $verifycode",
+      );
+
+      // Encrypt the password
+      var rsaKey = RSAKeyParser().parse(key);
+      String encryptedPassword = Encrypter(
+        RSA(publicKey: RSAPublicKey(rsaKey.modulus!, rsaKey.exponent!)),
+      ).encrypt(password).base64;
+
+      // Pre-login post
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Pre-login post");
+      page = await _dio.post(
+        "/site/validate-user",
+        data: _getPostStringBody({
+          "LoginForm[username]": username, //prefs.getString("idsAccount"),
+          "LoginForm[password]": encryptedPassword,
+          "LoginForm[verifyCode]": verifycode,
+        }),
+        options: Options(
+          headers: {
+            "X-CSRF-Token": csrf,
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
+      );
+
+      // Check success or not?
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] Check success or not?",
+      );
+      if (!jsonDecode(page.data)["success"]) {
+        lastErrorMessage = jsonDecode(page.data)["message"] ?? "unknown";
+        log.info(
+          "[SchoolNetSession][getGeneralNetworkUsage] Captcha failed: $lastErrorMessage",
+        );
+
+        // No need to retry if the error is about username or password
+        if (lastErrorMessage.contains("用户名") ||
+            lastErrorMessage.contains("密码")) {
+          throw const WrongPasswordException(type: PasswordType.schoolnet);
+        }
+
+        // Else throw other info
+        throw Exception(lastErrorMessage);
+      }
+
+      // Login post
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Login post");
+      page = await _dio.post(
+        "/",
+        data: _getPostStringBody({
+          "_csrf-8800": csrf,
+          "LoginForm[username]": username, //prefs.getString("idsAccount"),
+          "LoginForm[password]": encryptedPassword,
+          "LoginForm[smsCode]": "",
+          "LoginForm[verifyCode]": verifycode,
+        }),
+        options: Options(
+          headers: {
+            "X-CSRF-Token": csrf,
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
+      );
+
+      final usage = await _getNetworkUsage();
+      _generalUsageCache = usage;
+      _generalUsageCacheFetchTime = DateTime.now();
+      return FetchResult.fresh(
+        fetchTime: _generalUsageCacheFetchTime,
+        data: usage,
+      );
     } catch (e, s) {
       log.handle(e, s, "[SchoolnetSession][getGeneralNetworkUsage] Have issue");
       if (_generalUsageCache != null && _canUseCacheForGeneralUsageError(e)) {
@@ -301,4 +302,3 @@ class SchoolnetSession extends NetworkSession {
     }
   }
 }
-*/

@@ -685,7 +685,9 @@ school_net:
       title: "Current user"
       notice: "This is the current PDA user's information.
 
-         Notice that network traffic is charged in GB (1GB = 1000MB)."
+         Notice that network traffic is charged in GB (1GB = 1000MB).
+
+         If you cannot see any info, go to zfw.xidian.edu.cn for password reset"
       overview: "Overview"
       account: "Account"
       used: "Data usage"
@@ -718,6 +720,7 @@ school_net:
    empty_password: "You may forgot to enter the schoolnet password"
    not_initalized: "It seems the backend is not open for query:P"
    captcha_failed: "Failed to idenify captcha"
+   captcha_empty: "Captcha is empty"
    cache_hint_captcha_failed: "Captcha recognition failed. Please try again."
    cache_hint_request_failed: "The schoolnet request failed. Please try again later."
    wrong_password: "Wrong schoolnet password"

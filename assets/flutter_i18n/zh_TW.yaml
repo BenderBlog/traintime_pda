@@ -586,7 +586,9 @@ school_net:
     title: 當前用戶
     notice: '這是登錄到 PDA 賬戶的校園網信息
 
-      注意: 流量計費採用GB單位（1000進制）'
+      注意: 流量計費採用GB單位（1000進制）
+
+      如果沒有看到信息，請訪問 zfw.xidian.edu.cn 重置網絡密碼'
     overview: 賬戶概覽
     account: 賬號
     used: 已使用流量
@@ -616,6 +618,7 @@ school_net:
   empty_password: 您忘記輸入賬號密碼了
   not_initalized: 疑似查詢後端尚未開放查詢
   captcha_failed: 驗證碼識別失敗
+  captcha_empty: 驗證碼為空
   cache_hint_captcha_failed: 驗證碼識別失敗，請重試。
   cache_hint_request_failed: 校園網請求失敗，請稍後重試。
   wrong_password: 密碼錯誤

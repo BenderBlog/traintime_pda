@@ -1,7 +1,7 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-/*
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -21,7 +21,11 @@ class CurrentNetInfoPage extends StatefulWidget {
   State<CurrentNetInfoPage> createState() => _CurrentNetInfoState();
 }
 
-class _CurrentNetInfoState extends State<CurrentNetInfoPage> {
+class _CurrentNetInfoState extends State<CurrentNetInfoPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late Future<CurrentUserNetInfo> _currentUserNetInfoFuture;
 
   @override
@@ -214,4 +218,3 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage> {
     );
   }
 }
-*/
