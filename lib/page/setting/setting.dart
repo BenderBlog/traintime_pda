@@ -772,7 +772,9 @@ class _SettingWindowState extends State<SettingWindow> {
                     FlutterI18n.translate(context, "setting.check_logger"),
                   ),
                   trailing: const Icon(Icons.navigate_next),
-                  onTap: () => context.push(TalkerScreen(talker: log)),
+                  onTap: () => context.push(
+                    TalkerScreen(talker: log, isLogOrderReversed: false),
+                  ),
                 ),
                 const Divider(),
                 if (Platform.isAndroid || Platform.isIOS) ...[

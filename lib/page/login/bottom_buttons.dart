@@ -49,7 +49,10 @@ class ButtomButtons extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => TalkerScreen(talker: log),
+                builder: (context) => TalkerScreen(
+                  talker: log,
+                  isLogOrderReversed: false,
+                ),
               ),
             );
           },
