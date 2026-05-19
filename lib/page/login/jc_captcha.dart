@@ -25,11 +25,11 @@ class Lazy<T> {
   T get value => _value ??= _initializer();
 }
 
-/// 轨迹点模型
+/// Finger movement track point
 class TrackPoint {
-  final int a; // x 轴位移
-  final int b; // y 轴位移
-  final int c; // 时间戳 (毫秒)
+  final int a; // x pos
+  final int b; // y pos
+  final int c; // milliseconds
 
   TrackPoint(this.a, this.b, this.c);
 
@@ -98,7 +98,7 @@ class SliderCaptchaClientProvider {
       if (offset == null) throw CaptchaSolveFailedException();
       final int baseMove = (offset * _puzzleWidth).round();
       // try neighboring moves
-      for (final delta in [0, 2, -2, 4, -5, 7, -8, 10]) {
+      for (final delta in [1, -1, 2, -2, 3, -3, 4]) {
         final move = baseMove + delta;
         if (move < 0 || move > _puzzleWidth.toInt()) continue;
         final tracks = generateTracks(move);
@@ -162,13 +162,13 @@ class SliderCaptchaClientProvider {
         xR = bbox[2] - border,
         yB = bbox[3] - border;
 
-    var widthW = xR - xL, heightW = yB - yT, lenW = widthW * heightW;
-    var widthG = puzzle.width - piece.width + widthW - 1;
+    var widthW = xR - xL + 1, heightW = yB - yT + 1, lenW = widthW * heightW;
+    var widthG = puzzle.width - piece.width + widthW;
     // normalize
-    var meanT = _calculateMean(piece, xL, yT, widthW, heightW);
+    var meanT = _calculateSum(piece, xL, yT, widthW, heightW) / widthW / heightW;
     var templateN = _normalizeImage(piece, xL, yT, widthW, heightW, meanT);
     var colsW = [
-      for (var x = xL + 1; x < widthG + 1; ++x)
+      for (var x = xL; x < widthG; ++x)
         _calculateSum(puzzle, x, yT, 1, heightW),
     ];
     // init window
@@ -179,12 +179,17 @@ class SliderCaptchaClientProvider {
       sumW += colsWR.current;
     }
     // slide window and ncc
-    double nccMax = 0;
+    double nccMax = _calculateNCC(
+      puzzle,
+      0,
+      yT,
+      widthW,
+      heightW,
+      templateN,
+      sumW / lenW,
+    );
     int xMax = 0;
-    for (var x = xL + 1; x < widthG - widthW; x += 2) {
-      colsWL.moveNext();
-      colsWR.moveNext();
-      sumW = sumW - colsWL.current + colsWR.current;
+    for (var x = 1; x < widthG - widthW; ++x) {
       colsWL.moveNext();
       colsWR.moveNext();
       sumW = sumW - colsWL.current + colsWR.current;
@@ -203,13 +208,13 @@ class SliderCaptchaClientProvider {
       }
     }
     // return progress
-    return (xMax - xL - 1) / puzzle.width;
+    return xMax / puzzle.width;
   }
 
   // find bbox
   static List<int> _findAlphaBoundingBox(img.Image image) {
     var xL = image.width, yT = image.height, xR = 0, yB = 0;
-    for (var y = 0; y < image.height; y++) {
+    for (var y = 0; y < image.height; y++)
       for (var x = 0; x < image.width; x++) {
         if (image.getPixel(x, y).a != 255) continue;
         if (x < xL) xL = x;
@@ -217,7 +222,6 @@ class SliderCaptchaClientProvider {
         if (x > xR) xR = x;
         if (y > yB) yB = y;
       }
-    }
     return [xL, yT, xR, yB];
   }
 
@@ -230,23 +234,10 @@ class SliderCaptchaClientProvider {
     int height,
   ) {
     double sum = 0;
-    for (var yy = y; yy < y + height; yy++) {
-      for (var xx = x; xx < x + width; xx++) {
+    for (var yy = y; yy < y + height; yy++)
+      for (var xx = x; xx < x + width; xx++)
         sum += image.getPixel(xx, yy).luminance;
-      }
-    }
     return sum;
-  }
-
-  // calculate mean of area in an image
-  static double _calculateMean(
-    img.Image image,
-    int x,
-    int y,
-    int width,
-    int height,
-  ) {
-    return _calculateSum(image, x, y, width, height) / width / height;
   }
 
   // normalize area in an image
@@ -277,14 +268,13 @@ class SliderCaptchaClientProvider {
   ) {
     double sumWt = 0, sumWw = 0.000001;
     var iT = template.iterator;
-    for (var yy = y; yy < y + height; yy++) {
+    for (var yy = y; yy < y + height; yy++)
       for (var xx = x; xx < x + width; xx++) {
         iT.moveNext();
         var w = window.getPixel(xx, yy).luminance - meanW;
         sumWt += w * iT.current;
         sumWw += w * w;
       }
-    }
     return sumWt / sumWw;
   }
 
