@@ -137,6 +137,13 @@ class SemesterController {
     await pref.setString(pref.Preference.currentSemester, semester);
     await pref.setBool(pref.Preference.isUserDefinedSemester, true);
     semesterSignal.value = semester;
+    semesterSyncEventSignal.value = SemesterSyncEvent(
+      oldSemester: localSemester,
+      remoteSemester: semester,
+      effectiveSemester: semester,
+      didChange: didChange,
+      isUserDefinedSemester: true,
+    );
 
     log.info(
       "[SemesterController][setSemesterDirectly] "
