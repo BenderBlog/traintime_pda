@@ -271,11 +271,13 @@ class ClassTableController {
         continue;
       }
 
+      final classDetail = getClassDetail(arrangement);
       arrangementSet.add(
         HomeArrangement(
-          name: getClassDetail(arrangement).name,
+          name: classDetail.name,
           teacher: arrangement.teacher,
           place: arrangement.classroom,
+          colorIndex: classTableData.classDetail.indexOf(classDetail),
           startTimeStr: formatter.format(
             DateTime(
               updateTime.year,

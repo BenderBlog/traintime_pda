@@ -131,18 +131,21 @@ class ExamController {
     final formatter = DateFormat(HomeArrangement.format);
 
     return subjects.value
-        .where((e) => e.startTime?.isAtSameDayAs(now) ?? false)
+        .asMap()
+        .entries
+        .where((entry) => entry.value.startTime?.isAtSameDayAs(now) ?? false)
         .map(
-          (e) => HomeArrangement(
-            name: "${e.subject}考试",
-            place: e.place,
-            seat: e.seat,
-            startTimeStr: e.startTime != null
-                ? formatter.format(e.startTime!)
-                : e.startTimeStr,
-            endTimeStr: e.stopTime != null
-                ? formatter.format(e.stopTime!)
-                : e.endTimeStr,
+          (entry) => HomeArrangement(
+            name: "${entry.value.subject}考试",
+            place: entry.value.place,
+            seat: entry.value.seat,
+            colorIndex: entry.key,
+            startTimeStr: entry.value.startTime != null
+                ? formatter.format(entry.value.startTime!)
+                : entry.value.startTimeStr,
+            endTimeStr: entry.value.stopTime != null
+                ? formatter.format(entry.value.stopTime!)
+                : entry.value.endTimeStr,
           ),
         )
         .toList();
@@ -155,18 +158,21 @@ class ExamController {
     final formatter = DateFormat(HomeArrangement.format);
 
     return subjects.value
-        .where((e) => e.startTime?.isAtSameDayAs(now) ?? false)
+        .asMap()
+        .entries
+        .where((entry) => entry.value.startTime?.isAtSameDayAs(now) ?? false)
         .map(
-          (e) => HomeArrangement(
-            name: "${e.subject}考试",
-            place: e.place,
-            seat: e.seat,
-            startTimeStr: e.startTime != null
-                ? formatter.format(e.startTime!)
-                : e.startTimeStr,
-            endTimeStr: e.stopTime != null
-                ? formatter.format(e.stopTime!)
-                : e.endTimeStr,
+          (entry) => HomeArrangement(
+            name: "${entry.value.subject}考试",
+            place: entry.value.place,
+            seat: entry.value.seat,
+            colorIndex: entry.key,
+            startTimeStr: entry.value.startTime != null
+                ? formatter.format(entry.value.startTime!)
+                : entry.value.startTimeStr,
+            endTimeStr: entry.value.stopTime != null
+                ? formatter.format(entry.value.stopTime!)
+                : entry.value.endTimeStr,
           ),
         )
         .toList();

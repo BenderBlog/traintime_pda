@@ -114,7 +114,8 @@ class PhysicsExperimentController {
     DateFormat formatter = DateFormat(HomeArrangement.format);
     List<HomeArrangement> toReturn = [];
 
-    for (final experiment in physicsExperiments.value) {
+    for (var i = 0; i < physicsExperiments.value.length; i++) {
+      final experiment = physicsExperiments.value[i];
       for (final timeRange in experiment.timeRanges) {
         if (!timeRange.$1.isAtSameDayAs(now)) continue;
         toReturn.add(
@@ -122,6 +123,7 @@ class PhysicsExperimentController {
             name: experiment.name,
             place: experiment.classroom,
             teacher: experiment.teacher,
+            colorIndex: i,
             startTimeStr: formatter.format(timeRange.$1),
             endTimeStr: formatter.format(timeRange.$2),
           ),
@@ -137,7 +139,8 @@ class PhysicsExperimentController {
     DateFormat formatter = DateFormat(HomeArrangement.format);
     List<HomeArrangement> toReturn = [];
 
-    for (final experiment in physicsExperiments.value) {
+    for (var i = 0; i < physicsExperiments.value.length; i++) {
+      final experiment = physicsExperiments.value[i];
       for (final timeRange in experiment.timeRanges) {
         if (!timeRange.$1.isAtSameDayAs(now)) continue;
         toReturn.add(
@@ -145,6 +148,7 @@ class PhysicsExperimentController {
             name: experiment.name,
             place: experiment.classroom,
             teacher: experiment.teacher,
+            colorIndex: i,
             startTimeStr: formatter.format(timeRange.$1),
             endTimeStr: formatter.format(timeRange.$2),
           ),

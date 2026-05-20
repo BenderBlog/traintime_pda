@@ -40,6 +40,11 @@ class HomeArrangement {
       other.startTime == startTime &&
       other.endTime == endTime;
 
+  /// Used for color indexing to match the class table's color scheme.
+  /// Not serialized - set programmatically by the controller.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  int? colorIndex;
+
   HomeArrangement({
     required this.name,
     required this.startTimeStr,
@@ -47,6 +52,7 @@ class HomeArrangement {
     this.teacher,
     this.place,
     this.seat,
+    this.colorIndex,
   });
 
   factory HomeArrangement.fromJson(Map<String, dynamic> json) =>

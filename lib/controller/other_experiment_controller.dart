@@ -108,7 +108,8 @@ class OtherExperimentController {
     DateFormat formatter = DateFormat(HomeArrangement.format);
     List<HomeArrangement> toReturn = [];
 
-    for (final experiment in otherExperiments.value) {
+    for (var i = 0; i < otherExperiments.value.length; i++) {
+      final experiment = otherExperiments.value[i];
       for (final timeRange in experiment.timeRanges) {
         if (!timeRange.$1.isAtSameDayAs(now)) continue;
         toReturn.add(
@@ -116,6 +117,7 @@ class OtherExperimentController {
             name: experiment.name,
             place: experiment.classroom,
             teacher: experiment.teacher,
+            colorIndex: i,
             startTimeStr: formatter.format(timeRange.$1),
             endTimeStr: formatter.format(timeRange.$2),
           ),
@@ -131,7 +133,8 @@ class OtherExperimentController {
     DateFormat formatter = DateFormat(HomeArrangement.format);
     List<HomeArrangement> toReturn = [];
 
-    for (final experiment in otherExperiments.value) {
+    for (var i = 0; i < otherExperiments.value.length; i++) {
+      final experiment = otherExperiments.value[i];
       for (final timeRange in experiment.timeRanges) {
         if (!timeRange.$1.isAtSameDayAs(now)) continue;
         toReturn.add(
@@ -139,6 +142,7 @@ class OtherExperimentController {
             name: experiment.name,
             place: experiment.classroom,
             teacher: experiment.teacher,
+            colorIndex: i,
             startTimeStr: formatter.format(timeRange.$1),
             endTimeStr: formatter.format(timeRange.$2),
           ),
