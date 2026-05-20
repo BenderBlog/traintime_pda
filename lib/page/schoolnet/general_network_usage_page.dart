@@ -162,7 +162,8 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
       );
 
   @override
-  Widget build(BuildContext context) => Watch((context) {
+  Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder(
       future: state,
       builder: (context, snapshot) {
@@ -263,7 +264,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
         return const Center(child: CircularProgressIndicator());
       },
     );
-  });
+  }
 }
 
 class _DeviceListLite extends StatelessWidget {

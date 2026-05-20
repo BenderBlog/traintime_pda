@@ -49,6 +49,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder<CurrentUserNetInfo>(
       future: _currentUserNetInfoFuture,
       builder: (context, snapshot) {
