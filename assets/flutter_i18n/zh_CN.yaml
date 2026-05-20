@@ -275,7 +275,10 @@ classtable:
         choose_semester: 选择学期
         first_academic_year: 第一学年
         second_academic_year: 第二学年
+        fetch_remote_semester: 获取当前学期
+        fetching_remote_semester: 正在获取...
         year: "{year}年"
+        only_future_hint: "本程序仅允许查看未来学期的课程安排。"
 
 # 社团介绍
 club_promotion:

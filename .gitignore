@@ -54,3 +54,5 @@ app.*.map.json
 # fvm flutter sdk
 .fvm/
 *.APK
+
+/软件著作权申请资料

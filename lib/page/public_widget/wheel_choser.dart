@@ -12,13 +12,10 @@ class WheelChooseOptions<T> {
   WheelChooseOptions({required this.data, required this.hint});
 }
 
-class WheelChoose<T> extends StatelessWidget {
+class WheelChoose<T> extends StatefulWidget {
   final ValueChanged<T> changeBookIdCallBack;
   final List<WheelChooseOptions<T>> options;
   final int defaultPage;
-
-  final double heightOfText = 30;
-  final double widthOfLine = 1;
 
   const WheelChoose({
     super.key,
@@ -28,35 +25,68 @@ class WheelChoose<T> extends StatelessWidget {
   });
 
   @override
+  State<WheelChoose<T>> createState() => _WheelChooseState<T>();
+}
+
+class _WheelChooseState<T> extends State<WheelChoose<T>> {
+  static const double _heightOfText = 30;
+  static const double _widthOfLine = 1;
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      viewportFraction: 1 / 3,
+      initialPage: widget.defaultPage,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant WheelChoose<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.defaultPage != widget.defaultPage) {
+      _pageController.animateToPage(
+        widget.defaultPage,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(height: heightOfText)
+        Container(height: _heightOfText)
             .border(
-              top: widthOfLine,
-              bottom: widthOfLine,
+              top: _widthOfLine,
+              bottom: _widthOfLine,
               color: Theme.of(context).colorScheme.primary,
             )
             .center(),
         PageView.builder(
-          itemCount: options.length,
-          controller: PageController(
-            viewportFraction: 1 / 3,
-            initialPage: defaultPage,
-          ),
+          itemCount: widget.options.length,
+          controller: _pageController,
           scrollDirection: Axis.vertical,
           pageSnapping: true,
           physics: const AlwaysScrollableScrollPhysics(),
           itemBuilder: (ctx, index) {
             return Text(
-              options[index].hint,
+              widget.options[index].hint,
             ).textColor(Theme.of(context).colorScheme.primary).center();
           },
           onPageChanged: (int index) {
-            changeBookIdCallBack(options[index].data);
+            widget.changeBookIdCallBack(widget.options[index].data);
           },
         ),
       ],
-    ).height(heightOfText * 3).alignment(Alignment.center).center();
+    ).height(_heightOfText * 3).alignment(Alignment.center).center();
   }
 }

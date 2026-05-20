@@ -312,7 +312,10 @@ classtable:
       choose_semester: Choose a Semester
       first_academic_year: Academic year 1
       second_academic_year: Academic year 2
+      fetch_remote_semester: Fetch Current Semester
+      fetching_remote_semester: Fetching...
       year: "{year}"
+      only_future_hint: "This app only allows viewing course schedules for future semesters."
 
 # 社团介绍
 club_promotion:
