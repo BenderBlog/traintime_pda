@@ -4,9 +4,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
+import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/model/home_arrangement.dart';
@@ -61,11 +64,9 @@ class _ClassTableCardState extends State<ClassTableCard> {
   Widget build(BuildContext context) {
     return Watch((context) {
           final controller = home.HomepageController.i;
+          final classTableController = ClassTableController.i;
           final arrangementState =
               controller.homepageArrangementStateComputedSignal.value;
-          final currentArrangement = controller.currentComputedSignal.value;
-          final nextArrangement = controller.nextComputedSignal.value;
-          final remainingCount = controller.remainingComputedSignal.value;
           final arrangements = controller.arrangementComputedSignal.value;
           final isTomorrow = controller.isTomorrowComputedSignal.value;
           final isAllSourcesLoading =
@@ -76,6 +77,12 @@ class _ClassTableCardState extends State<ClassTableCard> {
           final havePhysicsExperiment =
               controller.havePhysicsExperimentSignal.value;
           final isPostGraduate = controller.isPostGraduate;
+          final currentWeek =
+              classTableController.currentWeekComputedSignal.value;
+          final semesterLength = classTableController
+              .classTableComputedSignal
+              .value
+              .semesterLength;
 
           return [
             _StateList(
@@ -86,18 +93,18 @@ class _ClassTableCardState extends State<ClassTableCard> {
               isPostGraduate: isPostGraduate,
             ),
             _ClassArrangementListView(
-              currentArrangement: currentArrangement,
-              nextArrangement: nextArrangement,
               arrangements: arrangements,
-              remainingCount: remainingCount,
               isTomorrow: isTomorrow,
               emptyInfoText: _getEmptyInfoText(arrangementState),
+              arrangementState: arrangementState,
+              currentWeek: currentWeek,
+              semesterLength: semesterLength,
             ),
           ].whereType<Widget>().toList().toColumn(
             separator: const SizedBox(height: 10),
           );
         })
-        .paddingDirectional(horizontal: 20, vertical: 14)
+        .paddingDirectional(horizontal: 16, vertical: 8)
         .withHomeCardStyle(
           context,
           onPressed: () {
@@ -113,96 +120,146 @@ class _ClassTableCardState extends State<ClassTableCard> {
 }
 
 class _ClassArrangementListView extends StatelessWidget {
-  final HomeArrangement? currentArrangement;
-  final HomeArrangement? nextArrangement;
   final List<HomeArrangement> arrangements;
-  final int remainingCount;
   final bool isTomorrow;
   final String emptyInfoText;
+  final ArrangementState arrangementState;
+  final int currentWeek;
+  final int semesterLength;
 
   const _ClassArrangementListView({
-    required this.currentArrangement,
-    required this.nextArrangement,
     required this.arrangements,
-    required this.remainingCount,
     required this.isTomorrow,
     required this.emptyInfoText,
+    required this.arrangementState,
+    required this.currentWeek,
+    required this.semesterLength,
   });
-
-  Widget _textWithIcon({required IconData icon, required String text}) =>
-      Row(children: [Icon(icon), Text(text)]);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (!isTomorrow) ...[
-          _textWithIcon(
-            icon: Icons.timelapse_outlined,
-            text: FlutterI18n.translate(
-              context,
-              "homepage.class_table_card.current",
+    return [
+      [
+        Icon(Icons.calendar_month, size: 32),
+        SizedBox(width: 18),
+        [
+          DefaultTextStyle(
+            style: TextStyle(
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            child: Builder(
+              builder: (context) {
+                if (isTomorrow) {
+                  if (arrangements.isEmpty) {
+                    return Text(
+                      FlutterI18n.translate(
+                        context,
+                        "homepage.class_table_card.tomorrow_none",
+                      ),
+                    );
+                  }
+                  return Text(
+                    FlutterI18n.translate(
+                      context,
+                      "homepage.class_table_card.tomorrow",
+                      translationParams: {
+                        "remain": arrangements.length.toString(),
+                      },
+                    ),
+                  );
+                }
+                if (arrangements.isEmpty) {
+                  return Text(
+                    FlutterI18n.translate(
+                      context,
+                      "homepage.class_table_card.today_finished",
+                    ),
+                  );
+                }
+                return Text(
+                  FlutterI18n.translate(
+                    context,
+                    "homepage.class_table_card.today",
+                    translationParams: {
+                      "remain": arrangements.length.toString(),
+                    },
+                  ),
+                );
+              },
             ),
           ),
-          Builder(
-            builder: (context) {
-              if (currentArrangement == null) {
-                return Text(emptyInfoText);
-              }
-              return _ClassArrangementListTile(
-                arrangement: currentArrangement!,
-                colorIndex: 0,
-              );
-            },
+          DefaultTextStyle(
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            child: Builder(
+              builder: (context) {
+                String timeString = DateFormat(
+                  "MMMd",
+                  FlutterI18n.currentLocale(context).toString(),
+                ).format(DateTime.now());
+
+                String weekString = DateFormat(
+                  "E",
+                  FlutterI18n.currentLocale(context).toString(),
+                ).format(DateTime.now());
+
+                String weekInfo =
+                    currentWeek >= 0 && currentWeek < semesterLength
+                    ? FlutterI18n.translate(
+                        context,
+                        "homepage.class_table_card.week_info",
+                        translationParams: {"weekinfo": "${currentWeek + 1}"},
+                      )
+                    : FlutterI18n.translate(
+                        context,
+                        "homepage.class_table_card.on_holiday",
+                      );
+
+                String toShow = switch (arrangementState) {
+                  home.ArrangementState.fetched =>
+                    "$timeString $weekString $weekInfo",
+                  home.ArrangementState.error => FlutterI18n.translate(
+                    context,
+                    "homepage.load_error",
+                  ),
+                  _ => FlutterI18n.translate(context, "homepage.loading"),
+                };
+                return Text(toShow);
+              },
+            ),
           ),
-        ],
-        _textWithIcon(
-          icon: Icons.schedule_outlined,
-          text: isTomorrow
-              ? FlutterI18n.translate(
-                  context,
-                  "homepage.class_table_card.tomorrow",
-                )
-              : FlutterI18n.translate(
-                  context,
-                  "homepage.class_table_card.later",
-                ),
-        ),
-        Builder(
-          builder: (context) {
-            if (nextArrangement == null) {
-              return Text(emptyInfoText);
-            }
-            return _ClassArrangementListTile(
-              arrangement: nextArrangement!,
-              colorIndex: currentArrangement != null ? 1 : 0,
-            );
-          },
-        ),
-        _textWithIcon(
-          icon: Icons.more_time_outlined,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.class_table_card.more",
-          ),
-        ),
-        Builder(
-          builder: (context) {
-            if (arrangements.isEmpty) {
-              return Text(emptyInfoText);
-            }
-            return [
-              ...arrangements.asMap().entries.map(
-                (entry) => _ClassArrangementListTile(
-                  arrangement: entry.value,
-                  colorIndex: entry.key,
-                ),
+        ].toColumn(crossAxisAlignment: CrossAxisAlignment.start),
+      ].toRow(),
+      SizedBox(height: 8),
+      if (arrangements.isEmpty)
+        Text(
+              emptyInfoText,
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 16,
               ),
-            ].toColumn();
-          },
-        ),
-      ],
-    );
+            )
+            .center()
+            .padding(horizontal: 10, vertical: 8)
+            .decorated(
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.125),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+            )
+            .width(double.infinity)
+            .padding(vertical: 4)
+      else
+        [
+          ...arrangements.asMap().entries.map(
+            (entry) => _ClassArrangementListTile(
+              arrangement: entry.value,
+              colorIndex: entry.key,
+            ),
+          ),
+        ].toColumn(),
+    ].toColumn(crossAxisAlignment: CrossAxisAlignment.start);
   }
 }
 
@@ -239,7 +296,7 @@ class _ClassArrangementListTile extends StatelessWidget {
                 Text(
                   arrangement.place.toString(),
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: color,
                   ),
@@ -255,7 +312,7 @@ class _ClassArrangementListTile extends StatelessWidget {
               "${arrangement.startTime.hour.toString().padLeft(2, '0')}:"
               "${arrangement.startTime.minute.toString().padLeft(2, '0')}",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: color,
               ),
@@ -264,7 +321,7 @@ class _ClassArrangementListTile extends StatelessWidget {
               "${arrangement.endTime.hour.toString().padLeft(2, '0')}:"
               "${arrangement.endTime.minute.toString().padLeft(2, '0')}",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: color,
               ),

@@ -2,15 +2,10 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:json_annotation/json_annotation.dart';
-
-part 'home_arrangement.g.dart';
-
 /// This is for the classtable applet.
 /// [startTime] and [endTime] must be stored with the following format
 // 'yyyy-MM-dd HH:mm:ss'
-@JsonSerializable(explicitToJson: true)
-class HomeArrangement {
+class HomeArrangement implements Comparable<HomeArrangement> {
   static const format = 'yyyy-MM-dd HH:mm:ss';
 
   String name;
@@ -18,32 +13,13 @@ class HomeArrangement {
   String? place;
   String? seat;
 
-  @JsonKey(name: 'start_time')
-  String startTimeStr;
-  @JsonKey(name: 'end_time')
-  String endTimeStr;
+  int? colorIndex;
 
-  @override
-  int get hashCode =>
-      "$name $teacher $place $seat $startTimeStr $endTimeStr".hashCode;
+  String startTimeStr;
+  String endTimeStr;
 
   DateTime get startTime => DateTime.parse(startTimeStr);
   DateTime get endTime => DateTime.parse(endTimeStr);
-
-  @override
-  bool operator ==(Object other) =>
-      other is HomeArrangement &&
-      other.name == name &&
-      other.teacher == teacher &&
-      other.place == place &&
-      other.seat == seat &&
-      other.startTime == startTime &&
-      other.endTime == endTime;
-
-  /// Used for color indexing to match the class table's color scheme.
-  /// Not serialized - set programmatically by the controller.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  int? colorIndex;
 
   HomeArrangement({
     required this.name,
@@ -55,8 +31,22 @@ class HomeArrangement {
     this.colorIndex,
   });
 
-  factory HomeArrangement.fromJson(Map<String, dynamic> json) =>
-      _$HomeArrangementFromJson(json);
+  @override
+  int get hashCode =>
+      "$name $teacher $place $seat $startTimeStr $endTimeStr".hashCode;
 
-  Map<String, dynamic> toJson() => _$HomeArrangementToJson(this);
+  @override
+  bool operator ==(Object other) =>
+      other is HomeArrangement &&
+      other.name == name &&
+      other.teacher == teacher &&
+      other.place == place &&
+      other.seat == seat &&
+      other.startTime == startTime &&
+      other.endTime == endTime;
+
+  @override
+  int compareTo(HomeArrangement other) {
+    return startTime.compareTo(other.startTime);
+  }
 }

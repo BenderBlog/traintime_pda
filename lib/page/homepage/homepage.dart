@@ -109,11 +109,7 @@ class _MainPageState extends State<MainPage> {
           expandedHeight: 160,
           pinned: true,
           flexibleSpace: FlexibleSpaceBar(
-            centerTitle: false,
-            titlePadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 12,
-            ),
+            titlePadding: EdgeInsetsDirectional.only(start: 16, bottom: 16),
             title: Watch((context) {
               final homepageController = home.HomepageController.i;
               final classTableController = ClassTableController.i;
@@ -152,15 +148,6 @@ class _MainPageState extends State<MainPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? null
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
                       color: Theme.of(context).brightness == Brightness.dark
                           ? null
                           : Theme.of(context).colorScheme.primary,

@@ -29,20 +29,8 @@ class HomepageController {
     GlobalTimerController.i;
   }
 
-  int _getInAdvanceMinutes(DateTime updateTime) {
-    final currentTime = updateTime.hour * 60 + updateTime.minute;
-    if (currentTime < 8.5 * 60 ||
-        (currentTime < 14 * 60 && currentTime >= 12 * 60) ||
-        (currentTime < 19 * 60 && currentTime >= 18 * 60)) {
-      return 60;
-    }
-    return 30;
-  }
-
   List<HomeArrangement> _sortArrangements(Iterable<HomeArrangement> data) {
-    final result = data.toList();
-    result.sort((a, b) => a.startTime.compareTo(b.startTime));
-    return result;
+    return data.toList()..sort();
   }
 
   bool _isEffectiveLoading(HomepageSourceState state) =>
@@ -177,67 +165,6 @@ class HomepageController {
       ),
     );
   });
-
-  late final _arrangementSelectionComputedSignal =
-      computed<(HomeArrangement?, HomeArrangement?, int)>(() {
-        final updateTime = updateTimeComputedSignal.value;
-        final arrangement = arrangementComputedSignal.value;
-
-        if (arrangement.isEmpty) {
-          return (null, null, 0);
-        }
-
-        if (isTomorrowComputedSignal.value) {
-          return (null, arrangement.first, arrangement.length - 1);
-        }
-
-        final inAdvance = _getInAdvanceMinutes(updateTime);
-        HomeArrangement? current;
-        HomeArrangement? next;
-        int currentIndex = -1;
-
-        for (var i = 0; i < arrangement.length; ++i) {
-          final item = arrangement[i];
-          final isCurrent =
-              updateTime.microsecondsSinceEpoch >=
-                  item.startTime.microsecondsSinceEpoch &&
-              updateTime.microsecondsSinceEpoch <=
-                  item.endTime.microsecondsSinceEpoch;
-          final isUpcomingSoon =
-              item.startTime.difference(updateTime).inMinutes >= 0 &&
-              item.startTime.difference(updateTime).inMinutes < inAdvance;
-
-          if (isCurrent || isUpcomingSoon) {
-            current = item;
-            currentIndex = i;
-            break;
-          }
-        }
-
-        if (current == null) {
-          next = arrangement.first;
-        } else if (currentIndex + 1 < arrangement.length) {
-          next = arrangement[currentIndex + 1];
-        }
-
-        int remaining = arrangement.length;
-        if (current != null) remaining -= 1;
-        if (next != null) remaining -= 1;
-
-        return (current, next, remaining);
-      });
-
-  late final currentComputedSignal = computed<HomeArrangement?>(
-    () => _arrangementSelectionComputedSignal.value.$1,
-  );
-
-  late final nextComputedSignal = computed<HomeArrangement?>(
-    () => _arrangementSelectionComputedSignal.value.$2,
-  );
-
-  late final remainingComputedSignal = computed<int>(
-    () => _arrangementSelectionComputedSignal.value.$3,
-  );
 
   late final hasArrangementComputedSignal = computed<bool>(
     () => arrangementComputedSignal.value.isNotEmpty,
