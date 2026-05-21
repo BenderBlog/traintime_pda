@@ -9,6 +9,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
+import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -58,6 +59,32 @@ class IDSSession extends NetworkSession {
     );
 
   Dio get dioNoOfflineCheck => super.dio;
+
+  /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
+  /// Padding part is libxduauth's idea.
+  String aesEncrypt(String toEnc, String key) {
+    dynamic k = encrypt.Key.fromUtf8(key);
+    var crypt = encrypt.AES(k, mode: encrypt.AESMode.cbc, padding: null);
+
+    /// Start padding
+    int blockSize = 16;
+    List<int> dataToPad = [];
+    dataToPad.addAll(
+      utf8.encode(
+        "xidianscriptsxduxidianscriptsxduxidianscriptsxduxidianscriptsxdu$toEnc",
+      ),
+    );
+    int paddingLength = blockSize - dataToPad.length % blockSize;
+    for (var i = 0; i < paddingLength; ++i) {
+      dataToPad.add(paddingLength);
+    }
+    String readyToEnc = utf8.decode(dataToPad);
+
+    /// Start encrypt.
+    return encrypt.Encrypter(
+      crypt,
+    ).encrypt(readyToEnc, iv: encrypt.IV.fromUtf8('xidianscriptsxdu')).base64;
+  }
 
   static const _header = [
     // "username",
@@ -200,7 +227,7 @@ class IDSSession extends NetworkSession {
     }
     Map<String, dynamic> head = {
       'username': username,
-      'password': aesEncrypt(password, utf8.encode(keys)),
+      'password': aesEncrypt(password, keys),
       'rememberMe': 'true',
       'cllt': 'userNameLogin',
       'dllt': 'generalLogin',
