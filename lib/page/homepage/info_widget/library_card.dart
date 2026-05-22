@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
-import 'package:watermeter/page/library/library_window.dart';
+import 'package:watermeter/routing/routes.dart';
 
 class LibraryCard extends StatelessWidget {
   const LibraryCard({super.key});
@@ -19,7 +19,7 @@ class LibraryCard extends StatelessWidget {
     final state = LibraryController.i.libraryBorrowStateSignal.watch(context);
     return MainPageCard(
       onPressed: () async {
-        context.pushReplacement(const LibraryWindow());
+        context.pushReplacementNamed(Routes.library);
       },
       isLoad: state.isLoading,
       icon: MingCuteIcons.mgc_book_2_line,

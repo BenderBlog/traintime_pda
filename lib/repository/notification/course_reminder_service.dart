@@ -20,7 +20,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/routing/routes.dart';
 import 'package:watermeter/generated/non_ui_i18n.g.dart';
 
 /// Course Reminder Service implementation
@@ -237,14 +237,7 @@ class CourseReminderService extends NotificationService
 
       final navigator = preference.debuggerKey.currentState;
       if (navigator != null) {
-        navigator.push(
-          MaterialPageRoute(
-            builder: (context) => LayoutBuilder(
-              builder: (context, constraints) =>
-                  ClassTableWindow(constraints: constraints),
-            ),
-          ),
-        );
+        navigator.push(Routes.resolveRoute(Routes.classTable));
         log.info(
           '[CourseReminderService] [handleNotificationTap] Navigated to class table',
         );

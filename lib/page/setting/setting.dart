@@ -36,7 +36,6 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -52,6 +51,7 @@ import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 import 'package:watermeter/repository/physics_experiment_session.dart';
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/routing/routes.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -167,7 +167,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       },
                     ),
                   ),
-                  onTap: () => context.pushReplacement(const AboutPage()),
+                  onTap: () => context.pushReplacementNamed(Routes.about),
                   trailing: const Icon(Icons.navigate_next),
                 ),
                 const Divider(),

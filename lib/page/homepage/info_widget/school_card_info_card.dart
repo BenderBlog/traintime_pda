@@ -12,7 +12,7 @@ import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/schoolcard/qr_code_view.dart';
-import 'package:watermeter/page/schoolcard/school_card_window.dart';
+import 'package:watermeter/routing/routes.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -33,7 +33,7 @@ class SchoolCardInfoCard extends StatelessWidget {
         } else {
           state.map(
             data: (_) {
-              context.pushReplacement(const SchoolCardWindow());
+              context.pushReplacementNamed(Routes.schoolCard);
             },
             error: (errorStatus, _) {
               ScaffoldMessenger.of(context).showSnackBar(

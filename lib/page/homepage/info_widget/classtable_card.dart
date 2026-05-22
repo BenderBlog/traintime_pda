@@ -10,7 +10,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/controller/homepage_controller.dart';
-import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/routing/routes.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -108,12 +108,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
         .withHomeCardStyle(
           context,
           onPressed: () {
-            context.pushReplacement(
-              LayoutBuilder(
-                builder: (context, constraints) =>
-                    ClassTableWindow(constraints: constraints),
-              ),
-            );
+            context.pushReplacementNamed(Routes.classTable);
           },
         );
   }

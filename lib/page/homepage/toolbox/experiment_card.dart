@@ -5,8 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/experiment/experiment_window.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
+import 'package:watermeter/routing/routes.dart';
 
 class ExperimentCard extends StatelessWidget {
   const ExperimentCard({super.key});
@@ -15,21 +15,7 @@ class ExperimentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SmallFunctionCard(
       onPressed: () async {
-        // bool isGood = true;
-        //  if (preference
-        //      .getString(preference.Preference.experimentPassword)
-        //      .isEmpty) {
-        //    isGood =
-        //        await showDialog(
-        //          context: context,
-        //          builder: (context) => const ExperimentPasswordDialog(),
-        //        ) ??
-        //        false;
-        //  }
-        // if (context.mounted && isGood == true) {
-        //Get.put(ExperimentController()).get();
-        context.pushReplacement(const ExperimentWindow());
-        // }
+        context.pushReplacementNamed(Routes.experiment);
       },
       icon: MingCuteIcons.mgc_science_line,
       nameKey: "homepage.toolbox.experiment",
