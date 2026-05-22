@@ -228,8 +228,8 @@ class _HomePageMasterState extends State<HomePageMaster>
       PageInformation(
         index: 0,
         name: FlutterI18n.translate(context, "homepage.homepage"),
-        icon: MingCuteIcons.mgc_home_3_line,
-        iconChoice: MingCuteIcons.mgc_home_3_fill,
+        icon: Icons.school_outlined,
+        iconChoice: Icons.school,
       ),
       PageInformation(
         index: 1,

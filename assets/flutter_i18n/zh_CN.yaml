@@ -401,13 +401,7 @@ experiment:
 
 # 主页
 homepage:
-    time_string:
-        morning: "早上好 准备出发"
-        before_noon: "上午好 祝万事如意"
-        at_noon: "中午好 一切还好吧"
-        afternoon: "下午好 今天如何"
-        night: "晚上好 祝你好梦"
-        midnight: "深宵了 我在陪你"
+    title: "校园信息查询"
     # homepage.dart
     loading: "正在加载"
     loaded: "加载成功"
@@ -418,7 +412,7 @@ homepage:
     postgraduate_notice: "研究生功能已经激活！"
     linux_notice: "Linux 版本正在测试，欢迎反馈！"
     # home.dart
-    homepage: "主页"
+    homepage: "信息查询"
     club: "社团推荐"
     dashboard: "猪图鉴赏"
     planet: "博客星球"

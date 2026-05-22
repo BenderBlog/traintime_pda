@@ -365,13 +365,7 @@ experiment:
   score_hint_2: 如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！
   score_hint_3: 目前識別庫數據不全，請您務必核對一下。
 homepage:
-  time_string:
-    morning: 早上好 準備出發
-    before_noon: 上午好 祝萬事如意
-    at_noon: 中午好 一切還好吧
-    afternoon: 下午好 今天如何
-    night: 晚上好 祝你好夢
-    midnight: 深宵了 我在陪你
+  title: 校園信息查詢
   loading: 正在加載
   loaded: 加載成功
   load_error: 加載錯誤
@@ -380,7 +374,7 @@ homepage:
   loading_message: 請稍候，正在刷新信息
   postgraduate_notice: 研究生功能已經激活！
   linux_notice: Linux 版本正在測試，歡迎反饋！
-  homepage: 主頁
+  homepage: 信息查詢
   club: 社團推薦
   dashboard: 豬圖鑑賞
   planet: 博客星球
@@ -416,7 +410,7 @@ homepage:
     tomorrow: 明日有 {remain} 個安排
     tomorrow_none: 明日沒有安排
     week_info: 第 {weekinfo} 周
-    holiday: 假期中
+    on_holiday: 假期中
     error_message: 遇到錯誤：{error}
     fetching_message: 正在獲取課表
     error_infoText: 遇到錯誤

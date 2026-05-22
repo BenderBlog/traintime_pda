@@ -102,63 +102,11 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxScrolled) => [
-        SliverAppBar(
-          centerTitle: false,
-          expandedHeight: 160,
-          pinned: true,
-          flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsetsDirectional.only(start: 16, bottom: 16),
-            title: Watch((context) {
-              final homepageController = home.HomepageController.i;
-              final classTableController = ClassTableController.i;
-              homepageController.updateTimeComputedSignal.value;
-              final currentWeek =
-                  classTableController.currentWeekComputedSignal.value;
-              final semesterLength = classTableController
-                  .classTableComputedSignal
-                  .value
-                  .semesterLength;
-              final arrangementState =
-                  homepageController.arrangementStateComputedSignal.value;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(FlutterI18n.translate(context, "homepage.title")),
+      ),
 
-              final subtitle = switch (arrangementState) {
-                home.ArrangementState.fetched =>
-                  currentWeek >= 0 && currentWeek < semesterLength
-                      ? FlutterI18n.translate(
-                          context,
-                          "homepage.on_weekday",
-                          translationParams: {"current": "${currentWeek + 1}"},
-                        )
-                      : FlutterI18n.translate(context, "homepage.on_holiday"),
-                home.ArrangementState.error => FlutterI18n.translate(
-                  context,
-                  "homepage.load_error",
-                ),
-                _ => FlutterI18n.translate(context, "homepage.loading"),
-              };
-
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    FlutterI18n.translate(context, _now),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? null
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ),
-        ),
-      ],
       body: RefreshIndicator(
         onRefresh: () async {
           showToast(

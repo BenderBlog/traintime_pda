@@ -450,13 +450,7 @@ experiment:
 
 # 主页
 homepage:
-   time_string:
-      morning: "Good morning, fueled to go!"
-      before_noon: "Good morning, may the light lies on you"
-      at_noon: "Good noon, everything's fine?"
-      afternoon: "Good afternoon, looking good?"
-      night: "Good evening, sweet dreams"
-      midnight: "Late at night, I'm with you."
+   title: "School Info Center"
    # homepage.dart
    loading: "Loading"
    loaded: "Message updated"
@@ -467,7 +461,7 @@ homepage:
    postgraduate_notice: "Postgraduate features activated!"
    linux_notice: "Linux version is under testing, feel free to feedback!"
    # home.dart
-   homepage: "Homepage"
+   homepage: "Info"
    club: "Club"
    planet: "Blog"
    dashboard: "Pighub"
