@@ -468,6 +468,8 @@ homepage:
         failed_source_exam_info: "考试信息"
         failed_source_physics_experiment: "物理实验"
         failed_source_other_experiment: "其他实验"
+        unknown_place: "未知位置"
+        seat: "座位号{seatnum}"
     electricity_card:
         title: "水电信息"
         current_electricity: "余额 {amount} 度"

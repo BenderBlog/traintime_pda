@@ -4,10 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/homepage_controller.dart' as home;
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
 import 'package:watermeter/page/homepage/toolbox/schoolnet_card.dart';
@@ -72,27 +69,6 @@ class _MainPageState extends State<MainPage> {
       const SportCard(),
     ],
   ];
-
-  String get _now {
-    DateTime now = DateTime.now();
-
-    if (now.hour >= 5 && now.hour < 9) {
-      return "homepage.time_string.morning";
-    }
-    if (now.hour >= 9 && now.hour < 11) {
-      return "homepage.time_string.before_noon";
-    }
-    if (now.hour >= 11 && now.hour < 14) {
-      return "homepage.time_string.at_noon";
-    }
-    if (now.hour >= 14 && now.hour < 18) {
-      return "homepage.time_string.afternoon";
-    }
-    if (now.hour >= 18 || now.hour == 0) {
-      return "homepage.time_string.night";
-    }
-    return "homepage.time_string.midnight";
-  }
 
   TextStyle textStyle(BuildContext context) => TextStyle(
     fontSize: 16,

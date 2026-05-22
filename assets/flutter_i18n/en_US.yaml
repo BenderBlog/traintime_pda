@@ -521,6 +521,8 @@ homepage:
       failed_source_exam_info: "Exam info"
       failed_source_physics_experiment: "Physics experiment"
       failed_source_other_experiment: "Other experiment"
+      unknown_place: "Unknown place"
+      seat: "Seat {seatnum}"
    electricity_card:
       title: "Electricity and Hydroenergy Information"
       current_electricity: "{amount} kWh remains"

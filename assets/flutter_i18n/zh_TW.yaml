@@ -430,6 +430,8 @@ homepage:
     failed_source_exam_info: 考試信息
     failed_source_physics_experiment: 物理實驗
     failed_source_other_experiment: 其他實驗
+    unknown_place: 未知位置
+    seat: 座位號{seatnum}
   electricity_card:
     title: 水電信息
     current_electricity: 餘額 {amount} 度

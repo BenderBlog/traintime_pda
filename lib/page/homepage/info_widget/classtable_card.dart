@@ -288,13 +288,31 @@ class _ClassArrangementListTile extends StatelessWidget {
                     color: color,
                   ),
                 ),
-                Text(
-                  arrangement.place.toString(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
+                Builder(
+                  builder: (context) {
+                    String place =
+                        arrangement.place ??
+                        FlutterI18n.translate(
+                          context,
+                          "homepage.class_table_card.unknown_place",
+                        );
+                    if (arrangement.seat != null) {
+                      place += " ";
+                      place += FlutterI18n.translate(
+                        context,
+                        "homepage.class_table_card.seat",
+                        translationParams: {"seatnum": arrangement.seat!},
+                      );
+                    }
+                    return Text(
+                      place,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
+                    );
+                  },
                 ),
               ]
               .toColumn(
