@@ -50,39 +50,47 @@ class _WeekSelectorState extends State<WeekSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-          children: [
-            Row(
-              children: [
-                Icon(Icons.calendar_month, color: widget.color, size: 16),
-                Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.class_add.input_week_hint",
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 6, 0, 6),
+      child:
+          Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month, color: widget.color, size: 16),
+                      Text(
+                            FlutterI18n.translate(
+                              context,
+                              "classtable.class_add.input_week_hint",
+                            ),
+                          )
+                          .textStyle(TextStyle(color: widget.color))
+                          .padding(left: 4),
+                    ],
                   ),
-                ).textStyle(TextStyle(color: widget.color)).padding(left: 4),
-              ],
-            ),
-            const SizedBox(height: 8),
-            GridView.extent(
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              maxCrossAxisExtent: 30,
-              children: List.generate(
-                chosenWeek.length,
-                (index) => weekDoc(index: index),
+                  const SizedBox(height: 8),
+                  GridView.extent(
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    maxCrossAxisExtent: 30,
+                    children: List.generate(
+                      chosenWeek.length,
+                      (index) => weekDoc(index: index),
+                    ),
+                  ),
+                ],
+              )
+              .padding(all: 12)
+              .decorated(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: widget.color.withValues(alpha: 0.25)),
               ),
-            ),
-          ],
-        )
-        .padding(all: 12)
-        .card(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          elevation: 0,
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        );
+    );
   }
 }

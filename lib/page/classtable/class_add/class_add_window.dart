@@ -4,18 +4,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/class_add/week_selector.dart';
-import 'package:watermeter/page/classtable/class_add/time_selector.dart';
+import 'package:watermeter/page/classtable/class_add/date_selector_free.dart';
 
 class ClassAddWindow extends StatefulWidget {
-  final (ClassDetail, TimeArrangement)? toChange;
+  final CustomClass? customToChange;
   final int semesterLength;
   const ClassAddWindow({
     super.key,
-    this.toChange,
+    this.customToChange,
     required this.semesterLength,
   });
 
@@ -24,70 +25,127 @@ class ClassAddWindow extends StatefulWidget {
 }
 
 class _ClassAddWindowState extends State<ClassAddWindow> {
-  late List<bool> chosenWeek;
+  late final CustomClassController customClassController;
+
+  late List<DateTimeRange> chosenDates;
   late TextEditingController classNameController;
   late TextEditingController teacherNameController;
   late TextEditingController classRoomController;
 
-  late int week;
-  late int start;
-  late int stop;
-
   final double inputFieldVerticalPadding = 4;
   final double horizontalPadding = 10;
 
-  late InputDecoration inputDecoration;
-
   Color get color => Theme.of(context).colorScheme.primary;
+  Color get deleteColor => Theme.of(context).colorScheme.error;
+
+  DateTime get semesterStartDate {
+    final String termStartDay =
+        ClassTableController.i.classTableComputedSignal.value.termStartDay;
+    return DateTime.tryParse(termStartDay) ??
+        DateUtils.dateOnly(DateTime.now());
+  }
 
   @override
   void initState() {
     super.initState();
-    if (widget.toChange == null) {
+    customClassController = CustomClassController.i;
+    if (widget.customToChange != null) {
+      final cc = widget.customToChange!;
+      classNameController = TextEditingController(text: cc.name);
+      teacherNameController = TextEditingController(text: cc.teacher);
+      classRoomController = TextEditingController(text: cc.classroom);
+      chosenDates = cc.timeRanges
+          .map((e) => DateTimeRange(start: e.startTime, end: e.endTime))
+          .toList();
+    } else {
       classNameController = TextEditingController();
       teacherNameController = TextEditingController();
       classRoomController = TextEditingController();
-      chosenWeek = List<bool>.generate(widget.semesterLength, (index) => false);
-      week = 1;
-      start = 1;
-      stop = 1;
-    } else {
-      classNameController = TextEditingController(
-        text: widget.toChange!.$1.name,
-      );
-      teacherNameController = TextEditingController(
-        text: widget.toChange!.$2.teacher,
-      );
-      classRoomController = TextEditingController(
-        text: widget.toChange!.$2.classroom,
-      );
-      chosenWeek = widget.toChange!.$2.weekList;
-      week = widget.toChange!.$2.day;
-      start = widget.toChange!.$2.start;
-      stop = widget.toChange!.$2.stop;
+      chosenDates = [];
     }
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    inputDecoration = InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(25),
-        borderSide: BorderSide.none,
-      ),
-      filled: true,
-      fillColor: Theme.of(context).colorScheme.onPrimary,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-    );
+  void dispose() {
+    classNameController.dispose();
+    teacherNameController.dispose();
+    classRoomController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (classNameController.text.isEmpty) {
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "classtable.class_add.class_name_empty_message",
+        ),
+      );
+      return;
+    }
+
+    if (chosenDates.isEmpty) {
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "classtable.class_add.choose_at_least_one",
+        ),
+      );
+      return;
+    }
+
+    try {
+      final Map<String, String> existingRangeIds = <String, String>{
+        for (final range in widget.customToChange?.timeRanges ?? [])
+          '${range.startTime.microsecondsSinceEpoch}-${range.endTime.microsecondsSinceEpoch}':
+              range.id,
+      };
+      final customClass = CustomClass(
+        id:
+            widget.customToChange?.id ??
+            customClassController.generateCustomClassId(),
+        name: classNameController.text,
+        teacher: teacherNameController.text.isNotEmpty
+            ? teacherNameController.text
+            : null,
+        classroom: classRoomController.text.isNotEmpty
+            ? classRoomController.text
+            : null,
+        timeRanges: chosenDates.map((e) {
+          final String key =
+              '${e.start.microsecondsSinceEpoch}-${e.end.microsecondsSinceEpoch}';
+          return CustomClassTimeRange(
+            id:
+                existingRangeIds[key] ??
+                customClassController.generateTimeRangeId(),
+            startTime: e.start,
+            endTime: e.end,
+          );
+        }).toList(),
+      );
+      Navigator.of(context).pop(customClass);
+    } catch (e) {
+      showToast(context: context, msg: e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final OutlineInputBorder inputEnabledBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: color.withValues(alpha: 0.25)),
+    );
+    final OutlineInputBorder inputFocusedBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: color, width: 1.2),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.toChange == null
+          widget.customToChange == null
               ? FlutterI18n.translate(
                   context,
                   "classtable.class_add.add_class_title",
@@ -99,62 +157,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         ),
         actions: [
           TextButton(
-            onPressed: () async {
-              if (classNameController.text.isEmpty) {
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "classtable.class_add.class_name_empty_message",
-                  ),
-                );
-              } else if (!(week > 0 && week <= 7) || !(start <= stop)) {
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "classtable.class_add.wrong_time_message",
-                  ),
-                );
-              } else if (widget.toChange == null) {
-                Navigator.of(context).pop((
-                  ClassDetail(name: classNameController.text),
-                  TimeArrangement(
-                    source: Source.user,
-                    index: -1,
-                    teacher: teacherNameController.text.isNotEmpty
-                        ? teacherNameController.text
-                        : null,
-                    classroom: classRoomController.text.isNotEmpty
-                        ? classRoomController.text
-                        : null,
-                    weekList: chosenWeek,
-                    day: week,
-                    start: start,
-                    stop: stop,
-                  ),
-                ));
-              } else {
-                Navigator.of(context).pop((
-                  widget.toChange!.$2,
-                  ClassDetail(name: classNameController.text),
-                  TimeArrangement(
-                    source: Source.user,
-                    index: widget.toChange!.$2.index,
-                    teacher: teacherNameController.text.isNotEmpty
-                        ? teacherNameController.text
-                        : null,
-                    classroom: classRoomController.text.isNotEmpty
-                        ? classRoomController.text
-                        : null,
-                    weekList: chosenWeek,
-                    day: week,
-                    start: start,
-                    stop: stop,
-                  ),
-                ));
-              }
-            },
+            onPressed: _save,
             child: Text(
               FlutterI18n.translate(
                 context,
@@ -164,15 +167,24 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
           ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        children: [
-          Column(
+      body: Align(
+        alignment: AlignmentGeometry.topCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 600),
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            children: [
+              Column(
                 children: [
                   TextField(
                     controller: classNameController,
-                    decoration: inputDecoration.copyWith(
-                      icon: Icon(Icons.calendar_month, color: color),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.book, color: color),
+                      enabledBorder: inputEnabledBorder,
+                      focusedBorder: inputFocusedBorder,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
                       hintText: FlutterI18n.translate(
                         context,
                         "classtable.class_add.input_classname_hint",
@@ -181,8 +193,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
                     controller: teacherNameController,
-                    decoration: inputDecoration.copyWith(
-                      icon: Icon(Icons.person, color: color),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person, color: color),
+                      enabledBorder: inputEnabledBorder,
+                      focusedBorder: inputFocusedBorder,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
                       hintText: FlutterI18n.translate(
                         context,
                         "classtable.class_add.input_teacher_hint",
@@ -191,8 +208,13 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
                     controller: classRoomController,
-                    decoration: inputDecoration.copyWith(
-                      icon: Icon(Icons.place, color: color),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.place, color: color),
+                      enabledBorder: inputEnabledBorder,
+                      focusedBorder: inputFocusedBorder,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
                       hintText: FlutterI18n.translate(
                         context,
                         "classtable.class_add.input_classroom_hint",
@@ -200,34 +222,21 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                 ],
-              )
-              .padding(vertical: 8, horizontal: 16)
-              .card(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                elevation: 0,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+              ).padding(vertical: 8),
+              DateSelectorFree(
+                initialDates: chosenDates,
+                semesterStartDay: semesterStartDate,
+                semesterLength: widget.semesterLength,
+                onChanged: (dates) {
+                  chosenDates = dates;
+                },
+                color: color,
+                deleteColor: deleteColor,
+                enableBorder: true,
               ),
-          WeekSelector(
-            initialWeeks: chosenWeek,
-            onChanged: (weeks) {
-              chosenWeek = weeks;
-            },
-            color: color,
+            ],
           ),
-          TimeSelector(
-            initialWeek: week,
-            initialStart: start,
-            initialStop: stop,
-            onChanged: (time) {
-              week = time.$1;
-              start = time.$2;
-              stop = time.$3;
-            },
-            color: color,
-          ),
-        ],
+        ),
       ),
     );
   }

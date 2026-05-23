@@ -14,7 +14,7 @@ import OSLog
 
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
-private let userClassFile = "UserClass.json"
+private let customClassFile = "CustomClassesV2.json"
 private let examFile = "ExamFile.json"
 private let physicsExperimentFile = "PhysicsExperiment.json"
 private let otherExperimentFile = "OtherExperiment.json"
@@ -105,18 +105,8 @@ struct Provider: TimelineProvider {
             logger.info("Getting courses data...")
             let fileURL = containerURL.appendingPathComponent(classTableFile)
             let jsonData = try Data(contentsOf: fileURL)
-            var classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
+            let classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
 
-            let userClassURL = containerURL.appendingPathComponent(userClassFile)
-            if let userClassJsonData = try? Data(contentsOf: userClassURL) {
-                let userDefinedClassData: UserDefinedClassData = try decoder.decode(
-                    UserDefinedClassData.self,
-                    from: userClassJsonData
-                )
-                classData.userDefinedDetail = userDefinedClassData.userDefinedDetail
-                classData.timeArrangement.append(contentsOf: userDefinedClassData.timeArrangement)
-            }
-            
             // Fetch start day
             guard var startDay = dateFormatter.date(from: classData.termStartDay) else {
                 throw StartDayFetchError()
@@ -199,7 +189,48 @@ struct Provider: TimelineProvider {
             completion(timeline)
             return
         }
-        
+
+        // Deal with custom class data
+        do {
+            logger.info("Getting custom class data...")
+            let customClassURL = containerURL.appendingPathComponent(customClassFile)
+            if let customClassJsonData = try? Data(contentsOf: customClassURL) {
+                let customClasses: [CustomClass] = try decoder.decode(
+                    [CustomClass].self, from: customClassJsonData
+                )
+
+                let components = calendar.dateComponents([.day,.month,.year], from: day)
+                let dayComp = components.day
+                let monthComp = components.month
+                let yearComp = components.year
+
+                for (index, cc) in customClasses.enumerated() {
+                    for tr in cc.timeRanges {
+                        let thisDay = calendar.dateComponents(
+                            [.day,.month,.year], from: tr.startTime
+                        )
+                        if thisDay.year == yearComp &&
+                           thisDay.month == monthComp &&
+                           thisDay.day == dayComp {
+                            arrangement.append(TimeLineStructItems(
+                                type: .user,
+                                name: cc.name,
+                                teacher: cc.teacher ?? "未知老师",
+                                place: cc.classroom ?? "未安排教室",
+                                start_time: tr.startTime,
+                                end_time: tr.endTime,
+                                colorIndex: index
+                            ))
+                        }
+                    }
+                }
+            } else {
+                logger.warning("No custom class data file, will ignore it")
+            }
+        } catch {
+            logger.error("Fetch custom class error: \(String(describing: error))")
+        }
+
         // Deal with exam data
         do {
             // Read data

@@ -8,13 +8,14 @@ import 'dart:math' as math;
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
-
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -83,6 +84,7 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// The controller...
   final ClassTableController classTableController = ClassTableController.i;
+  final CustomClassController customClassController = CustomClassController.i;
   final ExamController examController = ExamController.i;
   final PhysicsExperimentController physicsExperimentController =
       PhysicsExperimentController.i;
@@ -259,38 +261,51 @@ class ClassTableWidgetState with ChangeNotifier {
     ...otherExperimentController.otherExperiments.value,
   ];
 
+  /// The custom class list.
+  List<CustomClass> get customClasses => customClassController.customClasses;
+
   /// Get class detail by prividing index of timearrangement
   ClassDetail getClassDetail(int index) => classTableController
       .classTableComputedSignal
       .value
       .getClassDetail(timeArrangement[index]);
 
-  /// Bridge function to add/del/edit user defined class
-  /// Only main classtable support it!
-  Future<void> addUserDefinedClass(
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) => classTableController
-      .addUserDefinedClass(classDetail, timeArrangement)
-      .then((value) => notifyListeners());
+  Future<void> addCustomClass(CustomClass customClass) =>
+      customClassController.addCustomClass(customClass).then((_) {
+        notifyListeners();
+      });
 
-  Future<void> editUserDefinedClass(
-    TimeArrangement oldTimeArrangment,
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) => classTableController
-      .editUserDefinedClass(oldTimeArrangment, classDetail, timeArrangement)
-      .then((value) => notifyListeners());
+  Future<void> editCustomClassById(
+    String customClassId,
+    CustomClass customClass,
+  ) => customClassController
+      .editCustomClassById(customClassId, customClass)
+      .then((_) {
+        notifyListeners();
+      });
 
-  Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) =>
-      classTableController
-          .deleteUserDefinedClass(timeArrangement)
-          .then((value) => notifyListeners());
+  Future<void> deleteCustomClassById(String customClassId) =>
+      customClassController.deleteCustomClassById(customClassId).then((_) {
+        notifyListeners();
+      });
+
+  Future<void> deleteCustomClassTimeRange({
+    required String customClassId,
+    required String timeRangeId,
+  }) => customClassController
+      .deleteCustomClassTimeRange(
+        customClassId: customClassId,
+        timeRangeId: timeRangeId,
+      )
+      .then((_) {
+        notifyListeners();
+      });
 
   List<Event> get events => buildCalendarEvents(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: subjects,
     experiments: experiments,
+    customClasses: customClasses,
   );
 
   /// Generate icalendar file string.
@@ -422,6 +437,24 @@ class ClassTableWidgetState with ChangeNotifier {
           );
         }
       }
+    }
+
+    final customOccurrences = customClassController.getOccurrenceOfDay(
+      weekIndex: weekIndex,
+      dayIndex: dayIndex,
+      semesterStartDay: startDay,
+    );
+    for (final occurrence in customOccurrences) {
+      final int colorIndex = customClasses.indexWhere(
+        (item) => item.id == occurrence.customClass.id,
+      );
+      events.add(
+        ClassOrgainzedData.fromCustomClass(
+          colorList[(colorIndex >= 0 ? colorIndex : 0) % colorList.length],
+          occurrence.customClass,
+          occurrence.timeRange,
+        ),
+      );
     }
 
     /// Sort it with the ascending order of start time.

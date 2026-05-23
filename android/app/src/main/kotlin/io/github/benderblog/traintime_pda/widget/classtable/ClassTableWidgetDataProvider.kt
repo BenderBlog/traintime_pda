@@ -10,11 +10,11 @@ import io.github.benderblog.traintime_pda.R
 import io.github.benderblog.traintime_pda.model.ClassTableConstants
 import io.github.benderblog.traintime_pda.model.ClassTableData
 import io.github.benderblog.traintime_pda.model.ClassTableWidgetLoadState
+import io.github.benderblog.traintime_pda.model.CustomClass
 import io.github.benderblog.traintime_pda.model.ExamData
 import io.github.benderblog.traintime_pda.model.ExperimentData
 import io.github.benderblog.traintime_pda.model.Source
 import io.github.benderblog.traintime_pda.model.TimeLineItem
-import io.github.benderblog.traintime_pda.model.UserDefinedClassData
 import io.github.benderblog.traintime_pda.model.endTime
 import io.github.benderblog.traintime_pda.model.startTime
 import io.github.benderblog.traintime_pda.model.timeRanges
@@ -34,6 +34,7 @@ class ClassTableWidgetDataProvider {
     private lateinit var classTableData: ClassTableData
     private lateinit var examData: ExamData
     private var experimentData: List<ExperimentData> = emptyList()
+    private var customClassData: List<CustomClass> = emptyList()
 
     private var widgetState = ClassTableWidgetLoadState.LOADING
     private var errorMessage: String? = null
@@ -74,6 +75,7 @@ class ClassTableWidgetDataProvider {
                 loadOneDayClass()
                 loadOneDayExam()
                 loadOneDayExperiment()
+                loadOneDayCustomClass()
                 timeLineItem.sortBy { it.startTime }
             }
         } catch (e: Exception) {
@@ -123,31 +125,6 @@ class ClassTableWidgetDataProvider {
             Log.i(
                 "$tag[loadBasicConfig]",
                 "schoolClassTableData loaded, " + "semester code: ${schoolClassTableData.semesterCode}, " + "begin time: ${schoolClassTableData.termStartDay}, " + "semester length: ${schoolClassTableData.semesterLength}, " + "class detail length: ${schoolClassTableData.classDetail.size}, " + "time arrangement length: ${schoolClassTableData.timeArrangement.size}"
-            )
-
-            val userDefinedClassData = ClassTableDataHolder.userDefinedClassJsonData.getOrElse {
-                Log.e("$tag[loadBasicConfig]", "Failed to load userDefinedClassJsonData", it)
-                widgetState = ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED
-                errorMessage = it.localizedMessage ?: it.message
-                        ?: context.getString(R.string.widget_classtable_unknown_error)
-                return
-            }?.takeIf {
-                Log.i("$tag[loadBasicConfig]", "userDefinedClassJsonData is not blank: ${it.isNotBlank()}")
-                it.isNotBlank()
-            }?.let {
-                try {
-                    lenientJson.decodeFromString<UserDefinedClassData>(it)
-                } catch (e: Exception) {
-                    Log.e("$tag[loadBasicConfig]", "Failed to parse userDefinedClassJsonData", e)
-                    widgetState = ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED
-                    errorMessage = e.localizedMessage ?: e.message
-                            ?: context.getString(R.string.widget_classtable_unknown_error)
-                    return
-                }
-            } ?: UserDefinedClassData.EMPTY
-            Log.i(
-                "$tag[loadBasicConfig]",
-                "userDefinedClassJsonData loaded, " + "userDefinedDetail length: ${userDefinedClassData.userDefinedDetail.size}, " + "time arrangement length: ${userDefinedClassData.timeArrangement.size}"
             )
 
             examData = ClassTableDataHolder.examJsonData.getOrElse {
@@ -215,17 +192,35 @@ class ClassTableWidgetDataProvider {
 
             experimentData = physicsExperimentData + otherExperimentData
 
-            // merge class table with user added class
-            classTableData = schoolClassTableData.copy(
-                userDefinedDetail = userDefinedClassData.userDefinedDetail,
-                timeArrangement = schoolClassTableData.timeArrangement + userDefinedClassData.timeArrangement,
-            )
-            Log.i("$tag[loadBasicConfig]", "Class table merged.")
+            customClassData = ClassTableDataHolder.customClassJsonData.getOrElse {
+                Log.e("$tag[loadBasicConfig]", "Failed to load customClassJsonData", it)
+                widgetState = ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED
+                errorMessage = it.localizedMessage ?: it.message
+                        ?: context.getString(R.string.widget_classtable_unknown_error)
+                return
+            }?.takeIf {
+                Log.i("$tag[loadBasicConfig]", "customClassJsonData is not blank: ${it.isNotBlank()}")
+                it.isNotBlank()
+            }?.let {
+                try {
+                    lenientJson.decodeFromString<List<CustomClass>>(it)
+                } catch (e: Exception) {
+                    Log.e("$tag[loadBasicConfig]", "Failed to parse customClassJsonData", e)
+                    widgetState = ClassTableWidgetLoadState.ERROR_COURSE_USER_DEFINED
+                    errorMessage = e.localizedMessage ?: e.message
+                            ?: context.getString(R.string.widget_classtable_unknown_error)
+                    return
+                }
+            } ?: emptyList()
+            Log.i("$tag[loadBasicConfig]", "customClassData loaded, data length: ${customClassData.size}")
+
+            classTableData = schoolClassTableData
+            Log.i("$tag[loadBasicConfig]", "Class table loaded.")
 
             // calculate day index of today
             val termStartDayStr = classTableData.termStartDay
             if (termStartDayStr.isBlank()) {
-                if (classTableData == ClassTableData.EMPTY && userDefinedClassData == UserDefinedClassData.EMPTY) {
+                if (classTableData == ClassTableData.EMPTY) {
                     Log.w("$tag[loadBasicConfig]", "Term start day is blank and no class data loaded.")
                 } else {
                     Log.e("$tag[loadBasicConfig]", "Term start day is blank, cannot calculate week/day index!")
@@ -391,6 +386,40 @@ class ClassTableWidgetDataProvider {
                     Log.i(
                         "$tag[loadOneDayExperiment]",
                         "$data is not the same day as today",
+                    )
+                }
+            }
+        }
+    }
+
+    private fun loadOneDayCustomClass() {
+        val curYear: Int = currentTime.year
+        val curMonth: Int = currentTime.monthValue
+        val curDay: Int = currentTime.dayOfMonth
+        Log.i(
+            "$tag[loadOneDayCustomClass]",
+            "curTime: $curYear-$curMonth-$curDay",
+        )
+        for ((index, cc) in customClassData.withIndex()) {
+            for (tr in cc.timeRanges) {
+                if (tr.startTime.year == curYear &&
+                    tr.startTime.monthValue == curMonth &&
+                    tr.startTime.dayOfMonth == curDay
+                ) {
+                    Log.i(
+                        "$tag[loadOneDayCustomClass]",
+                        "Adding custom class $cc at date ${tr.startTime}",
+                    )
+                    timeLineItem.add(
+                        TimeLineItem(
+                            type = Source.USER,
+                            name = cc.name,
+                            teacher = cc.teacher ?: "未知教师",
+                            place = cc.classroom ?: "未安排教室",
+                            startTime = tr.startTime,
+                            endTime = tr.endTime,
+                            colorIndex = index,
+                        )
                     )
                 }
             }

@@ -6,6 +6,7 @@
 // Removed left/right, only use stack.
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -97,6 +98,19 @@ class ClassOrgainzedData {
     name: exp.name,
     place: exp.classroom,
     actualEndTime: stop,
+  );
+
+  factory ClassOrgainzedData.fromCustomClass(
+    MaterialColor color,
+    CustomClass customClass,
+    CustomClassTimeRange timeRange,
+  ) => ClassOrgainzedData._(
+    data: [(customClass, timeRange, color)],
+    start: timeRange.startTime,
+    stop: timeRange.endTime,
+    color: color,
+    name: customClass.name,
+    place: customClass.classroom,
   );
 
   ClassOrgainzedData({

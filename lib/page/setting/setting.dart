@@ -14,7 +14,6 @@ import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -42,8 +41,9 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
+import 'package:watermeter/repository/custom_class_service.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
@@ -606,13 +606,8 @@ class _SettingWindowState extends State<SettingWindow> {
                           child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
-                          onPressed: () {
-                            UserDefinedClassFile.clearUserDefinedClass();
-                            ClassTableController
-                                    .i
-                                    .userDefinedClassSignal
-                                    .value =
-                                UserDefinedClassData.empty();
+                          onPressed: () async {
+                            await CustomClassController.i.clearAll();
                             if (mounted) {
                               setState(() {});
                             }
@@ -967,7 +962,7 @@ void _removeAll() {
   EnergySession.clearElectricityHistory();
   for (var value in [
     ClassTableSession.schoolClassName,
-    UserDefinedClassFile.userDefinedClassName,
+    CustomClassRepository.fileName,
     ClassTableController.decorationName,
     ExamSession.examDataCacheName,
     ExperimentSession.physicsExperimentCacheName,

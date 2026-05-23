@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
@@ -741,22 +741,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   int semesterLength = ClassTableState.of(
                     context,
                   )!.controllers.semesterLength;
-                  (ClassDetail, TimeArrangement)? data =
-                      await Navigator.of(
-                        context,
-                      ).push<(ClassDetail, TimeArrangement)>(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return ClassAddWindow(
-                              semesterLength: semesterLength,
-                            );
-                          },
-                        ),
-                      );
+                  dynamic data = await Navigator.of(context).push<dynamic>(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return ClassAddWindow(semesterLength: semesterLength);
+                      },
+                    ),
+                  );
                   if (context.mounted && data != null) {
-                    await ClassTableState.of(
-                      context,
-                    )!.controllers.addUserDefinedClass(data.$1, data.$2);
+                    if (data is CustomClass) {
+                      await ClassTableState.of(
+                        context,
+                      )!.controllers.addCustomClass(data);
+                    }
                   }
                   break;
                 case 'D':
