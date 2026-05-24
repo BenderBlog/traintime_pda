@@ -117,7 +117,8 @@ class _MyAppState extends State<MyApp> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      final screenWidth = PlatformDispatcher.instance.views.first.physicalSize.width /
+      final screenWidth =
+          PlatformDispatcher.instance.views.first.physicalSize.width /
           PlatformDispatcher.instance.views.first.devicePixelRatio;
       log.info("Screen width: $screenWidth.");
       if (screenWidth < 480) {

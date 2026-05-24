@@ -1,50 +1,32 @@
 PODS:
   - charset_converter (0.0.1):
     - Flutter
-  - device_calendar (0.0.1):
-    - Flutter
   - Flutter (1.0.0)
-  - flutter_local_notifications (0.0.1):
-    - Flutter
   - flutter_mailer (0.0.1):
-    - Flutter
-  - fluttertoast (0.0.2):
     - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
 
 DEPENDENCIES:
   - charset_converter (from `.symlinks/plugins/charset_converter/ios`)
-  - device_calendar (from `.symlinks/plugins/device_calendar/ios`)
   - Flutter (from `Flutter`)
-  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
-  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 EXTERNAL SOURCES:
   charset_converter:
     :path: ".symlinks/plugins/charset_converter/ios"
-  device_calendar:
-    :path: ".symlinks/plugins/device_calendar/ios"
   Flutter:
     :path: Flutter
-  flutter_local_notifications:
-    :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_mailer:
     :path: ".symlinks/plugins/flutter_mailer/ios"
-  fluttertoast:
-    :path: ".symlinks/plugins/fluttertoast/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
   charset_converter: 82bc1d2e3c70dcb51bf769e9772e3ae5b2571695
-  device_calendar: b55b2c5406cfba45c95a59f9059156daee1f74ed
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
   flutter_mailer: 3a8cd4f36c960fb04528d5471097270c19fec1c4
-  fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
 
 PODFILE CHECKSUM: 33ee58e3b6ad46b815d23ed7bf392f2a93d23dc3
