@@ -70,7 +70,7 @@ abstract class NotificationService {
       );
 
       await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: handleNotificationTap,
       );
 
@@ -136,14 +136,12 @@ abstract class NotificationService {
         );
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzScheduledTime,
-          notificationDetails,
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: tzScheduledTime,
+          notificationDetails: notificationDetails,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           payload: payload,
         );
       } else if (Platform.isIOS || Platform.isMacOS) {
@@ -153,14 +151,12 @@ abstract class NotificationService {
         );
 
         await flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzScheduledTime,
-          notificationDetails,
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: tzScheduledTime,
+          notificationDetails: notificationDetails,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           payload: payload,
         );
       }
@@ -199,10 +195,10 @@ abstract class NotificationService {
         );
 
         await flutterLocalNotificationsPlugin.show(
-          id,
-          title,
-          body,
-          notificationDetails,
+          id: id,
+          title: title,
+          body: body,
+          notificationDetails: notificationDetails,
           payload: payload,
         );
       } else if (Platform.isIOS || Platform.isMacOS) {
@@ -212,10 +208,10 @@ abstract class NotificationService {
         );
 
         await flutterLocalNotificationsPlugin.show(
-          id,
-          title,
-          body,
-          notificationDetails,
+          id: id,
+          title: title,
+          body: body,
+          notificationDetails: notificationDetails,
           payload: payload,
         );
       }
@@ -342,7 +338,7 @@ abstract class NotificationService {
     }
 
     try {
-      await flutterLocalNotificationsPlugin.cancel(id);
+      await flutterLocalNotificationsPlugin.cancel(id: id);
       log.info('Cancelled notification $id');
     } catch (e, stackTrace) {
       log.error(

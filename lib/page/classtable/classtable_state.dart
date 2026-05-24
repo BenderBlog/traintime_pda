@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
 
@@ -287,7 +286,7 @@ class ClassTableWidgetState with ChangeNotifier {
           .deleteUserDefinedClass(timeArrangement)
           .then((value) => notifyListeners());
 
-  List<Event> get events => buildCalendarEvents(
+  List<CalendarEventDraft> get events => buildCalendarEvents(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: subjects,
     experiments: experiments,

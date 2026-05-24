@@ -50,7 +50,6 @@ class SchoolnetSession extends NetworkSession {
       6,
       networkInfoResponse.length - 1,
     );
-    print(jsonString);
     return CurrentUserNetInfo.fromJson(jsonDecode(jsonString));
   }
 

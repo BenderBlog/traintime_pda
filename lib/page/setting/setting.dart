@@ -525,7 +525,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () async {
-                    FilePickerResult? result;
+                    PlatformFile? result;
                     try {
                       result = await pickFile(type: FileType.image);
                     } on MissingStoragePermissionException {
@@ -541,7 +541,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     }
                     if (mounted) {
                       if (result != null) {
-                        File(result.files.single.path!).copySync(
+                        File(result.path!).copySync(
                           "${supportPath.path}/${ClassTableController.decorationName}",
                         );
                         preference.setBool(

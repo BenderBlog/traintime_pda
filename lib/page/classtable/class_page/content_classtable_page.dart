@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -25,7 +25,6 @@ import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:share_plus/share_plus.dart';
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -711,7 +710,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               ),
             ],
             onSelected: (String action) async {
-              final box = context.findRenderObject() as RenderBox?;
               switch (action) {
                 case 'A':
                   var notArranged = ClassTableState.of(
@@ -792,47 +790,41 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           "${DateFormat("yyyyMMddTHHmmss").format(DateTime.now())}-"
                           "${classTableState.semesterCode}"
                           ".ics";
-                      if (Platform.isLinux ||
-                          Platform.isMacOS ||
-                          Platform.isWindows) {
-                        String? resultFilePath = await FilePicker.saveFile(
-                          dialogTitle: FlutterI18n.translate(
-                            context,
-                            "classtable.partner_classtable.save_dialog.title",
-                          ),
-                          fileName: fileName,
-                          allowedExtensions: ["ics"],
-                          lockParentWindow: true,
-                        );
-                        if (resultFilePath != null) {
-                          File file = File(resultFilePath);
-                          if (!(await file.exists())) {
-                            await file.create();
-                          }
-                          await file.writeAsString(
-                            classTableState.iCalenderStr,
-                          );
-                        }
-                      } else {
-                        String tempPath = await getTemporaryDirectory().then(
-                          (value) => value.path,
-                        );
-                        File file = File("$tempPath/$fileName");
-                        if (!(await file.exists())) {
-                          await file.create();
-                        }
-                        await file.writeAsString(classTableState.iCalenderStr);
-                        await SharePlus.instance.share(
-                          ShareParams(
-                            files: [XFile("$tempPath/$fileName")],
-                            sharePositionOrigin:
-                                box!.localToGlobal(Offset.zero) & box.size,
-                          ),
-                        );
+                      //  if (Platform.isLinux ||
+                      //      Platform.isMacOS ||
+                      //      Platform.isWindows) {
+                      await FilePicker.saveFile(
+                        dialogTitle: FlutterI18n.translate(
+                          context,
+                          "classtable.partner_classtable.save_dialog.title",
+                        ),
+                        fileName: fileName,
+                        allowedExtensions: ["ics"],
+                        bytes: Uint8List.fromList(
+                          classTableState.iCalenderStr.codeUnits,
+                        ),
+                        lockParentWindow: true,
+                      );
+                      //  } else {
+                      //    String tempPath = await getTemporaryDirectory().then(
+                      //      (value) => value.path,
+                      //    );
+                      //    File file = File("$tempPath/$fileName");
+                      //    if (!(await file.exists())) {
+                      //      await file.create();
+                      //    }
+                      //    await file.writeAsString(classTableState.iCalenderStr);
+                      //   await SharePlus.instance.share(
+                      //    ShareParams(
+                      //        files: [XFile("$tempPath/$fileName")],
+                      //        sharePositionOrigin:
+                      //            box!.localToGlobal(Offset.zero) & box.size,
+                      //     ),
+                      //  );
 
-                        await file.delete();
-                      }
+                      //    await file.delete();
                     }
+                    //}
                     if (context.mounted) {
                       showToast(
                         context: context,

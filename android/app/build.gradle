@@ -1,9 +1,8 @@
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-    id 'org.jetbrains.kotlin.plugin.compose'
-    id 'org.jetbrains.kotlin.plugin.serialization'
+    id("com.android.application")
+    id("dev.flutter.flutter-gradle-plugin")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 def localProperties = new Properties()
@@ -30,6 +29,12 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 android {
     compileSdk = 36
     ndkVersion = "28.2.13676358"
@@ -47,10 +52,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled true
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
     }
 
     sourceSets {
@@ -102,7 +103,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'
 
     // Core library desugaring for flutter_local_notifications
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 
     // Add the WindowManager library to avoid crashing on Android 12L and above
     // Ref. https://pub.dev/packages/flutter_local_notifications#-android-setup
@@ -113,23 +114,12 @@ dependencies {
     //       is closed and the fix is available in a stable home_widget release.
     // Lock ALL androidx.glance artifacts to 1.1.1 — home_widget declares
     // "androidx.glance:glance-appwidget:1.+" which can resolve to alpha versions.
-    constraints {
-        implementation("androidx.glance:glance") {
-            version { strictly("1.1.1") }
-        }
-        implementation("androidx.glance:glance-appwidget") {
-            version { strictly("1.1.1") }
-        }
-        implementation("androidx.glance:glance-material3") {
-            version { strictly("1.1.1") }
-        }
-        implementation("androidx.glance:glance-preview") {
-            version { strictly("1.1.1") }
-        }
-        implementation("androidx.glance:glance-appwidget-preview") {
-            version { strictly("1.1.1") }
-        }
-    }
+    // Note: `constraints` does NOT work here because Flutter plugin subprojects
+    // resolve their own implementation dependencies independently. We must use
+    // resolutionStrategy.eachDependency which applies to every configuration
+    // across all modules in this build.
+    // (must be placed inside rootProject.subprojects in the root build.gradle,
+    //  or here via afterEvaluate)
     implementation 'androidx.glance:glance:1.1.1'
     implementation 'androidx.glance:glance-material3:1.1.1'
     implementation 'androidx.compose.ui:ui-android:1.8.1'

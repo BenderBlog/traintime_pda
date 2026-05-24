@@ -4,9 +4,8 @@
 
 import 'dart:convert';
 
-import 'package:device_calendar/device_calendar.dart';
+import 'package:device_calendar_plus/device_calendar_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
@@ -23,8 +22,8 @@ const String exportedClassTableCalendarPrefix = 'PDA Class Arrangement';
 /// Build a stable calendar name for exported classtable events.
 String buildExportedClassTableCalendarName(String semesterCode) =>
     semesterCode.isEmpty
-        ? exportedClassTableCalendarPrefix
-        : '$exportedClassTableCalendarPrefix $semesterCode';
+    ? exportedClassTableCalendarPrefix
+    : '$exportedClassTableCalendarPrefix $semesterCode';
 
 /// Build a stable snapshot used to decide whether auto sync is needed.
 String buildSystemCalendarSnapshot({
@@ -37,15 +36,36 @@ String buildSystemCalendarSnapshot({
   'experiments': experiments.map((item) => item.toJson()).toList(),
 });
 
-List<Event> buildCalendarEvents({
+/// Lightweight draft used to build events before pushing them to the system
+/// calendar or serialising to iCalendar format.
+///
+/// The plugin's [Event] class is read-only and can only be obtained from the
+/// platform.  This draft captures all the fields we need for both write and
+/// iCal-export paths.
+class CalendarEventDraft {
+  final String title;
+  final String? description;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String? location;
+  final RecurrenceRule? recurrenceRule;
+
+  const CalendarEventDraft({
+    required this.title,
+    this.description,
+    required this.startDate,
+    required this.endDate,
+    this.location,
+    this.recurrenceRule,
+  });
+}
+
+List<CalendarEventDraft> buildCalendarEvents({
   required ClassTableData classTableData,
   required List<Subject> subjects,
   required List<ExperimentData> experiments,
 }) {
-  List<Event> events = [];
-
-  tz.initializeTimeZones();
-  Location currentLocation = getLocation('Asia/Shanghai');
+  List<CalendarEventDraft> events = [];
 
   if (classTableData.termStartDay.isNotEmpty) {
     DateTime startDay = DateTime.parse(classTableData.termStartDay);
@@ -83,21 +103,21 @@ List<Event> buildCalendarEvents({
       DayOfWeek getDayOfWeek(int day) {
         switch (day) {
           case 1:
-            return DayOfWeek.Monday;
+            return DayOfWeek.monday;
           case 2:
-            return DayOfWeek.Tuesday;
+            return DayOfWeek.tuesday;
           case 3:
-            return DayOfWeek.Wednesday;
+            return DayOfWeek.wednesday;
           case 4:
-            return DayOfWeek.Thursday;
+            return DayOfWeek.thursday;
           case 5:
-            return DayOfWeek.Friday;
+            return DayOfWeek.friday;
           case 6:
-            return DayOfWeek.Saturday;
+            return DayOfWeek.saturday;
           case 7:
-            return DayOfWeek.Sunday;
+            return DayOfWeek.sunday;
           default:
-            return DayOfWeek.Sunday;
+            return DayOfWeek.sunday;
         }
       }
 
@@ -119,20 +139,20 @@ List<Event> buildCalendarEvents({
           ),
         );
 
-        RecurrenceRule rrule = RecurrenceRule(
-          RecurrenceFrequency.Weekly,
+        RecurrenceRule rrule = WeeklyRecurrence(
           daysOfWeek: [getDayOfWeek(i.day)],
-          endDate: firstDay.add(Duration(days: (range.$2 - range.$1) * 7 + 1)),
+          end: UntilEnd(
+            firstDay.add(Duration(days: (range.$2 - range.$1) * 7 + 1)),
+          ),
         );
 
         events.add(
-          Event(
-            null,
+          CalendarEventDraft(
             title: title,
             description: description,
             recurrenceRule: rrule,
-            start: TZDateTime.from(startTimeToUse, currentLocation),
-            end: TZDateTime.from(stopTimeToUse, currentLocation),
+            startDate: startTimeToUse,
+            endDate: stopTimeToUse,
             location: location,
           ),
         );
@@ -147,12 +167,11 @@ List<Event> buildCalendarEvents({
     String location = '${i.place} ${i.seat != null ? "-${i.seat}" : ""}';
 
     events.add(
-      Event(
-        null,
+      CalendarEventDraft(
         title: title,
         description: description,
-        start: TZDateTime.from(i.startTime!, currentLocation),
-        end: TZDateTime.from(i.stopTime!, currentLocation),
+        startDate: i.startTime!,
+        endDate: i.stopTime!,
         location: location,
       ),
     );
@@ -161,12 +180,11 @@ List<Event> buildCalendarEvents({
   for (var experiment in experiments) {
     for (var j in experiment.timeRanges) {
       events.add(
-        Event(
-          null,
+        CalendarEventDraft(
           title: '${experiment.name}@${experiment.classroom}',
           description: '实验名称：${experiment.name} - 老师：${experiment.teacher}',
-          start: TZDateTime.from(j.$1, currentLocation),
-          end: TZDateTime.from(j.$2, currentLocation),
+          startDate: j.$1,
+          endDate: j.$2,
           location: experiment.classroom,
         ),
       );
@@ -176,75 +194,58 @@ List<Event> buildCalendarEvents({
   return events;
 }
 
-String buildICalendarString(List<Event> events) {
-  String toReturn = '''BEGIN:VCALENDAR
-CALSCALE:GREGORIAN
-BEGIN:VTIMEZONE
-TZID:Asia/Shanghai
-X-LIC-LOCATION:Asia/Shanghai
-BEGIN:STANDARD
-TZOFFSETFROM:+0800
-TZOFFSETTO:+0800
-TZNAME:CST
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-''';
+String buildICalendarString(List<CalendarEventDraft> events) {
+  String toReturn = 'BEGIN:VCALENDAR\n'
+      'CALSCALE:GREGORIAN\n'
+      'BEGIN:VTIMEZONE\n'
+      'TZID:Asia/Shanghai\n'
+      'X-LIC-LOCATION:Asia/Shanghai\n'
+      'BEGIN:STANDARD\n'
+      'TZOFFSETFROM:+0800\n'
+      'TZOFFSETTO:+0800\n'
+      'TZNAME:CST\n'
+      'DTSTART:19700101T000000\n'
+      'END:STANDARD\n'
+      'END:VTIMEZONE\n';
 
   for (var i in events) {
     String vevent = 'BEGIN:VEVENT\n';
 
     vevent +=
         'DTSTAMP:${DateFormat('yyyyMMddTHHmmssZ').format(DateTime.now())}\n';
-    vevent += 'SUMMARY:${i.title ?? "待定"}\n';
+    vevent += 'SUMMARY:${i.title}\n';
     vevent += 'DESCRIPTION:${i.description ?? "待定"}\n';
 
     vevent +=
         'DTSTART;TZID=Asia/Shanghai:'
-        '${DateFormat('yyyyMMddTHHmmss').format(
-          DateTime.fromMicrosecondsSinceEpoch(i.start!.microsecondsSinceEpoch),
-        )}\n';
+        '${DateFormat('yyyyMMddTHHmmss').format(i.startDate)}\n';
     vevent +=
         'DTEND;TZID=Asia/Shanghai:'
-        '${DateFormat('yyyyMMddTHHmmss').format(
-          DateTime.fromMicrosecondsSinceEpoch(i.end!.microsecondsSinceEpoch),
-        )}\n';
+        '${DateFormat('yyyyMMddTHHmmss').format(i.endDate)}\n';
     if (i.location != null) {
       vevent += 'LOCATION:${i.location}\n';
     }
 
-    if (i.recurrenceRule != null) {
-      String getWeekStr(DayOfWeek day) {
-        switch (day) {
-          case DayOfWeek.Monday:
-            return 'MO';
-          case DayOfWeek.Tuesday:
-            return 'TU';
-          case DayOfWeek.Wednesday:
-            return 'WE';
-          case DayOfWeek.Thursday:
-            return 'TH';
-          case DayOfWeek.Friday:
-            return 'FR';
-          case DayOfWeek.Saturday:
-            return 'SA';
-          case DayOfWeek.Sunday:
-            return 'SU';
-        }
+    if (i.recurrenceRule is WeeklyRecurrence) {
+      final weekly = i.recurrenceRule! as WeeklyRecurrence;
+      final day = weekly.daysOfWeek?.firstOrNull;
+      final endDate = (weekly.end is UntilEnd)
+          ? (weekly.end as UntilEnd).until
+          : null;
+      if (day != null && endDate != null) {
+        vevent +=
+            'RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=${day.toRruleDay()};'
+            'UNTIL=${DateFormat('yyyyMMdd').format(endDate)}\n';
       }
-
-      vevent +=
-          'RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=${getWeekStr(i.recurrenceRule!.daysOfWeek!.first)};'
-          'UNTIL=${DateFormat('yyyyMMdd').format(i.recurrenceRule!.endDate!)}\n';
     }
     toReturn += '${vevent}END:VEVENT\n';
   }
 
-  return '${toReturn}END:VCALENDAR';
+  return '${toReturn}END:VCALENDAR\n';
 }
 
 class SystemCalendarSyncService {
-  final DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
+  final DeviceCalendar deviceCalendar = DeviceCalendar();
 
   ClassTableController get classTableController => ClassTableController.i;
   ExamController get examController => ExamController.i;
@@ -262,16 +263,15 @@ class SystemCalendarSyncService {
   String get savedCalendarSemesterCode =>
       preference.getString(preference.Preference.systemCalendarSemesterCode);
 
-  String get calendarName => buildExportedClassTableCalendarName(
-    currentSemesterCode,
-  );
+  String get calendarName =>
+      buildExportedClassTableCalendarName(currentSemesterCode);
 
   List<ExperimentData> get experiments => [
     ...physicsExperimentController.physicsExperiments.value,
     ...otherExperimentController.otherExperiments.value,
   ];
 
-  List<Event> get events => buildCalendarEvents(
+  List<CalendarEventDraft> get events => buildCalendarEvents(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: examController.subjects.value,
     experiments: experiments,
@@ -305,8 +305,8 @@ class SystemCalendarSyncService {
     required bool requestPermissionsIfNeeded,
     Future<void> Function()? showDialog,
   }) async {
-    Result<bool> hasPermitted = await deviceCalendarPlugin.hasPermissions();
-    if (hasPermitted.data == true) {
+    CalendarPermissionStatus status = await deviceCalendar.hasPermissions();
+    if (status == CalendarPermissionStatus.granted) {
       return true;
     }
 
@@ -317,8 +317,8 @@ class SystemCalendarSyncService {
     if (showDialog != null) {
       await showDialog();
     }
-    hasPermitted = await deviceCalendarPlugin.requestPermissions();
-    return hasPermitted.data == true;
+    status = await deviceCalendar.requestPermissions();
+    return status == CalendarPermissionStatus.granted;
   }
 
   Future<void> _saveCalendarBinding(String calendarId) async {
@@ -346,18 +346,17 @@ class SystemCalendarSyncService {
   }
 
   Future<List<Calendar>?> _retrieveWritableCalendars() async {
-    final calendarResult = await deviceCalendarPlugin.retrieveCalendars();
-    if (!calendarResult.isSuccess || calendarResult.data == null) {
+    try {
+      final calendars = await deviceCalendar.listCalendars();
+      return calendars.where((calendar) => !calendar.readOnly).toList();
+    } catch (e, s) {
       log.info(
         '[SystemCalendarSyncService][_retrieveWritableCalendars] '
-        'Retrieve calendars failed.',
+        'Retrieve calendars failed: $e',
       );
+      log.handle(e, s);
       return null;
     }
-
-    return calendarResult.data!
-        .where((calendar) => calendar.isReadOnly != true)
-        .toList();
   }
 
   Future<Calendar?> _findBoundCalendar(List<Calendar> calendars) async {
@@ -377,9 +376,8 @@ class SystemCalendarSyncService {
       // Migrate older bindings that do not persist the semester code yet.
       if (savedCalendarSemesterCode.isEmpty &&
           calendar.name == calendarName &&
-          calendar.id != null &&
-          calendar.id!.isNotEmpty) {
-        await _saveCalendarBinding(calendar.id!);
+          calendar.id.isNotEmpty) {
+        await _saveCalendarBinding(calendar.id);
         return calendar;
       }
 
@@ -415,10 +413,8 @@ class SystemCalendarSyncService {
     }
 
     for (var calendar in calendars) {
-      if (calendar.name == calendarName &&
-          calendar.id != null &&
-          calendar.id!.isNotEmpty) {
-        await _saveCalendarBinding(calendar.id!);
+      if (calendar.name == calendarName && calendar.id.isNotEmpty) {
+        await _saveCalendarBinding(calendar.id);
         return calendar;
       }
     }
@@ -427,20 +423,26 @@ class SystemCalendarSyncService {
   }
 
   Future<String?> _createExportedCalendar() async {
-    Result<String> calendarIdData = await deviceCalendarPlugin.createCalendar(
-      calendarName,
-    );
-    if (!calendarIdData.isSuccess ||
-        calendarIdData.data == null ||
-        calendarIdData.data!.isEmpty) {
+    try {
+      final calendarId = await deviceCalendar.createCalendar(
+        name: calendarName,
+      );
+      if (calendarId.isEmpty) {
+        log.info(
+          '[SystemCalendarSyncService][_createExportedCalendar] '
+          'Create calendar returned empty id.',
+        );
+        return null;
+      }
+      return calendarId;
+    } catch (e, s) {
       log.info(
         '[SystemCalendarSyncService][_createExportedCalendar] '
-        'Create calendar failed.',
+        'Create calendar failed: $e',
       );
+      log.handle(e, s);
       return null;
     }
-
-    return calendarIdData.data!;
   }
 
   Future<String?> _prepareCalendar({required bool onlyIfCalendarExists}) async {
@@ -455,7 +457,7 @@ class SystemCalendarSyncService {
       return await _createExportedCalendar();
     }
 
-    if (exportedCalendar.id == null || exportedCalendar.id!.isEmpty) {
+    if (exportedCalendar.id.isEmpty) {
       log.info(
         '[SystemCalendarSyncService][_prepareCalendar] '
         'Exported calendar has empty id.',
@@ -463,14 +465,14 @@ class SystemCalendarSyncService {
       return null;
     }
 
-    Result<bool> deleteResult = await deviceCalendarPlugin.deleteCalendar(
-      exportedCalendar.id!,
-    );
-    if (deleteResult.data != true) {
+    try {
+      await deviceCalendar.deleteCalendar(exportedCalendar.id);
+    } catch (e, s) {
       log.info(
         '[SystemCalendarSyncService][_prepareCalendar] '
-        'Delete old exported calendar failed.',
+        'Delete old exported calendar failed: $e',
       );
+      log.handle(e, s);
       return null;
     }
 
@@ -480,16 +482,22 @@ class SystemCalendarSyncService {
 
   Future<bool> _writeEventsToCalendar(String calendarId) async {
     for (var i in events) {
-      final toPush = i..calendarId = calendarId;
-      Result<String>? addEventResult = await deviceCalendarPlugin
-          .createOrUpdateEvent(toPush);
-      if (addEventResult == null ||
-          addEventResult.data == null ||
-          addEventResult.data!.isEmpty) {
+      try {
+        await deviceCalendar.createEvent(
+          calendarId: calendarId,
+          title: i.title,
+          startDate: i.startDate,
+          endDate: i.endDate,
+          description: i.description,
+          location: i.location,
+          recurrenceRule: i.recurrenceRule,
+        );
+      } catch (e, s) {
         log.info(
           '[SystemCalendarSyncService][_writeEventsToCalendar] '
-          'Write event failed.',
+          'Write event failed: $e',
         );
+        log.handle(e, s);
         return false;
       }
     }

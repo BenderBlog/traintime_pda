@@ -21,7 +21,6 @@ dependencies:
   cookie_jar: ^4.0.3
   path_provider: ^2.0.11
   json_annotation: ^4.9.0
-  share_plus: ^13.1.0
   # Deal with html
   html: ^0.15.4
   charset_converter: ^2.2.1
@@ -35,7 +34,7 @@ dependencies:
   time: ^2.1.5
   auto_size_text: ^3.0.0
   restart_app: ^1.7.3
-  calendar_date_picker2: ^2.0.0
+  calendar_date_picker2: ^3.0.0
   cached_network_image: ^3.2.3
   flutter_native_splash: ^2.3.1
   signals: ^6.3.0
@@ -54,7 +53,7 @@ dependencies:
   permission_handler: ^12.0.1
   # QR code scanner
   # Output to system calendar
-  device_calendar: ^4.3.3
+  device_calendar_plus: ^0.3.5
   # Homepage Widget
   home_widget: ^0.9.0
   image: ^4.2.0
@@ -65,8 +64,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl:
-  timezone: ^0.9.4
-  flutter_local_notifications: ^18.0.1
+  timezone: ^0.11.0
+  flutter_local_notifications: ^21.0.0
   qr_code_dart_scan: ^0.11.5
 
 dev_dependencies:
