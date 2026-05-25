@@ -374,6 +374,9 @@ homepage:
   loading_message: 請稍候，正在刷新信息
   postgraduate_notice: 研究生功能已經激活！
   linux_notice: Linux 版本正在測試，歡迎反饋！
+  edit_mode: "編輯佈局"
+  edit_done: "完成"
+    edit_reset: "恢復預設佈局"
   homepage: 信息查詢
   club: 社團推薦
   dashboard: 豬圖鑑賞
@@ -405,6 +408,7 @@ homepage:
     open_url: 訪問該鏈接
     notice_page_title: 通知列表
   class_table_card:
+    title: "課程表"
     today: 今日還有 {remain} 個日程
     today_finished: 今日安排完成
     tomorrow: 明日有 {remain} 個安排

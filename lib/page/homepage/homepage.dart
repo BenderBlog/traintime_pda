@@ -5,25 +5,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/page/homepage/notice_card/update_card.dart';
-import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
-import 'package:watermeter/page/homepage/toolbox/schoolnet_card.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
+import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/info_widget/energy_card.dart';
-import 'package:watermeter/page/homepage/info_widget/library_card.dart';
-import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
+import 'package:watermeter/page/homepage/staggered_grid.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
-import 'package:watermeter/page/homepage/toolbox/empty_classroom_card.dart';
-import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
-import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
-import 'package:watermeter/page/homepage/toolbox/score_card.dart';
-import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
-import 'package:watermeter/page/homepage/toolbox/dorm_water_card.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/preference.dart' as prefs;
 
 class MainPage extends StatefulWidget {
   final Function()? changePage;
@@ -35,11 +26,17 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  bool _editMode = false;
+  late List<HomepageWidgetEntry> _allEntries;
+
+  static const _gridColumns = 4;
+  static const _gridSpacing = 8.0;
+
   @override
   void initState() {
     super.initState();
+    _allEntries = getOrderedEntries();
 
-    // Validate and update notifications after controllers are initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await CourseReminderService().initialize();
@@ -57,32 +54,55 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  final List<Widget> smallFunction = [
-    const ScoreCard(),
-    const ExamCard(),
-    const EmptyClassroomCard(),
-    const ClassAttendanceCard(),
-    const SchoolnetCard(),
-    const DormWaterCard(),
-    if (prefs.getBool(prefs.Preference.role) == false) ...[
-      const ExperimentCard(),
-      const SportCard(),
-    ],
-  ];
+  void _exitEditMode() {
+    setState(() {
+      _editMode = false;
+      _allEntries = getOrderedEntries();
+    });
+  }
 
-  TextStyle textStyle(BuildContext context) => TextStyle(
-    fontSize: 16,
-    color: Theme.of(context).colorScheme.primary,
-    fontWeight: FontWeight.w700,
-  );
+  void _onSwap(String draggedId, String targetId) {
+    setState(() {
+      final from = _allEntries.indexWhere((e) => e.id == draggedId);
+      final to = _allEntries.indexWhere((e) => e.id == targetId);
+      if (from == -1 || to == -1) return;
+      final item = _allEntries.removeAt(from);
+      _allEntries.insert(to > from ? to - 1 : to, item);
+      saveOrder(_allEntries.map((e) => e.id).toList());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "homepage.title")),
+        actions: [
+          if (_editMode)
+            IconButton(
+              icon: const Icon(Icons.restore),
+              tooltip: FlutterI18n.translate(context, "homepage.edit_reset"),
+              onPressed: () async {
+                await resetOrder();
+                setState(() => _allEntries = getOrderedEntries());
+              },
+            ),
+          IconButton(
+            icon: Icon(_editMode ? Icons.check : Icons.edit),
+            tooltip: FlutterI18n.translate(
+              context,
+              _editMode ? "homepage.edit_done" : "homepage.edit_mode",
+            ),
+            onPressed: () {
+              if (_editMode) {
+                _exitEditMode();
+              } else {
+                setState(() => _editMode = true);
+              }
+            },
+          ),
+        ],
       ),
-
       body: RefreshIndicator(
         onRefresh: () async {
           showToast(
@@ -105,25 +125,35 @@ class _MainPageState extends State<MainPage> {
           }
         },
         child: ListView(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           children: [
-            UpdateCard().padding(bottom: 8),
+            const UpdateCard().padding(bottom: 8),
             const ClassTableCard().padding(bottom: 8),
-            EnergyCard().padding(bottom: 8),
-            // SchoolnetCard().padding(bottom: 8),
-            LibraryCard().padding(bottom: 8),
-            SchoolCardInfoCard().padding(bottom: 8),
-            MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: GridView.extent(
-                maxCrossAxisExtent: 96,
-                shrinkWrap: true,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                physics: const NeverScrollableScrollPhysics(),
-                children: smallFunction,
-              ),
+
+            // ---- 统一网格（自实现贪心行布局） ----
+            // builder 回调由 StaggeredGrid 的 LayoutBuilder 驱动，
+            // colWidth 基于 constraints.maxWidth 算出，分屏下自动正确。
+            StaggeredGrid(
+              crossAxisCount: _gridColumns,
+              rowHeight: 80,
+              mainAxisSpacing: _gridSpacing,
+              crossAxisSpacing: _gridSpacing,
+              builder: (colWidth) => [
+                for (final entry in _allEntries)
+                  StaggeredGridCell(
+                    crossAxisCellCount: entry.gridSpan,
+                    child: _editMode
+                        ? DraggableCard(
+                            id: entry.id,
+                            onSwap: _onSwap,
+                            feedbackWidth: entry.gridSpan * colWidth +
+                                (entry.gridSpan - 1) * _gridSpacing,
+                            feedbackHeight: 80,
+                            child: entry.builder(context, _editMode),
+                          )
+                        : entry.builder(context, _editMode),
+                  ),
+              ],
             ),
           ],
         ),

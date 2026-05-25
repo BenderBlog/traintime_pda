@@ -146,7 +146,19 @@ enum Preference {
   classStyleCompletedInnerAlpha(
     key: "classStyleCompletedInnerAlpha",
     type: "double",
-  ); // 已完成课程底色透明度
+  ), // 已完成课程底色透明度
+  homepageInfoOrder(
+    key: "homepageInfoOrder",
+    type: "String",
+  ), // 主页信息卡片顺序
+  homepageSmallOrder(
+    key: "homepageSmallOrder",
+    type: "String",
+  ), // 主页功能格子顺序
+  homepageAllOrder(
+    key: "homepageAllOrder",
+    type: "String",
+  ); // 主页卡片统一顺序
 
   const Preference({required this.key, this.type = "String"});
 

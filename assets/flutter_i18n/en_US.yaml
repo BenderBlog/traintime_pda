@@ -460,6 +460,9 @@ homepage:
    loading_message: "Refreshing information..."
    postgraduate_notice: "Postgraduate features activated!"
    linux_notice: "Linux version is under testing, feel free to feedback!"
+   edit_mode: "Edit Layout"
+   edit_done: "Done"
+    edit_reset: "Reset Layout"
    # home.dart
    homepage: "Info"
    club: "Club"
@@ -496,6 +499,7 @@ homepage:
       open_url: "Open link"
       notice_page_title: "Notification List"
    class_table_card:
+      title: "Timetable"
       today: "{remain} arrangment(s) today"
       today_finished: "Arrangements all done today"
       tomorrow: "{remain} arrangment(s) tomorrow"

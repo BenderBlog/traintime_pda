@@ -411,6 +411,9 @@ homepage:
     loading_message: "请稍候，正在刷新信息"
     postgraduate_notice: "研究生功能已经激活！"
     linux_notice: "Linux 版本正在测试，欢迎反馈！"
+    edit_mode: "编辑布局"
+    edit_done: "完成"
+    edit_reset: "恢复默认布局"
     # home.dart
     homepage: "信息查询"
     club: "社团推荐"
@@ -443,6 +446,7 @@ homepage:
         open_url: "访问该链接"
         notice_page_title: "通知列表"
     class_table_card:
+        title: "课程表"
         today: "今日还有 {remain} 个日程"
         today_finished: "今日安排完成"
         tomorrow: "明日有 {remain} 个安排"
