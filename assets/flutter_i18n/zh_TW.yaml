@@ -378,6 +378,10 @@ homepage:
   edit_done: "完成"
   edit_reset: "恢復預設佈局"
   edit_hint: "日程資訊和軟體升級資訊不允許編輯"
+  manage_hidden: "管理隱藏卡片"
+  hidden_title: "已隱藏的卡片"
+  hidden_label: "已隱藏"
+  hide_empty: "沒有隱藏的卡片"
   homepage: 信息查詢
   club: 社團推薦
   dashboard: 豬圖鑑賞

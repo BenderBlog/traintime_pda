@@ -17,8 +17,6 @@ import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
-/// [editMode] 为 true 时卡片应禁用交互（enabled: false），
-/// 以便父级 [LongPressDraggable] 能正常接管长按拖拽手势。
 typedef HomepageWidgetBuilder =
     Widget Function(BuildContext context, bool editMode);
 
@@ -27,8 +25,6 @@ class HomepageWidgetEntry {
   final String titleKey;
   final HomepageWidgetBuilder builder;
   final bool Function()? visible;
-
-  /// 在 4 列网格中占据的列数（1 或 2）。
   final int gridSpan;
 
   const HomepageWidgetEntry({
@@ -55,7 +51,7 @@ const defaultAllOrder = [
 ];
 
 final homepageRegistry = <HomepageWidgetEntry>[
-  // ---- 4 列大卡片 ----
+  // ---- 大卡片 ----
   HomepageWidgetEntry(
     id: 'energy',
     titleKey: 'homepage.electricity_card.title',
@@ -74,7 +70,7 @@ final homepageRegistry = <HomepageWidgetEntry>[
     gridSpan: 4,
     builder: (_, _) => SchoolCardInfoCard(),
   ),
-  // ---- 1 列小格子 ----
+  // ---- 小格子 ----
   HomepageWidgetEntry(
     id: 'score',
     titleKey: 'homepage.toolbox.score',
@@ -127,6 +123,8 @@ final homepageRegistry = <HomepageWidgetEntry>[
   ),
 ];
 
+// ---- 顺序读写 ----
+
 List<String> _readOrder(prefs.Preference prefKey) {
   final raw = prefs.getString(prefKey);
   if (raw.isEmpty) return [];
@@ -137,11 +135,8 @@ List<String> _readOrder(prefs.Preference prefKey) {
   return [];
 }
 
-/// 读取合并顺序（兼容旧的 info/small 分开存储格式）。
 List<HomepageWidgetEntry> getOrderedEntries() {
-  // 优先读新的合并 key
   List<String> saved = _readOrder(prefs.Preference.homepageAllOrder);
-  // 兼容旧格式：合并 info + small
   if (saved.isEmpty) {
     final info = _readOrder(prefs.Preference.homepageInfoOrder);
     final small = _readOrder(prefs.Preference.homepageSmallOrder);
@@ -150,26 +145,77 @@ List<HomepageWidgetEntry> getOrderedEntries() {
   if (saved.isEmpty) saved = defaultAllOrder;
 
   final map = {for (var e in homepageRegistry) e.id: e};
-
-  // 按 saved 顺序排列；新注册但不在 saved 中的追加到末尾
   final ordered = <HomepageWidgetEntry>[];
   for (final id in saved) {
     if (map.containsKey(id)) ordered.add(map.remove(id)!);
   }
   ordered.addAll(map.values);
 
-  // 过滤不可见条目
   return ordered.where((e) => e.visible?.call() ?? true).toList();
 }
 
-/// 拖拽/重排后写入 prefs。
 Future<void> saveOrder(List<String> ids) async {
   await prefs.setString(prefs.Preference.homepageAllOrder, jsonEncode(ids));
 }
 
-/// 重置为默认顺序。
-Future<void> resetOrder() async {
+// ---- 隐藏读写 ----
+
+List<String> _readHiddenIds() {
+  final raw = prefs.getString(prefs.Preference.homepageHiddenIds);
+  if (raw.isEmpty) return [];
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is List) return decoded.cast<String>();
+  } catch (_) {}
+  return [];
+}
+
+Future<void> _saveHiddenIds(List<String> ids) async {
+  await prefs.setString(prefs.Preference.homepageHiddenIds, jsonEncode(ids));
+}
+
+/// 获取已隐藏的条目（从注册表中查，保证顺序和完整性）。
+List<HomepageWidgetEntry> getHiddenEntries() {
+  final hidden = _readHiddenIds();
+  final map = {for (var e in homepageRegistry) e.id: e};
+  return hidden
+      .where((id) => map.containsKey(id))
+      .map((id) => map[id]!)
+      .toList();
+}
+
+/// 过滤掉已隐藏的条目。
+List<HomepageWidgetEntry> filterHidden(List<HomepageWidgetEntry> entries) {
+  final hidden = _readHiddenIds().toSet();
+  return entries.where((e) => !hidden.contains(e.id)).toList();
+}
+
+/// 隐藏一张卡片。
+Future<void> hideEntry(String id) async {
+  final hidden = _readHiddenIds();
+  if (!hidden.contains(id)) {
+    hidden.add(id);
+    await _saveHiddenIds(hidden);
+  }
+}
+
+/// 取消隐藏一张卡片。
+Future<void> unhideEntry(String id) async {
+  final hidden = _readHiddenIds();
+  if (hidden.remove(id)) {
+    await _saveHiddenIds(hidden);
+  }
+}
+
+/// 清除所有隐藏。
+Future<void> clearHidden() async {
+  await prefs.remove(prefs.Preference.homepageHiddenIds);
+}
+
+/// 重置为默认顺序并清除隐藏。
+Future<void> resetAll() async {
   await prefs.remove(prefs.Preference.homepageAllOrder);
   await prefs.remove(prefs.Preference.homepageInfoOrder);
   await prefs.remove(prefs.Preference.homepageSmallOrder);
+  await clearHidden();
 }

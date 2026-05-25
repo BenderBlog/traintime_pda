@@ -158,7 +158,11 @@ enum Preference {
   homepageAllOrder(
     key: "homepageAllOrder",
     type: "String",
-  ); // 主页卡片统一顺序
+  ), // 主页卡片统一顺序
+  homepageHiddenIds(
+    key: "homepageHiddenIds",
+    type: "String",
+  ); // 主页隐藏卡片
 
   const Preference({required this.key, this.type = "String"});
 

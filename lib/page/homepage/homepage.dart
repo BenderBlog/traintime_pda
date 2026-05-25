@@ -6,7 +6,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
 import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
@@ -33,7 +32,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final Map<String, double> _shakeAmplitudes = {};
 
   static const _gridColumns = 4;
-  static const _gridSpacing = 8.0;
 
   late final AnimationController _shakeController;
   late final Animation<double> _shakeAnimation;
@@ -105,42 +103,98 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     );
   }
 
+  void _showHiddenSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        final hidden = getHiddenEntries();
+        if (hidden.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              FlutterI18n.translate(context, "homepage.hide_empty"),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+        return ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                FlutterI18n.translate(context, "homepage.hidden_title"),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            for (final entry in hidden)
+              ListTile(
+                title: Text(FlutterI18n.translate(context, entry.titleKey)),
+                trailing: IconButton(
+                  icon: const Icon(Icons.visibility),
+                  onPressed: () async {
+                    await unhideEntry(entry.id);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      setState(() => _allEntries = getOrderedEntries());
+                    }
+                  },
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final gridEntries = _allEntries.toList();
+    final displayEntries = filterHidden(gridEntries);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "homepage.title")),
         actions: [
-          if (_editMode)
+          if (_editMode) ...[
+            IconButton(
+              icon: const Icon(Icons.visibility),
+              tooltip: FlutterI18n.translate(context, "homepage.manage_hidden"),
+              onPressed: _showHiddenSheet,
+            ),
             IconButton(
               icon: const Icon(Icons.restore),
               tooltip: FlutterI18n.translate(context, "homepage.edit_reset"),
               onPressed: () async {
-                await resetOrder();
+                await resetAll();
                 setState(() => _allEntries = getOrderedEntries());
               },
             ),
-          IconButton(
-            icon: Icon(_editMode ? Icons.check : Icons.edit),
-            tooltip: FlutterI18n.translate(
-              context,
-              _editMode ? "homepage.edit_done" : "homepage.edit_mode",
+          ],
+          Padding(
+            padding: EdgeInsetsGeometry.only(right: 8),
+            child: IconButton(
+              icon: Icon(_editMode ? Icons.check : Icons.edit),
+              tooltip: FlutterI18n.translate(
+                context,
+                _editMode ? "homepage.edit_done" : "homepage.edit_mode",
+              ),
+              onPressed: () {
+                if (_editMode) {
+                  _exitEditMode();
+                } else {
+                  setState(() {
+                    _editMode = true;
+                    _shakeAmplitudes.clear();
+                    for (final entry in _allEntries) {
+                      _shakeAmplitudes[entry.id] =
+                          0.7 + Random().nextDouble() * 0.3;
+                    }
+                  });
+                  _shakeController.repeat(reverse: true);
+                }
+              },
             ),
-            onPressed: () {
-              if (_editMode) {
-                _exitEditMode();
-              } else {
-                setState(() {
-                  _editMode = true;
-                  _shakeAmplitudes.clear();
-                  for (final entry in _allEntries) {
-                    _shakeAmplitudes[entry.id] =
-                        0.7 + Random().nextDouble() * 0.3;
-                  }
-                });
-                _shakeController.repeat(reverse: true);
-              }
-            },
           ),
         ],
       ),
@@ -166,13 +220,13 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           }
         },
         child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          padding: const EdgeInsets.all(8),
           children: [
-            const UpdateCard().padding(bottom: 8),
-            const ClassTableCard().padding(bottom: 8),
+            const UpdateCard(),
+            const ClassTableCard(),
             if (_editMode)
               Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   FlutterI18n.translate(context, "homepage.edit_hint"),
                   style: TextStyle(
@@ -183,29 +237,60 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 ),
               ),
 
-            // ---- 统一网格（自实现贪心行布局） ----
-            // builder 回调由 StaggeredGrid 的 LayoutBuilder 驱动，
-            // colWidth 基于 constraints.maxWidth 算出，分屏下自动正确。
+            // ---- 统一网格 ----
             StaggeredGrid(
               crossAxisCount: _gridColumns,
               rowHeight: 80,
-              mainAxisSpacing: _gridSpacing,
-              crossAxisSpacing: _gridSpacing,
               builder: (colWidth) => [
-                for (final entry in _allEntries)
+                for (final entry in displayEntries)
                   StaggeredGridCell(
                     crossAxisCellCount: entry.gridSpan,
                     child: _editMode
                         ? _buildShake(
                             entry.id,
-                            DraggableCard(
-                              id: entry.id,
-                              onSwap: _onSwap,
-                              feedbackWidth:
-                                  entry.gridSpan * colWidth +
-                                  (entry.gridSpan - 1) * _gridSpacing,
-                              feedbackHeight: 80,
-                              child: entry.builder(context, _editMode),
+                            Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                DraggableCard(
+                                  id: entry.id,
+                                  onSwap: _onSwap,
+                                  feedbackWidth: entry.gridSpan * colWidth,
+                                  feedbackHeight: 80,
+                                  child: entry.builder(context, _editMode),
+                                ),
+                                // 隐藏按钮：右上角（课程表不显示）
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await hideEntry(entry.id);
+                                      if (context.mounted) {
+                                        setState(() {
+                                          _allEntries = getOrderedEntries();
+                                        });
+                                      }
+                                    },
+                                    child: ClipOval(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.surfaceContainerHighest,
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 16,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           )
                         : entry.builder(context, _editMode),

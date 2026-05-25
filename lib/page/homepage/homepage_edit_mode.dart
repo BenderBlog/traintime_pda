@@ -46,15 +46,16 @@ class DraggableCard extends StatelessWidget {
           // 正常态 + 悬停高亮边框
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            decoration: isHovering
-                ? BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  )
-                : null,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isHovering
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
+                width: 2,
+                strokeAlign: BorderSide.strokeAlignOutside,
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
             child: child,
           ),
         );

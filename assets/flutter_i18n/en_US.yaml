@@ -464,6 +464,10 @@ homepage:
    edit_done: "Done"
    edit_reset: "Reset Layout"
    edit_hint: "Schedule and update cards cannot be edited"
+   manage_hidden: "Manage hidden cards"
+   hidden_title: "Hidden cards"
+   hidden_label: "Hidden"
+   hide_empty: "No hidden cards"
    # home.dart
    homepage: "Info"
    club: "Club"

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:styled_widget/styled_widget.dart';
 
 enum HomeCardType { plain, filled }
 
@@ -61,6 +62,6 @@ extension HomeCardPadding on Widget {
         ),
         child: this,
       ),
-    );
+    ).padding(all: 4);
   }
 }

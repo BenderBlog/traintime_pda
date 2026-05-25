@@ -415,6 +415,10 @@ homepage:
     edit_done: "完成"
     edit_reset: "恢复默认布局"
     edit_hint: "日程信息和软件升级信息不允许编辑"
+    manage_hidden: "管理隐藏卡片"
+    hidden_title: "已隐藏的卡片"
+    hidden_label: "已隐藏"
+    hide_empty: "没有隐藏的卡片"
     # home.dart
     homepage: "信息查询"
     club: "社团推荐"
