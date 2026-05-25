@@ -170,6 +170,18 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           children: [
             const UpdateCard().padding(bottom: 8),
             const ClassTableCard().padding(bottom: 8),
+            if (_editMode)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  FlutterI18n.translate(context, "homepage.edit_hint"),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: 13,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
 
             // ---- 统一网格（自实现贪心行布局） ----
             // builder 回调由 StaggeredGrid 的 LayoutBuilder 驱动，

@@ -376,7 +376,8 @@ homepage:
   linux_notice: Linux 版本正在測試，歡迎反饋！
   edit_mode: "編輯佈局"
   edit_done: "完成"
-    edit_reset: "恢復預設佈局"
+  edit_reset: "恢復預設佈局"
+  edit_hint: "日程資訊和軟體升級資訊不允許編輯"
   homepage: 信息查詢
   club: 社團推薦
   dashboard: 豬圖鑑賞

@@ -414,6 +414,7 @@ homepage:
     edit_mode: "编辑布局"
     edit_done: "完成"
     edit_reset: "恢复默认布局"
+    edit_hint: "日程信息和软件升级信息不允许编辑"
     # home.dart
     homepage: "信息查询"
     club: "社团推荐"

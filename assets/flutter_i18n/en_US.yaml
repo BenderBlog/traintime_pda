@@ -462,7 +462,8 @@ homepage:
    linux_notice: "Linux version is under testing, feel free to feedback!"
    edit_mode: "Edit Layout"
    edit_done: "Done"
-    edit_reset: "Reset Layout"
+   edit_reset: "Reset Layout"
+   edit_hint: "Schedule and update cards cannot be edited"
    # home.dart
    homepage: "Info"
    club: "Club"
