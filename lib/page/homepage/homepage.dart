@@ -30,6 +30,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   bool _editMode = false;
   late List<HomepageWidgetEntry> _allEntries;
   final Map<String, double> _shakeAmplitudes = {};
+  final Set<String> _fadingEntries = {};
 
   static const _gridColumns = 4;
 
@@ -75,6 +76,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     setState(() {
       _editMode = false;
       _shakeAmplitudes.clear();
+      _fadingEntries.clear();
       _shakeController.stop();
       _allEntries = getOrderedEntries();
     });
@@ -186,6 +188,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   setState(() {
                     _editMode = true;
                     _shakeAmplitudes.clear();
+      _fadingEntries.clear();
                     for (final entry in _allEntries) {
                       _shakeAmplitudes[entry.id] =
                           0.7 + Random().nextDouble() * 0.3;
@@ -245,8 +248,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 for (final entry in displayEntries)
                   StaggeredGridCell(
                     crossAxisCellCount: entry.gridSpan,
-                    child: _editMode
-                        ? _buildShake(
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: _fadingEntries.contains(entry.id) ? 0.0 : 1.0,
+                      child: _editMode
+                          ? _buildShake(
                             entry.id,
                             Stack(
                               fit: StackFit.expand,
@@ -263,13 +269,19 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                                   top: 0,
                                   right: 0,
                                   child: GestureDetector(
-                                    onTap: () async {
-                                      await hideEntry(entry.id);
-                                      if (context.mounted) {
-                                        setState(() {
-                                          _allEntries = getOrderedEntries();
-                                        });
-                                      }
+                                    onTap: () {
+                                      setState(() => _fadingEntries.add(entry.id));
+                                      Future.delayed(
+                                        const Duration(milliseconds: 300),
+                                        () async {
+                                          await hideEntry(entry.id);
+                                          _fadingEntries.remove(entry.id);
+                                          if (context.mounted) {
+                                            setState(() =>
+                                                _allEntries = getOrderedEntries());
+                                          }
+                                        },
+                                      );
                                     },
                                     child: ClipOval(
                                       child: Container(
@@ -294,6 +306,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                             ),
                           )
                         : entry.builder(context, _editMode),
+                    ),
                   ),
               ],
             ),
