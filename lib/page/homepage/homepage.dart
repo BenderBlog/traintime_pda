@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -25,16 +27,27 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   bool _editMode = false;
   late List<HomepageWidgetEntry> _allEntries;
+  final Map<String, double> _shakeAmplitudes = {};
 
   static const _gridColumns = 4;
   static const _gridSpacing = 8.0;
 
+  late final AnimationController _shakeController;
+  late final Animation<double> _shakeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _shakeAnimation = Tween<double>(begin: -0.02, end: 0.02).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+    );
     _allEntries = getOrderedEntries();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -54,9 +67,17 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
   void _exitEditMode() {
     setState(() {
       _editMode = false;
+      _shakeAmplitudes.clear();
+      _shakeController.stop();
       _allEntries = getOrderedEntries();
     });
   }
@@ -70,6 +91,18 @@ class _MainPageState extends State<MainPage> {
       _allEntries.insert(to > from ? to - 1 : to, item);
       saveOrder(_allEntries.map((e) => e.id).toList());
     });
+  }
+
+  Widget _buildShake(String id, Widget child) {
+    final amplitude = _shakeAmplitudes[id] ?? 0.85;
+    return AnimatedBuilder(
+      animation: _shakeAnimation,
+      builder: (_, child) => Transform.rotate(
+        angle: _shakeAnimation.value * amplitude,
+        child: child!,
+      ),
+      child: child,
+    );
   }
 
   @override
@@ -97,7 +130,15 @@ class _MainPageState extends State<MainPage> {
               if (_editMode) {
                 _exitEditMode();
               } else {
-                setState(() => _editMode = true);
+                setState(() {
+                  _editMode = true;
+                  _shakeAmplitudes.clear();
+                  for (final entry in _allEntries) {
+                    _shakeAmplitudes[entry.id] =
+                        0.7 + Random().nextDouble() * 0.3;
+                  }
+                });
+                _shakeController.repeat(reverse: true);
               }
             },
           ),
@@ -143,13 +184,17 @@ class _MainPageState extends State<MainPage> {
                   StaggeredGridCell(
                     crossAxisCellCount: entry.gridSpan,
                     child: _editMode
-                        ? DraggableCard(
-                            id: entry.id,
-                            onSwap: _onSwap,
-                            feedbackWidth: entry.gridSpan * colWidth +
-                                (entry.gridSpan - 1) * _gridSpacing,
-                            feedbackHeight: 80,
-                            child: entry.builder(context, _editMode),
+                        ? _buildShake(
+                            entry.id,
+                            DraggableCard(
+                              id: entry.id,
+                              onSwap: _onSwap,
+                              feedbackWidth:
+                                  entry.gridSpan * colWidth +
+                                  (entry.gridSpan - 1) * _gridSpacing,
+                              feedbackHeight: 80,
+                              child: entry.builder(context, _editMode),
+                            ),
                           )
                         : entry.builder(context, _editMode),
                   ),
