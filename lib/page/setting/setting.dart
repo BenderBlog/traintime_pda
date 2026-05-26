@@ -50,6 +50,8 @@ import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 import 'package:watermeter/repository/physics_experiment_session.dart';
+import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/themes/color_seed.dart';
 import 'package:watermeter/routing/routes.dart';
 
@@ -832,14 +834,20 @@ class _SettingWindowState extends State<SettingWindow> {
                                 "setting.clear_and_restart_dialog.cleaning",
                               ),
                             );
+
+                            /// Clean Cookie
                             try {
                               await NetworkSession().clearCookieJar();
-                            } on PathNotFoundException {
-                              log.debug(
-                                "[setting][ClearAllCache]"
-                                "No cookies.",
-                              );
-                            }
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
+
+                            /// Clean sport cookie.
+                            try {
+                              await SportSession().sportCookieJar.deleteAll();
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
 
                             /// Clean cache.
                             _removeCache();
@@ -913,6 +921,13 @@ class _SettingWindowState extends State<SettingWindow> {
                               // ignore: empty_catches
                             } on Exception {}
 
+                            /// Clean sport cookie.
+                            try {
+                              await SportSession().sportCookieJar.deleteAll();
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
+
                             /// Clean all.
                             _removeAll();
 
@@ -921,6 +936,12 @@ class _SettingWindowState extends State<SettingWindow> {
 
                             /// Theme back to default
                             ThemeController.i.updateTheme();
+
+                            /// Sync widget login state
+                            await syncWidgetLoginState(false);
+
+                            /// Clean iOS widget data files
+                            await clearWidgetFiles();
 
                             /// Restart app
                             if (mounted) {

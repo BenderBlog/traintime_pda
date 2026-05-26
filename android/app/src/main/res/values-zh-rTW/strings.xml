@@ -17,4 +17,5 @@
     <string name="widget_classtable_error_exam">獲取考試信息</string>
     <string name="widget_classtable_error_other">其他方面</string>
     <string name="widget_classtable_error_other_experience">獲取其他實驗信息</string>
+    <string name="widget_classtable_not_logged_in">未登錄，請在主應用中登錄</string>
 </resources>

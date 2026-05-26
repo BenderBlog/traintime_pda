@@ -15,6 +15,7 @@ import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -117,30 +118,10 @@ class _HomePageMasterState extends State<HomePageMaster>
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.of(context).pop();
-                    //if (Platform.isAndroid || Platform.isIOS) {
+                    await syncWidgetLoginState(false);
                     Restart.restartApp();
-                    //} else {
-                    //  showDialog(
-                    //    barrierDismissible: false,
-                    //    context: context,
-                    //    builder: (context) => AlertDialog(
-                    //      title: Text(
-                    //        FlutterI18n.translate(
-                    //          context,
-                    //          "setting.need_close_dialog.title",
-                    //        ),
-                    //      ),
-                    //      content: Text(
-                    //        FlutterI18n.translate(
-                    //          context,
-                    //          "setting.need_close_dialog.content",
-                    //        ),
-                    //      ),
-                    //    ),
-                    //  );
-                    //}
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),

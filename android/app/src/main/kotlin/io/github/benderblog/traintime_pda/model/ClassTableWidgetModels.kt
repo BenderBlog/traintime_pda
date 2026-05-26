@@ -6,6 +6,7 @@ package io.github.benderblog.traintime_pda.model
 
 enum class ClassTableWidgetLoadState {
     LOADING,
+    NOT_LOGGED_IN,
     ERROR_COURSE,
     ERROR_COURSE_USER_DEFINED,
     ERROR_PHYSICS_EXPERIMENT,

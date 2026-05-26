@@ -40,6 +40,12 @@ enum ErrorType : Int {
    case exam
    case experiment
    case others
+   case notLoggedIn
+}
+
+struct WidgetState : Codable {
+    var loggedIn : Bool
+    var updatedAt : String?
 }
 
 struct SimpleEntry: TimelineEntry {
@@ -98,7 +104,44 @@ struct Provider: TimelineProvider {
         let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: widgetGroupId
         )!
-        
+
+        // Check login state first
+        do {
+            let stateURL = containerURL.appendingPathComponent("WidgetState.json")
+            let stateData = try Data(contentsOf: stateURL)
+            let widgetState = try decoder.decode(WidgetState.self, from: stateData)
+            if !widgetState.loggedIn {
+                logger.info("User is not logged in (WidgetState.loggedIn = false)")
+                let entries = [
+                    SimpleEntry(
+                        date: Date(),
+                        currentWeek: -1,
+                        arrangement: [],
+                        errorType: .notLoggedIn,
+                        error: nil
+                    )
+                ]
+                let timeline = Timeline(entries: entries, policy: .atEnd)
+                completion(timeline)
+                return
+            }
+        } catch {
+            // WidgetState.json missing or unreadable — treat as not logged in
+            logger.warning("Could not read WidgetState.json: \(String(describing: error))")
+            let entries = [
+                SimpleEntry(
+                    date: Date(),
+                    currentWeek: -1,
+                    arrangement: [],
+                    errorType: .notLoggedIn,
+                    error: nil
+                )
+            ]
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+            return
+        }
+
         // Deal with ClassTable data
         do {
             // Read data
@@ -408,6 +451,8 @@ struct ClasstableWidgetEntryView : View {
     @ViewBuilder
     private func errorContentView() -> some View {
         let errorMessage = switch entry.errorType {
+        case .notLoggedIn:
+            NSLocalizedString("error_not_logged_in", comment: "Not logged in.")
         case .course:
             NSLocalizedString("error_course", comment: "Failed to load course data.")
         case .exam:
@@ -419,9 +464,12 @@ struct ClasstableWidgetEntryView : View {
         case .none:
             ""
         }
+        let errorIcon = entry.errorType == .notLoggedIn
+            ? "person.crop.circle.badge.questionmark"
+            : "exclamationmark.triangle.fill"
         VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline) {
-                Image(systemName: "exclamationmark.triangle.fill")
+                Image(systemName: errorIcon)
                     .font(.system(size: 18))
                     .foregroundStyle(
                         colorScheme == .dark ? .white :
