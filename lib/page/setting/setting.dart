@@ -66,18 +66,6 @@ class _SettingWindowState extends State<SettingWindow> {
     style: const TextStyle(fontWeight: FontWeight.bold),
   ).padding(bottom: 8).center();
 
-  void restart() {
-    if (Platform.isIOS) {
-      Restart.restartApp(
-        mode: RestartMode.notificationFallback,
-        notificationTitle: 'Login state cleared',
-        notificationBody: 'Tap to reopen the app.',
-      );
-    } else {
-      Restart.restartApp();
-    }
-  }
-
   bool get _isSemesterAwareControllerLoading =>
       ClassTableController.i.schoolClassTableStateSignal.value.isLoading ||
       ExamController.i.examInfoStateSignal.value.isLoading ||
@@ -852,7 +840,21 @@ class _SettingWindowState extends State<SettingWindow> {
                                   "setting.clear_and_restart_dialog.clear",
                                 ),
                               );
-                              restart();
+                              if (Platform.isIOS) {
+                                Restart.restartApp(
+                                  mode: RestartMode.notificationFallback,
+                                  notificationTitle: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.title_cache_cleared",
+                                  ),
+                                  notificationBody: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.content",
+                                  ),
+                                );
+                              } else {
+                                Restart.restartApp();
+                              }
                             }
                           },
                           child: Text(
@@ -938,9 +940,23 @@ class _SettingWindowState extends State<SettingWindow> {
                             await clearWidgetFiles();
 
                             /// Restart app
-                            if (mounted) {
+                            if (context.mounted) {
                               pd.close();
-                              restart();
+                              if (Platform.isIOS) {
+                                Restart.restartApp(
+                                  mode: RestartMode.notificationFallback,
+                                  notificationTitle: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.title_logged_out",
+                                  ),
+                                  notificationBody: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.content",
+                                  ),
+                                );
+                              } else {
+                                Restart.restartApp();
+                              }
                             }
                           },
                           child: Text(

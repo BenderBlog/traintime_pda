@@ -119,16 +119,25 @@ class _HomePageMasterState extends State<HomePageMaster>
               actions: [
                 TextButton(
                   onPressed: () async {
-                    Navigator.of(context).pop();
+                    String title = FlutterI18n.translate(
+                      context,
+                      "restart_app.title_password_wrong",
+                    );
+                    String body = FlutterI18n.translate(
+                      context,
+                      "restart_app.content",
+                    );
                     await syncWidgetLoginState(false);
-                    if (Platform.isIOS) {
-                      Restart.restartApp(
-                        mode: RestartMode.notificationFallback,
-                        notificationTitle: 'Login state cleared',
-                        notificationBody: 'Tap to reopen the app.',
-                      );
-                    } else {
-                      Restart.restartApp();
+                    if (mounted) {
+                      if (Platform.isIOS) {
+                        Restart.restartApp(
+                          mode: RestartMode.notificationFallback,
+                          notificationTitle: title,
+                          notificationBody: body,
+                        );
+                      } else {
+                        Restart.restartApp();
+                      }
                     }
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
