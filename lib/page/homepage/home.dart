@@ -121,7 +121,15 @@ class _HomePageMasterState extends State<HomePageMaster>
                   onPressed: () async {
                     Navigator.of(context).pop();
                     await syncWidgetLoginState(false);
-                    Restart.restartApp();
+                    if (Platform.isIOS) {
+                      Restart.restartApp(
+                        mode: RestartMode.notificationFallback,
+                        notificationTitle: 'Login state cleared',
+                        notificationBody: 'Tap to reopen the app.',
+                      );
+                    } else {
+                      Restart.restartApp();
+                    }
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),
