@@ -9,9 +9,10 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/external/ruisi_flutter/controller/ruisi_controller.dart';
+import 'package:watermeter/external/ruisi_flutter/ruisi_main.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
-import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
@@ -72,6 +73,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   void initState() {
     super.initState();
     _controller = PageController();
+    RuisiController.i.init();
   }
 
   void _loginAsync() async {
@@ -191,7 +193,6 @@ class _HomePageMasterState extends State<HomePageMaster>
     super.didChangeDependencies();
     if (!refreshAtStart) {
       unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
-      //message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
         "Current loginstate: $loginState, if none will _loginAsync.",
@@ -261,7 +262,7 @@ class _HomePageMasterState extends State<HomePageMaster>
               _controller.jumpToPage(_selectedIndex);
             },
           ),
-          const ToolBoxPage(),
+          const RuisiApp(),
           const PigPage(),
           const SettingWindow(),
         ],
@@ -285,7 +286,6 @@ class _HomePageMasterState extends State<HomePageMaster>
             )
             .toList(),
         selectedIndex: _selectedIndex,
-        //labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         onDestinationSelected: (int index) {
           if (_selectedIndex != index) {
             setState(() {

@@ -1168,8 +1168,118 @@ easter_egg_robot:
   button_one: 我们的救世主呢？
   button_two: 快点来啊！
   button_notice: \o/\o/\o/\o/\o/\o/\o/\o/
+
 restart_app:
   title_cache_cleared: 缓存已清空
   title_logged_out: 已退出登录
   title_password_wrong: 密码错误
   content: 点击通知重新打开应用
+
+ruisi:
+  common:
+    refresh: 刷新
+    confirm: 确定
+    cancel: 取消
+    retry: 重试
+    no_topics: 暂无帖子
+    no_content: 暂无内容
+    reply: 回复
+    favorite: 收藏
+    not_implemented: 未实现
+    login: 登录
+    logout: 退出登录
+    logged_out: 已退出登录
+  about:
+    title: 关于
+    app_name: 睿思
+    subtitle: 西安电子科技大学校园论坛客户端
+    version: 版本
+    version_number: "2.0.0 (Flutter)"
+    source_code: 源代码
+    bug_report: 问题反馈
+    bug_report_subtitle: 在 GitHub 上提交 issue
+    privacy_policy: 隐私政策
+    license: 本应用基于 BSD-3-Clause 许可证开源
+      基于 Ruisi-iOS 和 Ruisi-Android 在 AI 辅助下重写
+    privacy_policy_content: "本应用仅在西安电子科技大学校园网内运行，访问睿思论坛 (rs.xidian.edu.cn) 的数据。\n\n本应用不会收集、存储或传输任何用户的个人信息到第三方服务器。\n\n用户的登录凭据仅保存在本地设备中，用于与睿思论坛服务器进行身份验证。\n\n本应用使用 Cookie 与睿思论坛服务器进行通信，所有数据交互均直接在用户的设备与睿思论坛服务器之间进行。\n\n如有任何疑问，请通过 GitHub 提交 issue 联系开发者。"
+  home:
+    title: 睿思论坛
+    new_post: 发帖
+    forum_list: 论坛板块
+    tab_hot: 热帖
+    tab_new_reply: 最新回复
+    tab_new_post: 最新发表
+    tab_my: 我的
+    please_login: 请先登录
+    my_profile: 我的资料
+    my_posts: 我的帖子
+    my_favorites: 我的收藏
+    message_center: 消息中心
+    daily_checkin: 每日签到
+    settings: 设置
+    about: 关于
+  login:
+    title: 登录睿思
+    username: 用户名
+    username_hint: 请输入用户名
+    password: 密码
+    password_hint: 请输入密码
+    captcha: 验证码
+    captcha_hint: 请输入验证码
+    back: 返回
+  post:
+    title: 发帖
+    publish: 发布
+    select_forum: 选择板块
+    select_forum_hint: 请选择板块
+    subject: 标题
+    subject_hint: 请输入标题
+    content: 内容
+    content_hint: 请输入内容
+    success: 发帖成功
+    failure: 发帖失败
+  topic_detail:
+    title: 帖子详情
+    reply_too_short: 回复内容不能少于 13 个字符
+    reply_success: 回复成功
+    reply_failure: 回复失败
+    favorite_success: 收藏成功
+    favorite_failure: 收藏失败
+    no_data: 无数据
+    reply_hint: 写回复...
+  topic_list_item:
+    sticky: 置顶
+  forum_list:
+    title: 论坛板块
+  favorites:
+    title: 我的收藏
+    empty: 暂无收藏
+  messages:
+    title: 消息
+    tab_at: "@我"
+    no_reply: 暂无回复通知
+    no_at: 暂无@通知
+  search:
+    hint: 搜索帖子...
+    input_hint: 输入关键词搜索
+    no_results: 无搜索结果
+  settings:
+    title: 设置
+    section_display: 显示
+    full_style: 完整样式帖子
+    full_style_subtitle: 显示帖子完整样式（签名、头像等）
+    section_proxy: 代理
+    proxy_enable: 启用代理
+    proxy_disabled: 未启用
+    proxy_address: 代理地址
+    section_debug: 调试
+    view_logs: 查看日志
+    proxy_dialog_title: 代理设置
+    proxy_host: 主机地址
+    proxy_host_hint: "例如 127.0.0.1"
+    proxy_port: 端口
+    proxy_port_hint: "例如 7890"
+  user:
+    title: 我的
+    tab_profile: 资料
+    unknown: 未知用户
