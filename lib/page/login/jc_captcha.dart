@@ -320,9 +320,9 @@ class SliderCaptchaClientProvider {
       final double r = _rng.nextDouble();
       b = ((r < 0.65) ? (b - 1) : ((r < 0.80) ? (b + 1) : (b)));
       b = max(-10, min(10, b));
-      tracks.add(TrackPoint(a, b, _rng.nextInt(701) + 900));
+      tracks.add(TrackPoint(a, b, _rng.nextInt(201) + 300));
     }
-    tracks.add(TrackPoint(offs, b, _rng.nextInt(701) + 900));
+    tracks.add(TrackPoint(offs, b, _rng.nextInt(201) + 300));
     return tracks;
   }
 }
