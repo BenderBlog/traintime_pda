@@ -43,11 +43,6 @@ class RuisiApi {
   /// 持久化 Cookie 存储（退出登录时需要清除）
   late final PersistCookieJar _cookieJar;
 
-  /// 当前代理配置
-  bool _proxyEnabled = false;
-  String _proxyHost = '';
-  int _proxyPort = 0;
-
   RuisiApi({required String cookiePath, Talker? talker})
     : talker = talker ?? Talker() {
     _dio = Dio(
@@ -70,9 +65,6 @@ class RuisiApi {
         ),
       ),
     );
-
-    // 代理配置（默认禁用）
-    _applyProxy();
 
     // Cookie 管理
     _cookieJar = PersistCookieJar(
@@ -110,43 +102,6 @@ class RuisiApi {
     await _cookieJar.deleteAll();
     formhash = null;
     talker.info('已清除所有 Cookie 和 formhash');
-  }
-
-  // ---------------------------------------------------------------------------
-  // 代理设置
-  // ---------------------------------------------------------------------------
-
-  /// 设置代理配置
-  void setProxy({required bool enabled, String host = '', int port = 0}) {
-    _proxyEnabled = enabled;
-    _proxyHost = host;
-    _proxyPort = port;
-    _applyProxy();
-    talker.info('代理设置已更新: enabled=$enabled, host=$host, port=$port');
-  }
-
-  /// 应用代理配置到 Dio
-  void _applyProxy() {
-    final adapter = _dio.httpClientAdapter;
-    if (adapter is IOHttpClientAdapter) {
-      if (_proxyEnabled && _proxyHost.isNotEmpty && _proxyPort > 0) {
-        final proxyUrl = '$_proxyHost:$_proxyPort';
-        adapter.createHttpClient = () {
-          final client = HttpClient();
-          client.findProxy = (uri) => 'PROXY $proxyUrl';
-          client.badCertificateCallback = (cert, host, port) => true;
-          return client;
-        };
-        talker.info('代理已启用: $proxyUrl');
-      } else {
-        adapter.createHttpClient = () {
-          final client = HttpClient();
-          client.findProxy = (uri) => 'DIRECT';
-          return client;
-        };
-        talker.info('代理已禁用，使用直连');
-      }
-    }
   }
 
   // ---------------------------------------------------------------------------

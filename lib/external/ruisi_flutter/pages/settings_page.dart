@@ -41,54 +41,9 @@ class SettingsPage extends StatelessWidget {
                   'ruisi.settings.full_style_subtitle',
                 ),
               ),
-              value: c.settings.showFullStylePosts,
+              value: c.settings.showFullStylePosts.value,
               onChanged: (value) => c.settings.setShowFullStyle(value),
             ),
-
-            const Divider(),
-
-            // 代理设置
-            _SectionHeader(
-              title: FlutterI18n.translate(
-                context,
-                'ruisi.settings.section_proxy',
-              ),
-            ),
-            SwitchListTile(
-              title: Text(
-                FlutterI18n.translate(context, 'ruisi.settings.proxy_enable'),
-              ),
-              subtitle: Text(
-                c.settings.proxyEnabled
-                    ? '${c.settings.proxyHost}:${c.settings.proxyPort}'
-                    : FlutterI18n.translate(
-                        context,
-                        'ruisi.settings.proxy_disabled',
-                      ),
-              ),
-              value: c.settings.proxyEnabled,
-              onChanged: (value) {
-                if (value) {
-                  _showProxyDialog(context, c);
-                } else {
-                  c.updateProxy(enabled: false, host: '', port: 0);
-                }
-              },
-            ),
-            if (c.settings.proxyEnabled)
-              ListTile(
-                title: Text(
-                  FlutterI18n.translate(
-                    context,
-                    'ruisi.settings.proxy_address',
-                  ),
-                ),
-                subtitle: Text(
-                  '${c.settings.proxyHost}:${c.settings.proxyPort}',
-                ),
-                trailing: const Icon(Icons.edit),
-                onTap: () => _showProxyDialog(context, c),
-              ),
 
             const Divider(),
 
@@ -106,85 +61,13 @@ class SettingsPage extends StatelessWidget {
               ),
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => TalkerScreen(talker: talker),
-                ),
+                MaterialPageRoute(builder: (_) => TalkerScreen(talker: talker)),
               ),
             ),
           ],
         ),
       );
     });
-  }
-
-  void _showProxyDialog(BuildContext context, RuisiController c) {
-    final hostCtrl = TextEditingController(text: c.settings.proxyHost);
-    final portCtrl =
-        TextEditingController(text: c.settings.proxyPort.toString());
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          FlutterI18n.translate(context, 'ruisi.settings.proxy_dialog_title'),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: hostCtrl,
-              decoration: InputDecoration(
-                labelText: FlutterI18n.translate(
-                  context,
-                  'ruisi.settings.proxy_host',
-                ),
-                hintText: FlutterI18n.translate(
-                  context,
-                  'ruisi.settings.proxy_host_hint',
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: portCtrl,
-              decoration: InputDecoration(
-                labelText: FlutterI18n.translate(
-                  context,
-                  'ruisi.settings.proxy_port',
-                ),
-                hintText: FlutterI18n.translate(
-                  context,
-                  'ruisi.settings.proxy_port_hint',
-                ),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              FlutterI18n.translate(context, 'ruisi.common.cancel'),
-            ),
-          ),
-          FilledButton(
-            onPressed: () {
-              final port = int.tryParse(portCtrl.text) ?? 0;
-              c.updateProxy(
-                enabled: true,
-                host: hostCtrl.text,
-                port: port,
-              );
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              FlutterI18n.translate(context, 'ruisi.common.confirm'),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

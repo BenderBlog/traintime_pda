@@ -232,9 +232,9 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 1,
-        name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
-        icon: MingCuteIcons.mgc_tool_line,
-        iconChoice: MingCuteIcons.mgc_tool_fill,
+        name: FlutterI18n.translate(context, "homepage.ruisi"),
+        icon: Icons.forum_outlined,
+        iconChoice: Icons.forum,
       ),
       PageInformation(
         index: 2,

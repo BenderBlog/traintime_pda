@@ -4,7 +4,6 @@
 
  - 西电睿思：目前正在高强度氛围编程中，https://github.com/BenderBlog/ruisi_flutter
  - 网络分析工具：目前正在和相关开发者规划，最差情况为将本程序网络查询抽出
- - 物理实验计算工具：重写 https://github.com/koloer-blus/XDU-smart-lab
  - 慧生活：将本程序中的慧生活抽出
 
 本程序不接受任何“热更新”的建议，因为：

@@ -24,7 +24,7 @@ login_process:
   ready_page: Prepare to obtain login environment
   get_encrypt: Obtain password encryption key
   ready_login: Prepare to login
-  slider: Solving slider captcha
+  slider: Logging in
   after_process: Post-login processing
   failed: "Login failed, response status code: {statusCode}"
 no_info: No information
@@ -447,6 +447,7 @@ homepage:
   hidden_label: Hidden
   hide_empty: No hidden cards
   homepage: Info
+  ruisi: Forum
   club: Club
   planet: Blog
   dashboard: Pighub

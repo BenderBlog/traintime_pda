@@ -64,7 +64,9 @@ class _UserPageState extends State<UserPage>
             controller: _tabCtrl,
             tabs: [
               Tab(text: FlutterI18n.translate(context, 'ruisi.home.my_posts')),
-              Tab(text: FlutterI18n.translate(context, 'ruisi.user.tab_profile')),
+              Tab(
+                text: FlutterI18n.translate(context, 'ruisi.user.tab_profile'),
+              ),
             ],
           ),
         ),
@@ -75,25 +77,26 @@ class _UserPageState extends State<UserPage>
             c.myTopicsLoading.value && c.myTopics.value.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : c.myTopics.value.isEmpty
-                    ? Center(child: Text(FlutterI18n.translate(context, 'ruisi.common.no_topics')))
-                    : RefreshIndicator(
-                        onRefresh: () async =>
-                            c.loadMyTopics(refresh: true),
-                        child: ListView.separated(
-                          itemCount: c.myTopics.value.length,
-                          separatorBuilder: (_, _) =>
-                              const Divider(height: 1),
-                          itemBuilder: (_, i) {
-                            final topic = c.myTopics.value[i];
-                            return TopicListItem(
-                              topic: topic,
-                              onTap: () => context.push(
-                                TopicDetailPage(tid: topic.tid),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                ? Center(
+                    child: Text(
+                      FlutterI18n.translate(context, 'ruisi.common.no_topics'),
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () async => c.loadMyTopics(refresh: true),
+                    child: ListView.separated(
+                      itemCount: c.myTopics.value.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        final topic = c.myTopics.value[i];
+                        return TopicListItem(
+                          topic: topic,
+                          onTap: () =>
+                              context.push(TopicDetailPage(tid: topic.tid)),
+                        );
+                      },
+                    ),
+                  ),
 
             // 资料
             ListView(
@@ -107,7 +110,11 @@ class _UserPageState extends State<UserPage>
                         const Icon(Icons.person, size: 64),
                         const SizedBox(height: 12),
                         Text(
-                          c.username ?? FlutterI18n.translate(context, 'ruisi.user.unknown'),
+                          c.username ??
+                              FlutterI18n.translate(
+                                context,
+                                'ruisi.user.unknown',
+                              ),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 4),

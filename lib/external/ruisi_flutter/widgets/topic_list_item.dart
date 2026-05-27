@@ -69,7 +69,10 @@ class TopicListItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                           child: Text(
-                            FlutterI18n.translate(context, 'ruisi.topic_list_item.sticky'),
+                            FlutterI18n.translate(
+                              context,
+                              'ruisi.topic_list_item.sticky',
+                            ),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onError,
                               fontSize: 10,

@@ -43,34 +43,31 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
       return Scaffold(
         appBar: AppBar(
-          title: Text(
-            FlutterI18n.translate(context, 'ruisi.favorites.title'),
-          ),
+          title: Text(FlutterI18n.translate(context, 'ruisi.favorites.title')),
         ),
         body: c.favoritesLoading.value && c.favorites.value.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : c.favorites.value.isEmpty
-                ? Center(
-                    child: Text(
-                      FlutterI18n.translate(context, 'ruisi.favorites.empty'),
-                    ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () async => c.loadFavorites(refresh: true),
-                    child: ListView.separated(
-                      itemCount: c.favorites.value.length,
-                      separatorBuilder: (_, _) => const Divider(height: 1),
-                      itemBuilder: (_, i) {
-                        final topic = c.favorites.value[i];
-                        return TopicListItem(
-                          topic: topic,
-                          onTap: () => context.push(
-                            TopicDetailPage(tid: topic.tid),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+            ? Center(
+                child: Text(
+                  FlutterI18n.translate(context, 'ruisi.favorites.empty'),
+                ),
+              )
+            : RefreshIndicator(
+                onRefresh: () async => c.loadFavorites(refresh: true),
+                child: ListView.separated(
+                  itemCount: c.favorites.value.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (_, i) {
+                    final topic = c.favorites.value[i];
+                    return TopicListItem(
+                      topic: topic,
+                      onTap: () =>
+                          context.push(TopicDetailPage(tid: topic.tid)),
+                    );
+                  },
+                ),
+              ),
       );
     });
   }

@@ -176,7 +176,8 @@ class _HomePageState extends State<HomePage>
           final topic = topics[i];
           return TopicListItem(
             topic: topic,
-            onTap: () => context.push(TopicDetailPage(tid: topic.tid)),
+            onTap: () =>
+                context.pushReplacement(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),
@@ -213,13 +214,13 @@ class _HomePageState extends State<HomePage>
           leading: const Icon(Icons.person),
           title: Text(FlutterI18n.translate(context, 'ruisi.home.my_profile')),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push(const UserPage()),
+          onTap: () => context.pushReplacement(const UserPage(initialTab: 1)),
         ),
         ListTile(
           leading: const Icon(Icons.article),
           title: Text(FlutterI18n.translate(context, 'ruisi.home.my_posts')),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push(const UserPage(initialTab: 0)),
+          onTap: () => context.pushReplacement(const UserPage()),
         ),
         ListTile(
           leading: const Icon(Icons.bookmark),
@@ -227,7 +228,7 @@ class _HomePageState extends State<HomePage>
             FlutterI18n.translate(context, 'ruisi.home.my_favorites'),
           ),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push(const FavoritesPage()),
+          onTap: () => context.pushReplacement(const FavoritesPage()),
         ),
         ListTile(
           leading: const Icon(Icons.notifications),
@@ -271,13 +272,13 @@ class _HomePageState extends State<HomePage>
           leading: const Icon(Icons.settings),
           title: Text(FlutterI18n.translate(context, 'ruisi.home.settings')),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push(SettingsPage(talker: c.talker)),
+          onTap: () => context.pushReplacement(SettingsPage(talker: c.talker)),
         ),
         ListTile(
           leading: const Icon(Icons.info_outline),
           title: Text(FlutterI18n.translate(context, 'ruisi.home.about')),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push(const AboutPage()),
+          onTap: () => context.pushReplacement(const AboutPage()),
         ),
         const Divider(),
         ListTile(

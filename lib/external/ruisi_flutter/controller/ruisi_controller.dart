@@ -38,17 +38,7 @@ class RuisiController {
 
     talker = TalkerFlutter.init();
     settings = SettingsService(preference.prefs);
-    final ruisiApi = RuisiApi(
-      cookiePath: supportPath.path,
-      talker: talker,
-    );
-    if (settings.proxyEnabled) {
-      ruisiApi.setProxy(
-        enabled: true,
-        host: settings.proxyHost,
-        port: settings.proxyPort,
-      );
-    }
+    final ruisiApi = RuisiApi(cookiePath: supportPath.path, talker: talker);
     api = ApiService(ruisiApi, settings);
     _isLoggedIn.value = settings.isLogin;
   }
@@ -363,18 +353,5 @@ class RuisiController {
 
   Future<(bool, String?)> newPost(int fid, String subject, String content) {
     return api.newPost(fid, subject, content);
-  }
-
-  // =========================================================================
-  // 代理设置
-  // =========================================================================
-
-  Future<void> updateProxy({
-    required bool enabled,
-    required String host,
-    required int port,
-  }) async {
-    await settings.setProxy(enabled: enabled, host: host, port: port);
-    api.ruisiApi.setProxy(enabled: enabled, host: host, port: port);
   }
 }

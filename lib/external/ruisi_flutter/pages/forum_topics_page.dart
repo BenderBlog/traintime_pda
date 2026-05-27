@@ -56,7 +56,9 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
             const SizedBox(height: 8),
             FilledButton.tonal(
               onPressed: () => c.loadTopics(widget.fid, refresh: true),
-              child: Text(FlutterI18n.translate(context, 'ruisi.common.refresh')),
+              child: Text(
+                FlutterI18n.translate(context, 'ruisi.common.refresh'),
+              ),
             ),
           ],
         ),
@@ -79,7 +81,8 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
           final topic = c.topics.value[i];
           return TopicListItem(
             topic: topic,
-            onTap: () => context.push(TopicDetailPage(tid: topic.tid)),
+            onTap: () =>
+                context.pushReplacement(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),

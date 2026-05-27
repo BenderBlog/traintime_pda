@@ -23,7 +23,7 @@ login_process:
   ready_page: 準備獲取登錄網頁
   get_encrypt: 獲取密碼加密密鑰
   ready_login: 準備登錄
-  slider: 滑塊驗證
+  slider: 登錄中
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
 no_info: 沒有信息
@@ -382,7 +382,8 @@ homepage:
   hidden_title: 已隱藏的卡片
   hidden_label: 已隱藏
   hide_empty: 沒有隱藏的卡片
-  homepage: 信息查詢
+  homepage: 校園信息
+  ruisi: 睿思論壇
   club: 社團推薦
   dashboard: 豬圖鑑賞
   planet: 博客星球
@@ -1194,7 +1195,7 @@ ruisi:
     bug_report: 問題反饋
     bug_report_subtitle: 在 GitHub 上提交 issue
     privacy_policy: 隱私政策
-    license: 本應用基於 BSD-3-Clause 許可證開源\n基於 Ruisi-iOS 和 Ruisi-Android 在 AI 輔助下重寫
+    license: 本應用基於 BSD-3-Clause 許可證開源 基於 Ruisi-iOS 和 Ruisi-Android 在 AI 輔助下重寫
     privacy_policy_content: '本應用僅在西安電子科技大學校園網內運行，訪問睿思論壇 (rs.xidian.edu.cn) 的數據。
 
 

@@ -76,24 +76,32 @@ class _SearchPageState extends State<SearchPage> {
         body: c.searchLoading.value
             ? const Center(child: CircularProgressIndicator())
             : c.searchResults.value.isEmpty
-                ? Center(
-                    child: Text(
-                      c.searchKeyword.value.isEmpty ? FlutterI18n.translate(context, 'ruisi.search.input_hint') : FlutterI18n.translate(context, 'ruisi.search.no_results'),
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: c.searchResults.value.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (_, i) {
-                      final topic = c.searchResults.value[i];
-                      return TopicListItem(
-                        topic: topic,
-                        onTap: () => context.push(
-                          TopicDetailPage(tid: topic.tid),
+            ? Center(
+                child: Text(
+                  c.searchKeyword.value.isEmpty
+                      ? FlutterI18n.translate(
+                          context,
+                          'ruisi.search.input_hint',
+                        )
+                      : FlutterI18n.translate(
+                          context,
+                          'ruisi.search.no_results',
                         ),
-                      );
-                    },
-                  ),
+                ),
+              )
+            : ListView.separated(
+                itemCount: c.searchResults.value.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (_, i) {
+                  final topic = c.searchResults.value[i];
+                  return TopicListItem(
+                    topic: topic,
+                    onTap: () => context.pushReplacement(
+                      TopicDetailPage(tid: topic.tid),
+                    ),
+                  );
+                },
+              ),
       );
     });
   }
