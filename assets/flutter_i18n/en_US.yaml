@@ -1345,8 +1345,118 @@ easter_egg_robot:
   button_one: We are hanger for your help!
   button_two: Come on!
   button_notice: \o/\o/\o/\o/\o/\o/\o/\o/
+
 restart_app:
   title_cache_cleared: Cache Cleared
   title_logged_out: Logged Out
   title_password_wrong: Wrong Password
   content: Tap to reopen the app
+
+ruisi:
+  common:
+    refresh: Refresh
+    confirm: OK
+    cancel: Cancel
+    retry: Retry
+    no_topics: No topics
+    no_content: No content
+    reply: Reply
+    favorite: Favorite
+    not_implemented: Not implemented
+    login: Login
+    logout: Log out
+    logged_out: Logged out
+  about:
+    title: About
+    app_name: Ruisi
+    subtitle: Xidian University Campus Forum Client
+    version: Version
+    version_number: "2.0.0 (Flutter)"
+    source_code: Source Code
+    bug_report: Report Issue
+    bug_report_subtitle: Submit an issue on GitHub
+    privacy_policy: Privacy Policy
+    license: Open-sourced under the BSD-3-Clause License
+      Reimplemented based on Ruisi-iOS and Ruisi-Android with AI assistant
+    privacy_policy_content: "This app only operates on the Xidian University campus network, accessing data from the Ruisi Forum (rs.xidian.edu.cn).\n\nThis app does not collect, store, or transmit any personal information to third-party servers.\n\nUser login credentials are stored only on the local device, used for authentication with the Ruisi Forum server.\n\nThis app uses cookies to communicate with the Ruisi Forum server. All data exchange occurs directly between the user's device and the Ruisi Forum server.\n\nIf you have any questions, please contact the developer by submitting an issue on GitHub."
+  home:
+    title: Ruisi Forum
+    new_post: New Post
+    forum_list: Forum List
+    tab_hot: Hot
+    tab_new_reply: Latest Replies
+    tab_new_post: Latest Posts
+    tab_my: Me
+    please_login: Please log in first
+    my_profile: My Profile
+    my_posts: My Posts
+    my_favorites: My Favorites
+    message_center: Messages
+    daily_checkin: Daily Check-in
+    settings: Settings
+    about: About
+  login:
+    title: Login to Ruisi
+    username: Username
+    username_hint: Please enter username
+    password: Password
+    password_hint: Please enter password
+    captcha: Captcha
+    captcha_hint: Please enter captcha
+    back: Back
+  post:
+    title: New Post
+    publish: Publish
+    select_forum: Select Forum
+    select_forum_hint: Please select a forum
+    subject: Title
+    subject_hint: Please enter a title
+    content: Content
+    content_hint: Please enter content
+    success: Post published
+    failure: Failed to publish
+  topic_detail:
+    title: Topic Detail
+    reply_too_short: Reply must be at least 13 characters
+    reply_success: Reply sent
+    reply_failure: Failed to reply
+    favorite_success: Added to favorites
+    favorite_failure: Failed to add to favorites
+    no_data: No data
+    reply_hint: Write a reply...
+  topic_list_item:
+    sticky: Pinned
+  forum_list:
+    title: Forum List
+  favorites:
+    title: My Favorites
+    empty: No favorites
+  messages:
+    title: Messages
+    tab_at: "@Me"
+    no_reply: No reply notifications
+    no_at: No @ notifications
+  search:
+    hint: Search topics...
+    input_hint: Enter keywords to search
+    no_results: No results
+  settings:
+    title: Settings
+    section_display: Display
+    full_style: Full-style Posts
+    full_style_subtitle: Show full post styles (signatures, avatars, etc.)
+    section_proxy: Proxy
+    proxy_enable: Enable Proxy
+    proxy_disabled: Disabled
+    proxy_address: Proxy Address
+    section_debug: Debug
+    view_logs: View Logs
+    proxy_dialog_title: Proxy Settings
+    proxy_host: Host
+    proxy_host_hint: "e.g. 127.0.0.1"
+    proxy_port: Port
+    proxy_port_hint: "e.g. 7890"
+  user:
+    title: Me
+    tab_profile: Profile
+    unknown: Unknown User
