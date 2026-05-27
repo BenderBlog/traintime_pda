@@ -1405,6 +1405,11 @@ ruisi:
     captcha: Captcha
     captcha_hint: Please enter captcha
     back: Back
+    reset_login_state: Reset Login State
+    reset_confirm_title: Confirm Reset
+    reset_confirm_content: Are you sure you want to reset the login state? This will clear all login information.
+    reset_success: Login state has been reset
+    view_logs: View Logs
   post:
     title: New Post
     publish: Publish

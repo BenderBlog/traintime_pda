@@ -5,10 +5,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:talker/talker.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 
 class RuisiApi {

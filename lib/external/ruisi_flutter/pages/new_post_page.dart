@@ -65,9 +65,7 @@ class _NewPostPageState extends State<NewPostPage> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(
-                      FlutterI18n.translate(context, 'ruisi.post.publish'),
-                    ),
+                  : Text(FlutterI18n.translate(context, 'ruisi.post.publish')),
             ),
           ],
         ),
@@ -89,10 +87,8 @@ class _NewPostPageState extends State<NewPostPage> {
                 items: c.forumGroups.value
                     .expand((g) => g.forums)
                     .map(
-                      (f) => DropdownMenuItem(
-                        value: f.fid,
-                        child: Text(f.name),
-                      ),
+                      (f) =>
+                          DropdownMenuItem(value: f.fid, child: Text(f.name)),
                     )
                     .toList(),
                 onChanged: (v) => setState(() => _selectedFid = v),
@@ -116,10 +112,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   border: const OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.isEmpty)
-                    ? FlutterI18n.translate(
-                        context,
-                        'ruisi.post.subject_hint',
-                      )
+                    ? FlutterI18n.translate(context, 'ruisi.post.subject_hint')
                     : null,
               ),
               const SizedBox(height: 16),
@@ -137,10 +130,7 @@ class _NewPostPageState extends State<NewPostPage> {
                 ),
                 maxLines: 12,
                 validator: (v) => (v == null || v.isEmpty)
-                    ? FlutterI18n.translate(
-                        context,
-                        'ruisi.post.content_hint',
-                      )
+                    ? FlutterI18n.translate(context, 'ruisi.post.content_hint')
                     : null,
               ),
             ],
@@ -178,8 +168,7 @@ class _NewPostPageState extends State<NewPostPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error ??
-                FlutterI18n.translate(context, 'ruisi.post.failure'),
+            error ?? FlutterI18n.translate(context, 'ruisi.post.failure'),
           ),
         ),
       );

@@ -1234,6 +1234,11 @@ ruisi:
     captcha: 驗證碼
     captcha_hint: 請輸入驗證碼
     back: 返回
+    reset_login_state: 重置登錄狀態
+    reset_confirm_title: 確認重置
+    reset_confirm_content: 確定要重置登錄狀態嗎？這將清除所有登錄信息。
+    reset_success: 登錄狀態已重置
+    view_logs: 查看日誌
   post:
     title: 發帖
     publish: 發佈

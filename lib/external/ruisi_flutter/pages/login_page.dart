@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 import '../controller/ruisi_controller.dart';
 
@@ -228,6 +229,29 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                 );
               }),
+              const SizedBox(height: 16),
+
+              // 重置登录状态按钮
+              OutlinedButton.icon(
+                onPressed: () => _handleResetLoginState(context),
+                icon: const Icon(Icons.refresh),
+                label: Text(
+                  FlutterI18n.translate(
+                    context,
+                    'ruisi.login.reset_login_state',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // 查看日志按钮
+              OutlinedButton.icon(
+                onPressed: () => _handleViewLogs(context),
+                icon: const Icon(Icons.bug_report),
+                label: Text(
+                  FlutterI18n.translate(context, 'ruisi.login.view_logs'),
+                ),
+              ),
             ],
           ),
         ),
@@ -257,5 +281,28 @@ class _LoginPageState extends State<LoginPage> {
         _captchaCtrl.clear();
       }
     }
+  }
+
+  Future<void> _handleResetLoginState(BuildContext context) async {
+    await RuisiController.i.logout();
+    if (context.mounted) {
+      RuisiController.i.checkLoginCaptcha();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            FlutterI18n.translate(context, 'ruisi.login.reset_success'),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _handleViewLogs(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TalkerScreen(talker: RuisiController.i.talker),
+      ),
+    );
   }
 }

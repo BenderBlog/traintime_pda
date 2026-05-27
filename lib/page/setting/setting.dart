@@ -14,6 +14,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
+import 'package:watermeter/external/ruisi_flutter/controller/ruisi_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -831,7 +832,21 @@ class _SettingWindowState extends State<SettingWindow> {
                             } on Exception {}
 
                             /// Clean cache.
-                            _removeCache();
+                            EnergySession.clearCache();
+                            EnergySession.clearElectricityHistory();
+                            for (var value in [
+                              ClassTableSession.schoolClassName,
+                              ExamSession.examDataCacheName,
+                              ExperimentSession.physicsExperimentCacheName,
+                              SysjSession.otherExperimentCacheName,
+                              ScoreSession.scoreListCacheName,
+                            ]) {
+                              var file = File("${supportPath.path}/$value");
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
+                            }
+
                             if (context.mounted) {
                               showToast(
                                 context: context,
@@ -925,7 +940,23 @@ class _SettingWindowState extends State<SettingWindow> {
                             } on Exception {}
 
                             /// Clean all.
-                            _removeAll();
+                            EnergySession.clearCache();
+                            EnergySession.clearElectricityHistory();
+                            for (var value in [
+                              ClassTableSession.schoolClassName,
+                              UserDefinedClassFile.userDefinedClassName,
+                              ClassTableController.decorationName,
+                              ExamSession.examDataCacheName,
+                              ExperimentSession.physicsExperimentCacheName,
+                              SysjSession.otherExperimentCacheName,
+                              ScoreSession.scoreListCacheName,
+                            ]) {
+                              var file = File("${supportPath.path}/$value");
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
+                            }
+                            await RuisiController.i.logout();
 
                             /// Clean user information
                             await preference.prefrenceClear();
@@ -973,41 +1004,5 @@ class _SettingWindowState extends State<SettingWindow> {
         ],
       ).constrained(maxWidth: 600).center().safeArea(top: true),
     );
-  }
-}
-
-void _removeCache() {
-  EnergySession.clearCache();
-  EnergySession.clearElectricityHistory();
-  for (var value in [
-    ClassTableSession.schoolClassName,
-    ExamSession.examDataCacheName,
-    ExperimentSession.physicsExperimentCacheName,
-    SysjSession.otherExperimentCacheName,
-    ScoreSession.scoreListCacheName,
-  ]) {
-    var file = File("${supportPath.path}/$value");
-    if (file.existsSync()) {
-      file.deleteSync();
-    }
-  }
-}
-
-void _removeAll() {
-  EnergySession.clearCache();
-  EnergySession.clearElectricityHistory();
-  for (var value in [
-    ClassTableSession.schoolClassName,
-    UserDefinedClassFile.userDefinedClassName,
-    ClassTableController.decorationName,
-    ExamSession.examDataCacheName,
-    ExperimentSession.physicsExperimentCacheName,
-    SysjSession.otherExperimentCacheName,
-    ScoreSession.scoreListCacheName,
-  ]) {
-    var file = File("${supportPath.path}/$value");
-    if (file.existsSync()) {
-      file.deleteSync();
-    }
   }
 }

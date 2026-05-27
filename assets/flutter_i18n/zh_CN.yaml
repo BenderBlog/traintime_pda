@@ -1228,6 +1228,11 @@ ruisi:
     captcha: 验证码
     captcha_hint: 请输入验证码
     back: 返回
+    reset_login_state: 重置登录状态
+    reset_confirm_title: 确认重置
+    reset_confirm_content: 确定要重置登录状态吗？这将清除所有登录信息。
+    reset_success: 登录状态已重置
+    view_logs: 查看日志
   post:
     title: 发帖
     publish: 发布
