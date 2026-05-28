@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
 
 import '../constants/urls.dart';
@@ -461,40 +462,113 @@ class ApiService {
     final topics = <Topic>[];
 
     // 策略1: 桌面端 forumdisplay 页面 (板块帖子列表)
-    // 结构: <tbody id="normalthread_xxx"> 包含帖子行
-    final normalthreads = doc.querySelectorAll('tbody[id^="normalthread_"]');
-    for (final item in normalthreads) {
-      final link = item.querySelector('a.s.xst, a[href*="viewthread"]');
-      if (link == null) continue;
+    // 容器: div#threadlist
+    // 行结构: <tbody id="normalthread_xxx|stickthread_xxx">
+    //   <tr>
+    //     <td class="icn">       → 跳过
+    //     <th class="common|new"> → 标题 (a.s.xst) + 分类标签
+    //     <td class="by">         → 作者 + 发布日期
+    //     <td class="num">        → 回复数 + 浏览数
+    //     <td class="by">         → 最后回复人 + 时间
+    //   </tr>
+    // </tbody>
+    final threadlist = doc.querySelector('#threadlist');
+    if (threadlist != null) {
+      for (final tbody in threadlist.querySelectorAll('tbody')) {
+        final id = tbody.id;
+        if (id == 'separatorline') {
+          continue;
+        }
+        if (!id.startsWith('normalthread_') &&
+            !id.startsWith('stickthread_')) {
+          continue;
+        }
 
-      final title = link.text.trim();
-      final href = link.attributes['href'] ?? '';
-      final tidMatch = RegExp(r'tid=(\d+)').firstMatch(href);
-      if (tidMatch == null || title.isEmpty) continue;
+        final tr = tbody.querySelector('tr');
+        if (tr == null) continue;
 
-      final authorEl = item.querySelector(
-        'td.by a[href*="space"], .by a[href*="space"]',
-      );
-      final author = authorEl?.text.trim() ?? '未知';
-      final authorHref = authorEl?.attributes['href'] ?? '';
-      final uidMatch = RegExp(r'uid[=:\-](\d+)').firstMatch(authorHref);
+        // 找 th（标题列）
+        dom.Element? th;
+        for (final c in tr.children) {
+          if (c.localName == 'th') {
+            th = c;
+            break;
+          }
+        }
+        if (th == null) continue;
 
-      final replyEl = item.querySelector('td.num a, .num a');
-      final viewEl = item.querySelector('td.num em, .num em');
+        // 标题: a.s.xst
+        final titleLink = th.querySelector('a.s.xst');
+        if (titleLink == null) continue;
+        final title = titleLink.text.trim();
+        final href = titleLink.attributes['href'] ?? '';
+        final tidMatch = RegExp(r'tid=(\d+)').firstMatch(href);
+        if (tidMatch == null || title.isEmpty) continue;
 
-      topics.add(
-        Topic(
-          tid: int.parse(tidMatch.group(1)!),
-          fid: 0,
-          title: title,
-          author: author,
-          authorId: uidMatch != null ? int.parse(uidMatch.group(1)!) : 0,
-          replies: replyEl != null
-              ? (int.tryParse(replyEl.text.trim()) ?? 0)
-              : 0,
-          views: viewEl != null ? (int.tryParse(viewEl.text.trim()) ?? 0) : 0,
-        ),
-      );
+        // 分类标签
+        final tagLink = th.querySelector('em a[href*="forumdisplay"]');
+        final categoryName = tagLink?.text.trim();
+
+        // td.by 列表
+        final byCells = <dom.Element>[];
+        for (final c in tr.children) {
+          if (c.localName == 'td' && c.classes.contains('by')) {
+            byCells.add(c);
+          }
+        }
+
+        // 第1个 td.by: 作者 + 发布日期
+        String author = '未知';
+        int authorId = 0;
+        String? postTime;
+        if (byCells.isNotEmpty) {
+          final authorLink = byCells[0].querySelector('cite a');
+          author = authorLink?.text.trim() ?? '未知';
+          final authorHref = authorLink?.attributes['href'] ?? '';
+          final uidMatch =
+              RegExp(r'uid[=:\-](\d+)').firstMatch(authorHref);
+          if (uidMatch != null) authorId = int.parse(uidMatch.group(1)!);
+          postTime = byCells[0].querySelector('em span')?.text.trim();
+        }
+
+        // td.num: 回复数 + 浏览数
+        int replies = 0;
+        int views = 0;
+        for (final c in tr.children) {
+          if (c.localName == 'td' && c.classes.contains('num')) {
+            replies =
+                int.tryParse(c.querySelector('a')?.text.trim() ?? '') ?? 0;
+            views =
+                int.tryParse(c.querySelector('em')?.text.trim() ?? '') ?? 0;
+            break;
+          }
+        }
+
+        // 最后回复时间
+        String? lastReplyTime;
+        if (byCells.length >= 2) {
+          lastReplyTime = byCells[1].querySelector('em')?.text.trim();
+        }
+
+        // 置顶标记
+        final isStick = id.startsWith('stickthread_');
+
+        topics.add(
+          Topic(
+            tid: int.parse(tidMatch.group(1)!),
+            fid: 0,
+            title: title,
+            author: author,
+            authorId: authorId,
+            replies: replies,
+            views: views,
+            postTime: postTime,
+            lastReplyTime: lastReplyTime,
+            isStick: isStick,
+            categoryName: categoryName,
+          ),
+        );
+      }
     }
 
     // 策略2: 桌面端 guide 页面 (hot/new/newReply)

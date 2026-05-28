@@ -9,13 +9,11 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import '../controller/ruisi_controller.dart';
 import '../widgets/topic_list_item.dart';
 import 'topic_detail_page.dart';
+import '../constants/urls.dart';
 import 'forum_list_page.dart';
 import 'login_page.dart';
 import 'user_page.dart';
-import 'favorites_page.dart';
 import 'new_post_page.dart';
-import 'settings_page.dart';
-import 'about_page.dart';
 
 /// 首页
 class HomePage extends StatefulWidget {
@@ -32,12 +30,12 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 4, vsync: this);
+    _tabCtrl = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final c = RuisiController.i;
-      c.loadHotTopics();
-      c.loadNewReplyTopics(refresh: true);
       c.loadNewTopics(refresh: true);
+      c.loadPhotography(refresh: true);
+      c.loadLostFound(refresh: true);
     });
   }
 
@@ -62,40 +60,33 @@ class _HomePageState extends State<HomePage>
               onPressed: () => context.push(const NewPostPage()),
             ),
             IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'ruisi.common.not_implemented',
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            IconButton(
               icon: const Icon(Icons.forum),
               tooltip: FlutterI18n.translate(context, 'ruisi.home.forum_list'),
               onPressed: () => context.push(const ForumListPage()),
             ),
+            _buildUserButton(context, c),
           ],
           bottom: TabBar(
             controller: _tabCtrl,
             tabs: [
-              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_hot')),
               Tab(
                 text: FlutterI18n.translate(
                   context,
-                  'ruisi.home.tab_new_reply',
+                  'ruisi.home.tab_new_post',
                 ),
               ),
               Tab(
-                text: FlutterI18n.translate(context, 'ruisi.home.tab_new_post'),
+                text: FlutterI18n.translate(
+                  context,
+                  'ruisi.home.tab_photography',
+                ),
               ),
-              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_my')),
+              Tab(
+                text: FlutterI18n.translate(
+                  context,
+                  'ruisi.home.tab_lost_found',
+                ),
+              ),
             ],
           ),
         ),
@@ -104,27 +95,27 @@ class _HomePageState extends State<HomePage>
           children: [
             _buildTopicList(
               context,
-              topics: c.hotTopics.value,
-              isLoading: c.hotLoading.value,
-              onRefresh: () => c.loadHotTopics(),
-            ),
-            _buildTopicList(
-              context,
-              topics: c.newReplyTopics.value,
-              isLoading: c.newReplyLoading.value,
-              onRefresh: () => c.loadNewReplyTopics(refresh: true),
-              onLoadMore: c.hasMoreNewReply
-                  ? () => c.loadNewReplyTopics()
-                  : null,
-            ),
-            _buildTopicList(
-              context,
               topics: c.newTopics.value,
               isLoading: c.newLoading.value,
               onRefresh: () => c.loadNewTopics(refresh: true),
               onLoadMore: c.hasMoreNew ? () => c.loadNewTopics() : null,
             ),
-            _buildMyTab(context, c),
+            _buildTopicList(
+              context,
+              topics: c.photographyTopics.value,
+              isLoading: c.photographyLoading.value,
+              onRefresh: () => c.loadPhotography(refresh: true),
+              onLoadMore:
+                  c.hasMorePhoto ? () => c.loadPhotography() : null,
+            ),
+            _buildTopicList(
+              context,
+              topics: c.lostFoundTopics.value,
+              isLoading: c.lostFoundLoading.value,
+              onRefresh: () => c.loadLostFound(refresh: true),
+              onLoadMore:
+                  c.hasMoreLost ? () => c.loadLostFound() : null,
+            ),
           ],
         ),
       );
@@ -184,125 +175,27 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildMyTab(BuildContext context, RuisiController c) {
+  Widget _buildUserButton(BuildContext context, RuisiController c) {
     if (!c.isLoggedIn) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.person_outline, size: 64),
-            const SizedBox(height: 16),
-            Text(FlutterI18n.translate(context, 'ruisi.home.please_login')),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                );
-              },
-              child: Text(FlutterI18n.translate(context, 'ruisi.common.login')),
-            ),
-          ],
-        ),
+      return IconButton(
+        icon: const Icon(Icons.person_outline),
+        tooltip: FlutterI18n.translate(context, 'ruisi.common.login'),
+        onPressed: () => context.push(const LoginPage()),
       );
     }
 
-    return ListView(
-      children: [
-        ListTile(
-          leading: const Icon(Icons.person),
-          title: Text(FlutterI18n.translate(context, 'ruisi.home.my_profile')),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.pushReplacement(const UserPage(initialTab: 1)),
+    return IconButton(
+      icon: ClipOval(
+        child: Image.network(
+          Urls.getAvaterUrl(c.settings.uid, size: 0),
+          width: 28,
+          height: 28,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => const Icon(Icons.person, size: 24),
         ),
-        ListTile(
-          leading: const Icon(Icons.article),
-          title: Text(FlutterI18n.translate(context, 'ruisi.home.my_posts')),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.pushReplacement(const UserPage()),
-        ),
-        ListTile(
-          leading: const Icon(Icons.bookmark),
-          title: Text(
-            FlutterI18n.translate(context, 'ruisi.home.my_favorites'),
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.pushReplacement(const FavoritesPage()),
-        ),
-        ListTile(
-          leading: const Icon(Icons.notifications),
-          title: Text(
-            FlutterI18n.translate(context, 'ruisi.home.message_center'),
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  FlutterI18n.translate(
-                    context,
-                    'ruisi.common.not_implemented',
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.edit_calendar),
-          title: Text(
-            FlutterI18n.translate(context, 'ruisi.home.daily_checkin'),
-          ),
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  FlutterI18n.translate(
-                    context,
-                    'ruisi.common.not_implemented',
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.settings),
-          title: Text(FlutterI18n.translate(context, 'ruisi.home.settings')),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.pushReplacement(SettingsPage(talker: c.talker)),
-        ),
-        ListTile(
-          leading: const Icon(Icons.info_outline),
-          title: Text(FlutterI18n.translate(context, 'ruisi.home.about')),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.pushReplacement(const AboutPage()),
-        ),
-        const Divider(),
-        ListTile(
-          leading: Icon(
-            Icons.logout,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          title: Text(
-            FlutterI18n.translate(context, 'ruisi.common.logout'),
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-          onTap: () async {
-            await c.logout();
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  FlutterI18n.translate(context, 'ruisi.common.logged_out'),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
+      ),
+      tooltip: FlutterI18n.translate(context, 'ruisi.home.my_profile'),
+      onPressed: () => context.push(const UserPage()),
     );
   }
 }

@@ -17,177 +17,100 @@ class TopicListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
+    return ListTile(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      title: Text(topic.title),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: CachedNetworkImage(
+          imageUrl: Urls.getAvaterUrl(topic.authorId),
+          width: 24,
+          height: 24,
+          fit: BoxFit.cover,
+          placeholder: (_, _) => const Icon(Icons.person),
+          errorWidget: (_, _, _) => const Icon(Icons.person),
+        ),
+      ),
+      subtitle: Padding(
+        padding: EdgeInsetsGeometry.symmetric(vertical: 4),
+        child: Wrap(
+          spacing: 4.0,
+          runSpacing: 4.0,
           children: [
-            // 头像
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: CachedNetworkImage(
-                imageUrl: Urls.getAvaterUrl(topic.authorId),
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-                placeholder: (_, _) => Container(
-                  width: 40,
-                  height: 40,
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: const Icon(Icons.person, size: 24),
-                ),
-                errorWidget: (_, _, _) => Container(
-                  width: 40,
-                  height: 40,
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: const Icon(Icons.person, size: 24),
+            if (topic.isStick)
+              _TopicInfoWidget(
+                needErrorColor: true,
+                text: FlutterI18n.translate(
+                  context,
+                  'ruisi.topic_list_item.sticky',
                 ),
               ),
+
+            if (topic.categoryName != null && topic.categoryName!.isNotEmpty)
+              _TopicInfoWidget(text: topic.categoryName!),
+
+            _TopicInfoWidget(icon: Icons.person, text: topic.author),
+
+            if (topic.lastReplyTime != null)
+              _TopicInfoWidget(
+                icon: Icons.access_time,
+                text: topic.lastReplyTime!,
+              ),
+
+            _TopicInfoWidget(
+              icon: Icons.chat_bubble_outline,
+              text: '${topic.replies}',
             ),
-            const SizedBox(width: 12),
-            // 内容
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 标题行
-                  Row(
-                    children: [
-                      if (topic.isStick) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 1,
-                          ),
-                          margin: const EdgeInsets.only(right: 4),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.error,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                          child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'ruisi.topic_list_item.sticky',
-                            ),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onError,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ),
-                      ],
-                      Expanded(
-                        child: Text(
-                          topic.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      if (topic.isImage) ...[
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.image,
-                          size: 16,
-                          color: theme.colorScheme.outline,
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  // 底部信息
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.person,
-                        size: 14,
-                        color: theme.colorScheme.outline,
-                      ),
-                      Text(
-                        topic.author,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                      if (topic.categoryName != null &&
-                          topic.categoryName!.isNotEmpty) ...[
-                        Text(
-                          ' • ',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.outline,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 1,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            topic.categoryName!,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(width: 16),
-                      if (topic.lastReplyTime != null) ...[
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: theme.colorScheme.outline,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          topic.lastReplyTime!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.outline,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                      ],
-                      Icon(
-                        Icons.chat_bubble_outline,
-                        size: 14,
-                        color: theme.colorScheme.outline,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${topic.replies}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.remove_red_eye,
-                        size: 14,
-                        color: theme.colorScheme.outline,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${topic.views}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+
+            _TopicInfoWidget(
+              icon: Icons.remove_red_eye,
+              text: '${topic.views}',
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TopicInfoWidget extends StatelessWidget {
+  final bool needErrorColor;
+  final IconData? icon;
+  final String text;
+  const _TopicInfoWidget({
+    this.needErrorColor = false,
+    this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: needErrorColor
+            ? theme.colorScheme.error
+            : theme.colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Padding(
+              padding: EdgeInsetsGeometry.only(right: 2),
+              child: Icon(icon, size: 14),
+            ),
+          Text(
+            text,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: needErrorColor
+                  ? theme.colorScheme.onError
+                  : theme.colorScheme.onPrimaryContainer,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -9,6 +9,9 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import '../controller/ruisi_controller.dart';
 import '../widgets/topic_list_item.dart';
 import 'topic_detail_page.dart';
+import 'favorites_page.dart';
+import 'settings_page.dart';
+import 'about_page.dart';
 import 'login_page.dart';
 
 /// 用户页面（我的帖子、我的资料）
@@ -98,7 +101,7 @@ class _UserPageState extends State<UserPage>
                     ),
                   ),
 
-            // 资料
+            // 资料 + 功能入口
             ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -125,6 +128,60 @@ class _UserPageState extends State<UserPage>
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: const Icon(Icons.bookmark),
+                  title: Text(
+                    FlutterI18n.translate(context, 'ruisi.home.my_favorites'),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push(const FavoritesPage()),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: Text(
+                    FlutterI18n.translate(context, 'ruisi.home.settings'),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () =>
+                      context.push(SettingsPage(talker: c.talker)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(
+                    FlutterI18n.translate(context, 'ruisi.home.about'),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push(const AboutPage()),
+                ),
+                const Divider(),
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(
+                    FlutterI18n.translate(context, 'ruisi.common.logout'),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  onTap: () async {
+                    await c.logout();
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          FlutterI18n.translate(
+                            context,
+                            'ruisi.common.logged_out',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

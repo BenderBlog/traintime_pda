@@ -11,6 +11,7 @@ class Topic {
   final int views;
   final int replies;
   final String? lastReplyTime;
+  final String? postTime; // 发布日期
   final bool isStick; // 置顶
   final bool isImage; // 图片帖
   final String? imageUrl; // 封面图
@@ -26,6 +27,7 @@ class Topic {
     this.views = 0,
     this.replies = 0,
     this.lastReplyTime,
+    this.postTime,
     this.isStick = false,
     this.isImage = false,
     this.imageUrl,

@@ -260,6 +260,66 @@ class RuisiController {
   }
 
   // =========================================================================
+  // 摄影天地 (fid 561)
+  // =========================================================================
+
+  final photographyTopics = signal<List<Topic>>([]);
+  final photographyLoading = signal(false);
+  int _photoPage = 1;
+  bool _hasMorePhoto = true;
+  bool get hasMorePhoto => _hasMorePhoto;
+
+  Future<void> loadPhotography({bool refresh = false}) async {
+    if (refresh) {
+      _photoPage = 1;
+      _hasMorePhoto = true;
+      photographyTopics.value = [];
+    }
+
+    if (!_hasMorePhoto) return;
+
+    photographyLoading.value = true;
+    final result = await api.getTopicList(561, page: _photoPage);
+    if (result.isEmpty) {
+      _hasMorePhoto = false;
+    } else {
+      photographyTopics.value = [...photographyTopics.value, ...result];
+      _photoPage++;
+    }
+    photographyLoading.value = false;
+  }
+
+  // =========================================================================
+  // 失物招领 (fid 142)
+  // =========================================================================
+
+  final lostFoundTopics = signal<List<Topic>>([]);
+  final lostFoundLoading = signal(false);
+  int _lostPage = 1;
+  bool _hasMoreLost = true;
+  bool get hasMoreLost => _hasMoreLost;
+
+  Future<void> loadLostFound({bool refresh = false}) async {
+    if (refresh) {
+      _lostPage = 1;
+      _hasMoreLost = true;
+      lostFoundTopics.value = [];
+    }
+
+    if (!_hasMoreLost) return;
+
+    lostFoundLoading.value = true;
+    final result = await api.getTopicList(142, page: _lostPage);
+    if (result.isEmpty) {
+      _hasMoreLost = false;
+    } else {
+      lostFoundTopics.value = [...lostFoundTopics.value, ...result];
+      _lostPage++;
+    }
+    lostFoundLoading.value = false;
+  }
+
+  // =========================================================================
   // 我的帖子
   // =========================================================================
 
