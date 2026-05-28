@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../controller/ruisi_controller.dart';
 import '../models/post.dart';
 import '../constants/urls.dart';
+import '../widgets/smiley_picker.dart';
 import 'login_page.dart';
 
 /// 帖子详情页
@@ -26,6 +27,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   final _replyCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _showReply = false;
+  bool _showSmiley = false;
 
   dynamic _detail; // TopicDetail?
   bool _loading = true;
@@ -52,8 +54,10 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     });
 
     try {
-      final detail =
-          await RuisiController.i.api.getTopicDetail(widget.tid, page: page);
+      final detail = await RuisiController.i.api.getTopicDetail(
+        widget.tid,
+        page: page,
+      );
       if (!mounted) return;
       setState(() {
         _detail = detail;
@@ -74,9 +78,16 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     if (content.isEmpty) return;
 
     if (content.length < 13) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(FlutterI18n.translate(context, 'ruisi.topic_detail.reply_too_short'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            FlutterI18n.translate(
+              context,
+              'ruisi.topic_detail.reply_too_short',
+            ),
+          ),
+        ),
+      );
       return;
     }
 
@@ -95,16 +106,40 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
     if (ok) {
       _replyCtrl.clear();
-      setState(() => _showReply = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(FlutterI18n.translate(context, 'ruisi.topic_detail.reply_success'))));
+      setState(() {
+        _showReply = false;
+        _showSmiley = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            FlutterI18n.translate(context, 'ruisi.topic_detail.reply_success'),
+          ),
+        ),
+      );
       _load(page: _currentPage);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(FlutterI18n.translate(context, 'ruisi.topic_detail.reply_failure'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            FlutterI18n.translate(context, 'ruisi.topic_detail.reply_failure'),
+          ),
+        ),
+      );
     }
+  }
+
+  void _insertSmiley(String value) {
+    final text = _replyCtrl.text;
+    final selection = _replyCtrl.selection;
+    final cursorPos = selection.isValid ? selection.start : text.length;
+
+    final newText =
+        text.substring(0, cursorPos) + value + text.substring(cursorPos);
+    _replyCtrl.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: cursorPos + value.length),
+    );
   }
 
   Future<void> _addFavorite() async {
@@ -118,9 +153,21 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     }
     final ok = await c.addFavorite(widget.tid);
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(ok ? FlutterI18n.translate(context, 'ruisi.topic_detail.favorite_success') : FlutterI18n.translate(context, 'ruisi.topic_detail.favorite_failure'))));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok
+              ? FlutterI18n.translate(
+                  context,
+                  'ruisi.topic_detail.favorite_success',
+                )
+              : FlutterI18n.translate(
+                  context,
+                  'ruisi.topic_detail.favorite_failure',
+                ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -129,7 +176,10 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_detail?.title ?? FlutterI18n.translate(context, 'ruisi.topic_detail.title')),
+        title: Text(
+          _detail?.title ??
+              FlutterI18n.translate(context, 'ruisi.topic_detail.title'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.bookmark_border),
@@ -148,107 +198,122 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(_error!),
-                      const SizedBox(height: 8),
-                      FilledButton.tonal(
-                        onPressed: () => _load(),
-                        child: Text(FlutterI18n.translate(context, 'ruisi.common.retry')),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(_error!),
+                  const SizedBox(height: 8),
+                  FilledButton.tonal(
+                    onPressed: () => _load(),
+                    child: Text(
+                      FlutterI18n.translate(context, 'ruisi.common.retry'),
+                    ),
                   ),
-                )
-              : _detail == null
-                  ? Center(child: Text(FlutterI18n.translate(context, 'ruisi.topic_detail.no_data')))
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: () async =>
-                                _load(page: _currentPage),
-                            child: ListView.separated(
-                              controller: _scrollCtrl,
-                              itemCount:
-                                  (_detail.posts?.length ?? 0) + 2,
-                              separatorBuilder: (_, _) =>
-                                  const Divider(height: 1),
-                              itemBuilder: (_, i) {
-                                if (i == 0) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(
-                                      _detail.title ?? '',
-                                      style:
-                                          theme.textTheme.titleLarge,
-                                    ),
-                                  );
-                                }
-                                if (i ==
-                                    (_detail.posts?.length ?? 0) + 1) {
-                                  return _Pagination(
-                                    current: _currentPage,
-                                    total: _detail.totalPages ?? 1,
-                                    onPageChanged: (p) => _load(page: p),
-                                  );
-                                }
-                                final post = _detail.posts[i - 1] as Post;
-                                return _PostTile(
-                                  post: post,
-                                  onReply: () {
-                                    _replyCtrl.text =
-                                        '回复 #${post.index} ${post.author}\n';
-                                    setState(() => _showReply = true);
-                                  },
-                                );
-                              },
+                ],
+              ),
+            )
+          : _detail == null
+          ? Center(
+              child: Text(
+                FlutterI18n.translate(context, 'ruisi.topic_detail.no_data'),
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async => _load(page: _currentPage),
+                    child: ListView.separated(
+                      controller: _scrollCtrl,
+                      itemCount: (_detail.posts?.length ?? 0) + 2,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        if (i == 0) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              _detail.title ?? '',
+                              style: theme.textTheme.titleLarge,
                             ),
-                          ),
+                          );
+                        }
+                        if (i == (_detail.posts?.length ?? 0) + 1) {
+                          return _Pagination(
+                            current: _currentPage,
+                            total: _detail.totalPages ?? 1,
+                            onPageChanged: (p) => _load(page: p),
+                          );
+                        }
+                        final post = _detail.posts[i - 1] as Post;
+                        return _PostTile(
+                          post: post,
+                          onReply: () {
+                            _replyCtrl.text =
+                                '回复 #${post.index} ${post.author}\n';
+                            setState(() => _showReply = true);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                // 回复输入框
+                if (_showReply) ...[
+                  if (_showSmiley) SmileyPicker(onSelected: _insertSmiley),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      border: Border(
+                        top: BorderSide(
+                          color: theme.colorScheme.outlineVariant,
                         ),
-                        // 回复输入框
-                        if (_showReply)
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
-                              border: Border(
-                                top: BorderSide(
-                                  color: theme.colorScheme.outlineVariant,
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _replyCtrl,
+                              maxLines: 3,
+                              minLines: 1,
+                              decoration: InputDecoration(
+                                hintText: FlutterI18n.translate(
+                                  context,
+                                  'ruisi.topic_detail.reply_hint',
+                                ),
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
                                 ),
                               ),
                             ),
-                            child: SafeArea(
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _replyCtrl,
-                                      maxLines: 3,
-                                      minLines: 1,
-                                      decoration: InputDecoration(
-                                        hintText: FlutterI18n.translate(context, 'ruisi.topic_detail.reply_hint'),
-                                        border: OutlineInputBorder(),
-                                        contentPadding:
-                                            EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  IconButton.filled(
-                                    icon: const Icon(Icons.send),
-                                    onPressed: _submitReply,
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
-                      ],
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(
+                              _showSmiley
+                                  ? Icons.keyboard
+                                  : Icons.emoji_emotions_outlined,
+                            ),
+                            onPressed: () =>
+                                setState(() => _showSmiley = !_showSmiley),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton.filled(
+                            icon: const Icon(Icons.send),
+                            onPressed: _submitReply,
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                ],
+              ],
+            ),
       floatingActionButton: _showReply
           ? null
           : FloatingActionButton(
@@ -283,8 +348,7 @@ class _PostTile extends StatelessWidget {
                     width: 32,
                     height: 32,
                     fit: BoxFit.cover,
-                    placeholder: (_, _) =>
-                        const Icon(Icons.person, size: 20),
+                    placeholder: (_, _) => const Icon(Icons.person, size: 20),
                   ),
                 )
               else
@@ -356,14 +420,12 @@ class _PostTile extends StatelessWidget {
                         placeholder: (_, _) => Container(
                           width: 100,
                           height: 100,
-                          color:
-                              theme.colorScheme.surfaceContainerHighest,
+                          color: theme.colorScheme.surfaceContainerHighest,
                         ),
                         errorWidget: (_, _, _) => Container(
                           width: 100,
                           height: 100,
-                          color:
-                              theme.colorScheme.surfaceContainerHighest,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           child: const Icon(Icons.broken_image),
                         ),
                       ),
@@ -377,7 +439,9 @@ class _PostTile extends StatelessWidget {
             children: [
               TextButton.icon(
                 icon: const Icon(Icons.reply, size: 16),
-                label: Text(FlutterI18n.translate(context, 'ruisi.common.reply')),
+                label: Text(
+                  FlutterI18n.translate(context, 'ruisi.common.reply'),
+                ),
                 onPressed: onReply,
               ),
             ],
@@ -498,8 +562,7 @@ class _SmileyImage extends StatelessWidget {
       height: 24,
       errorBuilder: (_, _, _) {
         // Local asset missing — fall back to network with full URL.
-        final fullUrl =
-            src.startsWith('http') ? src : '${Urls.baseUrl}$src';
+        final fullUrl = src.startsWith('http') ? src : '${Urls.baseUrl}$src';
         return Image.network(
           fullUrl,
           width: 24,
