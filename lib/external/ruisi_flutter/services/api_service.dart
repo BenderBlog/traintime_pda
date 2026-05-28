@@ -750,13 +750,25 @@ class ApiService {
       // 帖子内容在 <td class="plc"> 中
       final plc = table.querySelector('td.plc');
       final contentEl = plc?.querySelector('.t_f, .postmessage');
-      final content = contentEl?.innerHtml ?? '';
+      var content = contentEl?.innerHtml ?? '';
+
+      // .pattl 包含附件（文件样式图片 / 纯文件），拼进 content
+      // 由 topic_detail_page 的 _IgnoreJsOpExtension 统一渲染
+      final pattl = plc?.querySelector('.pattl');
+      if (pattl != null) {
+        content += pattl.innerHtml;
+      }
 
       // 时间在 plc 区域的 .authi em 中
       final timeEl = plc?.querySelector('.authi em, .postinfo em');
 
+      // 提取图片列表（.t_f 内嵌图片 + .pattl 文件样式图片）
       final images = <ImageAttachment>[];
-      for (final img in contentEl?.querySelectorAll('img[file]') ?? []) {
+      final allImgs = [
+        ...?contentEl?.querySelectorAll('img[file]'),
+        ...?pattl?.querySelectorAll('img[file]'),
+      ];
+      for (final img in allImgs) {
         final file = img.attributes['file'] ?? img.attributes['src'] ?? '';
         if (file.isNotEmpty && !file.contains('smiley')) {
           images.add(

@@ -333,7 +333,6 @@ class _PostTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -384,56 +383,9 @@ class _PostTile extends StatelessWidget {
             onLinkTap: (url, _, _) {
               if (url != null) launchUrl(Uri.parse(url));
             },
-            extensions: [_SmileyExtension()],
+            extensions: [_SmileyExtension(), _IgnoreJsOpExtension()],
           ),
-          if (post.images.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: post.images
-                  .map(
-                    (img) => GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => Dialog(
-                            child: InteractiveViewer(
-                              child: CachedNetworkImage(
-                                imageUrl: img.url,
-                                fit: BoxFit.contain,
-                                placeholder: (_, _) => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                errorWidget: (_, _, _) =>
-                                    const Icon(Icons.broken_image),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      child: CachedNetworkImage(
-                        imageUrl: img.url,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                        placeholder: (_, _) => Container(
-                          width: 100,
-                          height: 100,
-                          color: theme.colorScheme.surfaceContainerHighest,
-                        ),
-                        errorWidget: (_, _, _) => Container(
-                          width: 100,
-                          height: 100,
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          child: const Icon(Icons.broken_image),
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
+
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -570,6 +522,144 @@ class _SmileyImage extends StatelessWidget {
           errorBuilder: (_, _, _) => const SizedBox.shrink(),
         );
       },
+    );
+  }
+}
+
+/// Extension to render `<ignore_js_op>` tags from Discuz desktop HTML.
+///
+/// Three variants:
+/// 1. Pure image:       `<img file="real.jpg" src="none.gif"/>`
+/// 2. File-style image: `<dl class="tattl attm">...<img file="real.jpg"/>...`
+/// 3. Pure file:        `<dl class="tattl">...<a>filename.pdf</a>...`
+class _IgnoreJsOpExtension extends HtmlExtension {
+  @override
+  Set<String> get supportedTags => {'ignore_js_op'};
+
+  @override
+  bool matches(ExtensionContext context) =>
+      context.elementName == 'ignore_js_op';
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final el = context.element;
+
+    // 1. Pure image: direct <img file="..."> child
+    final directImg = el?.querySelector('img[file]');
+    if (directImg != null) {
+      final file = directImg.attributes['file'] ?? '';
+      if (file.isNotEmpty) {
+        final url = file.startsWith('http') ? file : '${Urls.baseUrl}$file';
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: _IgnoreJsOpImage(url: url),
+        );
+      }
+    }
+
+    // 2 & 3. <dl class="tattl ..."> child
+    final dl = el?.querySelector('dl.tattl');
+    if (dl != null) {
+      // 2. File-style image: has class "attm" and contains img[file]
+      if (dl.className.contains('attm')) {
+        final img = dl.querySelector('img[file]');
+        final file = img?.attributes['file'] ?? '';
+        if (file.isNotEmpty) {
+          final url = file.startsWith('http') ? file : '${Urls.baseUrl}$file';
+          return WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: _IgnoreJsOpImage(url: url),
+          );
+        }
+      }
+
+      // 3. Pure file: has .attnm with download link
+      final linkEl = dl.querySelector('.attnm a');
+      if (linkEl != null) {
+        final href = linkEl.attributes['href'] ?? '';
+        final fileName = linkEl.text.trim();
+        final sizeText = dl.querySelectorAll('dd p').length > 1
+            ? dl.querySelectorAll('dd p')[1].text.trim()
+            : null;
+        final fullUrl = href.startsWith('http') ? href : '${Urls.baseUrl}$href';
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: _IgnoreJsOpFileCard(
+            fileName: fileName,
+            sizeText: sizeText,
+            url: fullUrl,
+          ),
+        );
+      }
+    }
+
+    // Fallback: unknown structure, render nothing
+    return WidgetSpan(
+      child: Text("Unknown ignore_js_op element: \n ${context.element}"),
+    );
+  }
+}
+
+/// Network image used by [_IgnoreJsOpExtension] for pure/file-style images.
+class _IgnoreJsOpImage extends StatelessWidget {
+  final String url;
+  const _IgnoreJsOpImage({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (_) => Dialog(
+              child: InteractiveViewer(
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.contain,
+                  placeholder: (_, _) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (_, _, _) => const Icon(Icons.broken_image),
+                ),
+              ),
+            ),
+          );
+        },
+        child: CachedNetworkImage(
+          imageUrl: url,
+          placeholder: (_, _) =>
+              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          errorWidget: (_, _, _) => const Icon(Icons.broken_image, size: 48),
+        ),
+      ),
+    );
+  }
+}
+
+/// File attachment card used by [_IgnoreJsOpExtension] for pure files.
+class _IgnoreJsOpFileCard extends StatelessWidget {
+  final String fileName;
+  final String? sizeText;
+  final String url;
+  const _IgnoreJsOpFileCard({
+    required this.fileName,
+    this.sizeText,
+    required this.url,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: const Icon(Icons.insert_drive_file),
+        title: Text(fileName, overflow: TextOverflow.ellipsis),
+        subtitle: sizeText != null ? Text(sizeText!) : null,
+        trailing: const Icon(Icons.download),
+        onTap: () => launchUrl(Uri.parse(url)),
+      ),
     );
   }
 }
