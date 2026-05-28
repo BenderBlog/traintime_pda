@@ -320,6 +320,7 @@ class _PostTile extends StatelessWidget {
             onLinkTap: (url, _, _) {
               if (url != null) launchUrl(Uri.parse(url));
             },
+            extensions: [_SmileyExtension()],
           ),
           if (post.images.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -439,6 +440,73 @@ class _Pagination extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Extension to render smiley images from local assets instead of network.
+///
+/// Discuz posts contain smileys as `<img src="static/image/smiley/...">`.
+/// The built-in [ImageBuiltIn] won't match these relative URLs.
+/// This extension intercepts them and loads from bundled assets.
+class _SmileyExtension extends HtmlExtension {
+  @override
+  Set<String> get supportedTags => {'img'};
+
+  @override
+  bool matches(ExtensionContext context) {
+    if (context.elementName != 'img') return false;
+    final src = context.attributes['src'] ?? '';
+    return src.contains('static/image/smiley');
+  }
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final src = context.attributes['src'] ?? '';
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: _SmileyImage(src: src),
+    );
+  }
+}
+
+class _SmileyImage extends StatelessWidget {
+  final String src;
+
+  const _SmileyImage({required this.src});
+
+  @override
+  Widget build(BuildContext context) {
+    // Extract the path after 'smiley/' from the forum URL.
+    // e.g. "static/image/smiley/jgz/jgz065.png" → "smiley/jgz/jgz065.png"
+    final smileyIndex = src.indexOf('smiley/');
+    if (smileyIndex < 0) return const SizedBox.shrink();
+
+    String assetPath = src.substring(smileyIndex);
+
+    // Android parity: the 'default' category uses .gif in forum HTML
+    // but the bundled assets are .png files.
+    if (assetPath.contains('/default')) {
+      assetPath = assetPath.replaceAll('.gif', '.png');
+    }
+
+    final fullPath = 'assets/ruisi_flutter/$assetPath';
+
+    return Image.asset(
+      fullPath,
+      width: 24,
+      height: 24,
+      errorBuilder: (_, _, _) {
+        // Local asset missing — fall back to network with full URL.
+        final fullUrl =
+            src.startsWith('http') ? src : '${Urls.baseUrl}$src';
+        return Image.network(
+          fullUrl,
+          width: 24,
+          height: 24,
+          errorBuilder: (_, _, _) => const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
