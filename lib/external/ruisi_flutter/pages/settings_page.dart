@@ -3,10 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
-import '../controller/ruisi_controller.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -15,59 +13,31 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = RuisiController.i;
-
-    return Watch((context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, 'ruisi.settings.title')),
-        ),
-        body: ListView(
-          children: [
-            // 显示设置
-            _SectionHeader(
-              title: FlutterI18n.translate(
-                context,
-                'ruisi.settings.section_display',
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(FlutterI18n.translate(context, 'ruisi.settings.title')),
+      ),
+      body: ListView(
+        children: [
+          _SectionHeader(
+            title: FlutterI18n.translate(
+              context,
+              'ruisi.settings.section_debug',
             ),
-            SwitchListTile(
-              title: Text(
-                FlutterI18n.translate(context, 'ruisi.settings.full_style'),
-              ),
-              subtitle: Text(
-                FlutterI18n.translate(
-                  context,
-                  'ruisi.settings.full_style_subtitle',
-                ),
-              ),
-              value: c.settings.showFullStylePosts.value,
-              onChanged: (value) => c.settings.setShowFullStyle(value),
+          ),
+          ListTile(
+            leading: const Icon(Icons.bug_report),
+            title: Text(
+              FlutterI18n.translate(context, 'ruisi.settings.view_logs'),
             ),
-
-            const Divider(),
-
-            // 调试
-            _SectionHeader(
-              title: FlutterI18n.translate(
-                context,
-                'ruisi.settings.section_debug',
-              ),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => TalkerScreen(talker: talker)),
             ),
-            ListTile(
-              leading: const Icon(Icons.bug_report),
-              title: Text(
-                FlutterI18n.translate(context, 'ruisi.settings.view_logs'),
-              ),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => TalkerScreen(talker: talker)),
-              ),
-            ),
-          ],
-        ),
-      );
-    });
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -1244,6 +1244,7 @@ ruisi:
     content_hint: 请输入内容
     success: 发帖成功
     failure: 发帖失败
+    smiley: 表情
   topic_detail:
     title: 帖子详情
     reply_too_short: 回复内容不能少于 13 个字符
@@ -1271,9 +1272,6 @@ ruisi:
     no_results: 无搜索结果
   settings:
     title: 设置
-    section_display: 显示
-    full_style: 完整样式帖子
-    full_style_subtitle: 显示帖子完整样式（签名、头像等）
     section_proxy: 代理
     proxy_enable: 启用代理
     proxy_disabled: 未启用

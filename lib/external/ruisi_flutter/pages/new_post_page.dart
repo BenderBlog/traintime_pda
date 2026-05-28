@@ -7,6 +7,7 @@ import 'package:signals/signals_flutter.dart';
 
 import '../controller/ruisi_controller.dart';
 import 'login_page.dart';
+import '../widgets/smiley_picker.dart';
 
 /// 发帖页面
 class NewPostPage extends StatefulWidget {
@@ -22,6 +23,7 @@ class _NewPostPageState extends State<NewPostPage> {
   final _contentCtrl = TextEditingController();
   int? _selectedFid;
   bool _submitting = false;
+  bool _showSmiley = false;
 
   @override
   void initState() {
@@ -133,11 +135,46 @@ class _NewPostPageState extends State<NewPostPage> {
                     ? FlutterI18n.translate(context, 'ruisi.post.content_hint')
                     : null,
               ),
+              const SizedBox(height: 8),
+
+              // 表情工具栏
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _showSmiley ? Icons.keyboard : Icons.emoji_emotions_outlined,
+                    ),
+                    tooltip: FlutterI18n.translate(
+                      context,
+                      'ruisi.post.smiley',
+                    ),
+                    onPressed: () => setState(() => _showSmiley = !_showSmiley),
+                  ),
+                ],
+              ),
+
+              // 表情面板
+              if (_showSmiley)
+                SmileyPicker(
+                  onSelected: _insertSmiley,
+                ),
             ],
           ),
         ),
       );
     });
+  }
+
+  void _insertSmiley(String value) {
+    final text = _contentCtrl.text;
+    final selection = _contentCtrl.selection;
+    final cursorPos = selection.isValid ? selection.start : text.length;
+
+    final newText = text.substring(0, cursorPos) + value + text.substring(cursorPos);
+    _contentCtrl.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: cursorPos + value.length),
+    );
   }
 
   Future<void> _submit() async {

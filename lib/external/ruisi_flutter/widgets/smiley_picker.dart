@@ -94,13 +94,6 @@ class _SmileyPickerState extends State<SmileyPicker>
                           ? Image.asset(
                               'assets/ruisi_flutter/smiley/${s.path}.png',
                               fit: BoxFit.contain,
-                              errorBuilder: (_, _, _) => Center(
-                                child: Text(
-                                  s.value,
-                                  style: const TextStyle(fontSize: 10),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
                             )
                           : Center(
                               child: Text(

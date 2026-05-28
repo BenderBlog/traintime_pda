@@ -1421,6 +1421,7 @@ ruisi:
     content_hint: Please enter content
     success: Post published
     failure: Failed to publish
+    smiley: Smileys
   topic_detail:
     title: Topic Detail
     reply_too_short: Reply must be at least 13 characters
@@ -1448,9 +1449,6 @@ ruisi:
     no_results: No results
   settings:
     title: Settings
-    section_display: Display
-    full_style: Full-style Posts
-    full_style_subtitle: Show full post styles (signatures, avatars, etc.)
     section_proxy: Proxy
     proxy_enable: Enable Proxy
     proxy_disabled: Disabled
