@@ -419,9 +419,16 @@ class RuisiController {
   Future<void> loadMyTopics({bool refresh = false}) async {
     myTopicsLoading.value = true;
     if (refresh) myTopics.value = [];
-    myTopics.value = await api.getMyTopics();
+    var page = 1;
+    while (true) {
+      final batch = await api.getMyTopics(page: page);
+      if (batch.isEmpty) break;
+      myTopics.value = [...myTopics.value, ...batch];
+      page++;
+    }
     myTopicsLoading.value = false;
   }
+
 
   // =========================================================================
   // 论坛网络收藏

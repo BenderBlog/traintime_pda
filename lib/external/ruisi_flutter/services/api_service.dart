@@ -532,13 +532,12 @@ class ApiService {
     return _parseGuideTopicList(body);
   }
 
-  /// 我的帖子
   Future<List<Topic>> getMyTopics({int page = 1}) async {
     final (ok, body) = await _api.get(
-      '${Urls.getMyPostsUrl(_settings.uid)}&page=$page',
+      '${Urls.getMyPostsUrl}&page=$page',
     );
     if (!ok) return [];
-    return _parseTopicList(body);
+    return _parseGuideTopicList(body);
   }
 
   /// 收藏列表

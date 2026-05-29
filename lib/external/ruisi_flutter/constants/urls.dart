@@ -76,12 +76,8 @@ class Urls {
       '${baseUrl}home.php?mod=spacecp&ac=favorite&op=delete&favid=$favid&type=all&inajax=1';
 
   // ---- 用户 ----
-  static String getMyPostsUrl(int? uid) {
-    if (uid == null) {
-      return '${baseUrl}forum.php?mod=guide&view=my';
-    }
-    return '${baseUrl}home.php?mod=space&uid=$uid&do=thread&view=me';
-  }
+  static const String getMyPostsUrl =
+      '${baseUrl}forum.php?mod=guide&view=my';
 
   static const String myMoneyUrl =
       '${baseUrl}home.php?mod=spacecp&ac=credit&showcredit=1&inajax=1';
