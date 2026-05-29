@@ -49,6 +49,7 @@ class RuisiApi {
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
+        headers: {HttpHeaders.userAgentHeader: "myRuisiAsyncLiteHttp/1.0"},
       ),
     );
 
@@ -169,13 +170,17 @@ class RuisiApi {
   /// 会自动注入 formhash（如果已设置）。
   Future<(bool, String)> post(
     String url, {
-    Map<String, dynamic>? params,
+    Object? params,
     bool multipart = false,
   }) async {
     try {
       final response = await _dio.post<String>(
         url,
-        data: multipart ? FormData.fromMap(params ?? {}) : params,
+        data: multipart
+            ? (params is FormData
+                  ? params
+                  : FormData.fromMap((params as Map<String, dynamic>?) ?? {}))
+            : params,
         options: Options(
           contentType: multipart
               ? 'multipart/form-data'
@@ -192,6 +197,54 @@ class RuisiApi {
       talker.error('POST $url 异常: $e', e);
       return (false, '请求异常: $e');
     }
+  }
+
+  /// 上传图片附件
+  ///
+  /// [uploadUrl] 服务端图片上传接口，[uid] 与 [hash] 来自发帖页面的
+  /// `uploadformdata` 字段。返回 `(成功?, aid 或错误信息)`。
+  Future<(bool, String)> uploadImage(
+    String uploadUrl, {
+    required String uid,
+    required String hash,
+    required Uint8List bytes,
+    String filename = 'upload.jpg',
+  }) async {
+    final form = FormData.fromMap({
+      'uid': uid,
+      'hash': hash,
+      'Filedata': MultipartFile.fromBytes(bytes, filename: filename),
+    });
+
+    final (ok, body) = await post(
+      uploadUrl,
+      params: form,
+      multipart: true,
+    );
+    if (!ok) return (false, body);
+
+    if (!body.contains('|')) {
+      return (false, body.isEmpty ? '上传失败，请稍后再试' : body);
+    }
+
+    final parts = body.split('|');
+    if (parts[0] == 'DISCUZUPLOAD' && parts.length > 3 && parts[2] == '0') {
+      return (true, parts[3]);
+    }
+
+    final code = parts.length > 2 ? parts[2] : parts.first;
+    final limitInfo = parts.length > 7 ? parts[7] : '';
+    String serverMsg = '';
+    if (limitInfo == 'ban') {
+      serverMsg = '（附件类型被禁止）';
+    } else if (limitInfo == 'perday' && parts.length > 8) {
+      serverMsg = '（不能超过 ${int.parse(parts[8]) ~/ 1024} K）';
+    } else if (limitInfo.isNotEmpty) {
+      serverMsg = '（不能超过 ${int.parse(limitInfo) ~/ 1024} K）';
+    }
+    final mapped = uploadImageErrors[code];
+    final msg = (mapped ?? '上传失败') + serverMsg;
+    return (false, msg);
   }
 
   /// 从 DioException 中提取可读的错误信息

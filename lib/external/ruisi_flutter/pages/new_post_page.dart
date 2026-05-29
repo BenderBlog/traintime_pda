@@ -6,6 +6,9 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 
 import '../controller/ruisi_controller.dart';
+import '../models/post_page_meta.dart';
+import '../constants/urls.dart';
+import '../../../repository/pick_file.dart';
 import 'login_page.dart';
 import '../widgets/smiley_picker.dart';
 
@@ -24,6 +27,11 @@ class _NewPostPageState extends State<NewPostPage> {
   int? _selectedFid;
   bool _submitting = false;
   bool _showSmiley = false;
+  bool _metaLoading = false;
+  bool _uploading = false;
+  PostPageMeta? _meta;
+  int? _selectedTypeId;
+  final List<_UploadedAttachment> _attachments = [];
 
   @override
   void initState() {
@@ -50,17 +58,113 @@ class _NewPostPageState extends State<NewPostPage> {
     super.dispose();
   }
 
+  Future<void> _loadMeta(int fid) async {
+    setState(() {
+      _metaLoading = true;
+      _meta = null;
+      _selectedTypeId = null;
+    });
+
+    try {
+      final meta = await RuisiController.i.api.loadNewPostMeta(fid);
+      if (!mounted) return;
+      setState(() {
+        _meta = meta;
+        _selectedTypeId = meta.typeOptions.isNotEmpty
+            ? meta.typeOptions.first.id
+            : null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('加载发帖信息失败: $e')));
+    } finally {
+      if (mounted) setState(() => _metaLoading = false);
+    }
+  }
+
+  bool get _canUpload {
+    return (_meta?.uploadUid != null) && (_meta?.uploadHash != null);
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    if (!_canUpload) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('当前板块暂不支持上传图片')));
+      return;
+    }
+
+    final file = await pickFile();
+    if (file == null) return;
+    if (!mounted) return;
+
+    final ext = file.extension?.toLowerCase();
+    const allowed = {'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'};
+    if (ext == null || !allowed.contains(ext)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('仅支持 jpg/jpeg/png/gif/bmp/webp 图片')),
+      );
+      return;
+    }
+
+    final data = await file.readAsBytes();
+    if (!mounted) return;
+    if (data.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('读取图片失败')));
+      return;
+    }
+
+    setState(() => _uploading = true);
+    try {
+      final (ok, result) = await RuisiController.i.api.ruisiApi.uploadImage(
+        Urls.uploadImageUrl,
+        uid: _meta!.uploadUid!,
+        hash: _meta!.uploadHash!,
+        bytes: data,
+        filename: file.name,
+      );
+      if (!ok) throw Exception(result);
+      setState(
+        () =>
+            _attachments.add(_UploadedAttachment(aid: result, name: file.name)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('图片上传失败: $e')));
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
+  }
+
+  Future<void> _removeAttachment(_UploadedAttachment attachment) async {
+    try {
+      await RuisiController.i.api.ruisiApi.post(
+        Urls.deleteUploadedUrl(attachment.aid),
+      );
+    } catch (_) {
+      // 忽略删除失败，保持列表同步即可
+    }
+    setState(() => _attachments.remove(attachment));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
       final c = RuisiController.i;
-
       return Scaffold(
         appBar: AppBar(
           title: Text(FlutterI18n.translate(context, 'ruisi.post.title')),
           actions: [
             TextButton(
-              onPressed: _submitting ? null : _submit,
+              onPressed: _submitting || _uploading || _metaLoading
+                  ? null
+                  : _submit,
               child: _submitting
                   ? const SizedBox(
                       height: 20,
@@ -78,7 +182,7 @@ class _NewPostPageState extends State<NewPostPage> {
             children: [
               // 板块选择
               DropdownButtonFormField<int>(
-                value: _selectedFid,
+                initialValue: _selectedFid,
                 decoration: InputDecoration(
                   labelText: FlutterI18n.translate(
                     context,
@@ -93,7 +197,10 @@ class _NewPostPageState extends State<NewPostPage> {
                           DropdownMenuItem(value: f.fid, child: Text(f.name)),
                     )
                     .toList(),
-                onChanged: (v) => setState(() => _selectedFid = v),
+                onChanged: (v) {
+                  setState(() => _selectedFid = v);
+                  if (v != null) _loadMeta(v);
+                },
                 validator: (v) => v == null
                     ? FlutterI18n.translate(
                         context,
@@ -102,6 +209,25 @@ class _NewPostPageState extends State<NewPostPage> {
                     : null,
               ),
               const SizedBox(height: 16),
+
+              if (_metaLoading) const LinearProgressIndicator(minHeight: 2),
+              if (_meta != null && _meta!.typeOptions.isNotEmpty) ...[
+                DropdownButtonFormField<int>(
+                  initialValue: _selectedTypeId,
+                  items: _meta!.typeOptions
+                      .map(
+                        (t) =>
+                            DropdownMenuItem(value: t.id, child: Text(t.name)),
+                      )
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedTypeId = v),
+                  decoration: const InputDecoration(
+                    labelText: '主题分类',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // 标题
               TextFormField(
@@ -142,7 +268,9 @@ class _NewPostPageState extends State<NewPostPage> {
                 children: [
                   IconButton(
                     icon: Icon(
-                      _showSmiley ? Icons.keyboard : Icons.emoji_emotions_outlined,
+                      _showSmiley
+                          ? Icons.keyboard
+                          : Icons.emoji_emotions_outlined,
                     ),
                     tooltip: FlutterI18n.translate(
                       context,
@@ -150,13 +278,39 @@ class _NewPostPageState extends State<NewPostPage> {
                     ),
                     onPressed: () => setState(() => _showSmiley = !_showSmiley),
                   ),
+                  IconButton(
+                    icon: _uploading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.image_outlined),
+                    tooltip: '上传图片',
+                    onPressed: _uploading || !_canUpload
+                        ? null
+                        : _pickAndUploadImage,
+                  ),
                 ],
               ),
 
               // 表情面板
-              if (_showSmiley)
-                SmileyPicker(
-                  onSelected: _insertSmiley,
+              if (_showSmiley) SmileyPicker(onSelected: _insertSmiley),
+              if (_attachments.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _attachments
+                        .map(
+                          (a) => Chip(
+                            label: Text(a.name),
+                            onDeleted: () => _removeAttachment(a),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
             ],
           ),
@@ -170,7 +324,8 @@ class _NewPostPageState extends State<NewPostPage> {
     final selection = _contentCtrl.selection;
     final cursorPos = selection.isValid ? selection.start : text.length;
 
-    final newText = text.substring(0, cursorPos) + value + text.substring(cursorPos);
+    final newText =
+        text.substring(0, cursorPos) + value + text.substring(cursorPos);
     _contentCtrl.value = TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: cursorPos + value.length),
@@ -183,11 +338,12 @@ class _NewPostPageState extends State<NewPostPage> {
 
     setState(() => _submitting = true);
 
-    final c = RuisiController.i;
-    final (ok, error) = await c.newPost(
+    final (ok, error) = await RuisiController.i.api.newPost(
       _selectedFid!,
       _subjectCtrl.text,
       _contentCtrl.text,
+      _attachments.map((a) => a.aid).toList(),
+      _selectedTypeId,
     );
 
     setState(() => _submitting = false);
@@ -211,4 +367,11 @@ class _NewPostPageState extends State<NewPostPage> {
       );
     }
   }
+}
+
+class _UploadedAttachment {
+  final String aid;
+  final String name;
+
+  const _UploadedAttachment({required this.aid, required this.name});
 }

@@ -412,6 +412,6 @@ class RuisiController {
   // =========================================================================
 
   Future<(bool, String?)> newPost(int fid, String subject, String content) {
-    return api.newPost(fid, subject, content);
+    return api.newPost(fid, subject, content, [], null);
   }
 }

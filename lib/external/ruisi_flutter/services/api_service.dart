@@ -7,12 +7,14 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
+import 'package:watermeter/repository/logger.dart';
 
 import '../constants/urls.dart';
 import '../models/forum.dart';
 import '../models/topic.dart';
 import '../models/post.dart';
 import '../models/message.dart';
+import '../models/post_page_meta.dart';
 import '../repository/ruisi_api.dart';
 import 'settings_service.dart';
 
@@ -409,6 +411,66 @@ class ApiService {
     }
   }
 
+  /// 获取发帖页面元信息（主题分类、上传凭证等）
+  Future<PostPageMeta> loadNewPostMeta(int fid) async {
+    final (ok, body) = await _api.get(Urls.newPostUrl(fid));
+    if (!ok) {
+      throw Exception('获取发帖页面失败');
+    }
+
+    final doc = html_parser.parse(body);
+
+    final freshFormhash = doc
+        .querySelector('input[name="formhash"]')
+        ?.attributes['value'];
+    if (freshFormhash != null) {
+      _api.formhash = freshFormhash;
+    }
+
+    final typeOptions = <ForumTypeOption>[];
+    for (final option in doc.querySelectorAll('#typeid option')) {
+      final value = option.attributes['value'];
+      final id = int.tryParse(value ?? '');
+      final name = option.text.trim();
+      if (id != null && id > 0 && name.isNotEmpty) {
+        typeOptions.add(ForumTypeOption(id: id, name: name));
+      }
+    }
+
+    String? uploadUid;
+    String? uploadHash;
+    final uploadMatch = RegExp(
+      r'uploadformdata:\s*\{uid:\s*"(\d+)",\s*hash:\s*"([^"]+)"\}',
+    ).firstMatch(body);
+    if (uploadMatch != null) {
+      uploadUid = uploadMatch.group(1);
+      uploadHash = uploadMatch.group(2);
+    }
+
+    String? seccodeHash;
+    final seccodeMatch = RegExp(r'updateseccode\(([^)]+)\)').firstMatch(body);
+    if (seccodeMatch != null) {
+      seccodeHash = seccodeMatch.group(1);
+    }
+
+    print(
+      "PostPageMeta\n"
+      "typeOptions: $typeOptions\n"
+      "uploadUid: $uploadUid\n"
+      "uploadHash: $uploadHash\n"
+      "seccodeHash: $seccodeHash\n"
+      "formhash: $freshFormhash",
+    );
+
+    return PostPageMeta(
+      typeOptions: typeOptions,
+      uploadUid: uploadUid,
+      uploadHash: uploadHash,
+      seccodeHash: seccodeHash,
+      formhash: freshFormhash,
+    );
+  }
+
   // =========================================================================
   // 帖子列表
   // =========================================================================
@@ -479,8 +541,7 @@ class ApiService {
         if (id == 'separatorline') {
           continue;
         }
-        if (!id.startsWith('normalthread_') &&
-            !id.startsWith('stickthread_')) {
+        if (!id.startsWith('normalthread_') && !id.startsWith('stickthread_')) {
           continue;
         }
 
@@ -525,8 +586,7 @@ class ApiService {
           final authorLink = byCells[0].querySelector('cite a');
           author = authorLink?.text.trim() ?? '未知';
           final authorHref = authorLink?.attributes['href'] ?? '';
-          final uidMatch =
-              RegExp(r'uid[=:\-](\d+)').firstMatch(authorHref);
+          final uidMatch = RegExp(r'uid[=:\-](\d+)').firstMatch(authorHref);
           if (uidMatch != null) authorId = int.parse(uidMatch.group(1)!);
           postTime = byCells[0].querySelector('em span')?.text.trim();
         }
@@ -538,8 +598,7 @@ class ApiService {
           if (c.localName == 'td' && c.classes.contains('num')) {
             replies =
                 int.tryParse(c.querySelector('a')?.text.trim() ?? '') ?? 0;
-            views =
-                int.tryParse(c.querySelector('em')?.text.trim() ?? '') ?? 0;
+            views = int.tryParse(c.querySelector('em')?.text.trim() ?? '') ?? 0;
             break;
           }
         }
@@ -973,24 +1032,11 @@ class ApiService {
     int fid,
     String subject,
     String message,
+    List<String> attachmentAids,
+    int? typeId,
   ) async {
-    // 1. 先访问发帖页面获取最新的 formhash
-    final pageUrl = Urls.newPostUrl(fid);
-    final (pageOk, pageBody) = await _api.get(pageUrl);
-    if (!pageOk) {
-      _api.talker.error('获取发帖页面失败');
-      return (false, '获取发帖页面失败');
-    }
-
-    // 从发帖页面提取 formhash
-    final pageDoc = html_parser.parse(pageBody);
-    final freshFormhash = pageDoc
-        .querySelector('input[name="formhash"]')
-        ?.attributes['value'];
-    if (freshFormhash != null) {
-      _api.formhash = freshFormhash;
-      _api.talker.info('发帖页面 formhash 已更新: $freshFormhash');
-    }
+    final meta = await loadNewPostMeta(fid);
+    _api.formhash = meta.formhash ?? _api.formhash;
 
     // 2. 提交新帖
     final (ok, body) = await _api.post(
@@ -1001,6 +1047,8 @@ class ApiService {
         'message': message,
         'allownoticeauthor': '1',
         'usesig': '1',
+        if (typeId != null && typeId > 0) 'typeid': '$typeId',
+        for (final aid in attachmentAids) 'attachnew[$aid]': '',
       },
     );
 

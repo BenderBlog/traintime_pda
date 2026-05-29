@@ -48,7 +48,7 @@ class Urls {
   }
 
   static String newPostUrl(int fid) =>
-      '${baseUrl}forum.php?mod=post&action=newthread&fid=$fid';
+      '${baseUrl}forum.php?mod=post&action=newthread&fid=$fid&mobile=2';
   static const String editSubmitUrl =
       '${baseUrl}forum.php?mod=post&action=edit&extra=&editsubmit=yes';
   static String editPostUrl(int tid, int pid) =>
@@ -115,7 +115,7 @@ class Urls {
 
   // ---- 图片上传 ----
   static const String uploadImageUrl =
-      '${baseUrl}misc.php?mod=swfupload&operation=upload&type=image&inajax=yes&infloat=yes&simple=2';
+      '${baseUrl}misc.php?mod=swfupload&operation=upload&type=image&inajax=yes&infloat=yes&simple=2&mobile=2';
   static String deleteUploadedUrl(String aid) =>
       '${baseUrl}forum.php?mod=ajax&action=deleteattach&inajax=yes&aids[]=$aid';
 
