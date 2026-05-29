@@ -30,14 +30,15 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 5, vsync: this);
+    _tabCtrl = TabController(length: 6, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final c = RuisiController.i;
       c.loadNewTopics(refresh: true);
-      c.loadPhotography(refresh: true);
-      c.loadLostFound(refresh: true);
-      c.loadTrade(refresh: true);
+      c.loadNewReplyTopics(refresh: true);
       c.loadWater(refresh: true);
+      c.loadPhotography(refresh: true);
+      c.loadTrade(refresh: true);
+      c.loadLostFound(refresh: true);
     });
   }
 
@@ -69,6 +70,7 @@ class _HomePageState extends State<HomePage>
             _buildUserButton(context, c),
           ],
           bottom: TabBar(
+            isScrollable: true,
             controller: _tabCtrl,
             tabs: [
               Tab(
@@ -77,17 +79,23 @@ class _HomePageState extends State<HomePage>
               Tab(
                 text: FlutterI18n.translate(
                   context,
+                  'ruisi.home.tab_new_reply',
+                ),
+              ),
+              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_water')),
+              Tab(
+                text: FlutterI18n.translate(
+                  context,
                   'ruisi.home.tab_photography',
                 ),
               ),
+              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_trade')),
               Tab(
                 text: FlutterI18n.translate(
                   context,
                   'ruisi.home.tab_lost_found',
                 ),
               ),
-              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_trade')),
-              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_water')),
             ],
           ),
         ),
@@ -103,17 +111,26 @@ class _HomePageState extends State<HomePage>
             ),
             _buildTopicList(
               context,
+              topics: c.newReplyTopics.value,
+              isLoading: c.newReplyLoading.value,
+              onRefresh: () => c.loadNewReplyTopics(refresh: true),
+              onLoadMore: c.hasMoreNewReply
+                  ? () => c.loadNewReplyTopics()
+                  : null,
+            ),
+            _buildTopicList(
+              context,
+              topics: c.waterTopics.value,
+              isLoading: c.waterLoading.value,
+              onRefresh: () => c.loadWater(refresh: true),
+              onLoadMore: c.hasMoreWater ? () => c.loadWater() : null,
+            ),
+            _buildTopicList(
+              context,
               topics: c.photographyTopics.value,
               isLoading: c.photographyLoading.value,
               onRefresh: () => c.loadPhotography(refresh: true),
               onLoadMore: c.hasMorePhoto ? () => c.loadPhotography() : null,
-            ),
-            _buildTopicList(
-              context,
-              topics: c.lostFoundTopics.value,
-              isLoading: c.lostFoundLoading.value,
-              onRefresh: () => c.loadLostFound(refresh: true),
-              onLoadMore: c.hasMoreLost ? () => c.loadLostFound() : null,
             ),
             _buildTopicList(
               context,
@@ -124,10 +141,10 @@ class _HomePageState extends State<HomePage>
             ),
             _buildTopicList(
               context,
-              topics: c.waterTopics.value,
-              isLoading: c.waterLoading.value,
-              onRefresh: () => c.loadWater(refresh: true),
-              onLoadMore: c.hasMoreWater ? () => c.loadWater() : null,
+              topics: c.lostFoundTopics.value,
+              isLoading: c.lostFoundLoading.value,
+              onRefresh: () => c.loadLostFound(refresh: true),
+              onLoadMore: c.hasMoreLost ? () => c.loadLostFound() : null,
             ),
           ],
         ),

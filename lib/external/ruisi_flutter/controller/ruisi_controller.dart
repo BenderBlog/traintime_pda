@@ -216,38 +216,47 @@ class RuisiController {
 
     newLoading.value = true;
 
-    // 并行获取最新帖子和最新回复，合并去重
-    final results = await Future.wait([
-      api.getNewTopics(page: _newPage),
-      api.getNewReplyTopics(page: _newPage),
-    ]);
-    final newPosts = results[0];
-    final newReplies = results[1];
-
-    // 以新帖顺序为主，追加新回复中不重复的条目
-    final existingTids = newTopics.value.map((t) => t.tid).toSet();
-    final merged = <Topic>[];
-    for (final t in newPosts) {
-      if (existingTids.add(t.tid)) merged.add(t);
-    }
-    for (final t in newReplies) {
-      if (existingTids.add(t.tid)) merged.add(t);
-    }
-
-    if (merged.isEmpty) {
+    final result = await api.getNewTopics(page: _newPage);
+    if (result.isEmpty) {
       _hasMoreNew = false;
     } else {
-      newTopics.value = [...newTopics.value, ...merged]
-        ..sort((a, b) {
-          DateTime? atime = DateTime.tryParse(a.lastReplyTime ?? "");
-          DateTime? btime = DateTime.tryParse(b.lastReplyTime ?? "");
-          if (atime == null || btime == null) return 0;
-          return atime.difference(btime).inSeconds;
-        });
+      newTopics.value = [...newTopics.value, ...result];
       _newPage++;
     }
 
     newLoading.value = false;
+  }
+
+  // =========================================================================
+  // 最新回复
+  // =========================================================================
+
+  final newReplyTopics = signal<List<Topic>>([]);
+  final newReplyLoading = signal(false);
+  int _newReplyPage = 1;
+  bool _hasMoreNewReply = true;
+  bool get hasMoreNewReply => _hasMoreNewReply;
+
+  Future<void> loadNewReplyTopics({bool refresh = false}) async {
+    if (refresh) {
+      _newReplyPage = 1;
+      _hasMoreNewReply = true;
+      newReplyTopics.value = [];
+    }
+
+    if (!_hasMoreNewReply) return;
+
+    newReplyLoading.value = true;
+
+    final result = await api.getNewReplyTopics(page: _newReplyPage);
+    if (result.isEmpty) {
+      _hasMoreNewReply = false;
+    } else {
+      newReplyTopics.value = [...newReplyTopics.value, ...result];
+      _newReplyPage++;
+    }
+
+    newReplyLoading.value = false;
   }
 
   // =========================================================================
