@@ -292,7 +292,6 @@ class ApiService {
     final doc = html_parser.parse(html);
     final groups = <ForumGroup>[];
 
-
     String extractLastText(dom.Element el) {
       String last = '';
       for (final node in el.nodes) {
@@ -306,6 +305,7 @@ class ApiService {
       }
       return last;
     }
+
     int extractForumId(String href) {
       final mobileMatch = RegExp(r'forum-(\d+)').firstMatch(href);
       if (mobileMatch != null) {
@@ -320,13 +320,18 @@ class ApiService {
       return 0;
     }
 
+    /// TODO: Add parse for 106
+    int normalizeForumId(int fid) {
+      return fid == 106 ? 110 : fid;
+    }
+
     List<Forum> parseForumLinks(dom.Element container) {
       final forums = <Forum>[];
       for (final a in container.querySelectorAll('a')) {
         final href = a.attributes['href'] ?? '';
         if (href.isEmpty) continue;
 
-        final fid = extractForumId(href);
+        final fid = normalizeForumId(extractForumId(href));
         if (fid <= 0) continue;
 
         final name = extractLastText(a);
@@ -343,11 +348,12 @@ class ApiService {
 
     for (int i = 0; i < titleBlocks.length; i++) {
       final titleEl = titleBlocks[i];
-      final titleText = titleEl.querySelector('h2 a')?.text.trim() ??
+      final titleText =
+          titleEl.querySelector('h2 a')?.text.trim() ??
           titleEl.querySelector('h2')?.text.trim() ??
           '板块 $i';
 
-        final forumsDiv = titleEl.nextElementSibling;
+      final forumsDiv = titleEl.nextElementSibling;
       if (forumsDiv == null) continue;
 
       final forums = parseForumLinks(forumsDiv);
@@ -384,8 +390,7 @@ class ApiService {
         final select = selects[i];
         final forums = parseForumLinks(select);
         if (forums.isNotEmpty) {
-          final title =
-              select.previousElementSibling?.text.trim() ?? '板块 $i';
+          final title = select.previousElementSibling?.text.trim() ?? '板块 $i';
           groups.add(ForumGroup(fgId: i, name: title, forums: forums));
         }
       }
@@ -561,9 +566,7 @@ class ApiService {
   }
 
   Future<List<Topic>> getMyTopics({int page = 1}) async {
-    final (ok, body) = await _api.get(
-      '${Urls.getMyPostsUrl}&page=$page',
-    );
+    final (ok, body) = await _api.get('${Urls.getMyPostsUrl}&page=$page');
     if (!ok) return [];
     return _parseGuideTopicList(body);
   }

@@ -1195,7 +1195,7 @@ ruisi:
     app_name: 睿思
     subtitle: 西安电子科技大学校园论坛客户端
     version: 版本
-    version_number: "2.0.0 (Flutter)"
+    version_number: "2.0.0 (随 XDYou 1.6.0 分发)"
     source_code: 源代码
     bug_report: 问题反馈
     bug_report_subtitle: 在 GitHub 上提交 issue

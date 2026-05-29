@@ -11,7 +11,8 @@ class AppConstants {
 }
 
 class Urls {
-  static const String homePage = 'https://github.com/BenderBlog/ruisi_flutter';
+  static const String homePage =
+      'https://github.com/BenderBlog/traintime_pda/tree/main/lib/external/ruisi_flutter/';
   static const String baseUrl = 'https://rs.xidian.edu.cn/';
 
   // ---- 认证 ----
@@ -76,8 +77,7 @@ class Urls {
       '${baseUrl}home.php?mod=spacecp&ac=favorite&op=delete&favid=$favid&type=all&inajax=1';
 
   // ---- 用户 ----
-  static const String getMyPostsUrl =
-      '${baseUrl}forum.php?mod=guide&view=my';
+  static const String getMyPostsUrl = '${baseUrl}forum.php?mod=guide&view=my';
 
   static const String myMoneyUrl =
       '${baseUrl}home.php?mod=spacecp&ac=credit&showcredit=1&inajax=1';

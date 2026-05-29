@@ -1372,7 +1372,7 @@ ruisi:
     app_name: Ruisi
     subtitle: Xidian University Campus Forum Client
     version: Version
-    version_number: "2.0.0 (Flutter)"
+    version_number: "2.0.0 (Bundled with XDYou 1.6.0)"
     source_code: Source Code
     bug_report: Report Issue
     bug_report_subtitle: Submit an issue on GitHub
