@@ -139,6 +139,29 @@ class _UserPageState extends State<UserPage>
                   onTap: () => context.push(const FavoritesPage()),
                 ),
                 ListTile(
+                  leading: const Icon(Icons.check_circle_outline),
+                  title: Text(
+                    FlutterI18n.translate(context, 'ruisi.home.daily_checkin'),
+                  ),
+                  trailing: c.signLoading.value
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chevron_right),
+                  onTap: c.signLoading.value
+                      ? null
+                      : () async {
+                          await c.sign();
+                          if (!context.mounted) return;
+                          final msg = c.signResult.value?.message ?? '签到完成';
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(msg)),
+                          );
+                        },
+                ),
+                ListTile(
                   leading: const Icon(Icons.settings),
                   title: Text(
                     FlutterI18n.translate(context, 'ruisi.home.settings'),

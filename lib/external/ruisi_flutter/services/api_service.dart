@@ -951,27 +951,80 @@ class ApiService {
   // 签到
   // =========================================================================
 
+  /// 从 HTML 中解析 <b> 标签内的签到天数
+  static int? _extractSignDays(String html, String keyword) {
+    final index = html.indexOf(keyword);
+    if (index == -1) return null;
+    final substring = html.substring(index);
+    final match = RegExp(r'<b>(\d+)</b>').firstMatch(substring);
+    return match != null ? int.tryParse(match.group(1)!) : null;
+  }
+
   Future<SignResult> sign() async {
+    // 1. 时间校验
+    final hour = DateTime.now().hour;
+    if (hour < 7) {
+      return SignResult(message: '签到时间: 7:00-24:00');
+    }
+
+    // 2. 获取签到页面
     final (pageOk, pageBody) = await _api.get(Urls.signUrl);
     if (!pageOk) return SignResult(message: '签到请求失败');
 
-    if (pageBody.contains('已签到') || pageBody.contains('您今日已经签到')) {
-      return SignResult(alreadySigned: true, message: '今日已签到');
+    // 3. 检测是否已签到：
+    //    未签到页面存在 <form id="qiandao"> 签到表单
+    //    已签到页面表单被替换为提示信息
+    final bool hasForm = pageBody.contains('id="qiandao"');
+
+    if (!hasForm) {
+      // 已签到 — 解析累计天数
+      final totalDays = _extractSignDays(pageBody, '您累计已签到');
+      final monthDays = _extractSignDays(pageBody, '您本月已累计签到');
+      return SignResult(
+        alreadySigned: true,
+        message: '今日已签到',
+        consecutiveDays: totalDays,
+        monthDays: monthDays,
+      );
     }
 
+    // 4. 从签到页面提取 formhash（CSRF 令牌）
+    final formhashMatch =
+        RegExp(r'name="formhash"\s+value="(\w+)"').firstMatch(pageBody);
+    final formhash = formhashMatch?.group(1) ?? _api.formhash ?? '';
+
+    // 5. 提交签到（qdmode=3 不填写）
     final (ok, body) = await _api.post(
       Urls.signPostUrl,
-      params: {'qdxq': 'kx', 'qdmode': '1', 'todaysay': '', 'fastreply': '0'},
+      params: {
+        'formhash': formhash,
+        'qdxq': 'kx',
+        'qdmode': '3',
+        'operation': 'qiandao',
+        'infloat': '1',
+      },
     );
 
     if (!ok) return SignResult(message: '签到请求失败');
 
-    if (body.contains('签到成功')) {
-      return SignResult(alreadySigned: false, message: '签到成功');
-    } else if (body.contains('已签到')) {
-      return SignResult(alreadySigned: true, message: '今日已签到');
+    // 6. 检测结果：提交后表单消失 = 签到成功
+    if (body.contains('恭喜你签到成功') || !body.contains('id="qiandao"')) {
+      final totalDays = _extractSignDays(body, '您累计已签到');
+      final monthDays = _extractSignDays(body, '您本月已累计签到');
+      return SignResult(
+        alreadySigned: false,
+        message: '签到成功',
+        consecutiveDays: totalDays,
+        monthDays: monthDays,
+      );
     }
-    return SignResult(message: '签到完成');
+
+    // 7. 错误处理
+    if (body.contains('您访问的页面无手机页面')) {
+      return SignResult(message: '非校园网环境无法签到');
+    }
+
+    return SignResult(message: '签到失败，请重试');
   }
 
   // =========================================================================

@@ -90,8 +90,14 @@ class SignResult {
   final bool alreadySigned;
   final String? message;
   final int? consecutiveDays;
+  final int? monthDays;
 
-  SignResult({this.alreadySigned = false, this.message, this.consecutiveDays});
+  SignResult({
+    this.alreadySigned = false,
+    this.message,
+    this.consecutiveDays,
+    this.monthDays,
+  });
 }
 
 /// 用户信息
