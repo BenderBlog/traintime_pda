@@ -216,47 +216,38 @@ class RuisiController {
 
     newLoading.value = true;
 
-    final result = await api.getNewTopics(page: _newPage);
-    if (result.isEmpty) {
+    // 并行获取最新帖子和最新回复，合并去重
+    final results = await Future.wait([
+      api.getNewTopics(page: _newPage),
+      api.getNewReplyTopics(page: _newPage),
+    ]);
+    final newPosts = results[0];
+    final newReplies = results[1];
+
+    // 以新帖顺序为主，追加新回复中不重复的条目
+    final existingTids = newTopics.value.map((t) => t.tid).toSet();
+    final merged = <Topic>[];
+    for (final t in newPosts) {
+      if (existingTids.add(t.tid)) merged.add(t);
+    }
+    for (final t in newReplies) {
+      if (existingTids.add(t.tid)) merged.add(t);
+    }
+
+    if (merged.isEmpty) {
       _hasMoreNew = false;
     } else {
-      newTopics.value = [...newTopics.value, ...result];
+      newTopics.value = [...newTopics.value, ...merged]
+        ..sort((a, b) {
+          DateTime? atime = DateTime.tryParse(a.lastReplyTime ?? "");
+          DateTime? btime = DateTime.tryParse(b.lastReplyTime ?? "");
+          if (atime == null || btime == null) return 0;
+          return atime.difference(btime).inSeconds;
+        });
       _newPage++;
     }
 
     newLoading.value = false;
-  }
-
-  // =========================================================================
-  // 最新回复
-  // =========================================================================
-
-  final newReplyTopics = signal<List<Topic>>([]);
-  final newReplyLoading = signal(false);
-  int _newReplyPage = 1;
-  bool _hasMoreNewReply = true;
-  bool get hasMoreNewReply => _hasMoreNewReply;
-
-  Future<void> loadNewReplyTopics({bool refresh = false}) async {
-    if (refresh) {
-      _newReplyPage = 1;
-      _hasMoreNewReply = true;
-      newReplyTopics.value = [];
-    }
-
-    if (!_hasMoreNewReply) return;
-
-    newReplyLoading.value = true;
-
-    final result = await api.getNewReplyTopics(page: _newReplyPage);
-    if (result.isEmpty) {
-      _hasMoreNewReply = false;
-    } else {
-      newReplyTopics.value = [...newReplyTopics.value, ...result];
-      _newReplyPage++;
-    }
-
-    newReplyLoading.value = false;
   }
 
   // =========================================================================
@@ -317,6 +308,66 @@ class RuisiController {
       _lostPage++;
     }
     lostFoundLoading.value = false;
+  }
+
+  // =========================================================================
+  // 二手交易 (fid 110)
+  // =========================================================================
+
+  final tradeTopics = signal<List<Topic>>([]);
+  final tradeLoading = signal(false);
+  int _tradePage = 1;
+  bool _hasMoreTrade = true;
+  bool get hasMoreTrade => _hasMoreTrade;
+
+  Future<void> loadTrade({bool refresh = false}) async {
+    if (refresh) {
+      _tradePage = 1;
+      _hasMoreTrade = true;
+      tradeTopics.value = [];
+    }
+
+    if (!_hasMoreTrade) return;
+
+    tradeLoading.value = true;
+    final result = await api.getTopicList(110, page: _tradePage);
+    if (result.isEmpty) {
+      _hasMoreTrade = false;
+    } else {
+      tradeTopics.value = [...tradeTopics.value, ...result];
+      _tradePage++;
+    }
+    tradeLoading.value = false;
+  }
+
+  // =========================================================================
+  // 灌水专区 (fid 72)
+  // =========================================================================
+
+  final waterTopics = signal<List<Topic>>([]);
+  final waterLoading = signal(false);
+  int _waterPage = 1;
+  bool _hasMoreWater = true;
+  bool get hasMoreWater => _hasMoreWater;
+
+  Future<void> loadWater({bool refresh = false}) async {
+    if (refresh) {
+      _waterPage = 1;
+      _hasMoreWater = true;
+      waterTopics.value = [];
+    }
+
+    if (!_hasMoreWater) return;
+
+    waterLoading.value = true;
+    final result = await api.getTopicList(72, page: _waterPage);
+    if (result.isEmpty) {
+      _hasMoreWater = false;
+    } else {
+      waterTopics.value = [...waterTopics.value, ...result];
+      _waterPage++;
+    }
+    waterLoading.value = false;
   }
 
   // =========================================================================

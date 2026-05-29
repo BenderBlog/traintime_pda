@@ -34,4 +34,11 @@ class Topic {
     this.categoryId,
     this.categoryName,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      other is Topic && other.fid == fid && other.tid == tid;
+
+  @override
+  int get hashCode => Object.hash(fid, tid);
 }

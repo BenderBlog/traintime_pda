@@ -522,14 +522,14 @@ class ApiService {
   Future<List<Topic>> getNewTopics({int page = 1}) async {
     final (ok, body) = await _api.get('${Urls.newUrl}&page=$page');
     if (!ok) return [];
-    return _parseTopicList(body);
+    return _parseGuideTopicList(body);
   }
 
   /// 最新回复
   Future<List<Topic>> getNewReplyTopics({int page = 1}) async {
     final (ok, body) = await _api.get('${Urls.newReplyUrl}&page=$page');
     if (!ok) return [];
-    return _parseTopicList(body);
+    return _parseGuideTopicList(body);
   }
 
   /// 我的帖子
@@ -739,6 +739,126 @@ class ApiService {
           ),
         );
       }
+    }
+    return topics;
+  }
+
+  /// 解析导读页面（最新帖子 / 最新回复 / 热帖）
+  ///
+  /// 导读页面的列布局与板块页不同：
+  ///   th > a.xst          标题
+  ///   td.by[0]            版块/群组
+  ///   td.by[1]            作者 + 发帖时间
+  ///   td.num              回复/查看
+  ///   td.by[2]            最后发表
+  List<Topic> _parseGuideTopicList(String html) {
+    final doc = html_parser.parse(html);
+    final topics = <Topic>[];
+
+    final threadlist = doc.querySelector('#threadlist');
+    if (threadlist == null) return topics;
+
+    for (final tbody in threadlist.querySelectorAll('tbody')) {
+      final id = tbody.id;
+      if (!id.startsWith('normalthread_') && !id.startsWith('stickthread_')) {
+        continue;
+      }
+
+      final tr = tbody.querySelector('tr');
+      if (tr == null) continue;
+
+      // 收集所有 td.by 和 td.num
+      final byCells = <dom.Element>[];
+      dom.Element? numCell;
+      for (final c in tr.children) {
+        if (c.localName != 'td') continue;
+        if (c.classes.contains('by')) {
+          byCells.add(c);
+        } else if (c.classes.contains('num')) {
+          numCell = c;
+        }
+      }
+
+      // 需要至少 3 个 td.by（版块、作者、最后发表）
+      if (byCells.length < 3) continue;
+
+      // 标题: th > a.xst
+      dom.Element? th;
+      for (final c in tr.children) {
+        if (c.localName == 'th') {
+          th = c;
+          break;
+        }
+      }
+      if (th == null) continue;
+
+      final titleLink = th.querySelector('a.xst');
+      if (titleLink == null) continue;
+      final title = titleLink.text.trim();
+      final href = titleLink.attributes['href'] ?? '';
+      final tidMatch = RegExp(r'tid=(\d+)').firstMatch(href);
+      if (tidMatch == null || title.isEmpty) continue;
+
+      // td.by[0]: 版块/群组
+      int fid = 0;
+      String? categoryName;
+      final forumLink = byCells[0].querySelector('a[href*="forumdisplay"]');
+      if (forumLink != null) {
+        categoryName = forumLink.text.trim();
+        final fidMatch = RegExp(
+          r'fid=(\d+)',
+        ).firstMatch(forumLink.attributes['href'] ?? '');
+        if (fidMatch != null) fid = int.parse(fidMatch.group(1)!);
+      }
+
+      // td.by[1]: 作者 + 发帖时间
+      String author = '未知';
+      int authorId = 0;
+      String? postTime;
+      final authorLink = byCells[1].querySelector('cite a');
+      if (authorLink != null) {
+        author = authorLink.text.trim();
+        final authorHref = authorLink.attributes['href'] ?? '';
+        final uidMatch = RegExp(r'uid[=:\-](\d+)').firstMatch(authorHref);
+        if (uidMatch != null) authorId = int.parse(uidMatch.group(1)!);
+      }
+      // 优先取 span[title] 的绝对时间，fallback 到元素文本
+      final postTimeEl = byCells[1].querySelector('em span');
+      postTime = postTimeEl?.attributes['title'] ?? postTimeEl?.text.trim();
+
+      // td.num: 回复/查看
+      int replies = 0;
+      int views = 0;
+      if (numCell != null) {
+        replies =
+            int.tryParse(numCell.querySelector('a')?.text.trim() ?? '') ?? 0;
+        views =
+            int.tryParse(numCell.querySelector('em')?.text.trim() ?? '') ?? 0;
+      }
+
+      // td.by[2]: 最后发表
+      String? lastReplyTime;
+      final lastReplyEl = byCells[2].querySelector('em span');
+      lastReplyTime =
+          lastReplyEl?.attributes['title'] ?? lastReplyEl?.text.trim();
+
+      final isStick = id.startsWith('stickthread_');
+
+      topics.add(
+        Topic(
+          tid: int.parse(tidMatch.group(1)!),
+          fid: fid,
+          title: title,
+          author: author,
+          authorId: authorId,
+          replies: replies,
+          views: views,
+          postTime: postTime,
+          lastReplyTime: lastReplyTime,
+          isStick: isStick,
+          categoryName: categoryName,
+        ),
+      );
     }
     return topics;
   }
@@ -989,8 +1109,9 @@ class ApiService {
     }
 
     // 4. 从签到页面提取 formhash（CSRF 令牌）
-    final formhashMatch =
-        RegExp(r'name="formhash"\s+value="(\w+)"').firstMatch(pageBody);
+    final formhashMatch = RegExp(
+      r'name="formhash"\s+value="(\w+)"',
+    ).firstMatch(pageBody);
     final formhash = formhashMatch?.group(1) ?? _api.formhash ?? '';
 
     // 5. 提交签到（qdmode=3 不填写）

@@ -30,12 +30,14 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 3, vsync: this);
+    _tabCtrl = TabController(length: 5, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final c = RuisiController.i;
       c.loadNewTopics(refresh: true);
       c.loadPhotography(refresh: true);
       c.loadLostFound(refresh: true);
+      c.loadTrade(refresh: true);
+      c.loadWater(refresh: true);
     });
   }
 
@@ -70,10 +72,7 @@ class _HomePageState extends State<HomePage>
             controller: _tabCtrl,
             tabs: [
               Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  'ruisi.home.tab_new_post',
-                ),
+                text: FlutterI18n.translate(context, 'ruisi.home.tab_new_post'),
               ),
               Tab(
                 text: FlutterI18n.translate(
@@ -87,6 +86,8 @@ class _HomePageState extends State<HomePage>
                   'ruisi.home.tab_lost_found',
                 ),
               ),
+              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_trade')),
+              Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_water')),
             ],
           ),
         ),
@@ -105,16 +106,28 @@ class _HomePageState extends State<HomePage>
               topics: c.photographyTopics.value,
               isLoading: c.photographyLoading.value,
               onRefresh: () => c.loadPhotography(refresh: true),
-              onLoadMore:
-                  c.hasMorePhoto ? () => c.loadPhotography() : null,
+              onLoadMore: c.hasMorePhoto ? () => c.loadPhotography() : null,
             ),
             _buildTopicList(
               context,
               topics: c.lostFoundTopics.value,
               isLoading: c.lostFoundLoading.value,
               onRefresh: () => c.loadLostFound(refresh: true),
-              onLoadMore:
-                  c.hasMoreLost ? () => c.loadLostFound() : null,
+              onLoadMore: c.hasMoreLost ? () => c.loadLostFound() : null,
+            ),
+            _buildTopicList(
+              context,
+              topics: c.tradeTopics.value,
+              isLoading: c.tradeLoading.value,
+              onRefresh: () => c.loadTrade(refresh: true),
+              onLoadMore: c.hasMoreTrade ? () => c.loadTrade() : null,
+            ),
+            _buildTopicList(
+              context,
+              topics: c.waterTopics.value,
+              isLoading: c.waterLoading.value,
+              onRefresh: () => c.loadWater(refresh: true),
+              onLoadMore: c.hasMoreWater ? () => c.loadWater() : null,
             ),
           ],
         ),
