@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 6, vsync: this);
+    _tabCtrl = TabController(length: 7, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final c = RuisiController.i;
       c.loadNewTopics(refresh: true);
@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage>
       c.loadWater(refresh: true);
       c.loadPhotography(refresh: true);
       c.loadTrade(refresh: true);
+      c.loadEmployment(refresh: true);
       c.loadLostFound(refresh: true);
     });
   }
@@ -99,6 +100,12 @@ class _HomePageState extends State<HomePage>
               Tab(
                 text: FlutterI18n.translate(
                   context,
+                  'ruisi.home.tab_employment',
+                ),
+              ),
+              Tab(
+                text: FlutterI18n.translate(
+                  context,
                   'ruisi.home.tab_lost_found',
                 ),
               ),
@@ -144,6 +151,13 @@ class _HomePageState extends State<HomePage>
               isLoading: c.tradeLoading.value,
               onRefresh: () => c.loadTrade(refresh: true),
               onLoadMore: c.hasMoreTrade ? () => c.loadTrade() : null,
+            ),
+            _buildTopicList(
+              context,
+              topics: c.employmentTopics.value,
+              isLoading: c.employmentLoading.value,
+              onRefresh: () => c.loadEmployment(refresh: true),
+              onLoadMore: c.hasMoreEmployment ? () => c.loadEmployment() : null,
             ),
             _buildTopicList(
               context,

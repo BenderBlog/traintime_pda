@@ -1059,7 +1059,7 @@ class ApiService {
     final (ok, body) = await _api.post(
       '${Urls.baseUrl}forum.php?mod=post&action=reply&fid=$fid&tid=$tid&extra=&replysubmit=yes&inajax=1&handlekey=fastpost',
       params: {
-        'message': content,
+        'message': "$content\nXDYou客户端发送",
         'usesig': '1',
         for (final aid in attachmentAids) 'attachnew[$aid]': '',
       },
@@ -1240,7 +1240,7 @@ class ApiService {
       params: {
         'formhash': _api.formhash ?? '',
         'subject': subject,
-        'message': message,
+        'message': "$message\nXDYou 睿思客户端发送",
         'allownoticeauthor': '1',
         'usesig': '1',
         if (typeId != null && typeId > 0) 'typeid': '$typeId',
@@ -1450,9 +1450,9 @@ class ApiService {
       if (totalPage <= 1) {
         final allLinks = pg.querySelectorAll('a');
         for (final a in allLinks) {
-          final pageMatch = RegExp(r'page=(\d+)').firstMatch(
-            a.attributes['href'] ?? '',
-          );
+          final pageMatch = RegExp(
+            r'page=(\d+)',
+          ).firstMatch(a.attributes['href'] ?? '');
           if (pageMatch != null) {
             final p = int.tryParse(pageMatch.group(1)!) ?? 1;
             if (p > totalPage) totalPage = p;

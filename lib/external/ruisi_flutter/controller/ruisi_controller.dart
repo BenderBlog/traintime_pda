@@ -380,6 +380,36 @@ class RuisiController {
   }
 
   // =========================================================================
+  // 就业 (fid 553)
+  // =========================================================================
+
+  final employmentTopics = signal<List<Topic>>([]);
+  final employmentLoading = signal(false);
+  int _employmentPage = 1;
+  bool _hasMoreEmployment = true;
+  bool get hasMoreEmployment => _hasMoreEmployment;
+
+  Future<void> loadEmployment({bool refresh = false}) async {
+    if (refresh) {
+      _employmentPage = 1;
+      _hasMoreEmployment = true;
+      employmentTopics.value = [];
+    }
+
+    if (!_hasMoreEmployment) return;
+
+    employmentLoading.value = true;
+    final result = await api.getTopicList(553, page: _employmentPage);
+    if (result.isEmpty) {
+      _hasMoreEmployment = false;
+    } else {
+      employmentTopics.value = [...employmentTopics.value, ...result];
+      _employmentPage++;
+    }
+    employmentLoading.value = false;
+  }
+
+  // =========================================================================
   // 我的帖子
   // =========================================================================
 
