@@ -8,6 +8,7 @@ import 'package:watermeter/external/ruisi_flutter/pages/search_page.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../controller/ruisi_controller.dart';
+import '../utils/branch_navigation.dart';
 import '../widgets/topic_list_item.dart';
 import 'topic_detail_page.dart';
 import '../constants/urls.dart';
@@ -67,12 +68,12 @@ class _HomePageState extends State<HomePage>
             IconButton(
               icon: const Icon(Icons.edit_note),
               tooltip: FlutterI18n.translate(context, 'ruisi.home.new_post'),
-              onPressed: () => context.push(const NewPostPage()),
+              onPressed: () => context.pushRuisiBranch(const NewPostPage()),
             ),
             IconButton(
               icon: const Icon(Icons.forum),
               tooltip: FlutterI18n.translate(context, 'ruisi.home.forum_list'),
-              onPressed: () => context.push(const ForumListPage()),
+              onPressed: () => context.pushRuisiBranch(const ForumListPage()),
             ),
             _buildUserButton(context, c),
           ],
@@ -217,8 +218,7 @@ class _HomePageState extends State<HomePage>
           final topic = topics[i];
           return TopicListItem(
             topic: topic,
-            onTap: () =>
-                context.pushReplacement(TopicDetailPage(tid: topic.tid)),
+            onTap: () => context.pushRuisiBranch(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),
@@ -230,7 +230,7 @@ class _HomePageState extends State<HomePage>
       return IconButton(
         icon: const Icon(Icons.person_outline),
         tooltip: FlutterI18n.translate(context, 'ruisi.common.login'),
-        onPressed: () => context.push(const LoginPage()),
+        onPressed: () => context.pushRuisiBranch(const LoginPage()),
       );
     }
 
@@ -245,7 +245,7 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       tooltip: FlutterI18n.translate(context, 'ruisi.home.my_profile'),
-      onPressed: () => context.push(const UserPage()),
+      onPressed: () => context.pushRuisiBranch(const UserPage()),
     );
   }
 }
