@@ -453,18 +453,55 @@ class RuisiController {
   final searchResults = signal<List<Topic>>([]);
   final searchLoading = signal(false);
   final searchKeyword = signal('');
+  final searchError = signal<String?>(null);
+  String? _searchId;
+  int _searchPage = 1;
+  bool _hasMoreSearch = true;
+  bool get hasMoreSearch => _hasMoreSearch;
 
   Future<void> search(String keyword) async {
     searchLoading.value = true;
     searchKeyword.value = keyword;
+    searchError.value = null;
+    _searchId = null;
+    _searchPage = 1;
+    _hasMoreSearch = true;
+    searchResults.value = [];
 
-    searchResults.value = await api.search(keyword);
+    final result = await api.search(keyword);
+    if (result.hasError) {
+      searchError.value = result.error;
+    } else {
+      searchResults.value = result.topics;
+      _searchId = result.searchId;
+      _searchPage = result.currentPage;
+
+      _hasMoreSearch = result.hasMore;
+    }
     searchLoading.value = false;
+  }
+
+  /// 加载下一页搜索结果
+  Future<void> searchMore() async {
+    if (!_hasMoreSearch || _searchId == null) return;
+
+    final next = _searchPage + 1;
+    final result = await api.searchPage(_searchId!, searchKeyword.value, next);
+    if (result.hasError) return;
+
+    searchResults.value = [...searchResults.value, ...result.topics];
+    _searchPage = result.currentPage;
+    _hasMoreSearch = result.hasMore;
   }
 
   void clearSearch() {
     searchResults.value = [];
     searchKeyword.value = '';
+    searchError.value = null;
+    _searchId = null;
+    _searchPage = 1;
+
+    _hasMoreSearch = true;
   }
 
   // =========================================================================

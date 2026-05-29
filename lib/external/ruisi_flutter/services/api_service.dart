@@ -1267,21 +1267,246 @@ class ApiService {
   // 搜索
   // =========================================================================
 
-  Future<List<Topic>> search(String keyword) async {
-    final (ok, body) = await _api.post(
+  /// 首次搜索，返回 [SearchResult]（含结果列表、searchid、分页信息、错误信息）。
+  Future<SearchResult> search(String keyword) async {
+    final (ok, body) = await _api.postFollowRedirect(
       Urls.searchUrl,
       params: {'srchtxt': keyword, 'searchsubmit': 'yes'},
     );
-    if (!ok) return [];
+    if (!ok) {
+      return SearchResult(error: '网络请求失败');
+    }
 
-    if (body.contains('searchid')) {
-      final m = RegExp(r'searchid=(\d+)').firstMatch(body);
-      if (m != null) {
-        final (rOk, rBody) = await _api.get(Urls.getSearchUrl2(m.group(1)!));
-        if (!rOk) return [];
-        return _parseTopicList(rBody);
+    // 频率限制
+    if (body.contains('秒内只能进行一次搜索')) {
+      return SearchResult(error: '搜索太频繁，请稍后再试');
+    }
+
+    // 无结果
+    if (body.contains('没有找到匹配结果')) {
+      return SearchResult(error: '没有找到匹配结果');
+    }
+
+    // 如果响应包含 searchid，说明返回了结果页或重定向页
+    // POST 响应即为搜索结果页，直接解析
+    return _parseSearchResults(body);
+  }
+
+  /// 翻页搜索
+  Future<SearchResult> searchPage(
+    String searchId,
+    String keyword,
+    int page,
+  ) async {
+    final (ok, body) = await _api.get(
+      Urls.getSearchUrl(searchId, keyword, page: page),
+    );
+    if (!ok) return SearchResult(error: '翻页请求失败');
+    return _parseSearchResults(body).copyWith(searchId: searchId);
+  }
+
+  /// 解析搜索结果页面（桌面版）。
+  ///
+  /// 实际桌面端 HTML 结构（Discuz! X3.2 search/thread.htm）：
+  /// ```html
+  /// <div class="slst mtw" id="threadlist"><ul>
+  ///   <li class="pbw" id="1188318">
+  ///     <h3 class="xs3">
+  ///       <a href="forum.php?mod=viewthread&amp;tid=1188318&amp;highlight=二手">
+  ///     新校区求购<strong><font color="#ff0000">二手</font></strong>电动车！！</a>
+  ///     </h3>
+  ///     <p class="xg1">0 个回复 - 0 次查看</p>
+  ///     <p>内容摘要...</p>
+  ///     <p>
+  ///       <span>2026-5-25 14:15</span>
+  ///       - <span><a href="space-uid-314082.html">一枚bottle</a></span>
+  ///       - <span><a href="forum-110-1.html" class="xi1">普通交易区</a></span>
+  ///     </p>
+  ///   </li>
+  /// </ul></div>
+  /// ```
+  SearchResult _parseSearchResults(String html) {
+    final doc = html_parser.parse(html);
+    final topics = <Topic>[];
+
+    // 定位搜索结果容器
+    final threadlist = doc.querySelector('#threadlist');
+    if (threadlist != null) {
+      for (final li in threadlist.querySelectorAll('li.pbw')) {
+        // tid: 优先从 li.id 获取
+        final liId = li.id;
+        int tid = int.tryParse(liId) ?? 0;
+
+        // 标题链接: h3.xs3 > a
+        final titleLink = li.querySelector('h3.xs3 a');
+        if (titleLink == null) continue;
+        final title = titleLink.text.trim();
+        if (title.isEmpty) continue;
+
+        // tid 备选: 从 href 中提取
+        if (tid == 0) {
+          final href = titleLink.attributes['href'] ?? '';
+          final tidMatch = RegExp(r'tid=(\d+)').firstMatch(href);
+          if (tidMatch != null) tid = int.tryParse(tidMatch.group(1)!) ?? 0;
+        }
+        if (tid == 0) continue;
+
+        // 统计: <p class="xg1">N 个回复 - N 次查看</p>
+        int replies = 0;
+        int views = 0;
+        final statsP = li.querySelector('p.xg1');
+        if (statsP != null) {
+          final statsText = statsP.text;
+          final nums = RegExp(r'\d+').allMatches(statsText).toList();
+          if (nums.length >= 2) {
+            replies = int.tryParse(nums[0].group(0)!) ?? 0;
+            views = int.tryParse(nums[1].group(0)!) ?? 0;
+          }
+        }
+
+        // 作者: <a href="space-uid-314082.html">一枚bottle</a>
+        String author = '';
+        int authorId = 0;
+        final authorLink = li.querySelector('a[href*="space-uid-"]');
+        if (authorLink != null) {
+          author = authorLink.text.trim();
+          final authorHref = authorLink.attributes['href'] ?? '';
+          final uidMatch = RegExp(r'space-uid-(\d+)').firstMatch(authorHref);
+          if (uidMatch != null) {
+            authorId = int.tryParse(uidMatch.group(1)!) ?? 0;
+          }
+        }
+
+        // 发帖时间: meta <p> 中第一个 <span>
+        String? postTime;
+        final allPs = li.querySelectorAll('p');
+        for (final p in allPs) {
+          if (p.classes.contains('xg1')) continue;
+          final firstSpan = p.querySelector('span');
+          if (firstSpan != null) {
+            final text = firstSpan.text.trim();
+            // 匹配日期格式: 2026-5-25 14:15
+            if (RegExp(r'\d{4}-\d{1,2}-\d{1,2}').hasMatch(text)) {
+              postTime = text;
+              break;
+            }
+          }
+        }
+
+        // 板块: <a href="forum-110-1.html" class="xi1">普通交易区</a>
+        String? categoryName;
+        int categoryId = 0;
+        final forumLink = li.querySelector('a.xi1');
+        if (forumLink != null) {
+          categoryName = forumLink.text.trim();
+          final forumHref = forumLink.attributes['href'] ?? '';
+          final fidMatch = RegExp(r'forum-(\d+)').firstMatch(forumHref);
+          if (fidMatch != null) {
+            categoryId = int.tryParse(fidMatch.group(1)!) ?? 0;
+          }
+        }
+
+        topics.add(
+          Topic(
+            tid: tid,
+            fid: categoryId,
+            title: title,
+            author: author,
+            authorId: authorId,
+            replies: replies,
+            views: views,
+            postTime: postTime,
+            categoryName: categoryName,
+            categoryId: categoryId,
+          ),
+        );
       }
     }
-    return _parseTopicList(body);
+
+    // 分页: <div class="pgs cl mbm"><div class="pg">
+    int currentPage = 1;
+    int totalPage = 1;
+    String? searchId;
+    final pg = doc.querySelector('.pg');
+    if (pg != null) {
+      final strong = pg.querySelector('strong');
+      if (strong != null) {
+        currentPage = _extractNumber(strong.text) ?? 1;
+      }
+      // searchid: 从分页链接中提取
+      for (final a in pg.querySelectorAll('a')) {
+        final href = a.attributes['href'] ?? '';
+        final sidMatch = RegExp(r'searchid=(\d+)').firstMatch(href);
+        if (sidMatch != null) {
+          searchId = sidMatch.group(1);
+          break;
+        }
+      }
+      final span = pg.querySelector('span[title]');
+      if (span != null) {
+        final titleAttr = span.attributes['title'] ?? '';
+        totalPage = _extractNumber(titleAttr) ?? 1;
+      }
+      if (totalPage <= 1) {
+        final allLinks = pg.querySelectorAll('a');
+        for (final a in allLinks) {
+          final pageMatch = RegExp(r'page=(\d+)').firstMatch(
+            a.attributes['href'] ?? '',
+          );
+          if (pageMatch != null) {
+            final p = int.tryParse(pageMatch.group(1)!) ?? 1;
+            if (p > totalPage) totalPage = p;
+          }
+        }
+      }
+    }
+
+    return SearchResult(
+      topics: topics,
+      searchId: searchId,
+      currentPage: currentPage,
+      totalPage: totalPage,
+    );
+  }
+
+  int? _extractNumber(String text) {
+    final m = RegExp(r'\d+').firstMatch(text);
+    return m != null ? int.tryParse(m.group(0)!) : null;
+  }
+}
+
+/// 搜索结果，携带帖子列表、分页信息和错误信息。
+class SearchResult {
+  final List<Topic> topics;
+  final String? searchId;
+  final int currentPage;
+  final int totalPage;
+  final String? error;
+
+  const SearchResult({
+    this.topics = const [],
+    this.searchId,
+    this.currentPage = 1,
+    this.totalPage = 1,
+    this.error,
+  });
+
+  bool get hasError => error != null;
+  bool get hasMore => currentPage < totalPage;
+
+  SearchResult copyWith({
+    List<Topic>? topics,
+    String? searchId,
+    int? currentPage,
+    int? totalPage,
+    String? error,
+  }) {
+    return SearchResult(
+      topics: topics ?? this.topics,
+      searchId: searchId ?? this.searchId,
+      currentPage: currentPage ?? this.currentPage,
+      totalPage: totalPage ?? this.totalPage,
+      error: error ?? this.error,
+    );
   }
 }

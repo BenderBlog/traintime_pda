@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:watermeter/external/ruisi_flutter/pages/search_page.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -57,6 +58,11 @@ class _HomePageState extends State<HomePage>
         appBar: AppBar(
           title: Text(FlutterI18n.translate(context, 'ruisi.home.title')),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              tooltip: FlutterI18n.translate(context, 'ruisi.home.search'),
+              onPressed: () => context.push(const SearchPage()),
+            ),
             IconButton(
               icon: const Icon(Icons.edit_note),
               tooltip: FlutterI18n.translate(context, 'ruisi.home.new_post'),

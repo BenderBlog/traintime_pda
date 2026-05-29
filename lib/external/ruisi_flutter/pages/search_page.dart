@@ -20,6 +20,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _searchCtrl = TextEditingController();
+  final _scrollCtrl = ScrollController();
 
   @override
   void initState() {
@@ -28,12 +29,25 @@ class _SearchPageState extends State<SearchPage> {
     if (c.searchKeyword.value.isNotEmpty) {
       _searchCtrl.text = c.searchKeyword.value;
     }
+    _scrollCtrl.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollCtrl.removeListener(_onScroll);
+    _scrollCtrl.dispose();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final c = RuisiController.i;
+    if (_scrollCtrl.position.pixels >=
+            _scrollCtrl.position.maxScrollExtent - 200 &&
+        c.hasMoreSearch &&
+        !c.searchLoading.value) {
+      c.searchMore();
+    }
   }
 
   @override
@@ -75,6 +89,17 @@ class _SearchPageState extends State<SearchPage> {
         ),
         body: c.searchLoading.value
             ? const Center(child: CircularProgressIndicator())
+            : c.searchError.value != null
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    c.searchError.value!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              )
             : c.searchResults.value.isEmpty
             ? Center(
                 child: Text(
@@ -90,15 +115,29 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               )
             : ListView.separated(
+                controller: _scrollCtrl,
                 itemCount: c.searchResults.value.length,
                 separatorBuilder: (_, _) => const Divider(height: 1),
                 itemBuilder: (_, i) {
                   final topic = c.searchResults.value[i];
-                  return TopicListItem(
+                  // 最后一项后显示加载更多指示器
+                  final isLast =
+                      i == c.searchResults.value.length - 1;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TopicListItem(
                     topic: topic,
                     onTap: () => context.pushReplacement(
                       TopicDetailPage(tid: topic.tid),
                     ),
+                      ),
+                      if (isLast && c.hasMoreSearch)
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(),
+                        ),
+                    ],
                   );
                 },
               ),

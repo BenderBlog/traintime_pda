@@ -199,6 +199,54 @@ class RuisiApi {
     }
   }
 
+  /// POST 并跟随 302 重定向（Discuz 搜索等场景）。
+  ///
+  /// Discuz 搜索 POST 后返回 302，Location 携带 searchid。
+  /// 本方法捕获 302，提取 Location，再 GET 拿到最终结果。
+  Future<(bool, String)> postFollowRedirect(
+    String url, {
+    Object? params,
+  }) async {
+    try {
+      final response = await _dio.post<String>(
+        url,
+        data: params,
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+          // 接受 302 状态码，不抛异常
+          validateStatus: (status) =>
+              status != null && (status < 400 || status == 302),
+          // 不自动跟随重定向，手动处理
+          followRedirects: false,
+          extra: {'withCredentials': true},
+        ),
+      );
+
+      // 如果是 302，提取 Location 并 GET
+      if (response.statusCode == 302) {
+        final location = response.headers.value('location');
+        if (location == null || location.isEmpty) {
+          return (false, '重定向地址为空');
+        }
+        // location 可能是相对路径，拼接 baseUrl
+        final redirectUrl = location.startsWith('http')
+            ? location
+            : '$_baseUrl/$location';
+        talker.info('POST 302 → GET $redirectUrl');
+        return get(redirectUrl);
+      }
+
+      return (true, response.data ?? '服务端无返回');
+    } on DioException catch (e) {
+      final msg = _errorMessage(e);
+      talker.error('POST $url 失败: $msg', e);
+      return (false, msg);
+    } catch (e) {
+      talker.error('POST $url 异常: $e', e);
+      return (false, '请求异常: $e');
+    }
+  }
+
   /// 上传图片附件
   ///
   /// [uploadUrl] 服务端图片上传接口，[uid] 与 [hash] 来自发帖页面的

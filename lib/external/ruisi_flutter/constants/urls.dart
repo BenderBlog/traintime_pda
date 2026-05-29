@@ -107,8 +107,10 @@ class Urls {
 
   // ---- 搜索 ----
   static const String searchUrl = '${baseUrl}search.php?mod=forum';
-  static String getSearchUrl2(String searchId) =>
-      '${baseUrl}search.php?mod=forum&searchid=$searchId&orderby=lastpost&ascdesc=desc&searchsubmit=yes';
+  static String getSearchUrl(String searchId, String keyword, {int page = 1}) =>
+      '${baseUrl}search.php?mod=forum&searchid=$searchId'
+      '&orderby=lastpost&ascdesc=desc&searchsubmit=yes'
+      '&kw=$keyword&page=$page';
 
   // ---- @列表 ----
   static const String atListUrl = '${baseUrl}misc.php?mod=getatuser&inajax=1';
