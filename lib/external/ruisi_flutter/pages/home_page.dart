@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage>
             IconButton(
               icon: const Icon(Icons.search),
               tooltip: FlutterI18n.translate(context, 'ruisi.home.search'),
-              onPressed: () => context.push(const SearchPage()),
+              onPressed: () => context.pushRuisiBranch(const SearchPage()),
             ),
             IconButton(
               icon: const Icon(Icons.edit_note),
@@ -218,7 +218,8 @@ class _HomePageState extends State<HomePage>
           final topic = topics[i];
           return TopicListItem(
             topic: topic,
-            onTap: () => context.pushRuisiBranch(TopicDetailPage(tid: topic.tid)),
+            onTap: () =>
+                context.pushRuisiBranch(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),

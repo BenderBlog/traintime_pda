@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/external/ruisi_flutter/utils/branch_navigation.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -81,8 +82,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
           final topic = c.topics.value[i];
           return TopicListItem(
             topic: topic,
-            onTap: () =>
-                context.pushReplacement(TopicDetailPage(tid: topic.tid)),
+            onTap: () => context.push(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),

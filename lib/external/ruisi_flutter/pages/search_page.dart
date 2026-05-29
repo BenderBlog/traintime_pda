@@ -121,16 +121,14 @@ class _SearchPageState extends State<SearchPage> {
                 itemBuilder: (_, i) {
                   final topic = c.searchResults.value[i];
                   // 最后一项后显示加载更多指示器
-                  final isLast =
-                      i == c.searchResults.value.length - 1;
+                  final isLast = i == c.searchResults.value.length - 1;
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TopicListItem(
-                    topic: topic,
-                    onTap: () => context.pushReplacement(
-                      TopicDetailPage(tid: topic.tid),
-                    ),
+                        topic: topic,
+                        onTap: () =>
+                            context.push(TopicDetailPage(tid: topic.tid)),
                       ),
                       if (isLast && c.hasMoreSearch)
                         const Padding(
