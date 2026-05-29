@@ -82,7 +82,7 @@ class _ForumTopicsPageState extends State<ForumTopicsPage> {
           return TopicListItem(
             topic: topic,
             onTap: () =>
-                context.pushReplacement(TopicDetailPage(tid: topic.tid)),
+                context.push(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),

@@ -96,7 +96,7 @@ class _SearchPageState extends State<SearchPage> {
                   final topic = c.searchResults.value[i];
                   return TopicListItem(
                     topic: topic,
-                    onTap: () => context.pushReplacement(
+                    onTap: () => context.push(
                       TopicDetailPage(tid: topic.tid),
                     ),
                   );

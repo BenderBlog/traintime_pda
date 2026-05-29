@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage>
           return TopicListItem(
             topic: topic,
             onTap: () =>
-                context.pushReplacement(TopicDetailPage(tid: topic.tid)),
+                context.push(TopicDetailPage(tid: topic.tid)),
           );
         },
       ),
