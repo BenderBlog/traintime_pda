@@ -46,7 +46,7 @@ class EnergyInfo {
   final DateTime lastReadDate;
   final num electricityRemain;
   final List<MeterInfo> electricityMeterList;
-  final List<MeterInfo> waterMeterList;
+  final List<MeterInfo>? waterMeterList;
 
   EnergyInfo({
     required this.lastReadDate,

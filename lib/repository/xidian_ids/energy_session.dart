@@ -296,14 +296,12 @@ class EnergySession extends IDSSession {
 
     int electricityIndex =
         response.data["ResData"]["rows"][0]["MediumCode"] == "2" ? 0 : 1;
-    int waterIndex = electricityIndex == 0 ? 1 : 0;
 
     num electricityRemainNum = num.parse(
       response.data["ResData"]["rows"][electricityIndex]["LastNum"].toString(),
     );
     String electricityMetID =
         response.data["ResData"]["rows"][electricityIndex]["MetID"];
-    String waterMetID = response.data["ResData"]["rows"][waterIndex]["MetID"];
 
     List<int> fetchDate = response
         .data["ResData"]["rows"][electricityIndex]["LastReadDate"]
@@ -343,21 +341,33 @@ class EnergySession extends IDSSession {
               .toList(),
         );
 
-    List<MeterInfo> waterList =
-        await _request(
-          "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
-          isGetMethod: true,
-          data: {
-            "MetID": waterMetID,
-            "ReadTimeS": DateFormat("yyyy-MM-dd").format(rangeBeginForWater),
-            "ReadTimeE": DateFormat("yyyy-MM-dd").format(rangeEndForWater),
-            "ReadNum": "",
-          },
-        ).then(
-          (value) => (value.data["ResData"]["rows"] as List<dynamic>)
-              .map((e) => MeterInfo.fromJson(e))
-              .toList(),
-        );
+    List<MeterInfo>? waterList;
+
+    try {
+      int waterIndex = electricityIndex == 0 ? 1 : 0;
+      String waterMetID = response.data["ResData"]["rows"][waterIndex]["MetID"];
+      waterList =
+          await _request(
+            "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
+            isGetMethod: true,
+            data: {
+              "MetID": waterMetID,
+              "ReadTimeS": DateFormat("yyyy-MM-dd").format(rangeBeginForWater),
+              "ReadTimeE": DateFormat("yyyy-MM-dd").format(rangeEndForWater),
+              "ReadNum": "",
+            },
+          ).then(
+            (value) => (value.data["ResData"]["rows"] as List<dynamic>)
+                .map((e) => MeterInfo.fromJson(e))
+                .toList(),
+          );
+    } catch (e, s) {
+      log.error(
+        "[EnergySession] failed to fetch water list, it will leave a blank",
+        e,
+        s,
+      );
+    }
 
     return EnergyInfo(
       electricityMeterList: electricityList,

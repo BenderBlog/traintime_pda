@@ -40,8 +40,8 @@ EnergyInfo _$EnergyInfoFromJson(Map<String, dynamic> json) => EnergyInfo(
   electricityMeterList: (json['electricityMeterList'] as List<dynamic>)
       .map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
       .toList(),
-  waterMeterList: (json['waterMeterList'] as List<dynamic>)
-      .map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
+  waterMeterList: (json['waterMeterList'] as List<dynamic>?)
+      ?.map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
