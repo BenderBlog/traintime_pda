@@ -284,96 +284,124 @@ class ApiService {
     return groups;
   }
 
-  /// 解析论坛板块列表 HTML（与 iOS 版 AllForumsTableViewController 一致）
+  /// 解析论坛板块列表 HTML
   ///
-  /// iOS 参考: Ruisi_iOS-master/Ruisi/controller/AllForumsTableViewController.swift
-  /// 策略 1: `h2.bbs-forum-title` 作为分区标题，
-  ///         其后的同级 div 内 `li > a[href*=forumdisplay]` 作为板块链接
-  /// 策略 2: `select#` 元素内的 `option` 标签（备用）
+  /// 同时兼容桌面版 `forumdisplay` 链接与移动端
+  /// `forum-<fid>-1.html` 链接。
   List<ForumGroup> _parseForumListHtml(String html) {
     final doc = html_parser.parse(html);
     final groups = <ForumGroup>[];
 
-    // 策略 1: 与 iOS 一致 - h2.bbs-forum-title + 下一个兄弟 div
-    final titleElements = doc.querySelectorAll('h2.bbs-forum-title');
-    _api.talker.debug('找到 h2.bbs-forum-title 数量: ${titleElements.length}');
 
-    if (titleElements.isNotEmpty) {
+    String extractLastText(dom.Element el) {
+      String last = '';
+      for (final node in el.nodes) {
+        if (node is dom.Text) {
+          final t = node.data.trim();
+          if (t.isNotEmpty) last = t;
+        } else if (node is dom.Element) {
+          final t = node.text.trim();
+          if (t.isNotEmpty) last = t;
+        }
+      }
+      return last;
+    }
+    int extractForumId(String href) {
+      final mobileMatch = RegExp(r'forum-(\d+)').firstMatch(href);
+      if (mobileMatch != null) {
+        return int.parse(mobileMatch.group(1)!);
+      }
+
+      final classicMatch = RegExp(r'fid=(\d+)').firstMatch(href);
+      if (classicMatch != null) {
+        return int.parse(classicMatch.group(1)!);
+      }
+
+      return 0;
+    }
+
+    List<Forum> parseForumLinks(dom.Element container) {
+      final forums = <Forum>[];
+      for (final a in container.querySelectorAll('a')) {
+        final href = a.attributes['href'] ?? '';
+        if (href.isEmpty) continue;
+
+        final fid = extractForumId(href);
+        if (fid <= 0) continue;
+
+        final name = extractLastText(a);
+        if (name.isEmpty) continue;
+
+        forums.add(Forum(fid: fid, name: name));
+      }
+      return forums;
+    }
+
+    // 策略 1: 移动版板块列表（subforumshow + sub_forum）
+    final titleBlocks = doc.querySelectorAll('.subforumshow');
+    _api.talker.debug('找到 .subforumshow 数量: ${titleBlocks.length}');
+
+    for (int i = 0; i < titleBlocks.length; i++) {
+      final titleEl = titleBlocks[i];
+      final titleText = titleEl.querySelector('h2 a')?.text.trim() ??
+          titleEl.querySelector('h2')?.text.trim() ??
+          '板块 $i';
+
+        final forumsDiv = titleEl.nextElementSibling;
+      if (forumsDiv == null) continue;
+
+      final forums = parseForumLinks(forumsDiv);
+      if (forums.isNotEmpty) {
+        groups.add(ForumGroup(fgId: i, name: titleText, forums: forums));
+      }
+    }
+
+    // 策略 2: 桌面版板块列表（bbs-forum-title + 下一个兄弟 div）
+    if (groups.isEmpty) {
+      final titleElements = doc.querySelectorAll('h2.bbs-forum-title');
+      _api.talker.debug('找到 h2.bbs-forum-title 数量: ${titleElements.length}');
+
       for (int i = 0; i < titleElements.length; i++) {
         final titleEl = titleElements[i];
-        // 分区名称取第一个子元素的文本（如 <a>西电生活</a>）
         final titleText = titleEl.children.isNotEmpty
             ? titleEl.children.first.text.trim()
             : titleEl.text.trim();
 
-        // 取下一个兄弟 div，其中包含 ul > li > a[forumdisplay]
         final forumDiv = titleEl.nextElementSibling;
         if (forumDiv == null) continue;
 
-        final forums = <Forum>[];
-        for (final a in forumDiv.querySelectorAll('a[href*="forumdisplay"]')) {
-          final href = a.attributes['href'] ?? '';
-          final fidMatch = RegExp(r'fid=(\d+)').firstMatch(href);
-          final forumName = a.text.trim();
-          if (fidMatch != null && forumName.isNotEmpty) {
-            forums.add(
-              Forum(fid: int.parse(fidMatch.group(1)!), name: forumName),
-            );
-          }
-        }
-
+        final forums = parseForumLinks(forumDiv);
         if (forums.isNotEmpty) {
           groups.add(ForumGroup(fgId: i, name: titleText, forums: forums));
         }
       }
     }
 
-    // 策略 2: iOS 备用方案 - select 标签内的 option
+    // 策略 3: select 元素中的 option（备用）
     if (groups.isEmpty) {
       final selects = doc.querySelectorAll('select[id]');
       for (int i = 0; i < selects.length; i++) {
         final select = selects[i];
-        final forums = <Forum>[];
-        for (final option in select.querySelectorAll('option')) {
-          final value = option.attributes['value'] ?? '';
-          final fidMatch = RegExp(r'fid=(\d+)').firstMatch(value);
-          final forumName = option.text.trim();
-          if (fidMatch != null && forumName.isNotEmpty) {
-            forums.add(
-              Forum(fid: int.parse(fidMatch.group(1)!), name: forumName),
-            );
-          }
-        }
+        final forums = parseForumLinks(select);
         if (forums.isNotEmpty) {
-          final title = select.previousElementSibling?.text.trim() ?? '板块 $i';
+          final title =
+              select.previousElementSibling?.text.trim() ?? '板块 $i';
           groups.add(ForumGroup(fgId: i, name: title, forums: forums));
         }
       }
     }
 
-    // 策略 3: 降级匹配 - .bm_c 区块（原方案）
+    // 策略 4: .bm_c 区域降级匹配
     if (groups.isEmpty) {
       final sections = doc.querySelectorAll('.bm_c');
       for (int i = 0; i < sections.length; i++) {
         final section = sections[i];
-        final forumItems = section.querySelectorAll('a[href*="forumdisplay"]');
-        if (forumItems.isEmpty) continue;
+        final forums = parseForumLinks(section);
+        if (forums.isEmpty) continue;
 
-        final forums = <Forum>[];
-        for (final item in forumItems) {
-          final name = item.text.trim();
-          final href = item.attributes['href'] ?? '';
-          final fidMatch = RegExp(r'fid=(\d+)').firstMatch(href);
-          if (fidMatch != null && name.isNotEmpty) {
-            forums.add(Forum(fid: int.parse(fidMatch.group(1)!), name: name));
-          }
-        }
-
-        if (forums.isNotEmpty) {
-          final title =
-              section.parent?.querySelector('h2')?.text.trim() ?? '板块 $i';
-          groups.add(ForumGroup(fgId: i, name: title, forums: forums));
-        }
+        final title =
+            section.parent?.querySelector('h2')?.text.trim() ?? '板块 $i';
+        groups.add(ForumGroup(fgId: i, name: title, forums: forums));
       }
     }
 
