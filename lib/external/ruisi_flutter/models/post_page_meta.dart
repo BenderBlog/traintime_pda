@@ -11,6 +11,7 @@ class PostPageMeta {
   final String? uploadHash;
   final String? seccodeHash;
   final String? formhash;
+  final String? fid;
 
   const PostPageMeta({
     required this.typeOptions,
@@ -18,5 +19,6 @@ class PostPageMeta {
     this.uploadHash,
     this.seccodeHash,
     this.formhash,
+    this.fid,
   });
 }

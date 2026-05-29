@@ -7,7 +7,6 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
-import 'package:watermeter/repository/logger.dart';
 
 import '../constants/urls.dart';
 import '../models/forum.dart';
@@ -453,15 +452,6 @@ class ApiService {
       seccodeHash = seccodeMatch.group(1);
     }
 
-    print(
-      "PostPageMeta\n"
-      "typeOptions: $typeOptions\n"
-      "uploadUid: $uploadUid\n"
-      "uploadHash: $uploadHash\n"
-      "seccodeHash: $seccodeHash\n"
-      "formhash: $freshFormhash",
-    );
-
     return PostPageMeta(
       typeOptions: typeOptions,
       uploadUid: uploadUid,
@@ -474,6 +464,45 @@ class ApiService {
   // =========================================================================
   // 帖子列表
   // =========================================================================
+
+  Future<PostPageMeta> loadReplyUploadMeta(int tid) async {
+    final url =
+        '${Urls.baseUrl}forum.php?mod=post&action=reply&tid=$tid&mobile=2';
+    final (ok, body) = await _api.get(url);
+    if (!ok) {
+      throw Exception('获取回复页面失败');
+    }
+
+    final doc = html_parser.parse(body);
+
+    final freshFormhash = doc
+        .querySelector('input[name="formhash"]')
+        ?.attributes['value'];
+    if (freshFormhash != null) {
+      _api.formhash = freshFormhash;
+    }
+
+    String? uploadUid;
+    String? uploadHash;
+    final uploadMatch = RegExp(
+      r'uploadformdata:\s*\{uid:\s*"(\d+)",\s*hash:\s*"([^"]+)"\}',
+    ).firstMatch(body);
+    if (uploadMatch != null) {
+      uploadUid = uploadMatch.group(1);
+      uploadHash = uploadMatch.group(2);
+    }
+
+    final fidMatch = RegExp(r'fid=(\d+)').firstMatch(body);
+    final fid = fidMatch?.group(1);
+
+    return PostPageMeta(
+      typeOptions: const [],
+      uploadUid: uploadUid,
+      uploadHash: uploadHash,
+      formhash: freshFormhash,
+      fid: fid,
+    );
+  }
 
   /// 板块帖子
   Future<List<Topic>> getTopicList(int fid, {int page = 1}) async {
@@ -894,33 +923,26 @@ class ApiService {
   // =========================================================================
 
   Future<bool> replyTopic(int tid, String content) async {
-    // 1. 先访问回复页面获取最新的 formhash 和正确的 fid
-    final replyPageUrl =
-        '${Urls.baseUrl}forum.php?mod=post&action=reply&tid=$tid';
-    final (pageOk, pageBody) = await _api.get(replyPageUrl);
-    if (!pageOk) {
-      _api.talker.error('获取回复页面失败');
-      return false;
-    }
+    return replyTopicWithAttachments(tid, content, const []);
+  }
 
-    // 从回复页面提取 formhash
-    final replyDoc = html_parser.parse(pageBody);
-    final freshFormhash = replyDoc
-        .querySelector('input[name="formhash"]')
-        ?.attributes['value'];
-    if (freshFormhash != null) {
-      _api.formhash = freshFormhash;
-      _api.talker.info('回复页面 formhash 已更新: $freshFormhash');
-    }
-
-    // 从回复页面 URL 提取 fid（Discuz 回复页面通常包含 fid 参数）
-    final fidMatch = RegExp(r'fid=(\d+)').firstMatch(pageBody);
-    final fid = fidMatch?.group(1) ?? '2';
+  Future<bool> replyTopicWithAttachments(
+    int tid,
+    String content,
+    List<String> attachmentAids,
+  ) async {
+    final meta = await loadReplyUploadMeta(tid);
+    _api.formhash = meta.formhash ?? _api.formhash;
+    final fid = meta.fid ?? '2';
 
     // 2. 提交回复
     final (ok, body) = await _api.post(
       '${Urls.baseUrl}forum.php?mod=post&action=reply&fid=$fid&tid=$tid&extra=&replysubmit=yes&inajax=1&handlekey=fastpost',
-      params: {'message': content, 'usesig': '1'},
+      params: {
+        'message': content,
+        'usesig': '1',
+        for (final aid in attachmentAids) 'attachnew[$aid]': '',
+      },
     );
     return ok && !body.contains('error');
   }

@@ -11,6 +11,7 @@ import '../controller/ruisi_controller.dart';
 import '../models/post.dart';
 import '../constants/urls.dart';
 import '../widgets/smiley_picker.dart';
+import '../../../repository/pick_file.dart';
 import 'login_page.dart';
 
 /// 帖子详情页
@@ -28,6 +29,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   final _scrollCtrl = ScrollController();
   bool _showReply = false;
   bool _showSmiley = false;
+  bool _replyUploading = false;
+  bool _replySubmitting = false;
+  final List<_UploadedAttachment> _replyAttachments = [];
 
   dynamic _detail; // TopicDetail?
   bool _loading = true;
@@ -101,7 +105,16 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       if (result != true) return;
     }
 
-    final ok = await c.api.replyTopic(widget.tid, content);
+    setState(() => _replySubmitting = true);
+
+    bool ok = false;
+    try {
+      final aids = _replyAttachments.map((a) => a.aid).toList();
+      ok = await c.api.replyTopicWithAttachments(widget.tid, content, aids);
+    } finally {
+      if (mounted) setState(() => _replySubmitting = false);
+    }
+
     if (!mounted) return;
 
     if (ok) {
@@ -109,6 +122,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       setState(() {
         _showReply = false;
         _showSmiley = false;
+        _replyAttachments.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -140,6 +154,60 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       text: newText,
       selection: TextSelection.collapsed(offset: cursorPos + value.length),
     );
+  }
+
+  Future<void> _pickReplyImage() async {
+    final file = await pickFile();
+    if (file == null) return;
+    if (!mounted) return;
+
+    final ext = file.extension?.toLowerCase();
+    const allowed = {'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'};
+    if (ext == null || !allowed.contains(ext)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('仅支持 jpg/jpeg/png/gif/bmp/webp 图片')),
+      );
+      return;
+    }
+
+    final data = await file.readAsBytes();
+    if (!mounted) return;
+    if (data.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('读取图片失败')));
+      return;
+    }
+
+    setState(() => _replyUploading = true);
+    try {
+      final meta = await RuisiController.i.api.loadReplyUploadMeta(widget.tid);
+      final uid = meta.uploadUid ?? '';
+      final hash = meta.uploadHash ?? '';
+      final (ok, result) = await RuisiController.i.api.ruisiApi.uploadImage(
+        Urls.uploadImageUrl,
+        uid: uid,
+        hash: hash,
+        bytes: data,
+        filename: file.name,
+      );
+      if (!ok) throw Exception(result);
+      final parts = result.split('|');
+      final aid = parts.isNotEmpty ? parts.first : result;
+      final thumbnailUrl = parts.length > 1 ? parts[1] : '';
+      setState(() {
+        _replyAttachments.add(
+          _UploadedAttachment(aid: aid, thumbnailUrl: thumbnailUrl),
+        );
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('图片上传失败: $e')));
+    } finally {
+      if (mounted) setState(() => _replyUploading = false);
+    }
   }
 
   Future<void> _addFavorite() async {
@@ -174,154 +242,244 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _detail?.title ??
-              FlutterI18n.translate(context, 'ruisi.topic_detail.title'),
+    final blockPop = _replyUploading || _replySubmitting;
+    return PopScope(
+      canPop: !blockPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            _detail?.title ??
+                FlutterI18n.translate(context, 'ruisi.topic_detail.title'),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.bookmark_border),
+              tooltip: FlutterI18n.translate(context, 'ruisi.common.favorite'),
+              onPressed: _addFavorite,
+            ),
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                final url = '${Urls.baseUrl}viewthread.php?tid=${widget.tid}';
+                launchUrl(Uri.parse(url));
+              },
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark_border),
-            tooltip: FlutterI18n.translate(context, 'ruisi.common.favorite'),
-            onPressed: _addFavorite,
-          ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              final url = '${Urls.baseUrl}viewthread.php?tid=${widget.tid}';
-              launchUrl(Uri.parse(url));
-            },
-          ),
-        ],
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_error!),
-                  const SizedBox(height: 8),
-                  FilledButton.tonal(
-                    onPressed: () => _load(),
-                    child: Text(
-                      FlutterI18n.translate(context, 'ruisi.common.retry'),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : _detail == null
-          ? Center(
-              child: Text(
-                FlutterI18n.translate(context, 'ruisi.topic_detail.no_data'),
-              ),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async => _load(page: _currentPage),
-                    child: ListView.separated(
-                      controller: _scrollCtrl,
-                      itemCount: (_detail.posts?.length ?? 0) + 2,
-                      separatorBuilder: (_, _) => const Divider(height: 1),
-                      itemBuilder: (_, i) {
-                        if (i == 0) {
-                          return Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(
-                              _detail.title ?? '',
-                              style: theme.textTheme.titleLarge,
-                            ),
-                          );
-                        }
-                        if (i == (_detail.posts?.length ?? 0) + 1) {
-                          return _Pagination(
-                            current: _currentPage,
-                            total: _detail.totalPages ?? 1,
-                            onPageChanged: (p) => _load(page: p),
-                          );
-                        }
-                        final post = _detail.posts[i - 1] as Post;
-                        return _PostTile(
-                          post: post,
-                          onReply: () {
-                            _replyCtrl.text =
-                                '回复 #${post.index} ${post.author}\n';
-                            setState(() => _showReply = true);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                // 回复输入框
-                if (_showReply) ...[
-                  if (_showSmiley) SmileyPicker(onSelected: _insertSmiley),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      border: Border(
-                        top: BorderSide(
-                          color: theme.colorScheme.outlineVariant,
-                        ),
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(_error!),
+                    const SizedBox(height: 8),
+                    FilledButton.tonal(
+                      onPressed: () => _load(),
+                      child: Text(
+                        FlutterI18n.translate(context, 'ruisi.common.retry'),
                       ),
                     ),
-                    child: SafeArea(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _replyCtrl,
-                              maxLines: 3,
-                              minLines: 1,
-                              decoration: InputDecoration(
-                                hintText: FlutterI18n.translate(
-                                  context,
-                                  'ruisi.topic_detail.reply_hint',
-                                ),
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
+                  ],
+                ),
+              )
+            : _detail == null
+            ? Center(
+                child: Text(
+                  FlutterI18n.translate(context, 'ruisi.topic_detail.no_data'),
+                ),
+              )
+            : Column(
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async => _load(page: _currentPage),
+                      child: ListView.separated(
+                        controller: _scrollCtrl,
+                        itemCount: (_detail.posts?.length ?? 0) + 2,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (_, i) {
+                          if (i == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text(
+                                _detail.title ?? '',
+                                style: theme.textTheme.titleLarge,
+                              ),
+                            );
+                          }
+                          if (i == (_detail.posts?.length ?? 0) + 1) {
+                            return _Pagination(
+                              current: _currentPage,
+                              total: _detail.totalPages ?? 1,
+                              onPageChanged: (p) => _load(page: p),
+                            );
+                          }
+                          final post = _detail.posts[i - 1] as Post;
+                          return _PostTile(
+                            post: post,
+                            onReply: () {
+                              _replyCtrl.text =
+                                  '回复 #${post.index} ${post.author}\n';
+                              setState(() => _showReply = true);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  // 回复输入框
+                  if (_showReply) ...[
+                    if (_showSmiley) SmileyPicker(onSelected: _insertSmiley),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        border: Border(
+                          top: BorderSide(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
+                        ),
+                      ),
+                      child: SafeArea(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _replyCtrl,
+                                maxLines: 3,
+                                minLines: 1,
+                                decoration: InputDecoration(
+                                  hintText: FlutterI18n.translate(
+                                    context,
+                                    'ruisi.topic_detail.reply_hint',
+                                  ),
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: Icon(
-                              _showSmiley
-                                  ? Icons.keyboard
-                                  : Icons.emoji_emotions_outlined,
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: Icon(
+                                _showSmiley
+                                    ? Icons.keyboard
+                                    : Icons.emoji_emotions_outlined,
+                              ),
+                              onPressed: _replyUploading || _replySubmitting
+                                  ? null
+                                  : () => setState(
+                                      () => _showSmiley = !_showSmiley,
+                                    ),
                             ),
-                            onPressed: () =>
-                                setState(() => _showSmiley = !_showSmiley),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton.filled(
-                            icon: const Icon(Icons.send),
-                            onPressed: _submitReply,
-                          ),
-                        ],
+                            IconButton(
+                              icon: _replyUploading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.image_outlined),
+                              tooltip: '上传图片',
+                              onPressed: _replyUploading || _replySubmitting
+                                  ? null
+                                  : _pickReplyImage,
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton.filled(
+                              icon: const Icon(Icons.send),
+                              onPressed: _replyUploading || _replySubmitting
+                                  ? null
+                                  : _submitReply,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                  if (_replyAttachments.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _replyAttachments
+                            .map(
+                              (a) => Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: a.thumbnailUrl.isNotEmpty
+                                        ? Image.network(
+                                            a.thumbnailUrl,
+                                            width: 64,
+                                            height: 64,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Container(
+                                            width: 64,
+                                            height: 64,
+                                            color: theme
+                                                .colorScheme
+                                                .surfaceContainerHighest,
+                                          ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      try {
+                                        await RuisiController.i.api.ruisiApi
+                                            .post(
+                                              Urls.deleteUploadedUrl(a.aid),
+                                            );
+                                      } catch (_) {}
+                                      setState(
+                                        () => _replyAttachments.remove(a),
+                                      );
+                                    },
+                                    child: const CircleAvatar(
+                                      radius: 10,
+                                      backgroundColor: Colors.black54,
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
                 ],
-              ],
-            ),
-      floatingActionButton: _showReply
-          ? null
-          : FloatingActionButton(
-              onPressed: () => setState(() => _showReply = true),
-              child: const Icon(Icons.reply),
-            ),
+              ),
+        floatingActionButton: _showReply
+            ? null
+            : FloatingActionButton(
+                onPressed: () => setState(() => _showReply = true),
+                child: const Icon(Icons.reply),
+              ),
+      ),
     );
   }
+}
+
+class _UploadedAttachment {
+  final String aid;
+  final String thumbnailUrl;
+
+  const _UploadedAttachment({required this.aid, this.thumbnailUrl = ''});
 }
 
 class _PostTile extends StatelessWidget {
