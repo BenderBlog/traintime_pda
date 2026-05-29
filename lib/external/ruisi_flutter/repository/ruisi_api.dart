@@ -202,7 +202,8 @@ class RuisiApi {
   /// 上传图片附件
   ///
   /// [uploadUrl] 服务端图片上传接口，[uid] 与 [hash] 来自发帖页面的
-  /// `uploadformdata` 字段。返回 `(成功?, aid 或错误信息)`。
+  /// `uploadformdata` 字段。返回 `(成功?, 附件信息或错误信息)`，附件信息包含
+  /// `aid` 与附件缩略图地址。
   Future<(bool, String)> uploadImage(
     String uploadUrl, {
     required String uid,
@@ -216,11 +217,7 @@ class RuisiApi {
       'Filedata': MultipartFile.fromBytes(bytes, filename: filename),
     });
 
-    final (ok, body) = await post(
-      uploadUrl,
-      params: form,
-      multipart: true,
-    );
+    final (ok, body) = await post(uploadUrl, params: form, multipart: true);
     if (!ok) return (false, body);
 
     if (!body.contains('|')) {
@@ -228,8 +225,11 @@ class RuisiApi {
     }
 
     final parts = body.split('|');
-    if (parts[0] == 'DISCUZUPLOAD' && parts.length > 3 && parts[2] == '0') {
-      return (true, parts[3]);
+    if (parts[0] == 'DISCUZUPLOAD' && parts.length > 5 && parts[2] == '0') {
+      final aid = parts[3];
+      final serverPath = parts[5];
+      final url = '$_baseUrl/data/attachment/forum/$serverPath';
+      return (true, '$aid|$url');
     }
 
     final code = parts.length > 2 ? parts[2] : parts.first;

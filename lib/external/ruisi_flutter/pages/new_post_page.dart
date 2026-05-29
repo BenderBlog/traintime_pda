@@ -128,9 +128,13 @@ class _NewPostPageState extends State<NewPostPage> {
         filename: file.name,
       );
       if (!ok) throw Exception(result);
+      final parts = result.split('|');
+      final aid = parts.isNotEmpty ? parts.first : result;
+      final thumbnailUrl = parts.length > 1 ? parts[1] : '';
       setState(
-        () =>
-            _attachments.add(_UploadedAttachment(aid: result, name: file.name)),
+        () => _attachments.add(
+          _UploadedAttachment(aid: aid, name: file.name, thumbnailUrl: thumbnailUrl),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -304,9 +308,35 @@ class _NewPostPageState extends State<NewPostPage> {
                     runSpacing: 8,
                     children: _attachments
                         .map(
-                          (a) => Chip(
-                            label: Text(a.name),
-                            onDeleted: () => _removeAttachment(a),
+                          (a) => Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: a.thumbnailUrl.isNotEmpty
+                                    ? Image.network(
+                                        a.thumbnailUrl,
+                                        width: 72,
+                                        height: 72,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(
+                                        width: 72,
+                                        height: 72,
+                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                        alignment: Alignment.center,
+                                        child: Text(a.name, textAlign: TextAlign.center),
+                                      ),
+                              ),
+                              GestureDetector(
+                                onTap: () => _removeAttachment(a),
+                                child: const CircleAvatar(
+                                  radius: 10,
+                                  backgroundColor: Colors.black54,
+                                  child: Icon(Icons.close, size: 12, color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
                         )
                         .toList(),
@@ -372,6 +402,7 @@ class _NewPostPageState extends State<NewPostPage> {
 class _UploadedAttachment {
   final String aid;
   final String name;
+  final String thumbnailUrl;
 
-  const _UploadedAttachment({required this.aid, required this.name});
+  const _UploadedAttachment({required this.aid, required this.name, this.thumbnailUrl = ''});
 }
