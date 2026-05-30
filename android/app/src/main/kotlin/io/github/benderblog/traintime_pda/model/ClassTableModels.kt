@@ -67,6 +67,11 @@ data class TimeLineItem(
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     val colorIndex: Int,
+    val sourceIndex: Int? = null,
+    val weekIndex: Int? = null,
+    val dayIndex: Int? = null,
+    val startPeriod: Int? = null,
+    val stopPeriod: Int? = null,
 ) {
     val startTimeStr: String = when (type) {
         Source.EXAM -> "考"

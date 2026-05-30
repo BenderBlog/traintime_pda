@@ -4,12 +4,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_page.dart';
+import 'package:watermeter/page/classtable/classtable_launch_target.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// Intro of the classtable.
 class ClassTableWindow extends StatefulWidget {
   final BoxConstraints constraints;
-  const ClassTableWindow({super.key, required this.constraints});
+  final ClassTableLaunchTarget? launchTarget;
+  const ClassTableWindow({
+    super.key,
+    required this.constraints,
+    this.launchTarget,
+  });
 
   @override
   State<ClassTableWindow> createState() => _ClassTableWindowState();
@@ -35,7 +41,7 @@ class _ClassTableWindowState extends State<ClassTableWindow> {
     return ClassTableState(
       constraints: widget.constraints,
       controllers: _controllers,
-      child: const ClassTablePage(),
+      child: ClassTablePage(launchTarget: widget.launchTarget),
     );
   }
 }

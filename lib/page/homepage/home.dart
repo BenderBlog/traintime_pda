@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:watermeter/external/ruisi_flutter/controller/ruisi_controller.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_main.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
@@ -17,6 +18,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/repository/widget_launch_handler.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -66,7 +68,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   int _selectedIndex = 0;
   static bool refreshAtStart = false;
 
-  late StreamSubscription _intentSub;
+  StreamSubscription<Uri?>? _intentSub;
   late PageController _controller;
 
   @override
@@ -74,6 +76,18 @@ class _HomePageMasterState extends State<HomePageMaster>
     super.initState();
     _controller = PageController();
     RuisiController.i.init();
+    if (Platform.isAndroid || Platform.isIOS) {
+      _intentSub = HomeWidget.widgetClicked.listen((uri) {
+        if (mounted) unawaited(handleWidgetLaunchUri(context, uri));
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await handleWidgetLaunchUri(
+          context,
+          await HomeWidget.initiallyLaunchedFromHomeWidget(),
+        );
+      });
+    }
   }
 
   void _loginAsync() async {
@@ -216,7 +230,7 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   @override
   void dispose() {
-    if (Platform.isAndroid || Platform.isIOS) _intentSub.cancel();
+    _intentSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

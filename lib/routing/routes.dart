@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_view.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
+import 'package:watermeter/page/classtable/classtable_launch_target.dart';
 import 'package:watermeter/page/dorm_water/dorm_water_window.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_window.dart';
 import 'package:watermeter/page/energy/electricity_window.dart';
@@ -42,7 +43,12 @@ class Routes {
       exam => const ExamInfoWindow(),
       classTable => LayoutBuilder(
         builder: (context, constraints) =>
-            ClassTableWindow(constraints: constraints),
+            ClassTableWindow(
+              constraints: constraints,
+              launchTarget: arguments is ClassTableLaunchTarget
+                  ? arguments
+                  : null,
+            ),
       ),
       about => const AboutPage(),
       sport => const SportWindow(),

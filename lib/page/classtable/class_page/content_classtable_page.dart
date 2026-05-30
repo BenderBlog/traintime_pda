@@ -2,6 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -12,22 +13,29 @@ import 'package:intl/intl.dart';
 
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/xidian_ids/exam.dart';
+import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/classtable_launch_target.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
+import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ContentClassTablePage extends StatefulWidget {
-  const ContentClassTablePage({super.key});
+  final ClassTableLaunchTarget? launchTarget;
+  const ContentClassTablePage({super.key, this.launchTarget});
 
   @override
   State<StatefulWidget> createState() => _ContentClassTablePageState();
@@ -51,6 +59,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
+  bool _didHandleLaunchTarget = false;
 
   void _switchPage() {
     if (!mounted) {
@@ -73,6 +82,146 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         isTopRowLocked = false;
       }
     });
+  }
+
+  bool _sameMinute(DateTime? a, DateTime? b) {
+    if (a == null || b == null) return false;
+    return a.year == b.year &&
+        a.month == b.month &&
+        a.day == b.day &&
+        a.hour == b.hour &&
+        a.minute == b.minute;
+  }
+
+  bool _matchesLaunchTarget(
+    ClassOrgainzedData event,
+    ClassTableLaunchTarget target,
+  ) {
+    final source = target.source;
+    if (source == null) return false;
+
+    for (final data in event.data) {
+      if (data is TimeArrangement) {
+        if (source != data.source.name.toLowerCase()) continue;
+        if (target.index != null && target.index != data.index) continue;
+        if (target.dayIndex != null && target.dayIndex != data.day) continue;
+        if (target.startPeriod != null && target.startPeriod != data.start) {
+          continue;
+        }
+        if (target.stopPeriod != null && target.stopPeriod != data.stop) {
+          continue;
+        }
+        if (target.weekIndex != null &&
+            (data.weekList.length <= target.weekIndex! ||
+                !data.weekList[target.weekIndex!])) {
+          continue;
+        }
+        return true;
+      }
+
+      if (data is Subject && source == "exam") {
+        final index = classTableState.subjects.indexOf(data);
+        if (target.index != null && target.index != index) continue;
+        if (!_sameMinute(data.startTime, target.startTime)) continue;
+        return true;
+      }
+
+      if (data is ExperimentData && source == "experiment") {
+        final index = classTableState.experiments.indexOf(data);
+        if (target.index != null && target.index != index) continue;
+        if (target.startTime == null) return true;
+        final matchesTimeRange = data.timeRanges.any(
+          (range) =>
+              _sameMinute(range.$1, target.startTime) &&
+              _sameMinute(range.$2, target.endTime),
+        );
+        if (matchesTimeRange) return true;
+      }
+    }
+
+    return false;
+  }
+
+  List<dynamic> _buildArrangementInformation(ClassOrgainzedData detail) {
+    return List.generate(detail.data.length, (index) {
+      final data = detail.data.elementAt(index);
+      if (data is Subject || data is ExperimentData) {
+        return data;
+      }
+
+      final arrangement = data as TimeArrangement;
+      return (
+        classTableState.getClassDetail(
+          classTableState.timeArrangement.indexOf(arrangement),
+        ),
+        arrangement,
+      );
+    });
+  }
+
+  Future<void> _showArrangementDetail(ClassOrgainzedData detail) async {
+    final toUse = await BothSideSheet.show<(ClassDetail, TimeArrangement, bool)>(
+      title: FlutterI18n.translate(context, "classtable.class_card.title"),
+      child: ArrangementDetail(
+        information: _buildArrangementInformation(detail),
+        currentWeek: classTableState.chosenWeek,
+      ),
+      context: context,
+    );
+
+    if (!context.mounted || toUse == null) return;
+    if (toUse.$3) {
+      await classTableState.deleteUserDefinedClass(toUse.$2);
+      return;
+    }
+
+    await Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => ClassAddWindow(
+              toChange: (toUse.$1, toUse.$2),
+              semesterLength: classTableState.semesterLength,
+            ),
+          ),
+        )
+        .then((value) {
+          if (value == null) return;
+          classTableState.editUserDefinedClass(value.$1, value.$2, value.$3);
+        });
+  }
+
+  Future<void> _handleLaunchTarget() async {
+    final target = widget.launchTarget;
+    if (_didHandleLaunchTarget || target == null) return;
+    _didHandleLaunchTarget = true;
+
+    final weekIndex = target.weekIndex;
+    if (weekIndex != null &&
+        weekIndex >= 0 &&
+        weekIndex < classTableState.semesterLength) {
+      classTableState.chosenWeek = weekIndex;
+    }
+
+    if (!target.opensSchedule) return;
+
+    final dayIndex = target.dayIndex;
+    if (weekIndex == null || dayIndex == null) return;
+
+    final arrangements = classTableState.getArrangement(
+      weekIndex: weekIndex,
+      dayIndex: dayIndex,
+    );
+    ClassOrgainzedData? match;
+    for (final event in arrangements) {
+      if (_matchesLaunchTarget(event, target)) {
+        match = event;
+        break;
+      }
+    }
+
+    if (match != null && mounted) {
+      await _showArrangementDetail(match);
+    }
   }
 
   @override
@@ -127,6 +276,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           : null,
     );
     super.didChangeDependencies();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_handleLaunchTarget());
+    });
   }
 
   /// A row shows a series of buttons about the classtable's index.

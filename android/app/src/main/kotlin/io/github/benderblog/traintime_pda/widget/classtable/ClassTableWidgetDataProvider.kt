@@ -302,7 +302,7 @@ class ClassTableWidgetDataProvider {
 
                     timeLineItem.add(
                         TimeLineItem(
-                            type = Source.SCHOOL,
+                            type = arrangement.source,
                             name = classTableData.getClassName(arrangement),
                             teacher = arrangement.teacher ?: "未知教师",
                             place = arrangement.classroom ?: "未安排教室",
@@ -310,7 +310,12 @@ class ClassTableWidgetDataProvider {
                                 .withMinute(startTimePoints[1]).withSecond(0).withNano(0),
                             endTime = now.withHour(endTimePoints[0]).withMinute(endTimePoints[1])
                                 .withSecond(0).withNano(0),
-                            colorIndex = arrangement.index
+                            colorIndex = arrangement.index,
+                            sourceIndex = arrangement.index,
+                            weekIndex = weekIndex,
+                            dayIndex = dayIndex,
+                            startPeriod = arrangement.start,
+                            stopPeriod = arrangement.stop,
                         )
                     )
                 }
@@ -356,7 +361,10 @@ class ClassTableWidgetDataProvider {
                         place = subject.place,
                         startTime = startTime,
                         endTime = endTime,
-                        colorIndex = examData.subject.indexOf(subject)
+                        colorIndex = examData.subject.indexOf(subject),
+                        sourceIndex = examData.subject.indexOf(subject),
+                        weekIndex = weekIndex,
+                        dayIndex = dayIndex,
                     )
                 )
             } else {
@@ -392,6 +400,9 @@ class ClassTableWidgetDataProvider {
                             startTime = timeRange.first,
                             endTime = timeRange.second,
                             colorIndex = experimentData.indexOf(data),
+                            sourceIndex = experimentData.indexOf(data),
+                            weekIndex = weekIndex,
+                            dayIndex = dayIndex,
                         )
                     )
                 } else {

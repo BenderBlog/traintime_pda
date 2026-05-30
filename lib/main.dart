@@ -314,6 +314,21 @@ class _MyAppState extends State<MyApp> {
           style: const TextStyle(textBaseline: TextBaseline.ideographic),
           child: widget.isFirst ? const LoginWindow() : const HomePage(),
         ),
+        onGenerateRoute: (settings) {
+          final uri = Uri.tryParse(settings.name ?? "");
+          if (uri != null &&
+              uri.path == "/" &&
+              uri.queryParameters.containsKey("source")) {
+            return MaterialPageRoute<void>(
+              settings: settings,
+              builder: (_) => DefaultTextStyle.merge(
+                style: const TextStyle(textBaseline: TextBaseline.ideographic),
+                child: widget.isFirst ? const LoginWindow() : const HomePage(),
+              ),
+            );
+          }
+          return null;
+        },
         builder: (context, widget) {
           Catcher2.addDefaultErrorWidget(
             showStacktrace: true,

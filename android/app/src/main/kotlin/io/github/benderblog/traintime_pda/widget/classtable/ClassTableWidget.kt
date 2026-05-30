@@ -6,7 +6,9 @@ package io.github.benderblog.traintime_pda.widget.classtable
 
 import es.antonborri.home_widget.HomeWidgetGlanceState
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
+import es.antonborri.home_widget.actionStartActivity
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,6 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import io.github.benderblog.traintime_pda.MainActivity
 
 class ClassTableWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*>
@@ -98,6 +101,31 @@ class ClassTableWidget : GlanceAppWidget() {
             "#9CCC65",
             "#66BB6A",
         ).map { it.toColorInt() }
+
+        private fun classTableUri(item: TimeLineItem? = null): String {
+            val builder = Uri.Builder()
+                .scheme("xdyou")
+                .authority("classtable")
+
+            if (item != null) {
+                fun appendOptional(name: String, value: String?) {
+                    if (value != null) builder.appendQueryParameter(name, value)
+                }
+
+                builder.appendQueryParameter("source", item.type.name.lowercase())
+                appendOptional("index", item.sourceIndex?.toString())
+                appendOptional("week", item.weekIndex?.toString())
+                appendOptional("day", item.dayIndex?.toString())
+                builder.appendQueryParameter("start", item.startTime.toString())
+                builder.appendQueryParameter("end", item.endTime.toString())
+                appendOptional("startPeriod", item.startPeriod?.toString())
+                appendOptional("stopPeriod", item.stopPeriod?.toString())
+                builder.appendQueryParameter("name", item.name)
+                builder.appendQueryParameter("place", item.place)
+            }
+
+            return builder.build().toString()
+        }
     }
 
     override suspend fun onDelete(context: Context, glanceId: GlanceId) {
@@ -202,7 +230,16 @@ class ClassTableWidget : GlanceAppWidget() {
                         modifier = GlanceModifier.fillMaxWidth().padding(top = 4.dp),
                         verticalAlignment = Alignment.Vertical.CenterVertically,
                     ) {
-                        Column(modifier = GlanceModifier.defaultWeight().padding(vertical = 4.dp)) {
+                        Column(
+                            modifier = GlanceModifier.defaultWeight()
+                                .clickable(
+                                    onClick = actionStartActivity<MainActivity>(
+                                        context,
+                                        Uri.parse(classTableUri())
+                                    )
+                                )
+                                .padding(vertical = 4.dp)
+                        ) {
                             Text(
                                 context.getString(R.string.widget_classtable_title),
                                 style = TextStyle(
@@ -360,11 +397,19 @@ class ClassTableWidget : GlanceAppWidget() {
 
     @Composable
     private fun ScheduleRow(item: TimeLineItem) {
+        val context = LocalContext.current
         val color = Color(indicatorColorList[item.colorIndex % indicatorColorList.size])
         val colorProvider = ColorProvider(color, color)
 
         Row(
-            modifier = GlanceModifier.fillMaxSize().padding(6.dp).cornerRadius(8.dp)
+            modifier = GlanceModifier.fillMaxSize()
+                .clickable(
+                    onClick = actionStartActivity<MainActivity>(
+                        context,
+                        Uri.parse(classTableUri(item))
+                    )
+                )
+                .padding(6.dp).cornerRadius(8.dp)
                 .background(color.copy(alpha = 0.15f)),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {

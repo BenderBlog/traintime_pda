@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/classtable/class_page/content_classtable_page.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
+import 'package:watermeter/page/classtable/classtable_launch_target.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
 class ClassTablePage extends StatefulWidget {
-  const ClassTablePage({super.key});
+  final ClassTableLaunchTarget? launchTarget;
+  const ClassTablePage({super.key, this.launchTarget});
 
   @override
   State<ClassTablePage> createState() => _ClassTablePageState();
@@ -37,7 +39,7 @@ class _ClassTablePageState extends State<ClassTablePage> {
   @override
   Widget build(BuildContext context) {
     return classTableState.haveClass
-        ? const ContentClassTablePage()
+        ? ContentClassTablePage(launchTarget: widget.launchTarget)
         : const EmptyClassTablePage();
   }
 }
