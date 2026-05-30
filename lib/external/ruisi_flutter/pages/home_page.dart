@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/pages/search_page.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../utils/branch_navigation.dart';
@@ -218,8 +217,9 @@ class _HomePageState extends State<HomePage>
           final topic = topics[i];
           return TopicListItem(
             topic: topic,
-            onTap: () =>
-                context.pushRuisiBranch(TopicDetailPage(tid: topic.tid)),
+            onTap: () => context.pushRuisiHomeTopicPreview(
+              TopicDetailPage(tid: topic.tid),
+            ),
           );
         },
       ),
