@@ -1186,6 +1186,7 @@ ruisi:
     login: 登錄
     logout: 退出登錄
     logged_out: 已退出登錄
+    submit: 提交
   about:
     title: 關於
     app_name: 睿思
@@ -1266,6 +1267,21 @@ ruisi:
     favorite_failure: 收藏失敗
     no_data: 無數據
     reply_hint: 寫回復...
+    vote:
+      single_select: 單選
+      multi_select: 多選，最多 {count} 項
+      title_prefix: 投票
+      count: "共 {count} 人參與"
+      open: 點此投票
+      sheet_title: 投票
+      max_selection: 最多只能選擇 {count} 項
+      not_selected: 你還沒有選擇
+      success: 投票成功
+      failure: 投票失敗
+      param_error: "投票失敗：參數錯誤"
+      already_voted: 您已經投過票，謝謝您的參與
+      expired: "該投票已過期或關閉"
+      ended: "投票已經結束"
   topic_list_item:
     sticky: 置頂
   forum_list:

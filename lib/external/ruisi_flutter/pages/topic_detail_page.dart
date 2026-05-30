@@ -9,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../models/post.dart';
+import '../models/vote.dart';
 import '../constants/urls.dart';
 import '../widgets/smiley_picker.dart';
 import '../../../repository/pick_file.dart';
@@ -297,9 +298,17 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                       onRefresh: () async => _load(page: _currentPage),
                       child: ListView.separated(
                         controller: _scrollCtrl,
-                        itemCount: (_detail.posts?.length ?? 0) + 2,
+                        itemCount:
+                            (_detail.posts?.length ?? 0) +
+                            2 +
+                            (_currentPage == 1 && _detail.vote != null ? 1 : 0),
                         separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (_, i) {
+                          // 投票卡片插在标题(index 0)之后
+                          final hasVote =
+                              _currentPage == 1 && _detail.vote != null;
+                          final voteOffset = hasVote ? 1 : 0;
+
                           if (i == 0) {
                             return Padding(
                               padding: const EdgeInsets.all(16),
@@ -309,14 +318,23 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                               ),
                             );
                           }
-                          if (i == (_detail.posts?.length ?? 0) + 1) {
+
+                          if (hasVote && i == 1) {
+                            return _VoteCard(
+                              vote: _detail.vote!,
+                              onVote: () => _showVoteSheet(_detail.vote!),
+                            );
+                          }
+
+                          final postIndex = i - 1 - voteOffset;
+                          if (postIndex >= (_detail.posts?.length ?? 0)) {
                             return _Pagination(
                               current: _currentPage,
                               total: _detail.totalPages ?? 1,
                               onPageChanged: (p) => _load(page: p),
                             );
                           }
-                          final post = _detail.posts[i - 1] as Post;
+                          final post = _detail.posts[postIndex] as Post;
                           return _PostTile(
                             post: post,
                             onReply: () {
@@ -472,6 +490,17 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               ),
       ),
     );
+  }
+
+  Future<void> _showVoteSheet(VoteData vote) async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => _VoteSheet(vote: vote),
+    );
+    if (result == true && mounted) {
+      _load(page: _currentPage);
+    }
   }
 }
 
@@ -818,6 +847,368 @@ class _IgnoreJsOpFileCard extends StatelessWidget {
         trailing: const Icon(Icons.download),
         onTap: () => launchUrl(Uri.parse(url)),
       ),
+    );
+  }
+}
+
+/// 投票摘要卡片（帖子详情页内嵌）
+///
+/// 三种状态：
+/// - canVote：显示选项列表 + "点此投票"按钮
+/// - voted：显示结果进度条 + 已投票提示
+/// - expired：显示过期提示
+class _VoteCard extends StatelessWidget {
+  final VoteData vote;
+  final VoidCallback onVote;
+
+  const _VoteCard({required this.vote, required this.onVote});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final typeText = vote.maxSelection > 1
+        ? FlutterI18n.translate(
+            context,
+            'ruisi.topic_detail.vote.multi_select',
+            translationParams: {'count': '${vote.maxSelection}'},
+          )
+        : FlutterI18n.translate(
+            context,
+            'ruisi.topic_detail.vote.single_select',
+          );
+
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题行
+          Row(
+            children: [
+              Icon(
+                Icons.how_to_vote,
+                size: 20,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${FlutterI18n.translate(context, 'ruisi.topic_detail.vote.title_prefix')} · $typeText',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            FlutterI18n.translate(
+              context,
+              'ruisi.topic_detail.vote.count',
+              translationParams: {'count': '${vote.voteCount}'},
+            ),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // 按状态分发内容
+          if (vote.status == VoteStatus.expired) ...[
+            // 选项标签（如果有）
+            for (final opt in vote.options)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(opt.label, style: theme.textTheme.bodyMedium),
+              ),
+            const SizedBox(height: 8),
+            Text(
+              FlutterI18n.translate(context, 'ruisi.topic_detail.vote.expired'),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ] else if (vote.status == VoteStatus.voted) ...[
+            // 已投票（投票进行中）：结果列表 + 已投票提示
+            for (final r in vote.results) _ResultRow(result: r),
+            const SizedBox(height: 8),
+            Text(
+              FlutterI18n.translate(
+                context,
+                'ruisi.topic_detail.vote.already_voted',
+              ),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+            ),
+          ] else if (vote.status == VoteStatus.endedWithResults) ...[
+            // 投票已结束 + 有结果：结果列表 + 已结束提示
+            for (final r in vote.results) _ResultRow(result: r),
+            const SizedBox(height: 8),
+            Text(
+              FlutterI18n.translate(context, 'ruisi.topic_detail.vote.ended'),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+            ),
+          ] else if (vote.status == VoteStatus.canVoteWithResults) ...[
+            // 可投票 + 显示分布：选项列表 + 结果 + 投票按钮
+            for (final r in vote.results) _ResultRow(result: r),
+            const SizedBox(height: 8),
+            FilledButton.tonal(
+              onPressed: onVote,
+              child: Text(
+                FlutterI18n.translate(context, 'ruisi.topic_detail.vote.open'),
+              ),
+            ),
+          ] else ...[
+            // 可投票：选项列表
+            for (final opt in vote.options)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(opt.label, style: theme.textTheme.bodyMedium),
+              ),
+            const SizedBox(height: 8),
+            FilledButton.tonal(
+              onPressed: onVote,
+              child: Text(
+                FlutterI18n.translate(context, 'ruisi.topic_detail.vote.open'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// 单行投票结果（进度条 + 百分比 + 票数）
+class _ResultRow extends StatelessWidget {
+  final VoteResultItem result;
+  const _ResultRow({required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = Color(int.parse(result.color.replaceFirst('#', '0xff')));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(result.label, style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: result.percent / 100,
+                    minHeight: 8,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation(color),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${result.percent.toStringAsFixed(2)}% (${result.count})',
+                style: theme.textTheme.bodySmall?.copyWith(color: color),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 投票底部弹窗（仅 canVote 状态使用）
+class _VoteSheet extends StatefulWidget {
+  final VoteData vote;
+  const _VoteSheet({required this.vote});
+
+  @override
+  State<_VoteSheet> createState() => _VoteSheetState();
+}
+
+class _VoteSheetState extends State<_VoteSheet> {
+  final Set<String> _selected = {};
+  bool _submitting = false;
+
+  bool get _isMulti => widget.vote.maxSelection > 1;
+
+  void _toggle(String value) {
+    setState(() {
+      if (_isMulti) {
+        if (_selected.contains(value)) {
+          _selected.remove(value);
+        } else if (_selected.length < widget.vote.maxSelection) {
+          _selected.add(value);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                FlutterI18n.translate(
+                  context,
+                  'ruisi.topic_detail.vote.max_selection',
+                  translationParams: {'count': '${widget.vote.maxSelection}'},
+                ),
+              ),
+            ),
+          );
+        }
+      } else {
+        _selected
+          ..clear()
+          ..add(value);
+      }
+    });
+  }
+
+  Future<void> _submit() async {
+    if (_selected.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            FlutterI18n.translate(
+              context,
+              'ruisi.topic_detail.vote.not_selected',
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      final (ok, err) = await RuisiController.i.api.submitVote(
+        widget.vote.actionUrl,
+        _selected.toList(),
+      );
+      if (!mounted) return;
+
+      if (ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              FlutterI18n.translate(context, 'ruisi.topic_detail.vote.success'),
+            ),
+          ),
+        );
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              err ??
+                  FlutterI18n.translate(
+                    context,
+                    'ruisi.topic_detail.vote.failure',
+                  ),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final typeText = _isMulti
+        ? FlutterI18n.translate(
+            context,
+            'ruisi.topic_detail.vote.multi_select',
+            translationParams: {'count': '${widget.vote.maxSelection}'},
+          )
+        : FlutterI18n.translate(
+            context,
+            'ruisi.topic_detail.vote.single_select',
+          );
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.5,
+      minChildSize: 0.3,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (ctx, scrollCtrl) {
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${FlutterI18n.translate(context, 'ruisi.topic_detail.vote.sheet_title')}($typeText)',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollCtrl,
+                itemCount: widget.vote.options.length,
+                itemBuilder: (_, idx) {
+                  final opt = widget.vote.options[idx];
+                  final checked = _selected.contains(opt.value);
+                  return _isMulti
+                      ? CheckboxListTile(
+                          value: checked,
+                          title: Text(opt.label),
+                          onChanged: (_) => _toggle(opt.value),
+                        )
+                      : RadioListTile<String>(
+                          value: opt.value,
+                          groupValue: _selected.isEmpty
+                              ? null
+                              : _selected.first,
+                          title: Text(opt.label),
+                          onChanged: (_) => _toggle(opt.value),
+                        );
+                },
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _submitting ? null : _submit,
+                    child: _submitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            FlutterI18n.translate(
+                              context,
+                              'ruisi.common.submit',
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
