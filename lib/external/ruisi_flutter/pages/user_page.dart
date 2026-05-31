@@ -15,17 +15,9 @@ import 'settings_page.dart';
 import 'about_page.dart';
 
 /// 用户页面（我的帖子、我的资料）
-class UserPage extends StatefulWidget {
-  final int initialTab;
+class UserPage extends StatelessWidget {
+  const UserPage({super.key});
 
-  const UserPage({super.key, this.initialTab = 0});
-
-  @override
-  State<UserPage> createState() => _UserPageState();
-}
-
-class _UserPageState extends State<UserPage>
-    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     RuisiService c = GetIt.instance<RuisiService>();
@@ -43,11 +35,12 @@ class _UserPageState extends State<UserPage>
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  ClipOval(
+                  ClipRRect(
+                    borderRadius: BorderRadiusGeometry.circular(12),
                     child: Image.network(
                       Urls.getAvaterUrl(c.settings.uid, size: 0),
-                      width: 28,
-                      height: 28,
+                      width: 60,
+                      height: 60,
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) =>
                           const Icon(Icons.person, size: 24),
@@ -109,6 +102,7 @@ class _UserPageState extends State<UserPage>
             onTap: () async {
               await c.logout();
               if (!context.mounted) return;
+              context.pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(

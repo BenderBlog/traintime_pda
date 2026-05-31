@@ -19,7 +19,7 @@ class FavoritesPage extends StatelessWidget {
       ),
       body: TopicListPage(
         getTopicList: (int page) =>
-            GetIt.instance<RuisiService>().api.getFavorites(),
+            GetIt.instance<RuisiService>().api.getFavorites(page: page),
       ),
     );
   }

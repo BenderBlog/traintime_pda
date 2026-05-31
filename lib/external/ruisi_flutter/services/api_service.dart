@@ -265,6 +265,18 @@ class ApiService {
     }
   }
 
+  Future<bool> validateSession() async {
+    _api.talker.info('正在验证会话有效性...');
+    final (ok, body) = await _api.get('${Urls.baseUrl}home.php?mod=space');
+    if (!ok) {
+      _api.talker.warning('会话验证请求失败');
+      return false;
+    }
+    final valid = !body.contains('请先登录后才能继续浏览');
+    _api.talker.info('会话有效性: $valid');
+    return valid;
+  }
+
   // =========================================================================
   // 板块列表
   // =========================================================================

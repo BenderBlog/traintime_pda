@@ -13,6 +13,18 @@ import '../repository/ruisi_api.dart';
 import '../services/api_service.dart';
 import '../services/settings_service.dart';
 
+/// 会话刷新结果
+enum SessionRefreshResult {
+  /// 刷新成功
+  success,
+
+  /// 需要验证码
+  needCaptcha,
+
+  /// 刷新失败（密码错误等），应回到登录页
+  failed,
+}
+
 class RuisiService {
   late final SettingsService settings;
   late final ApiService api;
@@ -33,6 +45,7 @@ class RuisiService {
   final loginError = ValueNotifier<String?>(null);
   final _isLoggedIn = ValueNotifier<bool>(false);
   bool get isLoggedIn => _isLoggedIn.value;
+  ValueNotifier<bool> get isLoggedInNotifier => _isLoggedIn;
   String? get username => settings.username;
 
   Future<bool> login(
@@ -71,6 +84,36 @@ class RuisiService {
     _isLoggedIn.value = false;
   }
 
+  Future<SessionRefreshResult> refreshSession() async {
+    final password = settings.password;
+    final uname = settings.username;
+    if (uname == null || password == null) {
+      talker.warning('无法刷新会话: 未保存用户名或密码');
+      return SessionRefreshResult.failed;
+    }
+
+    talker.info('尝试静默刷新会话...');
+    final (ok, error) = await api.login(uname, password);
+
+    if (ok) {
+      _isLoggedIn.value = true;
+      talker.info('会话刷新成功');
+      return SessionRefreshResult.success;
+    }
+
+    // 判断是否因为需要验证码而失败
+    // api.fetchLoginCaptchaHash() 返回非 null 表示服务端要求验证码
+    final captchaHash = await api.fetchLoginCaptchaHash();
+    if (captchaHash != null) {
+      talker.info('服务端要求验证码');
+      return SessionRefreshResult.needCaptcha;
+    }
+
+    // 其他失败（密码错误等）
+    talker.warning('会话刷新失败: $error');
+    return SessionRefreshResult.failed;
+  }
+
   final forumGroups = signal<List<ForumGroup>>([]);
   final forumLoading = signal(false);
   Future<void> loadForums() async {
@@ -79,6 +122,7 @@ class RuisiService {
     forumLoading.value = false;
   }
 
+  /*
   final replyNotifications = signal<List<ReplyNotification>>([]);
   final atNotifications = signal<List<AtNotification>>([]);
   final messageLoading = signal(false);
@@ -96,6 +140,7 @@ class RuisiService {
 
     messageLoading.value = false;
   }
+  */
 
   String? _searchId;
   Future<List<Topic>> search(String keyword, int page) async {
