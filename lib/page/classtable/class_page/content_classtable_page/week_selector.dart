@@ -29,12 +29,12 @@ class ClassTableWeekSelector extends StatelessWidget {
             behavior: HitTestBehavior.translucent,
             onTapUp: (details) =>
                 pagingController.chooseWeekAt(details.localPosition.dx),
-            child: PageView.builder(
-              padEnds: false,
+            child: ListView.builder(
               controller: pagingController.rowController,
               physics: const ClampingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               itemCount: classTableState.semesterLength,
+              itemExtent: weekButtonWidth + 2 * weekButtonHorizontalPadding,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
                   margin: const EdgeInsets.symmetric(

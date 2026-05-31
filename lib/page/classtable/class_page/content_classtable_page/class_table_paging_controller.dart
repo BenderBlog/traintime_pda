@@ -10,9 +10,9 @@ class ClassTablePagingController extends ChangeNotifier {
   ClassTablePagingController({required this.isMounted});
 
   late PageController pageController;
-  late PageController rowController;
+  late ScrollController rowController;
   ClassTableWidgetState? _state;
-  double? _viewportFraction;
+  double? _viewportWidth;
   int? _lastAnimatedWeek;
   int _animationToken = 0;
   bool _skipNextContentPageAnimation = false;
@@ -32,11 +32,7 @@ class ClassTablePagingController extends ChangeNotifier {
       _state!.addListener(_switchPage);
     }
 
-    final viewportFraction =
-        (weekButtonWidth + 2 * weekButtonHorizontalPadding) / viewportWidth;
-    if (!stateChanged &&
-        _hasControllers &&
-        _viewportFraction == viewportFraction) {
+    if (!stateChanged && _hasControllers && _viewportWidth == viewportWidth) {
       return;
     }
 
@@ -49,12 +45,11 @@ class ClassTablePagingController extends ChangeNotifier {
       initialPage: state.chosenWeek,
       keepPage: true,
     );
-    rowController = PageController(
-      initialPage: state.chosenWeek,
-      viewportFraction: viewportFraction,
-      keepPage: true,
+    _viewportWidth = viewportWidth;
+    rowController = ScrollController(
+      initialScrollOffset: _weekScrollOffset(state.chosenWeek),
+      keepScrollOffset: true,
     );
-    _viewportFraction = viewportFraction;
     _lastAnimatedWeek = state.chosenWeek;
     _animationToken++;
     _setTopRowLocked(false);
@@ -69,6 +64,18 @@ class ClassTablePagingController extends ChangeNotifier {
       rowController.dispose();
     }
     super.dispose();
+  }
+
+  double _weekScrollOffset(int week) {
+    final viewportWidth = _viewportWidth;
+    if (viewportWidth == null) {
+      return 0;
+    }
+
+    final itemWidth = weekButtonWidth + 2 * weekButtonHorizontalPadding;
+    final rawOffset = week * itemWidth - (viewportWidth - itemWidth) / 2;
+    final maxOffset = state.semesterLength * itemWidth - viewportWidth;
+    return rawOffset.clamp(0.0, maxOffset > 0 ? maxOffset : 0.0).toDouble();
   }
 
   void chooseWeek(int index) {
@@ -126,8 +133,8 @@ class ClassTablePagingController extends ChangeNotifier {
     _setTopRowLocked(true);
 
     final animations = <Future<void>>[
-      rowController.animateToPage(
-        targetWeek,
+      rowController.animateTo(
+        _weekScrollOffset(targetWeek),
         curve: Curves.easeInOut,
         duration: const Duration(milliseconds: changePageTime),
       ),
