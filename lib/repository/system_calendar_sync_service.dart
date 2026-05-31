@@ -6,10 +6,7 @@ import 'dart:convert';
 
 import 'package:device_calendar_plus/device_calendar_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/other_experiment_controller.dart';
-import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/model/schedule_snapshot.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -195,7 +192,8 @@ List<CalendarEventDraft> buildCalendarEvents({
 }
 
 String buildICalendarString(List<CalendarEventDraft> events) {
-  String toReturn = 'BEGIN:VCALENDAR\n'
+  String toReturn =
+      'BEGIN:VCALENDAR\n'
       'CALSCALE:GREGORIAN\n'
       'BEGIN:VTIMEZONE\n'
       'TZID:Asia/Shanghai\n'
@@ -245,17 +243,13 @@ String buildICalendarString(List<CalendarEventDraft> events) {
 }
 
 class SystemCalendarSyncService {
+  final ScheduleSnapshot snapshotData;
   final DeviceCalendar deviceCalendar = DeviceCalendar();
 
-  ClassTableController get classTableController => ClassTableController.i;
-  ExamController get examController => ExamController.i;
-  PhysicsExperimentController get physicsExperimentController =>
-      PhysicsExperimentController.i;
-  OtherExperimentController get otherExperimentController =>
-      OtherExperimentController.i;
+  SystemCalendarSyncService({required ScheduleSnapshot snapshot})
+    : snapshotData = snapshot;
 
-  String get currentSemesterCode =>
-      classTableController.classTableComputedSignal.value.semesterCode;
+  String get currentSemesterCode => snapshotData.classTableData.semesterCode;
 
   String get savedCalendarId =>
       preference.getString(preference.Preference.systemCalendarId);
@@ -266,20 +260,17 @@ class SystemCalendarSyncService {
   String get calendarName =>
       buildExportedClassTableCalendarName(currentSemesterCode);
 
-  List<ExperimentData> get experiments => [
-    ...physicsExperimentController.physicsExperiments.value,
-    ...otherExperimentController.otherExperiments.value,
-  ];
+  List<ExperimentData> get experiments => snapshotData.experiments;
 
   List<CalendarEventDraft> get events => buildCalendarEvents(
-    classTableData: classTableController.classTableComputedSignal.value,
-    subjects: examController.subjects.value,
+    classTableData: snapshotData.classTableData,
+    subjects: snapshotData.subjects,
     experiments: experiments,
   );
 
   String get snapshot => buildSystemCalendarSnapshot(
-    classTableData: classTableController.classTableComputedSignal.value,
-    subjects: examController.subjects.value,
+    classTableData: snapshotData.classTableData,
+    subjects: snapshotData.subjects,
     experiments: experiments,
   );
 
@@ -299,7 +290,7 @@ class SystemCalendarSyncService {
       (didSemesterChangeSinceLastBinding ||
           preference.getString(preference.Preference.systemCalendarSnapshot) !=
               snapshot) &&
-      classTableController.hasValidClassInfo.value;
+      snapshotData.hasValidClassInfo;
 
   Future<bool> _ensureCalendarPermission({
     required bool requestPermissionsIfNeeded,
@@ -539,23 +530,5 @@ class SystemCalendarSyncService {
       log.handle(e, s);
       return false;
     }
-  }
-}
-
-/// Auto sync only when the exported payload changed and the bound calendar
-/// still exists.
-Future<void> maybeAutoSyncSystemCalendar() async {
-  try {
-    final service = SystemCalendarSyncService();
-    if (!service.canAutoSync) {
-      return;
-    }
-
-    await service.syncSystemCalendar(
-      requestPermissionsIfNeeded: false,
-      onlyIfCalendarExists: true,
-    );
-  } catch (e, s) {
-    log.handle(e, s);
   }
 }

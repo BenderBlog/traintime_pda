@@ -16,6 +16,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 
 class MainPage extends StatefulWidget {
   final Function()? changePage;
@@ -188,7 +189,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   setState(() {
                     _editMode = true;
                     _shakeAmplitudes.clear();
-      _fadingEntries.clear();
+                    _fadingEntries.clear();
                     for (final entry in _allEntries) {
                       _shakeAmplitudes[entry.id] =
                           0.7 + Random().nextDouble() * 0.3;
@@ -210,9 +211,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           await update(
             context: context,
             sliderCaptcha: (String cookieStr) {
-              return SliderCaptchaClientProvider(
-                cookie: cookieStr,
-              ).solve(context);
+              return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+                manualSolver: (provider) =>
+                    solveSliderCaptchaManually(context, provider),
+              );
             },
           );
           if (context.mounted) {
@@ -253,59 +255,63 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                       opacity: _fadingEntries.contains(entry.id) ? 0.0 : 1.0,
                       child: _editMode
                           ? _buildShake(
-                            entry.id,
-                            Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                DraggableCard(
-                                  id: entry.id,
-                                  onSwap: _onSwap,
-                                  feedbackWidth: entry.gridSpan * colWidth,
-                                  feedbackHeight: 80,
-                                  child: entry.builder(context, _editMode),
-                                ),
-                                // 隐藏按钮：右上角（课程表不显示）
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() => _fadingEntries.add(entry.id));
-                                      Future.delayed(
-                                        const Duration(milliseconds: 300),
-                                        () async {
-                                          await hideEntry(entry.id);
-                                          _fadingEntries.remove(entry.id);
-                                          if (context.mounted) {
-                                            setState(() =>
-                                                _allEntries = getOrderedEntries());
-                                          }
-                                        },
-                                      );
-                                    },
-                                    child: ClipOval(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.surfaceContainerHighest,
-                                        ),
-                                        padding: const EdgeInsets.all(4),
-                                        child: Icon(
-                                          Icons.close,
-                                          size: 16,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                              entry.id,
+                              Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  DraggableCard(
+                                    id: entry.id,
+                                    onSwap: _onSwap,
+                                    feedbackWidth: entry.gridSpan * colWidth,
+                                    feedbackHeight: 80,
+                                    child: entry.builder(context, _editMode),
+                                  ),
+                                  // 隐藏按钮：右上角（课程表不显示）
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(
+                                          () => _fadingEntries.add(entry.id),
+                                        );
+                                        Future.delayed(
+                                          const Duration(milliseconds: 300),
+                                          () async {
+                                            await hideEntry(entry.id);
+                                            _fadingEntries.remove(entry.id);
+                                            if (context.mounted) {
+                                              setState(
+                                                () => _allEntries =
+                                                    getOrderedEntries(),
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                      child: ClipOval(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceContainerHighest,
+                                          ),
+                                          padding: const EdgeInsets.all(4),
+                                          child: Icon(
+                                            Icons.close,
+                                            size: 16,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : entry.builder(context, _editMode),
+                                ],
+                              ),
+                            )
+                          : entry.builder(context, _editMode),
                     ),
                   ),
               ],

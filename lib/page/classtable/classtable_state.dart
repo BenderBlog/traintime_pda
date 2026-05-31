@@ -13,6 +13,7 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/controller/schedule_snapshot_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -297,7 +298,9 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Output to System Calendar
   Future<bool> outputToCalendar(Future<void> Function() showDialog) async {
-    return await SystemCalendarSyncService().syncSystemCalendar(
+    return await SystemCalendarSyncService(
+      snapshot: currentScheduleSnapshot(),
+    ).syncSystemCalendar(
       requestPermissionsIfNeeded: true,
       onlyIfCalendarExists: false,
       showDialog: showDialog,

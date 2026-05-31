@@ -28,6 +28,7 @@ import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:watermeter/controller/schedule_snapshot_controller.dart';
 
 void main() async {
   // Make sure the library is initialized.
@@ -64,6 +65,8 @@ void main() async {
   String password = preference.getString(preference.Preference.idsPassword);
   bool isFirst = username.isEmpty || password.isEmpty;
   log.info("isFirstLogin: $isFirst");
+
+  configureCourseReminderApplicationBindings();
 
   Catcher2(
     rootWidget: MyApp(isFirst: isFirst),

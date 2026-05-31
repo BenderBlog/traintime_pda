@@ -26,6 +26,7 @@ import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class PageInformation {
@@ -87,7 +88,10 @@ class _HomePageMasterState extends State<HomePageMaster>
         context: context,
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
-          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+            manualSolver: (provider) =>
+                solveSliderCaptchaManually(context, provider),
+          );
         },
       );
     } finally {
@@ -204,9 +208,10 @@ class _HomePageMasterState extends State<HomePageMaster>
           context: context,
           forceRetryLogin: true,
           sliderCaptcha: (String cookieStr) {
-            return SliderCaptchaClientProvider(
-              cookie: cookieStr,
-            ).solve(context);
+            return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+              manualSolver: (provider) =>
+                  solveSliderCaptchaManually(context, provider),
+            );
           },
         );
       }

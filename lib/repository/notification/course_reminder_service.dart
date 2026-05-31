@@ -9,10 +9,7 @@ import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/other_experiment_controller.dart';
-import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/model/schedule_snapshot.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -20,8 +17,10 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/routing/routes.dart';
 import 'package:watermeter/generated/non_ui_i18n.g.dart';
+
+typedef ScheduleSnapshotProvider = ScheduleSnapshot Function();
+typedef CourseReminderTapHandler = void Function(NotificationResponse response);
 
 /// Course Reminder Service implementation
 class CourseReminderService extends NotificationService
@@ -59,6 +58,18 @@ class CourseReminderService extends NotificationService
   static const int _notificationRandomMin = 10;
   static const int _notificationRandomRange = 90;
   final Random _random = Random();
+  ScheduleSnapshotProvider? _scheduleSnapshotProvider;
+  CourseReminderTapHandler? _onCourseReminderTap;
+
+  void configureApplicationBindings({
+    ScheduleSnapshotProvider? scheduleSnapshotProvider,
+    CourseReminderTapHandler? onCourseReminderTap,
+  }) {
+    _scheduleSnapshotProvider = scheduleSnapshotProvider;
+    _onCourseReminderTap = onCourseReminderTap;
+  }
+
+  ScheduleSnapshot? get _snapshot => _scheduleSnapshotProvider?.call();
 
   // Configuration getters - encapsulate preference access
   bool get isEnabled =>
@@ -235,17 +246,13 @@ class CourseReminderService extends NotificationService
         return;
       }
 
-      final navigator = preference.debuggerKey.currentState;
-      if (navigator != null) {
-        navigator.push(Routes.resolveRoute(Routes.classTable));
-        log.info(
-          '[CourseReminderService] [handleNotificationTap] Navigated to class table',
-        );
-      } else {
+      if (_onCourseReminderTap == null) {
         log.warning(
-          '[CourseReminderService] [handleNotificationTap] Navigator not available',
+          '[CourseReminderService] [handleNotificationTap] Tap handler not configured',
         );
+        return;
       }
+      _onCourseReminderTap!(response);
     } catch (e, stackTrace) {
       log.error(
         '[CourseReminderService] [handleNotificationTap] Failed to parse notification payload',
@@ -355,23 +362,11 @@ class CourseReminderService extends NotificationService
     return locale;
   }
 
-  bool get hasSchedulableReminderSourceData {
-    final classTableData =
-        ClassTableController.i.classTableComputedSignal.value;
-    final hasClassTableData = classTableData.termStartDay.isNotEmpty;
-
-    final hasExperimentData =
-        PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
-        OtherExperimentController.i.otherExperiments.value.isNotEmpty;
-
-    final hasExamData = ExamController.i.subjects.value.any(
-      (subject) => subject.startTime != null,
-    );
-
-    return hasClassTableData || hasExperimentData || hasExamData;
-  }
+  bool get hasSchedulableReminderSourceData =>
+      _snapshot?.hasSchedulableReminderSourceData ?? false;
 
   Future<void> _scheduleNotificationFromCourseData({
+    required ScheduleSnapshot snapshot,
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
@@ -379,8 +374,7 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [scheduleNotificationsFromCourseData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
     try {
-      final controller = ClassTableController.i;
-      final ClassTableData data = controller.classTableComputedSignal.value;
+      final ClassTableData data = snapshot.classTableData;
 
       if (data.termStartDay.isEmpty) {
         log.warning(
@@ -392,11 +386,11 @@ class CourseReminderService extends NotificationService
       DateTime semesterStartDate = DateTime.parse(data.termStartDay);
       DateTime now = DateTime.now();
 
-      int currentWeek = controller.getCurrentWeek(now);
+      int currentWeek = snapshot.getCurrentWeek(now);
       if (currentWeek < 0) currentWeek = 0;
 
       DateTime endDate = now.add(Duration(days: daysToSchedule));
-      int endWeek = controller.getCurrentWeek(endDate);
+      int endWeek = snapshot.getCurrentWeek(endDate);
       if (endWeek >= data.semesterLength) {
         endWeek = data.semesterLength - 1;
       }
@@ -499,6 +493,7 @@ class CourseReminderService extends NotificationService
   }
 
   Future<void> _scheduleNotificationFromExperimentData({
+    required ScheduleSnapshot snapshot,
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
@@ -506,11 +501,7 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [scheduleNotificationsFromExperimentData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
     try {
-      final classTableController = ClassTableController.i;
-      final List<ExperimentData> experiments = [
-        ...PhysicsExperimentController.i.physicsExperiments.value,
-        ...OtherExperimentController.i.otherExperiments.value,
-      ];
+      final List<ExperimentData> experiments = snapshot.experiments;
 
       if (experiments.isEmpty) {
         log.warning(
@@ -559,9 +550,7 @@ class CourseReminderService extends NotificationService
           }
 
           // Calculate week index based on experiment start time
-          int weekIndex = classTableController.getCurrentWeek(
-            experimentStartTime,
-          );
+          int weekIndex = snapshot.getCurrentWeek(experimentStartTime);
           if (weekIndex < 0) weekIndex = 0;
 
           int weekday = experimentStartTime.weekday; // 1=Mon, 7=Sun
@@ -632,6 +621,7 @@ class CourseReminderService extends NotificationService
   }
 
   Future<void> _scheduleNotificationFromExamData({
+    required ScheduleSnapshot snapshot,
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
@@ -639,8 +629,7 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [scheduleNotificationsFromExamData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
     try {
-      final classTableController = ClassTableController.i;
-      final List<Subject> exams = ExamController.i.subjects.value
+      final List<Subject> exams = snapshot.subjects
           .where((subject) => subject.startTime != null)
           .toList();
 
@@ -671,7 +660,7 @@ class CourseReminderService extends NotificationService
           continue;
         }
 
-        int weekIndex = classTableController.getCurrentWeek(examStartTime);
+        int weekIndex = snapshot.getCurrentWeek(examStartTime);
         if (weekIndex < 0) weekIndex = 0;
 
         final weekday = examStartTime.weekday;
@@ -732,22 +721,34 @@ class CourseReminderService extends NotificationService
 
   /// Schedule notification by the course data (includes experiments and exams)
   Future<void> scheduleNotificationsFromCourseData({
+    ScheduleSnapshot? snapshot,
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
     try {
+      final dataSnapshot = snapshot ?? _snapshot;
+      if (dataSnapshot == null) {
+        log.warning(
+          '[CourseReminderService] [scheduleNotificationsFromCourseData] Schedule snapshot provider not configured',
+        );
+        return;
+      }
+
       // Schedule course, experiment and exam notifications in parallel
       await Future.wait([
         _scheduleNotificationFromCourseData(
+          snapshot: dataSnapshot,
           daysToSchedule: daysToSchedule,
           minutesBefore: minutesBefore,
         ),
         if (enableExperimentNotifications)
           _scheduleNotificationFromExperimentData(
+            snapshot: dataSnapshot,
             daysToSchedule: daysToSchedule,
             minutesBefore: minutesBefore,
           ),
         _scheduleNotificationFromExamData(
+          snapshot: dataSnapshot,
           daysToSchedule: daysToSchedule,
           minutesBefore: minutesBefore,
         ),

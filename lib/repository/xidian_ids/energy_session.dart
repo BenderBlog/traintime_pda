@@ -13,7 +13,7 @@ import 'package:time/time.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -251,7 +251,7 @@ class EnergySession extends IDSSession {
           "redirect=https://ignypt.xidian.edu.cn/revenueH5/login?"
           "opcode=MPAY&appid=200260318155520600&state=12312312312312&qrcode=0",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     var response = await dio.get(location);

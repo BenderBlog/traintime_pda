@@ -10,12 +10,12 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/controller/schedule_snapshot_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -95,7 +95,8 @@ Future<void> update({
   }
 
   // Sync login state to iOS widget
-  final hasCredential = preference.getString(preference.Preference.idsAccount).isNotEmpty &&
+  final hasCredential =
+      preference.getString(preference.Preference.idsAccount).isNotEmpty &&
       preference.getString(preference.Preference.idsPassword).isNotEmpty;
   await syncWidgetLoginState(hasCredential);
 }
