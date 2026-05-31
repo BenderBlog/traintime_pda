@@ -8,7 +8,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/controller/schedule_snapshot_controller.dart';
+import 'package:watermeter/app/schedule_orchestrator.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/external/ruisi_flutter/controller/ruisi_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';

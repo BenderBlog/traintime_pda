@@ -13,7 +13,7 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/controller/schedule_snapshot_controller.dart';
+import 'package:watermeter/app/schedule_orchestrator.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';

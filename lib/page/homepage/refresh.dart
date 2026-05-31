@@ -10,7 +10,7 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/controller/schedule_snapshot_controller.dart';
+import 'package:watermeter/app/schedule_orchestrator.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/repository/logger.dart';
