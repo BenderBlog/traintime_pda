@@ -2,14 +2,25 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 import 'controller/ruisi_controller.dart';
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 
 class RuisiApp extends StatefulWidget {
-  const RuisiApp({super.key});
+  final SharedPreferencesWithCache prefs;
+  final String cookiePath;
+  final Talker talker;
+  const RuisiApp({
+    super.key,
+    required this.prefs,
+    required this.cookiePath,
+    required this.talker,
+  });
 
   @override
   State<RuisiApp> createState() => _RuisiAppState();
@@ -21,12 +32,22 @@ class _RuisiAppState extends State<RuisiApp>
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    super.initState();
+    GetIt.instance.registerSingleton<RuisiService>(
+      RuisiService(
+        prefs: widget.prefs,
+        cookiePath: widget.cookiePath,
+        talker: widget.talker,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Watch((context) {
-      return RuisiController.i.isLoggedIn
-          ? const HomePage()
-          : const LoginPage();
-    });
+    return GetIt.instance<RuisiService>().isLoggedIn
+        ? const HomePage()
+        : const LoginPage();
   }
 }

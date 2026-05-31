@@ -3,13 +3,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:get_it/get_it.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../models/post_page_meta.dart';
 import '../constants/urls.dart';
 import '../../../repository/pick_file.dart';
-import 'login_page.dart';
 import '../widgets/smiley_picker.dart';
 
 /// 发帖页面
@@ -32,19 +31,12 @@ class _NewPostPageState extends State<NewPostPage> {
   PostPageMeta? _meta;
   int? _selectedTypeId;
   final List<_UploadedAttachment> _attachments = [];
+  RuisiService c = GetIt.instance<RuisiService>();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final c = RuisiController.i;
-      if (!c.isLoggedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-        );
-        return;
-      }
       if (c.forumGroups.value.isEmpty) {
         c.loadForums();
       }
@@ -66,7 +58,7 @@ class _NewPostPageState extends State<NewPostPage> {
     });
 
     try {
-      final meta = await RuisiController.i.api.loadNewPostMeta(fid);
+      final meta = await c.api.loadNewPostMeta(fid);
       if (!mounted) return;
       setState(() {
         _meta = meta;
@@ -120,7 +112,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
     setState(() => _uploading = true);
     try {
-      final (ok, result) = await RuisiController.i.api.ruisiApi.uploadImage(
+      final (ok, result) = await c.api.ruisiApi.uploadImage(
         Urls.uploadImageUrl,
         uid: _meta!.uploadUid!,
         hash: _meta!.uploadHash!,
@@ -133,7 +125,11 @@ class _NewPostPageState extends State<NewPostPage> {
       final thumbnailUrl = parts.length > 1 ? parts[1] : '';
       setState(
         () => _attachments.add(
-          _UploadedAttachment(aid: aid, name: file.name, thumbnailUrl: thumbnailUrl),
+          _UploadedAttachment(
+            aid: aid,
+            name: file.name,
+            thumbnailUrl: thumbnailUrl,
+          ),
         ),
       );
     } catch (e) {
@@ -148,9 +144,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
   Future<void> _removeAttachment(_UploadedAttachment attachment) async {
     try {
-      await RuisiController.i.api.ruisiApi.post(
-        Urls.deleteUploadedUrl(attachment.aid),
-      );
+      await c.api.ruisiApi.post(Urls.deleteUploadedUrl(attachment.aid));
     } catch (_) {
       // 忽略删除失败，保持列表同步即可
     }
@@ -159,194 +153,189 @@ class _NewPostPageState extends State<NewPostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final c = RuisiController.i;
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, 'ruisi.post.title')),
-          actions: [
-            TextButton(
-              onPressed: _submitting || _uploading || _metaLoading
-                  ? null
-                  : _submit,
-              child: _submitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(FlutterI18n.translate(context, 'ruisi.post.publish')),
-            ),
-          ],
-        ),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // 板块选择
-              DropdownButtonFormField<int>(
-                initialValue: _selectedFid,
-                decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    'ruisi.post.select_forum',
-                  ),
-                  border: const OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(FlutterI18n.translate(context, 'ruisi.post.title')),
+        actions: [
+          TextButton(
+            onPressed: _submitting || _uploading || _metaLoading
+                ? null
+                : _submit,
+            child: _submitting
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(FlutterI18n.translate(context, 'ruisi.post.publish')),
+          ),
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // 板块选择
+            DropdownButtonFormField<int>(
+              initialValue: _selectedFid,
+              decoration: InputDecoration(
+                labelText: FlutterI18n.translate(
+                  context,
+                  'ruisi.post.select_forum',
                 ),
-                items: c.forumGroups.value
-                    .expand((g) => g.forums)
+                border: const OutlineInputBorder(),
+              ),
+              items: c.forumGroups.value
+                  .expand((g) => g.forums)
+                  .map(
+                    (f) => DropdownMenuItem(value: f.fid, child: Text(f.name)),
+                  )
+                  .toList(),
+              onChanged: (v) {
+                setState(() => _selectedFid = v);
+                if (v != null) _loadMeta(v);
+              },
+              validator: (v) => v == null
+                  ? FlutterI18n.translate(
+                      context,
+                      'ruisi.post.select_forum_hint',
+                    )
+                  : null,
+            ),
+            const SizedBox(height: 16),
+
+            if (_metaLoading) const LinearProgressIndicator(minHeight: 2),
+            if (_meta != null && _meta!.typeOptions.isNotEmpty) ...[
+              DropdownButtonFormField<int>(
+                initialValue: _selectedTypeId,
+                items: _meta!.typeOptions
                     .map(
-                      (f) =>
-                          DropdownMenuItem(value: f.fid, child: Text(f.name)),
+                      (t) => DropdownMenuItem(value: t.id, child: Text(t.name)),
                     )
                     .toList(),
-                onChanged: (v) {
-                  setState(() => _selectedFid = v);
-                  if (v != null) _loadMeta(v);
-                },
-                validator: (v) => v == null
-                    ? FlutterI18n.translate(
-                        context,
-                        'ruisi.post.select_forum_hint',
-                      )
-                    : null,
+                onChanged: (v) => setState(() => _selectedTypeId = v),
+                decoration: const InputDecoration(
+                  labelText: '主题分类',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 16),
+            ],
 
-              if (_metaLoading) const LinearProgressIndicator(minHeight: 2),
-              if (_meta != null && _meta!.typeOptions.isNotEmpty) ...[
-                DropdownButtonFormField<int>(
-                  initialValue: _selectedTypeId,
-                  items: _meta!.typeOptions
-                      .map(
-                        (t) =>
-                            DropdownMenuItem(value: t.id, child: Text(t.name)),
-                      )
-                      .toList(),
-                  onChanged: (v) => setState(() => _selectedTypeId = v),
-                  decoration: const InputDecoration(
-                    labelText: '主题分类',
-                    border: OutlineInputBorder(),
+            // 标题
+            TextFormField(
+              controller: _subjectCtrl,
+              decoration: InputDecoration(
+                labelText: FlutterI18n.translate(context, 'ruisi.post.subject'),
+                border: const OutlineInputBorder(),
+              ),
+              validator: (v) => (v == null || v.isEmpty)
+                  ? FlutterI18n.translate(context, 'ruisi.post.subject_hint')
+                  : null,
+            ),
+            const SizedBox(height: 16),
+
+            // 内容
+            TextFormField(
+              controller: _contentCtrl,
+              decoration: InputDecoration(
+                labelText: FlutterI18n.translate(context, 'ruisi.post.content'),
+                border: const OutlineInputBorder(),
+                alignLabelWithHint: true,
+              ),
+              maxLines: 12,
+              validator: (v) => (v == null || v.isEmpty)
+                  ? FlutterI18n.translate(context, 'ruisi.post.content_hint')
+                  : null,
+            ),
+            const SizedBox(height: 8),
+
+            // 表情工具栏
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    _showSmiley
+                        ? Icons.keyboard
+                        : Icons.emoji_emotions_outlined,
                   ),
+                  tooltip: FlutterI18n.translate(context, 'ruisi.post.smiley'),
+                  onPressed: () => setState(() => _showSmiley = !_showSmiley),
                 ),
-                const SizedBox(height: 16),
+                IconButton(
+                  icon: _uploading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.image_outlined),
+                  tooltip: '上传图片',
+                  onPressed: _uploading || !_canUpload
+                      ? null
+                      : _pickAndUploadImage,
+                ),
               ],
+            ),
 
-              // 标题
-              TextFormField(
-                controller: _subjectCtrl,
-                decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    'ruisi.post.subject',
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-                validator: (v) => (v == null || v.isEmpty)
-                    ? FlutterI18n.translate(context, 'ruisi.post.subject_hint')
-                    : null,
-              ),
-              const SizedBox(height: 16),
-
-              // 内容
-              TextFormField(
-                controller: _contentCtrl,
-                decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    'ruisi.post.content',
-                  ),
-                  border: const OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-                maxLines: 12,
-                validator: (v) => (v == null || v.isEmpty)
-                    ? FlutterI18n.translate(context, 'ruisi.post.content_hint')
-                    : null,
-              ),
-              const SizedBox(height: 8),
-
-              // 表情工具栏
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      _showSmiley
-                          ? Icons.keyboard
-                          : Icons.emoji_emotions_outlined,
-                    ),
-                    tooltip: FlutterI18n.translate(
-                      context,
-                      'ruisi.post.smiley',
-                    ),
-                    onPressed: () => setState(() => _showSmiley = !_showSmiley),
-                  ),
-                  IconButton(
-                    icon: _uploading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.image_outlined),
-                    tooltip: '上传图片',
-                    onPressed: _uploading || !_canUpload
-                        ? null
-                        : _pickAndUploadImage,
-                  ),
-                ],
-              ),
-
-              // 表情面板
-              if (_showSmiley) SmileyPicker(onSelected: _insertSmiley),
-              if (_attachments.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _attachments
-                        .map(
-                          (a) => Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: a.thumbnailUrl.isNotEmpty
-                                    ? Image.network(
-                                        a.thumbnailUrl,
-                                        width: 72,
-                                        height: 72,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Container(
-                                        width: 72,
-                                        height: 72,
-                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                        alignment: Alignment.center,
-                                        child: Text(a.name, textAlign: TextAlign.center),
+            // 表情面板
+            if (_showSmiley) SmileyPicker(onSelected: _insertSmiley),
+            if (_attachments.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _attachments
+                      .map(
+                        (a) => Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: a.thumbnailUrl.isNotEmpty
+                                  ? Image.network(
+                                      a.thumbnailUrl,
+                                      width: 72,
+                                      height: 72,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      width: 72,
+                                      height: 72,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerHighest,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        a.name,
+                                        textAlign: TextAlign.center,
                                       ),
-                              ),
-                              GestureDetector(
-                                onTap: () => _removeAttachment(a),
-                                child: const CircleAvatar(
-                                  radius: 10,
-                                  backgroundColor: Colors.black54,
-                                  child: Icon(Icons.close, size: 12, color: Colors.white),
+                                    ),
+                            ),
+                            GestureDetector(
+                              onTap: () => _removeAttachment(a),
+                              child: const CircleAvatar(
+                                radius: 10,
+                                backgroundColor: Colors.black54,
+                                child: Icon(
+                                  Icons.close,
+                                  size: 12,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ],
-                          ),
-                        )
-                        .toList(),
-                  ),
+                            ),
+                          ],
+                        ),
+                      )
+                      .toList(),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
-      );
-    });
+      ),
+    );
   }
 
   void _insertSmiley(String value) {
@@ -368,7 +357,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
     setState(() => _submitting = true);
 
-    final (ok, error) = await RuisiController.i.api.newPost(
+    final (ok, error) = await c.api.newPost(
       _selectedFid!,
       _subjectCtrl.text,
       _contentCtrl.text,
@@ -404,5 +393,9 @@ class _UploadedAttachment {
   final String name;
   final String thumbnailUrl;
 
-  const _UploadedAttachment({required this.aid, required this.name, this.thumbnailUrl = ''});
+  const _UploadedAttachment({
+    required this.aid,
+    required this.name,
+    this.thumbnailUrl = '',
+  });
 }

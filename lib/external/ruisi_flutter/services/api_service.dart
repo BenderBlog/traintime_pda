@@ -948,8 +948,9 @@ class ApiService {
         if (pbr == null) continue;
 
         final style = pbr.attributes['style'] ?? '';
-        final colorMatch =
-            RegExp(r'background-color:\s*(#[0-9a-fA-F]+)').firstMatch(style);
+        final colorMatch = RegExp(
+          r'background-color:\s*(#[0-9a-fA-F]+)',
+        ).firstMatch(style);
         final color = colorMatch?.group(1) ?? '#999999';
 
         final resultCells = nextRow.querySelectorAll('td');
@@ -970,8 +971,14 @@ class ApiService {
           }
           break;
         }
-        items.add(VoteResultItem(
-          label: label, percent: percent, count: count, color: color));
+        items.add(
+          VoteResultItem(
+            label: label,
+            percent: percent,
+            count: count,
+            color: color,
+          ),
+        );
       }
       return items;
     }
@@ -987,7 +994,9 @@ class ApiService {
       var optionRows = form.querySelectorAll('tr.ptl');
       if (optionRows.isEmpty) {
         optionRows = tableRows
-            .where((r) => r.querySelector('input[name="pollanswers[]"]') != null)
+            .where(
+              (r) => r.querySelector('input[name="pollanswers[]"]') != null,
+            )
             .toList();
       }
       final options = <VoteOption>[];
@@ -1031,8 +1040,8 @@ class ApiService {
 
     // 2. 无 input + 有结果 → voted 或 endedWithResults
     if (results.isNotEmpty) {
-      final bool isEnded = formText.contains('投票已经结束') ||
-          !formText.contains('距结束');
+      final bool isEnded =
+          formText.contains('投票已经结束') || !formText.contains('距结束');
       return VoteData(
         status: isEnded ? VoteStatus.endedWithResults : VoteStatus.voted,
         actionUrl: actionUrl,
@@ -1059,7 +1068,6 @@ class ApiService {
       isPublic: isPublic,
     );
   }
-
 
   // =========================================================================
   // 帖子详情
@@ -1232,8 +1240,6 @@ class ApiService {
   // 收藏
   // =========================================================================
 
-
-
   // =========================================================================
   // 投票提交
   // =========================================================================
@@ -1256,7 +1262,10 @@ class ApiService {
     final formData = FormData.fromMap({'pollanswers[]': selectedValues});
 
     _api.talker.info('提交投票: $actionUrl, answers=$selectedValues');
-    final (ok, body) = await _api.postFollowRedirect(actionUrl, params: formData);
+    final (ok, body) = await _api.postFollowRedirect(
+      actionUrl,
+      params: formData,
+    );
     if (!ok) {
       _api.talker.error('投票提交失败');
       return (false, '投票失败');
@@ -1514,21 +1523,17 @@ class ApiService {
       params: {'srchtxt': keyword, 'searchsubmit': 'yes'},
     );
     if (!ok) {
-      return SearchResult(error: '网络请求失败');
+      return SearchResult(error: SearchNetworkFailure());
     }
 
-    // 频率限制
     if (body.contains('秒内只能进行一次搜索')) {
-      return SearchResult(error: '搜索太频繁，请稍后再试');
+      return SearchResult(error: SearchRateLimitFailure());
     }
 
-    // 无结果
     if (body.contains('没有找到匹配结果')) {
-      return SearchResult(error: '没有找到匹配结果');
+      return SearchResult(error: SearchEmptyFailure());
     }
 
-    // 如果响应包含 searchid，说明返回了结果页或重定向页
-    // POST 响应即为搜索结果页，直接解析
     return _parseSearchResults(body);
   }
 
@@ -1541,7 +1546,7 @@ class ApiService {
     final (ok, body) = await _api.get(
       Urls.getSearchUrl(searchId, keyword, page: page),
     );
-    if (!ok) return SearchResult(error: '翻页请求失败');
+    if (!ok) return SearchResult(error: SearchDataFailure());
     return _parseSearchResults(body).copyWith(searchId: searchId);
   }
 
@@ -1721,7 +1726,7 @@ class SearchResult {
   final String? searchId;
   final int currentPage;
   final int totalPage;
-  final String? error;
+  final SearchFailure? error;
 
   const SearchResult({
     this.topics = const [],
@@ -1739,7 +1744,7 @@ class SearchResult {
     String? searchId,
     int? currentPage,
     int? totalPage,
-    String? error,
+    SearchFailure? error,
   }) {
     return SearchResult(
       topics: topics ?? this.topics,
@@ -1749,4 +1754,28 @@ class SearchResult {
       error: error ?? this.error,
     );
   }
+}
+
+sealed class SearchFailure implements Exception {
+  const SearchFailure();
+}
+
+class SearchNetworkFailure extends SearchFailure {
+  const SearchNetworkFailure();
+}
+
+class SearchRateLimitFailure extends SearchFailure {
+  const SearchRateLimitFailure();
+}
+
+class SearchEmptyFailure extends SearchFailure {
+  const SearchEmptyFailure();
+}
+
+class SearchAuthFailure extends SearchFailure {
+  const SearchAuthFailure();
+}
+
+class SearchDataFailure extends SearchFailure {
+  const SearchDataFailure();
 }

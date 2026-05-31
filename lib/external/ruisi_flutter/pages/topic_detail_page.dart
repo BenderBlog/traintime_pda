@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -13,7 +14,6 @@ import '../models/vote.dart';
 import '../constants/urls.dart';
 import '../widgets/smiley_picker.dart';
 import '../../../repository/pick_file.dart';
-import 'login_page.dart';
 
 /// 帖子详情页
 class TopicDetailPage extends StatefulWidget {
@@ -33,6 +33,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   bool _replyUploading = false;
   bool _replySubmitting = false;
   final List<_UploadedAttachment> _replyAttachments = [];
+  RuisiService c = GetIt.instance<RuisiService>();
 
   dynamic _detail; // TopicDetail?
   bool _loading = true;
@@ -59,10 +60,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     });
 
     try {
-      final detail = await RuisiController.i.api.getTopicDetail(
-        widget.tid,
-        page: page,
-      );
+      final detail = await c.api.getTopicDetail(widget.tid, page: page);
       if (!mounted) return;
       setState(() {
         _detail = detail;
@@ -94,16 +92,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         ),
       );
       return;
-    }
-
-    final c = RuisiController.i;
-    if (!c.isLoggedIn) {
-      if (!mounted) return;
-      final result = await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
-      if (result != true) return;
     }
 
     setState(() => _replySubmitting = true);
@@ -182,10 +170,10 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
     setState(() => _replyUploading = true);
     try {
-      final meta = await RuisiController.i.api.loadReplyUploadMeta(widget.tid);
+      final meta = await c.api.loadReplyUploadMeta(widget.tid);
       final uid = meta.uploadUid ?? '';
       final hash = meta.uploadHash ?? '';
-      final (ok, result) = await RuisiController.i.api.ruisiApi.uploadImage(
+      final (ok, result) = await c.api.ruisiApi.uploadImage(
         Urls.uploadImageUrl,
         uid: uid,
         hash: hash,
@@ -212,15 +200,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   Future<void> _addFavorite() async {
-    final c = RuisiController.i;
-    if (!c.isLoggedIn) {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
-      return;
-    }
-    final ok = await c.addFavorite(widget.tid);
+    final ok = await c.api.addFavorite(widget.tid);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -455,10 +435,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                   GestureDetector(
                                     onTap: () async {
                                       try {
-                                        await RuisiController.i.api.ruisiApi
-                                            .post(
-                                              Urls.deleteUploadedUrl(a.aid),
-                                            );
+                                        await c.api.ruisiApi.post(
+                                          Urls.deleteUploadedUrl(a.aid),
+                                        );
                                       } catch (_) {}
                                       setState(
                                         () => _replyAttachments.remove(a),
@@ -1084,7 +1063,7 @@ class _VoteSheetState extends State<_VoteSheet> {
 
     setState(() => _submitting = true);
     try {
-      final (ok, err) = await RuisiController.i.api.submitVote(
+      final (ok, err) = await GetIt.instance<RuisiService>().api.submitVote(
         widget.vote.actionUrl,
         _selected.toList(),
       );

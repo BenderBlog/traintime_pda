@@ -46,13 +46,11 @@ class SemesterSyncResult {
 class SemesterController {
   static final SemesterController i = SemesterController._();
 
-  SemesterController._() {
-    semesterSignal.equalityCheck = (a, b) => a == b;
-  }
+  SemesterController._();
 
   final semesterSignal = signal(
     pref.getString(pref.Preference.currentSemester),
-    debugLabel: "SemesterSignal",
+    options: SignalOptions(name: "SemesterSignal"),
   );
 
   final semesterSyncEventSignal = signal<SemesterSyncEvent?>(

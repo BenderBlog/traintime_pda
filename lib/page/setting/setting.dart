@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:get_it/get_it.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -956,7 +957,7 @@ class _SettingWindowState extends State<SettingWindow> {
                                 file.deleteSync();
                               }
                             }
-                            await RuisiController.i.logout();
+                            await GetIt.instance<RuisiService>().logout();
 
                             /// Clean user information
                             await preference.prefrenceClear();

@@ -3,11 +3,6 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 用户设置与认证状态管理
-/// 假设程序仅在校内网运行
-///
-/// 使用主程序传入的 [SharedPreferencesWithCache] 实例，
-/// 与程序整体共享同一个持久化存储。
 class SettingsService {
   static const _keyUid = 'ruisi_uid';
   static const _keyUsername = 'ruisi_username';

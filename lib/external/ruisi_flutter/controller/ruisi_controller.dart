@@ -1,12 +1,10 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'dart:typed_data';
-
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signals/signals.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:watermeter/repository/network_session.dart' show supportPath;
-import 'package:watermeter/repository/preference.dart' as preference;
 
 import '../models/forum.dart';
 import '../models/topic.dart';
@@ -15,98 +13,32 @@ import '../repository/ruisi_api.dart';
 import '../services/api_service.dart';
 import '../services/settings_service.dart';
 
-/// 睿思论坛单例控制器
-///
-/// 使用 signals 包实现响应式状态管理，与主程序其他 controller 模式一致。
-class RuisiController {
-  static final RuisiController i = RuisiController._();
-  RuisiController._();
-
-  // =========================================================================
-  // 服务层
-  // =========================================================================
-
+class RuisiService {
   late final SettingsService settings;
   late final ApiService api;
-  late final Talker talker;
+  final Talker talker;
 
-  bool _initialized = false;
-
-  Future<void> init() async {
-    if (_initialized) return;
-    _initialized = true;
-
-    talker = TalkerFlutter.init();
-    settings = SettingsService(preference.prefs);
-    final ruisiApi = RuisiApi(cookiePath: supportPath.path, talker: talker);
+  RuisiService({
+    required SharedPreferencesWithCache prefs,
+    required String cookiePath,
+    required this.talker,
+  }) {
+    settings = SettingsService(prefs);
+    final ruisiApi = RuisiApi(cookiePath: cookiePath, talker: talker);
     api = ApiService(ruisiApi, settings);
     _isLoggedIn.value = settings.isLogin;
   }
 
-  // =========================================================================
-  // 登录状态
-  // =========================================================================
-
-  final loginLoading = signal(false);
-  final _isLoggedIn = signal(false);
+  final loginLoading = ValueNotifier<bool>(false);
+  final loginError = ValueNotifier<String?>(null);
+  final _isLoggedIn = ValueNotifier<bool>(false);
   bool get isLoggedIn => _isLoggedIn.value;
   String? get username => settings.username;
-
-  // 验证码
-  final captchaRequired = signal(false);
-  final captchaHash = signal<String?>(null);
-  final captchaImageBytes = signal<Uint8List?>(null);
-  final captchaLoading = signal(false);
-  final captchaError = signal<String?>(null);
-  final loginError = signal<String?>(null);
-
-  Future<void> checkLoginCaptcha() async {
-    final hash = await api.fetchLoginCaptchaHash();
-    captchaHash.value = hash;
-    captchaRequired.value = hash != null;
-
-    if (captchaRequired.value) {
-      await _loadCaptchaImage();
-    }
-  }
-
-  Future<void> refreshCaptcha() async {
-    captchaHash.value = await api.fetchLoginCaptchaHash();
-    await _loadCaptchaImage();
-  }
-
-  Future<void> _loadCaptchaImage() async {
-    captchaLoading.value = true;
-    captchaError.value = null;
-
-    if (captchaHash.value == null) {
-      captchaLoading.value = false;
-      captchaError.value = '验证码不可用';
-      return;
-    }
-
-    captchaImageBytes.value = await api.fetchCaptchaImage(captchaHash.value!);
-    captchaLoading.value = false;
-
-    if (captchaImageBytes.value == null) {
-      captchaError.value = '验证码加载失败';
-    }
-  }
-
-  Future<bool> verifyCaptcha(String value) async {
-    if (captchaHash.value == null) return false;
-    return api.verifyCaptcha(captchaHash.value!, value);
-  }
-
-  Future<void> resetLoginState() async {
-    await api.ruisiApi.clearCookies();
-    loginError.value = null;
-    await checkLoginCaptcha();
-  }
 
   Future<bool> login(
     String username,
     String password, {
+    String? seccodeHash,
     String? seccodeVerify,
   }) async {
     loginLoading.value = true;
@@ -115,7 +47,7 @@ class RuisiController {
     final (ok, error) = await api.login(
       username,
       password,
-      seccodeHash: captchaHash.value,
+      seccodeHash: seccodeHash,
       seccodeVerify: seccodeVerify,
     );
 
@@ -139,331 +71,13 @@ class RuisiController {
     _isLoggedIn.value = false;
   }
 
-  // =========================================================================
-  // 板块
-  // =========================================================================
-
   final forumGroups = signal<List<ForumGroup>>([]);
   final forumLoading = signal(false);
-
   Future<void> loadForums() async {
     forumLoading.value = true;
     forumGroups.value = await api.getForumList();
     forumLoading.value = false;
   }
-
-  // =========================================================================
-  // 帖子列表
-  // =========================================================================
-
-  final topics = signal<List<Topic>>([]);
-  final topicLoading = signal(false);
-  final currentFid = signal(0);
-  int _topicPage = 1;
-  bool _hasMoreTopics = true;
-  bool get hasMoreTopics => _hasMoreTopics;
-
-  Future<void> loadTopics(int fid, {bool refresh = false}) async {
-    if (refresh) {
-      _topicPage = 1;
-      _hasMoreTopics = true;
-      topics.value = [];
-    }
-
-    if (!_hasMoreTopics) return;
-
-    currentFid.value = fid;
-    topicLoading.value = true;
-
-    final newTopics = await api.getTopicList(fid, page: _topicPage);
-    if (newTopics.isEmpty) {
-      _hasMoreTopics = false;
-    } else {
-      topics.value = [...topics.value, ...newTopics];
-      _topicPage++;
-    }
-
-    topicLoading.value = false;
-  }
-
-  // =========================================================================
-  // 热帖 / 最新
-  // =========================================================================
-
-  final hotTopics = signal<List<Topic>>([]);
-  final hotLoading = signal(false);
-
-  Future<void> loadHotTopics() async {
-    hotLoading.value = true;
-    hotTopics.value = await api.getHotTopics();
-    hotLoading.value = false;
-  }
-
-  final newTopics = signal<List<Topic>>([]);
-  final newLoading = signal(false);
-  int _newPage = 1;
-  bool _hasMoreNew = true;
-  bool get hasMoreNew => _hasMoreNew;
-
-  Future<void> loadNewTopics({bool refresh = false}) async {
-    if (refresh) {
-      _newPage = 1;
-      _hasMoreNew = true;
-      newTopics.value = [];
-    }
-
-    if (!_hasMoreNew) return;
-
-    newLoading.value = true;
-
-    final result = await api.getNewTopics(page: _newPage);
-    if (result.isEmpty) {
-      _hasMoreNew = false;
-    } else {
-      newTopics.value = [...newTopics.value, ...result];
-      _newPage++;
-    }
-
-    newLoading.value = false;
-  }
-
-  // =========================================================================
-  // 最新回复
-  // =========================================================================
-
-  final newReplyTopics = signal<List<Topic>>([]);
-  final newReplyLoading = signal(false);
-  int _newReplyPage = 1;
-  bool _hasMoreNewReply = true;
-  bool get hasMoreNewReply => _hasMoreNewReply;
-
-  Future<void> loadNewReplyTopics({bool refresh = false}) async {
-    if (refresh) {
-      _newReplyPage = 1;
-      _hasMoreNewReply = true;
-      newReplyTopics.value = [];
-    }
-
-    if (!_hasMoreNewReply) return;
-
-    newReplyLoading.value = true;
-
-    final result = await api.getNewReplyTopics(page: _newReplyPage);
-    if (result.isEmpty) {
-      _hasMoreNewReply = false;
-    } else {
-      newReplyTopics.value = [...newReplyTopics.value, ...result];
-      _newReplyPage++;
-    }
-
-    newReplyLoading.value = false;
-  }
-
-  // =========================================================================
-  // 摄影天地 (fid 561)
-  // =========================================================================
-
-  final photographyTopics = signal<List<Topic>>([]);
-  final photographyLoading = signal(false);
-  int _photoPage = 1;
-  bool _hasMorePhoto = true;
-  bool get hasMorePhoto => _hasMorePhoto;
-
-  Future<void> loadPhotography({bool refresh = false}) async {
-    if (refresh) {
-      _photoPage = 1;
-      _hasMorePhoto = true;
-      photographyTopics.value = [];
-    }
-
-    if (!_hasMorePhoto) return;
-
-    photographyLoading.value = true;
-    final result = await api.getTopicList(561, page: _photoPage);
-    if (result.isEmpty) {
-      _hasMorePhoto = false;
-    } else {
-      photographyTopics.value = [...photographyTopics.value, ...result];
-      _photoPage++;
-    }
-    photographyLoading.value = false;
-  }
-
-  // =========================================================================
-  // 失物招领 (fid 142)
-  // =========================================================================
-
-  final lostFoundTopics = signal<List<Topic>>([]);
-  final lostFoundLoading = signal(false);
-  int _lostPage = 1;
-  bool _hasMoreLost = true;
-  bool get hasMoreLost => _hasMoreLost;
-
-  Future<void> loadLostFound({bool refresh = false}) async {
-    if (refresh) {
-      _lostPage = 1;
-      _hasMoreLost = true;
-      lostFoundTopics.value = [];
-    }
-
-    if (!_hasMoreLost) return;
-
-    lostFoundLoading.value = true;
-    final result = await api.getTopicList(142, page: _lostPage);
-    if (result.isEmpty) {
-      _hasMoreLost = false;
-    } else {
-      lostFoundTopics.value = [...lostFoundTopics.value, ...result];
-      _lostPage++;
-    }
-    lostFoundLoading.value = false;
-  }
-
-  // =========================================================================
-  // 二手交易 (fid 110)
-  // =========================================================================
-
-  final tradeTopics = signal<List<Topic>>([]);
-  final tradeLoading = signal(false);
-  int _tradePage = 1;
-  bool _hasMoreTrade = true;
-  bool get hasMoreTrade => _hasMoreTrade;
-
-  Future<void> loadTrade({bool refresh = false}) async {
-    if (refresh) {
-      _tradePage = 1;
-      _hasMoreTrade = true;
-      tradeTopics.value = [];
-    }
-
-    if (!_hasMoreTrade) return;
-
-    tradeLoading.value = true;
-    final result = await api.getTopicList(110, page: _tradePage);
-    if (result.isEmpty) {
-      _hasMoreTrade = false;
-    } else {
-      tradeTopics.value = [...tradeTopics.value, ...result];
-      _tradePage++;
-    }
-    tradeLoading.value = false;
-  }
-
-  // =========================================================================
-  // 灌水专区 (fid 72)
-  // =========================================================================
-
-  final waterTopics = signal<List<Topic>>([]);
-  final waterLoading = signal(false);
-  int _waterPage = 1;
-  bool _hasMoreWater = true;
-  bool get hasMoreWater => _hasMoreWater;
-
-  Future<void> loadWater({bool refresh = false}) async {
-    if (refresh) {
-      _waterPage = 1;
-      _hasMoreWater = true;
-      waterTopics.value = [];
-    }
-
-    if (!_hasMoreWater) return;
-
-    waterLoading.value = true;
-    final result = await api.getTopicList(72, page: _waterPage);
-    if (result.isEmpty) {
-      _hasMoreWater = false;
-    } else {
-      waterTopics.value = [...waterTopics.value, ...result];
-      _waterPage++;
-    }
-    waterLoading.value = false;
-  }
-
-  // =========================================================================
-  // 就业 (fid 553)
-  // =========================================================================
-
-  final employmentTopics = signal<List<Topic>>([]);
-  final employmentLoading = signal(false);
-  int _employmentPage = 1;
-  bool _hasMoreEmployment = true;
-  bool get hasMoreEmployment => _hasMoreEmployment;
-
-  Future<void> loadEmployment({bool refresh = false}) async {
-    if (refresh) {
-      _employmentPage = 1;
-      _hasMoreEmployment = true;
-      employmentTopics.value = [];
-    }
-
-    if (!_hasMoreEmployment) return;
-
-    employmentLoading.value = true;
-    final result = await api.getTopicList(553, page: _employmentPage);
-    if (result.isEmpty) {
-      _hasMoreEmployment = false;
-    } else {
-      employmentTopics.value = [...employmentTopics.value, ...result];
-      _employmentPage++;
-    }
-    employmentLoading.value = false;
-  }
-
-  // =========================================================================
-  // 我的帖子
-  // =========================================================================
-
-  final myTopics = signal<List<Topic>>([]);
-  final myTopicsLoading = signal(false);
-
-  Future<void> loadMyTopics({bool refresh = false}) async {
-    myTopicsLoading.value = true;
-    if (refresh) myTopics.value = [];
-    var page = 1;
-    while (true) {
-      final batch = await api.getMyTopics(page: page);
-      if (batch.isEmpty) break;
-      myTopics.value = [...myTopics.value, ...batch];
-      page++;
-    }
-    myTopicsLoading.value = false;
-  }
-
-
-  // =========================================================================
-  // 论坛网络收藏
-  // =========================================================================
-
-  final favorites = signal<List<Topic>>([]);
-  final favoritesLoading = signal(false);
-
-  Future<void> loadFavorites({bool refresh = false}) async {
-    favoritesLoading.value = true;
-    if (refresh) favorites.value = [];
-    favorites.value = await api.getFavorites();
-    favoritesLoading.value = false;
-  }
-
-  Future<bool> addFavorite(int tid) async {
-    return api.addFavorite(tid);
-  }
-
-  // =========================================================================
-  // 签到
-  // =========================================================================
-
-  final signResult = signal<SignResult?>(null);
-  final signLoading = signal(false);
-
-  Future<void> sign() async {
-    signLoading.value = true;
-    signResult.value = await api.sign();
-    signLoading.value = false;
-  }
-
-  // =========================================================================
-  // 消息通知
-  // =========================================================================
 
   final replyNotifications = signal<List<ReplyNotification>>([]);
   final atNotifications = signal<List<AtNotification>>([]);
@@ -483,69 +97,22 @@ class RuisiController {
     messageLoading.value = false;
   }
 
-  // =========================================================================
-  // 搜索
-  // =========================================================================
-
-  final searchResults = signal<List<Topic>>([]);
-  final searchLoading = signal(false);
-  final searchKeyword = signal('');
-  final searchError = signal<String?>(null);
   String? _searchId;
-  int _searchPage = 1;
-  bool _hasMoreSearch = true;
-  bool get hasMoreSearch => _hasMoreSearch;
-
-  Future<void> search(String keyword) async {
-    searchLoading.value = true;
-    searchKeyword.value = keyword;
-    searchError.value = null;
-    _searchId = null;
-    _searchPage = 1;
-    _hasMoreSearch = true;
-    searchResults.value = [];
-
-    final result = await api.search(keyword);
-    if (result.hasError) {
-      searchError.value = result.error;
-    } else {
-      searchResults.value = result.topics;
+  Future<List<Topic>> search(String keyword, int page) async {
+    if (_searchId == null || page == 1) {
+      final result = await api.search(keyword);
+      if (result.hasError) {
+        throw result.error!;
+      }
       _searchId = result.searchId;
-      _searchPage = result.currentPage;
-
-      _hasMoreSearch = result.hasMore;
+      return result.topics;
     }
-    searchLoading.value = false;
-  }
 
-  /// 加载下一页搜索结果
-  Future<void> searchMore() async {
-    if (!_hasMoreSearch || _searchId == null) return;
-
-    final next = _searchPage + 1;
-    final result = await api.searchPage(_searchId!, searchKeyword.value, next);
-    if (result.hasError) return;
-
-    searchResults.value = [...searchResults.value, ...result.topics];
-    _searchPage = result.currentPage;
-    _hasMoreSearch = result.hasMore;
-  }
-
-  void clearSearch() {
-    searchResults.value = [];
-    searchKeyword.value = '';
-    searchError.value = null;
-    _searchId = null;
-    _searchPage = 1;
-
-    _hasMoreSearch = true;
-  }
-
-  // =========================================================================
-  // 发帖
-  // =========================================================================
-
-  Future<(bool, String?)> newPost(int fid, String subject, String content) {
-    return api.newPost(fid, subject, content, [], null);
+    final result = await api.searchPage(_searchId!, keyword, page);
+    if (result.hasError) {
+      _searchId = null;
+      throw result.error!;
+    }
+    return result.topics;
   }
 }
