@@ -37,7 +37,7 @@ class _NewPostPageState extends State<NewPostPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (c.forumGroups.value.isEmpty) {
+      if (c.forumState.value.groups.isEmpty && !c.forumState.value.isLoading) {
         c.loadForums();
       }
     });
@@ -177,31 +177,54 @@ class _NewPostPageState extends State<NewPostPage> {
           padding: const EdgeInsets.all(16),
           children: [
             // 板块选择
-            DropdownButtonFormField<int>(
-              initialValue: _selectedFid,
-              decoration: InputDecoration(
-                labelText: FlutterI18n.translate(
-                  context,
-                  'ruisi.post.select_forum',
-                ),
-                border: const OutlineInputBorder(),
-              ),
-              items: c.forumGroups.value
-                  .expand((g) => g.forums)
-                  .map(
-                    (f) => DropdownMenuItem(value: f.fid, child: Text(f.name)),
-                  )
-                  .toList(),
-              onChanged: (v) {
-                setState(() => _selectedFid = v);
-                if (v != null) _loadMeta(v);
-              },
-              validator: (v) => v == null
-                  ? FlutterI18n.translate(
+            ValueListenableBuilder<ForumState>(
+              valueListenable: c.forumState,
+              builder: (context, state, child) {
+                // 检查是否正在加载且没有数据
+                final bool isLoading = state.isLoading && state.groups.isEmpty;
+
+                // 从 state 中展平获取所有的 sub-forum 列表
+                final forums = state.groups.expand((g) => g.forums).toList();
+
+                return DropdownButtonFormField<int>(
+                  value:
+                      _selectedFid, // 注意：Flutter 新版本推荐使用 value 代替 initialValue
+                  decoration: InputDecoration(
+                    labelText: FlutterI18n.translate(
                       context,
-                      'ruisi.post.select_forum_hint',
-                    )
-                  : null,
+                      'ruisi.post.select_forum',
+                    ),
+                    // 如果正在加载，提示用户稍等；如果加载失败且无数据，提示刷新
+                    hintText: isLoading
+                        ? "正在加载板块..."
+                        : (state.hasError && forums.isEmpty
+                              ? "加载失败，请返回重试"
+                              : null),
+                    border: const OutlineInputBorder(),
+                  ),
+                  // 当正在加载或数据为空时，将 items 设为 null，下拉框会自动变成禁用(Disabled)状态
+                  items: forums.isEmpty
+                      ? null
+                      : forums
+                            .map(
+                              (f) => DropdownMenuItem(
+                                value: f.fid,
+                                child: Text(f.name),
+                              ),
+                            )
+                            .toList(),
+                  onChanged: (v) {
+                    setState(() => _selectedFid = v);
+                    if (v != null) _loadMeta(v);
+                  },
+                  validator: (v) => v == null
+                      ? FlutterI18n.translate(
+                          context,
+                          'ruisi.post.select_forum_hint',
+                        )
+                      : null,
+                );
+              },
             ),
             const SizedBox(height: 16),
 

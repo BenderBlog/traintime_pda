@@ -3,27 +3,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:signals/signals.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../models/forum.dart';
 import '../models/topic.dart';
-import '../models/message.dart';
 import '../repository/ruisi_api.dart';
 import '../services/api_service.dart';
 import '../services/settings_service.dart';
 
-/// 会话刷新结果
-enum SessionRefreshResult {
-  /// 刷新成功
-  success,
-
-  /// 需要验证码
-  needCaptcha,
-
-  /// 刷新失败（密码错误等），应回到登录页
-  failed,
-}
+enum SessionRefreshResult { success, needCaptcha, failed }
 
 class RuisiService {
   late final SettingsService settings;
@@ -101,25 +89,34 @@ class RuisiService {
       return SessionRefreshResult.success;
     }
 
-    // 判断是否因为需要验证码而失败
-    // api.fetchLoginCaptchaHash() 返回非 null 表示服务端要求验证码
     final captchaHash = await api.fetchLoginCaptchaHash();
     if (captchaHash != null) {
       talker.info('服务端要求验证码');
       return SessionRefreshResult.needCaptcha;
     }
 
-    // 其他失败（密码错误等）
     talker.warning('会话刷新失败: $error');
     return SessionRefreshResult.failed;
   }
 
-  final forumGroups = signal<List<ForumGroup>>([]);
-  final forumLoading = signal(false);
+  final forumState = ValueNotifier<ForumState>(
+    ForumState(groups: [], isLoading: false),
+  );
   Future<void> loadForums() async {
-    forumLoading.value = true;
-    forumGroups.value = await api.getForumList();
-    forumLoading.value = false;
+    final currentState = forumState.value;
+    if (!currentState.isLoading &&
+        (currentState.groups.isEmpty || currentState.hasError)) {
+      forumState.value = ForumState.loading(currentGroups: currentState.groups);
+      try {
+        final result = await api.getForumList();
+        forumState.value = ForumState.success(result);
+      } catch (e) {
+        forumState.value = ForumState.error(
+          e.toString(),
+          currentGroups: currentState.groups,
+        );
+      }
+    }
   }
 
   /*
@@ -159,5 +156,39 @@ class RuisiService {
       throw result.error!;
     }
     return result.topics;
+  }
+}
+
+class ForumState {
+  final List<ForumGroup> groups;
+  final bool isLoading;
+  final String? errorMessage;
+
+  bool get hasError => errorMessage != null;
+
+  ForumState({
+    required this.groups,
+    required this.isLoading,
+    this.errorMessage,
+  });
+
+  factory ForumState.loading({List<ForumGroup>? currentGroups}) {
+    return ForumState(
+      groups: currentGroups ?? [],
+      isLoading: true,
+      errorMessage: null, // 开始新加载时，清空之前的错误
+    );
+  }
+
+  factory ForumState.success(List<ForumGroup> groups) {
+    return ForumState(groups: groups, isLoading: false, errorMessage: null);
+  }
+
+  factory ForumState.error(String message, {List<ForumGroup>? currentGroups}) {
+    return ForumState(
+      groups: currentGroups ?? [],
+      isLoading: false,
+      errorMessage: message,
+    );
   }
 }
