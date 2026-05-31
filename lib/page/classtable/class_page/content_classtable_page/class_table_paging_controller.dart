@@ -15,6 +15,7 @@ class ClassTablePagingController extends ChangeNotifier {
   double? _viewportWidth;
   int? _lastAnimatedWeek;
   int _animationToken = 0;
+  bool _ignoreContentPageChanges = false;
   bool _skipNextContentPageAnimation = false;
   bool _hasControllers = false;
   bool isTopRowLocked = false;
@@ -98,7 +99,7 @@ class ClassTablePagingController extends ChangeNotifier {
   }
 
   void onPageChanged(int value) {
-    if (isTopRowLocked || state.chosenWeek == value) {
+    if (_ignoreContentPageChanges || state.chosenWeek == value) {
       return;
     }
     _skipNextContentPageAnimation = true;
@@ -131,6 +132,7 @@ class ClassTablePagingController extends ChangeNotifier {
     final skipContentPageAnimation = _skipNextContentPageAnimation;
     _skipNextContentPageAnimation = false;
     _setTopRowLocked(true);
+    notifyListeners();
 
     final animations = <Future<void>>[
       rowController.animateTo(
@@ -141,19 +143,27 @@ class ClassTablePagingController extends ChangeNotifier {
     ];
 
     final contentPage = pageController.page;
+    Future<void>? contentPageAnimation;
     if (!skipContentPageAnimation &&
         (contentPage == null || (contentPage - targetWeek).abs() > 0.01)) {
-      animations.add(
-        pageController.animateToPage(
-          targetWeek,
-          curve: Curves.easeInOutCubic,
-          duration: const Duration(milliseconds: changePageTime),
-        ),
+      _ignoreContentPageChanges = true;
+      contentPageAnimation = pageController.animateToPage(
+        targetWeek,
+        curve: Curves.easeInOutCubic,
+        duration: const Duration(milliseconds: changePageTime),
       );
+      animations.add(contentPageAnimation);
     }
+
+    contentPageAnimation?.whenComplete(() {
+      if (isMounted() && animationToken == _animationToken) {
+        _ignoreContentPageChanges = false;
+      }
+    });
 
     Future.wait(animations).whenComplete(() {
       if (isMounted() && animationToken == _animationToken) {
+        _ignoreContentPageChanges = false;
         _setTopRowLocked(false);
       }
     });
