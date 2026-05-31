@@ -322,27 +322,32 @@ class ClassTableWidgetState with ChangeNotifier {
 
   ClassTableWidgetState() {
     _effectCleanup.add(
-      effect(() {
-        classTableController.schoolClassTableStateSignal.value;
-        classTableController.classTableComputedSignal.value;
-        classTableController.isClassTableFromCacheComputedSignal.value;
-        classTableController.classTableCacheHintKeyComputedSignal.value;
-        examController.examInfoStateSignal.value;
-        examController.subjects.value;
-        examController.isExamFromCache.value;
-        examController.examCacheHintKey.value;
-        physicsExperimentController.physicsExperimentStateSignal.value;
-        physicsExperimentController.physicsExperiments.value;
-        physicsExperimentController.isPhysicsExperimentFromCache.value;
-        physicsExperimentController.physicsExperimentCacheHintKey.value;
-        otherExperimentController.otherExperimentStateSignal.value;
-        otherExperimentController.otherExperiments.value;
-        otherExperimentController.isOtherExperimentFromCache.value;
-        otherExperimentController.otherExperimentCacheHintKey.value;
-        weekSwiftController.weekSwiftSignal.value;
-        globalTimerController.currentTimeSignal.value;
-        notifyListeners();
-      }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
+      effect(
+        () {
+          classTableController.schoolClassTableStateSignal.value;
+          classTableController.classTableComputedSignal.value;
+          classTableController.isClassTableFromCacheComputedSignal.value;
+          classTableController.classTableCacheHintKeyComputedSignal.value;
+          examController.examInfoStateSignal.value;
+          examController.subjects.value;
+          examController.isExamFromCache.value;
+          examController.examCacheHintKey.value;
+          physicsExperimentController.physicsExperimentStateSignal.value;
+          physicsExperimentController.physicsExperiments.value;
+          physicsExperimentController.isPhysicsExperimentFromCache.value;
+          physicsExperimentController.physicsExperimentCacheHintKey.value;
+          otherExperimentController.otherExperimentStateSignal.value;
+          otherExperimentController.otherExperiments.value;
+          otherExperimentController.isOtherExperimentFromCache.value;
+          otherExperimentController.otherExperimentCacheHintKey.value;
+          weekSwiftController.weekSwiftSignal.value;
+          globalTimerController.currentTimeSignal.value;
+          notifyListeners();
+        },
+        options: const EffectOptions(
+          name: "ClassTableWidgetStateSignalBridgeEffect",
+        ),
+      ),
     );
     // Init current week info
     if (currentWeek < 0) {

@@ -55,7 +55,7 @@ class SemesterController {
 
   final semesterSyncEventSignal = signal<SemesterSyncEvent?>(
     null,
-    debugLabel: "SemesterSyncEventSignal",
+    options: SignalOptions(name: "SemesterSyncEventSignal"),
   );
 
   int _semesterOrder(String semesterCode) {

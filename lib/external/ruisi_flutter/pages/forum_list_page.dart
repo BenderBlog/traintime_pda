@@ -76,8 +76,7 @@ class _ForumListPageState extends State<ForumListPage> {
           if (state.groups.isEmpty) {
             return Center(
               child: Text(
-                FlutterI18n.translate(context, 'ruisi.forum_list.empty') ??
-                    "暂无数据",
+                FlutterI18n.translate(context, 'ruisi.forum_list.empty'),
               ),
             );
           }

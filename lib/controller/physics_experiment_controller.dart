@@ -39,27 +39,32 @@ class PhysicsExperimentController {
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final semesterChangeEvent =
-          SemesterController.i.semesterSyncEventSignal.value;
-      if (semesterChangeEvent == null ||
-          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
-        return;
-      }
+    effect(
+      () {
+        final semesterChangeEvent =
+            SemesterController.i.semesterSyncEventSignal.value;
+        if (semesterChangeEvent == null ||
+            identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+          return;
+        }
 
-      _lastHandledSemesterSyncEvent = semesterChangeEvent;
-      if (semesterChangeEvent.didChange) {
-        _lastValidPhysicsExperiment.value = null;
-        unawaited(
-          Future(() async {
-            ExperimentSession.deleteCache();
-            await pref.remove(pref.Preference.experimentPassword);
-          }),
-        );
-        return;
-      }
-      unawaited(reloadPhysicsExperiment());
-    }, debugLabel: "PhysicsExperimentSemesterChangeEffect");
+        _lastHandledSemesterSyncEvent = semesterChangeEvent;
+        if (semesterChangeEvent.didChange) {
+          _lastValidPhysicsExperiment.value = null;
+          unawaited(
+            Future(() async {
+              ExperimentSession.deleteCache();
+              await pref.remove(pref.Preference.experimentPassword);
+            }),
+          );
+          return;
+        }
+        unawaited(reloadPhysicsExperiment());
+      },
+      options: const EffectOptions(
+        name: "PhysicsExperimentSemesterChangeEffect",
+      ),
+    );
   }
 
   Future<void> reloadPhysicsExperiment() async {

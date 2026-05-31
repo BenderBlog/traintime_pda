@@ -37,21 +37,23 @@ class SettingAboutSection extends StatelessWidget {
           const Divider(),
           ListTile(
             title: Text(FlutterI18n.translate(context, "setting.check_update")),
-            subtitle: Watch((context) {
-              final updateState =
-                  UpdateNoticeController.i.updateMessageStateSignal.value;
-              return Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.latest_version",
-                  translationParams: {
-                    "latest":
-                        updateState.value?.code ??
-                        FlutterI18n.translate(context, "setting.waiting"),
-                  },
-                ),
-              );
-            }),
+            subtitle: SignalBuilder(
+              builder: (context) {
+                final updateState =
+                    UpdateNoticeController.i.updateMessageStateSignal.value;
+                return Text(
+                  FlutterI18n.translate(
+                    context,
+                    "setting.latest_version",
+                    translationParams: {
+                      "latest":
+                          updateState.value?.code ??
+                          FlutterI18n.translate(context, "setting.waiting"),
+                    },
+                  ),
+                );
+              },
+            ),
             onTap: () => _checkUpdate(context),
             trailing: const Icon(Icons.navigate_next),
           ),
@@ -83,8 +85,8 @@ class SettingAboutSection extends StatelessWidget {
       case true:
         await showDialog(
           context: context,
-          builder: (context) => Watch(
-            (context) => UpdateDialog(
+          builder: (context) => SignalBuilder(
+            builder: (context) => UpdateDialog(
               updateMessage: UpdateNoticeController
                   .i
                   .updateMessageStateSignal

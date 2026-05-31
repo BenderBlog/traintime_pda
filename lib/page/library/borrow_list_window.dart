@@ -29,19 +29,20 @@ class _BorrowListWindowState extends State<BorrowListWindow>
 
     return RefreshIndicator(
       onRefresh: LibraryController.i.reloadBorrowList,
-      child: LibraryController.i.libraryBorrowStateSignal
-          .watch(context)
-          .map(
-            data: (list) => BorrowListView(borrowList: list),
-            loading: () => const CircularProgressIndicator().center(),
-            refreshing: () => const CircularProgressIndicator().center(),
-            reloading: () => const CircularProgressIndicator().center(),
-            error: (err, stack) => ReloadWidget(
-              errorStatus: err,
-              stackTrace: stack,
-              function: LibraryController.i.reloadBorrowList,
-            ).center(),
-          ),
+      child: SignalBuilder(
+        builder: (context) =>
+            LibraryController.i.libraryBorrowStateSignal.value.map(
+              data: (list) => BorrowListView(borrowList: list),
+              loading: () => const CircularProgressIndicator().center(),
+              refreshing: () => const CircularProgressIndicator().center(),
+              reloading: () => const CircularProgressIndicator().center(),
+              error: (err, stack) => ReloadWidget(
+                errorStatus: err,
+                stackTrace: stack,
+                function: LibraryController.i.reloadBorrowList,
+              ).center(),
+            ),
+      ),
     );
   }
 }

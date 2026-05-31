@@ -35,21 +35,24 @@ class ExamController {
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final semesterChangeEvent =
-          SemesterController.i.semesterSyncEventSignal.value;
-      if (semesterChangeEvent == null ||
-          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
-        return;
-      }
+    effect(
+      () {
+        final semesterChangeEvent =
+            SemesterController.i.semesterSyncEventSignal.value;
+        if (semesterChangeEvent == null ||
+            identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+          return;
+        }
 
-      _lastHandledSemesterSyncEvent = semesterChangeEvent;
-      if (semesterChangeEvent.didChange) {
-        _lastValidExamInfo.value = null;
-        ExamSession.deleteCache();
-      }
-      unawaited(reloadExamInfo());
-    }, debugLabel: "ExamControllerSemesterChangeEffect");
+        _lastHandledSemesterSyncEvent = semesterChangeEvent;
+        if (semesterChangeEvent.didChange) {
+          _lastValidExamInfo.value = null;
+          ExamSession.deleteCache();
+        }
+        unawaited(reloadExamInfo());
+      },
+      options: const EffectOptions(name: "ExamControllerSemesterChangeEffect"),
+    );
   }
 
   Future<void> reloadExamInfo() async {

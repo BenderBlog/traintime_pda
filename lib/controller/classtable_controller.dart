@@ -135,29 +135,34 @@ class ClassTableController {
       signal<AsyncState<FetchResult<ClassTableData>>>(const AsyncLoading());
 
   void _initEffects() {
-    effect(() {
-      final semesterChangeEvent =
-          SemesterController.i.semesterSyncEventSignal.value;
-      if (semesterChangeEvent == null ||
-          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
-        return;
-      }
+    effect(
+      () {
+        final semesterChangeEvent =
+            SemesterController.i.semesterSyncEventSignal.value;
+        if (semesterChangeEvent == null ||
+            identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+          return;
+        }
 
-      _lastHandledSemesterSyncEvent = semesterChangeEvent;
-      if (semesterChangeEvent.didChange) {
-        _lastValidSchoolClassTable.value = null;
-        userDefinedClassSignal.value = UserDefinedClassData.empty();
-        ClassTableSession.deleteCache();
-        UserDefinedClassFile.clearUserDefinedClass();
-      }
-      unawaited(reloadClassTable());
-      log.info(
-        "[ClassTableController][_initEffects] "
-        "${semesterChangeEvent.didChange ? "Clear user defined classtable because semester changed" : "Reload classtable because semester synced"} "
-        "from ${semesterChangeEvent.oldSemester} "
-        "to ${semesterChangeEvent.effectiveSemester}.",
-      );
-    }, debugLabel: "ClassTableControllerSemesterChangeEffect");
+        _lastHandledSemesterSyncEvent = semesterChangeEvent;
+        if (semesterChangeEvent.didChange) {
+          _lastValidSchoolClassTable.value = null;
+          userDefinedClassSignal.value = UserDefinedClassData.empty();
+          ClassTableSession.deleteCache();
+          UserDefinedClassFile.clearUserDefinedClass();
+        }
+        unawaited(reloadClassTable());
+        log.info(
+          "[ClassTableController][_initEffects] "
+          "${semesterChangeEvent.didChange ? "Clear user defined classtable because semester changed" : "Reload classtable because semester synced"} "
+          "from ${semesterChangeEvent.oldSemester} "
+          "to ${semesterChangeEvent.effectiveSemester}.",
+        );
+      },
+      options: const EffectOptions(
+        name: "ClassTableControllerSemesterChangeEffect",
+      ),
+    );
   }
 
   Future<void> reloadClassTable() async {

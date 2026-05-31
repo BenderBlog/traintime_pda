@@ -187,8 +187,7 @@ class _NewPostPageState extends State<NewPostPage> {
                 final forums = state.groups.expand((g) => g.forums).toList();
 
                 return DropdownButtonFormField<int>(
-                  value:
-                      _selectedFid, // 注意：Flutter 新版本推荐使用 value 代替 initialValue
+                  initialValue: _selectedFid,
                   decoration: InputDecoration(
                     labelText: FlutterI18n.translate(
                       context,

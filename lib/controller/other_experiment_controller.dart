@@ -39,21 +39,24 @@ class OtherExperimentController {
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final semesterChangeEvent =
-          SemesterController.i.semesterSyncEventSignal.value;
-      if (semesterChangeEvent == null ||
-          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
-        return;
-      }
+    effect(
+      () {
+        final semesterChangeEvent =
+            SemesterController.i.semesterSyncEventSignal.value;
+        if (semesterChangeEvent == null ||
+            identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+          return;
+        }
 
-      _lastHandledSemesterSyncEvent = semesterChangeEvent;
-      if (semesterChangeEvent.didChange) {
-        _lastValidOtherExperiment.value = null;
-        SysjSession.deleteCache();
-      }
-      unawaited(reloadOtherExperiment());
-    }, debugLabel: "OtherExperimentSemesterChangeEffect");
+        _lastHandledSemesterSyncEvent = semesterChangeEvent;
+        if (semesterChangeEvent.didChange) {
+          _lastValidOtherExperiment.value = null;
+          SysjSession.deleteCache();
+        }
+        unawaited(reloadOtherExperiment());
+      },
+      options: const EffectOptions(name: "OtherExperimentSemesterChangeEffect"),
+    );
   }
 
   Future<void> reloadOtherExperiment() async {

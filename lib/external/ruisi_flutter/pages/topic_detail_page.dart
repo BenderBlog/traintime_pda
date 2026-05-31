@@ -1139,27 +1139,31 @@ class _VoteSheetState extends State<_VoteSheet> {
             ),
             const Divider(height: 1),
             Expanded(
-              child: ListView.builder(
-                controller: scrollCtrl,
-                itemCount: widget.vote.options.length,
-                itemBuilder: (_, idx) {
-                  final opt = widget.vote.options[idx];
-                  final checked = _selected.contains(opt.value);
-                  return _isMulti
-                      ? CheckboxListTile(
-                          value: checked,
-                          title: Text(opt.label),
-                          onChanged: (_) => _toggle(opt.value),
-                        )
-                      : RadioListTile<String>(
-                          value: opt.value,
-                          groupValue: _selected.isEmpty
-                              ? null
-                              : _selected.first,
-                          title: Text(opt.label),
-                          onChanged: (_) => _toggle(opt.value),
-                        );
+              child: RadioGroup<String>(
+                groupValue: _selected.isEmpty ? null : _selected.first,
+                onChanged: (value) {
+                  if (value != null) {
+                    _toggle(value);
+                  }
                 },
+                child: ListView.builder(
+                  controller: scrollCtrl,
+                  itemCount: widget.vote.options.length,
+                  itemBuilder: (_, idx) {
+                    final opt = widget.vote.options[idx];
+                    final checked = _selected.contains(opt.value);
+                    return _isMulti
+                        ? CheckboxListTile(
+                            value: checked,
+                            title: Text(opt.label),
+                            onChanged: (_) => _toggle(opt.value),
+                          )
+                        : RadioListTile<String>(
+                            value: opt.value,
+                            title: Text(opt.label),
+                          );
+                  },
+                ),
               ),
             ),
             SafeArea(

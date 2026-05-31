@@ -18,24 +18,29 @@ class WeekSwiftController {
 
   final weekSwiftSignal = signal(
     preference.getInt(preference.Preference.swift),
-    debugLabel: "WeekSwiftSignal",
+    options: SignalOptions<int>(name: "WeekSwiftSignal"),
   );
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
   void _initEffects() {
-    effect(() {
-      final semesterChangeEvent =
-          SemesterController.i.semesterSyncEventSignal.value;
-      if (semesterChangeEvent == null ||
-          identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
-        return;
-      }
+    effect(
+      () {
+        final semesterChangeEvent =
+            SemesterController.i.semesterSyncEventSignal.value;
+        if (semesterChangeEvent == null ||
+            identical(semesterChangeEvent, _lastHandledSemesterSyncEvent)) {
+          return;
+        }
 
-      _lastHandledSemesterSyncEvent = semesterChangeEvent;
-      if (semesterChangeEvent.didChange) {
-        reset();
-      }
-    }, debugLabel: "WeekSwiftControllerSemesterChangeEffect");
+        _lastHandledSemesterSyncEvent = semesterChangeEvent;
+        if (semesterChangeEvent.didChange) {
+          reset();
+        }
+      },
+      options: const EffectOptions(
+        name: "WeekSwiftControllerSemesterChangeEffect",
+      ),
+    );
   }
 
   void refresh() async {

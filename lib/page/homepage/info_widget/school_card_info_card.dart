@@ -22,155 +22,159 @@ class SchoolCardInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = SchoolCardController.i.moneyStateSignal.watch(context);
-    return MainPageCard(
-      onPressed: () async {
-        if (offline) {
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "homepage.offline_mode"),
-          );
-        } else {
-          state.map(
-            data: (_) {
-              context.pushReplacementNamed(Routes.schoolCard);
-            },
-            error: (errorStatus, _) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    errorStatus.toString().substring(
-                      0,
-                      min(errorStatus.toString().length, 120),
+    return SignalBuilder(
+      builder: (context) {
+        final state = SchoolCardController.i.moneyStateSignal.value;
+        return MainPageCard(
+          onPressed: () async {
+            if (offline) {
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(context, "homepage.offline_mode"),
+              );
+            } else {
+              state.map(
+                data: (_) {
+                  context.pushReplacementNamed(Routes.schoolCard);
+                },
+                error: (errorStatus, _) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        errorStatus.toString().substring(
+                          0,
+                          min(errorStatus.toString().length, 120),
+                        ),
+                      ),
+                    ),
+                  );
+
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.error_toast",
+                    ),
+                  );
+                },
+                loading: () {
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.fetching_toast",
+                    ),
+                  );
+                },
+                refreshing: () {
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.fetching_toast",
+                    ),
+                  );
+                },
+                reloading: () {
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.fetching_toast",
+                    ),
+                  );
+                },
+              );
+            }
+          },
+          isLoad: state.isLoading,
+          icon: MingCuteIcons.mgc_wallet_4_line,
+          text: FlutterI18n.translate(
+            context,
+            "homepage.school_card_info_card.bill",
+          ),
+          infoText: Text.rich(
+            TextSpan(
+              style: const TextStyle(fontSize: 20),
+              children: [
+                TextSpan(
+                  text: state.map(
+                    data: (money) {
+                      if (money.contains(RegExp(r'[0-9]'))) {
+                        return FlutterI18n.translate(
+                          context,
+                          "homepage.school_card_info_card.balance",
+                          translationParams: {
+                            "amount": double.parse(money) >= 10
+                                ? double.parse(money).truncate().toString()
+                                : money,
+                          },
+                        );
+                      }
+                      return FlutterI18n.translate(context, money);
+                    },
+                    loading: () => FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.fetching",
+                    ),
+                    refreshing: () => FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.fetching",
+                    ),
+                    reloading: () => FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.fetching",
+                    ),
+                    error: (_, stackTrace) => FlutterI18n.translate(
+                      context,
+                      "homepage.school_card_info_card.error_occured",
                     ),
                   ),
                 ),
-              );
-
-              showToast(
-                context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.error_toast",
-                ),
-              );
-            },
-            loading: () {
-              showToast(
-                context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.fetching_toast",
-                ),
-              );
-            },
-            refreshing: () {
-              showToast(
-                context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.fetching_toast",
-                ),
-              );
-            },
-            reloading: () {
-              showToast(
-                context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.fetching_toast",
-                ),
-              );
-            },
-          );
-        }
-      },
-      isLoad: state.isLoading,
-      icon: MingCuteIcons.mgc_wallet_4_line,
-      text: FlutterI18n.translate(
-        context,
-        "homepage.school_card_info_card.bill",
-      ),
-      infoText: Text.rich(
-        TextSpan(
-          style: const TextStyle(fontSize: 20),
-          children: [
-            TextSpan(
-              text: state.map(
-                data: (money) {
-                  if (money.contains(RegExp(r'[0-9]'))) {
-                    return FlutterI18n.translate(
-                      context,
-                      "homepage.school_card_info_card.balance",
-                      translationParams: {
-                        "amount": double.parse(money) >= 10
-                            ? double.parse(money).truncate().toString()
-                            : money,
-                      },
-                    );
-                  }
-                  return FlutterI18n.translate(context, money);
-                },
-                loading: () => FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.fetching",
-                ),
-                refreshing: () => FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.fetching",
-                ),
-                reloading: () => FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.fetching",
-                ),
-                error: (_, stackTrace) => FlutterI18n.translate(
-                  context,
-                  "homepage.school_card_info_card.error_occured",
-                ),
+              ],
+            ),
+          ),
+          bottomText: Text(
+            state.map(
+              data: (_) => FlutterI18n.translate(
+                context,
+                "homepage.school_card_info_card.bottom_text_success",
+              ),
+              loading: () => FlutterI18n.translate(
+                context,
+                "homepage.school_card_info_card.fetching_info",
+              ),
+              refreshing: () => FlutterI18n.translate(
+                context,
+                "homepage.school_card_info_card.fetching_info",
+              ),
+              reloading: () => FlutterI18n.translate(
+                context,
+                "homepage.school_card_info_card.fetching_info",
+              ),
+              error: (_, stackTrace) => FlutterI18n.translate(
+                context,
+                "homepage.school_card_info_card.no_info",
               ),
             ),
-          ],
-        ),
-      ),
-      bottomText: Text(
-        state.map(
-          data: (_) => FlutterI18n.translate(
-            context,
-            "homepage.school_card_info_card.bottom_text_success",
+            overflow: TextOverflow.ellipsis,
           ),
-          loading: () => FlutterI18n.translate(
-            context,
-            "homepage.school_card_info_card.fetching_info",
-          ),
-          refreshing: () => FlutterI18n.translate(
-            context,
-            "homepage.school_card_info_card.fetching_info",
-          ),
-          reloading: () => FlutterI18n.translate(
-            context,
-            "homepage.school_card_info_card.fetching_info",
-          ),
-          error: (_, stackTrace) => FlutterI18n.translate(
-            context,
-            "homepage.school_card_info_card.no_info",
-          ),
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
-      rightButton: state.hasValue
-          ? IconButton.filledTonal(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (context) {
-                    return QRCodeView();
+          rightButton: state.hasValue
+              ? IconButton.filledTonal(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (context) {
+                        return QRCodeView();
+                      },
+                    );
                   },
-                );
-              },
-              icon: Icon(Icons.qr_code_2),
-            )
-          : null,
+                  icon: Icon(Icons.qr_code_2),
+                )
+              : null,
+        );
+      },
     );
   }
 }

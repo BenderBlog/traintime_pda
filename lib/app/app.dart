@@ -64,48 +64,50 @@ class _XDYouAppState extends State<XDYouApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final color = appTheme.colorSignal.value;
-      final themeMode = appTheme.colorStateSignal.value;
-      final i18nDelegate = appTheme.i18nDelegateSignal.value;
+    return SignalBuilder(
+      builder: (context) {
+        final color = appTheme.colorSignal.value;
+        final themeMode = appTheme.colorStateSignal.value;
+        final i18nDelegate = appTheme.i18nDelegateSignal.value;
 
-      return MaterialApp(
-        localizationsDelegates: [
-          i18nDelegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('zh', 'CN'),
-          Locale('zh', 'TW'),
-          Locale('en', 'US'),
-        ],
-        debugShowCheckedModeBanner: false,
-        scrollBehavior: XDYouScrollBehavior(),
-        navigatorKey: preference.debuggerKey,
-        title: Platform.isIOS || Platform.isMacOS || Platform.isAndroid
-            ? "XDYou"
-            : 'Traintime PDA',
-        theme: buildLightAppTheme(color.first),
-        darkTheme: buildDarkAppTheme(color.last),
-        themeMode: themeMode,
-        home: DefaultTextStyle.merge(
-          style: const TextStyle(textBaseline: TextBaseline.ideographic),
-          child: widget.isFirst ? const LoginWindow() : const HomePage(),
-        ),
-        builder: (context, widget) {
-          Catcher2.addDefaultErrorWidget(
-            showStacktrace: true,
-            title: "Unexpected problem:P",
-            description: "An unexpected behaviour occured!",
-            maxWidthForSmallMode: 150,
-          );
-          if (widget != null) return widget;
-          throw StateError('widget is null');
-        },
-      );
-    });
+        return MaterialApp(
+          localizationsDelegates: [
+            i18nDelegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('zh', 'CN'),
+            Locale('zh', 'TW'),
+            Locale('en', 'US'),
+          ],
+          debugShowCheckedModeBanner: false,
+          scrollBehavior: XDYouScrollBehavior(),
+          navigatorKey: preference.debuggerKey,
+          title: Platform.isIOS || Platform.isMacOS || Platform.isAndroid
+              ? "XDYou"
+              : 'Traintime PDA',
+          theme: buildLightAppTheme(color.first),
+          darkTheme: buildDarkAppTheme(color.last),
+          themeMode: themeMode,
+          home: DefaultTextStyle.merge(
+            style: const TextStyle(textBaseline: TextBaseline.ideographic),
+            child: widget.isFirst ? const LoginWindow() : const HomePage(),
+          ),
+          builder: (context, widget) {
+            Catcher2.addDefaultErrorWidget(
+              showStacktrace: true,
+              title: "Unexpected problem:P",
+              description: "An unexpected behaviour occured!",
+              maxWidthForSmallMode: 150,
+            );
+            if (widget != null) return widget;
+            throw StateError('widget is null');
+          },
+        );
+      },
+    );
   }
 }
 

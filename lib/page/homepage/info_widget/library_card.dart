@@ -16,98 +16,104 @@ class LibraryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = LibraryController.i.libraryBorrowStateSignal.watch(context);
-    return MainPageCard(
-      onPressed: () async {
-        context.pushReplacementNamed(Routes.library);
-      },
-      isLoad: state.isLoading,
-      icon: MingCuteIcons.mgc_book_2_line,
-      text: FlutterI18n.translate(context, "homepage.library_card.title"),
-      infoText: Text.rich(
-        TextSpan(
-          style: const TextStyle(fontSize: 20),
-          children: [
-            state.map(
-              data: (list) => TextSpan(
-                text: FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.current_borrow",
-                  translationParams: {"count": list.length.toString()},
+    return SignalBuilder(
+      builder: (context) {
+        final state = LibraryController.i.libraryBorrowStateSignal.value;
+        return MainPageCard(
+          onPressed: () async {
+            context.pushReplacementNamed(Routes.library);
+          },
+          isLoad: state.isLoading,
+          icon: MingCuteIcons.mgc_book_2_line,
+          text: FlutterI18n.translate(context, "homepage.library_card.title"),
+          infoText: Text.rich(
+            TextSpan(
+              style: const TextStyle(fontSize: 20),
+              children: [
+                state.map(
+                  data: (list) => TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.current_borrow",
+                      translationParams: {"count": list.length.toString()},
+                    ),
+                  ),
+                  loading: () => TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.fetching",
+                    ),
+                  ),
+                  refreshing: () => TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.fetching",
+                    ),
+                  ),
+                  reloading: () => TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.fetching",
+                    ),
+                  ),
+                  error: (_, _) => TextSpan(
+                    text: FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.error_occured",
+                    ),
+                  ),
                 ),
-              ),
-              loading: () => TextSpan(
-                text: FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.fetching",
-                ),
-              ),
-              refreshing: () => TextSpan(
-                text: FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.fetching",
-                ),
-              ),
-              reloading: () => TextSpan(
-                text: FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.fetching",
-                ),
-              ),
-              error: (_, _) => TextSpan(
-                text: FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.error_occured",
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
-      bottomText: DefaultTextStyle.merge(
-        overflow: TextOverflow.ellipsis,
-        child: state.map(
-          data: (data) {
-            int duedNum = data.where((element) => element.lendDay < 0).length;
-            if (duedNum == 0) {
-              return Text(
+          ),
+          bottomText: DefaultTextStyle.merge(
+            overflow: TextOverflow.ellipsis,
+            child: state.map(
+              data: (data) {
+                int duedNum = data
+                    .where((element) => element.lendDay < 0)
+                    .length;
+                if (duedNum == 0) {
+                  return Text(
+                    FlutterI18n.translate(
+                      context,
+                      "homepage.library_card.no_return",
+                    ),
+                  );
+                }
+                return Text(
+                  FlutterI18n.translate(
+                    context,
+                    "homepage.library_card.need_return",
+                    translationParams: {"dued": duedNum.toString()},
+                  ),
+                );
+              },
+              loading: () => Text(
                 FlutterI18n.translate(
                   context,
-                  "homepage.library_card.no_return",
+                  "homepage.library_card.fetching_info",
                 ),
-              );
-            }
-            return Text(
-              FlutterI18n.translate(
-                context,
-                "homepage.library_card.need_return",
-                translationParams: {"dued": duedNum.toString()},
               ),
-            );
-          },
-          loading: () => Text(
-            FlutterI18n.translate(
-              context,
-              "homepage.library_card.fetching_info",
+              refreshing: () => Text(
+                FlutterI18n.translate(
+                  context,
+                  "homepage.library_card.fetching_info",
+                ),
+              ),
+              reloading: () => Text(
+                FlutterI18n.translate(
+                  context,
+                  "homepage.library_card.fetching_info",
+                ),
+              ),
+              error: (_, _) => Text(
+                FlutterI18n.translate(context, "homepage.library_card.no_info"),
+              ),
             ),
           ),
-          refreshing: () => Text(
-            FlutterI18n.translate(
-              context,
-              "homepage.library_card.fetching_info",
-            ),
-          ),
-          reloading: () => Text(
-            FlutterI18n.translate(
-              context,
-              "homepage.library_card.fetching_info",
-            ),
-          ),
-          error: (_, _) => Text(
-            FlutterI18n.translate(context, "homepage.library_card.no_info"),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

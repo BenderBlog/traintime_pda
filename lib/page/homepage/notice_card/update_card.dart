@@ -14,41 +14,46 @@ class UpdateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final state = UpdateNoticeController.i.updateMessageStateSignal.value;
-      if (state.isLoading || state.isRefreshing) {
-        return Text(FlutterI18n.translate(context, "setting.fetching_update"))
-            .paddingDirectional(horizontal: 16, vertical: 14)
-            .withHomeCardStyle(context);
-      } else if (state.hasError) {
-        return Text(FlutterI18n.translate(context, "setting.fetch_failed"))
-            .paddingDirectional(horizontal: 16, vertical: 14)
-            .withHomeCardStyle(context);
-      } else {
-        switch (UpdateNoticeController.i.isNewVersionAvaliableComputed.value) {
-          case null:
-            return Text(
-                  FlutterI18n.translate(context, "setting.current_testing"),
-                )
-                .paddingDirectional(horizontal: 16, vertical: 14)
-                .withHomeCardStyle(context);
-          case true:
-            return Text(FlutterI18n.translate(context, "setting.new_version"))
-                .paddingDirectional(horizontal: 16, vertical: 14)
-                .withHomeCardStyle(
-                  context,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) =>
-                          UpdateDialog(updateMessage: state.value!),
-                    );
-                  },
-                );
-          case false:
-            return SizedBox(height: 0);
+    return SignalBuilder(
+      builder: (context) {
+        final state = UpdateNoticeController.i.updateMessageStateSignal.value;
+        if (state.isLoading || state.isRefreshing) {
+          return Text(FlutterI18n.translate(context, "setting.fetching_update"))
+              .paddingDirectional(horizontal: 16, vertical: 14)
+              .withHomeCardStyle(context);
+        } else if (state.hasError) {
+          return Text(FlutterI18n.translate(context, "setting.fetch_failed"))
+              .paddingDirectional(horizontal: 16, vertical: 14)
+              .withHomeCardStyle(context);
+        } else {
+          switch (UpdateNoticeController
+              .i
+              .isNewVersionAvaliableComputed
+              .value) {
+            case null:
+              return Text(
+                    FlutterI18n.translate(context, "setting.current_testing"),
+                  )
+                  .paddingDirectional(horizontal: 16, vertical: 14)
+                  .withHomeCardStyle(context);
+            case true:
+              return Text(FlutterI18n.translate(context, "setting.new_version"))
+                  .paddingDirectional(horizontal: 16, vertical: 14)
+                  .withHomeCardStyle(
+                    context,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                            UpdateDialog(updateMessage: state.value!),
+                      );
+                    },
+                  );
+            case false:
+              return SizedBox(height: 0);
+          }
         }
-      }
-    });
+      },
+    );
   }
 }

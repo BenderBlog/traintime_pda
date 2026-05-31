@@ -30,160 +30,165 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
   Widget build(BuildContext context) {
     final c = ExamController.i;
 
-    return Watch((cache) {
-      final state = c.examInfoStateSignal.value;
-      final hasValidExamInfo = c.hasValidExamInfo.value;
-      final isFromCache = c.isExamFromCache.value;
-      final fetchTime = c.examFetchTime.value;
-      final cacheHintKey = c.examCacheHintKey.value;
-      final subjects = c.subjects.value;
-      final isDisQualified = c.isDisQualified.value;
-      final isFinished = c.isFinished.value;
-      final isNotFinished = c.isNotFinished.value;
-      final toBeArranged = c.toBeArranged.value;
+    return SignalBuilder(
+      builder: (context) {
+        final state = c.examInfoStateSignal.value;
+        final hasValidExamInfo = c.hasValidExamInfo.value;
+        final isFromCache = c.isExamFromCache.value;
+        final fetchTime = c.examFetchTime.value;
+        final cacheHintKey = c.examCacheHintKey.value;
+        final subjects = c.subjects.value;
+        final isDisQualified = c.isDisQualified.value;
+        final isFinished = c.isFinished.value;
+        final isNotFinished = c.isNotFinished.value;
+        final toBeArranged = c.toBeArranged.value;
 
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, "exam.title")),
-          actions: [
-            if (hasValidExamInfo)
-              IconButton(
-                icon: const Icon(Icons.update),
-                onPressed: () => c.reloadExamInfo(),
-              ),
-            if (hasValidExamInfo)
-              IconButton(
-                icon: const Icon(Icons.more_time),
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => NoArrangedInfo(list: toBeArranged),
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(FlutterI18n.translate(context, "exam.title")),
+            actions: [
+              if (hasValidExamInfo)
+                IconButton(
+                  icon: const Icon(Icons.update),
+                  onPressed: () => c.reloadExamInfo(),
+                ),
+              if (hasValidExamInfo)
+                IconButton(
+                  icon: const Icon(Icons.more_time),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => NoArrangedInfo(list: toBeArranged),
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
-        body: Builder(
-          builder: (context) {
-            if (hasValidExamInfo) {
-              Widget content;
-              if (subjects.isNotEmpty) {
-                content = TimelineWidget(
-                  isTitle: [
-                    true,
-                    false,
-                    true,
-                    false,
-                    if (isDisQualified.isNotEmpty) ...[true, false],
-                  ],
-                  children: [
-                    if (isDisQualified.isNotEmpty) ...[
+            ],
+          ),
+          body: Builder(
+            builder: (context) {
+              if (hasValidExamInfo) {
+                Widget content;
+                if (subjects.isNotEmpty) {
+                  content = TimelineWidget(
+                    isTitle: [
+                      true,
+                      false,
+                      true,
+                      false,
+                      if (isDisQualified.isNotEmpty) ...[true, false],
+                    ],
+                    children: [
+                      if (isDisQualified.isNotEmpty) ...[
+                        TimelineTitle(
+                          title: FlutterI18n.translate(
+                            context,
+                            "exam.unable_to_exam",
+                          ),
+                        ),
+                        isDisQualified
+                            .map((e) => ExamInfoCard(toUse: e))
+                            .toList()
+                            .toColumn(),
+                      ],
                       TimelineTitle(
                         title: FlutterI18n.translate(
                           context,
-                          "exam.unable_to_exam",
+                          "exam.not_finished",
                         ),
                       ),
-                      isDisQualified
-                          .map((e) => ExamInfoCard(toUse: e))
-                          .toList()
-                          .toColumn(),
+                      [
+                        if (isNotFinished.isNotEmpty)
+                          ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
+                        else
+                          ExamInfoCard(
+                            title: FlutterI18n.translate(
+                              context,
+                              "exam.all_finished",
+                            ),
+                          ),
+                      ].toColumn(),
+                      TimelineTitle(
+                        title: FlutterI18n.translate(context, "exam.finished"),
+                      ),
+                      [
+                        if (isFinished.isNotEmpty)
+                          ...isFinished.map((e) => ExamInfoCard(toUse: e))
+                        else
+                          ExamInfoCard(
+                            title: FlutterI18n.translate(
+                              context,
+                              "exam.none_finished",
+                            ),
+                          ),
+                      ].toColumn(),
                     ],
-                    TimelineTitle(
-                      title: FlutterI18n.translate(
-                        context,
-                        "exam.not_finished",
+                  );
+                } else {
+                  content = EmptyListView(
+                    type: EmptyListViewType.defaultimg,
+                    text: FlutterI18n.translate(
+                      context,
+                      "exam.no_exam_arrangement",
+                    ),
+                  );
+                }
+
+                final body = Column(
+                  children: [
+                    if (isFromCache && fetchTime != null)
+                      CacheAlerter(
+                        dataType: FlutterI18n.translate(context, "exam.title"),
+                        hint: FlutterI18n.translate(
+                          context,
+                          cacheHintKey == null ||
+                                  cacheHintKey == "local_cache_hint"
+                              ? "cache_reason_default"
+                              : cacheHintKey,
+                        ),
+                        placeOfCache: PlaceOfCache.device,
+                        fetchTime: fetchTime,
                       ),
-                    ),
-                    [
-                      if (isNotFinished.isNotEmpty)
-                        ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
-                      else
-                        ExamInfoCard(
-                          title: FlutterI18n.translate(
-                            context,
-                            "exam.all_finished",
-                          ),
-                        ),
-                    ].toColumn(),
-                    TimelineTitle(
-                      title: FlutterI18n.translate(context, "exam.finished"),
-                    ),
-                    [
-                      if (isFinished.isNotEmpty)
-                        ...isFinished.map((e) => ExamInfoCard(toUse: e))
-                      else
-                        ExamInfoCard(
-                          title: FlutterI18n.translate(
-                            context,
-                            "exam.none_finished",
-                          ),
-                        ),
-                    ].toColumn(),
+                    Expanded(child: content),
                   ],
                 );
-              } else {
-                content = EmptyListView(
-                  type: EmptyListViewType.defaultimg,
-                  text: FlutterI18n.translate(
-                    context,
-                    "exam.no_exam_arrangement",
-                  ),
-                );
-              }
 
-              final body = Column(
-                children: [
-                  if (isFromCache && fetchTime != null)
-                    CacheAlerter(
-                      dataType: FlutterI18n.translate(context, "exam.title"),
+                if (!state.isLoading) return body;
+
+                return Stack(
+                  children: [
+                    Column(
+                      children: [
+                        AnimatedContainer(
+                          height: kTextTabBarHeight,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        ),
+                        Expanded(child: body),
+                      ],
+                    ),
+                    LoadingAlerter(
+                      isLoading: true,
                       hint: FlutterI18n.translate(
                         context,
-                        cacheHintKey == null ||
-                                cacheHintKey == "local_cache_hint"
-                            ? "cache_reason_default"
-                            : cacheHintKey,
+                        "exam.fetching_hint",
                       ),
-                      placeOfCache: PlaceOfCache.device,
-                      fetchTime: fetchTime,
+                      opacity: 0.15,
+                      showOverlay: true,
                     ),
-                  Expanded(child: content),
-                ],
-              );
-
-              if (!state.isLoading) return body;
-
-              return Stack(
-                children: [
-                  Column(
-                    children: [
-                      AnimatedContainer(
-                        height: kTextTabBarHeight,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      ),
-                      Expanded(child: body),
-                    ],
-                  ),
-                  LoadingAlerter(
-                    isLoading: true,
-                    hint: FlutterI18n.translate(context, "exam.fetching_hint"),
-                    opacity: 0.15,
-                    showOverlay: true,
-                  ),
-                ],
-              );
-            } else if (state is AsyncError) {
-              return ReloadWidget(
-                function: () => c.reloadExamInfo(),
-                errorStatus: state.error,
-                stackTrace: state.stackTrace,
-              ).center();
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-      );
-    });
+                  ],
+                );
+              } else if (state is AsyncError) {
+                return ReloadWidget(
+                  function: () => c.reloadExamInfo(),
+                  errorStatus: state.error,
+                  stackTrace: state.stackTrace,
+                ).center();
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        );
+      },
+    );
   }
 }
