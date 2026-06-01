@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/external/ruisi_flutter/pages/my_posts_page.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/pages/my_posts_page.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../constants/urls.dart';

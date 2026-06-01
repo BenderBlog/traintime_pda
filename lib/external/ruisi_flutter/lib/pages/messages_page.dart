@@ -49,7 +49,7 @@ class _MessagesPageState extends State<MessagesPage>
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return SignalBuilder(builder: (context) {
       final c = RuisiController.i;
 
       return Scaffold(

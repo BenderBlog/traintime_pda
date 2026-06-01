@@ -15,7 +15,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
-import 'package:watermeter/external/ruisi_flutter/controller/ruisi_controller.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/controller/ruisi_controller.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -159,21 +159,28 @@ class _SettingWindowState extends State<SettingWindow> {
                   title: Text(
                     FlutterI18n.translate(context, "setting.check_update"),
                   ),
-                  subtitle: Watch((context) {
-                    final updateState =
-                        UpdateNoticeController.i.updateMessageStateSignal.value;
-                    return Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.latest_version",
-                        translationParams: {
-                          "latest":
-                              updateState.value?.code ??
-                              FlutterI18n.translate(context, "setting.waiting"),
-                        },
-                      ),
-                    );
-                  }),
+                  subtitle: SignalBuilder(
+                    builder: (context) {
+                      final updateState = UpdateNoticeController
+                          .i
+                          .updateMessageStateSignal
+                          .value;
+                      return Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.latest_version",
+                          translationParams: {
+                            "latest":
+                                updateState.value?.code ??
+                                FlutterI18n.translate(
+                                  context,
+                                  "setting.waiting",
+                                ),
+                          },
+                        ),
+                      );
+                    },
+                  ),
                   onTap: () {
                     showToast(
                       context: context,
@@ -216,8 +223,8 @@ class _SettingWindowState extends State<SettingWindow> {
                           case true:
                             await showDialog(
                               context: context,
-                              builder: (context) => Watch(
-                                (context) => UpdateDialog(
+                              builder: (context) => SignalBuilder(
+                                builder: (context) => UpdateDialog(
                                   updateMessage: UpdateNoticeController
                                       .i
                                       .updateMessageStateSignal

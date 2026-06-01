@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
-import 'package:watermeter/external/ruisi_flutter/constants/forum_id.dart';
-import 'package:watermeter/external/ruisi_flutter/pages/search_page.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/constants/forum_id.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/pages/search_page.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../utils/branch_navigation.dart';

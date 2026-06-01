@@ -13,7 +13,7 @@ import '../models/post.dart';
 import '../models/vote.dart';
 import '../constants/urls.dart';
 import '../widgets/smiley_picker.dart';
-import '../../../repository/pick_file.dart';
+import '../../../../repository/pick_file.dart';
 
 /// 帖子详情页
 class TopicDetailPage extends StatefulWidget {

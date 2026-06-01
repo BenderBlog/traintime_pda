@@ -49,7 +49,7 @@ class ExamController {
         ExamSession.deleteCache();
       }
       unawaited(reloadExamInfo());
-    }, debugLabel: "ExamControllerSemesterChangeEffect");
+    }, options: EffectOptions(name: "ExamControllerSemesterChangeEffect"));
   }
 
   Future<void> reloadExamInfo() async {

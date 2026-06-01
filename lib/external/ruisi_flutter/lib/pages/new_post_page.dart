@@ -8,7 +8,7 @@ import 'package:get_it/get_it.dart';
 import '../controller/ruisi_controller.dart';
 import '../models/post_page_meta.dart';
 import '../constants/urls.dart';
-import '../../../repository/pick_file.dart';
+import '../../../../repository/pick_file.dart';
 import '../widgets/smiley_picker.dart';
 
 /// 发帖页面

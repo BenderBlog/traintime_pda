@@ -62,48 +62,50 @@ class _ClassTableCardState extends State<ClassTableCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-          final controller = home.HomepageController.i;
-          final classTableController = ClassTableController.i;
-          final arrangementState =
-              controller.homepageArrangementStateComputedSignal.value;
-          final arrangements = controller.arrangementComputedSignal.value;
-          final isTomorrow = controller.isTomorrowComputedSignal.value;
-          final isAllSourcesLoading =
-              controller.isAllSourcesLoadingComputedSignal.value;
-          final isPartialSourcesLoading =
-              controller.isPartialSourcesLoadingComputedSignal.value;
-          final failedSources = controller.failedSourcesComputedSignal.value;
-          final havePhysicsExperiment =
-              controller.havePhysicsExperimentSignal.value;
-          final isPostGraduate = controller.isPostGraduate;
-          final currentWeek =
-              classTableController.currentWeekComputedSignal.value;
-          final semesterLength = classTableController
-              .classTableComputedSignal
-              .value
-              .semesterLength;
+    return SignalBuilder(
+          builder: (context) {
+            final controller = home.HomepageController.i;
+            final classTableController = ClassTableController.i;
+            final arrangementState =
+                controller.homepageArrangementStateComputedSignal.value;
+            final arrangements = controller.arrangementComputedSignal.value;
+            final isTomorrow = controller.isTomorrowComputedSignal.value;
+            final isAllSourcesLoading =
+                controller.isAllSourcesLoadingComputedSignal.value;
+            final isPartialSourcesLoading =
+                controller.isPartialSourcesLoadingComputedSignal.value;
+            final failedSources = controller.failedSourcesComputedSignal.value;
+            final havePhysicsExperiment =
+                controller.havePhysicsExperimentSignal.value;
+            final isPostGraduate = controller.isPostGraduate;
+            final currentWeek =
+                classTableController.currentWeekComputedSignal.value;
+            final semesterLength = classTableController
+                .classTableComputedSignal
+                .value
+                .semesterLength;
 
-          return [
-            _StateList(
-              isAllSourcesLoading: isAllSourcesLoading,
-              isPartialSourcesLoading: isPartialSourcesLoading,
-              failedSources: failedSources,
-              havePhysicsExperiment: havePhysicsExperiment,
-              isPostGraduate: isPostGraduate,
-            ),
-            _ClassArrangementListView(
-              arrangements: arrangements,
-              isTomorrow: isTomorrow,
-              emptyInfoText: _getEmptyInfoText(arrangementState),
-              arrangementState: arrangementState,
-              currentWeek: currentWeek,
-              semesterLength: semesterLength,
-            ),
-          ].whereType<Widget>().toList().toColumn(
-            separator: const SizedBox(height: 10),
-          );
-        })
+            return [
+              _StateList(
+                isAllSourcesLoading: isAllSourcesLoading,
+                isPartialSourcesLoading: isPartialSourcesLoading,
+                failedSources: failedSources,
+                havePhysicsExperiment: havePhysicsExperiment,
+                isPostGraduate: isPostGraduate,
+              ),
+              _ClassArrangementListView(
+                arrangements: arrangements,
+                isTomorrow: isTomorrow,
+                emptyInfoText: _getEmptyInfoText(arrangementState),
+                arrangementState: arrangementState,
+                currentWeek: currentWeek,
+                semesterLength: semesterLength,
+              ),
+            ].whereType<Widget>().toList().toColumn(
+              separator: const SizedBox(height: 10),
+            );
+          },
+        )
         .paddingDirectional(horizontal: 16, vertical: 8)
         .withHomeCardStyle(
           context,

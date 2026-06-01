@@ -1,5 +1,5 @@
-// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
-// SPDX-License-Identifier: MPL-2.0
+// Copyright 2026 BenderBlog Rodriguez and Contributors.
+// SPDX-License-Identifier: BSD-3-Clause
 
 class ForumId {
   static final randomChat = 72;

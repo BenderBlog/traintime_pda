@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/external/ruisi_flutter/utils/branch_navigation.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/utils/branch_navigation.dart';
 
 import '../models/topic.dart';
 import '../controller/ruisi_controller.dart';

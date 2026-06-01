@@ -1,11 +1,11 @@
-// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
-// SPDX-License-Identifier: MPL-2.0
+// Copyright 2026 BenderBlog Rodriguez and Contributors.
+// SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../models/topic.dart';
-import '../pages/topic_detail_page.dart';
+import 'topic_detail_page.dart';
 import '../utils/branch_navigation.dart';
 import '../widgets/topic_list_item.dart';
 

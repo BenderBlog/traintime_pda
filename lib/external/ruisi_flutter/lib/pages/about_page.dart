@@ -43,10 +43,7 @@ class AboutPage extends StatelessWidget {
           Center(
             child: Text(
               FlutterI18n.translate(context, 'ruisi.about.app_name'),
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 8),
@@ -85,10 +82,7 @@ class AboutPage extends StatelessWidget {
               FlutterI18n.translate(context, 'ruisi.about.bug_report'),
             ),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                'ruisi.about.bug_report_subtitle',
-              ),
+              FlutterI18n.translate(context, 'ruisi.about.bug_report_subtitle'),
             ),
             onTap: () => _openUrl('${Urls.homePage}/issues'),
           ),
