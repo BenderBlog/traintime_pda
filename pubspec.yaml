@@ -58,7 +58,7 @@ dependencies:
   # Output to system calendar
   device_calendar_plus: ^0.4.0
   # Homepage Widget
-  home_widget: ^0.9.0
+  home_widget: 0.9.1
   image: ^4.2.0
   catcher_2: ^2.0.0
   # internationalized
