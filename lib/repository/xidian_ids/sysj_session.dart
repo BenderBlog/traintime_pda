@@ -13,7 +13,7 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
@@ -197,7 +197,7 @@ class SysjSession extends IDSSession {
         location = await checkAndLogin(
           target: hrefIds.queryParameters["service"]!,
           sliderCaptcha: (String cookieStr) =>
-              SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+              SliderCaptchaClientProvider(cookie: cookieStr).solve(),
         );
       } else {
         location = hrefIds.toString();

@@ -5,7 +5,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
@@ -15,7 +15,7 @@ class PersonalInfoSession extends EhallSession {
     String location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     log.info(
@@ -57,7 +57,7 @@ class PersonalInfoSession extends EhallSession {
       target:
           "https://xgxt.xidian.edu.cn/xsfw/sys/jbxxapp/*default/index.do#/wdxx",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
     log.info(
       "[ehall_session][getDormInfoEhall] "

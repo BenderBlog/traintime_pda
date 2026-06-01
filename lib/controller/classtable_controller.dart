@@ -256,7 +256,7 @@ class ClassTableController {
 
   List<HomeArrangement> getArrangementOfDay(DateTime updateTime) {
     final formatter = DateFormat(HomeArrangement.format);
-    final currentWeek = currentWeekComputedSignal.value;
+    final currentWeek = getCurrentWeek(updateTime);
     final classTableData = classTableComputedSignal.value;
     final arrangementSet = <HomeArrangement>{};
 
