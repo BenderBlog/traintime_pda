@@ -7,7 +7,7 @@
 /*
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -21,7 +21,7 @@ class CreativeServiceSession extends IDSSession {
       String location = await checkAndLogin(
         target: "$url/login/ids",
         sliderCaptcha: (String cookieStr) =>
-            SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+            SliderCaptchaClientProvider(cookie: cookieStr).solve(),
       );
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {

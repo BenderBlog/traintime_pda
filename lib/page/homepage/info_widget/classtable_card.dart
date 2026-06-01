@@ -70,6 +70,10 @@ class _ClassTableCardState extends State<ClassTableCard> {
                 controller.homepageArrangementStateComputedSignal.value;
             final arrangements = controller.arrangementComputedSignal.value;
             final isTomorrow = controller.isTomorrowComputedSignal.value;
+            final updateTime = controller.updateTimeComputedSignal.value;
+            final displayTime = isTomorrow
+                ? updateTime.add(const Duration(days: 1))
+                : updateTime;
             final isAllSourcesLoading =
                 controller.isAllSourcesLoadingComputedSignal.value;
             final isPartialSourcesLoading =
@@ -78,8 +82,9 @@ class _ClassTableCardState extends State<ClassTableCard> {
             final havePhysicsExperiment =
                 controller.havePhysicsExperimentSignal.value;
             final isPostGraduate = controller.isPostGraduate;
-            final currentWeek =
-                classTableController.currentWeekComputedSignal.value;
+            final currentWeek = classTableController.getCurrentWeek(
+              displayTime,
+            );
             final semesterLength = classTableController
                 .classTableComputedSignal
                 .value
@@ -98,6 +103,7 @@ class _ClassTableCardState extends State<ClassTableCard> {
                 isTomorrow: isTomorrow,
                 emptyInfoText: _getEmptyInfoText(arrangementState),
                 arrangementState: arrangementState,
+                displayTime: displayTime,
                 currentWeek: currentWeek,
                 semesterLength: semesterLength,
               ),
@@ -121,6 +127,7 @@ class _ClassArrangementListView extends StatelessWidget {
   final bool isTomorrow;
   final String emptyInfoText;
   final ArrangementState arrangementState;
+  final DateTime displayTime;
   final int currentWeek;
   final int semesterLength;
 
@@ -129,6 +136,7 @@ class _ClassArrangementListView extends StatelessWidget {
     required this.isTomorrow,
     required this.emptyInfoText,
     required this.arrangementState,
+    required this.displayTime,
     required this.currentWeek,
     required this.semesterLength,
   });
@@ -196,12 +204,12 @@ class _ClassArrangementListView extends StatelessWidget {
                 String timeString = DateFormat(
                   "MMMd",
                   FlutterI18n.currentLocale(context).toString(),
-                ).format(DateTime.now());
+                ).format(displayTime);
 
                 String weekString = DateFormat(
                   "E",
                   FlutterI18n.currentLocale(context).toString(),
-                ).format(DateTime.now());
+                ).format(displayTime);
 
                 String weekInfo =
                     currentWeek >= 0 && currentWeek < semesterLength

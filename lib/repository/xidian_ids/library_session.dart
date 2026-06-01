@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:pool/pool.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -187,7 +187,7 @@ class LibrarySession extends IDSSession {
             "https://hyytsgxzs.xidian.edu.cn/api/index/casLoginDo.html?"
             "libraryId=5&openId=o2b1a5Fg6r8hKcL0FXopEkfmiQGc&source=xdbb",
         sliderCaptcha: (String cookieStr) =>
-            SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+            SliderCaptchaClientProvider(cookie: cookieStr).solve(),
       );
 
       RegExp matchJson = RegExp(r'wx.miniProgram.postMessage(.*);');
@@ -301,7 +301,7 @@ class LibrarySession extends IDSSession {
   //    String location = await checkAndLogin(
   //      target: "https://tyrzfw.chaoxing.com/auth/xidian/cas/index",
   //      sliderCaptcha: (String cookieStr) =>
-  //          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+  //          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
   //    );
   //    var response = await dio.get(location);
   //

@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
@@ -124,7 +124,7 @@ class ClassTableSession extends EhallSession {
           "https://yjspt.xidian.edu.cn/gsapp/"
           "sys/wdkbapp/*default/index.do#/xskcb",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     while (location != null) {

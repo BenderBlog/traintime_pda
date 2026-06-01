@@ -16,6 +16,7 @@ import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 
 class MainPage extends StatefulWidget {
   final Function()? changePage;
@@ -210,9 +211,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           await update(
             context: context,
             sliderCaptcha: (String cookieStr) {
-              return SliderCaptchaClientProvider(
-                cookie: cookieStr,
-              ).solve(context);
+              return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+                manualSolver: (provider) =>
+                    solveSliderCaptchaManually(context, provider),
+              );
             },
           );
           if (context.mounted) {
