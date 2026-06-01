@@ -1,0 +1,6 @@
+1. 睿思论坛实现 @BenderBlog
+   相关路由栈优化 @clever-max
+2. 修改学期时可从网络获取 @BenderBlog
+3. 校园网功能回归 @BenderBlog
+4. 新的主页日程卡片 @BenderBlog
+5. 主页可编辑 @BenderBlog

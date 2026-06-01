@@ -1,0 +1,6 @@
+1. Ruisi Forum @BenderBlog
+   Navigator optimization @clever-max
+2. Fetch semester info from Internet @BenderBlog
+3. Schoolnet return @BenderBlog
+4. New classtable homepage card  @BenderBlog
+5. Editable homepage @BenderBlog

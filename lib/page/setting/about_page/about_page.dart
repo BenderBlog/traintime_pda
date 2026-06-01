@@ -23,10 +23,10 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  final String urlOthers =
-      "https://www.bilibili.com/video/BV14T411277a?t=739.0";
+  final String urlOthers = "https://www.bilibili.com/video/BV1sA411X7V4";
 
-  final String urlApple = "https://www.bilibili.com/bangumi/play/ep86203/";
+  final String urlApple =
+      "https://www.bilibili.com/video/BV1WW41187VR?t=3523.9";
 
   List<Developer> getDevelopers() => [
     Developer(
@@ -317,7 +317,7 @@ class _AboutPageState extends State<AboutPage> {
                   TextSpan(
                     text:
                         "${Platform.isIOS || Platform.isMacOS ? "" : ""}"
-                        "Himawari's Hogweed Adventure Edition",
+                        "Children of the World Edition",
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],

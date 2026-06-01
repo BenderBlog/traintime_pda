@@ -7,6 +7,8 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/utils/branch_navigation.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../models/post.dart';
@@ -777,16 +779,28 @@ class _IgnoreJsOpImage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: GestureDetector(
         onTap: () {
-          showDialog(
-            context: context,
-            builder: (_) => Dialog(
-              child: InteractiveViewer(
-                child: CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.contain,
-                  placeholder: (_, _) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (_, _, _) => const Icon(Icons.broken_image),
+          context.push(
+            Scaffold(
+              appBar: AppBar(title: const Text("Image Viewer"), elevation: 0),
+              body: Center(
+                child: InteractiveViewer(
+                  clipBehavior: Clip.none,
+                  minScale: 1.0,
+                  maxScale: 4.0,
+                  child: CachedNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.contain,
+                    placeholder: (_, _) => const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                    errorWidget: (_, _, _) => const Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

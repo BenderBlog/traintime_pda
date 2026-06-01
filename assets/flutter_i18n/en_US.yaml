@@ -1233,100 +1233,21 @@ electricity_status:
 school_card_status:
   failed_to_fetch: Failed fetching
   failed_to_query: Failed querying
-easter_egg_apple: "Himawari have a dream
+easter_egg_apple: |
+  Children's Day Wishes from developer
 
-  She wrote it in Chinese
+  No matter how dark the world is
+  Remember the good faith of all
 
-  So please see the Chinese version"
-easter_egg_others: "Turn and run!
+  Also be who you are
 
-  Nothing can stop them
+easter_egg_others: |
+  Children's Day Wishes from developer
 
-  Around every river and canal their power is growing
+  No matter how dark the world is
+  Remember the good faith of all
 
-
-  Stamp them out!
-
-  We must destroy them
-
-  They infiltrate each city with their thick dark warning odour
-
-
-  They are invincible
-
-  They seem immune to all our herbicidal battering
-
-
-  Long ago in the Russian hills
-
-  A Victorian explorer found
-
-  The regal Hogweed by a marsh
-
-  He captured it and brought it home
-
-
-  Botanical creature stirs, seeking revenge
-
-  Royal beast did not forget
-
-
-  He came home to London
-
-  And made a present of the Hogweed
-
-  To the Royal Gardens at Kew
-
-
-  Waste no time!
-
-  They are approaching
-
-  Hurry now, we must protect ourselves and find some shelter
-
-
-  Strike by night!
-
-  They are defenceless
-
-  They all need the sun to photosensitize their venom
-
-
-  Still they're invincible
-
-  Still they're immune to all our herbicidal battering
-
-
-  Fashionable country gentlemen
-
-  Had some cultivated wild gardens
-
-  In which they innocently planted
-
-  The Giant Hogweed throughout the land
-
-
-  Botanical creature stirs, seeking revenge
-
-  Royal beast did not forget
-
-
-  Soon they escaped, spreading
-
-  Their seed preparing for an onslaught
-
-  Threatening the human race
-
-
-  Mighty Hogweed is avenged
-
-  Human bodies soon will know our anger
-
-  Kill them with your Hogweed hairs
-
-  Heracleum Mantegazziani
-
-  Advance!"
+  Also be who you are
 easter_egg_robot:
   appbar: Welcome Students!
   title: Looking like you are worrying about opening semester?

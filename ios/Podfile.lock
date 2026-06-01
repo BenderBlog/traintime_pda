@@ -4,14 +4,11 @@ PODS:
   - Flutter (1.0.0)
   - flutter_mailer (0.0.1):
     - Flutter
-  - permission_handler_apple (9.3.0):
-    - Flutter
 
 DEPENDENCIES:
   - charset_converter (from `.symlinks/plugins/charset_converter/ios`)
   - Flutter (from `Flutter`)
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
-  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 EXTERNAL SOURCES:
   charset_converter:
@@ -20,14 +17,11 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_mailer:
     :path: ".symlinks/plugins/flutter_mailer/ios"
-  permission_handler_apple:
-    :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
   charset_converter: 82bc1d2e3c70dcb51bf769e9772e3ae5b2571695
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_mailer: 3a8cd4f36c960fb04528d5471097270c19fec1c4
-  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
 
 PODFILE CHECKSUM: 33ee58e3b6ad46b815d23ed7bf392f2a93d23dc3
 
