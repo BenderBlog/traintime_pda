@@ -105,31 +105,39 @@ class _HomePageState extends State<HomePage>
       body: TabBarView(
         controller: _tabCtrl,
         children: [
+          // 首页帖子列表使用预览语义，避免分屏误触后直接丢失原详情链。
           TopicListPage(
             getTopicList: (int page) => c.api.getNewTopics(page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
           TopicListPage(
             getTopicList: (int page) => c.api.getNewReplyTopics(page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
           TopicListPage(
             getTopicList: (int page) =>
                 c.api.getTopicList(ForumId.randomChat, page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
           TopicListPage(
             getTopicList: (int page) =>
                 c.api.getTopicList(ForumId.photograph, page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
           TopicListPage(
             getTopicList: (int page) =>
                 c.api.getTopicList(ForumId.secondHand, page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
           TopicListPage(
             getTopicList: (int page) =>
                 c.api.getTopicList(ForumId.employment, page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
           TopicListPage(
             getTopicList: (int page) =>
                 c.api.getTopicList(ForumId.lostAndFound, page: page),
+            useHomeTopicPreviewNavigation: true,
           ),
         ],
       ),
