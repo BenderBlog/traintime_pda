@@ -1,6 +1,8 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
+import 'vote.dart';
+
 /// 帖子内容中的图片信息
 class ImageAttachment {
   final int aid;
@@ -63,6 +65,7 @@ class TopicDetail {
   final List<Post> posts;
   final int currentPage;
   final int totalPages;
+  final VoteData? vote; // 投票数据（仅主楼有投票时非空）
 
   TopicDetail({
     required this.tid,
@@ -77,5 +80,6 @@ class TopicDetail {
     this.posts = const [],
     this.currentPage = 1,
     this.totalPages = 1,
+    this.vote,
   });
 }

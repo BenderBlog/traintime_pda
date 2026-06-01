@@ -9,13 +9,14 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/external/ruisi_flutter/controller/ruisi_controller.dart';
-import 'package:watermeter/external/ruisi_flutter/ruisi_main.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
@@ -73,7 +74,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   void initState() {
     super.initState();
     _controller = PageController();
-    RuisiController.i.init();
   }
 
   void _loginAsync() async {
@@ -262,7 +262,11 @@ class _HomePageMasterState extends State<HomePageMaster>
               _controller.jumpToPage(_selectedIndex);
             },
           ),
-          const RuisiApp(),
+          RuisiApp(
+            prefs: preference.prefs,
+            cookiePath: supportPath.path,
+            talker: TalkerFlutter.init(),
+          ),
           const PigPage(),
           const SettingWindow(),
         ],

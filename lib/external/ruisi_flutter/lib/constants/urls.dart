@@ -1,21 +1,11 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// 睿思论坛 API 地址常量
-/// 基于 Discuz! 论坛系统
-/// 仅校内网运行
-class AppConstants {
-  static const String appId = 'id1322805454';
-  static const int postId = 921699;
-  static const String hostRs = 'rs.xidian.edu.cn';
-}
-
 class Urls {
   static const String homePage =
       'https://github.com/BenderBlog/traintime_pda/tree/main/lib/external/ruisi_flutter/';
   static const String baseUrl = 'https://rs.xidian.edu.cn/';
 
-  // ---- 认证 ----
   static const String loginUrl =
       '${baseUrl}member.php?mod=logging&action=login';
   static const String checkLoginUrl =
@@ -34,7 +24,6 @@ class Urls {
   static const String newReplyUrl = '${baseUrl}forum.php?mod=guide&view=new';
 
   // ---- 板块 ----
-  // 与 iOS 版本一致：使用 mobile=2 移动端接口，返回简洁 HTML
   static const String forumlistUrl =
       '${baseUrl}forum.php?inajax=1&forumlist=1&mobile=2';
   static String getPostsUrl(int fid) =>

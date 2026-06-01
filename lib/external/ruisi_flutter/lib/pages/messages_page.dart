@@ -1,5 +1,6 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
+/*
 
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -11,6 +12,7 @@ import 'topic_detail_page.dart';
 import 'login_page.dart';
 
 /// 消息通知页面
+
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
 
@@ -47,7 +49,7 @@ class _MessagesPageState extends State<MessagesPage>
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
+    return SignalBuilder(builder: (context) {
       final c = RuisiController.i;
 
       return Scaffold(
@@ -136,3 +138,4 @@ class _MessagesPageState extends State<MessagesPage>
     );
   }
 }
+*/

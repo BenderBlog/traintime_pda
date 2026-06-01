@@ -11,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
-import 'package:flutter/widgets.dart';
 import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/repository/logger.dart';
 

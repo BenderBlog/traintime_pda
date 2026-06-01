@@ -1368,6 +1368,7 @@ ruisi:
     login: Login
     logout: Log out
     logged_out: Logged out
+    submit: Submit
   about:
     title: About
     app_name: Ruisi
@@ -1437,6 +1438,21 @@ ruisi:
     favorite_failure: Failed to add to favorites
     no_data: No data
     reply_hint: Write a reply...
+    vote:
+      single_select: Single choice
+      multi_select: "Multiple choice, up to {count}"
+      title_prefix: Vote
+      count: "{count} people voted"
+      open: Vote
+      sheet_title: Vote
+      max_selection: "You can select up to {count}"
+      not_selected: Please select an option
+      success: Vote submitted
+      failure: Vote failed
+      param_error: "Vote failed: invalid parameters"
+      already_voted: "You have already voted. Thank you!"
+      expired: "This poll has expired or been closed"
+      ended: "This poll has ended"
   topic_list_item:
     sticky: Pinned
   forum_list:

@@ -157,7 +157,7 @@ class ClassTableController {
         "from ${semesterChangeEvent.oldSemester} "
         "to ${semesterChangeEvent.effectiveSemester}.",
       );
-    }, debugLabel: "ClassTableControllerSemesterChangeEffect");
+    }, options: EffectOptions(name: "ClassTableControllerSemesterChangeEffect"));
   }
 
   Future<void> reloadClassTable() async {

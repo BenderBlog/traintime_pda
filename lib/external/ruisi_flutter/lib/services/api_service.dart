@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
 
@@ -12,6 +13,7 @@ import '../constants/urls.dart';
 import '../models/forum.dart';
 import '../models/topic.dart';
 import '../models/post.dart';
+import '../models/vote.dart';
 import '../models/message.dart';
 import '../models/post_page_meta.dart';
 import '../repository/ruisi_api.dart';
@@ -261,6 +263,18 @@ class ApiService {
     } else {
       return (false, '账号或密码错误');
     }
+  }
+
+  Future<bool> validateSession() async {
+    _api.talker.info('正在验证会话有效性...');
+    final (ok, body) = await _api.get('${Urls.baseUrl}home.php?mod=space');
+    if (!ok) {
+      _api.talker.warning('会话验证请求失败');
+      return false;
+    }
+    final valid = !body.contains('请先登录后才能继续浏览');
+    _api.talker.info('会话有效性: $valid');
+    return valid;
   }
 
   // =========================================================================
@@ -894,6 +908,180 @@ class ApiService {
   }
 
   // =========================================================================
+  // 投票解析
+  // =========================================================================
+
+  /// 从帖子 HTML 中解析投票表单
+  ///
+  /// 投票表单 `<form id="poll">` 位于主楼 `.pcbs` 内、`<td class="t_f">` 之后，
+  /// 不在帖子正文内容里，需要在 `.pcbs` 级别查找。
+  VoteData? _parseVoteData(dom.Document doc) {
+    final form = doc.querySelector('form#poll');
+    if (form == null) return null;
+
+    // 提交 URL：form action 属性
+    final rawAction = form.attributes['action'] ?? '';
+    if (rawAction.isEmpty) return null;
+    final actionUrl = rawAction.startsWith('http')
+        ? rawAction
+        : '${Urls.baseUrl}$rawAction';
+
+    // 投票类型 + 参与人数：.pinf 文本
+    final pinf = form.querySelector('.pinf');
+    final pinfText = pinf?.text ?? '';
+    final isMulti = pinfText.contains('多选投票');
+
+    // 参与人数
+    int voteCount = 0;
+    final countMatch = RegExp(r'(\d+)\s*人参与投票').firstMatch(pinfText);
+    if (countMatch != null) {
+      voteCount = int.parse(countMatch.group(1)!);
+    }
+
+    final isPublic = form.text.contains('公开投票');
+    final formText = form.text;
+
+    // --- 判定状态 ---
+    // 优先级：canVote > voted/endedWithResults > expired
+
+    // --- 提取结果的通用方法 ---
+    // 选项标签和结果在相邻的两行：
+    // <td class="pvt"><label>...</label></td>
+    // 下一行 <td><div class="pbg"><div class="pbr" style="width:X%;..."></div></div></td>
+    //        <td>XX.XX% <em style="color:#xxx">(N)</em></td>
+    List<VoteResultItem> extractResults(List<dom.Element> rows) {
+      final items = <VoteResultItem>[];
+      for (int i = 0; i < rows.length - 1; i++) {
+        final labelEl = rows[i].querySelector('td.pvt label');
+        if (labelEl == null) continue;
+        final label = labelEl.text.trim();
+        final nextRow = rows[i + 1];
+        final pbr = nextRow.querySelector('.pbr');
+        if (pbr == null) continue;
+
+        final style = pbr.attributes['style'] ?? '';
+        final colorMatch = RegExp(
+          r'background-color:\s*(#[0-9a-fA-F]+)',
+        ).firstMatch(style);
+        final color = colorMatch?.group(1) ?? '#999999';
+
+        final resultCells = nextRow.querySelectorAll('td');
+        double percent = 0;
+        int count = 0;
+        // 百分比文本可能在 cells[1]（2列布局）或 cells[2]（3列布局）
+        // 遍历所有 cell 找包含 % 的那个
+        for (final cell in resultCells) {
+          final cellText = cell.text;
+          if (!cellText.contains('%')) continue;
+          final percentMatch = RegExp(r'([\d.]+)%').firstMatch(cellText);
+          if (percentMatch != null) {
+            percent = double.tryParse(percentMatch.group(1)!) ?? 0;
+          }
+          final countMatch = RegExp(r'\((\d+)\)').firstMatch(cellText);
+          if (countMatch != null) {
+            count = int.tryParse(countMatch.group(1)!) ?? 0;
+          }
+          break;
+        }
+        items.add(
+          VoteResultItem(
+            label: label,
+            percent: percent,
+            count: count,
+            color: color,
+          ),
+        );
+      }
+      return items;
+    }
+
+    final table = form.querySelector('table');
+    final tableRows = table?.querySelectorAll('tr') ?? [];
+    final results = extractResults(tableRows);
+
+    // 1. 可投票：存在 input[name="pollanswers[]"]
+    final hasInputs = form.querySelector('input[name="pollanswers[]"]') != null;
+    if (hasInputs) {
+      // 选项：优先从 tr.ptl 提取（状态①），否则从含 input 的行提取（状态⑤）
+      var optionRows = form.querySelectorAll('tr.ptl');
+      if (optionRows.isEmpty) {
+        optionRows = tableRows
+            .where(
+              (r) => r.querySelector('input[name="pollanswers[]"]') != null,
+            )
+            .toList();
+      }
+      final options = <VoteOption>[];
+      int maxSelection = isMulti ? optionRows.length : 1;
+
+      for (final row in optionRows) {
+        final input = row.querySelector('input[name="pollanswers[]"]');
+        if (input == null) continue;
+        final value = input.attributes['value'] ?? '';
+        final label = row.querySelector('label')?.text.trim() ?? '';
+        if (value.isNotEmpty) {
+          options.add(VoteOption(value: value, label: label));
+        }
+      }
+
+      if (options.isEmpty) return null;
+
+      // 有 input + 有结果 → canVoteWithResults
+      if (results.isNotEmpty) {
+        return VoteData(
+          status: VoteStatus.canVoteWithResults,
+          actionUrl: actionUrl,
+          options: options,
+          results: results,
+          maxSelection: maxSelection,
+          voteCount: voteCount,
+          isPublic: isPublic,
+        );
+      }
+
+      // 有 input + 无结果 → canVote
+      return VoteData(
+        status: VoteStatus.canVote,
+        actionUrl: actionUrl,
+        options: options,
+        maxSelection: maxSelection,
+        voteCount: voteCount,
+        isPublic: isPublic,
+      );
+    }
+
+    // 2. 无 input + 有结果 → voted 或 endedWithResults
+    if (results.isNotEmpty) {
+      final bool isEnded =
+          formText.contains('投票已经结束') || !formText.contains('距结束');
+      return VoteData(
+        status: isEnded ? VoteStatus.endedWithResults : VoteStatus.voted,
+        actionUrl: actionUrl,
+        results: results,
+        maxSelection: isMulti ? results.length : 1,
+        voteCount: voteCount,
+        isPublic: isPublic,
+      );
+    }
+
+    // 3. 无 input + 无结果 → expired
+    final expiredOptions = <VoteOption>[];
+    for (final row in form.querySelectorAll('tr.ptl')) {
+      final label = row.querySelector('td.pvt label')?.text.trim() ?? '';
+      if (label.isNotEmpty) {
+        expiredOptions.add(VoteOption(value: '', label: label));
+      }
+    }
+    return VoteData(
+      status: VoteStatus.expired,
+      actionUrl: actionUrl,
+      options: expiredOptions,
+      voteCount: voteCount,
+      isPublic: isPublic,
+    );
+  }
+
+  // =========================================================================
   // 帖子详情
   // =========================================================================
 
@@ -1043,6 +1231,9 @@ class ApiService {
       }
     }
 
+    // 解析投票表单（仅主楼有投票时返回）
+    final vote = _parseVoteData(doc);
+
     return TopicDetail(
       tid: tid,
       fid: 0,
@@ -1053,12 +1244,52 @@ class ApiService {
       posts: posts,
       currentPage: page,
       totalPages: maxPage,
+      vote: vote,
     );
   }
 
   // =========================================================================
   // 收藏
   // =========================================================================
+
+  // =========================================================================
+  // 投票提交
+  // =========================================================================
+
+  /// 提交投票
+  ///
+  /// [actionUrl] 投票接口地址（来自 VoteData.actionUrl），
+  /// [selectedValues] 用户选中的 pollanswers 值列表。
+  /// 返回 (成功?, 错误信息)。
+  Future<(bool, String?)> submitVote(
+    String actionUrl,
+    List<String> selectedValues,
+  ) async {
+    if (selectedValues.isEmpty) {
+      return (false, '你还没有选择');
+    }
+
+    // 使用 FormData 支持多个同名 key（pollanswers[]）
+    // Dio 的 FormData.fromMap 对 List 值会自动展开为重复 key
+    final formData = FormData.fromMap({'pollanswers[]': selectedValues});
+
+    _api.talker.info('提交投票: $actionUrl, answers=$selectedValues');
+    final (ok, body) = await _api.postFollowRedirect(
+      actionUrl,
+      params: formData,
+    );
+    if (!ok) {
+      _api.talker.error('投票提交失败');
+      return (false, '投票失败');
+    }
+
+    if (body.contains('参数错误')) {
+      return (false, '投票失败：参数错误');
+    }
+
+    _api.talker.info('投票成功');
+    return (true, null);
+  }
 
   Future<bool> addFavorite(int tid) async {
     final (ok, body) = await _api.post(
@@ -1304,21 +1535,17 @@ class ApiService {
       params: {'srchtxt': keyword, 'searchsubmit': 'yes'},
     );
     if (!ok) {
-      return SearchResult(error: '网络请求失败');
+      return SearchResult(error: SearchNetworkFailure());
     }
 
-    // 频率限制
     if (body.contains('秒内只能进行一次搜索')) {
-      return SearchResult(error: '搜索太频繁，请稍后再试');
+      return SearchResult(error: SearchRateLimitFailure());
     }
 
-    // 无结果
     if (body.contains('没有找到匹配结果')) {
-      return SearchResult(error: '没有找到匹配结果');
+      return SearchResult(error: SearchEmptyFailure());
     }
 
-    // 如果响应包含 searchid，说明返回了结果页或重定向页
-    // POST 响应即为搜索结果页，直接解析
     return _parseSearchResults(body);
   }
 
@@ -1331,7 +1558,7 @@ class ApiService {
     final (ok, body) = await _api.get(
       Urls.getSearchUrl(searchId, keyword, page: page),
     );
-    if (!ok) return SearchResult(error: '翻页请求失败');
+    if (!ok) return SearchResult(error: SearchDataFailure());
     return _parseSearchResults(body).copyWith(searchId: searchId);
   }
 
@@ -1511,7 +1738,7 @@ class SearchResult {
   final String? searchId;
   final int currentPage;
   final int totalPage;
-  final String? error;
+  final SearchFailure? error;
 
   const SearchResult({
     this.topics = const [],
@@ -1529,7 +1756,7 @@ class SearchResult {
     String? searchId,
     int? currentPage,
     int? totalPage,
-    String? error,
+    SearchFailure? error,
   }) {
     return SearchResult(
       topics: topics ?? this.topics,
@@ -1539,4 +1766,28 @@ class SearchResult {
       error: error ?? this.error,
     );
   }
+}
+
+sealed class SearchFailure implements Exception {
+  const SearchFailure();
+}
+
+class SearchNetworkFailure extends SearchFailure {
+  const SearchNetworkFailure();
+}
+
+class SearchRateLimitFailure extends SearchFailure {
+  const SearchRateLimitFailure();
+}
+
+class SearchEmptyFailure extends SearchFailure {
+  const SearchEmptyFailure();
+}
+
+class SearchAuthFailure extends SearchFailure {
+  const SearchAuthFailure();
+}
+
+class SearchDataFailure extends SearchFailure {
+  const SearchDataFailure();
 }

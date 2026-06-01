@@ -53,7 +53,7 @@ class OtherExperimentController {
         SysjSession.deleteCache();
       }
       unawaited(reloadOtherExperiment());
-    }, debugLabel: "OtherExperimentSemesterChangeEffect");
+    }, options: EffectOptions(name: "OtherExperimentSemesterChangeEffect"));
   }
 
   Future<void> reloadOtherExperiment() async {

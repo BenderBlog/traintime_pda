@@ -1,9 +1,11 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:get_it/get_it.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -22,11 +24,20 @@ class _LoginPageState extends State<LoginPage> {
   final _captchaCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  // 验证码状态（从控制器下沉）
+  bool _captchaRequired = false;
+  String? _captchaHash;
+  Uint8List? _captchaImageBytes;
+  bool _captchaLoading = false;
+  String? _captchaError;
+
+  RuisiService get _c => GetIt.instance<RuisiService>();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      RuisiController.i.checkLoginCaptcha();
+      _checkLoginCaptcha();
     });
   }
 
@@ -38,10 +49,56 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future<void> _checkLoginCaptcha() async {
+    final hash = await _c.api.fetchLoginCaptchaHash();
+    if (!mounted) return;
+    setState(() {
+      _captchaHash = hash;
+      _captchaRequired = hash != null;
+    });
+
+    if (_captchaRequired) {
+      await _loadCaptchaImage();
+    }
+  }
+
+  Future<void> _refreshCaptcha() async {
+    final hash = await _c.api.fetchLoginCaptchaHash();
+    if (!mounted) return;
+    setState(() {
+      _captchaHash = hash;
+    });
+    await _loadCaptchaImage();
+  }
+
+  Future<void> _loadCaptchaImage() async {
+    setState(() {
+      _captchaLoading = true;
+      _captchaError = null;
+    });
+
+    if (_captchaHash == null) {
+      if (!mounted) return;
+      setState(() {
+        _captchaLoading = false;
+        _captchaError = '验证码不可用';
+      });
+      return;
+    }
+
+    final bytes = await _c.api.fetchCaptchaImage(_captchaHash!);
+    if (!mounted) return;
+    setState(() {
+      _captchaImageBytes = bytes;
+      _captchaLoading = false;
+      if (_captchaImageBytes == null) {
+        _captchaError = '验证码加载失败';
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final c = RuisiController.i;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, 'ruisi.login.title')),
@@ -110,12 +167,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               // 验证码
-              Watch((context) {
-                if (!c.captchaRequired.value) return const SizedBox.shrink();
-                final isLoading = c.captchaLoading.value;
-                final imageBytes = c.captchaImageBytes.value;
-                final error = c.captchaError.value;
-                return Padding(
+              if (_captchaRequired)
+                Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: Row(
                     children: [
@@ -129,26 +182,19 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             prefixIcon: const Icon(Icons.security),
                             border: const OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.refresh),
-                              onPressed: () => c.refreshCaptcha(),
-                            ),
                           ),
-                          validator: (v) {
-                            if (c.captchaRequired.value &&
-                                (v == null || v.isEmpty)) {
-                              return FlutterI18n.translate(
-                                context,
-                                'ruisi.login.captcha_hint',
-                              );
-                            }
-                            return null;
-                          },
+                          validator: (v) =>
+                              _captchaRequired && (v == null || v.isEmpty)
+                              ? FlutterI18n.translate(
+                                  context,
+                                  'ruisi.login.captcha_hint',
+                                )
+                              : null,
                         ),
                       ),
                       const SizedBox(width: 12),
                       GestureDetector(
-                        onTap: () => c.refreshCaptcha(),
+                        onTap: _refreshCaptcha,
                         child: Container(
                           width: 120,
                           height: 56,
@@ -157,27 +203,25 @@ class _LoginPageState extends State<LoginPage> {
                               color: Theme.of(context).colorScheme.outline,
                             ),
                             borderRadius: BorderRadius.circular(4),
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.surfaceContainerHighest,
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 48,
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
+                          child: _captchaLoading
+                              ? const Center(
+                                  child: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   ),
                                 )
-                              : imageBytes != null
+                              : _captchaImageBytes != null
                               ? Image.memory(
-                                  imageBytes,
-                                  height: 48,
+                                  _captchaImageBytes!,
                                   fit: BoxFit.contain,
                                 )
-                              : error != null
+                              : _captchaError != null
                               ? Text(
-                                  error,
+                                  _captchaError!,
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.error,
                                   ),
@@ -195,40 +239,47 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                );
-              }),
+                ),
 
               // 错误信息
-              Watch((context) {
-                final error = c.loginError.value;
-                if (error == null) return const SizedBox.shrink();
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    error,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+              ValueListenableBuilder<String?>(
+                valueListenable: _c.loginError,
+                builder: (context, error, _) {
+                  if (error == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      error,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                },
+              ),
               const SizedBox(height: 24),
 
               // 登录按钮
-              Watch((context) {
-                return FilledButton(
-                  onPressed: c.loginLoading.value ? null : _handleLogin,
-                  child: c.loginLoading.value
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          FlutterI18n.translate(context, 'ruisi.common.login'),
-                        ),
-                );
-              }),
+              ValueListenableBuilder<bool>(
+                valueListenable: _c.loginLoading,
+                builder: (context, loading, _) {
+                  return FilledButton(
+                    onPressed: loading ? null : _handleLogin,
+                    child: loading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            FlutterI18n.translate(
+                              context,
+                              'ruisi.common.login',
+                            ),
+                          ),
+                  );
+                },
+              ),
               const SizedBox(height: 16),
 
               // 重置登录状态按钮
@@ -259,34 +310,36 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // =========================================================================
+  // 事件处理
+  // =========================================================================
+
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final c = RuisiController.i;
     String? seccodeVerify;
-    if (c.captchaRequired.value) {
+    if (_captchaRequired) {
       seccodeVerify = _captchaCtrl.text;
     }
 
-    final ok = await c.login(
+    final ok = await _c.login(
       _usernameCtrl.text,
       _passwordCtrl.text,
+      seccodeHash: _captchaHash,
       seccodeVerify: seccodeVerify,
     );
 
     if (!mounted) return;
 
-    if (!ok) {
-      if (c.captchaRequired.value) {
-        _captchaCtrl.clear();
-      }
+    if (!ok && _captchaRequired) {
+      _captchaCtrl.clear();
     }
   }
 
   Future<void> _handleResetLoginState(BuildContext context) async {
-    await RuisiController.i.logout();
+    await _c.logout();
     if (context.mounted) {
-      RuisiController.i.checkLoginCaptcha();
+      _checkLoginCaptcha();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -300,9 +353,7 @@ class _LoginPageState extends State<LoginPage> {
   void _handleViewLogs(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => TalkerScreen(talker: RuisiController.i.talker),
-      ),
+      MaterialPageRoute(builder: (_) => TalkerScreen(talker: _c.talker)),
     );
   }
 }

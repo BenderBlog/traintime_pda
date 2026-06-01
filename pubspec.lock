@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: "8d7ff3948166b8ec5da0fbb5962000926b8e02f2ed9b3e51d1738905fbd4c98d"
+      sha256: a49d6cf99e8d8e7a8e93668d09ced0bbdb954d0b4fccc2f5f9241c6b87fad95c
       url: "https://pub.dev"
     source: hosted
-    version: "93.0.0"
+    version: "99.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: de7148ed2fcec579b19f122c1800933dfa028f6d9fd38a152b04b1516cec120b
+      sha256: "663efa951fb8a45e06f491223a604c93820598f20e6a99c25617a1576065e8b7"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.1"
+    version: "12.1.0"
   ansicolor:
     dependency: transitive
     description:
@@ -269,10 +269,10 @@ packages:
     dependency: transitive
     description:
       name: code_assets
-      sha256: dad6bf6b9f4f378b0a69edbf42584d336efd1a9ce15deb1ba591cbb1b5ff440f
+      sha256: "67cf6d84013f9c601e42a6f8a6b74c4c0d9dc1a1619d775f2b28b732d3551b85"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   code_builder:
     dependency: transitive
     description:
@@ -341,10 +341,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "29f7ecc274a86d32920b1d9cfc7502fa87220da41ec60b55f329559d5732e2b2"
+      sha256: a4c1ccfee44c7e75ed80484071a5c142a385345e658fd8bd7c4b5c97e7198f98
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.7"
+    version: "3.1.8"
   dbus:
     dependency: transitive
     description:
@@ -357,34 +357,34 @@ packages:
     dependency: "direct main"
     description:
       name: device_calendar_plus
-      sha256: b56591dd017034b905ee6119111788fd1423327a3dc250e92243335da493bd89
+      sha256: fdbfaeb429c97df61f886735f1e996c3e38bd1e5c41696e1db0e99cb490538d0
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5"
+    version: "0.4.0"
   device_calendar_plus_android:
     dependency: transitive
     description:
       name: device_calendar_plus_android
-      sha256: "583aabc0b376ed1c6979b824b68c3b650c8ed700d75d1f2cd888e00b15b3506b"
+      sha256: e0581b2d69f20fcbcdc061b90341c8dfe37a5d744af43c0c8e32b2c7a35dd2a9
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5"
+    version: "0.4.0"
   device_calendar_plus_ios:
     dependency: transitive
     description:
       name: device_calendar_plus_ios
-      sha256: "6f5808acb594b1a17abe4188957f06fb7cc022d03f7f6fd2e499f152255e3e3e"
+      sha256: "33155a57bec19dc5c5c66992de8d912796d0fe0250e1038d35b0b0d7b08babb7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5"
+    version: "0.4.0"
   device_calendar_plus_platform_interface:
     dependency: transitive
     description:
       name: device_calendar_plus_platform_interface
-      sha256: "8b6a633b651c3eb9b21d68d38d1d0b6bd81d6b5d5774c95332cf416b2cba5f31"
+      sha256: "83395c6aa13664ee2410029119f383c0058c89210493b43df33e616db9a00d0b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5"
+    version: "0.4.0"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -477,10 +477,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "0204695694b687b167fd497da5252e9f4aaa162e8d274d6fa1e757380f2a5f46"
+      sha256: fc83774ce5bd7ce08168333b5e53dbe9090ec04eb21e7aa7cd7bac921032c934
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.0-beta.4"
+    version: "12.0.0-beta.5"
   fixnum:
     dependency: transitive
     description:
@@ -518,6 +518,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
+  flutter_hooks:
+    dependency: transitive
+    description:
+      name: flutter_hooks
+      sha256: "8ae1f090e5f4ef5cfa6670ce1ab5dddadd33f3533a7f9ba19d9f958aa2a89f42"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.21.3+1"
   flutter_html:
     dependency: "direct main"
     description:
@@ -599,10 +607,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_native_splash
-      sha256: "4fb9f4113350d3a80841ce05ebf1976a36de622af7d19aca0ca9a9911c7ff002"
+      sha256: "9db4b80b044e9af17cc4b1272137fc7ace0054d879ef8210a76adc34aaf4cdff"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.7"
+    version: "2.4.8"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -637,6 +645,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.1.0"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      sha256: "568d62f0e68666fb5d95519743b3c24a34c7f19d834b0658c46e26d778461f66"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.2.1"
   glob:
     dependency: transitive
     description:
@@ -665,10 +681,10 @@ packages:
     dependency: "direct main"
     description:
       name: home_widget
-      sha256: b04f99438ad6c5aad80fc9fca1e2e3471bf2a15028f614e4814d2552e13bc2a3
+      sha256: "7a32f7d6a3afd542126fb0004acba939a41ee57d874172926212774fbce684d3"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.1"
+    version: "0.9.2"
   hooks:
     dependency: transitive
     description:
@@ -985,10 +1001,10 @@ packages:
     dependency: "direct main"
     description:
       name: permission_handler
-      sha256: bc917da36261b00137bbc8896bf1482169cd76f866282368948f032c8c1caae1
+      sha256: ca045d03615023c08ccdb297aad46a9198193666039ddd36d4d85fd0b1864b98
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.1"
+    version: "12.0.2"
   permission_handler_android:
     dependency: transitive
     description:
@@ -1001,10 +1017,10 @@ packages:
     dependency: transitive
     description:
       name: permission_handler_apple
-      sha256: f000131e755c54cf4d84a5d8bd6e4149e262cc31c5a8b1d698de1ac85fa41023
+      sha256: "447c18bc3c5fdea5c3039f042b2b365fd51e3634f5f6e269ed22c1f00071addc"
       url: "https://pub.dev"
     source: hosted
-    version: "9.4.7"
+    version: "9.4.8"
   permission_handler_html:
     dependency: transitive
     description:
@@ -1089,10 +1105,10 @@ packages:
     dependency: transitive
     description:
       name: preact_signals
-      sha256: "0cd9262527732f1d9760e3fed1e407630e893c49e48229ff3f007daf357dbb1e"
+      sha256: "18f45e7f91a4dfad8bd0138efa6b85770bb25e13278b863fdaafd28a56579b16"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.1"
+    version: "7.0.0"
   provider:
     dependency: "direct main"
     description:
@@ -1177,10 +1193,10 @@ packages:
     dependency: transitive
     description:
       name: sentry
-      sha256: f04095a25ff02b202a914174c73ec309570aa93d61098cb4a0a9e715b4aaa465
+      sha256: "3284d220618d9344ce8a0765519129744a4cc658309496f052680909d74f7c51"
       url: "https://pub.dev"
     source: hosted
-    version: "9.20.0"
+    version: "9.21.0"
   share_plus:
     dependency: transitive
     description:
@@ -1273,26 +1289,34 @@ packages:
     dependency: "direct main"
     description:
       name: signals
-      sha256: "0d644f4ec8ce4862c61e3d3d1168d08a7b9b6ecbe067d4f96e26dd35287f5dcd"
+      sha256: "3b6be91d04808b542612a525eaeb1875e50be153671e618a42f74e0607088ecd"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.0"
+    version: "7.1.0"
   signals_core:
     dependency: transitive
     description:
       name: signals_core
-      sha256: abed6049b557da5b4e9c41715fd67bcc1a032dcc1ec147a9f228c2acf34ee151
+      sha256: "04d7ccb0265264191a4e2666050031129f47c2bbf4ac3f31f6586889a9903b62"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.1"
+    version: "7.0.0"
   signals_flutter:
     dependency: transitive
     description:
       name: signals_flutter
-      sha256: "7c83418f47e3538685217e583f0fbd17a29716fa1a9ce2247e2455786e8ea81a"
+      sha256: f0285fd2f98d720724df879c258dc41725f260f8e5b1184655ef64ba679197ad
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.0"
+    version: "7.1.0"
+  signals_hooks:
+    dependency: transitive
+    description:
+      name: signals_hooks
+      sha256: af6c2c4be47f06214292fedab6f6e943433c02086c956eeaffe45c4a23a57413
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.0"
   sky_engine:
     dependency: transitive
     description: flutter

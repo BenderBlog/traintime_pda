@@ -59,7 +59,7 @@ class PhysicsExperimentController {
         return;
       }
       unawaited(reloadPhysicsExperiment());
-    }, debugLabel: "PhysicsExperimentSemesterChangeEffect");
+    }, options: EffectOptions(name: "PhysicsExperimentSemesterChangeEffect"));
   }
 
   Future<void> reloadPhysicsExperiment() async {
