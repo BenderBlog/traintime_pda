@@ -68,22 +68,20 @@ class NetworkSession {
             status != null && status >= 200 && status < 400;
 
   static Future<bool> isInSchool() async {
-    bool isInSchool = false;
     Dio dio = Dio()
       ..interceptors.add(logDioAdapter)
       ..options.connectTimeout = const Duration(seconds: 30);
-    isInSchool = await dio
-        .get("https://rs.xidian.edu.cn/cas/login.php")
-        .then((value) => true)
+    return await dio
+        .get("https://notice.xidian.edu.cn")
+        .then((value) => !value.data.toString().contains("校外访问"))
         .onError((error, stackTrace) {
           log.warning(
-            "[isSchoolNet] Current net is not schoolnet.",
+            "[isSchoolNet] Unable to fetch, treat as not schoolnet.",
             error,
             stackTrace,
           );
           return false;
         });
-    return isInSchool;
   }
 
   NetworkSession() {
@@ -106,7 +104,7 @@ class NetworkSession {
         "[NetworkSession][initSession] "
         "Fetching...",
       );
-      var response = await dio.get("http://linux.xidian.edu.cn");
+      var response = await dio.get("http://www.xidian.edu.cn");
       if (response.statusCode == 200) {
         _isInit = SessionState.fetched;
         log.info(

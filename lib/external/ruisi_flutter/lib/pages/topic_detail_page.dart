@@ -7,7 +7,6 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:watermeter/external/ruisi_flutter/lib/utils/branch_navigation.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 
 import '../controller/ruisi_controller.dart';
