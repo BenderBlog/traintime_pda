@@ -964,7 +964,11 @@ class _SettingWindowState extends State<SettingWindow> {
                                 file.deleteSync();
                               }
                             }
-                            await GetIt.instance<RuisiService>().logout();
+                            try {
+                              await GetIt.instance<RuisiService>().logout();
+                            } catch (e, s) {
+                              log.error(e, s);
+                            }
 
                             /// Clean user information
                             await preference.prefrenceClear();
