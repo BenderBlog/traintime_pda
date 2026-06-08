@@ -19,6 +19,11 @@ class ElectricityHistoryInfo {
       _$ElectricityHistoryInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$ElectricityHistoryInfoToJson(this);
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }
 
 @JsonSerializable()
