@@ -13,6 +13,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
+import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
@@ -243,12 +244,18 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 2,
+        name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
+        icon: MingCuteIcons.mgc_tool_line,
+        iconChoice: MingCuteIcons.mgc_tool_fill,
+      ),
+      PageInformation(
+        index: 3,
         name: FlutterI18n.translate(context, "homepage.dashboard"),
         icon: MingCuteIcons.mgc_pig_line,
         iconChoice: MingCuteIcons.mgc_pig_fill,
       ),
       PageInformation(
-        index: 3,
+        index: 4,
         name: FlutterI18n.translate(context, "homepage.setting"),
         icon: MingCuteIcons.mgc_user_2_line,
         iconChoice: MingCuteIcons.mgc_user_2_fill,
@@ -272,6 +279,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             cookiePath: supportPath.path,
             talker: TalkerFlutter.init(),
           ),
+          const ToolBoxPage(),
           const PigPage(),
           const SettingWindow(),
         ],

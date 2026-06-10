@@ -12,6 +12,7 @@ import '../widgets/topic_list_item.dart';
 
 class TopicListPage extends StatefulWidget {
   final Future<List<Topic>> Function(int) getTopicList;
+
   /// 首页列表使用预览语义，普通帖子列表保持常规详情链路。
   final bool useHomeTopicPreviewNavigation;
 
@@ -46,25 +47,28 @@ class _TopicListPageState extends State<TopicListPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return PagingListener(
-      controller: _pagingController,
-      builder: (context, state, fetchNextPage) =>
-          PagedListView<int, Topic>.separated(
-            state: state,
-            fetchNextPage: fetchNextPage,
-            builderDelegate: PagedChildBuilderDelegate(
-              itemBuilder: (context, item, index) => TopicListItem(
-                topic: item,
-                // 首页误触需要保留当前详情链，其他列表继续使用普通 push。
-                onTap: () => widget.useHomeTopicPreviewNavigation
-                    ? context.pushRuisiHomeTopicPreview(
-                        TopicDetailPage(tid: item.tid),
-                      )
-                    : context.push(TopicDetailPage(tid: item.tid)),
+    return RefreshIndicator(
+      onRefresh: () => Future.sync(() => _pagingController.refresh()),
+      child: PagingListener(
+        controller: _pagingController,
+        builder: (context, state, fetchNextPage) =>
+            PagedListView<int, Topic>.separated(
+              state: state,
+              fetchNextPage: fetchNextPage,
+              builderDelegate: PagedChildBuilderDelegate(
+                itemBuilder: (context, item, index) => TopicListItem(
+                  topic: item,
+                  // 首页误触需要保留当前详情链，其他列表继续使用普通 push。
+                  onTap: () => widget.useHomeTopicPreviewNavigation
+                      ? context.pushRuisiHomeTopicPreview(
+                          TopicDetailPage(tid: item.tid),
+                        )
+                      : context.push(TopicDetailPage(tid: item.tid)),
+                ),
               ),
+              separatorBuilder: (_, _) => const Divider(height: 1),
             ),
-            separatorBuilder: (_, _) => const Divider(height: 1),
-          ),
+      ),
     );
   }
 }

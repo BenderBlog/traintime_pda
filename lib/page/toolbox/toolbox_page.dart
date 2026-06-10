@@ -24,7 +24,8 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
         children: [
           WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.payment"),
-            url: "https://xxcapp.xidian.edu.cn/uc/api/oauth/index?redirect=https://ignypt.xidian.edu.cn/revenueH5/login?opcode=MPAY&appid=200260318155520600&state=1231231231",
+            url:
+                "https://xxcapp.xidian.edu.cn/uc/api/oauth/index?redirect=https://ignypt.xidian.edu.cn/revenueH5/login?opcode=MPAY&appid=200260318155520600&state=1231231231",
             description: FlutterI18n.translate(
               context,
               "toolbox.payment_description",
@@ -63,15 +64,6 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
               "toolbox.reserve_description",
             ),
             iconData: MingCuteIcons.mgc_building_4_line,
-          ),
-          WebViewAddresses(
-            name: FlutterI18n.translate(context, "toolbox.mobile"),
-            url: "https://xxcapp.xidian.edu.cn/site/xidianPage/home",
-            description: FlutterI18n.translate(
-              context,
-              "toolbox.mobile_description",
-            ),
-            iconData: MingCuteIcons.mgc_chat_2_line,
           ),
           WebViewAddresses(
             name: FlutterI18n.translate(context, "toolbox.network"),
