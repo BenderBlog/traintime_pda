@@ -1198,7 +1198,7 @@ packages:
     source: hosted
     version: "9.21.0"
   share_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: share_plus
       sha256: a857d8b1479250aff6b57a51b2c02d31ca05848d441817c43f1640c885c286c0

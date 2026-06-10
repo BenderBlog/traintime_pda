@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -239,11 +240,29 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               tooltip: FlutterI18n.translate(context, 'ruisi.common.favorite'),
               onPressed: _addFavorite,
             ),
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: () {
-                final url = '${Urls.baseUrl}viewthread.php?tid=${widget.tid}';
-                launchUrl(Uri.parse(url));
+            Builder(
+              builder: (context) {
+                final box = context.findRenderObject() as RenderBox?;
+                return IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () {
+                    SharePlus.instance.share(
+                      ShareParams(
+                        sharePositionOrigin:
+                            box!.localToGlobal(Offset.zero) & box.size,
+                        uri: Uri(
+                          scheme: 'https',
+                          host: 'rs.xidian.edu.cn',
+                          path: 'forum.php',
+                          queryParameters: {
+                            "mod": "viewthread",
+                            "tid": widget.tid.toString(),
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ],
