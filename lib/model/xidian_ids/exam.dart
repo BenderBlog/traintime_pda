@@ -18,7 +18,7 @@ class Subject {
   String? seat;
 
   static RegExp timeRegExpUnderGraduate = RegExp(
-    r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})',
+    r'^(?<year>\d+)-(?<month>\d+)-(?<day>\d+) (?<hour>\d+)(::?)(?<minute>\d+)-(?<stopHour>\d+)(::?)(?<stopMinute>\d+)',
   );
   static RegExp timeRegExpPostGraduate = RegExp(
     r'^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) (.{3})\((?<hour>\d{2})(::?)(?<minute>\d{2})-(?<stopHour>\d{2})(::?)(?<stopMinute>\d{2})\)',
