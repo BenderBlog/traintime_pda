@@ -213,6 +213,7 @@ class LearningSession extends IDSSession {
 
     List<Element> rows = table.querySelectorAll('tbody tr');
     for (var row in rows) {
+      bool isWarning = row.classes.contains('redtr');
       List<Element> cells = row.querySelectorAll('td');
       if (cells.length < 17) {
         continue;
@@ -226,6 +227,7 @@ class LearningSession extends IDSSession {
       );
       results.add(
         ClassAttendance(
+          isWarning: isWarning,
           courseName: rowData[0],
           className: rowData[1],
           checkInCount: rowData[2],

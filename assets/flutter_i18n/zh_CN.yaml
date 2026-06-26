@@ -69,6 +69,7 @@ class_attendance:
     time_info: "{checkInCount} 已签 / {absenceCount} 缺勤 / {requiredCheckIn} 应签"
     not_attend: 复活次数
     not_attend_info: "{timeToHaveError} 次 / {totalTimes} 总课程"
+    not_attend_info_error: 无法对应已有课程
     leave: 请假次数
     leave_info: 事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}
     study: 学习进度

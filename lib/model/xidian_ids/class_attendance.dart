@@ -9,7 +9,25 @@ part 'class_attendance.g.dart';
 
 enum AttendanceStatus { unknown, eligible, warning, ineligible }
 
+extension I18nString on AttendanceStatus {
+  String get i18nString {
+    switch (this) {
+      case AttendanceStatus.unknown:
+        return "class_attendance.course_state.unknown";
+      case AttendanceStatus.eligible:
+        return "class_attendance.course_state.eligible";
+      case AttendanceStatus.warning:
+        return "class_attendance.course_state.warning";
+      case AttendanceStatus.ineligible:
+        return "class_attendance.course_state.ineligible";
+    }
+  }
+}
+
 class ClassAttendance {
+  // 有无预警
+  final bool isWarning;
+
   // 课程信息
   final String courseName; // 课程名称 (课程 名称)
   final String className; // 教学班名称 (教学班 名称)
@@ -59,25 +77,23 @@ class ClassAttendance {
     this.courseId,
     this.clazzId,
     this.cpi,
+    this.isWarning = false,
   });
 
   /// Calculate the attendance status based on total class times
   /// Returns a translation key for the status
-  String getAttendanceStatus(int totalTimes) {
-    final timeToHaveError = (totalTimes / 4).floor();
-    final absenceNum = int.tryParse(absenceCount) ?? 0;
+  AttendanceStatus get attendanceStatus {
+    if (isWarning) return AttendanceStatus.ineligible;
+
     final attendanceRatio = double.tryParse(
       attendanceRate.replaceAll(" %", ""),
     );
-
     if (attendanceRatio == null) {
-      return "class_attendance.course_state.unknown";
-    } else if (timeToHaveError < absenceNum) {
-      return "class_attendance.course_state.ineligible";
-    } else if (attendanceRatio >= 90.0 || timeToHaveError >= absenceNum) {
-      return "class_attendance.course_state.eligible";
+      return AttendanceStatus.unknown;
+    } else if (attendanceRatio < 80.0) {
+      return AttendanceStatus.warning;
     } else {
-      return "class_attendance.course_state.warning";
+      return AttendanceStatus.eligible;
     }
   }
 }

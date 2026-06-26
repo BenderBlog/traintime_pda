@@ -25,26 +25,26 @@ class ClassAttendanceTable extends StatefulWidget {
 }
 
 class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
-  String? _selectedFilter;
+  AttendanceStatus? _selectedFilter;
   int? _sortColumnIndex = 1; // 默认按状态列排序
   bool _sortAscending = true;
 
-  int _getStatusPriority(String status) {
-    if (status.contains("ineligible")) return 0; // 最高优先级
-    if (status.contains("warning")) return 1;
-    if (status.contains("eligible")) return 2;
+  int _getStatusPriority(AttendanceStatus status) {
+    if (status == AttendanceStatus.ineligible) return 0; // 最高优先级
+    if (status == AttendanceStatus.warning) return 1;
+    if (status == AttendanceStatus.eligible) return 2;
     return 3; // unknown 最低优先级
   }
 
   List<ClassAttendance> get _filteredCourses {
     List<ClassAttendance> filtered;
 
-    if (_selectedFilter == null || _selectedFilter == 'all') {
+    if (_selectedFilter == null) {
       filtered = widget.courses.toList();
     } else {
       filtered = widget.courses.where((course) {
-        final totalTimes = widget.classTimes[course.courseName] ?? 0;
-        final status = course.getAttendanceStatus(totalTimes);
+        // final totalTimes = widget.classTimes[course.courseName] ?? 0;
+        final status = course.attendanceStatus;
         return status == _selectedFilter;
       }).toList();
     }
@@ -53,16 +53,16 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
     if (_sortColumnIndex != null) {
       filtered.sort((a, b) {
         int comparison = 0;
-        final totalTimesA = widget.classTimes[a.courseName] ?? 0;
-        final totalTimesB = widget.classTimes[b.courseName] ?? 0;
+        // final totalTimesA = widget.classTimes[a.courseName] ?? 0;
+        // final totalTimesB = widget.classTimes[b.courseName] ?? 0;
 
         switch (_sortColumnIndex) {
           case 0: // 课程名称
             comparison = a.courseName.compareTo(b.courseName);
             break;
           case 1: // 状态
-            final statusA = a.getAttendanceStatus(totalTimesA);
-            final statusB = b.getAttendanceStatus(totalTimesB);
+            final statusA = a.attendanceStatus;
+            final statusB = b.attendanceStatus;
             comparison = _getStatusPriority(
               statusA,
             ).compareTo(_getStatusPriority(statusB));
@@ -98,15 +98,16 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
     return filtered;
   }
 
-  Color _getStatusColor(String status) {
-    if (status.contains("ineligible")) {
-      return Colors.red;
-    } else if (status.contains("warning")) {
-      return Colors.orange;
-    } else if (status.contains("eligible")) {
-      return Colors.green;
-    } else {
-      return Colors.grey;
+  Color _getStatusColor(AttendanceStatus status) {
+    switch (status) {
+      case AttendanceStatus.unknown:
+        return Colors.grey;
+      case AttendanceStatus.eligible:
+        return Colors.green;
+      case AttendanceStatus.warning:
+        return Colors.orange;
+      case AttendanceStatus.ineligible:
+        return Colors.red;
     }
   }
 
@@ -135,11 +136,11 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                         "class_attendance.table.filter_all",
                       ),
                     ),
-                    selected:
-                        _selectedFilter == null || _selectedFilter == 'all',
+                    selected: _selectedFilter == null,
                     onSelected: (selected) {
                       setState(() {
-                        _selectedFilter = selected ? 'all' : null;
+                        // TODO: Check
+                        _selectedFilter = null;
                       });
                     },
                   ),
@@ -151,14 +152,12 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                         "class_attendance.course_state.ineligible",
                       ),
                     ),
-                    selected:
-                        _selectedFilter ==
-                        'class_attendance.course_state.ineligible',
+                    selected: _selectedFilter == AttendanceStatus.ineligible,
                     selectedColor: Colors.red.withValues(alpha: 0.2),
                     onSelected: (selected) {
                       setState(() {
                         _selectedFilter = selected
-                            ? 'class_attendance.course_state.ineligible'
+                            ? AttendanceStatus.ineligible
                             : null;
                       });
                     },
@@ -171,14 +170,12 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                         "class_attendance.course_state.warning",
                       ),
                     ),
-                    selected:
-                        _selectedFilter ==
-                        'class_attendance.course_state.warning',
+                    selected: _selectedFilter == AttendanceStatus.warning,
                     selectedColor: Colors.orange.withValues(alpha: 0.2),
                     onSelected: (selected) {
                       setState(() {
                         _selectedFilter = selected
-                            ? 'class_attendance.course_state.warning'
+                            ? AttendanceStatus.warning
                             : null;
                       });
                     },
@@ -191,14 +188,12 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                         "class_attendance.course_state.eligible",
                       ),
                     ),
-                    selected:
-                        _selectedFilter ==
-                        'class_attendance.course_state.eligible',
+                    selected: _selectedFilter == AttendanceStatus.eligible,
                     selectedColor: Colors.green.withValues(alpha: 0.2),
                     onSelected: (selected) {
                       setState(() {
                         _selectedFilter = selected
-                            ? 'class_attendance.course_state.eligible'
+                            ? AttendanceStatus.eligible
                             : null;
                       });
                     },
@@ -211,14 +206,12 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                         "class_attendance.course_state.unknown",
                       ),
                     ),
-                    selected:
-                        _selectedFilter ==
-                        'class_attendance.course_state.unknown',
+                    selected: _selectedFilter == AttendanceStatus.unknown,
                     selectedColor: Colors.grey.withValues(alpha: 0.2),
                     onSelected: (selected) {
                       setState(() {
                         _selectedFilter = selected
-                            ? 'class_attendance.course_state.unknown'
+                            ? AttendanceStatus.unknown
                             : null;
                       });
                     },
@@ -374,9 +367,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                   ],
                   rows: filteredCourses.map((course) {
-                    final totalTimes =
-                        widget.classTimes[course.courseName] ?? 0;
-                    final status = course.getAttendanceStatus(totalTimes);
+                    final status = course.attendanceStatus;
                     final statusColor = _getStatusColor(status);
 
                     return DataRow(
@@ -389,7 +380,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           onTap: () async {
-                            if (!status.contains("unknown")) {
+                            if (status != AttendanceStatus.unknown) {
                               await BothSideSheet.show(
                                 context: context,
                                 title: FlutterI18n.translate(
@@ -418,7 +409,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              FlutterI18n.translate(context, status),
+                              FlutterI18n.translate(context, status.i18nString),
                               style: TextStyle(
                                 color: statusColor,
                                 fontWeight: FontWeight.bold,
