@@ -93,7 +93,18 @@ class ClassAttendanceView extends StatelessWidget {
 
   Widget _buildCardView(BuildContext context, ClassAttendanceState state) {
     final courseCards = state.courses.map((classAttendance) {
-      int times = state.classTimes[classAttendance.courseName] ?? 0;
+      int? times = state.classTimes[classAttendance.courseName];
+      if (times == null) {
+        String suspeciousClassName = state.classTimes.keys.firstWhere(
+          (str) =>
+              str.contains(classAttendance.courseName) ||
+              classAttendance.courseName.contains(str),
+          orElse: () => "",
+        );
+        if (suspeciousClassName.isNotEmpty) {
+          times = state.classTimes[suspeciousClassName];
+        }
+      }
       return CourseCard(course: classAttendance, totalTimes: times);
     }).toList();
 

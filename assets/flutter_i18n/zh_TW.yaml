@@ -70,6 +70,7 @@ class_attendance:
     time_info: '{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤'
     not_attend: 復活次數
     not_attend_info: '{timeToHaveError} 次 / {totalTimes} 總課程'
+    not_attend_info_error: 無法對應已有課程
     leave: 請假次數
     leave_info: 事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}
     study: 學習進度

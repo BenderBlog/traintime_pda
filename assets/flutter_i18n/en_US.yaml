@@ -75,6 +75,7 @@ class_attendance:
       Required"
     not_attend: Rebirths
     not_attend_info: "{timeToHaveError} Times / {totalTimes} Total"
+    not_attend_info_error: Cannot match course in the classtable
     leave: Leaves
     leave_info: Personal {personalLeave} / Sick {sickLeave} / Official {officialLeave}
     study: Study
