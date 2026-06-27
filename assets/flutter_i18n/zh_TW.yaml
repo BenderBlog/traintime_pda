@@ -975,7 +975,7 @@ setting:
 
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
 
-      Copyright 2025 Traintime PDA authors.
+      Copyright 2025-present Traintime PDA authors.
 
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
@@ -1085,22 +1085,94 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: '開發者兒童節寄語：
+easter_egg_apple: '=== 帶我飛向月亮吧 ===
 
-  就算他們告訴你社會如何黑暗
+  歌聲演繹：Frank Sintara, 1964
 
-  也不要忘了善意
 
-  也不要忘記你本來的面目
+  帶我飛向月亮吧
+
+  讓我和星星共舞嬉戲
+
+
+  我好想知道
+
+  木星和火星上的春天
+
+  是什麼顏色的
+
+
+  讓你的歌聲溫暖我的心
+
+  我會一直歌唱下去
+
+
+  我日夜都在想你和牽掛你
+
+  請你真心接受我 我愛你
+
+
+  === 沉浸在你的愛意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  無法忘懷這種感覺，被你的愛包裹的溫暖
+
+  不想失去這種感覺，被你的愛撫摸的舒適
+
+  你讓我感到好自在，被你的愛託舉的堅強
+
+  想一直在你懷中，沉浸在你的愛意中
+
+  我不敢向你說出，我對你的心意和愛
 
   '
-easter_egg_others: '開發者兒童節寄語：
+easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
 
-  就算他們告訴你社會如何黑暗
+  歌聲演繹：Maaya Sakamoto, 2000
 
-  也不要忘了善意
+  （原歌詞為日文，按照英語翻譯二翻）
 
-  也不要忘記你本來的面目
+
+  I am a dreamer, 有無限的力量
+
+
+  我的世界有夢想、熱愛與躊躇
+
+  但有些東西，我依舊無法想象
+
+  我想向著廣闊的天空，尋求自己的方向
+
+
+  我要追求自己的夢想
+
+  努力讓自己的心願成真
+
+  雖困難重重也要繼續前行
+
+
+  等待奇蹟 等待美好
+
+  用心感受這個世界
+
+  最終 一定會出乎意料
+
+
+  === 沉浸在你的愛意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  無法忘懷這種感覺，被你的愛包裹的溫暖
+
+  不想失去這種感覺，被你的愛撫摸的舒適
+
+  你讓我感到好自在，被你的愛託舉的堅強
+
+  想躺在你的懷中，沉浸在你的愛意
+
+  而且，我不敢想你說出，我現在的心意
 
   '
 easter_egg_robot:

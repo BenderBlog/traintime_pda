@@ -978,7 +978,7 @@ setting:
 
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
 
-      Copyright 2025 Traintime PDA authors.
+      Copyright 2025-present Traintime PDA authors.
 
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
@@ -1089,17 +1089,57 @@ school_card_status:
   failed_to_fetch: 获取失败
   failed_to_query: 查询失败
 easter_egg_apple: |
-  开发者儿童节寄语：
-  就算他们告诉你社会如何黑暗
-  也不要忘了善意
-  也不要忘记你本来的面目
+  === 带我飞向月亮吧 ===
+  歌声演绎：Frank Sintara, 1964
 
+  带我飞向月亮吧
+  让我和星星共舞嬉戏
+
+  我好想知道
+  木星和火星上的春天
+  是什么颜色的
+
+  让你的歌声温暖我的心
+  我会一直歌唱下去
+
+  我日夜都在想你和牵挂你
+  请你真心接受我 我爱你
+
+  === 沉浸在你的爱意中 ===
+  吉他演奏：Earl Klugh, 1976
+
+  无法忘怀这种感觉，被你的爱包裹的温暖
+  不想失去这种感觉，被你的爱抚摸的舒适
+  你让我感到好自在，被你的爱托举的坚强
+  想一直在你怀中，沉浸在你的爱意中
+  我不敢向你说出，我对你的心意和爱
 easter_egg_others: |
-  开发者儿童节寄语：
-  就算他们告诉你社会如何黑暗
-  也不要忘了善意
-  也不要忘记你本来的面目
+  === 百变小樱魔术卡之小樱卡篇主题曲 ===
+  歌声演绎：Maaya Sakamoto, 2000
+  （原歌词为日文，按照英语翻译二翻）
 
+  I am a dreamer, 有无限的力量
+
+  我的世界有梦想、热爱与踌躇
+  但有些东西，我依旧无法想象
+  我想向着广阔的天空，寻求自己的方向
+
+  我要追求自己的梦想
+  努力让自己的心愿成真
+  虽困难重重也要继续前行
+
+  等待奇迹 等待美好
+  用心感受这个世界
+  最终 一定会出乎意料
+
+  === 沉浸在你的爱意中 ===
+  吉他演奏：Earl Klugh, 1976
+
+  无法忘怀这种感觉，被你的爱包裹的温暖
+  不想失去这种感觉，被你的爱抚摸的舒适
+  你让我感到好自在，被你的爱托举的坚强
+  想躺在你的怀中，沉浸在你的爱意
+  而且，我不敢想你说出，我现在的心意
 easter_egg_robot:
   appbar: 欢迎你，同学！
   title: 看看这些要开学的学生们吧！

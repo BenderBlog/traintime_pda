@@ -1118,7 +1118,7 @@ setting:
 
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
 
-      Copyright 2025 Traintime PDA authors.
+      Copyright 2025-present Traintime PDA authors.
 
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
@@ -1235,20 +1235,87 @@ school_card_status:
   failed_to_fetch: Failed fetching
   failed_to_query: Failed querying
 easter_egg_apple: |
-  Children's Day Wishes from developer
+  === Fly Me To The Moon ===
+  Vocal: Frank Sintara, 1964
 
-  No matter how dark the world is
-  Remember the good faith of all
+  Fly me to the moon
+  Let me play among the stars
 
-  Also be who you are
+  Let me see what's spring is like
+  on a Jupiter and Mars
 
-easter_egg_others: |
-  Children's Day Wishes from developer
+  Fill my heart with song
+  and let me sing forever more
 
-  No matter how dark the world is
-  Remember the good faith of all
+  You are all I long for
+  all I worship and I adore
 
-  Also be who you are
+  In other words
+  Please, be true
+
+  In other words
+  I love you
+
+  === Living Inside Your Love ===
+  Guitar: Earl Klugh, 1976
+
+  Can't get over the feeling
+  Living inside your love
+
+  I never want to lose the feeling
+  Living inside your love
+
+  Baby, you made my life so free
+  Living inside your love
+
+  I'm just where I want to be
+  Living inside your love
+
+  And I never could say
+  What I'm feeling today
+  For you...
+For youeaster_egg_others: |
+  === Cardcaptor Sakura OP3 ===
+  Vocal: Maaya Sakamoto, 2000
+  In Japanese Roman Letters
+
+  I'm a dreamer
+  hisomu PAWA-
+
+  watashi no sekai
+  yume to koi to fuan de dekite'ru
+  demo souzou wo shinai mono
+  kakurete'ru hazu
+
+  sora ni mukau kiki no you ni anata wo
+  massugu mitsumete'ru
+  mitsuketai naa kanaetai naa
+  shinjiru sore dake de
+
+  koerarenai mono wa nai
+  utau you ni kiseki no you ni
+  "omoi" ga subete wo kaete yuku yo
+  kitto kitto
+  odoroku kurai
+
+  === Living Inside Your Love ===
+  Guitar: Earl Klugh, 1976
+
+  Can't get over the feeling
+  Living inside your love
+
+  I never want to lose the feeling
+  Living inside your love
+
+  Baby, you made my life so free
+  Living inside your love
+
+  I'm just where I want to be
+  Living inside your love
+
+  And I never could say
+  What I'm feeling today
+  For you...
 easter_egg_robot:
   appbar: Welcome Students!
   title: Looking like you are worrying about opening semester?
