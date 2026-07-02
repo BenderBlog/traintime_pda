@@ -36,9 +36,12 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
 
   Future<void> _reload(BuildContext context) =>
       state = session.getGeneralNetworkUsage(
-        captchaFunction: (image) => showDialog<String>(
+        captchaFunction: (image, onRefresh) => showDialog<String>(
           context: context,
-          builder: (context) => CaptchaInputDialog(image: image),
+          builder: (context) => CaptchaInputDialog(
+            image: image,
+            onRefresh: onRefresh,
+          ),
         ).then((value) => value ?? ""),
       );
 

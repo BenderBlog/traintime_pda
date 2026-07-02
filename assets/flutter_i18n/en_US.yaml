@@ -665,6 +665,7 @@ login:
     title: Please enter captcha
     hint: Input captcha
     message_on_empty: Please enter captcha
+    refresh_failed: "Failed to refresh captcha: {error}"
   slider_title: Server authentication service
 school_net:
   title: School Net Usage Query

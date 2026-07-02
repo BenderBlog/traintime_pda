@@ -591,6 +591,7 @@ login:
     title: 請輸入驗證碼
     hint: 輸入驗證碼
     message_on_empty: 請輸入驗證碼
+    refresh_failed: "刷新驗證碼失敗: {error}"
   slider_title: 服務器認證服務
 school_net:
   title: 校園網使用詳情

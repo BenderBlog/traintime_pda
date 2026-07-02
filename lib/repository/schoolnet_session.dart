@@ -126,7 +126,10 @@ class SchoolnetSession extends NetworkSession {
   }
 
   Future<FetchResult<GeneralNetworkUsage>> getGeneralNetworkUsage({
-    required Future<String> Function(List<int>) captchaFunction,
+    required Future<String> Function(
+      List<int> initialImage,
+      Future<List<int>> Function() onRefresh,
+    ) captchaFunction,
   }) async {
     try {
       // Get username and password
@@ -182,26 +185,30 @@ class SchoolnetSession extends NetworkSession {
 
       String lastErrorMessage = "";
 
-      // Refresh captcha
-      log.info("[SchoolnetSession][getGeneralNetworkUsage] Refresh captcha");
-      await _dio.get(
-        'https://zfw.xidian.edu.cn/site/captcha',
-        queryParameters: {
-          'refresh': 1,
-          '_': DateTime.now().millisecondsSinceEpoch,
-        },
-      );
+      // Refresh and fetch captcha helper
+      Future<List<int>> refreshCaptcha() async {
+        log.info("[SchoolnetSession][getGeneralNetworkUsage] Refreshing captcha via API");
+        await _dio.get(
+          'https://zfw.xidian.edu.cn/site/captcha',
+          queryParameters: {
+            'refresh': 1,
+            '_': DateTime.now().millisecondsSinceEpoch,
+          },
+        );
+        var picture = await _dio.get(
+          "https://zfw.xidian.edu.cn/site/captcha",
+          options: Options(responseType: ResponseType.bytes),
+        ).then((data) => data.data);
 
-      // Get verifycode
-      log.info("[SchoolnetSession][getGeneralNetworkUsage] Get verifycode");
-      var picture = await _dio
-          .get(
-            "https://zfw.xidian.edu.cn/site/captcha",
-            options: Options(responseType: ResponseType.bytes),
-          )
-          .then((data) => data.data);
+        if (picture is List<int>) {
+          return picture;
+        }
+        throw Exception("Failed to load captcha image bytes");
+      }
+
+      var picture = await refreshCaptcha();
       String failedmsg = "school_net.captcha_failed";
-      String? verifycode = await captchaFunction(picture);
+      String? verifycode = await captchaFunction(picture, refreshCaptcha);
 
       // If failed too much time, set error state.
       if (verifycode == failedmsg || verifycode == "") {

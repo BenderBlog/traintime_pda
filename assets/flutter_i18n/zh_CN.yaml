@@ -593,6 +593,7 @@ login:
     title: 请输入验证码
     hint: 输入验证码
     message_on_empty: 请输入验证码
+    refresh_failed: "刷新验证码失败: {error}"
   slider_title: 服务器认证服务
 school_net:
   title: 校园网使用详情
