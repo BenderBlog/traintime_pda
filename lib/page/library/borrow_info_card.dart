@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -181,18 +182,26 @@ class BorrowInfoCard extends StatelessWidget {
                   ),
                 ).padding(bottom: 10);
                 final button = TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (!isOverdue) {
                       ProgressDialog pd = ProgressDialog(context: context);
                       pd.show(
                         msg: FlutterI18n.translate(context, "library.renewing"),
                       );
-                      LibrarySession().renew(toUse).then((value) {
+                      try {
+                        final value = await LibrarySession().renew(toUse);
+                        if (!context.mounted) return;
+                        showToast(context: context, msg: value);
+                        await LibraryController.i.reloadBorrowList();
+                      } catch (e, s) {
+                        log.handle(e, s, "[BorrowInfoCard][renew] Failed.");
+                        if (!context.mounted) return;
+                        showToast(context: context, msg: e.toString());
+                      } finally {
                         if (context.mounted) {
                           pd.close();
-                          showToast(context: context, msg: value);
                         }
-                      });
+                      }
                     }
                   },
                   child: Text(

@@ -104,22 +104,163 @@ class LibrarySession extends IDSSession {
       )
       .then((value) => value.data["data"]["duxiuImageUrl"]?.toString() ?? "");
 
-  Future<String> renew(BorrowData toUse) => dio
-      .post(
-        "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/renewBook.html",
-        data: {
-          "libraryId": 5,
-          "userId": userId,
-          "token": token,
-          "cardNumber": preference.getString(preference.Preference.idsAccount),
-          "barNumber": toUse.barcode,
-        },
-      )
-      .then((value) => value.data["msg"]?.toString() ?? "接口返回错误")
-      .onError<Object>((e, s) {
-        log.handle(e, s);
-        return "获取过程遇到错误";
-      });
+  Future<String> renew(BorrowData toUse) async {
+    if (userId == 0 || token.isEmpty) {
+      await initSession();
+    }
+
+    final response = await dio.post(
+      "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/renewBook.html",
+      data: {
+        "libraryId": 5,
+        "userId": userId,
+        "token": token,
+        "cardNumber": preference.getString(preference.Preference.idsAccount),
+        "barNumber": toUse.barcode,
+        "bookName": toUse.title,
+        "isbn": toUse.isbn,
+        "author": toUse.author,
+      },
+    );
+
+    final data = response.data;
+    _throwIfLibrarySessionExpired(data);
+    if (data is Map && data["code"]?.toString() == "1") {
+      return "续借成功";
+    }
+
+    throw LibraryOperationException(
+      message: data is Map ? data["msg"]?.toString() ?? "续借失败" : "续借失败",
+    );
+  }
+
+  Future<BookInfo> getScannedBorrowBook(String barcode) async {
+    if (barcode.isEmpty) {
+      throw LibraryOperationException(message: "图书条码为空");
+    }
+    if (userId == 0 || token.isEmpty) {
+      await initSession();
+    }
+
+    final response = await dio.post(
+      "https://shuwo.xidian.edu.cn/xidian_book/api/search/list.html",
+      data: {
+        "libraryId": 5,
+        "userId": userId,
+        "token": token,
+        "cardNumber": preference.getString(preference.Preference.idsAccount),
+        "searchWord": barcode,
+        "searchFiled": "barcode",
+      },
+    );
+
+    final data = response.data;
+    _throwIfLibrarySessionExpired(data);
+    if (data is Map && data["code"] != null && data["code"] != 1) {
+      throw LibraryOperationException(
+        message: data["msg"]?.toString() ?? "查询图书失败",
+      );
+    }
+
+    final rawList = data["data"]?["list"];
+    if (rawList is! List || rawList.isEmpty) {
+      throw LibraryOperationException(message: "未查找到相关书籍");
+    }
+
+    final book = BookInfo.fromJson(rawList.first as Map<String, dynamic>);
+    book.imageUrl = await bookCover(
+      book.bookName,
+      book.isbn ?? "",
+      book.docNumber,
+    );
+    return book;
+  }
+
+  Future<String> borrowScannedBook({
+    required String barcode,
+    required BookInfo bookInfo,
+  }) => borrowBook(barcode: barcode, bookInfo: bookInfo);
+
+  Future<String> borrowBook({
+    required String barcode,
+    required BookInfo bookInfo,
+    String? searchCode,
+  }) async {
+    if (barcode.isEmpty) {
+      throw LibraryOperationException(message: "图书条码为空");
+    }
+    if (userId == 0 || token.isEmpty) {
+      await initSession();
+    }
+
+    final userBarcode = await _getUserBarcode();
+    final searchCodeToUse = searchCode ?? bookInfo.searchCode?.firstOrNull;
+    if (searchCodeToUse == null || searchCodeToUse.isEmpty) {
+      throw LibraryOperationException(message: "缺少索书号，无法申请借书");
+    }
+
+    final response = await dio.post(
+      "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/borrow.html",
+      data: {
+        "libraryId": 5,
+        "userId": userId,
+        "token": token,
+        "barNumber": barcode,
+        "cardNumber": userBarcode,
+        "bookName": bookInfo.bookName,
+        "author": bookInfo.author ?? "",
+        "searchCode": searchCodeToUse,
+      },
+    );
+
+    final data = response.data;
+    _throwIfLibrarySessionExpired(data);
+    if (data is Map && data["code"] == 1) {
+      return data["msg"]?.toString() ?? data["data"]?.toString() ?? "借书申请已提交";
+    }
+    throw LibraryOperationException(
+      message: data is Map ? data["msg"]?.toString() ?? "申请借书失败" : "申请借书失败",
+    );
+  }
+
+  Future<String> _getUserBarcode() async {
+    if (userId == 0 || token.isEmpty) {
+      await initSession();
+    }
+
+    final response = await dio.post(
+      "https://shuwo.xidian.edu.cn/xidian_book/api/borrow/getUserInfo",
+      data: {
+        "libraryId": 5,
+        "userId": userId,
+        "token": token,
+        "cardNumber": preference.getString(preference.Preference.idsAccount),
+      },
+    );
+
+    final data = response.data;
+    _throwIfLibrarySessionExpired(data);
+    if (data is Map && data["code"] == 1) {
+      final userBarcode = data["data"]?["userBarcode"]?.toString();
+      if (userBarcode != null && userBarcode.isNotEmpty) {
+        return userBarcode;
+      }
+    }
+
+    throw LibraryOperationException(
+      message: data is Map ? data["msg"]?.toString() ?? "获取读者条码失败" : "获取读者条码失败",
+    );
+  }
+
+  void _throwIfLibrarySessionExpired(dynamic data) {
+    if (data is Map && data["code"] == -1) {
+      userId = 0;
+      token = "";
+      throw NotFetchLibraryException(
+        message: data["msg"]?.toString() ?? "图书馆登录已失效",
+      );
+    }
+  }
 
   Future<List<BorrowData>> getBorrowList() async {
     log.info(
@@ -391,4 +532,15 @@ class LibrarySession extends IDSSession {
 class NotFetchLibraryException implements Exception {
   final String message;
   NotFetchLibraryException({this.message = "Error detected."});
+
+  @override
+  String toString() => message;
+}
+
+class LibraryOperationException implements Exception {
+  final String message;
+  LibraryOperationException({required this.message});
+
+  @override
+  String toString() => message;
 }

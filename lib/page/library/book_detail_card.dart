@@ -14,14 +14,78 @@ import 'package:watermeter/repository/logger.dart';
 
 class BookDetailCard extends StatefulWidget {
   final BookInfo toUse;
+  final bool showBorrowAction;
+  final void Function(BuildContext context, BookInfo bookInfo)? onBorrowRequest;
 
-  const BookDetailCard({super.key, required this.toUse});
+  const BookDetailCard({
+    super.key,
+    required this.toUse,
+    this.showBorrowAction = true,
+    this.onBorrowRequest,
+  });
 
   @override
   State<BookDetailCard> createState() => _BookDetailCardState();
 }
 
 class _BookDetailCardState extends State<BookDetailCard> {
+  BookLocation? get _firstBorrowableLocation {
+    final items = widget.toUse.items;
+    if (items == null) return null;
+    for (final item in items) {
+      if (item.processType == "在架" && (item.barCode?.isNotEmpty ?? false)) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  Widget _buildBorrowAction(BuildContext context) {
+    final borrowableLocation = _firstBorrowableLocation;
+    if (borrowableLocation == null) {
+      return OutlinedButton.icon(
+        onPressed: null,
+        icon: const Icon(Icons.block),
+        label: Text(
+          FlutterI18n.translate(context, "library.borrow_unavailable"),
+        ),
+      );
+    }
+
+    return [
+      Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: [
+          Icon(
+            Icons.warning_rounded,
+            color: Theme.of(context).colorScheme.onErrorContainer,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            FlutterI18n.translate(context, "library.search_borrow_warning"),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onErrorContainer,
+            ),
+          ).expanded(),
+        ].toRow(),
+      ),
+      const SizedBox(height: 8),
+      FilledButton.icon(
+        onPressed: widget.onBorrowRequest == null
+            ? null
+            : () => widget.onBorrowRequest!(context, widget.toUse),
+        icon: const Icon(Icons.qr_code_scanner),
+        label: Text(
+          FlutterI18n.translate(context, "library.scan_to_borrow_this_book"),
+        ),
+      ),
+    ].toColumn(crossAxisAlignment: CrossAxisAlignment.stretch);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -241,6 +305,10 @@ class _BookDetailCardState extends State<BookDetailCard> {
                 .flexible(),
           ],
         ),
+        if (widget.showBorrowAction) ...[
+          const SizedBox(height: 12),
+          _buildBorrowAction(context),
+        ],
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Column(

@@ -566,6 +566,29 @@ library:
   search_here: 在此搜索
   book_detail: 書籍詳細信息
   no_result: 沒有結果，請修改搜索參數或者開始你的搜索
+  scan_borrow: 掃碼借書
+  toggle_flash: 切換閃光燈
+  scan_book_barcode: 對準圖書條碼，掃描後確認借書
+  scan_expected_book_barcode: 請掃描《{book}》書上的館藏條碼
+  scan_barcode_help: 請橫向對準圖書上的一維館藏條碼，盡量讓條碼充滿框內
+  loading_scanned_book: 正在讀取圖書信息
+  scan_book_found: 已識別圖書
+  scan_borrow_available: 已識別圖書，可借位置：{location}
+  scan_borrow_unavailable: 已識別圖書，但當前不可借：{status}
+  scan_borrow_no_copy: 已識別圖書，但沒有找到可借館藏
+  scan_expected_book_mismatch: 掃到的是《{actual}》，不是你在搜索頁選擇的《{expected}》
+  confirm_borrow_title: 確認借閱這本書？
+  confirm_borrow: 確認借書
+  confirm_borrow_real_action: 確認借書（將真實借出）
+  borrow_submitting_notice: 正在提交借書申請，請稍候
+  rescan: 重新掃描
+  scanned_barcode: 條碼：{barcode}
+  borrow_this_book: 借閱此書
+  scan_to_borrow_this_book: 掃碼借閱此書
+  search_borrow_warning: 為避免誤借，搜索結果不能直接借出。請到館拿到這本書後，掃描書上的館藏條碼；最終點擊確認借書會真實發起借閱。
+  borrow_unavailable: 暫無可借館藏
+  borrowing_book: 正在申請借書
+  confirm_search_borrow_message: 確認借閱《{book}》？館藏位置：{location}
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取圖書館信息

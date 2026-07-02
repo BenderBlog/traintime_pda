@@ -14,6 +14,7 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart'
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
+import 'package:watermeter/page/library/scan_borrow_window.dart';
 
 enum SearchField { keyWord, title, author, isbn, barcode, callNo }
 
@@ -191,7 +192,25 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                                     context,
                                     "library.book_detail",
                                   ),
-                                  child: BookDetailCard(toUse: item),
+                                  child: BookDetailCard(
+                                    toUse: item,
+                                    onBorrowRequest: (sheetContext, bookInfo) {
+                                      final navigator = Navigator.of(context);
+                                      Navigator.of(sheetContext).pop();
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                            if (!context.mounted) return;
+                                            navigator.push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ScanBorrowWindow(
+                                                      expectedBook: bookInfo,
+                                                    ),
+                                              ),
+                                            );
+                                          });
+                                    },
+                                  ),
                                 ),
                               )
                               .padding(horizontal: 12, vertical: 2)

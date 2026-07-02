@@ -638,6 +638,29 @@ library:
   search_here: Search here
   book_detail: Book details
   no_result: No result, change parameter or start your search
+  scan_borrow: Scan to Borrow
+  toggle_flash: Toggle flash
+  scan_book_barcode: Align the book barcode, then confirm borrowing
+  scan_expected_book_barcode: 'Scan the holding barcode on "{book}"'
+  scan_barcode_help: Keep the one-dimensional holding barcode horizontal and fill the frame as much as possible
+  loading_scanned_book: Loading book information
+  scan_book_found: Book identified
+  scan_borrow_available: "Book identified. Borrowable location: {location}"
+  scan_borrow_unavailable: "Book identified, but unavailable now: {status}"
+  scan_borrow_no_copy: Book identified, but no borrowable copy was found
+  scan_expected_book_mismatch: 'Scanned "{actual}", not the book selected in search: "{expected}"'
+  confirm_borrow_title: Borrow this book?
+  confirm_borrow: Confirm borrow
+  confirm_borrow_real_action: Confirm borrow (will really borrow)
+  borrow_submitting_notice: Submitting borrow request, please wait
+  rescan: Scan again
+  scanned_barcode: "Barcode: {barcode}"
+  borrow_this_book: Borrow this book
+  scan_to_borrow_this_book: Scan to borrow this book
+  search_borrow_warning: Search results cannot be borrowed directly to avoid mistakes. Take the book in the library, scan its holding barcode, then the final confirm action will really submit the borrow request.
+  borrow_unavailable: No borrowable copy
+  borrowing_book: Requesting borrow
+  confirm_search_borrow_message: 'Borrow "{book}" from {location}?'
 library_card:
   title: Library status
   fetching: Fetching

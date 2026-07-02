@@ -568,6 +568,29 @@ library:
   search_here: 在此搜索
   book_detail: 书籍详细信息
   no_result: 没有结果，请修改搜索参数或者开始你的搜索
+  scan_borrow: 扫码借书
+  toggle_flash: 切换闪光灯
+  scan_book_barcode: 对准图书条码，扫描后确认借书
+  scan_expected_book_barcode: 请扫描《{book}》书上的馆藏条码
+  scan_barcode_help: 请横向对准图书上的一维馆藏条码，尽量让条码充满框内
+  loading_scanned_book: 正在读取图书信息
+  scan_book_found: 已识别图书
+  scan_borrow_available: 已识别图书，可借位置：{location}
+  scan_borrow_unavailable: 已识别图书，但当前不可借：{status}
+  scan_borrow_no_copy: 已识别图书，但没有找到可借馆藏
+  scan_expected_book_mismatch: 扫到的是《{actual}》，不是你在搜索页选择的《{expected}》
+  confirm_borrow_title: 确认借阅这本书？
+  confirm_borrow: 确认借书
+  confirm_borrow_real_action: 确认借书（将真实借出）
+  borrow_submitting_notice: 正在提交借书申请，请稍候
+  rescan: 重新扫描
+  scanned_barcode: 条码：{barcode}
+  borrow_this_book: 借阅此书
+  scan_to_borrow_this_book: 扫码借阅此书
+  search_borrow_warning: 为避免误借，搜索结果不能直接借出。请到馆拿到这本书后，扫描书上的馆藏条码；最终点击确认借书会真实发起借阅。
+  borrow_unavailable: 暂无可借馆藏
+  borrowing_book: 正在申请借书
+  confirm_search_borrow_message: 确认借阅《{book}》？馆藏位置：{location}
 library_card:
   title: 图书馆当前状况
   fetching: 正在获取图书馆信息
