@@ -136,7 +136,7 @@ class LibrarySession extends IDSSession {
 
   Future<BookInfo> getScannedBorrowBook(String barcode) async {
     if (barcode.isEmpty) {
-      throw LibraryOperationException(message: "图书条码为空");
+      throw LibraryOperationException(message: "馆藏条码为空");
     }
     if (userId == 0 || token.isEmpty) {
       await initSession();
@@ -187,7 +187,7 @@ class LibrarySession extends IDSSession {
     String? searchCode,
   }) async {
     if (barcode.isEmpty) {
-      throw LibraryOperationException(message: "图书条码为空");
+      throw LibraryOperationException(message: "馆藏条码为空");
     }
     if (userId == 0 || token.isEmpty) {
       await initSession();

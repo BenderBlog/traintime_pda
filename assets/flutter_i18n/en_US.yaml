@@ -640,7 +640,7 @@ library:
   no_result: No result, change parameter or start your search
   scan_borrow: Scan to Borrow
   toggle_flash: Toggle flash
-  scan_book_barcode: Align the book barcode, then confirm borrowing
+  scan_book_barcode: Align the holding barcode, then confirm borrowing
   scan_expected_book_barcode: 'Scan the holding barcode on "{book}"'
   scan_barcode_help: Keep the one-dimensional holding barcode horizontal and fill the frame as much as possible
   loading_scanned_book: Loading book information

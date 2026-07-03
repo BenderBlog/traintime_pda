@@ -568,7 +568,7 @@ library:
   no_result: 沒有結果，請修改搜索參數或者開始你的搜索
   scan_borrow: 掃碼借書
   toggle_flash: 切換閃光燈
-  scan_book_barcode: 對準圖書條碼，掃描後確認借書
+  scan_book_barcode: 對準館藏條碼，掃描後確認借書
   scan_expected_book_barcode: 請掃描《{book}》書上的館藏條碼
   scan_barcode_help: 請橫向對準圖書上的一維館藏條碼，盡量讓條碼充滿框內
   loading_scanned_book: 正在讀取圖書信息

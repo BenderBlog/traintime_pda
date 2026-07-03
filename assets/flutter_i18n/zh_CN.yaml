@@ -570,7 +570,7 @@ library:
   no_result: 没有结果，请修改搜索参数或者开始你的搜索
   scan_borrow: 扫码借书
   toggle_flash: 切换闪光灯
-  scan_book_barcode: 对准图书条码，扫描后确认借书
+  scan_book_barcode: 对准馆藏条码，扫描后确认借书
   scan_expected_book_barcode: 请扫描《{book}》书上的馆藏条码
   scan_barcode_help: 请横向对准图书上的一维馆藏条码，尽量让条码充满框内
   loading_scanned_book: 正在读取图书信息
