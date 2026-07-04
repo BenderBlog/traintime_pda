@@ -2,6 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -801,7 +802,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         fileName: fileName,
                         allowedExtensions: ["ics"],
                         bytes: Uint8List.fromList(
-                          classTableState.iCalenderStr.codeUnits,
+                          utf8.encode(classTableState.iCalenderStr),
                         ),
                         lockParentWindow: true,
                       );
