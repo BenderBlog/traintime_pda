@@ -649,6 +649,7 @@ library:
   scan_borrow_unavailable: "Book identified, but unavailable now: {status}"
   scan_borrow_no_copy: Book identified, but no borrowable copy was found
   scan_expected_book_mismatch: 'Scanned "{actual}", not the book selected in search: "{expected}"'
+  scan_borrow_fallback: Book identified, borrowable (exact copy location not matched)
   confirm_borrow_title: Borrow this book?
   confirm_borrow: Confirm borrow
   confirm_borrow_real_action: Confirm borrow (will really borrow)
@@ -661,6 +662,14 @@ library:
   borrow_unavailable: No borrowable copy
   borrowing_book: Requesting borrow
   confirm_search_borrow_message: 'Borrow "{book}" from {location}?'
+  error_barcode_empty: Holding barcode is empty
+  error_search_failed: Book search failed
+  error_book_not_found: No matching books found
+  error_no_search_code: Missing call number, cannot borrow
+  error_user_barcode_failed: Failed to get reader barcode
+  error_borrow_failed: Borrow request failed
+  error_renew_failed: Renew failed
+  error_session_expired: Library session expired
 library_card:
   title: Library status
   fetching: Fetching

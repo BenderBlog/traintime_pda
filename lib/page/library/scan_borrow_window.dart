@@ -9,6 +9,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
+import 'package:watermeter/page/library/borrow_confirm_dialog.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/library_session.dart';
@@ -66,7 +67,7 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
     } catch (e, s) {
       log.handle(e, s, "[ScanBorrowWindow][_handleCapture] Failed.");
       if (!mounted) return;
-      showToast(context: context, msg: e.toString());
+      showToast(context: context, msg: _exceptionMsg(e));
       await _resumeScan();
     } finally {
       if (mounted) {
@@ -75,6 +76,16 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
         });
       }
     }
+  }
+
+  String _exceptionMsg(Object e) {
+    if (e is LibraryOperationException && e.i18nKey != null) {
+      return FlutterI18n.translate(context, e.i18nKey!);
+    }
+    if (e is NotFetchLibraryException && e.i18nKey != null) {
+      return FlutterI18n.translate(context, e.i18nKey!);
+    }
+    return e.toString();
   }
 
   Future<void> _resumeScan() async {
@@ -218,13 +229,10 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
     if (borrowableLocation != null) {
       return _ScanBorrowStatus(
         canBorrow: true,
-        location: borrowableLocation,
+        location: null,
         message: FlutterI18n.translate(
           context,
-          "library.scan_borrow_available",
-          translationParams: {
-            "location": _locationLabel(context, borrowableLocation),
-          },
+          "library.scan_borrow_fallback",
         ),
       );
     }
@@ -246,6 +254,18 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
       showToast(context: context, msg: borrowStatus.message);
       return;
     }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => BorrowConfirmDialog(
+        coverUrl: bookInfo.imageUrl,
+        bookName: bookInfo.bookName,
+        locationName: borrowStatus.location?.locationName,
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
 
     setState(() {
       _submitting = true;
@@ -270,7 +290,7 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
     } catch (e, s) {
       log.handle(e, s, "[ScanBorrowWindow][_submitBorrow] Failed.");
       if (!mounted) return;
-      showToast(context: context, msg: e.toString());
+      showToast(context: context, msg: _exceptionMsg(e));
       setState(() {
         _submitting = false;
       });
@@ -422,7 +442,7 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
                           : Text(
                               FlutterI18n.translate(
                                 context,
-                                "library.confirm_borrow_real_action",
+                                "library.confirm_borrow",
                               ),
                             ),
                     ).expanded(),

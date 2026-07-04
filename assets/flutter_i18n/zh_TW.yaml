@@ -577,6 +577,7 @@ library:
   scan_borrow_unavailable: 已識別圖書，但當前不可借：{status}
   scan_borrow_no_copy: 已識別圖書，但沒有找到可借館藏
   scan_expected_book_mismatch: 掃到的是《{actual}》，不是你在搜索頁選擇的《{expected}》
+  scan_borrow_fallback: 已識別圖書，可借（未能匹配精確館藏位置）
   confirm_borrow_title: 確認借閱這本書？
   confirm_borrow: 確認借書
   confirm_borrow_real_action: 確認借書（將真實借出）
@@ -589,6 +590,14 @@ library:
   borrow_unavailable: 暫無可借館藏
   borrowing_book: 正在申請借書
   confirm_search_borrow_message: 確認借閱《{book}》？館藏位置：{location}
+  error_barcode_empty: 館藏條碼為空
+  error_search_failed: 查詢圖書失敗
+  error_book_not_found: 未查找到相關書籍
+  error_no_search_code: 缺少索書號，無法申請借書
+  error_user_barcode_failed: 獲取讀者條碼失敗
+  error_borrow_failed: 申請借書失敗
+  error_renew_failed: 續借失敗
+  error_session_expired: 圖書館登錄已失效
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取圖書館信息

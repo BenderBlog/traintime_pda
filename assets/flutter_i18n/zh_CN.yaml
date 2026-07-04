@@ -579,6 +579,7 @@ library:
   scan_borrow_unavailable: 已识别图书，但当前不可借：{status}
   scan_borrow_no_copy: 已识别图书，但没有找到可借馆藏
   scan_expected_book_mismatch: 扫到的是《{actual}》，不是你在搜索页选择的《{expected}》
+  scan_borrow_fallback: 已识别图书，可借（未能匹配精确馆藏位置）
   confirm_borrow_title: 确认借阅这本书？
   confirm_borrow: 确认借书
   confirm_borrow_real_action: 确认借书（将真实借出）
@@ -591,6 +592,14 @@ library:
   borrow_unavailable: 暂无可借馆藏
   borrowing_book: 正在申请借书
   confirm_search_borrow_message: 确认借阅《{book}》？馆藏位置：{location}
+  error_barcode_empty: 馆藏条码为空
+  error_search_failed: 查询图书失败
+  error_book_not_found: 未查找到相关书籍
+  error_no_search_code: 缺少索书号，无法申请借书
+  error_user_barcode_failed: 获取读者条码失败
+  error_borrow_failed: 申请借书失败
+  error_renew_failed: 续借失败
+  error_session_expired: 图书馆登录已失效
 library_card:
   title: 图书馆当前状况
   fetching: 正在获取图书馆信息

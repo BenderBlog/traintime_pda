@@ -131,12 +131,16 @@ class LibrarySession extends IDSSession {
 
     throw LibraryOperationException(
       message: data is Map ? data["msg"]?.toString() ?? "续借失败" : "续借失败",
+      i18nKey: "library.error_renew_failed",
     );
   }
 
   Future<BookInfo> getScannedBorrowBook(String barcode) async {
     if (barcode.isEmpty) {
-      throw LibraryOperationException(message: "馆藏条码为空");
+      throw LibraryOperationException(
+        message: "馆藏条码为空",
+        i18nKey: "library.error_barcode_empty",
+      );
     }
     if (userId == 0 || token.isEmpty) {
       await initSession();
@@ -159,12 +163,16 @@ class LibrarySession extends IDSSession {
     if (data is Map && data["code"] != null && data["code"] != 1) {
       throw LibraryOperationException(
         message: data["msg"]?.toString() ?? "查询图书失败",
+        i18nKey: "library.error_search_failed",
       );
     }
 
     final rawList = data["data"]?["list"];
     if (rawList is! List || rawList.isEmpty) {
-      throw LibraryOperationException(message: "未查找到相关书籍");
+      throw LibraryOperationException(
+        message: "未查找到相关书籍",
+        i18nKey: "library.error_book_not_found",
+      );
     }
 
     final book = BookInfo.fromJson(rawList.first as Map<String, dynamic>);
@@ -187,7 +195,10 @@ class LibrarySession extends IDSSession {
     String? searchCode,
   }) async {
     if (barcode.isEmpty) {
-      throw LibraryOperationException(message: "馆藏条码为空");
+      throw LibraryOperationException(
+        message: "馆藏条码为空",
+        i18nKey: "library.error_barcode_empty",
+      );
     }
     if (userId == 0 || token.isEmpty) {
       await initSession();
@@ -196,7 +207,10 @@ class LibrarySession extends IDSSession {
     final userBarcode = await _getUserBarcode();
     final searchCodeToUse = searchCode ?? bookInfo.searchCode?.firstOrNull;
     if (searchCodeToUse == null || searchCodeToUse.isEmpty) {
-      throw LibraryOperationException(message: "缺少索书号，无法申请借书");
+      throw LibraryOperationException(
+        message: "缺少索书号，无法申请借书",
+        i18nKey: "library.error_no_search_code",
+      );
     }
 
     final response = await dio.post(
@@ -216,10 +230,15 @@ class LibrarySession extends IDSSession {
     final data = response.data;
     _throwIfLibrarySessionExpired(data);
     if (data is Map && data["code"] == 1) {
-      return data["msg"]?.toString() ?? data["data"]?.toString() ?? "借书申请已提交";
+      final msg = data["msg"]?.toString();
+      if (msg != null && msg.isNotEmpty) return msg;
+      final dataStr = data["data"]?.toString();
+      if (dataStr != null && dataStr.isNotEmpty) return dataStr;
+      return "借书申请已提交";
     }
     throw LibraryOperationException(
       message: data is Map ? data["msg"]?.toString() ?? "申请借书失败" : "申请借书失败",
+      i18nKey: "library.error_borrow_failed",
     );
   }
 
@@ -249,6 +268,7 @@ class LibrarySession extends IDSSession {
 
     throw LibraryOperationException(
       message: data is Map ? data["msg"]?.toString() ?? "获取读者条码失败" : "获取读者条码失败",
+      i18nKey: "library.error_user_barcode_failed",
     );
   }
 
@@ -258,6 +278,7 @@ class LibrarySession extends IDSSession {
       token = "";
       throw NotFetchLibraryException(
         message: data["msg"]?.toString() ?? "图书馆登录已失效",
+        i18nKey: "library.error_session_expired",
       );
     }
   }
@@ -531,7 +552,8 @@ class LibrarySession extends IDSSession {
 
 class NotFetchLibraryException implements Exception {
   final String message;
-  NotFetchLibraryException({this.message = "Error detected."});
+  final String? i18nKey;
+  NotFetchLibraryException({this.message = "Error detected.", this.i18nKey});
 
   @override
   String toString() => message;
@@ -539,7 +561,8 @@ class NotFetchLibraryException implements Exception {
 
 class LibraryOperationException implements Exception {
   final String message;
-  LibraryOperationException({required this.message});
+  final String? i18nKey;
+  LibraryOperationException({required this.message, this.i18nKey});
 
   @override
   String toString() => message;

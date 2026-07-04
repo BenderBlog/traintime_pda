@@ -276,30 +276,6 @@ class _BookDetailCardState extends State<BookDetailCard> {
                       ],
                     ),
                   ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "library.arrangement_code",
-                          ),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFBFBFBF),
-                          ),
-                        ),
-                        TextSpan(
-                          text: widget.toUse.barCodesStr,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ]
                 .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
                 .flexible(),
