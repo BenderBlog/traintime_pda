@@ -9,9 +9,13 @@ import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/energy_controller.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/routing/routes.dart';
+
+const int _defaultLowElectricityWarningThreshold = 20;
 
 class EnergyCard extends StatelessWidget {
   const EnergyCard({super.key});
@@ -23,6 +27,28 @@ class EnergyCard extends StatelessWidget {
       builder: (context) {
         final state = controller.energyInfoStateSignal.value;
         final displayInfo = controller.displayEnergyInfo.value;
+        final lowElectricityWarningEnabled =
+            !preference.contains(
+              preference.Preference.lowElectricityWarningEnabled,
+            ) ||
+            preference.getBool(
+              preference.Preference.lowElectricityWarningEnabled,
+            );
+        final lowElectricityWarningThreshold =
+            preference.contains(
+              preference.Preference.lowElectricityWarningThreshold,
+            )
+            ? preference.getInt(
+                preference.Preference.lowElectricityWarningThreshold,
+              )
+            : _defaultLowElectricityWarningThreshold;
+        final effectiveThreshold = lowElectricityWarningThreshold > 0
+            ? lowElectricityWarningThreshold
+            : _defaultLowElectricityWarningThreshold;
+        final lowElectricityWarning =
+            displayInfo != null &&
+            lowElectricityWarningEnabled &&
+            displayInfo.electricityRemain < effectiveThreshold;
 
         return MainPageCard(
           onPressed: () async {
@@ -30,6 +56,9 @@ class EnergyCard extends StatelessWidget {
           },
           isLoad: state.isLoading && displayInfo == null,
           icon: MingCuteIcons.mgc_flash_line,
+          type: lowElectricityWarning
+              ? HomeCardType.warning
+              : HomeCardType.plain,
           text: FlutterI18n.translate(
             context,
             "homepage.electricity_card.title",

@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
-enum HomeCardType { plain, filled }
+enum HomeCardType { plain, filled, warning }
 
 extension HomeCardPadding on Widget {
   Widget withHomeCardStyle(
@@ -27,6 +27,9 @@ extension HomeCardPadding on Widget {
         iconSize: WidgetStateProperty.all(20),
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           final colorScheme = Theme.of(context).colorScheme;
+          if (type == HomeCardType.warning) {
+            return colorScheme.errorContainer;
+          }
           if (type == HomeCardType.filled) {
             return colorScheme.surfaceContainerHigh;
           }
@@ -34,6 +37,9 @@ extension HomeCardPadding on Widget {
         }),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           final colorScheme = Theme.of(context).colorScheme;
+          if (type == HomeCardType.warning) {
+            return colorScheme.onErrorContainer;
+          }
           if (type == HomeCardType.filled) {
             return colorScheme.onSurfaceVariant;
           }
@@ -41,6 +47,9 @@ extension HomeCardPadding on Widget {
         }),
         side: WidgetStateProperty.resolveWith((states) {
           final colorScheme = Theme.of(context).colorScheme;
+          if (type == HomeCardType.warning) {
+            return BorderSide(color: colorScheme.error);
+          }
           if (type == HomeCardType.filled) {
             return BorderSide.none;
           }
@@ -56,7 +65,9 @@ extension HomeCardPadding on Widget {
       onPressed: onPressed,
       child: DefaultTextStyle(
         style: TextStyle(
-          color: Theme.of(context).brightness == Brightness.dark
+          color: type == HomeCardType.warning
+              ? Theme.of(context).colorScheme.onErrorContainer
+              : Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).colorScheme.onSurface
               : Theme.of(context).colorScheme.onSurfaceVariant,
         ),
