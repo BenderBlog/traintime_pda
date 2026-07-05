@@ -70,7 +70,58 @@ class BorrowData {
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);
 
+  factory BorrowData.fromOpacJson(Map<String, dynamic> json) {
+    final normReturnDate = _stringValue(json['normReturnDate']);
+    final dueDate = _parseLibraryDate(normReturnDate);
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+
+    return BorrowData(
+      lendDay: dueDate.difference(todayDate).inDays,
+      locationId: _intValue(json['locationId']),
+      loanId: _intValue(json['loanId']),
+      renewTimes: _intValue(json['renewTimes']),
+      recallTimes: _intValue(json['recallTimes']),
+      loanDate: _stringValue(json['loanDate']),
+      renewDate: _nullableStringValue(json['renewDate']),
+      normReturnDate: normReturnDate,
+      returnDate: _nullableStringValue(json['returnDate']),
+      loanType: _stringValue(json['loanType']),
+      locationName: _stringValue(json['locationName']),
+      itemLibCode: _stringValue(json['curLibCode'] ?? json['itemLibCode']),
+      itemLibName: _stringValue(json['curLibName'] ?? json['itemLibName']),
+      loanDeskName: _stringValue(json['loanDeskName']),
+      title: _stringValue(json['title']),
+      author: _stringValue(json['author']),
+      publisher: _stringValue(json['publisher']),
+      isbn: _stringValue(json['isbn']),
+      isbn10: _stringValue(json['isbn10']),
+      isbn13: _stringValue(json['isbn13']),
+      publishYear: _stringValue(json['publishYear']),
+      titles: _nullableStringValue(json['titles']),
+      barcode: _stringValue(json['barcode'] ?? json['propNo']),
+    );
+  }
+
   Map<String, dynamic> toJson() => _$BorrowDataToJson(this);
+}
+
+int _intValue(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
+String _stringValue(Object? value) => value?.toString() ?? "";
+
+String? _nullableStringValue(Object? value) => value?.toString();
+
+DateTime _parseLibraryDate(String value) {
+  if (value.isEmpty) {
+    return DateTime.now();
+  }
+  return DateTime.parse(value.replaceAll('/', '-').split(' ').first);
 }
 
 @JsonSerializable()
@@ -92,6 +143,8 @@ class BookInfo {
   final List<String?>? barCodes;
   final List<String>? searchCode;
   final List<BookLocation>? items;
+  final int? availableCount;
+  final int? storageCount;
   String? imageUrl;
 
   BookInfo({
@@ -112,15 +165,48 @@ class BookInfo {
     this.searchCode,
     required this.barCodes,
     this.items,
+    this.availableCount,
+    this.storageCount,
     this.imageUrl,
   });
 
   factory BookInfo.fromJson(Map<String, dynamic> json) =>
       _$BookInfoFromJson(json);
 
+  factory BookInfo.fromOpacJson(Map<String, dynamic> json) {
+    final callNos = _stringList(json['callNo']);
+    final barCodes = _nullableStringList(
+      json['barCodes'] ?? json['barcode'] ?? json['propNo'],
+    );
+    return BookInfo(
+      author: _nullableStringValue(json['author']),
+      subject: _nullableStringValue(json['subjectWord']),
+      isbn: _nullableStringValue(json['isbn']),
+      description: _nullableStringValue(json['adstract'] ?? json['ddAbstract']),
+      bookName: _stringValue(json['title']),
+      barCode: _nullableStringValue(json['barcode'] ?? json['propNo']),
+      docNumber: _intValue(json['recordId']),
+      publishYear: _nullableStringValue(json['publishYear'] ?? json['year']),
+      publisherHouse: _nullableStringValue(json['publisher']),
+      groupCode: _nullableStringValue(json['groupCode']),
+      callNos: callNos,
+      searchCode: callNos,
+      barCodes: barCodes,
+      availableCount: _nullableIntValue(
+        json['onShelfCountI'] ?? json['canBrrowCountI'] ?? json['onShelfNum'],
+      ),
+      storageCount: _nullableIntValue(
+        json['groupPhysicalCount'] ?? json['physicalCount'],
+      ),
+    );
+  }
+
   Map<String, dynamic> toJson() => _$BookInfoToJson(this);
 
   int? get canBeBorrowed {
+    if (availableCount != null) {
+      return availableCount;
+    }
     if (items == null) {
       return null;
     }
@@ -129,6 +215,20 @@ class BookInfo {
       if (i.processType == "在架") toReturn += 1;
     }
     return toReturn;
+  }
+
+  int? get totalStorage {
+    if (storageCount != null) {
+      return storageCount;
+    }
+    return items?.length;
+  }
+
+  bool get hasBarCodes {
+    if (barCodes == null || barCodes!.isEmpty) {
+      return false;
+    }
+    return barCodes!.any((e) => e != null && e.isNotEmpty);
   }
 
   String get searchCodeStr {
@@ -142,8 +242,39 @@ class BookInfo {
     if (barCodes == null || barCodes!.isEmpty) {
       return "未提供";
     }
-    return barCodes!.first ?? "未提供";
+    for (final code in barCodes!) {
+      if (code != null && code.isNotEmpty) {
+        return code;
+      }
+    }
+    return "未提供";
   }
+}
+
+int? _nullableIntValue(Object? value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
+}
+
+List<String>? _stringList(Object? value) {
+  if (value == null) return null;
+  if (value is List) {
+    return value.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+  }
+  final text = value.toString();
+  return text.isEmpty ? null : [text];
+}
+
+List<String?>? _nullableStringList(Object? value) {
+  if (value == null) return null;
+  if (value is List) {
+    return value.map((e) => e?.toString()).toList();
+  }
+  final text = value.toString();
+  return text.isEmpty ? null : [text];
 }
 
 @JsonSerializable()
@@ -182,6 +313,33 @@ class BookLocation {
 
   factory BookLocation.fromJson(Map<String, dynamic> json) =>
       _$BookLocationFromJson(json);
+
+  factory BookLocation.fromOpacJson(Map<String, dynamic> json) {
+    final locationName = _stringValue(
+      json['realLocationName'] ?? json['locationName'],
+    );
+    final shelfName = _stringValue(json['urlName']);
+    final displayLocation = shelfName.isEmpty
+        ? locationName
+        : "$locationName $shelfName";
+
+    return BookLocation(
+      yearVol: _nullableStringValue(json['vol'] ?? json['yearVol']),
+      locationName: displayLocation.isEmpty ? null : displayLocation,
+      searchCode: _stringValue(json['callNo']),
+      campus: _nullableStringValue(json['campus']),
+      inDate: _nullableStringValue(json['inDate']),
+      barCode: _nullableStringValue(json['barcode'] ?? json['propNo']),
+      itemId: _intValue(json['itemId']),
+      circAttr: _stringValue(json['circAttr']),
+      locationId: _nullableStringValue(json['locationId']),
+      processType: _stringValue(json['processType']),
+      curLocationId: _stringValue(json['curLocationId']),
+      propNo: _nullableStringValue(json['propNo']),
+      borrowStatus: _nullableStringValue(json['borrowStatus']),
+      noBorrowMessages: _nullableStringValue(json['noBorrowMessages']),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$BookLocationToJson(this);
 }
