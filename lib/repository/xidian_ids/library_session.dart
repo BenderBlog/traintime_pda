@@ -72,20 +72,21 @@ class LibrarySession extends IDSSession {
           }
         });
 
-    List<BookInfo> toReturn = [];
+    final toReturn = List<BookInfo>.generate(
+      rawData.length,
+      (index) => BookInfo.fromJson(rawData[index]),
+    );
     final pool = Pool(5);
 
-    await Future.wait([
-      ...List<BookInfo>.generate(
-        rawData.length,
-        (index) => BookInfo.fromJson(rawData[index]),
-      ).map(
-        (e) => pool.withResource(() async {
-          e.imageUrl = await bookCover(e.bookName, e.isbn ?? "", e.docNumber);
-          toReturn.add(e);
-        }),
-      ),
-    ]);
+    await Future.wait(
+      List.generate(toReturn.length, (i) => pool.withResource(() async {
+        toReturn[i].imageUrl = await bookCover(
+          toReturn[i].bookName,
+          toReturn[i].isbn ?? "",
+          toReturn[i].docNumber,
+        );
+      })),
+    );
 
     return toReturn;
   }
@@ -289,7 +290,7 @@ class LibrarySession extends IDSSession {
       "Getting borrow list",
     );
 
-    if (userId == 0 && token == "") {
+    if (userId == 0 || token.isEmpty) {
       await initSession();
     }
 
@@ -306,7 +307,10 @@ class LibrarySession extends IDSSession {
             "page": 0,
           },
         )
-        .then((value) => value.data["data"]);
+        .then((value) {
+          _throwIfLibrarySessionExpired(value.data);
+          return value.data["data"];
+        });
 
     List<BorrowData> toAppend = [];
     final pool = Pool(5);
@@ -319,7 +323,7 @@ class LibrarySession extends IDSSession {
           e.imageUrl = await searchBook(e.barcode, 1, searchField: "barcode")
               .then(
                 (books) => books.isNotEmpty
-                    ? LibrarySession().bookCover(
+                    ? bookCover(
                         books.first.bookName,
                         books.first.isbn ?? "",
                         books.first.docNumber,
@@ -332,9 +336,11 @@ class LibrarySession extends IDSSession {
     ]);
 
     toAppend.sort(
-      (a, b) =>
-          a.normReturnDateTime.millisecondsSinceEpoch -
-          b.normReturnDateTime.millisecondsSinceEpoch,
+      (a, b) {
+        final returnCmp = a.normReturnDateTime.compareTo(b.normReturnDateTime);
+        if (returnCmp != 0) return returnCmp;
+        return a.loanDateTime.compareTo(b.loanDateTime);
+      },
     );
 
     return toAppend;
