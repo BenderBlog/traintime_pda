@@ -34,12 +34,6 @@ Catcher2Options catcherOptions = Catcher2Options(
   ],
   localizationOptions: [LocalizationOptions.buildDefaultChineseOptions()],
   logger: PDACatcher2Logger(),
-  filterFunction: (report) {
-    final errorText = report.error.toString();
-    final detailsText = report.errorDetails?.exceptionAsString() ?? "";
-    return !errorText.contains("RenderFlex overflowed") &&
-        !detailsText.contains("RenderFlex overflowed");
-  },
 );
 
 enum Preference {
@@ -153,10 +147,22 @@ enum Preference {
     key: "classStyleCompletedInnerAlpha",
     type: "double",
   ), // 已完成课程底色透明度
-  homepageInfoOrder(key: "homepageInfoOrder", type: "String"), // 主页信息卡片顺序
-  homepageSmallOrder(key: "homepageSmallOrder", type: "String"), // 主页功能格子顺序
-  homepageAllOrder(key: "homepageAllOrder", type: "String"), // 主页卡片统一顺序
-  homepageHiddenIds(key: "homepageHiddenIds", type: "String"); // 主页隐藏卡片
+  homepageInfoOrder(
+    key: "homepageInfoOrder",
+    type: "String",
+  ), // 主页信息卡片顺序
+  homepageSmallOrder(
+    key: "homepageSmallOrder",
+    type: "String",
+  ), // 主页功能格子顺序
+  homepageAllOrder(
+    key: "homepageAllOrder",
+    type: "String",
+  ), // 主页卡片统一顺序
+  homepageHiddenIds(
+    key: "homepageHiddenIds",
+    type: "String",
+  ); // 主页隐藏卡片
 
   const Preference({required this.key, this.type = "String"});
 
