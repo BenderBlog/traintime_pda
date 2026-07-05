@@ -632,6 +632,7 @@ library:
   can_be_renewable: Renewable
   cannot_be_renewable: Not renewable
   renewing: Renewing
+  renew_success: Renewed successfully
   empty_borrow_list: No borrowed books found
   borrow_list_info: Borrowing {borrow} book(s), among which {dued} book(s) have expired
   search_book_window: null
@@ -661,6 +662,7 @@ library:
   search_borrow_warning: Search results cannot be borrowed directly to avoid mistakes. Take the book in the library, scan its holding barcode, then the final confirm action will really submit the borrow request.
   borrow_unavailable: No borrowable copy
   borrowing_book: Requesting borrow
+  borrow_submitted: Borrow request submitted
   confirm_search_borrow_message: 'Borrow "{book}" from {location}?'
   error_barcode_empty: Holding barcode is empty
   error_search_failed: Book search failed

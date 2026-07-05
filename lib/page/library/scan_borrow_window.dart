@@ -276,14 +276,17 @@ class _ScanBorrowWindowState extends State<ScanBorrowWindow> {
     );
 
     try {
-      final message = await _session.borrowBook(
+      await _session.borrowBook(
         barcode: barcode,
         bookInfo: bookInfo,
         searchCode:
             borrowStatus.location?.searchCode ?? _firstSearchCode(bookInfo),
       );
       if (!mounted) return;
-      showToast(context: context, msg: message);
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(context, "library.borrow_submitted"),
+      );
       await LibraryController.i.reloadBorrowList();
       if (!mounted) return;
       Navigator.of(context).pop();

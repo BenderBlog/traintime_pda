@@ -137,16 +137,8 @@ class BookInfo {
     }
     return searchCode!.first;
   }
-
-  String get barCodesStr {
-    if (barCodes == null || barCodes!.isEmpty) {
-      return "未提供";
-    }
-    return barCodes!.first ?? "未提供";
-  }
 }
 
-@JsonSerializable()
 class BookLocation {
   final String? yearVol;
   final String? locationName;

@@ -558,6 +558,7 @@ library:
   can_be_renewable: 續借
   cannot_be_renewable: 不可續借
   renewing: 正在續借
+  renew_success: 續借成功
   empty_borrow_list: '目前沒有查詢到在借圖書
 
     不借書就要變成上面的小呆瓜咯'
@@ -589,6 +590,7 @@ library:
   search_borrow_warning: 為避免誤借，搜索結果不能直接借出。請到館拿到這本書後，掃描書上的館藏條碼；最終點擊確認借書會真實發起借閱。
   borrow_unavailable: 暫無可借館藏
   borrowing_book: 正在申請借書
+  borrow_submitted: 借書申請已提交
   confirm_search_borrow_message: 確認借閱《{book}》？館藏位置：{location}
   error_barcode_empty: 館藏條碼為空
   error_search_failed: 查詢圖書失敗

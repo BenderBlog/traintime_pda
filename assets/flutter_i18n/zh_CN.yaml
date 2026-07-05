@@ -560,6 +560,7 @@ library:
   can_be_renewable: 续借
   cannot_be_renewable: 不可续借
   renewing: 正在续借
+  renew_success: 续借成功
   empty_borrow_list: "目前没有查询到在借图书
 
     不借书就要变成上面的小呆瓜咯"
@@ -591,6 +592,7 @@ library:
   search_borrow_warning: 为避免误借，搜索结果不能直接借出。请到馆拿到这本书后，扫描书上的馆藏条码；最终点击确认借书会真实发起借阅。
   borrow_unavailable: 暂无可借馆藏
   borrowing_book: 正在申请借书
+  borrow_submitted: 借书申请已提交
   confirm_search_borrow_message: 确认借阅《{book}》？馆藏位置：{location}
   error_barcode_empty: 馆藏条码为空
   error_search_failed: 查询图书失败

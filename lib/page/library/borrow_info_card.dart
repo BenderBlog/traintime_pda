@@ -189,9 +189,15 @@ class BorrowInfoCard extends StatelessWidget {
                         msg: FlutterI18n.translate(context, "library.renewing"),
                       );
                       try {
-                        final value = await LibrarySession().renew(toUse);
+                        await LibrarySession().renew(toUse);
                         if (!context.mounted) return;
-                        showToast(context: context, msg: value);
+                        showToast(
+                          context: context,
+                          msg: FlutterI18n.translate(
+                            context,
+                            "library.renew_success",
+                          ),
+                        );
                         await LibraryController.i.reloadBorrowList();
                       } catch (e, s) {
                         log.handle(e, s, "[BorrowInfoCard][renew] Failed.");
