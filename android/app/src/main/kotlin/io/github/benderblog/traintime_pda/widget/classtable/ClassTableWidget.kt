@@ -261,6 +261,26 @@ class ClassTableWidget : GlanceAppWidget() {
                                 }
                             }
                         }
+                    } else if (status == ClassTableWidgetLoadState.NOT_LOGGED_IN) {
+                        Column(
+                            modifier = GlanceModifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                provider = ImageProvider(R.drawable.ic_classtable_no_course),
+                                colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
+                                modifier = GlanceModifier.size(72.dp),
+                                contentDescription = ""
+                            )
+                            Spacer(modifier = GlanceModifier.size(8.dp))
+                            Text(
+                                context.getString(R.string.widget_classtable_not_logged_in),
+                                style = TextStyle(
+                                    fontSize = 13.sp, color = GlanceTheme.colors.primary
+                                )
+                            )
+                        }
                     } else if (status == ClassTableWidgetLoadState.LOADING || status == ClassTableWidgetLoadState.FINISHED) {
                         val icon = ImageProvider(
                             if (status == ClassTableWidgetLoadState.LOADING) R.drawable.ic_classtable_refresh

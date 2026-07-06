@@ -10,18 +10,9 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 
 class CourseCard extends StatelessWidget {
   final ClassAttendance course;
-  final int totalTimes;
-  late final int timeToHaveError;
-  late final int remainAbsenceNum;
-  late final int absenceNum;
-  late final String attendanceStatus;
+  final int? totalTimes;
 
-  CourseCard({super.key, required this.course, required this.totalTimes}) {
-    timeToHaveError = (totalTimes / 4).floor();
-    absenceNum = int.tryParse(course.absenceCount) ?? 0;
-    remainAbsenceNum = timeToHaveError - absenceNum;
-    attendanceStatus = course.getAttendanceStatus(totalTimes);
-  }
+  const CourseCard({super.key, required this.course, required this.totalTimes});
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
@@ -42,7 +33,9 @@ class CourseCard extends StatelessWidget {
     return ReXCard(
       title: Text(course.courseName),
       remaining: [
-        ReXCardRemaining(FlutterI18n.translate(context, attendanceStatus)),
+        ReXCardRemaining(
+          FlutterI18n.translate(context, course.attendanceStatus.i18nString),
+        ),
       ],
       bottomRow: Column(
         children: [
@@ -60,14 +53,22 @@ class CourseCard extends StatelessWidget {
           ),
           _buildInfoRow(
             FlutterI18n.translate(context, "class_attendance.card.not_attend"),
-            FlutterI18n.translate(
-              context,
-              "class_attendance.card.not_attend_info",
-              translationParams: {
-                "timeToHaveError": remainAbsenceNum.toString(),
-                "totalTimes": totalTimes.toString(),
-              },
-            ),
+            (totalTimes == null)
+                ? FlutterI18n.translate(
+                    context,
+                    "class_attendance.card.not_attend_info_error",
+                  )
+                : FlutterI18n.translate(
+                    context,
+                    "class_attendance.card.not_attend_info",
+                    translationParams: {
+                      "timeToHaveError":
+                          ((totalTimes! / 4).floor() -
+                                  (int.tryParse(course.absenceCount) ?? 0))
+                              .toString(),
+                      "totalTimes": totalTimes.toString(),
+                    },
+                  ),
           ),
           _buildInfoRow(
             FlutterI18n.translate(context, "class_attendance.card.leave"),
@@ -97,15 +98,13 @@ class CourseCard extends StatelessWidget {
       ),
     ).gestures(
       onTap: () async {
-        if (!attendanceStatus.contains("unknown")) {
+        if (course.attendanceStatus == AttendanceStatus.unknown) {
           await BothSideSheet.show(
             context: context,
             title: FlutterI18n.translate(
               context,
               "class_attendance.detail_title",
-              translationParams: {
-                "courseName": course.courseName,
-              },
+              translationParams: {"courseName": course.courseName},
             ),
             child: ClassAttendanceDetailView(
               classAttendance: course,

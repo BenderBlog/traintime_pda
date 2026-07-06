@@ -4,6 +4,8 @@
 
 // PigHub API session. https://www.pighub.top
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:math' as math;
 import 'dart:isolate';
 
@@ -23,26 +25,23 @@ List<PigHubImage>? _cachedImages;
 
 class PigHubImage {
   final String id;
-  final String thumbnail; // relative path, e.g. /data/xxx.jpg
+  final String image_url; // relative path, e.g. /data/xxx.jpg
   final String title;
-  final String imageType; // "static" or "gif"
 
   const PigHubImage({
     required this.id,
-    required this.thumbnail,
+    required this.image_url,
     required this.title,
-    required this.imageType,
   });
 
   factory PigHubImage.fromJson(Map<String, dynamic> json) => PigHubImage(
     id: json["id"].toString(),
-    thumbnail: json["thumbnail"].toString(),
+    image_url: json["image_url"].toString(),
     title: json["title"].toString(),
-    imageType: json["image_type"].toString(),
   );
 
   /// Full URL of the image.
-  String get url => "$_base$thumbnail";
+  String get url => "$_base$image_url";
 }
 
 List<dynamic> _extractImageList(dynamic data) {
@@ -86,7 +85,7 @@ Future<List<PigHubImage>> _getAllPigs({bool forceRefresh = false}) async {
     return _cachedImages!;
   }
 
-  final response = await _dio.get("$_base/api/all-images");
+  final response = await _dio.get("$_base/api/images?sort=0");
 
   // Parse in a background isolate to avoid UI jank on large payloads.
   final parsed = await Isolate.run(() => _parsePigImages(response.data));

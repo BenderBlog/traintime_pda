@@ -14,7 +14,16 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+
 object ClassTableDataHolder {
+
+    @JvmStatic
+    var isLoggedIn: Boolean = false
+        @Synchronized set
 
     @JvmStatic
     var schoolClassJsonData: Result<String> = Result.success("")
@@ -45,6 +54,26 @@ object ClassTableDataHolder {
     suspend fun loadData(context: Context) {
         withContext(Dispatchers.IO) {
             Log.i(TAG, "Starting to load data from files...")
+
+            // Check login state first
+            isLoggedIn = try {
+                val stateFile = File(context.filesDir, ClassTableConstants.WIDGET_STATE_FILE_NAME)
+                if (!stateFile.exists()) {
+                    Log.w(TAG, "WidgetState.json not found, treating as not logged in")
+                    false
+                } else {
+                    val json = Json.parseToJsonElement(stateFile.readText())
+                    json.jsonObject["loggedIn"]?.jsonPrimitive?.boolean ?: false
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to parse WidgetState.json: ${e.message}")
+                false
+            }
+            Log.i(TAG, "isLoggedIn: $isLoggedIn")
+            if (!isLoggedIn) {
+                Log.i(TAG, "User is not logged in, skip loading data")
+                return@withContext
+            }
 
             schoolClassJsonData = loadFileContent(
                 context, ClassTableConstants.CLASS_FILE_NAME

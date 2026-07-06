@@ -9,12 +9,16 @@ import 'dart:async';
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
@@ -23,6 +27,7 @@ import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class PageInformation {
@@ -84,7 +89,10 @@ class _HomePageMasterState extends State<HomePageMaster>
         context: context,
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
-          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+            manualSolver: (provider) =>
+                solveSliderCaptchaManually(context, provider),
+          );
         },
       );
     } finally {
@@ -117,30 +125,27 @@ class _HomePageMasterState extends State<HomePageMaster>
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    //if (Platform.isAndroid || Platform.isIOS) {
-                    Restart.restartApp();
-                    //} else {
-                    //  showDialog(
-                    //    barrierDismissible: false,
-                    //    context: context,
-                    //    builder: (context) => AlertDialog(
-                    //      title: Text(
-                    //        FlutterI18n.translate(
-                    //          context,
-                    //          "setting.need_close_dialog.title",
-                    //        ),
-                    //      ),
-                    //      content: Text(
-                    //        FlutterI18n.translate(
-                    //          context,
-                    //          "setting.need_close_dialog.content",
-                    //        ),
-                    //      ),
-                    //    ),
-                    //  );
-                    //}
+                  onPressed: () async {
+                    String title = FlutterI18n.translate(
+                      context,
+                      "restart_app.title_password_wrong",
+                    );
+                    String body = FlutterI18n.translate(
+                      context,
+                      "restart_app.content",
+                    );
+                    await syncWidgetLoginState(false);
+                    if (mounted) {
+                      if (Platform.isIOS) {
+                        Restart.restartApp(
+                          mode: RestartMode.notificationFallback,
+                          notificationTitle: title,
+                          notificationBody: body,
+                        );
+                      } else {
+                        Restart.restartApp();
+                      }
+                    }
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),
@@ -193,7 +198,6 @@ class _HomePageMasterState extends State<HomePageMaster>
     super.didChangeDependencies();
     if (!refreshAtStart) {
       unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
-      //message.getClubList();
       log.info(
         "[home][BackgroundFetchFromHome]"
         "Current loginstate: $loginState, if none will _loginAsync.",
@@ -205,9 +209,10 @@ class _HomePageMasterState extends State<HomePageMaster>
           context: context,
           forceRetryLogin: true,
           sliderCaptcha: (String cookieStr) {
-            return SliderCaptchaClientProvider(
-              cookie: cookieStr,
-            ).solve(context);
+            return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+              manualSolver: (provider) =>
+                  solveSliderCaptchaManually(context, provider),
+            );
           },
         );
       }
@@ -228,23 +233,29 @@ class _HomePageMasterState extends State<HomePageMaster>
       PageInformation(
         index: 0,
         name: FlutterI18n.translate(context, "homepage.homepage"),
-        icon: MingCuteIcons.mgc_home_3_line,
-        iconChoice: MingCuteIcons.mgc_home_3_fill,
+        icon: Icons.school_outlined,
+        iconChoice: Icons.school,
       ),
       PageInformation(
         index: 1,
+        name: FlutterI18n.translate(context, "homepage.ruisi"),
+        icon: Icons.forum_outlined,
+        iconChoice: Icons.forum,
+      ),
+      PageInformation(
+        index: 2,
         name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
         icon: MingCuteIcons.mgc_tool_line,
         iconChoice: MingCuteIcons.mgc_tool_fill,
       ),
       PageInformation(
-        index: 2,
+        index: 3,
         name: FlutterI18n.translate(context, "homepage.dashboard"),
         icon: MingCuteIcons.mgc_pig_line,
         iconChoice: MingCuteIcons.mgc_pig_fill,
       ),
       PageInformation(
-        index: 3,
+        index: 4,
         name: FlutterI18n.translate(context, "homepage.setting"),
         icon: MingCuteIcons.mgc_user_2_line,
         iconChoice: MingCuteIcons.mgc_user_2_fill,
@@ -262,6 +273,11 @@ class _HomePageMasterState extends State<HomePageMaster>
               });
               _controller.jumpToPage(_selectedIndex);
             },
+          ),
+          RuisiApp(
+            prefs: preference.prefs,
+            cookiePath: supportPath.path,
+            talker: TalkerFlutter.init(),
           ),
           const ToolBoxPage(),
           const PigPage(),
@@ -287,7 +303,6 @@ class _HomePageMasterState extends State<HomePageMaster>
             )
             .toList(),
         selectedIndex: _selectedIndex,
-        //labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         onDestinationSelected: (int index) {
           if (_selectedIndex != index) {
             setState(() {

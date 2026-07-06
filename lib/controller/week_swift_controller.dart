@@ -16,9 +16,9 @@ class WeekSwiftController {
     _initEffects();
   }
 
-  final weekSwiftSignal = signal(
+  final weekSwiftSignal = signal<int>(
     preference.getInt(preference.Preference.swift),
-    debugLabel: "WeekSwiftSignal",
+    options: SignalOptions(name: "WeekSwiftSignal"),
   );
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
@@ -35,7 +35,7 @@ class WeekSwiftController {
       if (semesterChangeEvent.didChange) {
         reset();
       }
-    }, debugLabel: "WeekSwiftControllerSemesterChangeEffect");
+    }, options: EffectOptions(name: "WeekSwiftControllerSemesterChangeEffect"));
   }
 
   void refresh() async {

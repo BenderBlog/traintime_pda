@@ -586,7 +586,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                           deviceId: device.id,
                           remove: true,
                         );
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         showToast(
                           context: context,
                           msg: FlutterI18n.translate(
@@ -599,7 +599,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                           _devices.removeWhere((d) => d.id == device.id);
                         });
                       } catch (e) {
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         showToast(
                           context: context,
                           msg:

@@ -1,6 +1,8 @@
 // Copyright 2025 Hazuki Keatsu.
 // SPDX-License-Identifier: MPL-2.0
 
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
@@ -138,11 +140,11 @@ int _calculatePixelFNV1AFromBytes(Uint8List bytes) {
     }
   }
 
-  var _hash = 0x811C9DC5;
+  var hash = 0x811C9DC5;
   for (var p in pixelBytes) {
-    _hash ^= p;
-    _hash = (_hash * 0x01000193) & 0xFFFFFFFF;
+    hash ^= p;
+    hash = (hash * 0x01000193) & 0xFFFFFFFF;
   }
 
-  return _hash;
+  return hash;
 }

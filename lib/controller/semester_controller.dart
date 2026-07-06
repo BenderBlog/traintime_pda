@@ -46,18 +46,16 @@ class SemesterSyncResult {
 class SemesterController {
   static final SemesterController i = SemesterController._();
 
-  SemesterController._() {
-    semesterSignal.equalityCheck = (a, b) => a == b;
-  }
+  SemesterController._();
 
   final semesterSignal = signal(
     pref.getString(pref.Preference.currentSemester),
-    debugLabel: "SemesterSignal",
+    options: SignalOptions(name: "SemesterSignal"),
   );
 
   final semesterSyncEventSignal = signal<SemesterSyncEvent?>(
     null,
-    debugLabel: "SemesterSyncEventSignal",
+    options: SignalOptions(name: "SemesterSyncEventSignal"),
   );
 
   int _semesterOrder(String semesterCode) {
@@ -69,7 +67,7 @@ class SemesterController {
     return _semesterOrder(a) >= _semesterOrder(b) ? a : b;
   }
 
-  Future<String> _fetchRemoteSemester() async {
+  Future<String> fetchRemoteSemester() async {
     final remoteSemester = pref.getBool(pref.Preference.role)
         ? await PersonalInfoSession().getSemesterInfoYjspt()
         : await PersonalInfoSession().getSemesterInfoEhall();
@@ -86,7 +84,7 @@ class SemesterController {
 
   Future<SemesterSyncResult> _syncSemester({String? preferredSemester}) async {
     final localSemester = semesterSignal.value;
-    final remoteSemester = await _fetchRemoteSemester();
+    final remoteSemester = await fetchRemoteSemester();
     final preferred = preferredSemester != null && preferredSemester.isNotEmpty
         ? preferredSemester
         : localSemester;
@@ -124,6 +122,33 @@ class SemesterController {
       didChange: didChange,
       isUserDefinedSemester: isUserDefinedSemester,
     );
+  }
+
+  /// Directly set the semester locally without any network request.
+  /// Used by the semester switch dialog for manual user selection.
+  Future<bool> setSemesterDirectly(String semester) async {
+    final localSemester = semesterSignal.value;
+    final didChange = semester != localSemester;
+
+    _ensureSemesterAwareControllersReady();
+
+    await pref.setString(pref.Preference.currentSemester, semester);
+    await pref.setBool(pref.Preference.isUserDefinedSemester, true);
+    semesterSignal.value = semester;
+    semesterSyncEventSignal.value = SemesterSyncEvent(
+      oldSemester: localSemester,
+      remoteSemester: semester,
+      effectiveSemester: semester,
+      didChange: didChange,
+      isUserDefinedSemester: true,
+    );
+
+    log.info(
+      "[SemesterController][setSemesterDirectly] "
+      "local=$localSemester new=$semester changed=$didChange.",
+    );
+
+    return didChange;
   }
 
   Future<void> refreshSemesterInfo() async {

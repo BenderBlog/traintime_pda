@@ -2,13 +2,14 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -16,6 +17,8 @@ import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
+import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
@@ -23,7 +26,6 @@ import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:share_plus/share_plus.dart';
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -48,8 +50,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   late BoxDecoration decoration;
   late ClassTableWidgetState classTableState;
+  bool _isListening = false;
+  bool _didLoadVisualSettings = false;
 
   void _switchPage() {
+    if (!mounted) {
+      return;
+    }
     setState(() => isTopRowLocked = true);
     Future.wait([
       rowControl.animateToPage(
@@ -62,7 +69,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         curve: Curves.easeInOutCubic,
         duration: const Duration(milliseconds: changePageTime),
       ),
-    ]).then((value) => isTopRowLocked = false);
+    ]).then((value) {
+      if (mounted) {
+        isTopRowLocked = false;
+      }
+    });
   }
 
   @override
@@ -73,7 +84,17 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   @override
   void didChangeDependencies() {
-    classTableState = ClassTableState.of(context)!.controllers;
+    if (!_didLoadVisualSettings) {
+      CurrentTimeIndicatorConfig.loadFromPreference();
+      CompletedClassStyleConfig.loadFromPreference();
+      _didLoadVisualSettings = true;
+    }
+
+    if (!_isListening) {
+      classTableState = ClassTableState.of(context)!.controllers;
+      classTableState.addListener(_switchPage);
+      _isListening = true;
+    }
 
     pageControl = PageController(
       initialPage: classTableState.chosenWeek,
@@ -91,11 +112,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
 
     /// Let controllers listen to the currentWeek's change.
-    // if (isPushedListener == false) {
-    classTableState.addListener(_switchPage);
-    //  isPushedListener = true;
-    //}
-
     /// Init the background.
     File image = File("${supportPath.path}/${classTableState.decorationName}");
     decoration = BoxDecoration(
@@ -249,6 +265,357 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
+  String _formatPercent(double value) => "${(value * 100).round()}%";
+
+  Future<void> _showCurrentTimeSettingsDialog() async {
+    var enabled = CurrentTimeIndicatorConfig.enabled;
+    var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
+    var showTodayColumnHighlight =
+        CurrentTimeIndicatorConfig.showTodayColumnHighlight;
+
+    final shouldApply =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: Text(
+                FlutterI18n.translate(
+                  context,
+                  "classtable.visual_settings.current_time_settings_title",
+                ),
+              ),
+              content: SizedBox(
+                width: 420,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.show_current_time_indicator",
+                          ),
+                        ),
+                        value: enabled,
+                        onChanged: (value) =>
+                            setDialogState(() => enabled = value),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.show_current_time_label",
+                          ),
+                        ),
+                        value: showTimeLabel,
+                        onChanged: enabled
+                            ? (value) =>
+                                  setDialogState(() => showTimeLabel = value)
+                            : null,
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.show_today_column_highlight",
+                          ),
+                        ),
+                        value: showTodayColumnHighlight,
+                        onChanged: (value) => setDialogState(
+                          () => showTodayColumnHighlight = value,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(FlutterI18n.translate(context, "cancel")),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(FlutterI18n.translate(context, "confirm")),
+                ),
+              ],
+            ),
+          ),
+        ) ??
+        false;
+
+    if (!shouldApply || !mounted) {
+      return;
+    }
+
+    CurrentTimeIndicatorConfig.enabled = enabled;
+    CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
+    CurrentTimeIndicatorConfig.showTodayColumnHighlight =
+        showTodayColumnHighlight;
+    await CurrentTimeIndicatorConfig.saveToPreference();
+    setState(() {});
+  }
+
+  Future<void> _showClassColorSettingsDialog() async {
+    var completedEnabled = CompletedClassStyleConfig.completedEnabled;
+    var activeBrightnessFactor = CompletedClassStyleConfig
+        .activeBrightnessFactor
+        .clamp(0.5, 1.0)
+        .toDouble();
+    var activeBorderAlpha = CompletedClassStyleConfig.activeBorderAlpha;
+    var activeInnerAlpha = CompletedClassStyleConfig.activeInnerAlpha;
+    var completedSaturationFactor =
+        CompletedClassStyleConfig.completedSaturationFactor;
+    var completedBrightnessFactor = CompletedClassStyleConfig
+        .completedBrightnessFactor
+        .clamp(0.5, 1.0)
+        .toDouble();
+    var completedTextSaturationFactor =
+        CompletedClassStyleConfig.completedTextSaturationFactor;
+    var completedBorderAlpha = CompletedClassStyleConfig.completedBorderAlpha;
+    var completedInnerAlpha = CompletedClassStyleConfig.completedInnerAlpha;
+
+    final shouldApply =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: Text(
+                FlutterI18n.translate(
+                  context,
+                  "classtable.visual_settings.class_color_settings_title",
+                ),
+              ),
+              content: SizedBox(
+                width: 420,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_style_enabled",
+                          ),
+                        ),
+                        value: completedEnabled,
+                        onChanged: (value) =>
+                            setDialogState(() => completedEnabled = value),
+                      ),
+                      const Divider(height: 24),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.unfinished_section",
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.active_brightness_factor",
+                          translationParams: {
+                            "value": _formatPercent(activeBrightnessFactor),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: activeBrightnessFactor,
+                        min: 0.5,
+                        max: 1.0,
+                        divisions: 10,
+                        onChanged: (value) => setDialogState(
+                          () => activeBrightnessFactor = value,
+                        ),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.active_border_alpha",
+                          translationParams: {
+                            "value": _formatPercent(activeBorderAlpha),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: activeBorderAlpha,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) =>
+                            setDialogState(() => activeBorderAlpha = value),
+                      ),
+                      Text(
+                        FlutterI18n.translate(
+                          context,
+                          "classtable.visual_settings.active_inner_alpha",
+                          translationParams: {
+                            "value": _formatPercent(activeInnerAlpha),
+                          },
+                        ),
+                      ),
+                      Slider(
+                        value: activeInnerAlpha,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (value) =>
+                            setDialogState(() => activeInnerAlpha = value),
+                      ),
+                      if (completedEnabled) ...[
+                        const Divider(height: 24),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_section",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_saturation_factor",
+                            translationParams: {
+                              "value": _formatPercent(
+                                completedSaturationFactor,
+                              ),
+                            },
+                          ),
+                        ),
+                        Slider(
+                          value: completedSaturationFactor,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) => setDialogState(
+                            () => completedSaturationFactor = value,
+                          ),
+                        ),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_brightness_factor",
+                            translationParams: {
+                              "value": _formatPercent(
+                                completedBrightnessFactor,
+                              ),
+                            },
+                          ),
+                        ),
+                        Slider(
+                          value: completedBrightnessFactor,
+                          min: 0.5,
+                          max: 1.0,
+                          divisions: 10,
+                          onChanged: (value) => setDialogState(
+                            () => completedBrightnessFactor = value,
+                          ),
+                        ),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_text_saturation_factor",
+                            translationParams: {
+                              "value": _formatPercent(
+                                completedTextSaturationFactor,
+                              ),
+                            },
+                          ),
+                        ),
+                        Slider(
+                          value: completedTextSaturationFactor,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) => setDialogState(
+                            () => completedTextSaturationFactor = value,
+                          ),
+                        ),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_border_alpha",
+                            translationParams: {
+                              "value": _formatPercent(completedBorderAlpha),
+                            },
+                          ),
+                        ),
+                        Slider(
+                          value: completedBorderAlpha,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) => setDialogState(
+                            () => completedBorderAlpha = value,
+                          ),
+                        ),
+                        Text(
+                          FlutterI18n.translate(
+                            context,
+                            "classtable.visual_settings.completed_inner_alpha",
+                            translationParams: {
+                              "value": _formatPercent(completedInnerAlpha),
+                            },
+                          ),
+                        ),
+                        Slider(
+                          value: completedInnerAlpha,
+                          min: 0.1,
+                          max: 1.0,
+                          divisions: 18,
+                          onChanged: (value) =>
+                              setDialogState(() => completedInnerAlpha = value),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(FlutterI18n.translate(context, "cancel")),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(FlutterI18n.translate(context, "confirm")),
+                ),
+              ],
+            ),
+          ),
+        ) ??
+        false;
+
+    if (!shouldApply || !mounted) {
+      return;
+    }
+
+    CompletedClassStyleConfig.completedEnabled = completedEnabled;
+    CompletedClassStyleConfig.activeBrightnessFactor = activeBrightnessFactor
+        .clamp(0.5, 1.0)
+        .toDouble();
+    CompletedClassStyleConfig.activeBorderAlpha = activeBorderAlpha;
+    CompletedClassStyleConfig.activeInnerAlpha = activeInnerAlpha;
+    CompletedClassStyleConfig.completedSaturationFactor =
+        completedSaturationFactor;
+    CompletedClassStyleConfig.completedBrightnessFactor =
+        completedBrightnessFactor.clamp(0.5, 1.0).toDouble();
+    CompletedClassStyleConfig.completedTextSaturationFactor =
+        completedTextSaturationFactor;
+    CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
+    CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
+    await CompletedClassStyleConfig.saveToPreference();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
@@ -259,10 +626,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "classtable.page_title")),
-        leading: BackButton(
-          onPressed: () =>
-              Navigator.of(ClassTableState.of(context)!.parentContext).pop(),
-        ),
+        leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
           if (hasError)
             IconButton(
@@ -327,9 +691,26 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   ),
                 ),
               ),
+              PopupMenuItem<String>(
+                value: 'J',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.current_time_settings",
+                  ),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'K',
+                child: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.popup_menu.class_color_settings",
+                  ),
+                ),
+              ),
             ],
             onSelected: (String action) async {
-              final box = context.findRenderObject() as RenderBox?;
               switch (action) {
                 case 'A':
                   var notArranged = ClassTableState.of(
@@ -410,48 +791,41 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           "${DateFormat("yyyyMMddTHHmmss").format(DateTime.now())}-"
                           "${classTableState.semesterCode}"
                           ".ics";
-                      if (Platform.isLinux ||
-                          Platform.isMacOS ||
-                          Platform.isWindows) {
-                        String?
-                        resultFilePath = await FilePicker.platform.saveFile(
-                          dialogTitle: FlutterI18n.translate(
-                            context,
-                            "classtable.partner_classtable.save_dialog.title",
-                          ),
-                          fileName: fileName,
-                          allowedExtensions: ["ics"],
-                          lockParentWindow: true,
-                        );
-                        if (resultFilePath != null) {
-                          File file = File(resultFilePath);
-                          if (!(await file.exists())) {
-                            await file.create();
-                          }
-                          await file.writeAsString(
-                            classTableState.iCalenderStr,
-                          );
-                        }
-                      } else {
-                        String tempPath = await getTemporaryDirectory().then(
-                          (value) => value.path,
-                        );
-                        File file = File("$tempPath/$fileName");
-                        if (!(await file.exists())) {
-                          await file.create();
-                        }
-                        await file.writeAsString(classTableState.iCalenderStr);
-                        await SharePlus.instance.share(
-                          ShareParams(
-                            files: [XFile("$tempPath/$fileName")],
-                            sharePositionOrigin:
-                                box!.localToGlobal(Offset.zero) & box.size,
-                          ),
-                        );
+                      //  if (Platform.isLinux ||
+                      //      Platform.isMacOS ||
+                      //      Platform.isWindows) {
+                      await FilePicker.saveFile(
+                        dialogTitle: FlutterI18n.translate(
+                          context,
+                          "classtable.partner_classtable.save_dialog.title",
+                        ),
+                        fileName: fileName,
+                        allowedExtensions: ["ics"],
+                        bytes: Uint8List.fromList(
+                          utf8.encode(classTableState.iCalenderStr),
+                        ),
+                        lockParentWindow: true,
+                      );
+                      //  } else {
+                      //    String tempPath = await getTemporaryDirectory().then(
+                      //      (value) => value.path,
+                      //    );
+                      //    File file = File("$tempPath/$fileName");
+                      //    if (!(await file.exists())) {
+                      //      await file.create();
+                      //    }
+                      //    await file.writeAsString(classTableState.iCalenderStr);
+                      //   await SharePlus.instance.share(
+                      //    ShareParams(
+                      //        files: [XFile("$tempPath/$fileName")],
+                      //        sharePositionOrigin:
+                      //            box!.localToGlobal(Offset.zero) & box.size,
+                      //     ),
+                      //  );
 
-                        await file.delete();
-                      }
+                      //    await file.delete();
                     }
+                    //}
                     if (context.mounted) {
                       showToast(
                         context: context,
@@ -573,6 +947,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       }
                     });
                   }
+                  break;
+                case 'J':
+                  await _showCurrentTimeSettingsDialog();
+                  break;
+                case 'K':
+                  await _showClassColorSettingsDialog();
+                  break;
               }
             },
           ),

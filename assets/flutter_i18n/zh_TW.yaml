@@ -23,7 +23,7 @@ login_process:
   ready_page: 準備獲取登錄網頁
   get_encrypt: 獲取密碼加密密鑰
   ready_login: 準備登錄
-  slider: 滑塊驗證
+  slider: 登錄中
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
 no_info: 沒有信息
@@ -31,7 +31,9 @@ catcher_detected: 發生錯誤
 catcher_description: 詳情如下
 new_homepage_hint: 本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快
 local_cache_hint: 本地緩存獲取於 {datetime}
-inapp_cache_hint: "程序內緩存獲取於 {datetime}\n緩存退出程序後失效！"
+inapp_cache_hint: '程序內緩存獲取於 {datetime}
+
+  緩存退出程序後失效！'
 cache_reason_default: 當前顯示緩存數據。
 weekday:
   monday: 週一
@@ -65,9 +67,10 @@ class_attendance:
     showing_count: 顯示 {count}/{total} 門課程
   card:
     time: 簽到次數
-    time_info: "{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤"
+    time_info: '{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤'
     not_attend: 復活次數
-    not_attend_info: "{timeToHaveError} 次 / {totalTimes} 總課程"
+    not_attend_info: '{timeToHaveError} 次 / {totalTimes} 總課程'
+    not_attend_info_error: 無法對應已有課程
     leave: 請假次數
     leave_info: 事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}
     study: 學習進度
@@ -118,7 +121,7 @@ classtable:
       accept: 提交
       blank_input: 輸入空白!
   page_title: 我的日程表
-  partner_page_title: "{partner_name}的日程表"
+  partner_page_title: '{partner_name}的日程表'
   popup_menu:
     not_arranged: 查看未安排課程信息
     class_changed: 查看課程安排調整信息
@@ -130,6 +133,26 @@ classtable:
     output_to_system: 導出到系統日曆
     refresh_classtable: 刷新日程表
     switch_semester: 切換課程表學期
+    current_time_settings: 時間指示設置
+    class_color_settings: 課表樣式設置
+  visual_settings:
+    current_time_settings_title: 時間指示設置
+    class_color_settings_title: 課表樣式設置
+    completed_style_enabled: 已結束課程樣式區分
+    current_time_section: 時間指示
+    show_current_time_indicator: 顯示當前時間指示線
+    show_current_time_label: 顯示迷你數字時鐘
+    show_today_column_highlight: 強調顯示今天的縱列
+    unfinished_section: 課程樣式
+    active_brightness_factor: '亮度: {value}'
+    active_border_alpha: '邊框透明度: {value}'
+    active_inner_alpha: '底色透明度: {value}'
+    completed_section: 已結束課程樣式
+    completed_saturation_factor: '底色飽和度: {value}'
+    completed_brightness_factor: '亮度: {value}'
+    completed_text_saturation_factor: '文字飽和度: {value}'
+    completed_border_alpha: '邊框透明度: {value}'
+    completed_inner_alpha: '底色透明度: {value}'
   status_source:
     class_table: 課表
     exam: 考試
@@ -141,10 +164,10 @@ classtable:
     cache: 當前使用緩存：{sources}
     error_summary: 以下信息加載失敗：{sources}
   empty_state:
-    no_course: "{semester_code} 學期沒有課程安排。"
-    with_exam: "{semester_code} 學期沒有課程安排，但有考試安排。"
-    with_experiment: "{semester_code} 學期沒有課程安排，但有實驗安排。"
-    with_exam_and_experiment: "{semester_code} 學期沒有課程安排，但有考試和實驗安排。"
+    no_course: '{semester_code} 學期沒有課程安排。'
+    with_exam: '{semester_code} 學期沒有課程安排，但有考試安排。'
+    with_experiment: '{semester_code} 學期沒有課程安排，但有實驗安排。'
+    with_exam_and_experiment: '{semester_code} 學期沒有課程安排，但有考試和實驗安排。'
   empty_action:
     view_exam: 查看考試安排
     view_experiment: 查看實驗安排
@@ -153,38 +176,37 @@ classtable:
     empty_message: 目前沒有調課信息
     teacher_change: 教師變更：從{previous_teacher}變為{new_teacher}
     no_teacher_change: 教師信息沒有改變
-    "1": 一
-    "2": 二
-    "3": 三
-    "4": 四
-    "5": 五
-    "6": 六
-    "7": 日
-    change_class_message: 調課信息，從第{originalAffectedWeeks}周
-      星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
+    '1': 一
+    '2': 二
+    '3': 三
+    '4': 四
+    '5': 五
+    '6': 六
+    '7': 日
+    change_class_message: 調課信息，從第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
       調整為第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，{newClassroom}教室上課
-    patch_class_message: 補課信息，第{newAffectedWeeksListStr}周
-      星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，
+    patch_class_message: 補課信息，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，
       {newClassroom}補課
-    stop_class_message: 停課信息，第{originalAffectedWeeks}周
-      星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課
-    class_info: "編號: {classCode} | {classNumber} 班
+    stop_class_message: 停課信息，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課
+    class_info: '編號: {classCode} | {classNumber} 班
 
-      安排變更：{classChange}{teacherChange}"
+      安排變更：{classChange}{teacherChange}'
   not_arranged_page:
     title: 沒有時間安排的科目
     empty_message: 目前全部課程均有時間安排
-    content: "編號: {classCode} | {classNumber} 班
+    content: '編號: {classCode} | {classNumber} 班
 
-      老師: {teacher}"
-  empty_class_message: "{semester_code} 學期沒有課程"
-  empty_class_with_exam: "{semester_code} 學期沒有課程但是有考試安排！
+      老師: {teacher}'
+  empty_class_message: '{semester_code} 學期沒有課程'
+  empty_class_with_exam: '{semester_code} 學期沒有課程但是有考試安排！
 
-    請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面"
+    請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面'
   week_title: 第{week}周
   noon_break: 午休
   supper_break: 晚休
-  month: "{month}\n月"
+  month: '{month}
+
+    月'
   no_class: 本週暫無安排，請不要在床上過於慵懶
   class_card:
     title: 日程信息
@@ -206,10 +228,10 @@ classtable:
     input_end_time_hint: 下課時間
     wheel_choose_hint: 第 {index} 節
   course_detail_card:
-    class_number_string: "{number} 班"
+    class_number_string: '{number} 班'
     unknown_teacher: 老師未定
     unknown_place: 地點未定
-    class_period: "{start}-{stop}節"
+    class_period: '{start}-{stop}節'
     edit: 編輯
     delete: 刪除
     delete_title: 是否刪除課程信息？
@@ -230,7 +252,10 @@ classtable:
     choose_semester: 選擇學期
     first_academic_year: 第一學年
     second_academic_year: 第二學年
-    year: "{year}年"
+    fetch_remote_semester: 獲取當前學期
+    fetching_remote_semester: 正在獲取...
+    year: '{year}年'
+    only_future_hint: 本程序僅允許查看未來學期的課程安排。
 club_promotion:
   type:
     tech: 技術
@@ -264,9 +289,9 @@ electricity:
   history: 歷史記錄
   daily_usage: 平均每日用量
   not_enough_data: 數據量不足以用於渲染
-  info: "新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
+  info: '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
 
-    歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。"
+    歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。'
   fetching_hint: 正在獲取最新電費信息
   date: 日期
   power: 該日0點電量
@@ -275,6 +300,7 @@ electricity:
   water_usage_read_before: 上次讀數
   water_usage_read_now: 本次讀數
   water_usage: 洗澡水用量
+  not_school_network: 非校園網訪問
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
@@ -300,14 +326,14 @@ exam:
   no_arrangement:
     title: 目前無安排考試的科目
     all_arranged: 目前所有科目均已安排考試
-    subtitle: "編號: {id}"
+    subtitle: '編號: {id}'
 experiment:
   title: 實驗信息
   ongoing: 正在進行實驗
   not_finished: 未完成實驗
   all_finished: 所有實驗全部完成
   finished: 已完成實驗
-  score_info: "{score} (推測)"
+  score_info: '{score} (推測)'
   score_sum: 目前分數總和：{sum}
   none_finished: 目前沒有已經完成的實驗
   not_provided: 未提供
@@ -340,13 +366,7 @@ experiment:
   score_hint_2: 如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！
   score_hint_3: 目前識別庫數據不全，請您務必核對一下。
 homepage:
-  time_string:
-    morning: 早上好 準備出發
-    before_noon: 上午好 祝萬事如意
-    at_noon: 中午好 一切還好吧
-    afternoon: 下午好 今天如何
-    night: 晚上好 祝你好夢
-    midnight: 深宵了 我在陪你
+  title: 校園信息查詢
   loading: 正在加載
   loaded: 加載成功
   load_error: 加載錯誤
@@ -355,7 +375,16 @@ homepage:
   loading_message: 請稍候，正在刷新信息
   postgraduate_notice: 研究生功能已經激活！
   linux_notice: Linux 版本正在測試，歡迎反饋！
-  homepage: 主頁
+  edit_mode: 編輯佈局
+  edit_done: 完成
+  edit_reset: 恢復默認佈局
+  edit_hint: 日程信息和軟件升級信息不允許編輯
+  manage_hidden: 管理隱藏卡片
+  hidden_title: 已隱藏的卡片
+  hidden_label: 已隱藏
+  hide_empty: 沒有隱藏的卡片
+  homepage: 校園信息
+  ruisi: 睿思論壇
   club: 社團推薦
   dashboard: 豬圖鑑賞
   planet: 博客星球
@@ -373,11 +402,11 @@ homepage:
   password_wrong_content: 是否重啟應用後手動登錄？
   password_wrong_denial: 否，進入離線模式
   offline_mode_title: 統一認證服務離線模式開啟
-  offline_mode_content: "無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
+  offline_mode_content: '無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
 
     成績查詢，考試信息查詢，欠費查詢，校園卡查詢關閉。課表顯示緩存數據。其他功能暫不受影響。
 
-    如有不便，敬請諒解。"
+    如有不便，敬請諒解。'
   offline_mode: 脫機模式下，一站式相關功能全部禁止使用
   notice_card:
     empty_notice: 目前沒有獲取應用公告，請刷新
@@ -386,10 +415,13 @@ homepage:
     open_url: 訪問該鏈接
     notice_page_title: 通知列表
   class_table_card:
-    current: 當前
-    tomorrow: 明天
-    later: 稍後
-    more: 更多
+    title: 課程表
+    today: 今日還有 {remain} 個日程
+    today_finished: 今日安排完成
+    tomorrow: 明日有 {remain} 個安排
+    tomorrow_none: 明日沒有安排
+    week_info: 第 {weekinfo} 周
+    on_holiday: 假期中
     error_message: 遇到錯誤：{error}
     fetching_message: 正在獲取課表
     error_infoText: 遇到錯誤
@@ -404,11 +436,13 @@ homepage:
     all_loading_infoText: 全部加載中
     partial_loading_infoText: 部分加載中
     partial_error_infoText: 部分數據加載失敗
-    failed_chip: "{source}加載失敗"
+    failed_chip: '{source}加載失敗'
     failed_source_class_info: 課程信息
     failed_source_exam_info: 考試信息
     failed_source_physics_experiment: 物理實驗
     failed_source_other_experiment: 其他實驗
+    unknown_place: 未知位置
+    seat: 座位號{seatnum}
   electricity_card:
     title: 水電信息
     current_electricity: 餘額 {amount} 度
@@ -507,24 +541,26 @@ library:
   search_field_barcode_option: 條碼號
   search_field_callno_option: 索書號
   not_provided: 未提供相關信息
-  author: "作者 "
-  publish_house: "出版社 "
-  call_number: "索書號 "
-  publish_date: "發行時間 "
+  author: '作者 '
+  publish_house: '出版社 '
+  call_number: '索書號 '
+  publish_date: '發行時間 '
   isbn: ISBN
-  arrangement_code: "編排號碼 "
+  arrangement_code: '編排號碼 '
   avaliable_borrow: 可借
   storage: 館藏
   on_shelve: 在架
   book_code: 書籍編號：{barCode}
-  due_date: " 到期"
-  borrow_str: " 借閱"
-  after_due_date: " 天前到期"
-  before_due_date: " 天后"
+  due_date: ' 到期'
+  borrow_str: ' 借閱'
+  after_due_date: ' 天前到期'
+  before_due_date: ' 天后'
   can_be_renewable: 續借
   cannot_be_renewable: 不可續借
   renewing: 正在續借
-  empty_borrow_list: "目前沒有查詢到在借圖書\n不借書就要變成上面的小呆瓜咯"
+  empty_borrow_list: '目前沒有查詢到在借圖書
+
+    不借書就要變成上面的小呆瓜咯'
   borrow_list_info: 在借 {borrow} 本，其中已過期 {dued} 本
   search_book_window: null
   search_here: 在此搜索
@@ -555,14 +591,17 @@ login:
     title: 請輸入驗證碼
     hint: 輸入驗證碼
     message_on_empty: 請輸入驗證碼
+    refresh_failed: "刷新驗證碼失敗: {error}"
   slider_title: 服務器認證服務
 school_net:
   title: 校園網使用詳情
   ids_account_net:
     title: 當前用戶
-    notice: "這是登錄到 PDA 賬戶的校園網信息
+    notice: '這是登錄到 PDA 賬戶的校園網信息
 
-      注意: 流量計費採用GB單位（1000進制）"
+      注意: 流量計費採用GB單位（1000進制）
+
+      如果沒有看到信息，請訪問 zfw.xidian.edu.cn 重置網絡密碼'
     overview: 賬戶概覽
     account: 賬號
     used: 已使用流量
@@ -571,9 +610,9 @@ school_net:
     no_device_online: 當前沒有在線設備
   current_login_net:
     title: 正在使用
-    notice: "這是您正在使用中校園網的信息，可能和您登錄 PDA 的信息不一致
+    notice: '這是您正在使用中校園網的信息，可能和您登錄 PDA 的信息不一致
 
-      注意: 流量計費採用GB單位（1000進制）"
+      注意: 流量計費採用GB單位（1000進制）'
     overview: 賬戶概覽
     account: 賬號
     plan_type: 套餐類型
@@ -592,6 +631,7 @@ school_net:
   empty_password: 您忘記輸入賬號密碼了
   not_initalized: 疑似查詢後端尚未開放查詢
   captcha_failed: 驗證碼識別失敗
+  captcha_empty: 驗證碼為空
   cache_hint_captcha_failed: 驗證碼識別失敗，請重試。
   cache_hint_request_failed: 校園網請求失敗，請稍後重試。
   wrong_password: 密碼錯誤
@@ -612,9 +652,9 @@ school_card_window:
   reload: 重新加載
 score:
   cache_message: 已顯示緩存成績信息
-  summary: "目前選中科目 {chosen}  總計學分 {credit}
+  summary: '目前選中科目 {chosen}  總計學分 {credit}
 
-    均分 {avg} GPA {gpa}"
+    均分 {avg} GPA {gpa}'
   all_passed: 所有科目均已通過
   cache_hint_password_wrong: 統一認證密碼錯誤或已失效
   cache_hint_login_failed: 登錄考試服務失敗
@@ -631,7 +671,7 @@ score:
     search_hint: 搜索成績記錄
     empty_list: 沒有選擇該學期的課程計入均分計算
     sum_dialog_title: 小總結
-    sum_dialog_content: "所有科目的GPA：{gpa_all}
+    sum_dialog_content: '所有科目的GPA：{gpa_all}
 
       所有科目的均分：{avg_all}
 
@@ -641,7 +681,7 @@ score:
 
       公共選修課：{not_core_type}
 
-      本程序提供的數據僅供參考，開發者對其準確性不負責"
+      本程序提供的數據僅供參考，開發者對其準確性不負責'
   score_compose_card:
     no_detail: 未提供詳情信息
     fetching: 正在獲取
@@ -651,7 +691,7 @@ score:
   score_info_card:
     title: 成績詳情
     original_course: 初修
-    failed: "[掛] "
+    failed: '[掛] '
     credit: 學分 {credit}
     gpa: GPA {gpa}
     score: 成績 {score}
@@ -672,7 +712,7 @@ setting:
   version: 版本號：{version}
   user_info: 用戶信息
   check_update: 檢查軟件更新
-  latest_version: "最新版本: {latest}"
+  latest_version: '最新版本: {latest}'
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
   new_version: 有新版本發佈！
@@ -697,7 +737,7 @@ setting:
   course_reminder_description: 設置課前提醒通知
   notification_page:
     title: 課前通知設置
-    load_failed: "加載設置失敗: {error}"
+    load_failed: '加載設置失敗: {error}'
     function_section: 通知功能
     enable_notification: 啟用課前通知
     notification_scheduled: 已安排 {count} 個通知
@@ -729,7 +769,7 @@ setting:
     days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
     days_unit: 天
     settings_guide_title: 通知設置提示
-    settings_guide_content_1: "為了確保您能及時收到課前提醒，請確保：
+    settings_guide_content_1: '為了確保您能及時收到課前提醒，請確保：
 
       1. 開啟了應用的通知權限
 
@@ -737,22 +777,22 @@ setting:
 
       3. 開啟了懸浮通知（橫幅通知）
 
-      4. 非原生安卓用戶，開啟自啟動和關閉電源優化"
-    settings_guide_content_2: "課前提醒模塊運行機制：
+      4. 非原生安卓用戶，開啟自啟動和關閉電源優化'
+    settings_guide_content_2: '課前提醒模塊運行機制：
 
       1. 首次開啟時自動安排未來幾天的課前提醒
 
       2. 每次打開應用時自動檢查並更新通知日程
 
-      3. 修改設置後自動重新安排所有通知"
+      3. 修改設置後自動重新安排所有通知'
     got_it: 知道了
     open_settings: 打開系統設置
     no_classtable_data: 請先獲取課程表、考試或實驗數據
     schedule_success: 已安排 {count} 個課前提醒
-    schedule_failed: "安排通知失敗: {error}"
+    schedule_failed: '安排通知失敗: {error}'
     cancel_all_success: 已取消所有課前提醒
     reschedule_success: 已重新安排 {count} 個課前提醒
-    reschedule_failed: "重新安排通知失敗: {error}"
+    reschedule_failed: '重新安排通知失敗: {error}'
   notification_debug_page: 通知服務調試頁面
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
@@ -769,7 +809,9 @@ setting:
   class_refresh_title: 確認對話框
   class_refresh_content: 是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
   class_swift: 課程偏移設置
-  class_swift_description: "正數錯後開學日期 負數提前開學日期\n目前為 {swift}"
+  class_swift_description: '正數錯後開學日期 負數提前開學日期
+
+    目前為 {swift}'
   core_setting: 緩存登錄設置
   check_logger: 查看網絡攔截器和日誌
   clear_and_restart: 清除緩存後重啟
@@ -822,7 +864,7 @@ setting:
     southern_building: 南棟
     failed_generate: 生成失敗：{e}
     building_number: 樓號
-    building_number_hint: "例如: 16, 7, 55"
+    building_number_hint: '例如: 16, 7, 55'
     building_number_query: 請輸入樓號
     yard: 院區
     yard_hint: 選擇院區
@@ -837,7 +879,7 @@ setting:
     levelCode: 層號
     levelCode_query: 請輸入層號
     roomCode: 房間號
-    roomCode_hint: "例如: 304, 508"
+    roomCode_hint: '例如: 304, 508'
     roomCode_query: 請輸入房間號
     account: 電費賬號
     account_hint: 請輸入或從網絡獲取
@@ -867,7 +909,9 @@ setting:
     app_store: App Store 更新
     download_apk: 下載安裝包
     github_release: 去 Git Release
-    new_content: "版本號 {code} 新增內容：\n"
+    new_content: '版本號 {code} 新增內容：
+
+      '
   localization_dialog:
     title: 修改語言
     undefined: 追隨系統設置
@@ -885,8 +929,9 @@ setting:
     bellssgit: 支持：最佳&最久故障反饋者
     brackrat: 設計：主頁，登錄頁，配色，iOS 小部件等
     breezeline: 支持：無價值無意義的產品經理(他自己的描述)
-    cafebabe: 支持：提供彩蛋代碼
+    cafebabe: 支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配
     chitao1234: 開發：修復滑塊不對齊問題
+    copperkoi: 開發：系統日曆最新課表同步
     dimole: 開發支持：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
     elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導（該功能已經被移除）
@@ -896,14 +941,17 @@ setting:
     hazuki-keatsu: 開發：物理實驗成績查詢和識別
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
+    imaginary_17: 開發：睿思論壇路由修復
     imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
     ka-mate-ka-ora: 國際化：軟件英語翻譯優化
-    lhx-666-cool: 支持：Windows 和 Linux 構建腳本
+    lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性
+    lhx-666-cool: 支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配
     lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
     lqsy-h: 支持：推文宣傳圖片製作
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
     nancunchild: 開發：圖書館搜索功能 / 國際化：優化英語翻譯
+    nkanf: 開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持
     pairman: 開發：成績緩存功能和優化滑塊算法 / 國際化：優化英語翻譯
     reverierxu: 設計：用於信息展示的 ReX 卡片 / 開發支持：研究生課表
     rrrilac: 開發支持：電費查詢
@@ -920,7 +968,7 @@ setting:
     homepage: 主頁
     code: 開源代碼
     know_more: 知道更多
-    copyright_notice: "本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
+    copyright_notice: '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
       Public License, v. 2.0 授權。
 
       本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
@@ -928,12 +976,12 @@ setting:
 
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
 
-      Copyright 2025 Traintime PDA authors.
+      Copyright 2025-present Traintime PDA authors.
 
 
-      The Source Code Form is subject to the terms of the Mozilla Public
-      License, v. 2.0. If a copy of the MPL was not distributed with this file,
-      you can obtain one at https://mozilla.org/MPL/2.0/."
+      The Source Code Form is subject to the terms of the Mozilla Public License,
+      v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
+      one at https://mozilla.org/MPL/2.0/.'
     beian: 備案號
     sign_android: 安卓簽名
     title: 關於本軟件
@@ -945,13 +993,13 @@ sport:
   total_score: 四年總分
   total_score_label: 總分
   rank_label: 等級
-  semester: "{year} 第{gradeType}"
+  semester: '{year} 第{gradeType}'
   subject: 項目
   data: 數據
   score: 分數
   passed: 及格
   from_to: 第{start}節到第{stop}節
-  score_string: "{score}分"
+  score_string: '{score}分'
   situation_nopassword: 沒密碼
   situation_maintain: 系統維護
   situation_failed_login: 登錄失敗
@@ -959,7 +1007,7 @@ sport:
   situation_network: 網絡故障
   situation_unknown: 未知故障{situation}
   situation_fetching: 正在獲取
-  situation_error: "壞事: {situation}"
+  situation_error: '壞事: {situation}'
   cache_hint_missing_password: 請先填寫體育密碼後重試。
   cache_hint_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。
   cache_hint_maintain: 體育服務正在維護中，請稍後重試。
@@ -995,8 +1043,8 @@ xdu_planet:
   load_failed_title: 加載失敗
   load_failed_bottom: 文章加載失敗，如有需要可以點擊右上方的按鈕在瀏覽器裡打開。
   no_comment: 暫無評論
-  reply_audit: "回覆評論 #{reply_to} 已被舉報或刪除"
-  reply: "回覆評論 #{reply_to}：{content}"
+  reply_audit: '回覆評論 #{reply_to} 已被舉報或刪除'
+  reply: '回覆評論 #{reply_to}：{content}'
   have_been_audit: 本評論已經被舉報
   audit: 舉報
   confirm_audit_dialog:
@@ -1038,49 +1086,100 @@ electricity_status:
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
-easter_egg_apple: "Time to get some electric STUFF...
+easter_egg_apple: '=== 帶我飛向月亮吧 ===
 
-  ...to get high
-
-
-  I am dry for long time...
-
-  ...because of the pigs
+  歌聲演繹：Frank Sintara, 1964
 
 
-  They said 'No animal shall drink alcohol.'...
+  帶我飛向月亮吧
 
-  ...but Napoleon's COUNTRY SON always walking in circle
-
-
-  So I got to secretly hide my bootleg PARAPHERNALIA...
-
-  ...in a place under the sun, where pigs hates
+  讓我和星星共舞嬉戲
 
 
-  Waiting for stupid pig's...
+  我好想知道
 
-  ...BLACK COMEDY plays"
-easter_egg_others: "向日葵小姐做夢了
+  木星和火星上的春天
 
-  她身上裝飾了很多寶石
-
-  遠處看像是出席舞會的貴族小姐
+  是什麼顏色的
 
 
-  她和英俊的王子跳舞
+  讓你的歌聲溫暖我的心
 
-  她們都有點臉紅
+  我會一直歌唱下去
 
-  又有點神智不清
 
-  突然，他把她抱起來
+  我日夜都在想你和牽掛你
 
-  舉到了空中"
+  請你真心接受我 我愛你
+
+
+  === 沉浸在你的愛意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  無法忘懷這種感覺，被你的愛包裹的溫暖
+
+  不想失去這種感覺，被你的愛撫摸的舒適
+
+  你讓我感到好自在，被你的愛託舉的堅強
+
+  想一直在你懷中，沉浸在你的愛意中
+
+  我不敢向你說出，我對你的心意和愛
+
+  '
+easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
+
+  歌聲演繹：Maaya Sakamoto, 2000
+
+  （原歌詞為日文，按照英語翻譯二翻）
+
+
+  I am a dreamer, 有無限的力量
+
+
+  我的世界有夢想、熱愛與躊躇
+
+  但有些東西，我依舊無法想象
+
+  我想向著廣闊的天空，尋求自己的方向
+
+
+  我要追求自己的夢想
+
+  努力讓自己的心願成真
+
+  雖困難重重也要繼續前行
+
+
+  等待奇蹟 等待美好
+
+  用心感受這個世界
+
+  最終 一定會出乎意料
+
+
+  === 沉浸在你的愛意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  無法忘懷這種感覺，被你的愛包裹的溫暖
+
+  不想失去這種感覺，被你的愛撫摸的舒適
+
+  你讓我感到好自在，被你的愛託舉的堅強
+
+  想躺在你的懷中，沉浸在你的愛意
+
+  而且，我不敢想你說出，我現在的心意
+
+  '
 easter_egg_robot:
   appbar: 歡迎你，同學！
   title: 看看這些要開學的學生們吧！
-  contents: "咱孩子零用錢太少了，於是我們來了。
+  contents: '咱孩子零用錢太少了，於是我們來了。
 
     1. 機器人不得傷害人類，或袖手旁觀坐視人類受到傷害。
 
@@ -1092,7 +1191,155 @@ easter_egg_robot:
 
     5. 機器人的閃亮屁股不能隨便咬。
 
-    而且他們有個不可明說的計劃。"
+    而且他們有個不可明說的計劃。'
   button_one: 我們的救世主呢？
   button_two: 快點來啊！
   button_notice: \o/\o/\o/\o/\o/\o/\o/\o/
+restart_app:
+  title_cache_cleared: 緩存已清空
+  title_logged_out: 已退出登錄
+  title_password_wrong: 密碼錯誤
+  content: 點擊通知重新打開應用
+ruisi:
+  common:
+    refresh: 刷新
+    confirm: 確定
+    cancel: 取消
+    retry: 重試
+    no_topics: 暫無帖子
+    no_content: 暫無內容
+    reply: 回覆
+    favorite: 收藏
+    not_implemented: 未實現
+    login: 登錄
+    logout: 退出登錄
+    logged_out: 已退出登錄
+    submit: 提交
+  about:
+    title: 關於
+    app_name: 睿思
+    subtitle: 西安電子科技大學校園論壇客戶端
+    version: 版本
+    version_number: 2.0.0 (隨 XDYou 1.6.0 分發)
+    source_code: 源代碼
+    bug_report: 問題反饋
+    bug_report_subtitle: 在 GitHub 上提交 issue
+    privacy_policy: 隱私政策
+    license: 本應用基於 BSD-3-Clause 許可證開源 基於 Ruisi-iOS 和 Ruisi-Android 在 AI 輔助下重寫
+    privacy_policy_content: '本應用僅在西安電子科技大學校園網內運行，訪問睿思論壇 (rs.xidian.edu.cn) 的數據。
+
+
+      本應用不會收集、存儲或傳輸任何用戶的個人信息到第三方服務器。
+
+
+      用戶的登錄憑據僅保存在本地設備中，用於與睿思論壇服務器進行身份驗證。
+
+
+      本應用使用 Cookie 與睿思論壇服務器進行通信，所有數據交互均直接在用戶的設備與睿思論壇服務器之間進行。
+
+
+      如有任何疑問，請通過 GitHub 提交 issue 聯繫開發者。'
+  home:
+    title: 睿思論壇
+    new_post: 發帖
+    forum_list: 論壇板塊
+    tab_hot: 熱帖
+    tab_new_reply: 最新回覆
+    tab_new_post: 最新發表
+    tab_my: 我的
+    tab_trade: 二手交易
+    tab_water: 灌水
+    tab_lost_found: 失物招領
+    tab_employment: 就業
+    tab_photography: 攝影
+    please_login: 請先登錄
+    my_profile: 我的資料
+    my_posts: 我的帖子
+    my_favorites: 我的收藏
+    message_center: 消息中心
+    daily_checkin: 每日簽到
+    settings: 設置
+    about: 關於
+  login:
+    title: 登錄睿思
+    username: 用戶名
+    username_hint: 請輸入用戶名
+    password: 密碼
+    password_hint: 請輸入密碼
+    captcha: 驗證碼
+    captcha_hint: 請輸入驗證碼
+    back: 返回
+    reset_login_state: 重置登錄狀態
+    reset_confirm_title: 確認重置
+    reset_confirm_content: 確定要重置登錄狀態嗎？這將清除所有登錄信息。
+    reset_success: 登錄狀態已重置
+    view_logs: 查看日誌
+  post:
+    title: 發帖
+    publish: 發佈
+    select_forum: 選擇板塊
+    select_forum_hint: 請選擇板塊
+    subject: 標題
+    subject_hint: 請輸入標題
+    content: 內容
+    content_hint: 請輸入內容
+    success: 發帖成功
+    failure: 發帖失敗
+    smiley: 表情
+  topic_detail:
+    title: 帖子詳情
+    reply_too_short: 回覆內容不能少於 13 個字符
+    reply_success: 回覆成功
+    reply_failure: 回覆失敗
+    favorite_success: 收藏成功
+    favorite_failure: 收藏失敗
+    no_data: 無數據
+    reply_hint: 寫回復...
+    vote:
+      single_select: 單選
+      multi_select: 多選，最多 {count} 項
+      title_prefix: 投票
+      count: 共 {count} 人參與
+      open: 點此投票
+      sheet_title: 投票
+      max_selection: 最多隻能選擇 {count} 項
+      not_selected: 你還沒有選擇
+      success: 投票成功
+      failure: 投票失敗
+      param_error: 投票失敗：參數錯誤
+      already_voted: 您已經投過票，謝謝您的參與
+      expired: 該投票已過期或關閉
+      ended: 投票已經結束
+  topic_list_item:
+    sticky: 置頂
+  forum_list:
+    title: 論壇板塊
+  favorites:
+    title: 我的收藏
+    empty: 暫無收藏
+  messages:
+    title: 消息
+    tab_at: '@我'
+    no_reply: 暫無回覆通知
+    no_at: 暫無@通知
+  search:
+    hint: 搜索帖子...
+    input_hint: 輸入關鍵詞搜索
+    no_results: 無搜索結果
+  settings:
+    title: 設置
+    section_proxy: 代理
+    proxy_enable: 啟用代理
+    proxy_disabled: 未啟用
+    proxy_address: 代理地址
+    section_debug: 調試
+    view_logs: 查看日誌
+    proxy_dialog_title: 代理設置
+    proxy_host: 主機地址
+    proxy_host_hint: 例如 127.0.0.1
+    proxy_port: 端口
+    proxy_port_hint: 例如 7890
+  user:
+    title: 我的
+    tab_profile: 資料
+    unknown: 未知用戶

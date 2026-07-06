@@ -112,9 +112,11 @@ class ElectricityReadyView extends StatelessWidget {
             ],
           ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
 
-          WaterUsageList(
-            usages: displayInfo.waterMeterList,
-          ).padding(vertical: 4).constrained(maxWidth: sheetMaxWidth).center(),
+          if (displayInfo.waterMeterList != null)
+            WaterUsageList(usages: displayInfo.waterMeterList!)
+                .padding(vertical: 4)
+                .constrained(maxWidth: sheetMaxWidth)
+                .center(),
 
           FilledButton(
                 onPressed: onRefresh,

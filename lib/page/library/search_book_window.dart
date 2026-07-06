@@ -157,7 +157,9 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                       .toList(),
                   onChanged: (SearchField? newValue) {
                     if (newValue != null) {
-                      selectedSearchField = newValue;
+                      setState(() {
+                        selectedSearchField = newValue;
+                      });
                       _pagingController.refresh();
                     }
                   },

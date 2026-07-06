@@ -257,126 +257,136 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final physicsController = PhysicsExperimentController.i;
-      final otherController = OtherExperimentController.i;
+    return SignalBuilder(
+      builder: (context) {
+        final physicsController = PhysicsExperimentController.i;
+        final otherController = OtherExperimentController.i;
 
-      final physicsState = physicsController.physicsExperimentStateSignal.value;
-      final otherState = otherController.otherExperimentStateSignal.value;
+        final physicsState =
+            physicsController.physicsExperimentStateSignal.value;
+        final otherState = otherController.otherExperimentStateSignal.value;
 
-      final hasValidPhysics = physicsController.hasValidPhysicsExperiment.value;
-      final hasValidOther = otherController.hasValidOtherExperiment.value;
-      final hasAnyValidData = hasValidPhysics || hasValidOther;
+        final hasValidPhysics =
+            physicsController.hasValidPhysicsExperiment.value;
+        final hasValidOther = otherController.hasValidOtherExperiment.value;
+        final hasAnyValidData = hasValidPhysics || hasValidOther;
 
-      final physicsLoading = physicsState.isLoading;
-      final otherLoading = otherState.isLoading;
-      final isLoading = physicsLoading || otherLoading;
+        final physicsLoading = physicsState.isLoading;
+        final otherLoading = otherState.isLoading;
+        final isLoading = physicsLoading || otherLoading;
 
-      final physicsFatalError = physicsState is AsyncError && !hasValidPhysics;
-      final physicsError = physicsFatalError ? physicsState.error : null;
+        final physicsFatalError =
+            physicsState is AsyncError && !hasValidPhysics;
+        final physicsError = physicsFatalError ? physicsState.error : null;
 
-      final otherFatalError = otherState is AsyncError && !hasValidOther;
-      final otherError = otherFatalError ? otherState.error : null;
+        final otherFatalError = otherState is AsyncError && !hasValidOther;
+        final otherError = otherFatalError ? otherState.error : null;
 
-      final loadingHintKey = isLoading
-          ? _resolveLoadingHintKey(
-              physicsLoading: physicsLoading,
-              otherLoading: otherLoading,
-              physicsFatalError: physicsFatalError,
-              otherFatalError: otherFatalError,
-            )
-          : null;
+        final loadingHintKey = isLoading
+            ? _resolveLoadingHintKey(
+                physicsLoading: physicsLoading,
+                otherLoading: otherLoading,
+                physicsFatalError: physicsFatalError,
+                otherFatalError: otherFatalError,
+              )
+            : null;
 
-      final doing = _sortExperiments([
-        ...physicsController.isDoingPhysicsExperimentComputedSignal.value,
-        ...otherController.isDoingOtherExperimentComputedSignal.value,
-      ]);
+        final doing = _sortExperiments([
+          ...physicsController.isDoingPhysicsExperimentComputedSignal.value,
+          ...otherController.isDoingOtherExperimentComputedSignal.value,
+        ]);
 
-      final unDone = _sortExperiments([
-        ...physicsController.isNotStartedPhysicsExperimentComputedSignal.value,
-        ...otherController.isNotStartedOtherExperimentComputedSignal.value,
-      ]);
+        final unDone = _sortExperiments([
+          ...physicsController
+              .isNotStartedPhysicsExperimentComputedSignal
+              .value,
+          ...otherController.isNotStartedOtherExperimentComputedSignal.value,
+        ]);
 
-      final done = _sortExperiments([
-        ...physicsController.isFinishedPhysicsExperimentComputedSignal.value,
-        ...otherController.isFinishedOtherExperimentComputedSignal.value,
-      ]);
+        final done = _sortExperiments([
+          ...physicsController.isFinishedPhysicsExperimentComputedSignal.value,
+          ...otherController.isFinishedOtherExperimentComputedSignal.value,
+        ]);
 
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, "experiment.title")),
-          actions: [
-            if (!offline && hasAnyValidData)
-              IconButton(icon: const Icon(Icons.update), onPressed: _reloadAll),
-          ],
-        ),
-        body: Builder(
-          builder: (context) {
-            if (!hasAnyValidData) {
-              if (physicsFatalError && otherFatalError) {
-                return ReloadWidget(
-                  function: _reloadAll,
-                  errorStatus:
-                      "Physics: ${physicsError.toString()}\n"
-                      "Others: ${otherError.toString()}",
-                ).center();
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(FlutterI18n.translate(context, "experiment.title")),
+            actions: [
+              if (!offline && hasAnyValidData)
+                IconButton(
+                  icon: const Icon(Icons.update),
+                  onPressed: _reloadAll,
+                ),
+            ],
+          ),
+          body: Builder(
+            builder: (context) {
+              if (!hasAnyValidData) {
+                if (physicsFatalError && otherFatalError) {
+                  return ReloadWidget(
+                    function: _reloadAll,
+                    errorStatus:
+                        "Physics: ${physicsError.toString()}\n"
+                        "Others: ${otherError.toString()}",
+                  ).center();
+                }
+
+                return Stack(
+                  children: [
+                    const Center(child: CircularProgressIndicator()),
+                    if (loadingHintKey != null)
+                      LoadingAlerter(
+                        isLoading: true,
+                        hint: FlutterI18n.translate(context, loadingHintKey),
+                        opacity: 0,
+                        showOverlay: false,
+                      ),
+                  ],
+                );
               }
+
+              final content = _buildExperimentList(
+                context,
+                doing: doing,
+                unDone: unDone,
+                done: done,
+                isPhysicsFromCache:
+                    physicsController.isPhysicsExperimentFromCache.value,
+                isOtherFromCache:
+                    otherController.isOtherExperimentFromCache.value,
+                physicsFetchTime:
+                    physicsController.physicsExperimentFetchTime.value,
+                otherFetchTime: otherController.otherExperimentFetchTime.value,
+                physicsError: physicsFatalError ? physicsState.error : null,
+                otherError: otherFatalError ? otherState.error : null,
+              );
+
+              if (!isLoading) return content;
 
               return Stack(
                 children: [
-                  const Center(child: CircularProgressIndicator()),
-                  if (loadingHintKey != null)
-                    LoadingAlerter(
-                      isLoading: true,
-                      hint: FlutterI18n.translate(context, loadingHintKey),
-                      opacity: 0,
-                      showOverlay: false,
-                    ),
+                  Column(
+                    children: [
+                      AnimatedContainer(
+                        height: kTextTabBarHeight,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                      Expanded(child: content),
+                    ],
+                  ),
+                  LoadingAlerter(
+                    isLoading: true,
+                    hint: FlutterI18n.translate(context, loadingHintKey!),
+                    opacity: 0.15,
+                    showOverlay: true,
+                  ),
                 ],
               );
-            }
-
-            final content = _buildExperimentList(
-              context,
-              doing: doing,
-              unDone: unDone,
-              done: done,
-              isPhysicsFromCache:
-                  physicsController.isPhysicsExperimentFromCache.value,
-              isOtherFromCache:
-                  otherController.isOtherExperimentFromCache.value,
-              physicsFetchTime:
-                  physicsController.physicsExperimentFetchTime.value,
-              otherFetchTime: otherController.otherExperimentFetchTime.value,
-              physicsError: physicsFatalError ? physicsState.error : null,
-              otherError: otherFatalError ? otherState.error : null,
-            );
-
-            if (!isLoading) return content;
-
-            return Stack(
-              children: [
-                Column(
-                  children: [
-                    AnimatedContainer(
-                      height: kTextTabBarHeight,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    ),
-                    Expanded(child: content),
-                  ],
-                ),
-                LoadingAlerter(
-                  isLoading: true,
-                  hint: FlutterI18n.translate(context, loadingHintKey!),
-                  opacity: 0.15,
-                  showOverlay: true,
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    });
+            },
+          ),
+        );
+      },
+    );
   }
 }

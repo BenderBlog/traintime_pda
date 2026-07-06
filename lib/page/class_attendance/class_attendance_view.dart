@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attandance_card.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_state.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_table.dart';
@@ -92,18 +93,37 @@ class ClassAttendanceView extends StatelessWidget {
 
   Widget _buildCardView(BuildContext context, ClassAttendanceState state) {
     final courseCards = state.courses.map((classAttendance) {
-      int times = state.classTimes[classAttendance.courseName] ?? 0;
+      int? times = state.classTimes[classAttendance.courseName];
+      if (times == null) {
+        String suspeciousClassName = state.classTimes.keys.firstWhere(
+          (str) =>
+              str.contains(classAttendance.courseName) ||
+              classAttendance.courseName.contains(str),
+          orElse: () => "",
+        );
+        if (suspeciousClassName.isNotEmpty) {
+          times = state.classTimes[suspeciousClassName];
+        }
+      }
       return CourseCard(course: classAttendance, totalTimes: times);
     }).toList();
 
     final warningCourses = courseCards.toList()
-      ..retainWhere((e) => e.attendanceStatus.contains("warning"));
+      ..retainWhere(
+        (e) => e.course.attendanceStatus == AttendanceStatus.warning,
+      );
     final ineligibleCourses = courseCards.toList()
-      ..retainWhere((e) => e.attendanceStatus.contains("ineligible"));
+      ..retainWhere(
+        (e) => e.course.attendanceStatus == AttendanceStatus.ineligible,
+      );
     final eligibleCourses = courseCards.toList()
-      ..retainWhere((e) => e.attendanceStatus.contains("eligible"));
+      ..retainWhere(
+        (e) => e.course.attendanceStatus == AttendanceStatus.eligible,
+      );
     final unknownCourses = courseCards.toList()
-      ..retainWhere((e) => e.attendanceStatus.contains("unknown"));
+      ..retainWhere(
+        (e) => e.course.attendanceStatus == AttendanceStatus.unknown,
+      );
 
     return RefreshIndicator(
       onRefresh: state.refreshData,

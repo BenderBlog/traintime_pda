@@ -21,7 +21,11 @@ class CurrentNetInfoPage extends StatefulWidget {
   State<CurrentNetInfoPage> createState() => _CurrentNetInfoState();
 }
 
-class _CurrentNetInfoState extends State<CurrentNetInfoPage> {
+class _CurrentNetInfoState extends State<CurrentNetInfoPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late Future<CurrentUserNetInfo> _currentUserNetInfoFuture;
 
   @override
@@ -45,6 +49,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder<CurrentUserNetInfo>(
       future: _currentUserNetInfoFuture,
       builder: (context, snapshot) {

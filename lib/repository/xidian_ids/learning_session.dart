@@ -11,7 +11,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
 class LearningSession extends IDSSession {
@@ -45,7 +45,7 @@ class LearningSession extends IDSSession {
     String? location = await checkAndLogin(
       target: LOGIN_URL,
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     while (location != null) {
@@ -213,6 +213,7 @@ class LearningSession extends IDSSession {
 
     List<Element> rows = table.querySelectorAll('tbody tr');
     for (var row in rows) {
+      bool isWarning = row.classes.contains('redtr');
       List<Element> cells = row.querySelectorAll('td');
       if (cells.length < 17) {
         continue;
@@ -226,6 +227,7 @@ class LearningSession extends IDSSession {
       );
       results.add(
         ClassAttendance(
+          isWarning: isWarning,
           courseName: rowData[0],
           className: rowData[1],
           checkInCount: rowData[2],

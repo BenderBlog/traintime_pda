@@ -16,6 +16,7 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
@@ -144,7 +145,10 @@ class _LoginWindowState extends State<LoginWindow> {
           value: number,
         ),
         sliderCaptcha: (String cookieStr) {
-          return SliderCaptchaClientProvider(cookie: cookieStr).solve(context);
+          return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+            manualSolver: (provider) =>
+                solveSliderCaptchaManually(context, provider),
+          );
         },
       );
       if (!mounted) return;

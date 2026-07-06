@@ -2,14 +2,15 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
+import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
@@ -24,13 +25,11 @@ import 'package:watermeter/themes/color_seed.dart';
 /// Use a inheritedWidget to share the ClassTableWidgetState
 class ClassTableState extends InheritedWidget {
   final ClassTableWidgetState controllers;
-  final BuildContext parentContext;
   final BoxConstraints constraints;
 
   const ClassTableState({
     super.key,
     required super.child,
-    required this.parentContext,
     required this.controllers,
     required this.constraints,
   });
@@ -89,39 +88,7 @@ class ClassTableWidgetState with ChangeNotifier {
   final OtherExperimentController otherExperimentController =
       OtherExperimentController.i;
   final WeekSwiftController weekSwiftController = WeekSwiftController.i;
-
-  void _initEffects() {
-    _effectCleanup.add(
-      effect(() {
-        classTableController.schoolClassTableStateSignal.value;
-        classTableController.classTableComputedSignal.value;
-        classTableController.isClassTableFromCacheComputedSignal.value;
-        classTableController.classTableCacheHintKeyComputedSignal.value;
-        examController.examInfoStateSignal.value;
-        examController.subjects.value;
-        examController.isExamFromCache.value;
-        examController.examCacheHintKey.value;
-        physicsExperimentController.physicsExperimentStateSignal.value;
-        physicsExperimentController.physicsExperiments.value;
-        physicsExperimentController.isPhysicsExperimentFromCache.value;
-        physicsExperimentController.physicsExperimentCacheHintKey.value;
-        otherExperimentController.otherExperimentStateSignal.value;
-        otherExperimentController.otherExperiments.value;
-        otherExperimentController.isOtherExperimentFromCache.value;
-        otherExperimentController.otherExperimentCacheHintKey.value;
-        weekSwiftController.weekSwiftSignal.value;
-        notifyListeners();
-      }, debugLabel: "ClassTableWidgetStateSignalBridgeEffect"),
-    );
-    // Init current week info
-    if (currentWeek < 0) {
-      _chosenWeek = 0;
-    } else if (currentWeek >= semesterLength) {
-      _chosenWeek = semesterLength - 1;
-    } else {
-      _chosenWeek = currentWeek;
-    }
-  }
+  final GlobalTimerController globalTimerController = GlobalTimerController.i;
 
   /// The length of the semester, the amount of the class table.
   int get semesterLength =>
@@ -135,6 +102,8 @@ class ClassTableWidgetState with ChangeNotifier {
       classTableController.classTableComputedSignal.value.semesterCode;
 
   String get decorationName => ClassTableController.decorationName;
+
+  DateTime get currentTime => GlobalTimerController.i.currentTimeSignal.value;
 
   ///*****************************///
   /// Following are dynamic data. ///
@@ -317,7 +286,7 @@ class ClassTableWidgetState with ChangeNotifier {
           .deleteUserDefinedClass(timeArrangement)
           .then((value) => notifyListeners());
 
-  List<Event> get events => buildCalendarEvents(
+  List<CalendarEventDraft> get events => buildCalendarEvents(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: subjects,
     experiments: experiments,
@@ -349,7 +318,41 @@ class ClassTableWidgetState with ChangeNotifier {
   }
 
   ClassTableWidgetState() {
-    _initEffects();
+    _effectCleanup.add(
+      effect(
+        () {
+          classTableController.schoolClassTableStateSignal.value;
+          classTableController.classTableComputedSignal.value;
+          classTableController.isClassTableFromCacheComputedSignal.value;
+          classTableController.classTableCacheHintKeyComputedSignal.value;
+          examController.examInfoStateSignal.value;
+          examController.subjects.value;
+          examController.isExamFromCache.value;
+          examController.examCacheHintKey.value;
+          physicsExperimentController.physicsExperimentStateSignal.value;
+          physicsExperimentController.physicsExperiments.value;
+          physicsExperimentController.isPhysicsExperimentFromCache.value;
+          physicsExperimentController.physicsExperimentCacheHintKey.value;
+          otherExperimentController.otherExperimentStateSignal.value;
+          otherExperimentController.otherExperiments.value;
+          otherExperimentController.isOtherExperimentFromCache.value;
+          otherExperimentController.otherExperimentCacheHintKey.value;
+          weekSwiftController.weekSwiftSignal.value;
+          globalTimerController.currentTimeSignal.value;
+          notifyListeners();
+        },
+
+        options: EffectOptions(name: "ClassTableWidgetStateSignalBridgeEffect"),
+      ),
+    );
+    // Init current week info
+    if (currentWeek < 0) {
+      _chosenWeek = 0;
+    } else if (currentWeek >= semesterLength) {
+      _chosenWeek = semesterLength - 1;
+    } else {
+      _chosenWeek = currentWeek;
+    }
   }
 
   bool _checkIsOverlapping(

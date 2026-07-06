@@ -12,27 +12,32 @@ class ClassTablePage extends StatefulWidget {
 
 class _ClassTablePageState extends State<ClassTablePage> {
   late ClassTableWidgetState classTableState;
+  bool _isListening = false;
 
-  void _reload() => setState(() {});
+  void _reload() {
+    if (mounted) setState(() {});
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    classTableState = ClassTableState.of(context)!.controllers;
-    classTableState.addListener(_reload);
+    if (!_isListening) {
+      classTableState = ClassTableState.of(context)!.controllers;
+      classTableState.addListener(_reload);
+      _isListening = true;
+    }
   }
 
   @override
   void dispose() {
     classTableState.removeListener(_reload);
-    classTableState.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ClassTableState.of(context)!.controllers.haveClass
-        ? ContentClassTablePage()
-        : EmptyClassTablePage();
+    return classTableState.haveClass
+        ? const ContentClassTablePage()
+        : const EmptyClassTablePage();
   }
 }

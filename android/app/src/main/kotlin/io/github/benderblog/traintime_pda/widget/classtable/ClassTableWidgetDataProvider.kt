@@ -58,6 +58,13 @@ class ClassTableWidgetDataProvider {
         weekIndex = -1
         Log.i("$tag[reloadData]", "currentTime is $currentTime")
 
+        // Check login state before loading data
+        if (!ClassTableDataHolder.isLoggedIn) {
+            Log.i("$tag[reloadData]", "User is not logged in")
+            widgetState = ClassTableWidgetLoadState.NOT_LOGGED_IN
+            return
+        }
+
         // Loading data
         loadBasicConfig(context)
         if (widgetState != ClassTableWidgetLoadState.LOADING) {

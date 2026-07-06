@@ -19,6 +19,7 @@ object ClassTableConstants {
     const val EXAM_FILE_NAME = "exam.json"
     const val PHYSICS_EXPERIMENT_FILE_NAME = "PhysicsExperiment.json"
     const val OTHER_EXPERIMENT_FILE_NAME = "OtherExperiment.json"
+    const val WIDGET_STATE_FILE_NAME = "WidgetState.json"
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
     // Be attention to the changes of SharedPreferencesPlugin.SHARED_PREFERENCES_NAME.
@@ -211,4 +212,3 @@ val ExperimentData.timeRanges: List<Pair<LocalDateTime, LocalDateTime>>
             it -> Pair(it["$1"]!!, it["$2"]!!)
         }
     }
-

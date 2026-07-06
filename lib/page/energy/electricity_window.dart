@@ -22,91 +22,96 @@ class ElectricityWindow extends StatelessWidget {
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "electricity.title")),
       ),
-      body: Watch((context) {
-        final c = EnergyController.i;
-        final state = c.energyInfoStateSignal.value;
-        final displayInfo = c.displayEnergyInfo.value;
-        final isFromCache = c.isEnergyInfoFromCache.value;
-        final fetchTime = c.energyInfoFetchTime.value;
-        final cacheHintKey = c.energyInfoCacheHintKey.value;
-        final historyElectricityInfoList = c.historyElectricityInfoList;
-        final hasValidData = displayInfo != null;
-        final isFatalError = state is AsyncError && !hasValidData;
+      body: SignalBuilder(
+        builder: (context) {
+          final c = EnergyController.i;
+          final state = c.energyInfoStateSignal.value;
+          final displayInfo = c.displayEnergyInfo.value;
+          final isFromCache = c.isEnergyInfoFromCache.value;
+          final fetchTime = c.energyInfoFetchTime.value;
+          final cacheHintKey = c.energyInfoCacheHintKey.value;
+          final historyElectricityInfoList = c.historyElectricityInfoList;
+          final hasValidData = displayInfo != null;
+          final isFatalError = state is AsyncError && !hasValidData;
 
-        if (hasValidData) {
-          final content = ElectricityReadyView(
-            displayInfo: displayInfo,
-            historyElectricityInfoList: historyElectricityInfoList,
-            onRefresh: () => c.refreshElectricityInfo(force: true),
-          );
+          if (hasValidData) {
+            final content = ElectricityReadyView(
+              displayInfo: displayInfo,
+              historyElectricityInfoList: historyElectricityInfoList,
+              onRefresh: () => c.refreshElectricityInfo(force: true),
+            );
 
-          final body = Column(
-            children: [
-              if (isFromCache && fetchTime != null)
-                CacheAlerter(
-                  dataType: FlutterI18n.translate(context, "electricity.title"),
+            final body = Column(
+              children: [
+                if (isFromCache && fetchTime != null)
+                  CacheAlerter(
+                    dataType: FlutterI18n.translate(
+                      context,
+                      "electricity.title",
+                    ),
+                    hint: FlutterI18n.translate(
+                      context,
+                      cacheHintKey == null || cacheHintKey == "local_cache_hint"
+                          ? "cache_reason_default"
+                          : cacheHintKey,
+                    ),
+                    placeOfCache: PlaceOfCache.device,
+                    fetchTime: fetchTime,
+                  ),
+                Expanded(child: content),
+              ],
+            );
+
+            if (!state.isLoading) return body;
+
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    AnimatedContainer(
+                      height: kTextTabBarHeight,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    ),
+                    Expanded(child: body),
+                  ],
+                ),
+                LoadingAlerter(
+                  isLoading: true,
                   hint: FlutterI18n.translate(
                     context,
-                    cacheHintKey == null || cacheHintKey == "local_cache_hint"
-                        ? "cache_reason_default"
-                        : cacheHintKey,
+                    "electricity.fetching_hint",
                   ),
-                  placeOfCache: PlaceOfCache.device,
-                  fetchTime: fetchTime,
+                  opacity: 0.15,
+                  showOverlay: true,
                 ),
-              Expanded(child: content),
-            ],
-          );
+              ],
+            );
+          }
 
-          if (!state.isLoading) return body;
+          if (isFatalError) {
+            final errorState = state as AsyncError;
+            return ReloadWidget(
+              errorStatus: errorState.error,
+              stackTrace: errorState.stackTrace,
+              function: () async {
+                if (context.mounted) {
+                  showToast(
+                    context: context,
+                    msg: FlutterI18n.translate(
+                      context,
+                      "setting.change_electricity_account.successful_setting",
+                    ),
+                  );
+                }
+                await c.refreshElectricityInfo(force: true);
+              },
+            ).center();
+          }
 
-          return Stack(
-            children: [
-              Column(
-                children: [
-                  AnimatedContainer(
-                    height: kTextTabBarHeight,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  ),
-                  Expanded(child: body),
-                ],
-              ),
-              LoadingAlerter(
-                isLoading: true,
-                hint: FlutterI18n.translate(
-                  context,
-                  "electricity.fetching_hint",
-                ),
-                opacity: 0.15,
-                showOverlay: true,
-              ),
-            ],
-          );
-        }
-
-        if (isFatalError) {
-          final errorState = state as AsyncError;
-          return ReloadWidget(
-            errorStatus: errorState.error,
-            stackTrace: errorState.stackTrace,
-            function: () async {
-              if (context.mounted) {
-                showToast(
-                  context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "setting.change_electricity_account.successful_setting",
-                  ),
-                );
-              }
-              await c.refreshElectricityInfo(force: true);
-            },
-          ).center();
-        }
-
-        return const CircularProgressIndicator().center();
-      }),
+          return const CircularProgressIndicator().center();
+        },
+      ),
     );
   }
 }
