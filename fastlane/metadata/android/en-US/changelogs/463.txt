@@ -1,0 +1,10 @@
+1. Bug fix and quality improvement @BenderBlog
+    a. Schoolnet detect
+    b. Ruisi Forum Fix
+    c. Electricity Graph fix
+    d. Special Exam Time failed to fetch fix
+    e. Logout failed fix
+2. Class attendance improvement @BenderBlog
+    a. Canceled course info read directly from oroginal data
+    b. Danger course are courses which checkin percent below 80%
+3. Toolbox return @BenderBlog

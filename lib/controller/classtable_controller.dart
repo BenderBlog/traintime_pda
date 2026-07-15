@@ -60,7 +60,7 @@ class ClassTableController {
         "from ${semesterChangeEvent.oldSemester} "
         "to ${semesterChangeEvent.effectiveSemester}.",
       );
-    }, debugLabel: "ClassTableControllerSemesterChangeEffect");
+    }, options: EffectOptions(name: "ClassTableControllerSemesterChangeEffect"));
   }
 
   Future<void> reloadClassTable() async {
@@ -155,7 +155,7 @@ class ClassTableController {
 
   List<HomeArrangement> getArrangementOfDay(DateTime updateTime) {
     final formatter = DateFormat(HomeArrangement.format);
-    final currentWeek = currentWeekComputedSignal.value;
+    final currentWeek = getCurrentWeek(updateTime);
     final classTableData = classTableComputedSignal.value;
     final arrangementSet = <HomeArrangement>{};
 
@@ -170,11 +170,13 @@ class ClassTableController {
         continue;
       }
 
+      final classDetail = getClassDetail(arrangement);
       arrangementSet.add(
         HomeArrangement(
-          name: getClassDetail(arrangement).name,
+          name: classDetail.name,
           teacher: arrangement.teacher,
           place: arrangement.classroom,
+          colorIndex: classTableData.classDetail.indexOf(classDetail),
           startTimeStr: formatter.format(
             DateTime(
               updateTime.year,

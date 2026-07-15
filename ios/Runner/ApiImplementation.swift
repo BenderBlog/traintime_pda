@@ -77,5 +77,40 @@ public class ApiImplementation: SaveToGroupIdSwiftApi {
     func getHostLanguage() throws -> String {
         return "Swift"
     }
+
+    func deleteFromGroupId(data: FileToGroupID, completion: @escaping (Result<Bool, Error>) -> Void) {
+        let fileManager = FileManager.default
+
+        do {
+            guard let containerURL = fileManager.containerURL(
+                forSecurityApplicationGroupIdentifier: data.appid
+            ) else {
+                throw AppIdFailedError()
+            }
+
+            let targetURL = containerURL.appendingPathComponent(data.fileName, isDirectory: false)
+
+            if fileManager.fileExists(atPath: targetURL.path) {
+                try fileManager.removeItem(at: targetURL)
+                print("Deleted: \(targetURL.path)")
+            } else {
+                print("File not found, skip: \(targetURL.path)")
+            }
+
+            completion(.success(true))
+        } catch is AppIdFailedError {
+            completion(.failure(FlutterError(
+                code: "AppIdFailedError",
+                message: "Can't get the folder with appid",
+                details: "You should check whether your app group id spells wrong."
+            )))
+        } catch {
+            completion(.failure(FlutterError(
+                code: "DeleteFailedError",
+                message: "\(error)",
+                details: error.localizedDescription
+            )))
+        }
+    }
 }
 // #enddocregion swift-class

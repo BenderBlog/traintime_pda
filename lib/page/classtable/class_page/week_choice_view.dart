@@ -6,7 +6,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
-import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -27,11 +26,6 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
   static const double _occupiedOpacity = 1.0;
   static const double _completedOpacity = 0.45;
   static const double _vacantOpacity = 0.25;
-
-  Color _desaturateColor(Color color, {required double factor}) {
-    final hsl = HSLColor.fromColor(color);
-    return hsl.withSaturation(hsl.saturation * factor).toColor();
-  }
 
   ({int start, int stop}) _slotRange(int timeIndex) {
     switch (timeIndex) {
@@ -91,14 +85,10 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
     Color dotColor = primaryColor;
     if (isOccupied) {
       opacity = isCompleted ? _completedOpacity : _occupiedOpacity;
-      if (isCompleted) {
-        dotColor = _desaturateColor(
-          primaryColor,
-          factor: CompletedClassStyleConfig.completedSaturationFactor,
-        );
-      }
     }
-    return ClipOval(child: ColoredBox(color: dotColor.withValues(alpha: opacity)));
+    return ClipOval(
+      child: ColoredBox(color: dotColor.withValues(alpha: opacity)),
+    );
   }
 
   /// [buttonInformaion] shows the botton's [index] and the overview.
@@ -148,8 +138,8 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
                     .add(Duration(days: 7 * controller.offset))
                     .add(Duration(days: 7 * widget.index));
                 final blockDate = weekStart.add(Duration(days: day - 1));
-                final currentBlockIndex = CurrentTimeIndicator
-                    .transferTimeToBlockIndex(now);
+                final currentBlockIndex =
+                    CurrentTimeIndicator.transferTimeToBlockIndex(now);
                 List<ClassOrgainzedData> arrangedEvents = controller
                     .getArrangement(weekIndex: widget.index, dayIndex: day);
 

@@ -19,6 +19,7 @@ object ClassTableConstants {
     const val PHYSICS_EXPERIMENT_FILE_NAME = "PhysicsExperiment.json"
     const val OTHER_EXPERIMENT_FILE_NAME = "OtherExperiment.json"
     const val CUSTOM_CLASS_FILE_NAME = "CustomClassesV2.json"
+    const val WIDGET_STATE_FILE_NAME = "WidgetState.json"
 
     // In SharedPreferencesPlugin, SHARED_PREFERENCES_NAME is private.
     // Be attention to the changes of SharedPreferencesPlugin.SHARED_PREFERENCES_NAME.
@@ -219,4 +220,3 @@ data class CustomClass(
     @SerialName("time_ranges")
     val timeRanges: List<CustomClassTimeRange>,
 )
-

@@ -17,4 +17,5 @@
     <string name="widget_classtable_error_exam">exam info</string>
     <string name="widget_classtable_error_other">other issues</string>
     <string name="widget_classtable_error_other_experience">other experiment info</string>
+    <string name="widget_classtable_not_logged_in">Not logged in</string>
 </resources>

@@ -11,7 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -264,6 +264,7 @@ class IDSSession extends NetworkSession {
     try {
       var data = await dioNoOfflineCheck.post(
         "https://ids.xidian.edu.cn/authserver/login",
+        queryParameters: target != null ? {'service': target} : null,
         data: head,
         options: Options(
           validateStatus: (status) =>
@@ -331,7 +332,7 @@ class IDSSession extends NetworkSession {
           "https://yjspt.xidian.edu.cn/gsapp"
           "/sys/yjsemaphome/portal/index.do",
       sliderCaptcha: (cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {

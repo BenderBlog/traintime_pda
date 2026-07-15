@@ -21,17 +21,14 @@ class _NotificationDebugPageState extends State<NotificationDebugPage> {
     }
     return Scaffold(
       appBar: AppBar(title: Text('通知服务调试页面')),
-      body: Center(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: NotificationServiceRegistrar()
-              .getAllServices()
-              .map(
-                (service) =>
-                    NotificationTestWidget(notificationService: service),
-              )
-              .toList(),
-        ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: NotificationServiceRegistrar()
+            .getAllServices()
+            .map(
+              (service) => NotificationTestWidget(notificationService: service),
+            )
+            .toList(),
       ),
     );
   }

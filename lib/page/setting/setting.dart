@@ -10,16 +10,18 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:get_it/get_it.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
+import 'package:watermeter/external/ruisi_flutter/lib/controller/ruisi_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
-// import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
@@ -34,7 +36,6 @@ import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -50,7 +51,10 @@ import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 import 'package:watermeter/repository/physics_experiment_session.dart';
+import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/routing/routes.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -63,25 +67,6 @@ class _SettingWindowState extends State<SettingWindow> {
     text,
     style: const TextStyle(fontWeight: FontWeight.bold),
   ).padding(bottom: 8).center();
-
-  void restart() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      Restart.restartApp();
-    } else {
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            FlutterI18n.translate(context, "setting.need_close_dialog.title"),
-          ),
-          content: Text(
-            FlutterI18n.translate(context, "setting.need_close_dialog.content"),
-          ),
-        ),
-      );
-    }
-  }
 
   bool get _isSemesterAwareControllerLoading =>
       ClassTableController.i.schoolClassTableStateSignal.value.isLoading ||
@@ -166,7 +151,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       },
                     ),
                   ),
-                  onTap: () => context.pushReplacement(const AboutPage()),
+                  onTap: () => context.pushReplacementNamed(Routes.about),
                   trailing: const Icon(Icons.navigate_next),
                 ),
                 const Divider(),
@@ -174,21 +159,28 @@ class _SettingWindowState extends State<SettingWindow> {
                   title: Text(
                     FlutterI18n.translate(context, "setting.check_update"),
                   ),
-                  subtitle: Watch((context) {
-                    final updateState =
-                        UpdateNoticeController.i.updateMessageStateSignal.value;
-                    return Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.latest_version",
-                        translationParams: {
-                          "latest":
-                              updateState.value?.code ??
-                              FlutterI18n.translate(context, "setting.waiting"),
-                        },
-                      ),
-                    );
-                  }),
+                  subtitle: SignalBuilder(
+                    builder: (context) {
+                      final updateState = UpdateNoticeController
+                          .i
+                          .updateMessageStateSignal
+                          .value;
+                      return Text(
+                        FlutterI18n.translate(
+                          context,
+                          "setting.latest_version",
+                          translationParams: {
+                            "latest":
+                                updateState.value?.code ??
+                                FlutterI18n.translate(
+                                  context,
+                                  "setting.waiting",
+                                ),
+                          },
+                        ),
+                      );
+                    },
+                  ),
                   onTap: () {
                     showToast(
                       context: context,
@@ -231,8 +223,8 @@ class _SettingWindowState extends State<SettingWindow> {
                           case true:
                             await showDialog(
                               context: context,
-                              builder: (context) => Watch(
-                                (context) => UpdateDialog(
+                              builder: (context) => SignalBuilder(
+                                builder: (context) => UpdateDialog(
                                   updateMessage: UpdateNoticeController
                                       .i
                                       .updateMessageStateSignal
@@ -427,7 +419,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   const Divider(),
                 ],
-                /*
+
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(
@@ -449,7 +441,6 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   },
                 ),
-                */
               ],
             ),
           ),
@@ -525,7 +516,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () async {
-                    FilePickerResult? result;
+                    PlatformFile? result;
                     try {
                       result = await pickFile(type: FileType.image);
                     } on MissingStoragePermissionException {
@@ -541,7 +532,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     }
                     if (mounted) {
                       if (result != null) {
-                        File(result.files.single.path!).copySync(
+                        File(result.path!).copySync(
                           "${supportPath.path}/${ClassTableController.decorationName}",
                         );
                         preference.setBool(
@@ -790,6 +781,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
+                    barrierDismissible: false,
                     builder: (BuildContext context) => AlertDialog(
                       title: Text(
                         FlutterI18n.translate(
@@ -827,17 +819,37 @@ class _SettingWindowState extends State<SettingWindow> {
                                 "setting.clear_and_restart_dialog.cleaning",
                               ),
                             );
+
+                            /// Clean Cookie
                             try {
                               await NetworkSession().clearCookieJar();
-                            } on PathNotFoundException {
-                              log.debug(
-                                "[setting][ClearAllCache]"
-                                "No cookies.",
-                              );
-                            }
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
+
+                            /// Clean sport cookie.
+                            try {
+                              await SportSession().sportCookieJar.deleteAll();
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
 
                             /// Clean cache.
-                            _removeCache();
+                            EnergySession.clearCache();
+                            EnergySession.clearElectricityHistory();
+                            for (var value in [
+                              ClassTableSession.schoolClassName,
+                              ExamSession.examDataCacheName,
+                              ExperimentSession.physicsExperimentCacheName,
+                              SysjSession.otherExperimentCacheName,
+                              ScoreSession.scoreListCacheName,
+                            ]) {
+                              var file = File("${supportPath.path}/$value");
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
+                            }
+
                             if (context.mounted) {
                               showToast(
                                 context: context,
@@ -846,7 +858,21 @@ class _SettingWindowState extends State<SettingWindow> {
                                   "setting.clear_and_restart_dialog.clear",
                                 ),
                               );
-                              restart();
+                              if (Platform.isIOS) {
+                                Restart.restartApp(
+                                  mode: RestartMode.notificationFallback,
+                                  notificationTitle: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.title_cache_cleared",
+                                  ),
+                                  notificationBody: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.content",
+                                  ),
+                                );
+                              } else {
+                                Restart.restartApp();
+                              }
                             }
                           },
                           child: Text(
@@ -863,6 +889,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
+                    barrierDismissible: false,
                     builder: (BuildContext context) => AlertDialog(
                       title: Text(
                         FlutterI18n.translate(
@@ -908,8 +935,35 @@ class _SettingWindowState extends State<SettingWindow> {
                               // ignore: empty_catches
                             } on Exception {}
 
+                            /// Clean sport cookie.
+                            try {
+                              await SportSession().sportCookieJar.deleteAll();
+                              // I don't care.
+                              // ignore: empty_catches
+                            } on Exception {}
+
                             /// Clean all.
-                            _removeAll();
+                            EnergySession.clearCache();
+                            EnergySession.clearElectricityHistory();
+                            for (var value in [
+                              ClassTableSession.schoolClassName,
+                              CustomClassRepository.fileName,
+                              ClassTableController.decorationName,
+                              ExamSession.examDataCacheName,
+                              ExperimentSession.physicsExperimentCacheName,
+                              SysjSession.otherExperimentCacheName,
+                              ScoreSession.scoreListCacheName,
+                            ]) {
+                              var file = File("${supportPath.path}/$value");
+                              if (file.existsSync()) {
+                                file.deleteSync();
+                              }
+                            }
+                            try {
+                              await GetIt.instance<RuisiService>().logout();
+                            } catch (e, s) {
+                              log.error(e, s);
+                            }
 
                             /// Clean user information
                             await preference.prefrenceClear();
@@ -917,10 +971,30 @@ class _SettingWindowState extends State<SettingWindow> {
                             /// Theme back to default
                             ThemeController.i.updateTheme();
 
+                            /// Sync widget login state
+                            await syncWidgetLoginState(false);
+
+                            /// Clean iOS widget data files
+                            await clearWidgetFiles();
+
                             /// Restart app
-                            if (mounted) {
+                            if (context.mounted) {
                               pd.close();
-                              restart();
+                              if (Platform.isIOS) {
+                                Restart.restartApp(
+                                  mode: RestartMode.notificationFallback,
+                                  notificationTitle: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.title_logged_out",
+                                  ),
+                                  notificationBody: FlutterI18n.translate(
+                                    context,
+                                    "restart_app.content",
+                                  ),
+                                );
+                              } else {
+                                Restart.restartApp();
+                              }
                             }
                           },
                           child: Text(
@@ -937,41 +1011,5 @@ class _SettingWindowState extends State<SettingWindow> {
         ],
       ).constrained(maxWidth: 600).center().safeArea(top: true),
     );
-  }
-}
-
-void _removeCache() {
-  EnergySession.clearCache();
-  EnergySession.clearElectricityHistory();
-  for (var value in [
-    ClassTableSession.schoolClassName,
-    ExamSession.examDataCacheName,
-    ExperimentSession.physicsExperimentCacheName,
-    SysjSession.otherExperimentCacheName,
-    ScoreSession.scoreListCacheName,
-  ]) {
-    var file = File("${supportPath.path}/$value");
-    if (file.existsSync()) {
-      file.deleteSync();
-    }
-  }
-}
-
-void _removeAll() {
-  EnergySession.clearCache();
-  EnergySession.clearElectricityHistory();
-  for (var value in [
-    ClassTableSession.schoolClassName,
-    CustomClassRepository.fileName,
-    ClassTableController.decorationName,
-    ExamSession.examDataCacheName,
-    ExperimentSession.physicsExperimentCacheName,
-    SysjSession.otherExperimentCacheName,
-    ScoreSession.scoreListCacheName,
-  ]) {
-    var file = File("${supportPath.path}/$value");
-    if (file.existsSync()) {
-      file.deleteSync();
-    }
   }
 }

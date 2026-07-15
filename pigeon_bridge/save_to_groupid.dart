@@ -28,6 +28,9 @@ abstract class SaveToGroupIdSwiftApi {
 
   @async
   bool saveToGroupId(FileToGroupID data);
+
+  @async
+  bool deleteFromGroupId(FileToGroupID data);
 }
 
 abstract class SaveToGroupIdFlutterApi {
