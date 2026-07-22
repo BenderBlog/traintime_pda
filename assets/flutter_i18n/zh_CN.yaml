@@ -302,6 +302,13 @@ electricity:
   water_usage_read_now: 本次读数
   water_usage: 洗澡水用量
   not_school_network: 非校园网访问
+  aircon_title: 空调用电
+  aircon_imei: 空调 IMEI
+  aircon_amount: 平台用电量
+  aircon_update_time: 更新时间
+  aircon_waiting: 等待获取空调用电信息
+  aircon_error: 空调用电获取失败
+  aircon_retry: 重试
 empty_classroom:
   title: 空闲教室
   date: 日期 {date}
@@ -734,6 +741,16 @@ setting:
   electricity_account_setting: 电费账号设置
   schoolnet_password_setting: 校园网帐号密码设置
   schoolnet_password_description: 不设置查看不了网费
+  aircon_imei_title: 空调用电数据源
+  aircon_imei: 空调 IMEI
+  aircon_imei_helper: 扫描空调贴纸二维码，或手动输入 15 位 IMEI
+  aircon_imei_not_set: 未设置，电费页不显示空调用电
+  aircon_imei_current: 当前 IMEI：{imei}
+  aircon_imei_saved: 空调 IMEI 已保存
+  aircon_imei_cleared: 空调 IMEI 已清除
+  aircon_imei_invalid: 没有识别到有效的 15 位 IMEI
+  aircon_imei_clear: 清除
+  scan_aircon_qr: 扫描空调二维码
   notification_setting: 通知设置
   course_reminder_setting: 课前通知设置
   course_reminder_description: 设置课前提醒通知

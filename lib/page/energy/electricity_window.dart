@@ -30,7 +30,10 @@ class ElectricityWindow extends StatelessWidget {
           final isFromCache = c.isEnergyInfoFromCache.value;
           final fetchTime = c.energyInfoFetchTime.value;
           final cacheHintKey = c.energyInfoCacheHintKey.value;
+          final airconImei = c.airconImeiSignal.value;
+          final airconState = c.airconEnergyInfoStateSignal.value;
           final historyElectricityInfoList = c.historyElectricityInfoList;
+          final airconEnergyHistoryInfoList = c.airconEnergyHistoryInfoList;
           final hasValidData = displayInfo != null;
           final isFatalError = state is AsyncError && !hasValidData;
 
@@ -38,7 +41,11 @@ class ElectricityWindow extends StatelessWidget {
             final content = ElectricityReadyView(
               displayInfo: displayInfo,
               historyElectricityInfoList: historyElectricityInfoList,
+              airconEnergyHistoryInfoList: airconEnergyHistoryInfoList,
+              airconImei: airconImei,
+              airconEnergyInfoState: airconState,
               onRefresh: () => c.refreshElectricityInfo(force: true),
+              onRefreshAircon: c.refreshAirconEnergyInfo,
             );
 
             final body = Column(

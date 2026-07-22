@@ -4,13 +4,17 @@
 import 'package:signals/signals.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
+import 'package:watermeter/repository/aircon_session.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 
 class EnergyController {
   static final EnergyController i = EnergyController._();
   bool _isReloading = false;
+  bool _isAirconReloading = false;
 
   EnergyController._() {
     // Load last successful fetched electricity info
@@ -24,13 +28,27 @@ class EnergyController {
     historyElectricityInfoList
       ..clear()
       ..addAll(EnergySession.getElectricityHistory());
+    airconEnergyHistoryInfoList
+      ..clear()
+      ..addAll(AirconSession.getEnergyHistory());
+
+    if (airconImeiSignal.peek().isNotEmpty) {
+      Future.microtask(refreshAirconEnergyInfo);
+    }
   }
 
   final _lastValidEnergyInfo = signal<FetchResult<EnergyInfo>?>(null);
   final energyInfoStateSignal = signal<AsyncState<FetchResult<EnergyInfo>>>(
     const AsyncLoading(),
   );
+  final airconImeiSignal = signal<String>(
+    preference.getString(preference.Preference.airconImei),
+  );
+  final airconEnergyInfoStateSignal = signal<AsyncState<AirconEnergyInfo>?>(
+    null,
+  );
   final historyElectricityInfoList = <ElectricityHistoryInfo>[];
+  final airconEnergyHistoryInfoList = <ElectricityHistoryInfo>[];
 
   void _syncLastValidElectricity(FetchResult<EnergyInfo> result) {
     _lastValidEnergyInfo.value = result;
@@ -63,6 +81,35 @@ class EnergyController {
     historyElectricityInfoList.addAll(newHistoryInfo);
   }
 
+  void _syncAirconEnergyHistory(AirconEnergyInfo info) {
+    final newHistoryInfo = List<ElectricityHistoryInfo>.from(
+      airconEnergyHistoryInfoList,
+    );
+    final historyInfo = ElectricityHistoryInfo(
+      fetchDay: info.stateTime,
+      remain: info.electricAmount.toString(),
+    );
+
+    if (newHistoryInfo.isNotEmpty) {
+      final last = newHistoryInfo.last;
+      if (last.fetchDay.isAtSameDayAs(info.stateTime)) {
+        newHistoryInfo[newHistoryInfo.length - 1] = historyInfo;
+        AirconSession.saveEnergyHistory(newHistoryInfo);
+        airconEnergyHistoryInfoList.clear();
+        airconEnergyHistoryInfoList.addAll(newHistoryInfo);
+        return;
+      }
+    }
+
+    if (newHistoryInfo.length > 14) {
+      newHistoryInfo.removeAt(0);
+    }
+    newHistoryInfo.add(historyInfo);
+    AirconSession.saveEnergyHistory(newHistoryInfo);
+    airconEnergyHistoryInfoList.clear();
+    airconEnergyHistoryInfoList.addAll(newHistoryInfo);
+  }
+
   Future<void> refreshElectricityInfo({bool force = false}) async {
     if (_isReloading) return;
     _isReloading = true;
@@ -80,6 +127,57 @@ class EnergyController {
     } finally {
       _isReloading = false;
     }
+  }
+
+  Future<void> refreshAirconEnergyInfo() async {
+    final imei = airconImeiSignal.value;
+    if (imei.isEmpty || _isAirconReloading) return;
+
+    _isAirconReloading = true;
+    final previous = airconEnergyInfoStateSignal.peek()?.value;
+    airconEnergyInfoStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+
+    try {
+      final result = await AirconSession().getEnergyInfo(imei);
+      _syncAirconEnergyHistory(result);
+      airconEnergyInfoStateSignal.value = AsyncState.data(result);
+    } catch (e, s) {
+      airconEnergyInfoStateSignal.value = AsyncState.error(e, s);
+      log.handle(
+        e,
+        s,
+        "[EnergyController][refreshAirconEnergyInfo] Have issue",
+      );
+    } finally {
+      _isAirconReloading = false;
+    }
+  }
+
+  Future<void> updateAirconImei(String rawImei) async {
+    final trimmed = rawImei.trim();
+    if (trimmed.isEmpty) {
+      await clearAirconImei();
+      return;
+    }
+
+    final imei = AirconSession.normalizeImei(trimmed);
+    if (airconImeiSignal.value != imei) {
+      AirconSession.clearEnergyHistory();
+      airconEnergyHistoryInfoList.clear();
+    }
+    await preference.setString(preference.Preference.airconImei, imei);
+    airconImeiSignal.value = imei;
+    await refreshAirconEnergyInfo();
+  }
+
+  Future<void> clearAirconImei() async {
+    await preference.remove(preference.Preference.airconImei);
+    airconImeiSignal.value = "";
+    airconEnergyInfoStateSignal.value = null;
+    AirconSession.clearEnergyHistory();
+    airconEnergyHistoryInfoList.clear();
   }
 
   void clearElectricityHistory() {

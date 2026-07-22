@@ -162,7 +162,8 @@ enum Preference {
   homepageHiddenIds(
     key: "homepageHiddenIds",
     type: "String",
-  ); // 主页隐藏卡片
+  ), // 主页隐藏卡片
+  airconImei(key: "aircon_imei", type: "String"); // 空调 IMEI
 
   const Preference({required this.key, this.type = "String"});
 
