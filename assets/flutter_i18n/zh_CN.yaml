@@ -743,7 +743,6 @@ setting:
   schoolnet_password_description: 不设置查看不了网费
   aircon_imei_title: 空调用电数据源
   aircon_imei: 空调 IMEI
-  aircon_imei_helper: 扫描空调贴纸二维码，或手动输入 15 位 IMEI
   aircon_imei_not_set: 未设置，电费页不显示空调用电
   aircon_imei_current: 当前 IMEI：{imei}
   aircon_imei_saved: 空调 IMEI 已保存
@@ -751,6 +750,8 @@ setting:
   aircon_imei_invalid: 没有识别到有效的 15 位 IMEI
   aircon_imei_clear: 清除
   scan_aircon_qr: 扫描空调二维码
+  pick_aircon_qr_image: 从相册选择二维码图片
+  aircon_camera_unavailable: 当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI
   notification_setting: 通知设置
   course_reminder_setting: 课前通知设置
   course_reminder_description: 设置课前提醒通知

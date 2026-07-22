@@ -255,14 +255,6 @@ class _AirconEnergyCard extends StatelessWidget {
               ],
             ),
           ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            onPressed: onRefresh,
-            icon: const Icon(Icons.refresh),
-            label: Text(FlutterI18n.translate(context, "electricity.update")),
-          ),
-        ),
       ],
     );
   }

@@ -741,7 +741,6 @@ setting:
   schoolnet_password_description: 不設置查看不了網費
   aircon_imei_title: 空調用電數據源
   aircon_imei: 空調 IMEI
-  aircon_imei_helper: 掃描空調貼紙二維碼，或手動輸入 15 位 IMEI
   aircon_imei_not_set: 未設置，電費頁不顯示空調用電
   aircon_imei_current: 當前 IMEI：{imei}
   aircon_imei_saved: 空調 IMEI 已保存
@@ -749,6 +748,8 @@ setting:
   aircon_imei_invalid: 沒有識別到有效的 15 位 IMEI
   aircon_imei_clear: 清除
   scan_aircon_qr: 掃描空調二維碼
+  pick_aircon_qr_image: 從相冊選擇二維碼圖片
+  aircon_camera_unavailable: 當前平台不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
   notification_setting: 通知設置
   course_reminder_setting: 課前通知設置
   course_reminder_description: 設置課前提醒通知
