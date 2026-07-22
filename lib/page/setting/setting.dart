@@ -34,6 +34,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
@@ -63,8 +64,6 @@ class SettingWindow extends StatefulWidget {
   State<SettingWindow> createState() => _SettingWindowState();
 }
 
-const int _defaultLowElectricityWarningThreshold = 20;
-
 class _SettingWindowState extends State<SettingWindow> {
   Widget _buildListSubtitle(String text) => Text(
     text,
@@ -91,22 +90,12 @@ class _SettingWindowState extends State<SettingWindow> {
   }
 
   bool get _lowElectricityWarningEnabled =>
-      !preference.contains(
-        preference.Preference.lowElectricityWarningEnabled,
-      ) ||
-      preference.getBool(preference.Preference.lowElectricityWarningEnabled);
+      EnergyController.i.electricityWarning.value >= 0;
 
-  int get _lowElectricityWarningThreshold {
-    final value =
-        preference.contains(
-          preference.Preference.lowElectricityWarningThreshold,
-        )
-        ? preference.getInt(
-            preference.Preference.lowElectricityWarningThreshold,
-          )
-        : _defaultLowElectricityWarningThreshold;
-    return value > 0 ? value : _defaultLowElectricityWarningThreshold;
-  }
+  int get _lowElectricityWarningThreshold =>
+      EnergyController.i.electricityWarning.value > 0
+      ? EnergyController.i.electricityWarning.value
+      : EnergyController.defaultLowElectricityWarningThreshold;
 
   Future<void> _showLowElectricityThresholdDialog() async {
     var inputText = _lowElectricityWarningThreshold.toString();
@@ -145,7 +134,7 @@ class _SettingWindowState extends State<SettingWindow> {
               Navigator.pop(
                 context,
                 parsed == null || parsed <= 0
-                    ? _defaultLowElectricityWarningThreshold
+                    ? EnergyController.defaultLowElectricityWarningThreshold
                     : parsed,
               );
             },
@@ -156,10 +145,7 @@ class _SettingWindowState extends State<SettingWindow> {
     );
 
     if (value == null) return;
-    await preference.setInt(
-      preference.Preference.lowElectricityWarningThreshold,
-      value,
-    );
+    await EnergyController.i.setLowElectricityWarningThreshold(value);
     if (mounted) {
       setState(() {});
     }
@@ -437,8 +423,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   trailing: Switch(
                     value: _lowElectricityWarningEnabled,
                     onChanged: (bool value) async {
-                      await preference.setBool(
-                        preference.Preference.lowElectricityWarningEnabled,
+                      await EnergyController.i.setLowElectricityWarningEnabled(
                         value,
                       );
                       if (mounted) {
