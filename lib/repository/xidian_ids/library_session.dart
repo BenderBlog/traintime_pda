@@ -548,10 +548,9 @@ class LibrarySession extends IDSSession {
     await Future.wait([
       ...rawData.map(
         (rawItem) => pool.withResource(() async {
-          final e = BorrowData.fromOpacJson(rawItem);
-          final recordId = _intValue(rawItem["recordId"]);
-          e.imageUrl = recordId > 0
-              ? await bookCover(e.title, e.isbn, recordId)
+          final e = BorrowData.fromJson(rawItem);
+          e.imageUrl = e.recordId > 0
+              ? await bookCover(e.title, e.isbn, e.recordId)
               : "";
           toAppend.add(e);
         }),
@@ -565,13 +564,6 @@ class LibrarySession extends IDSSession {
     );
 
     return toAppend;
-  }
-
-  int _intValue(Object? value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
   }
 
   @override

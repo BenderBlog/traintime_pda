@@ -10,33 +10,55 @@ part 'library.g.dart';
 
 @JsonSerializable()
 class BorrowData {
-  final int lendDay;
+  @JsonKey(fromJson: _intValue)
   final int locationId;
+  @JsonKey(fromJson: _intValue)
   final int loanId;
+  @JsonKey(fromJson: _intValue)
   final int renewTimes;
+  @JsonKey(fromJson: _intValue)
   final int recallTimes;
+  @JsonKey(fromJson: _stringValue)
   final String loanDate;
+  @JsonKey(fromJson: _nullableStringValue)
   final String? renewDate;
+  @JsonKey(fromJson: _stringValue)
   final String normReturnDate;
+  @JsonKey(fromJson: _nullableStringValue)
   final String? returnDate;
+  @JsonKey(fromJson: _stringValue)
   final String loanType;
+  @JsonKey(fromJson: _stringValue)
   final String locationName;
-  final String itemLibCode;
-  final String itemLibName;
+  @JsonKey(fromJson: _stringValue)
+  final String curLibCode;
+  @JsonKey(fromJson: _stringValue)
+  final String curLibName;
+  @JsonKey(fromJson: _stringValue)
   final String loanDeskName;
+  @JsonKey(fromJson: _stringValue)
   final String title;
+  @JsonKey(fromJson: _stringValue)
   final String author;
+  @JsonKey(fromJson: _stringValue)
   final String publisher;
+  @JsonKey(fromJson: _stringValue)
   final String isbn;
+  @JsonKey(fromJson: _stringValue)
   final String isbn10;
+  @JsonKey(fromJson: _stringValue)
   final String isbn13;
+  @JsonKey(fromJson: _stringValue)
   final String publishYear;
+  @JsonKey(fromJson: _nullableStringValue)
   final String? titles;
-  final String barcode;
+  @JsonKey(fromJson: _stringValue)
+  final String propNo;
+  @JsonKey(fromJson: _intValue)
+  final int recordId;
   String? imageUrl;
 
   BorrowData({
-    required this.lendDay,
     required this.locationId,
     required this.loanId,
     required this.renewTimes,
@@ -47,8 +69,8 @@ class BorrowData {
     required this.returnDate,
     required this.loanType,
     required this.locationName,
-    required this.itemLibCode,
-    required this.itemLibName,
+    required this.curLibCode,
+    required this.curLibName,
     required this.loanDeskName,
     required this.title,
     required this.author,
@@ -58,50 +80,29 @@ class BorrowData {
     required this.isbn13,
     required this.publishYear,
     required this.titles,
-    required this.barcode,
+    required this.propNo,
+    required this.recordId,
     this.imageUrl,
   });
 
-  DateTime get loanDateTime => DateTime.parse(loanDate.replaceAll('/', '-'));
+  int get lendDay {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    return normReturnDateTime.difference(todayDate).inDays;
+  }
 
-  DateTime get normReturnDateTime =>
-      DateTime.parse(normReturnDate.replaceAll('/', '-'));
+  String get itemLibCode => curLibCode;
+
+  String get itemLibName => curLibName;
+
+  String get barcode => propNo;
+
+  DateTime get loanDateTime => _parseLibraryDate(loanDate);
+
+  DateTime get normReturnDateTime => _parseLibraryDate(normReturnDate);
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);
-
-  factory BorrowData.fromOpacJson(Map<String, dynamic> json) {
-    final normReturnDate = _stringValue(json['normReturnDate']);
-    final dueDate = _parseLibraryDate(normReturnDate);
-    final today = DateTime.now();
-    final todayDate = DateTime(today.year, today.month, today.day);
-
-    return BorrowData(
-      lendDay: dueDate.difference(todayDate).inDays,
-      locationId: _intValue(json['locationId']),
-      loanId: _intValue(json['loanId']),
-      renewTimes: _intValue(json['renewTimes']),
-      recallTimes: _intValue(json['recallTimes']),
-      loanDate: _stringValue(json['loanDate']),
-      renewDate: _nullableStringValue(json['renewDate']),
-      normReturnDate: normReturnDate,
-      returnDate: _nullableStringValue(json['returnDate']),
-      loanType: _stringValue(json['loanType']),
-      locationName: _stringValue(json['locationName']),
-      itemLibCode: _stringValue(json['curLibCode'] ?? json['itemLibCode']),
-      itemLibName: _stringValue(json['curLibName'] ?? json['itemLibName']),
-      loanDeskName: _stringValue(json['loanDeskName']),
-      title: _stringValue(json['title']),
-      author: _stringValue(json['author']),
-      publisher: _stringValue(json['publisher']),
-      isbn: _stringValue(json['isbn']),
-      isbn10: _stringValue(json['isbn10']),
-      isbn13: _stringValue(json['isbn13']),
-      publishYear: _stringValue(json['publishYear']),
-      titles: _nullableStringValue(json['titles']),
-      barcode: _stringValue(json['barcode'] ?? json['propNo']),
-    );
-  }
 
   Map<String, dynamic> toJson() => _$BorrowDataToJson(this);
 }

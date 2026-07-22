@@ -5,11 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/library/ebook_place_card.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class BookDetailCard extends StatefulWidget {
   final BookInfo toUse;
@@ -21,10 +21,8 @@ class BookDetailCard extends StatefulWidget {
 }
 
 class _BookDetailCardState extends State<BookDetailCard> {
-  late final Future<List<BookLocation>> _locationsFuture =
-      widget.toUse.items != null
-      ? Future.value(widget.toUse.items!)
-      : LibrarySession().bookLocations(widget.toUse.docNumber);
+  late final Future<List<BookLocation>> _locationsFuture = LibraryController.i
+      .loadBookLocations(widget.toUse);
 
   @override
   Widget build(BuildContext context) {
