@@ -7,9 +7,11 @@ import 'dart:convert';
 import 'package:device_calendar_plus/device_calendar_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -30,10 +32,12 @@ String buildSystemCalendarSnapshot({
   required ClassTableData classTableData,
   required List<Subject> subjects,
   required List<ExperimentData> experiments,
+  required List<CustomClass> customClasses,
 }) => jsonEncode({
   'classTableData': classTableData.toJson(),
   'subjects': subjects.map((item) => item.toJson()).toList(),
   'experiments': experiments.map((item) => item.toJson()).toList(),
+  'customClasses': customClasses.map((item) => item.toJson()).toList(),
 });
 
 /// Lightweight draft used to build events before pushing them to the system
@@ -64,6 +68,7 @@ List<CalendarEventDraft> buildCalendarEvents({
   required ClassTableData classTableData,
   required List<Subject> subjects,
   required List<ExperimentData> experiments,
+  required List<CustomClass> customClasses,
 }) {
   List<CalendarEventDraft> events = [];
 
@@ -191,6 +196,21 @@ List<CalendarEventDraft> buildCalendarEvents({
     }
   }
 
+  for (final cc in customClasses) {
+    for (final tr in cc.timeRanges) {
+      events.add(
+        CalendarEventDraft(
+          title: '${cc.name}@${cc.classroom ?? "待定"}',
+          description:
+              '自定义课程：${cc.name} - 老师：${cc.teacher ?? "未知"}',
+          startDate: tr.startTime,
+          endDate: tr.endTime,
+          location: cc.classroom,
+        ),
+      );
+    }
+  }
+
   return events;
 }
 
@@ -271,16 +291,21 @@ class SystemCalendarSyncService {
     ...otherExperimentController.otherExperiments.value,
   ];
 
+  List<CustomClass> get customClasses =>
+      CustomClassController.i.customClassesSignal.value;
+
   List<CalendarEventDraft> get events => buildCalendarEvents(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: examController.subjects.value,
     experiments: experiments,
+    customClasses: customClasses,
   );
 
   String get snapshot => buildSystemCalendarSnapshot(
     classTableData: classTableController.classTableComputedSignal.value,
     subjects: examController.subjects.value,
     experiments: experiments,
+    customClasses: customClasses,
   );
 
   bool get hasCalendarBinding => savedCalendarId.isNotEmpty;

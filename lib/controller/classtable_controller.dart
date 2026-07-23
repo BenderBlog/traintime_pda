@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:intl/intl.dart';
 import 'package:signals/signals.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
@@ -14,7 +15,6 @@ import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ClassTableController {
@@ -34,102 +34,6 @@ class ClassTableController {
 
   SemesterSyncEvent? _lastHandledSemesterSyncEvent;
 
-  final userDefinedClassSignal = signal<UserDefinedClassData>(
-    UserDefinedClassFile.getUserDefinedClass(),
-  );
-
-  Future<void> addUserDefinedClass(
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) async {
-    final current = userDefinedClassSignal.value;
-    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail)
-      ..add(ClassDetail.from(classDetail));
-    final timeArrangements = List<TimeArrangement>.from(
-      current.timeArrangement,
-    );
-    final toAdd = TimeArrangement(
-      source: timeArrangement.source,
-      index: userDefinedDetail.length - 1,
-      weekList: List<bool>.from(timeArrangement.weekList),
-      classroom: timeArrangement.classroom,
-      teacher: timeArrangement.teacher,
-      day: timeArrangement.day,
-      start: timeArrangement.start,
-      stop: timeArrangement.stop,
-    );
-    timeArrangements.add(toAdd);
-    final toChange = UserDefinedClassData(
-      userDefinedDetail: userDefinedDetail,
-      timeArrangement: timeArrangements,
-    );
-    UserDefinedClassFile.updateUserDefinedClass(toChange);
-    userDefinedClassSignal.value = toChange;
-  }
-
-  Future<void> editUserDefinedClass(
-    TimeArrangement originalTimeArrangement,
-    ClassDetail classDetail,
-    TimeArrangement timeArrangement,
-  ) async {
-    if (originalTimeArrangement.source != Source.user ||
-        originalTimeArrangement.index != timeArrangement.index) {
-      return;
-    }
-    final current = userDefinedClassSignal.value;
-    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail);
-    final timeArrangements = List<TimeArrangement>.from(
-      current.timeArrangement,
-    );
-    int timeArrangementIndex = timeArrangements.indexOf(
-      originalTimeArrangement,
-    );
-    if (timeArrangementIndex < 0) return;
-    timeArrangements[timeArrangementIndex] = TimeArrangement(
-      source: originalTimeArrangement.source,
-      index: originalTimeArrangement.index,
-      weekList: List<bool>.from(timeArrangement.weekList),
-      classroom: timeArrangement.classroom,
-      teacher: timeArrangement.teacher,
-      day: timeArrangement.day,
-      start: timeArrangement.start,
-      stop: timeArrangement.stop,
-    );
-
-    /// Update classDetail
-    int classDetailIndex = originalTimeArrangement.index;
-    userDefinedDetail[classDetailIndex] = ClassDetail.from(classDetail);
-
-    final toChange = UserDefinedClassData(
-      userDefinedDetail: userDefinedDetail,
-      timeArrangement: timeArrangements,
-    );
-
-    UserDefinedClassFile.updateUserDefinedClass(toChange);
-    userDefinedClassSignal.value = toChange;
-  }
-
-  Future<void> deleteUserDefinedClass(TimeArrangement timeArrangement) async {
-    if (timeArrangement.source != Source.user) return;
-    final current = userDefinedClassSignal.value;
-    final userDefinedDetail = List<ClassDetail>.from(current.userDefinedDetail);
-    final timeArrangements = List<TimeArrangement>.from(
-      current.timeArrangement,
-    );
-    int tempIndex = timeArrangement.index;
-    timeArrangements.remove(timeArrangement);
-    userDefinedDetail.removeAt(timeArrangement.index);
-    for (var i in timeArrangements) {
-      if (i.index >= tempIndex) i.index -= 1;
-    }
-    final toChange = UserDefinedClassData(
-      userDefinedDetail: userDefinedDetail,
-      timeArrangement: timeArrangements,
-    );
-    UserDefinedClassFile.updateUserDefinedClass(toChange);
-    userDefinedClassSignal.value = toChange;
-  }
-
   final _lastValidSchoolClassTable = signal<FetchResult<ClassTableData>?>(null);
   final schoolClassTableStateSignal =
       signal<AsyncState<FetchResult<ClassTableData>>>(const AsyncLoading());
@@ -146,9 +50,8 @@ class ClassTableController {
       _lastHandledSemesterSyncEvent = semesterChangeEvent;
       if (semesterChangeEvent.didChange) {
         _lastValidSchoolClassTable.value = null;
-        userDefinedClassSignal.value = UserDefinedClassData.empty();
         ClassTableSession.deleteCache();
-        UserDefinedClassFile.clearUserDefinedClass();
+        unawaited(CustomClassController.i.clearAll());
       }
       unawaited(reloadClassTable());
       log.info(
@@ -191,22 +94,18 @@ class ClassTableController {
 
   late final classTableComputedSignal = computed<ClassTableData>(() {
     final networkClassTable = schoolClassTableComputedSignal.value;
-    final userDefinedClass = userDefinedClassSignal.value;
 
     return ClassTableData(
       semesterLength: networkClassTable.semesterLength,
       semesterCode: networkClassTable.semesterCode,
       termStartDay: networkClassTable.termStartDay,
       classDetail: List<ClassDetail>.from(networkClassTable.classDetail),
-      userDefinedDetail: List<ClassDetail>.from(
-        userDefinedClass.userDefinedDetail,
-      ),
       notArranged: List<NotArrangementClassDetail>.from(
         networkClassTable.notArranged,
       ),
       timeArrangement: List<TimeArrangement>.from(
         networkClassTable.timeArrangement,
-      )..addAll(userDefinedClass.timeArrangement),
+      ),
       classChanges: List<ClassChange>.from(networkClassTable.classChanges),
     );
   });
