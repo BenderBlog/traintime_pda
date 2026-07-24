@@ -25,6 +25,9 @@
 		26CC2A492B541A9A007E67CB /* EventItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A482B541A9A007E67CB /* EventItem.swift */; };
 		26E67DD52B9222FD00B2BD5D /* IsTomorrowIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */; };
 		26F000022E33A00100CC2026 /* CustomClassModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F000012E33A00100CC2026 /* CustomClassModel.swift */; };
+		26F000032E33A00100CC2026 /* CustomClassModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F000012E33A00100CC2026 /* CustomClassModel.swift */; };
+		26F000042E33A00100CC2026 /* ExamModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B01712B5931740094B372 /* ExamModule.swift */; };
+		26F000052E33A00100CC2026 /* ExperimentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263322A92B908A8A009BEDF5 /* ExperimentModel.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -524,6 +527,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26F000032E33A00100CC2026 /* CustomClassModel.swift in Sources */,
+				26F000042E33A00100CC2026 /* ExamModule.swift in Sources */,
+				26F000052E33A00100CC2026 /* ExperimentModel.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

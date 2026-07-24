@@ -19,6 +19,15 @@ struct CustomClassTimeRange : Codable {
         case endTimeStr = "end_time"
     }
 
+    private static let localDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        return formatter
+    }()
+
     private static let isoFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -32,7 +41,8 @@ struct CustomClassTimeRange : Codable {
     }()
 
     private static func parseISO8601(_ string: String) -> Date {
-        return Self.isoFormatter.date(from: string)
+        return Self.localDateFormatter.date(from: string)
+            ?? Self.isoFormatter.date(from: string)
             ?? Self.isoFormatterNoFraction.date(from: string)
             ?? Date(timeIntervalSince1970: 0)
     }
