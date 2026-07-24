@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals/signals_flutter.dart';
@@ -16,7 +17,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/controller/ruisi_controller.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -34,6 +34,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
@@ -44,8 +45,9 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
+import 'package:watermeter/repository/custom_class_service.dart';
 import 'package:watermeter/repository/network_session.dart';
-import 'package:watermeter/repository/user_defined_class_file.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
@@ -85,6 +87,68 @@ class _SettingWindowState extends State<SettingWindow> {
     while (_isSemesterAwareControllerLoading &&
         stopwatch.elapsed < const Duration(seconds: 30)) {
       await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
+  bool get _lowElectricityWarningEnabled =>
+      EnergyController.i.electricityWarning.value >= 0;
+
+  int get _lowElectricityWarningThreshold =>
+      EnergyController.i.electricityWarning.value > 0
+      ? EnergyController.i.electricityWarning.value
+      : EnergyController.defaultLowElectricityWarningThreshold;
+
+  Future<void> _showLowElectricityThresholdDialog() async {
+    var inputText = _lowElectricityWarningThreshold.toString();
+
+    final value = await showDialog<int>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          FlutterI18n.translate(
+            context,
+            "setting.low_electricity_threshold_dialog.title",
+          ),
+        ),
+        content: TextFormField(
+          autofocus: true,
+          initialValue: inputText,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          maxLines: 1,
+          onChanged: (value) => inputText = value,
+          decoration: InputDecoration(
+            hintText: FlutterI18n.translate(
+              context,
+              "setting.low_electricity_threshold_dialog.input_hint",
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(FlutterI18n.translate(context, "cancel")),
+          ),
+          TextButton(
+            onPressed: () {
+              final parsed = int.tryParse(inputText);
+              Navigator.pop(
+                context,
+                parsed == null || parsed <= 0
+                    ? EnergyController.defaultLowElectricityWarningThreshold
+                    : parsed,
+              );
+            },
+            child: Text(FlutterI18n.translate(context, "confirm")),
+          ),
+        ],
+      ),
+    );
+
+    if (value == null) return;
+    await EnergyController.i.setLowElectricityWarningThreshold(value);
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -342,6 +406,55 @@ class _SettingWindowState extends State<SettingWindow> {
                       });
                     },
                   ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_warning",
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_warning_description",
+                    ),
+                  ),
+                  trailing: Switch(
+                    value: _lowElectricityWarningEnabled,
+                    onChanged: (bool value) async {
+                      await EnergyController.i.setLowElectricityWarningEnabled(
+                        value,
+                      );
+                      if (mounted) {
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ),
+                const Divider(),
+                ListTile(
+                  enabled: _lowElectricityWarningEnabled,
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_threshold",
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_threshold_description",
+                      translationParams: {
+                        "threshold": _lowElectricityWarningThreshold.toString(),
+                      },
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: _lowElectricityWarningEnabled
+                      ? _showLowElectricityThresholdDialog
+                      : null,
                 ),
                 const Divider(),
                 ListTile(
@@ -631,13 +744,8 @@ class _SettingWindowState extends State<SettingWindow> {
                           child: Text(FlutterI18n.translate(context, "cancel")),
                         ),
                         TextButton(
-                          onPressed: () {
-                            UserDefinedClassFile.clearUserDefinedClass();
-                            ClassTableController
-                                    .i
-                                    .userDefinedClassSignal
-                                    .value =
-                                UserDefinedClassData.empty();
+                          onPressed: () async {
+                            await CustomClassController.i.clearAll();
                             if (mounted) {
                               setState(() {});
                             }
@@ -986,7 +1094,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             EnergySession.clearElectricityHistory();
                             for (var value in [
                               ClassTableSession.schoolClassName,
-                              UserDefinedClassFile.userDefinedClassName,
+                              CustomClassRepository.fileName,
                               ClassTableController.decorationName,
                               ExamSession.examDataCacheName,
                               ExperimentSession.physicsExperimentCacheName,

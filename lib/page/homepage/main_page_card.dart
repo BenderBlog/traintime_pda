@@ -14,6 +14,7 @@ class MainPageCard extends StatelessWidget {
   final Widget bottomText;
   final Widget? rightButton;
   final bool? isBold;
+  final HomeCardType type;
   final void Function()? onPressed;
   const MainPageCard({
     super.key,
@@ -26,19 +27,25 @@ class MainPageCard extends StatelessWidget {
     this.rightButton,
     this.progress,
     this.isBold,
+    this.type = HomeCardType.plain,
   });
 
   @override
   Widget build(BuildContext context) {
+    final textColor = type == HomeCardType.warning
+        ? Theme.of(context).colorScheme.onErrorContainer
+        : Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context).colorScheme.onSurface
+        : Theme.of(context).colorScheme.onSurfaceVariant;
     return ListTile(
       leading: Icon(
         icon,
         size: 32,
-        color: Theme.of(context).colorScheme.primary,
+        color: type == HomeCardType.warning
+            ? Theme.of(context).colorScheme.onErrorContainer
+            : Theme.of(context).colorScheme.primary,
       ),
-      textColor: Theme.of(context).brightness == Brightness.dark
-          ? Theme.of(context).colorScheme.onSurface
-          : Theme.of(context).colorScheme.onSurfaceVariant,
+      textColor: textColor,
       title: infoText,
       subtitle: Builder(
         builder: (context) {
@@ -57,6 +64,6 @@ class MainPageCard extends StatelessWidget {
         },
       ),
       trailing: rightButton,
-    ).withHomeCardStyle(context, onPressed: onPressed);
+    ).withHomeCardStyle(context, onPressed: onPressed, type: type);
   }
 }

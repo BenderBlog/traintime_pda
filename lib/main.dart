@@ -73,18 +73,20 @@ void main() async {
   );
 
   // Initialize notification services
-  try {
-    await NotificationServiceRegistrar().initializeAllServices();
+  if (Platform.isAndroid || Platform.isIOS) {
+    try {
+      await NotificationServiceRegistrar().initializeAllServices();
 
-    // Handle app launch from notification
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final services = NotificationServiceRegistrar().getAllServices();
-      await Future.wait(
-        services.map((service) => service.handleAppLaunchFromNotification()),
-      );
-    });
-  } catch (e) {
-    log.error('Failed to initialize notification services', e);
+      // Handle app launch from notification
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final services = NotificationServiceRegistrar().getAllServices();
+        await Future.wait(
+          services.map((service) => service.handleAppLaunchFromNotification()),
+        );
+      });
+    } catch (e) {
+      log.error('Failed to initialize notification services', e);
+    }
   }
 }
 
