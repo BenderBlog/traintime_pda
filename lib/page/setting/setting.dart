@@ -22,6 +22,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
+import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -552,6 +553,39 @@ class _SettingWindowState extends State<SettingWindow> {
                       context: context,
                       builder: (context) => const SchoolNetPasswordDialog(),
                     );
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(context, "setting.aircon_imei_title"),
+                  ),
+                  subtitle: Text(
+                    preference
+                            .getString(preference.Preference.airconImei)
+                            .isEmpty
+                        ? FlutterI18n.translate(
+                            context,
+                            "setting.aircon_imei_not_set",
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            "setting.aircon_imei_current",
+                            translationParams: {
+                              "imei": preference.getString(
+                                preference.Preference.airconImei,
+                              ),
+                            },
+                          ),
+                  ),
+                  trailing: const Icon(Icons.qr_code_scanner),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const AirconImeiDialog(),
+                    ).then((_) {
+                      if (mounted) setState(() {});
+                    });
                   },
                 ),
               ],

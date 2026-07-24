@@ -373,6 +373,13 @@ electricity:
   water_usage_read_now: This time
   water_usage: Bath water usage
   not_school_network: Not school network
+  aircon_title: Aircon Electricity
+  aircon_imei: Aircon IMEI
+  aircon_amount: Platform usage
+  aircon_update_time: Updated at
+  aircon_waiting: Waiting to fetch aircon electricity data
+  aircon_error: Failed to fetch aircon electricity data
+  aircon_retry: Retry
 empty_classroom:
   title: Empty Classrooms
   date: Date {date}
@@ -846,6 +853,17 @@ setting:
   electricity_account_setting: Electricity account setting
   schoolnet_password_setting: Campus net password
   schoolnet_password_description: If you have not setted it, you cannot query it.
+  aircon_imei_title: Aircon electricity data source
+  aircon_imei: Aircon IMEI
+  aircon_imei_not_set: Not set. Aircon electricity will be hidden on the power page.
+  aircon_imei_current: "Current IMEI: {imei}"
+  aircon_imei_saved: Aircon IMEI saved
+  aircon_imei_cleared: Aircon IMEI cleared
+  aircon_imei_invalid: No valid 15-digit IMEI found
+  aircon_imei_clear: Clear
+  scan_aircon_qr: Scan aircon QR code
+  pick_aircon_qr_image: Choose QR image
+  aircon_camera_unavailable: Camera scanning is unavailable on this platform. Choose a QR image or enter the IMEI manually.
   notification_setting: Notification Settings
   course_reminder_setting: Pre-class Reminder Settings
   course_reminder_description: Configure pre-class reminder notifications
