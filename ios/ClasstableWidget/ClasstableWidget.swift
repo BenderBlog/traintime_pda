@@ -30,6 +30,7 @@ struct StartDayFetchError : Error {}
 
 enum ArrangementType : String {
     case course = "课\n程"
+    case user = "自\n定"
     case exam = "考\n试"
     case experiment = "实\n验"
 }

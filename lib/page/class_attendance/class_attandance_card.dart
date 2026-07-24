@@ -98,7 +98,7 @@ class CourseCard extends StatelessWidget {
       ),
     ).gestures(
       onTap: () async {
-        if (course.attendanceStatus == AttendanceStatus.unknown) {
+        if (course.attendanceStatus != AttendanceStatus.unknown) {
           await BothSideSheet.show(
             context: context,
             title: FlutterI18n.translate(
