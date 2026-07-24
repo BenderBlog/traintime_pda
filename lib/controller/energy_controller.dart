@@ -37,28 +37,30 @@ class EnergyController {
   final electricityWarning = signal<int>(defaultLowElectricityWarningThreshold);
   final historyElectricityInfoList = <ElectricityHistoryInfo>[];
 
-  int _readElectricityWarning() {
+  void updateElectricityWarning() {
     final isEnabled =
         !preference.contains(
           preference.Preference.lowElectricityWarningEnabled,
         ) ||
         preference.getBool(preference.Preference.lowElectricityWarningEnabled);
-    if (!isEnabled) return -1;
+    if (!isEnabled) {
+      electricityWarning.value = -1;
+      return;
+    }
 
     if (!preference.contains(
       preference.Preference.lowElectricityWarningThreshold,
     )) {
-      return defaultLowElectricityWarningThreshold;
+      electricityWarning.value = defaultLowElectricityWarningThreshold;
+      return;
     }
 
     final threshold = preference.getInt(
       preference.Preference.lowElectricityWarningThreshold,
     );
-    return threshold > 0 ? threshold : defaultLowElectricityWarningThreshold;
-  }
-
-  void updateElectricityWarning() {
-    electricityWarning.value = _readElectricityWarning();
+    electricityWarning.value = threshold > 0
+        ? threshold
+        : defaultLowElectricityWarningThreshold;
   }
 
   Future<void> setLowElectricityWarningEnabled(bool value) async {
