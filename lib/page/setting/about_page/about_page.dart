@@ -43,7 +43,7 @@ class _AboutPageState extends State<AboutPage> {
       "https://github.com/A1nair",
     ),
     Developer(
-      "Appkad (Kevin)",
+      "Aqqkad (Kevin)",
       "https://avatars.githubusercontent.com/u/97880629",
       FlutterI18n.translate(context, "setting.about_page.aqqkad"),
       "https://github.com/aqqkad",
