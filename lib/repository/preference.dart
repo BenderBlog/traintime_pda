@@ -147,6 +147,14 @@ enum Preference {
     key: "classStyleCompletedInnerAlpha",
     type: "double",
   ), // 已完成课程底色透明度
+  lowElectricityWarningEnabled(
+    key: "lowElectricityWarningEnabled",
+    type: "bool",
+  ), // 首页低电量卡片变色提醒
+  lowElectricityWarningThreshold(
+    key: "lowElectricityWarningThreshold",
+    type: "int",
+  ), // 首页低电量卡片变色提醒阈值
   homepageInfoOrder(
     key: "homepageInfoOrder",
     type: "String",

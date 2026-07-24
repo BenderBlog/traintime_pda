@@ -829,6 +829,15 @@ setting:
   color_setting: Color theme
   simplify_timeline: Simplify schedule timeline
   simplify_timeline_description: Reduce space occupation while no schedule
+  low_electricity_warning: Low electricity card color warning
+  low_electricity_warning_description:
+    Change the homepage electricity card color when remaining electricity is below
+    the threshold
+  low_electricity_threshold: Low electricity threshold
+  low_electricity_threshold_description: "Current: {threshold} kWh"
+  low_electricity_threshold_dialog:
+    title: Set low electricity threshold
+    input_hint: Input remaining electricity
   account_setting: Account Settings
   sport_password_setting: PE system password
   experiment_password_setting: Physics experiment password

@@ -750,6 +750,13 @@ setting:
   color_setting: 顏色設置
   simplify_timeline: 簡化日程時間軸
   simplify_timeline_description: 沒有日程時 減少空間佔用
+  low_electricity_warning: 低電量卡片變色提醒
+  low_electricity_warning_description: 電量小於閾值時 電量卡片變色提醒
+  low_electricity_threshold: 低電量閾值
+  low_electricity_threshold_description: 目前為 {threshold} 度
+  low_electricity_threshold_dialog:
+    title: 設置低電量閾值
+    input_hint: 請輸入電量度數
   account_setting: 賬號設置
   sport_password_setting: 體育系統密碼設置
   experiment_password_setting: 物理實驗系統密碼設置

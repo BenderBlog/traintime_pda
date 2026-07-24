@@ -6,13 +6,17 @@ import 'package:time/time.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 
 class EnergyController {
   static final EnergyController i = EnergyController._();
+  static const int defaultLowElectricityWarningThreshold = 20;
   bool _isReloading = false;
 
   EnergyController._() {
+    updateElectricityWarning();
+
     // Load last successful fetched electricity info
     final cache = EnergySession.getCache();
     if (cache != null) {
@@ -30,7 +34,48 @@ class EnergyController {
   final energyInfoStateSignal = signal<AsyncState<FetchResult<EnergyInfo>>>(
     const AsyncLoading(),
   );
+  final electricityWarning = signal<int>(defaultLowElectricityWarningThreshold);
   final historyElectricityInfoList = <ElectricityHistoryInfo>[];
+
+  int _readElectricityWarning() {
+    final isEnabled =
+        !preference.contains(
+          preference.Preference.lowElectricityWarningEnabled,
+        ) ||
+        preference.getBool(preference.Preference.lowElectricityWarningEnabled);
+    if (!isEnabled) return -1;
+
+    if (!preference.contains(
+      preference.Preference.lowElectricityWarningThreshold,
+    )) {
+      return defaultLowElectricityWarningThreshold;
+    }
+
+    final threshold = preference.getInt(
+      preference.Preference.lowElectricityWarningThreshold,
+    );
+    return threshold > 0 ? threshold : defaultLowElectricityWarningThreshold;
+  }
+
+  void updateElectricityWarning() {
+    electricityWarning.value = _readElectricityWarning();
+  }
+
+  Future<void> setLowElectricityWarningEnabled(bool value) async {
+    await preference.setBool(
+      preference.Preference.lowElectricityWarningEnabled,
+      value,
+    );
+    updateElectricityWarning();
+  }
+
+  Future<void> setLowElectricityWarningThreshold(int value) async {
+    await preference.setInt(
+      preference.Preference.lowElectricityWarningThreshold,
+      value > 0 ? value : defaultLowElectricityWarningThreshold,
+    );
+    updateElectricityWarning();
+  }
 
   void _syncLastValidElectricity(FetchResult<EnergyInfo> result) {
     _lastValidEnergyInfo.value = result;

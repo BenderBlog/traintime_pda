@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals/signals_flutter.dart';
@@ -32,6 +33,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
@@ -84,6 +86,68 @@ class _SettingWindowState extends State<SettingWindow> {
     while (_isSemesterAwareControllerLoading &&
         stopwatch.elapsed < const Duration(seconds: 30)) {
       await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
+  bool get _lowElectricityWarningEnabled =>
+      EnergyController.i.electricityWarning.value >= 0;
+
+  int get _lowElectricityWarningThreshold =>
+      EnergyController.i.electricityWarning.value > 0
+      ? EnergyController.i.electricityWarning.value
+      : EnergyController.defaultLowElectricityWarningThreshold;
+
+  Future<void> _showLowElectricityThresholdDialog() async {
+    var inputText = _lowElectricityWarningThreshold.toString();
+
+    final value = await showDialog<int>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          FlutterI18n.translate(
+            context,
+            "setting.low_electricity_threshold_dialog.title",
+          ),
+        ),
+        content: TextFormField(
+          autofocus: true,
+          initialValue: inputText,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          maxLines: 1,
+          onChanged: (value) => inputText = value,
+          decoration: InputDecoration(
+            hintText: FlutterI18n.translate(
+              context,
+              "setting.low_electricity_threshold_dialog.input_hint",
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(FlutterI18n.translate(context, "cancel")),
+          ),
+          TextButton(
+            onPressed: () {
+              final parsed = int.tryParse(inputText);
+              Navigator.pop(
+                context,
+                parsed == null || parsed <= 0
+                    ? EnergyController.defaultLowElectricityWarningThreshold
+                    : parsed,
+              );
+            },
+            child: Text(FlutterI18n.translate(context, "confirm")),
+          ),
+        ],
+      ),
+    );
+
+    if (value == null) return;
+    await EnergyController.i.setLowElectricityWarningThreshold(value);
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -341,6 +405,55 @@ class _SettingWindowState extends State<SettingWindow> {
                       });
                     },
                   ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_warning",
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_warning_description",
+                    ),
+                  ),
+                  trailing: Switch(
+                    value: _lowElectricityWarningEnabled,
+                    onChanged: (bool value) async {
+                      await EnergyController.i.setLowElectricityWarningEnabled(
+                        value,
+                      );
+                      if (mounted) {
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ),
+                const Divider(),
+                ListTile(
+                  enabled: _lowElectricityWarningEnabled,
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_threshold",
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_threshold_description",
+                      translationParams: {
+                        "threshold": _lowElectricityWarningThreshold.toString(),
+                      },
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: _lowElectricityWarningEnabled
+                      ? _showLowElectricityThresholdDialog
+                      : null,
                 ),
                 const Divider(),
                 ListTile(
