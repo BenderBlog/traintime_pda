@@ -15,7 +15,7 @@ import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 
 const double _searchPanelMaxWidth = 760;
-const double _resultCardMaxWidth = 500;
+const double _resultCardMaxWidth = 360;
 
 enum SearchPanelMode { normal, advanced }
 
@@ -163,9 +163,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
       controller: _pagingController,
       builder: (context, state, fetchNextPage) => LayoutBuilder(
         builder: (context, constraints) {
-          final crossAxisCount = constraints.maxWidth < _resultCardMaxWidth * 2
-              ? 1
-              : constraints.maxWidth ~/ _resultCardMaxWidth;
+          final crossAxisCount = (constraints.maxWidth ~/ _resultCardMaxWidth).clamp(1, 6);
           return PagedMasonryGridView<int, BookInfo>.count(
             state: state,
             fetchNextPage: fetchNextPage,
