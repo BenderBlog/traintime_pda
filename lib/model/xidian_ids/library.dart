@@ -10,33 +10,55 @@ part 'library.g.dart';
 
 @JsonSerializable()
 class BorrowData {
-  final int lendDay;
+  @JsonKey(fromJson: _intValue)
   final int locationId;
+  @JsonKey(fromJson: _intValue)
   final int loanId;
+  @JsonKey(fromJson: _intValue)
   final int renewTimes;
+  @JsonKey(fromJson: _intValue)
   final int recallTimes;
+  @JsonKey(fromJson: _stringValue)
   final String loanDate;
+  @JsonKey(fromJson: _nullableStringValue)
   final String? renewDate;
+  @JsonKey(fromJson: _stringValue)
   final String normReturnDate;
+  @JsonKey(fromJson: _nullableStringValue)
   final String? returnDate;
+  @JsonKey(fromJson: _stringValue)
   final String loanType;
+  @JsonKey(fromJson: _stringValue)
   final String locationName;
-  final String itemLibCode;
-  final String itemLibName;
+  @JsonKey(fromJson: _stringValue)
+  final String curLibCode;
+  @JsonKey(fromJson: _stringValue)
+  final String curLibName;
+  @JsonKey(fromJson: _stringValue)
   final String loanDeskName;
+  @JsonKey(fromJson: _stringValue)
   final String title;
+  @JsonKey(fromJson: _stringValue)
   final String author;
+  @JsonKey(fromJson: _stringValue)
   final String publisher;
+  @JsonKey(fromJson: _stringValue)
   final String isbn;
+  @JsonKey(fromJson: _stringValue)
   final String isbn10;
+  @JsonKey(fromJson: _stringValue)
   final String isbn13;
+  @JsonKey(fromJson: _stringValue)
   final String publishYear;
+  @JsonKey(fromJson: _nullableStringValue)
   final String? titles;
-  final String barcode;
+  @JsonKey(fromJson: _stringValue)
+  final String propNo;
+  @JsonKey(fromJson: _intValue)
+  final int recordId;
   String? imageUrl;
 
   BorrowData({
-    required this.lendDay,
     required this.locationId,
     required this.loanId,
     required this.renewTimes,
@@ -47,8 +69,8 @@ class BorrowData {
     required this.returnDate,
     required this.loanType,
     required this.locationName,
-    required this.itemLibCode,
-    required this.itemLibName,
+    required this.curLibCode,
+    required this.curLibName,
     required this.loanDeskName,
     required this.title,
     required this.author,
@@ -58,19 +80,49 @@ class BorrowData {
     required this.isbn13,
     required this.publishYear,
     required this.titles,
-    required this.barcode,
+    required this.propNo,
+    required this.recordId,
     this.imageUrl,
   });
 
-  DateTime get loanDateTime => DateTime.parse(loanDate.replaceAll('/', '-'));
+  int get lendDay {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    return normReturnDateTime.difference(todayDate).inDays;
+  }
 
-  DateTime get normReturnDateTime =>
-      DateTime.parse(normReturnDate.replaceAll('/', '-'));
+  String get itemLibCode => curLibCode;
+
+  String get itemLibName => curLibName;
+
+  String get barcode => propNo;
+
+  DateTime get loanDateTime => _parseLibraryDate(loanDate);
+
+  DateTime get normReturnDateTime => _parseLibraryDate(normReturnDate);
 
   factory BorrowData.fromJson(Map<String, dynamic> json) =>
       _$BorrowDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$BorrowDataToJson(this);
+}
+
+int _intValue(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
+String _stringValue(Object? value) => value?.toString() ?? "";
+
+String? _nullableStringValue(Object? value) => value?.toString();
+
+DateTime _parseLibraryDate(String value) {
+  if (value.isEmpty) {
+    return DateTime.now();
+  }
+  return DateTime.parse(value.replaceAll('/', '-').split(' ').first);
 }
 
 @JsonSerializable()
@@ -92,6 +144,8 @@ class BookInfo {
   final List<String?>? barCodes;
   final List<String>? searchCode;
   final List<BookLocation>? items;
+  final int? availableCount;
+  final int? storageCount;
   String? imageUrl;
 
   BookInfo({
@@ -112,15 +166,48 @@ class BookInfo {
     this.searchCode,
     required this.barCodes,
     this.items,
+    this.availableCount,
+    this.storageCount,
     this.imageUrl,
   });
 
   factory BookInfo.fromJson(Map<String, dynamic> json) =>
       _$BookInfoFromJson(json);
 
+  factory BookInfo.fromOpacJson(Map<String, dynamic> json) {
+    final callNos = _stringList(json['callNo']);
+    final barCodes = _nullableStringList(
+      json['barCodes'] ?? json['barcode'] ?? json['propNo'],
+    );
+    return BookInfo(
+      author: _nullableStringValue(json['author']),
+      subject: _nullableStringValue(json['subjectWord']),
+      isbn: _nullableStringValue(json['isbn']),
+      description: _nullableStringValue(json['adstract'] ?? json['ddAbstract']),
+      bookName: _stringValue(json['title']),
+      barCode: _nullableStringValue(json['barcode'] ?? json['propNo']),
+      docNumber: _intValue(json['recordId']),
+      publishYear: _nullableStringValue(json['publishYear'] ?? json['year']),
+      publisherHouse: _nullableStringValue(json['publisher']),
+      groupCode: _nullableStringValue(json['groupCode']),
+      callNos: callNos,
+      searchCode: callNos,
+      barCodes: barCodes,
+      availableCount: _nullableIntValue(
+        json['onShelfCountI'] ?? json['canBrrowCountI'] ?? json['onShelfNum'],
+      ),
+      storageCount: _nullableIntValue(
+        json['groupPhysicalCount'] ?? json['physicalCount'],
+      ),
+    );
+  }
+
   Map<String, dynamic> toJson() => _$BookInfoToJson(this);
 
   int? get canBeBorrowed {
+    if (availableCount != null) {
+      return availableCount;
+    }
     if (items == null) {
       return null;
     }
@@ -129,6 +216,20 @@ class BookInfo {
       if (i.processType == "在架") toReturn += 1;
     }
     return toReturn;
+  }
+
+  int? get totalStorage {
+    if (storageCount != null) {
+      return storageCount;
+    }
+    return items?.length;
+  }
+
+  bool get hasBarCodes {
+    if (barCodes == null || barCodes!.isEmpty) {
+      return false;
+    }
+    return barCodes!.any((e) => e != null && e.isNotEmpty);
   }
 
   String get searchCodeStr {
@@ -142,8 +243,39 @@ class BookInfo {
     if (barCodes == null || barCodes!.isEmpty) {
       return "未提供";
     }
-    return barCodes!.first ?? "未提供";
+    for (final code in barCodes!) {
+      if (code != null && code.isNotEmpty) {
+        return code;
+      }
+    }
+    return "未提供";
   }
+}
+
+int? _nullableIntValue(Object? value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
+}
+
+List<String>? _stringList(Object? value) {
+  if (value == null) return null;
+  if (value is List) {
+    return value.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+  }
+  final text = value.toString();
+  return text.isEmpty ? null : [text];
+}
+
+List<String?>? _nullableStringList(Object? value) {
+  if (value == null) return null;
+  if (value is List) {
+    return value.map((e) => e?.toString()).toList();
+  }
+  final text = value.toString();
+  return text.isEmpty ? null : [text];
 }
 
 @JsonSerializable()
@@ -182,6 +314,33 @@ class BookLocation {
 
   factory BookLocation.fromJson(Map<String, dynamic> json) =>
       _$BookLocationFromJson(json);
+
+  factory BookLocation.fromOpacJson(Map<String, dynamic> json) {
+    final locationName = _stringValue(
+      json['realLocationName'] ?? json['locationName'],
+    );
+    final shelfName = _stringValue(json['urlName']);
+    final displayLocation = shelfName.isEmpty
+        ? locationName
+        : "$locationName $shelfName";
+
+    return BookLocation(
+      yearVol: _nullableStringValue(json['vol'] ?? json['yearVol']),
+      locationName: displayLocation.isEmpty ? null : displayLocation,
+      searchCode: _stringValue(json['callNo']),
+      campus: _nullableStringValue(json['campus']),
+      inDate: _nullableStringValue(json['inDate']),
+      barCode: _nullableStringValue(json['barcode'] ?? json['propNo']),
+      itemId: _intValue(json['itemId']),
+      circAttr: _stringValue(json['circAttr']),
+      locationId: _nullableStringValue(json['locationId']),
+      processType: _stringValue(json['processType']),
+      curLocationId: _stringValue(json['curLocationId']),
+      propNo: _nullableStringValue(json['propNo']),
+      borrowStatus: _nullableStringValue(json['borrowStatus']),
+      noBorrowMessages: _nullableStringValue(json['noBorrowMessages']),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$BookLocationToJson(this);
 }

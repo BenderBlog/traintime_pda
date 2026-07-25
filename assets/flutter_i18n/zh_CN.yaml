@@ -599,6 +599,19 @@ library:
   borrow_list_info: 在借 {borrow} 本，其中已过期 {dued} 本
   search_book_window: null
   search_here: 在此搜索
+  normal_search: 普通搜索
+  advanced_search: 高级搜索
+  search: 搜索
+  match_mode: 匹配方式
+  match_exact: 精确匹配
+  match_fuzzy: 模糊匹配
+  match_prefix: 前方一致
+  document_type: 文献类型
+  document_type_all: 全部
+  document_type_book: 图书
+  only_on_shelf: 仅看在架
+  publish_year_begin: 出版年起
+  publish_year_end: 出版年止
   book_detail: 书籍详细信息
   no_result: 没有结果，请修改搜索参数或者开始你的搜索
 library_card:

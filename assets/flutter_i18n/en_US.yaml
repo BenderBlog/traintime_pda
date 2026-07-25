@@ -669,6 +669,19 @@ library:
   borrow_list_info: Borrowing {borrow} book(s), among which {dued} book(s) have expired
   search_book_window: null
   search_here: Search here
+  normal_search: Normal Search
+  advanced_search: Advanced Search
+  search: Search
+  match_mode: Match Mode
+  match_exact: Exact
+  match_fuzzy: Fuzzy
+  match_prefix: Prefix
+  document_type: Document Type
+  document_type_all: All
+  document_type_book: Book
+  only_on_shelf: Only on shelf
+  publish_year_begin: Publish year from
+  publish_year_end: Publish year to
   book_detail: Book details
   no_result: No result, change parameter or start your search
 library_card:

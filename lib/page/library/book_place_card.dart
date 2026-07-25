@@ -30,6 +30,7 @@ class BookPlaceCard extends StatelessWidget {
             Text(
               toUse.locationName ??
                   FlutterI18n.translate(context, "library.not_provided"),
+              softWrap: true,
               style: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 16,
@@ -37,7 +38,7 @@ class BookPlaceCard extends StatelessWidget {
                     ? Colors.green.shade900
                     : Colors.red.shade900,
               ),
-            ),
+            ).expanded(),
           ].toRow(),
           const SizedBox(height: 8),
           Text(
@@ -56,6 +57,7 @@ class BookPlaceCard extends StatelessWidget {
                   ? Colors.green.shade900
                   : Colors.red.shade900,
             ),
+            softWrap: true,
           ),
         ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
