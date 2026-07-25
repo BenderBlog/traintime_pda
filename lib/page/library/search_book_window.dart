@@ -178,7 +178,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                       horizontal: 8,
                       vertical: 8,
                     ),
-                    crossAxisCount: constraints.maxWidth ~/ 360,
+                    crossAxisCount: (constraints.maxWidth ~/ 360).clamp(1, 6),
                     mainAxisSpacing: 4,
                     crossAxisSpacing: 4,
                     builderDelegate: PagedChildBuilderDelegate<BookInfo>(
