@@ -6,45 +6,76 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/model/aircon_energy.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 
+Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
+  log.info("[AirconSession][update] Ready to update electricity info. ");
+  DateTime fetchDay = DateTime.now();
+
+  final cache = AirconSession.getCache(imei: imei);
+
+  try {
+    log.info("[AirconSession][update] Fetching from Internet.");
+    var toReturn = await AirconSession().getEnergyInfo(imei);
+    AirconSession.saveCache(toReturn);
+    return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
+  } catch (e, s) {
+    log.handle(e, s, "[AirconSession][update] Have issue");
+    if (cache != null) {
+      return FetchResult.cache(
+        fetchTime: cache.fetchTime,
+        data: cache.data,
+        hintKey: e.toString(),
+      );
+    }
+    rethrow;
+  }
+}
+
 class AirconSession extends NetworkSession {
   static const host = "gxkt.juhaolian.cn";
+
+  static const airconEnergyCache = "AirconEnergyCache.json";
+  static File fileCache = File("${supportPath.path}/$airconEnergyCache");
+
   static const airconEnergyHistory = "AirconEnergyHistory.json";
   static File fileHistory = File("${supportPath.path}/$airconEnergyHistory");
 
-  static String? tryParseImei(String raw) {
-    final matches = RegExp(
-      r"\d{15}",
-    ).allMatches(raw).map((e) => e.group(0)!).toList();
-    if (matches.isEmpty) return null;
-    return matches.first;
+  static bool get isCacheExist => fileCache.existsSync();
+
+  static FetchResult<AirconEnergyInfo>? getCache({String? imei}) {
+    if (!isCacheExist) return null;
+    log.info("[AirconSession][cache] Checking out cache.");
+    try {
+      final cache = AirconEnergyInfo.fromJson(
+        jsonDecode(fileCache.readAsStringSync()),
+      );
+      if (imei != null && cache.imei != imei) return null;
+      return FetchResult.cache(
+        fetchTime: fileCache.lastModifiedSync(),
+        data: cache,
+      );
+    } catch (e, s) {
+      log.handle(e, s);
+      return null;
+    }
   }
 
-  static String normalizeImei(String raw) {
-    final parsed = tryParseImei(raw.trim());
-    if (parsed == null) {
-      throw AirconImeiInvalidException(raw);
+  static void saveCache(AirconEnergyInfo info) {
+    if (!isCacheExist) {
+      fileCache.createSync(recursive: true);
     }
-    return parsed;
+    fileCache.writeAsStringSync(jsonEncode(info.toJson()));
   }
 
-  Future<AirconEnergyInfo> getEnergyInfo(String rawImei) async {
-    final imei = normalizeImei(rawImei);
-    final response = await dio.get(
-      "https://$host/api/device/direct/state",
-      queryParameters: {"imei": imei},
-      options: Options(contentType: Headers.jsonContentType),
-    );
-
-    final data = response.data;
-    if (data is! Map) {
-      throw const AirconEnergyParseException("response is not a map");
+  static void clearCache() {
+    if (!AirconSession.fileCache.existsSync()) {
+      return;
     }
-
-    return AirconEnergyInfo.fromJuhaolianJson(Map<String, dynamic>.from(data));
+    AirconSession.fileCache.deleteSync();
   }
 
   static List<ElectricityHistoryInfo> getEnergyHistory() {
@@ -84,13 +115,43 @@ class AirconSession extends NetworkSession {
       fileHistory.deleteSync();
     }
   }
+
+  Future<AirconEnergyInfo> getEnergyInfo(String imei) async {
+    final response = await dio.get(
+      "https://$host/api/device/direct/state",
+      queryParameters: {"imei": imei},
+      options: Options(contentType: Headers.jsonContentType),
+    );
+
+    final data = response.data;
+
+    if (data is! Map) {
+      log.error("[AirconSession][getEnergyInfo] response is not a map: $data");
+      throw const AirconEnergyParseException("response is not a map");
+    }
+
+    if (data["success"] != true) {
+      throw AirconEnergyParseException(data["message"]?.toString() ?? "");
+    }
+
+    return AirconEnergyInfo(
+      imei: data["result"]["imei"] ?? "",
+      fetchTime: DateTime.fromMillisecondsSinceEpoch(data["timestamp"] as int),
+      stateTime: DateTime.fromMillisecondsSinceEpoch(
+        (data["result"]["timestamp"] as int) * 1000,
+      ),
+      electricAmount: data["result"]["electricAmount"],
+    );
+  }
 }
 
-class AirconImeiInvalidException implements Exception {
-  final String raw;
+class AirconEnergyParseException implements Exception {
+  final String message;
 
-  const AirconImeiInvalidException(this.raw);
+  const AirconEnergyParseException(this.message);
 
   @override
-  String toString() => "Invalid aircon IMEI: $raw";
+  String toString() => message.isEmpty
+      ? "Aircon energy response parse failed"
+      : "Aircon energy response parse failed: $message";
 }

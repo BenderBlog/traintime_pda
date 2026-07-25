@@ -365,6 +365,7 @@ electricity:
     History will be recorded locally while average usage is based on the electric
     meter's record."
   fetching_hint: Fetching the latest electricity info.
+  fetch_error: Failed to fetch electricity information. Please retry.
   date: Date
   power: Remaining
   update: Refresh
@@ -372,6 +373,10 @@ electricity:
   water_usage_read_before: Last time
   water_usage_read_now: This time
   water_usage: Bath water usage
+  water_title: Water usage
+  water_loading: Loading water usage information
+  water_unavailable: Water usage is unavailable. Retry from the electricity card.
+  water_empty: No water usage information
   not_school_network: Not school network
   aircon_title: Aircon Electricity
   aircon_imei: Aircon IMEI
@@ -380,6 +385,9 @@ electricity:
   aircon_waiting: Waiting to fetch aircon electricity data
   aircon_error: Failed to fetch aircon electricity data
   aircon_retry: Retry
+  aircon_imei_missing: Add the aircon IMEI to view its electricity usage.
+  aircon_add_imei: Add aircon IMEI
+  aircon_cache_notice: "Showing cached aircon data from {time}"
 empty_classroom:
   title: Empty Classrooms
   date: Date {date}

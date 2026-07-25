@@ -319,6 +319,7 @@ electricity:
 
     歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。'
   fetching_hint: 正在獲取最新電費信息
+  fetch_error: 電費信息獲取失敗，請重試。
   date: 日期
   power: 該日0點電量
   update: 刷新信息
@@ -326,6 +327,10 @@ electricity:
   water_usage_read_before: 上次讀數
   water_usage_read_now: 本次讀數
   water_usage: 洗澡水用量
+  water_title: 水費信息
+  water_loading: 正在加載水費信息
+  water_unavailable: 水費信息暫不可用，請在電費卡片重試。
+  water_empty: 暫無水費信息
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
   aircon_imei: 空調 IMEI
@@ -334,6 +339,9 @@ electricity:
   aircon_waiting: 等待獲取空調用電信息
   aircon_error: 空調用電獲取失敗
   aircon_retry: 重試
+  aircon_imei_missing: 尚未添加空調 IMEI，添加後即可查看空調用電信息。
+  aircon_add_imei: 添加空調 IMEI
+  aircon_cache_notice: 當前顯示空調緩存數據，緩存時間：{time}
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}

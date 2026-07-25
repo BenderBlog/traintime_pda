@@ -8,9 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
-import 'package:watermeter/controller/energy_controller.dart';
+import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/aircon_session.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -29,7 +28,7 @@ DecodeParams _airconQrImageDecodeParams({bool isMultiScan = false}) =>
 
 String? _tryParseAirconImei(Codes results) {
   for (final result in results.codes) {
-    final imei = AirconSession.tryParseImei(result.text ?? "");
+    final imei = AirconController.tryParseImei(result.text ?? "");
     if (imei != null) return imei;
   }
   return null;
@@ -84,7 +83,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
       );
       if (!mounted) return;
 
-      var imei = AirconSession.tryParseImei(result.text ?? "");
+      var imei = AirconController.tryParseImei(result.text ?? "");
       if (imei == null) {
         final results = await zx.readBarcodesImagePathString(
           path,
@@ -114,7 +113,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
 
   Future<void> _save() async {
     try {
-      await EnergyController.i.updateAirconImei(_controller.text);
+      await AirconController.i.updateImei(_controller.text);
       if (!mounted) return;
       showToast(
         context: context,
@@ -131,7 +130,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
   }
 
   Future<void> _clear() async {
-    await EnergyController.i.clearAirconImei();
+    await AirconController.i.clearImei();
     if (!mounted) return;
     showToast(
       context: context,
