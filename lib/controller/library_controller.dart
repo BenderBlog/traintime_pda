@@ -9,6 +9,7 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart';
 class LibraryController {
   static final LibraryController i = LibraryController._();
   bool _isReloading = false;
+  final Map<int, Future<List<BookLocation>>> _bookLocationFutures = {};
 
   LibraryController._();
 
@@ -32,5 +33,22 @@ class LibraryController {
     } finally {
       _isReloading = false;
     }
+  }
+
+  Future<List<BookLocation>> loadBookLocations(BookInfo book) {
+    final items = book.items;
+    if (items != null) {
+      return Future.value(items);
+    }
+
+    return _bookLocationFutures.putIfAbsent(book.docNumber, () async {
+      try {
+        return await LibrarySession().bookLocations(book.docNumber);
+      } catch (e, s) {
+        _bookLocationFutures.remove(book.docNumber);
+        log.handle(e, s, "[LibraryController][loadBookLocations] Have issue");
+        rethrow;
+      }
+    });
   }
 }

@@ -2,15 +2,14 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
+import 'package:watermeter/page/library/book_info_card.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/library/ebook_place_card.dart';
-import 'package:watermeter/repository/logger.dart';
 
 class BookDetailCard extends StatefulWidget {
   final BookInfo toUse;
@@ -22,6 +21,9 @@ class BookDetailCard extends StatefulWidget {
 }
 
 class _BookDetailCardState extends State<BookDetailCard> {
+  late final Future<List<BookLocation>> _locationsFuture = LibraryController.i
+      .loadBookLocations(widget.toUse);
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -30,33 +32,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CachedNetworkImage(
-                  imageUrl: widget.toUse.imageUrl ?? "",
-                  placeholder: (context, url) => Image.asset(
-                    "assets/art/pda_empty_cover.jpg",
-                    width: 120,
-                    height: 150,
-                    fit: BoxFit.fill,
-                  ),
-                  errorWidget: (context, url, error) => Image.asset(
-                    "assets/art/pda_empty_cover.jpg",
-                    width: 120,
-                    height: 150,
-                    fit: BoxFit.fill,
-                  ),
-                  width: 120,
-                  height: 150,
-                  fit: BoxFit.fitHeight,
-                  alignment: Alignment.center,
-                  errorListener: (e) {
-                    if (e is DioException) {
-                      log.info('Error with Internet error...');
-                    } else {
-                      log.info('Image Exception is: ${e.runtimeType}');
-                    }
-                  },
-                )
-                //.clipRect(clipper: BookImageClipper())
+            BookCover(toUse: widget.toUse, width: 120, height: 150)
                 .clipRRect(all: 14)
                 .padding(all: 2)
                 .decorated(
@@ -212,30 +188,31 @@ class _BookDetailCardState extends State<BookDetailCard> {
                       ],
                     ),
                   ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "library.arrangement_code",
+                  if (widget.toUse.hasBarCodes)
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: FlutterI18n.translate(
+                              context,
+                              "library.arrangement_code",
+                            ),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFBFBFBF),
+                            ),
                           ),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFBFBFBF),
+                          TextSpan(
+                            text: widget.toUse.barCodesStr,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: widget.toUse.barCodesStr,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                 ]
                 .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
                 .flexible(),
@@ -243,20 +220,30 @@ class _BookDetailCardState extends State<BookDetailCard> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (widget.toUse.items != null)
-                ...List.generate(
-                  widget.toUse.items!.length,
-                  (index) => BookPlaceCard(toUse: widget.toUse.items![index]),
-                ),
-              if (widget.toUse.eitems != null)
-                ...List.generate(
-                  widget.toUse.eitems!.length,
-                  (index) => EBookPlaceCard(toUse: widget.toUse.eitems![index]),
-                ),
-            ],
+          child: FutureBuilder<List<BookLocation>>(
+            future: _locationsFuture,
+            builder: (context, snapshot) {
+              final locations = snapshot.data ?? const <BookLocation>[];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ).padding(vertical: 12),
+                  ...List.generate(
+                    locations.length,
+                    (index) => BookPlaceCard(toUse: locations[index]),
+                  ),
+                  if (widget.toUse.eitems != null)
+                    ...List.generate(
+                      widget.toUse.eitems!.length,
+                      (index) =>
+                          EBookPlaceCard(toUse: widget.toUse.eitems![index]),
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ],
