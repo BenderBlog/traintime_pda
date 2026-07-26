@@ -15,7 +15,12 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart';
 
 class BookInfoCard extends StatelessWidget {
   final BookInfo toUse;
-  const BookInfoCard({super.key, required this.toUse});
+  final BoxConstraints constraints;
+  const BookInfoCard({
+    super.key,
+    required this.toUse,
+    required this.constraints,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,167 +28,156 @@ class BookInfoCard extends StatelessWidget {
       BookCover(
         key: ValueKey(toUse.docNumber),
         toUse: toUse,
-      ).clipRRect(all: 14),
-      const SizedBox(width: 10),
+        width: constraints.maxWidth - 16,
+      ).clipRRect(all: 6),
+      const SizedBox(height: 8),
       [
-            Text(
-              toUse.bookName,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.start,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text.rich(
+        Text(
+          toUse.bookName,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.start,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        Text.rich(
+          TextSpan(
+            children: [
               TextSpan(
-                children: [
-                  TextSpan(
-                    text: FlutterI18n.translate(context, "library.author"),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFBFBFBF),
-                    ),
-                  ),
-                  TextSpan(
-                    text:
-                        toUse.author ??
-                        FlutterI18n.translate(context, "library.not_provided"),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                text: FlutterI18n.translate(context, "library.author"),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFBFBFBF),
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+              TextSpan(
+                text:
+                    toUse.author ??
+                    FlutterI18n.translate(context, "library.not_provided"),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: FlutterI18n.translate(context, "library.publish_house"),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFBFBFBF),
+                ),
+              ),
+              TextSpan(
+                text:
+                    toUse.publisherHouse ??
+                    FlutterI18n.translate(context, "library.not_provided"),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: FlutterI18n.translate(context, "library.call_number"),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFBFBFBF),
+                ),
+              ),
+              TextSpan(
+                text: toUse.searchCodeStr,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        [
+          [
             Text.rich(
               TextSpan(
                 children: [
+                  TextSpan(
+                    text: toUse.canBeBorrowed?.toString() ?? "0",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: (toUse.canBeBorrowed ?? 0) > 0
+                          ? Colors.green
+                          : Colors.orange,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   TextSpan(
                     text: FlutterI18n.translate(
                       context,
-                      "library.publish_house",
+                      "library.avaliable_borrow",
                     ),
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFFBFBFBF),
                     ),
                   ),
-                  TextSpan(
-                    text:
-                        toUse.publisherHouse ??
-                        FlutterI18n.translate(context, "library.not_provided"),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                 ],
               ),
+            ),
+            const Text(
+              " / ",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             Text.rich(
               TextSpan(
                 children: [
                   TextSpan(
-                    text: FlutterI18n.translate(context, "library.call_number"),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    text: toUse.totalStorage?.toString() ?? "0",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: (toUse.totalStorage ?? 0) > 0
+                          ? Colors.green
+                          : Colors.yellow,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFBFBFBF),
                     ),
                   ),
                   TextSpan(
-                    text: toUse.searchCodeStr,
+                    text: FlutterI18n.translate(context, "library.storage"),
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
+                      color: Color(0xFFBFBFBF),
                     ),
                   ),
                 ],
               ),
             ),
-            [
-              [
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: toUse.canBeBorrowed?.toString() ?? "0",
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: (toUse.canBeBorrowed ?? 0) > 0
-                              ? Colors.green
-                              : Colors.orange,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      TextSpan(
-                        text: FlutterI18n.translate(
-                          context,
-                          "library.avaliable_borrow",
-                        ),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFBFBFBF),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Text(
-                  " / ",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: toUse.totalStorage?.toString() ?? "0",
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: (toUse.totalStorage ?? 0) > 0
-                              ? Colors.green
-                              : Colors.yellow,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      TextSpan(
-                        text: FlutterI18n.translate(context, "library.storage"),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFBFBFBF),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ].toRow(),
-            ].toRow(mainAxisAlignment: MainAxisAlignment.end),
-          ]
-          .toColumn(crossAxisAlignment: CrossAxisAlignment.stretch)
-          .center()
-          .expanded(),
-    ].toRow().padding(all: 12).card(elevation: 0);
+          ].toRow(),
+        ].toRow(mainAxisAlignment: MainAxisAlignment.end),
+      ].toColumn(crossAxisAlignment: CrossAxisAlignment.start),
+    ].toColumn().padding(all: 12).card(elevation: 0);
   }
 }
 
 class BookCover extends StatefulWidget {
   final BookInfo toUse;
   final double width;
-  final double height;
 
-  const BookCover({
-    super.key,
-    required this.toUse,
-    this.width = 176 * 0.6,
-    this.height = 250 * 0.6,
-  });
+  const BookCover({super.key, required this.toUse, this.width = 176 * 0.6});
 
   @override
   State<BookCover> createState() => _BookCoverState();
@@ -242,8 +236,7 @@ class _BookCoverState extends State<BookCover> {
       placeholder: (context, url) => _emptyCover(),
       errorWidget: (context, url, error) => _emptyCover(),
       width: widget.width,
-      height: widget.height,
-      fit: BoxFit.fitHeight,
+      fit: BoxFit.fill,
       alignment: Alignment.center,
       errorListener: (e) {
         if (e is DioException) {
@@ -259,7 +252,6 @@ class _BookCoverState extends State<BookCover> {
     return Image.asset(
       "assets/art/pda_empty_cover.jpg",
       width: widget.width,
-      height: widget.height,
       fit: BoxFit.fill,
     );
   }

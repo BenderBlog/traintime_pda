@@ -2,7 +2,10 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/page/library/search_book_constant.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +16,6 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart'
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
-
-const double _searchPanelMaxWidth = 760;
-const double _resultCardMaxWidth = 360;
 
 enum SearchPanelMode { normal, advanced }
 
@@ -151,7 +151,8 @@ class _SearchBookWindowState extends State<SearchBookWindow>
         children: [
           _buildSearchArea(context)
               .padding(horizontal: 8, vertical: 4)
-              .constrained(maxWidth: _searchPanelMaxWidth),
+              .constrained(maxWidth: searchPanelMaxWidth)
+              .center(),
           if (_hasSearched) _buildResultList().expanded(),
         ],
       ),
@@ -163,24 +164,21 @@ class _SearchBookWindowState extends State<SearchBookWindow>
       controller: _pagingController,
       builder: (context, state, fetchNextPage) => LayoutBuilder(
         builder: (context, constraints) {
-          final crossAxisCount = (constraints.maxWidth ~/ _resultCardMaxWidth).clamp(1, 6);
           return PagedMasonryGridView<int, BookInfo>.count(
             state: state,
             fetchNextPage: fetchNextPage,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            crossAxisCount: crossAxisCount,
+            padding: const EdgeInsets.all(4),
+            crossAxisCount: max(1, constraints.maxWidth ~/ resultCardMaxWidth),
             mainAxisSpacing: 4,
             crossAxisSpacing: 4,
             builderDelegate: PagedChildBuilderDelegate<BookInfo>(
-              itemBuilder: (context, item, index) =>
-                  GestureDetector(
-                        child: BookInfoCard(toUse: item),
-                        onTap: () => _openBookDetail(item),
-                      )
-                      .padding(horizontal: 12, vertical: 2)
-                      .width(double.infinity)
-                      .constrained(width: _resultCardMaxWidth)
-                      .center(),
+              itemBuilder: (context, item, index) => GestureDetector(
+                child: LayoutBuilder(
+                  builder: (context, constraints) =>
+                      BookInfoCard(toUse: item, constraints: constraints),
+                ),
+                onTap: () => _openBookDetail(item),
+              ),
               firstPageProgressIndicatorBuilder: (context) =>
                   const Center(child: CircularProgressIndicator()),
               firstPageErrorIndicatorBuilder: (context) => ReloadWidget(
@@ -206,18 +204,24 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                   ),
                 ),
               ),
+
+              // 致 Codex
+              // 1. 文字需要国际化
+              // 2. 文字大小和图标大小需要修改
+              // 3. 图标是不是可以换一个
               noMoreItemsIndicatorBuilder: (context) =>
                   [
-                        Icon(Icons.sentiment_very_satisfied, size: 32),
+                        Icon(Icons.sentiment_very_satisfied, size: 24),
                         SizedBox(width: 8),
                         Text(
-                          "That's all folks!",
-                          style: Theme.of(context).textTheme.titleLarge,
+                          "没有更多数据了",
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ]
                       .toRow(mainAxisAlignment: MainAxisAlignment.center)
                       .padding(vertical: 12)
-                      .center(),
+                      .center()
+                      .card(elevation: 0),
             ),
           );
         },
